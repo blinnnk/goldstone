@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.component
+package io.goldstone.blockchain.common.component.container
 
 import android.content.Context
 import android.widget.ImageView
@@ -9,6 +9,7 @@ import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.ScreenSize

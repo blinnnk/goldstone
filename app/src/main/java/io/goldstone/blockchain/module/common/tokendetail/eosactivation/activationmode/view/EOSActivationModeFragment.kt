@@ -9,7 +9,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionView
+import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont

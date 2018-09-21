@@ -2,6 +2,8 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemoryd
 
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMMarketHeaderModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.model.RAMMarketModel
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
@@ -19,7 +21,8 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 
 	}
 
-	fun getIsMainnet() {
+	fun getIsMainnet() {}
 
-	}
+	var ramMarketModel = RAMMarketModel(RAMMarketHeaderModel())
+
 }

@@ -4,6 +4,7 @@ package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.CommonText
@@ -17,6 +18,7 @@ import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import org.jetbrains.anko.doAsync
@@ -218,11 +220,14 @@ fun Context.getPrivateKeyByWalletID(
 		walletID,
 		errorCallback
 	) { it ->
-		WalletUtil.getKeyPairFromWalletFile(
-			it,
-			password,
-			errorCallback
-		)?.let { hold(it.privateKey) }
+		doAsync {
+			// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
+			WalletUtil.getKeyPairFromWalletFile(
+				it,
+				password,
+				errorCallback
+			)?.let { GoldStoneAPI.context.runOnUiThread { hold(it.privateKey) } }
+		}
 	}
 }
 
@@ -286,7 +291,7 @@ fun Context.deleteAccountByWalletID(
 fun Context.verifyCurrentWalletKeyStorePassword(
 	password: String,
 	walletID: Int,
-	hold: (Boolean) -> Unit
+	@WorkerThread hold: (Boolean) -> Unit
 ) {
 	doAsync {
 		val currentType = Config.getCurrentWalletType()

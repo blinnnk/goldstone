@@ -52,11 +52,11 @@ class EOSAccountSelectionPresenter(
 					currentChainNames.forEach { account ->
 						EOSAccountTable.getAccountByName(account.name, false) { localAccount ->
 							// 本地为空的话从网络获取数据
-							if (localAccount.isNull()) EOSAPI.getAccountInfoByName(
+							if (localAccount.isNull()) EOSAPI.getAccountInfo(
 								account.name,
 								{
 									completeMark()
-									LogUtil.error("getAccountInfoByName", it)
+									LogUtil.error("getAccountInfo", it)
 								}
 							) { eosAccount ->
 								actors.addAll(getAccountActorByPublicKey(eosAccount, account.name))

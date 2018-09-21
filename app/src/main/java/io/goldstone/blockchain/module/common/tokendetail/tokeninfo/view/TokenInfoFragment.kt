@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.SessionTitleView
+import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText

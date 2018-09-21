@@ -19,7 +19,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 	
-	private val candleChart by lazy { EOSRAMPriceTrendCandleChart(context!!) }
+	val candleChart by lazy { EOSRAMPriceTrendCandleChart(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
 	
 	val ramInformationHeader by lazy { RAMInformationHeader(context!!) }
@@ -39,21 +39,7 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 		)
 		menu.getButton { button ->
 			button.onClick {
-				val dateType = when(button.id) {
-					EOSRAMChartType.Minute.code -> DateUtils.FORMAT_SHOW_TIME
-					EOSRAMChartType.Hour.code -> DateUtils.FORMAT_SHOW_TIME
-					EOSRAMChartType.Day.code -> DateUtils.FORMAT_SHOW_DATE
-					else -> DateUtils.FORMAT_SHOW_TIME
-				}
-				
-				val period = when(button.id) {
-					EOSRAMChartType.Minute.code -> EOSRAMChartType.Minute.info
-					EOSRAMChartType.Hour.code -> EOSRAMChartType.Hour.info
-					EOSRAMChartType.Day.code -> EOSRAMChartType.Day.info
-					else -> EOSRAMChartType.Minute.info
-				}
-				
-				presenter.updateCandleData(candleChart, period,  dateType)
+				updateCurrentData(button.id)
 				menu.selected(button.id)
 				button.preventDuplicateClicks()
 			}
@@ -63,7 +49,34 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 			addView(ramInformationHeader)
 			addView(menu)
 			addView(candleChart)
-			presenter.updateCandleData(candleChart, EOSRAMChartType.Minute.info, DateUtils.FORMAT_SHOW_TIME)
+			presenter.updateEosRamPriceTrend(EOSRAMChartType.Minute.info, DateUtils.FORMAT_SHOW_TIME)
 		}
+	}
+	
+	private fun updateCurrentData(buttonId: Int){
+		val dateType = when(buttonId) {
+			EOSRAMChartType.Minute.code -> DateUtils.FORMAT_SHOW_TIME
+			EOSRAMChartType.Hour.code -> DateUtils.FORMAT_SHOW_TIME
+			EOSRAMChartType.Day.code -> DateUtils.FORMAT_SHOW_DATE
+			else -> DateUtils.FORMAT_SHOW_TIME
+		}
+		
+		val period = when(buttonId) {
+			EOSRAMChartType.Minute.code -> EOSRAMChartType.Minute.info
+			EOSRAMChartType.Hour.code -> EOSRAMChartType.Hour.info
+			EOSRAMChartType.Day.code -> EOSRAMChartType.Day.info
+			else -> EOSRAMChartType.Minute.info
+		}
+		presenter.updateEosRamPriceTrend(period,  dateType)
+	}
+	
+	override fun onPause() {
+		super.onPause()
+		presenter.onPause()
+	}
+	
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		presenter.onHiddenChanged(hidden)
 	}
 }

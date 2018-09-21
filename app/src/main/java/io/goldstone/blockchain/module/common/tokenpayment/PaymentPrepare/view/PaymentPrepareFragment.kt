@@ -11,8 +11,8 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.ValueInputView
-import io.goldstone.blockchain.common.component.WalletEditText
+import io.goldstone.blockchain.common.component.edittext.ValueInputView
+import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell

@@ -8,7 +8,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.RadiusButton
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.glideImage

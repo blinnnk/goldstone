@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -19,9 +20,7 @@ fun TokenDetailPresenter.loadEOSDataFromChain(localMaxIndex: Int) {
 	val accountName = Config.getCurrentEOSName()
 	EOSAPI.getTransactionsLastIndex(
 		accountName,
-		{
-			LogUtil.error("loadEOSChainData", it)
-		}
+		{ LogUtil.error("loadEOSChainData", it) }
 	) { transactionCount ->
 		loadTransactionsFromChain(
 			accountName,
@@ -44,7 +43,7 @@ private fun loadTransactionsFromChain(
 	localDataMaxIndex: Int,
 	transactionCount: Int,
 	errorCallback: (Throwable) -> Unit,
-	successCallback: (hasData: Boolean) -> Unit
+	@WorkerThread successCallback: (hasData: Boolean) -> Unit
 ) {
 	val pageInfo = EOSAPI.getPageInfo(localDataMaxIndex, transactionCount)
 	// 意味着网络没有更新的数据直接返回
@@ -65,11 +64,16 @@ private fun loadTransactionsFromChain(
 		 * 需要时刻跟进随时更改这里的实现.
 		 * */
 		// Calculate All Inputs to get transfer value
-		successCallback(
-			transactionList.asSequence().distinctBy { it.txID }.map {
-				// 插入转账数据到数据库
-				EOSTransactionTable.preventDuplicateInsert(accountName, it)
-			}.toList().isNotEmpty()
-		)
+		val newData = transactionList.asSequence().filterNot {
+			// 某些非交易类的行为会在多条重复的 Action 中夹杂 From 和 To 的值为空的数据跳步
+			// 在去重复处理的时候有的时候会被保留, 这里首先移除这种情况的数据
+			it.transactionData.fromName.isEmpty() || it.transactionData.toName.isEmpty()
+		}.distinctBy {
+			it.txID
+		}.map {
+			// 插入转账数据到数据库
+			EOSTransactionTable.preventDuplicateInsert(accountName, it)
+		}.toList()
+		successCallback(newData.isNotEmpty())
 	}
 }

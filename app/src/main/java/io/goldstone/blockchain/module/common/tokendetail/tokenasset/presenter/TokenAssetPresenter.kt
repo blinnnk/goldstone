@@ -14,11 +14,14 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.cputradingdetail.view.CPUTradingFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.nettradingdetail.view.NETTradingFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.ramtradingdetail.view.RAMTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.view.TokenAssetFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -40,6 +43,13 @@ class TokenAssetPresenter(
 
 	private val currentAddress by lazy {
 		CoinSymbol(tokenInfo?.symbol).getAddress()
+	}
+
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		// 在详情界面有可能有 `Stake` 或 `Trade` 操作这里, 恢复显示的时候从
+		// 数据库更新一次信息
+		updateAccountInfo()
 	}
 
 	override fun onFragmentViewCreated() {
@@ -69,42 +79,51 @@ class TokenAssetPresenter(
 	}
 
 	fun showResourceTradingFragmentByTitle(title: String) {
+		val tokenDetailOverlayPresenter =
+			fragment.getGrandFather<TokenDetailOverlayFragment>()?.presenter
 		when (title) {
-			TokenDetailText.delegateCPU -> fragment.getGrandFather<TokenDetailOverlayFragment>()
-				?.presenter?.showTargetFragment<CPUTradingFragment>(
-				TokenDetailText.tradingCPU,
-				TokenDetailText.tokenDetail,
-				Bundle(),
-				2
-			)
-			TokenDetailText.delegateNET -> fragment.getGrandFather<TokenDetailOverlayFragment>()
-				?.presenter?.showTargetFragment<CPUTradingFragment>(
-				TokenDetailText.tradingCPU,
-				TokenDetailText.tokenDetail,
-				Bundle(),
-				2
-			)
-			TokenDetailText.tradeRAM -> fragment.getGrandFather<TokenDetailOverlayFragment>()
-				?.presenter?.showTargetFragment<CPUTradingFragment>(
-				TokenDetailText.tradingCPU,
-				TokenDetailText.tokenDetail,
-				Bundle(),
-				2
-			)
+			TokenDetailText.delegateCPU -> tokenDetailOverlayPresenter
+				?.showTargetFragment<CPUTradingFragment>(
+					TokenDetailText.tradingCPU,
+					TokenDetailText.tokenDetail,
+					Bundle(),
+					2
+				)
+			TokenDetailText.delegateNET -> tokenDetailOverlayPresenter
+				?.showTargetFragment<NETTradingFragment>(
+					TokenDetailText.tradingNET,
+					TokenDetailText.tokenDetail,
+					Bundle(),
+					2
+				)
+			TokenDetailText.tradeRAM -> tokenDetailOverlayPresenter
+				?.showTargetFragment<RAMTradingFragment>(
+					TokenDetailText.tradingRAM,
+					TokenDetailText.tokenDetail,
+					Bundle(),
+					2
+				)
 		}
 	}
 
-	private fun updateAccountInfo() {
+	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
 		val accountName = Config.getCurrentEOSName()
-		EOSAPI.getAccountInfoByName(
-			accountName,
-			{
-				LogUtil.error("getAccountInfoByName", it)
-			}
-		) { eosAccount ->
-			EOSAccountTable.update(eosAccount, accountName)
-			GoldStoneAPI.context.runOnUiThread {
-				eosAccount.updateUIValue()
+		EOSAccountTable.getAccountByName(accountName) { localData ->
+			// 首先显示数据库的数据在界面上
+			localData?.updateUIValue()
+			if (onlyUpdateLocalData) return@getAccountByName
+			EOSAPI.getAccountInfo(
+				accountName,
+				{
+					LogUtil.error("getAccountInfo", it)
+				}
+			) { eosAccount ->
+				val newData =
+					if (localData.isNull()) eosAccount else eosAccount.apply { this.id = localData!!.id }
+				GoldStoneDataBase.database.eosAccountDao().update(newData)
+				GoldStoneAPI.context.runOnUiThread {
+					eosAccount.updateUIValue()
+				}
 			}
 		}
 	}
@@ -154,10 +173,10 @@ class TokenAssetPresenter(
 
 	private fun checkAndSetAccountValue() {
 		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
-			if (account.isNull()) EOSAPI.getAccountInfoByName(
+			if (account.isNull()) EOSAPI.getAccountInfo(
 				Config.getCurrentEOSName(),
 				{
-					LogUtil.error("getAccountInfoByName", it)
+					LogUtil.error("getAccountInfo", it)
 				}
 			) {
 				EOSAccountTable.preventDuplicateInsert(it)

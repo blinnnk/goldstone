@@ -44,8 +44,8 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(keyboardWidth, keyboardHeight)
 		(0 until totalCount).forEach { index ->
 			textView {
-				text = if (index == 9) "0" else if (index == 10) CommonText.cancel else (index + 1).toString()
-				textSize = if (index == 10) fontSize(12) else fontSize(30)
+				text = if (index == 9) "0" else if (index == deleteButtonIndex) CommonText.cancel else (index + 1).toString()
+				textSize = if (index == deleteButtonIndex) fontSize(12) else fontSize(30)
 				typeface = GoldStoneFont.heavy(context)
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER

@@ -148,9 +148,7 @@ class TokenSearchPresenter(
 	) {
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
-			{ error, reason ->
-				fragment.context?.alert(reason ?: error.toString())
-			},
+			{ fragment.context?.alert(it.message) },
 			Config.getCurrentChainName()
 		) { symbol, name, decimal ->
 			if (symbol.isEmpty() || name.isEmpty()) {

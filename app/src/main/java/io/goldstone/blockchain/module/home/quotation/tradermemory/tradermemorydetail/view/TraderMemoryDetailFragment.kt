@@ -40,6 +40,9 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {}
 
 					// 内存交易记录列表
+					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {
+						putSerializable("model", presenter.ramMarketModel)
+					}
 					frameLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
 							topMargin = 10.uiPX()

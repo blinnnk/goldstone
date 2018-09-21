@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto.utils
 
-import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import java.math.BigInteger
 
 /**
@@ -8,9 +7,7 @@ import java.math.BigInteger
  * @author KaySaith
  */
 fun String.toAscii(removeBlank: Boolean = true): String {
-	var hex =
-		if (substring(0, 2).equals(SolidityCode.ethTransfer, true)) substring(2, length)
-		else this
+	var hex = clean0xPrefix()
 	var ascii = ""
 	var string: String
 	// Convert hex string to "even" length

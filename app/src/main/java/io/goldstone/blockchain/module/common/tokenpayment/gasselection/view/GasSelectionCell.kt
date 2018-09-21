@@ -9,7 +9,7 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum

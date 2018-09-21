@@ -2,13 +2,14 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyRadioButton
-import com.blinnnk.extension.*
+import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.GrayCardView
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.container.GrayCardView
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
@@ -40,7 +41,7 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 	}
 
 	init {
-		setCardParams(ScreenSize.widthWithPadding, 70.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 70.uiPX())
 		addView(cellContainer)
 		cellContainer.addView(info)
 		info.setCenterInVertical()

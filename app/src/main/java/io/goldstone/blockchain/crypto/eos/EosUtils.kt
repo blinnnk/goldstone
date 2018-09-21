@@ -5,6 +5,7 @@ import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isEvenCount
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
+import io.goldstone.blockchain.crypto.eos.transaction.completeZero
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
@@ -82,12 +83,7 @@ object EOSUtils {
 		val amountHex = amount.toString(16)
 		val evenCountHex = amountHex.completeToEvent()
 		val littleEndianAmountHex = toLittleEndian(evenCountHex)
-		var completeZero = ""
-		val completeCount = 16 - littleEndianAmountHex.count()
-		for (index in 0 until completeCount) {
-			completeZero += "0"
-		}
-		return littleEndianAmountHex + completeZero
+		return littleEndianAmountHex.completeZero(16 - littleEndianAmountHex.count())
 	}
 
 	fun getEvenHexOfDecimal(decimal: Int): String {

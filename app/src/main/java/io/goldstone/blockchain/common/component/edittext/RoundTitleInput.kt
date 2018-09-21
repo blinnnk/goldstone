@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.component
+package io.goldstone.blockchain.common.component.edittext
 
 import android.content.Context
 import android.graphics.PorterDuff
@@ -86,6 +86,14 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 	fun showButton() {
 		editText.rightPadding = 45.uiPX()
 		button.visibility = View.VISIBLE
+	}
+
+	fun getContent(): String {
+		return if (editText.text.isNullOrEmpty()) editText.hint.toString() else editText.text.toString()
+	}
+
+	fun clearText() {
+		editText.text.clear()
 	}
 
 	fun setButtonClickEvent(action: () -> Unit) {

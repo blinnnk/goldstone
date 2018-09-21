@@ -9,7 +9,6 @@ import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -309,10 +308,9 @@ private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
 		MyTokenTable.getBalanceByContract(
 			contract,
 			address,
-			{ error, reason ->
-				fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-				LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+			{
+				fragment.context?.alert(it.message)
+				callback()
 			}
 		) {
 			MyTokenTable.updateBalanceByContract(it, address, contract)

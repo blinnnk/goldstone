@@ -1,9 +1,10 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
@@ -28,7 +29,7 @@ object LitecoinApi {
 
 	fun getUnspentListByAddress(
 		address: String,
-		hold: (List<UnspentModel>) -> Unit
+		@WorkerThread hold: (List<UnspentModel>) -> Unit
 	) {
 		BTCSeriesApiUtils.getUnspentListByAddress(
 			LitecoinUrl.getUnspentInfo(address),
@@ -86,7 +87,7 @@ object LitecoinApi {
 					address,
 					CoinSymbol.ltc,
 					false,
-					MultiChainType.LTC.id
+					ChainType.LTC.id
 				)
 			)
 		}

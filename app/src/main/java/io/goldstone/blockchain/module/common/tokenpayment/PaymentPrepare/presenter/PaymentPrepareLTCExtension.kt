@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.scaleTo
@@ -13,7 +14,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
-import io.goldstone.blockchain.crypto.error.TransferError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -34,7 +36,7 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareLTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	callback: (TransferError) -> Unit
+	callback: (GoldStoneError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
 		callback(TransferError.IncorrectDecimal)
@@ -55,9 +57,9 @@ fun PaymentPreparePresenter.prepareLTCPaymentModel(
 private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	count: Double,
 	changeAddress: String,
-	hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
+	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = CoinSymbol.getLTC().getAddress()
+	val myAddress = CoinSymbol.LTC.getAddress()
 	val chainName =
 		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -98,7 +100,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.None, it)
+					hold(GoldStoneError.None, it)
 				}
 			}
 		}

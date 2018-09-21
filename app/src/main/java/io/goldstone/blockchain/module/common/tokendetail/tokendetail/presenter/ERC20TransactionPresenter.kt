@@ -1,13 +1,9 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/8/14 5:02 PM
@@ -29,12 +25,6 @@ fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListMode
 			transactionListModel.find { it.contract == token?.contract }.isNotNull {
 				// 有数据后重新执行从数据库拉取数据
 				loadDataFromDatabaseOrElse()
-			} otherwise {
-				GoldStoneAPI.context.runOnUiThread {
-					// 链上和本地都没有数据就更新一个空数组作为默认
-					fragment.updatePageBy(arrayListOf(), Config.getCurrentEthereumAddress())
-					fragment.removeLoadingView()
-				}
 			}
 		}
 	}

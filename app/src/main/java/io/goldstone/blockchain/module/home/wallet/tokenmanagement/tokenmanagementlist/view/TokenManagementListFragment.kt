@@ -6,7 +6,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.component.AttentionTextView
+import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity

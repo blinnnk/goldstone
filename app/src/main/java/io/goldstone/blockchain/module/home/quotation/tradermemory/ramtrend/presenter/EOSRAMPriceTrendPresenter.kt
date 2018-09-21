@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.presenter
 
 import android.annotation.SuppressLint
+import android.os.Handler
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -29,9 +30,29 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	private var todayOpenPrice: String? = null
 	private var todayCurrentPrice: String? = null
 	
-	@SuppressLint("SetTextI18n")
+	private var needRefresh = true
+	
+	private val priceTrendHandler = Handler()
+	
+	private val priceTrendRunnable = Runnable {
+		updateHeaderData()
+		postPriceTrend()
+	}
+	
+	private fun postPriceTrend() {
+		if (needRefresh) {
+			priceTrendHandler.postDelayed(priceTrendRunnable, 20 *1000)
+		}
+	}
+	
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
+		updateHeaderData()
+	}
+	
+	@SuppressLint("SetTextI18n")
+	private fun updateHeaderData() {
+		LogUtil.debug("updateheadData", "update")
 		getTodayPrice()
 		EOSRAMUtil.getRAMPrice(EOSUnit.KB) {
 			GoldStoneAPI.context.runOnUiThread {
@@ -51,7 +72,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 					val gbDivisior = Math.pow(1024.toDouble(), 3.toDouble())
 					var maxAmount = BigDecimal(it.maxRamSize)
 					var reservedAmount = BigDecimal(it.totalRamBytesReserved)
-					var percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
+					val percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
 					maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
 					reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
 					fragment.ramInformationHeader.apply {
@@ -66,37 +87,25 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	}
 	
 	
-	fun updateCandleData(
-		candleChart: EOSRAMPriceTrendCandleChart,
-		pair: String,
-		dateType: Int
-	) {
-		updateEosRamPriceTrendcy(candleChart, pair , dateType)
-	}
-	
-	private fun updateEosRamPriceTrendcy(
-		candleChart: EOSRAMPriceTrendCandleChart,
+	fun updateEosRamPriceTrend(
 		period: String,
 		dateType: Int
 	) {
 		// 请求的数据条目数量
 		val size = DataValue.candleChartCount
-		fragment.getMainActivity()?.showLoadingView()
 		GoldStoneAPI.getEOSRAMPriceTendcyCandle(
 			period,
 			size,
 			{
 				// Show the error exception to user
 				fragment.context.alert(it.toString().showAfterColonContent())
-				fragment.getMainActivity()?.removeLoadingView()
-				candleChart.updateCandleChartUI(arrayListOf(), dateType)
+				fragment.candleChart.updateCandleChartUI(arrayListOf(), dateType)
 			}
 		) {
 			// 把数据更新到数据库
 			// 更新 `UI` 界面
 			GoldStoneAPI.context.runOnUiThread {
-				fragment.getMainActivity()?.removeLoadingView()
-				candleChart.updateCandleChartUI(it, dateType)
+				fragment.candleChart.updateCandleChartUI(it, dateType)
 			}
 		}
 	}
@@ -137,12 +146,13 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		}
 	}
 	
+	@SuppressLint("SetTextI18n")
 	private fun setTrendPercent() {
 		todayOpenPrice?.let { open ->
 			todayCurrentPrice?.let { current ->
 				var trend = (current.toDouble() - open.toDouble()) / open.toDouble()
 				trend *= 100.toDouble()
-				var trendBigDecimal = BigDecimal(trend).divide(BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP)
+				val trendBigDecimal = BigDecimal(trend).divide(BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP)
 				fragment.ramInformationHeader.apply {
 					if (trend > 0) {
 						trendcyPercent.text = "+$trendBigDecimal%"
@@ -155,6 +165,36 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 			}
 		}
 	}
+	
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		needRefresh = false
+		priceTrendHandler.removeCallbacks(priceTrendRunnable)
+	}
+	
+	fun onPause(){
+		needRefresh = false
+		priceTrendHandler.removeCallbacks(priceTrendRunnable)
+	}
+	
+	override fun onFragmentResume() {
+		super.onFragmentResume()
+		priceTrendHandler.removeCallbacks(priceTrendRunnable)
+		needRefresh = true
+		postPriceTrend()
+	}
+	
+	fun onHiddenChanged(hidden: Boolean) {
+		if (hidden) {
+			needRefresh = false
+			priceTrendHandler.removeCallbacks(priceTrendRunnable)
+		} else {
+			needRefresh = true
+			postPriceTrend()
+		}
+	}
+	
 }
 
 

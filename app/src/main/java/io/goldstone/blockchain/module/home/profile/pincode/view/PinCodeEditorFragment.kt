@@ -9,7 +9,7 @@ import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PincodeText
