@@ -95,10 +95,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			isEnabled = true
 		}
 	}
-<<<<<<< HEAD
 
-=======
->>>>>>> fefe84589ec08f95664372caaa588a1e620c8d6d
 	fun setGrayStyle(top: Int? = null) {
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
@@ -117,10 +114,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textPaint.color = GrayScale.midGray
 		invalidate()
 	}
-<<<<<<< HEAD
 
-=======
->>>>>>> fefe84589ec08f95664372caaa588a1e620c8d6d
 	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding, height: Int = buttonHeight) {
 		layoutParams = LinearLayout.LayoutParams(width, height).apply {
 			topMargin = top ?: marginTop
