@@ -7,7 +7,7 @@ import io.goldstone.blockchain.crypto.eos.eosram.EOSSellRamModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.eos.transaction.completeZero
-import io.goldstone.blockchain.crypto.error.GoldStoneError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface

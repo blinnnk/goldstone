@@ -1,19 +1,10 @@
-package io.goldstone.blockchain.crypto.error
+package io.goldstone.blockchain.common.error
 
 
 /**
  * @author KaySaith
  * @date  2018/09/14
  */
-
-open class GoldStoneError(override val message: String, val tag: String = "GoldStoneError") : Throwable(message) {
-	fun isNone(): Boolean = message.equals(GoldStoneError.None.message, true)
-
-	companion object {
-		@JvmStatic
-		val None = GoldStoneError("No errors")
-	}
-}
 
 class TransferError(val content: String) : GoldStoneError(content) {
 	companion object {
@@ -27,6 +18,8 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		val GetChainInfoError = TransferError("get chain info error, please check your net environment")
 		@JvmStatic
 		val TradingInputIsEmpty = TransferError("please enter the count which you will trading")
+		@JvmStatic
+		val wrongRAMInputValue = TransferError("you must enter only Integer because of the unit of selling ram is byte")
 	}
 }
 
@@ -35,25 +28,6 @@ class StakeBandWidthError(override val message: String) : GoldStoneError(message
 		/** EOS Delegate/Refund CPU Errors */
 		@JvmStatic
 		val TransferToSelf = StakeBandWidthError("you can't transfer to you self when stake resource and from account name is same as to account name")
-	}
-}
-
-class EthereumRPCError(override val message: String) : GoldStoneError(message) {
-	companion object {
-		/** EOS Delegate/Refund CPU Errors */
-		@JvmStatic
-		val GetSymbol: (Throwable) -> EthereumRPCError = {
-			EthereumRPCError("Ethereum RPC Error Of Getting Symbol ${it.message}")
-		}
-		@JvmStatic
-		val GetTokenName: (Throwable) -> EthereumRPCError = {
-			EthereumRPCError("Ethereum RPC Error Of Getting Token Name ${it.message}")
-		}
-
-		@JvmStatic
-		val GetTokenDecimal: (Throwable) -> EthereumRPCError = {
-			EthereumRPCError("Ethereum RPC Error Of Getting Token Decimal ${it.message}")
-		}
 	}
 }
 

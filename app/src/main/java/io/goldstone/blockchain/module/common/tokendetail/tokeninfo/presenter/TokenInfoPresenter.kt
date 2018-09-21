@@ -126,7 +126,7 @@ class TokenInfoPresenter(
 					}
 				}
 			tokenInfo?.contract.isETC() -> {
-				TransactionTable.getETCTransactionsByAddress(currentAddress) { transactions ->
+				TransactionTable.getETCTransactions(currentAddress) { transactions ->
 					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
 					// 分别查询 `接收的总值` 和 `支出的总值`
 					val totalReceiveValue =
@@ -145,14 +145,14 @@ class TokenInfoPresenter(
 				}
 			}
 
-			else -> TransactionTable.getERCTransactionsByAddress(currentAddress) { transactions ->
+			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->
 				if (transactions.isEmpty()) {
 					// 本地没有数据的话从链上获取 `Count`
 					GoldStoneEthCall.getUsableNonce(
 						{ error, reason ->
 							LogUtil.error("getUsableNonce $reason", error)
 						},
-						MultiChainType.ETH,
+						ChainType.ETH,
 						currentAddress
 					) {
 						val convertedCount = it.toInt()

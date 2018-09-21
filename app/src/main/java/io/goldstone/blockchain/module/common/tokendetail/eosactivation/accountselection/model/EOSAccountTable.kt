@@ -6,8 +6,6 @@ import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toBigIntegerOrZero
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -72,12 +70,6 @@ data class EOSAccountTable(
 
 	companion object {
 
-		fun isActivationPublicKey(publicKey: String, hold: (Boolean) -> Unit) {
-			load {
-				GoldStoneDataBase.database.eosAccountDao().getByKey(publicKey)
-			} then { hold(!it.isNull()) }
-		}
-
 		fun getAccountByName(
 			name: String,
 			getResultInUIThread: Boolean = true,
@@ -96,6 +88,14 @@ data class EOSAccountTable(
 					if (getAccount(account.name).isNull()) {
 						insert(account)
 					}
+				}
+			}
+		}
+
+		fun deleteByRecordAddress(address: String) {
+			doAsync {
+				GoldStoneDataBase.database.eosAccountDao().apply {
+					deleteAll(getByKey(address))
 				}
 			}
 		}
@@ -129,7 +129,7 @@ interface EOSAccountDao {
 	fun getAccount(name: String): EOSAccountTable?
 
 	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
-	fun getByKey(publicKey: String): EOSAccountTable?
+	fun getByKey(publicKey: String): List<EOSAccountTable>
 
 	@Insert
 	fun insert(table: EOSAccountTable)
@@ -139,4 +139,8 @@ interface EOSAccountDao {
 
 	@Delete
 	fun delete(table: EOSAccountTable)
+
+	@Delete
+	fun deleteAll(table: List<EOSAccountTable>)
+
 }

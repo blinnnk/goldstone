@@ -5,10 +5,10 @@ import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
-import io.goldstone.blockchain.crypto.error.GoldStoneError
-import io.goldstone.blockchain.crypto.error.RequestError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.runOnUiThread

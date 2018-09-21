@@ -17,7 +17,7 @@ import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.isValid
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.PrivateKeyType
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
@@ -159,19 +159,19 @@ class WatchOnlyImportPresenter(
 						// 注册钱包地址用于发送 `Push`
 						val addressPairs =
 							listOf(
-								Pair(currentBTCAddress, MultiChainType.BTC.id),
-								Pair(currentLTCAddress, MultiChainType.LTC.id),
-								Pair(currentBCHAddress, MultiChainType.BCH.id),
-								Pair(currentBTCTestAddress, MultiChainType.AllTest.id),
-								Pair(currentETCAddress, MultiChainType.ETC.id),
-								Pair(currentETHAndERCAddress, MultiChainType.ETH.id),
-								Pair(currentEOSAddress, MultiChainType.EOS.id)
+								Pair(currentBTCAddress, ChainType.BTC),
+								Pair(currentLTCAddress, ChainType.LTC),
+								Pair(currentBCHAddress, ChainType.BCH),
+								Pair(currentBTCTestAddress, ChainType.AllTest),
+								Pair(currentETCAddress, ChainType.ETC),
+								Pair(currentETHAndERCAddress, ChainType.ETH),
+								Pair(currentEOSAddress, ChainType.EOS)
 							)
 						val current = addressPairs.first { it.first.isNotEmpty() }
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
 								current.first,
-								current.second,
+								current.second.id,
 								1,
 								thisWallet!!.id
 							))

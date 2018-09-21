@@ -6,7 +6,6 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -237,39 +236,19 @@ data class BTCSeriesTransactionTable(
 			}
 		}
 
-		fun deleteByAddress(address: String, chainType: Int, callback: () -> Unit = {}) {
+		fun deleteByAddress(address: String, chainType: ChainType, callback: () -> Unit = {}) {
 			doAsync {
 				GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
 					// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
 					// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
 					val formattedAddress =
-						if (
-							ChainType(chainType).isBCH() &&
-							(
-								address.substring(0, 1).equals("m", true) ||
-									address.substring(0, 1).equals("n", true)
-								)
-						) BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
+						if (ChainType(chainType.id).isBCH() && !BCHWalletUtils.isNewCashAddress(address))
+							BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
 						else address
-
 					val data =
-						getDataByAddressAndChainType(formattedAddress, chainType)
-					if (data.isEmpty()) {
-						callback()
-						return@doAsync
-					}
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount: Int = data.size
-						override fun concurrentJobs() {
-							data.forEach {
-								delete(it)
-								completeMark()
-							}
-						}
-
-						override fun getResultInMainThread() = false
-						override fun mergeCallBack() = callback()
-					}.start()
+						getDataByAddressAndChainType(formattedAddress, chainType.id)
+					deleteAll(data)
+					callback()
 				}
 			}
 		}
@@ -300,4 +279,7 @@ interface BTCSeriesTransactionDao {
 
 	@Delete
 	fun delete(table: BTCSeriesTransactionTable)
+
+	@Delete
+	fun deleteAll(table: List<BTCSeriesTransactionTable>)
 }

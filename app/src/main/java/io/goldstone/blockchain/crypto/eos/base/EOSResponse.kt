@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.crypto.eos.accountregister
+package io.goldstone.blockchain.crypto.eos.base
 
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toBigIntegerOrZero

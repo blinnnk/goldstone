@@ -48,7 +48,7 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
 private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
-	chainType: MultiChainType,
+	chainType: ChainType,
 	callback: () -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {

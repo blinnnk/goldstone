@@ -12,10 +12,6 @@ public interface EosType {
     void pack(EosType.Writer writer);
   }
 
-  interface Unpacker {
-    void unpack(EosType.Reader reader) throws EosType.InsufficientBytesException;
-  }
-
   interface Reader {
     byte get() throws EosType.InsufficientBytesException;
 

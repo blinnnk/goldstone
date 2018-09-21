@@ -4,6 +4,7 @@ package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.CommonText
@@ -290,7 +291,7 @@ fun Context.deleteAccountByWalletID(
 fun Context.verifyCurrentWalletKeyStorePassword(
 	password: String,
 	walletID: Int,
-	hold: (Boolean) -> Unit
+	@WorkerThread hold: (Boolean) -> Unit
 ) {
 	doAsync {
 		val currentType = Config.getCurrentWalletType()

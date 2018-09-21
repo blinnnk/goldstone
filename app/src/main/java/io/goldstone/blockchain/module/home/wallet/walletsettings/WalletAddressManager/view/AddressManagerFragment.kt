@@ -10,8 +10,8 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
 import io.goldstone.blockchain.common.component.overlay.MiniOverlay
+import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
@@ -26,7 +26,6 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -76,7 +75,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data.first,
-					MultiChainType.ETH.id,
+					ChainType.ETH,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -89,7 +88,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data.first,
-					MultiChainType.ETC.id,
+					ChainType.ETC,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -102,7 +101,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data.first,
-					MultiChainType.BTC.id,
+					ChainType.BTC,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -115,7 +114,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data.first,
-					MultiChainType.LTC.id,
+					ChainType.LTC,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -130,7 +129,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data.first,
-					MultiChainType.EOS.id,
+					ChainType.EOS,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -144,7 +143,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data.first,
-					MultiChainType.BCH.id,
+					ChainType.BCH,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -341,14 +340,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	private fun showCellMoreDashboard(top: Float, address: String, coinType: Int, hasDefaultCell: Boolean) {
+	private fun showCellMoreDashboard(top: Float, address: String, coinType: ChainType, hasDefaultCell: Boolean) {
 		AddressManagerFragment.showMoreDashboard(
 			getParentContainer(),
 			top,
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				ChainType(coinType).updateCurrentAddress(address) { isSwitchEOSAddress ->
+				coinType.updateCurrentAddress(address) { isSwitchEOSAddress ->
 					// 如果是更改了 `EOS` 的默认地址, 那么跳回首页重新走检测 `AccountName` 流程
 					if (isSwitchEOSAddress) showSwitchEOSAddressAlertAndJump(context)
 					// 更新默认地址后同时更新首页的列表
@@ -356,14 +355,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						updateWalletDetail()
 						WalletTable.getCurrentWallet {
 							when (coinType) {
-								MultiChainType.ETH.id -> presenter.getEthereumAddresses(this)
-								MultiChainType.ETC.id -> presenter.getEthereumClassicAddresses(this)
-								MultiChainType.EOS.id -> presenter.getEOSAddresses(this)
-								MultiChainType.LTC.id -> {
+								ChainType.ETH -> presenter.getEthereumAddresses(this)
+								ChainType.ETC -> presenter.getEthereumClassicAddresses(this)
+								ChainType.EOS -> presenter.getEOSAddresses(this)
+								ChainType.LTC -> {
 									if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses(this)
 									else presenter.getLitecoinAddresses(this)
 								}
-								MultiChainType.BTC.id -> {
+								ChainType.BTC -> {
 									if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
 									else presenter.getBitcoinAddresses(this)
 								}
@@ -377,7 +376,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			qrCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
 					// `BCH` 需要在二维码页面下转换 `CashAddress` 和 `Legacy` 所以需要标记 `BCH Symbol`
-					val symbol = if (ChainType(coinType).isBCH()) CoinSymbol.bch else ""
+					val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
 					AddressManagerPresenter
 						.showQRCodeFragment(ContactModel(address, symbol), this)
 				}

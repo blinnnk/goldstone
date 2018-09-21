@@ -67,15 +67,15 @@ fun TokenContract?.isBTCSeries(): Boolean {
 	return TokenContract.isBTCSeries(this?.contract)
 }
 
-fun TokenContract?.getChainType(): MultiChainType {
+fun TokenContract?.getChainType(): ChainType {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> MultiChainType.ETC
-		this?.contract.equals(TokenContract.btcContract, true) -> MultiChainType.BTC
-		this?.contract.equals(TokenContract.ltcContract, true) -> MultiChainType.LTC
-		this?.contract.equals(TokenContract.bchContract, true) -> MultiChainType.BCH
-		this?.contract.equals(TokenContract.eosContract, true) -> MultiChainType.EOS
-		this?.contract.equals(TokenContract.ethContract, true) -> MultiChainType.ETH
-		else -> MultiChainType.ETH // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+		this?.contract.equals(TokenContract.etcContract, true) -> ChainType.ETC
+		this?.contract.equals(TokenContract.btcContract, true) -> ChainType.BTC
+		this?.contract.equals(TokenContract.ltcContract, true) -> ChainType.LTC
+		this?.contract.equals(TokenContract.bchContract, true) -> ChainType.BCH
+		this?.contract.equals(TokenContract.eosContract, true) -> ChainType.EOS
+		this?.contract.equals(TokenContract.ethContract, true) -> ChainType.ETH
+		else -> ChainType.ETH // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }
 

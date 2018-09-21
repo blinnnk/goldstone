@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.component
+package io.goldstone.blockchain.common.component.edittext
 
 import android.content.Context
 import android.content.res.ColorStateList
