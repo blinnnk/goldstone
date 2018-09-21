@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
@@ -32,11 +33,13 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 				verticalLayout {
 					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
-					
+
 					frameLayout {
 						id = ElementID.chartView
 					}.lparams(matchParent, wrapContent)
 					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {}
+
+					// 内存交易记录列表
 					frameLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
 							topMargin = 10.uiPX()
@@ -61,17 +64,27 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 				}
 			}
 
-			val roundButton = RoundButton(context)
-			roundButton.into(this)
-			roundButton.apply {
-				text = "买入/卖出 RAM"
-				y -= 10.uiPX()
-				setBlueStyle(20.uiPX(), ScreenSize.widthWithPadding - 40.uiPX())
+			linearLayout {
 				setAlignParentBottom()
 				setCenterInHorizontal()
-				onClick {
-
-					presenter.sendRAM()
+				val roundButton = RoundButton(context)
+				roundButton.into(this)
+				roundButton.apply {
+					text = "买入/卖出 RAM"
+					y -= 10.uiPX()
+					setBlueStyle(20.uiPX(), ScreenSize.widthWithPadding - 40.uiPX())
+					onClick {
+						presenter.getIsMainnet()
+						AppConfigTable.getAppConfig {
+							it?.apply {
+								if (!isMainnet) {
+									getContext().toast("目前不支持测试网络买卖")
+								} else {
+									presenter.merchandiseRAM()
+								}
+							}
+						}
+					}
 				}
 			}
 		}

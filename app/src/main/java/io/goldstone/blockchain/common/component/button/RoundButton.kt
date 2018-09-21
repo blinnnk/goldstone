@@ -17,26 +17,29 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 
 /**
  * @date 21/03/2018 11:00 PM
  * @author KaySaith
  */
 class RoundButton(context: Context) : RelativeLayout(context) {
-	
+
 	var text by observing("") {
 		invalidate()
 	}
 	var marginTop = 0
 	private val shadowSize = 1.uiPX().toFloat()
-	private val buttonHeight = 40.uiPX()
+	private val buttonHeight = 45.uiPX()
 	private val textPaint = Paint()
 	private var textSize: Float by observing(0f) {
 		textPaint.textSize = textSize
 		invalidate()
 	}
-	
+
 	init {
 		setWillNotDraw(false)
 		textPaint.isAntiAlias = true
@@ -45,7 +48,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		elevation = shadowSize
 		textSize = 14.uiPX().toFloat()
 	}
-	
+
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
@@ -54,7 +57,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		canvas?.drawText(text, textX, textY, textPaint)
 		canvas?.save()
 	}
-	
+
 	fun showLoadingStatus(
 		needToShow: Boolean = true,
 		color: Int = Spectrum.white,
@@ -92,35 +95,16 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			isEnabled = true
 		}
 	}
-	
-	fun setWhiteStyle() {
-		layoutParams = RelativeLayout.LayoutParams(
-			ScreenSize.widthWithPadding,
-			buttonHeight
-		).apply {
-			topMargin = marginTop
-			bottomMargin = 5.uiPX()
-		}
-		
-		addTouchRippleAnimation(
-			Spectrum.white,
-			Spectrum.yellow,
-			RippleMode.Square,
-			layoutParams.height / 2f
-		)
-		textPaint.color = Spectrum.blue
-		invalidate()
-	}
-	
+
 	fun setGrayStyle(top: Int? = null) {
-		layoutParams = RelativeLayout.LayoutParams(
+		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		
+
 		addTouchRippleAnimation(
 			GrayScale.whiteGray,
 			Spectrum.green,
@@ -130,13 +114,13 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textPaint.color = GrayScale.midGray
 		invalidate()
 	}
-	
-	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding) {
-		layoutParams = RelativeLayout.LayoutParams(width, buttonHeight).apply {
+
+	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding, height: Int = buttonHeight) {
+		layoutParams = LinearLayout.LayoutParams(width, height).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		
+
 		addTouchRippleAnimation(
 			Spectrum.blue,
 			Spectrum.white,
@@ -146,16 +130,16 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		textPaint.color = Spectrum.white
 		invalidate()
 	}
-	
+
 	fun setDarkStyle(top: Int? = null) {
-		layoutParams = RelativeLayout.LayoutParams(
+		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		
+
 		addTouchRippleAnimation(
 			GrayScale.Opacity3Black,
 			Spectrum.white,
@@ -167,7 +151,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setGreenStyle(top: Int? = null) {
-		layoutParams = RelativeLayout.LayoutParams(
+		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
 			buttonHeight
 		).apply {

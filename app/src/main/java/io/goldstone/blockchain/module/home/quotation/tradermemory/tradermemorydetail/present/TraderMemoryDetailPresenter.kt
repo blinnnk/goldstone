@@ -15,13 +15,11 @@ import org.jetbrains.anko.toast
 class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragment)
 	: BasePresenter<TraderMemoryDetailFragment>() {
 
-	fun sendRAM() {
-		AppConfigTable.getAppConfig {
-			it?.apply {
-				if (!isMainnet) {
-					fragment.context?.toast("目前不支持测试网络买卖")
-				}
-			}
-		}
+	fun merchandiseRAM() {
+
+	}
+
+	fun getIsMainnet() {
+
 	}
 }
