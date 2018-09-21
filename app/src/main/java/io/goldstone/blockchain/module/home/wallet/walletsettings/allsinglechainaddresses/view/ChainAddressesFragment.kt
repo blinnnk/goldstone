@@ -39,7 +39,6 @@ class ChainAddressesFragment
 				coinType?.apply {
 					presenter.showMoreDashboard(cell, model.first, this)
 				}
-
 			}
 		}
 	}

@@ -124,7 +124,7 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val allETHAndERCAddresses = when (currentLanguage) {
+	val allETHSeriesAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "All ETH & ERC20 Token Addresses"
 		HoneyLanguage.Chinese.code -> "所有ETH和ERC20代币地址"
 		HoneyLanguage.Japanese.code -> "すべてのETHおよびERC20トークンアドレス"

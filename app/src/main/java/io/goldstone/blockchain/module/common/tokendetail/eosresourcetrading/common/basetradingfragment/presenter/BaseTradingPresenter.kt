@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter
 
 import android.content.Context
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
@@ -188,7 +189,7 @@ open class BaseTradingPresenter(
 			tradingCount: Double,
 			symbol: CoinSymbol,
 			isSellRam: Boolean = false,
-			hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			// 检出用户的输入值是否合规
 			isValidInputValue(Pair(toAccountName, tradingCount), isSellRam) { error ->
@@ -220,7 +221,7 @@ open class BaseTradingPresenter(
 			isSellRam: Boolean,
 			callback: (GoldStoneError) -> Unit
 		) {
-			if (!EOSWalletUtils.isValidAccountName(inputValue.first)) {
+			if (!EOSWalletUtils.isValidAccountName(inputValue.first).isValid()) {
 				// 检查用户名是否正确
 				callback(AccountError.InvalidAccountName)
 			} else if (inputValue.second == 0.0) {

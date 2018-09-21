@@ -67,9 +67,8 @@ object EOSWalletUtils {
 	 */
 	fun isValidAccountName(
 		accountName: String,
-		isOnlyNormalName: Boolean = true,
-		hold: (invalidReason: EOSAccountNameChecker) -> Unit = {}
-	): Boolean {
+		isOnlyNormalName: Boolean = true
+	): EOSAccountNameChecker {
 		val legalCharsIn12 = Regex(".*[a-z1-5.]{0,11}[a-z1-5].*")
 		val legalCharsAt13th = Regex(".*[a-j1-5].*")
 		// 是否是特殊账号决定长度判断的不同
@@ -77,21 +76,17 @@ object EOSWalletUtils {
 			if (isOnlyNormalName) accountName.length == maxNameLength
 			else accountName.length in 2 .. maxSpecialNameLength
 		if (!isLegalLength) {
-			hold(
-				if (isOnlyNormalName) {
-					if (accountName.length < maxNameLength) EOSAccountNameChecker.TooShort
-					else EOSAccountNameChecker.TooLong
-				} else when {
-					accountName.length > maxSpecialNameLength -> EOSAccountNameChecker.TooLong
-					else -> EOSAccountNameChecker.TooShort
-				}
-			)
-			return false
+			return if (isOnlyNormalName) {
+				if (accountName.length < maxNameLength) EOSAccountNameChecker.TooShort
+				else EOSAccountNameChecker.TooLong
+			} else when {
+				accountName.length > maxSpecialNameLength -> EOSAccountNameChecker.TooLong
+				else -> EOSAccountNameChecker.TooShort
+			}
 		}
 		val isIllegalSuffixSymbol = accountName.last().toString() == "."
 		if (isIllegalSuffixSymbol) {
-			hold(EOSAccountNameChecker.IllegalSuffix)
-			return false
+			return EOSAccountNameChecker.IllegalSuffix
 		}
 		val isLegalCharacter =
 		// 如果是普通用户名检查 `12` 位的规则
@@ -104,27 +99,29 @@ object EOSWalletUtils {
 				else accountName.none { !it.toString().matches(legalCharsIn12) }
 			}
 		return if (!isLegalCharacter) {
-			hold(
-				if (accountName.matches(Regex(".*[6-9].*")) || accountName.contains("9")) {
-					EOSAccountNameChecker.NumberOtherThan1To5
-				} else if (accountName.length > maxSpecialNameLength) {
-					if (accountName.substring(12).matches(Regex(".*[k-z].*")))
-						EOSAccountNameChecker.IllegalCharacterAt13th
-					else EOSAccountNameChecker.IsLongName
-				} else EOSAccountNameChecker.IsShortName
-			)
-			false
-		} else true
+			if (accountName.matches(Regex(".*[6-9].*")) || accountName.contains("9")) {
+				EOSAccountNameChecker.NumberOtherThan1To5
+			} else if (accountName.length > maxSpecialNameLength) {
+				if (accountName.substring(12).matches(Regex(".*[k-z].*")))
+					EOSAccountNameChecker.IllegalCharacterAt13th
+				else EOSAccountNameChecker.IsLongName
+			} else if (accountName.length < maxNameLength)
+				EOSAccountNameChecker.IsShortName
+			else EOSAccountNameChecker.IsValid
+		} else EOSAccountNameChecker.IsValid
 	}
 }
 
-enum class EOSAccountNameChecker(val content: String) {
-	TooLong("Wrong length, this account name is longer than 12"),
-	TooShort("Wrong Length, this account name is shorter than 12"),
-	NumberOtherThan1To5("Illegal number in this account name, Only allowed in 1 ~ 5"),
-	IllegalCharacterAt13th("the 13th character is must in a~j or 1~5"),
-	ContainsIllegalSymbol("Illegal symbol in this account name, Only allowed '.'"),
-	IllegalSuffix("Illegal suffix in this account name, it never be allowed that contains '.' in name end"),
-	IsShortName("Attention this is a special short account name "),
-	IsLongName("Attention this is a special long account name ")
+enum class EOSAccountNameChecker(val content: String, val shortDescription: String) {
+	TooLong("Wrong length, this account name is longer than 12", "Length Too Long"),
+	TooShort("Wrong Length, this account name is shorter than 12", "Length Too Short"),
+	NumberOtherThan1To5("Illegal number in this account name, Only allowed in 1 ~ 5", "Invalid Number"),
+	IllegalCharacterAt13th("the 13th character is must in a~j or 1~5", "Invalid 13th Value"),
+	ContainsIllegalSymbol("Illegal symbol in this account name, Only allowed '.'", "Illegal Symbol"),
+	IllegalSuffix("Illegal suffix in this account name, it never be allowed that contains '.' in name end", "Illegal Suffix"),
+	IsShortName("Attention this is a special short account name ", "Special Shot Name"),
+	IsLongName("Attention this is a special long account name ", "Special Long Name"),
+	IsValid("Is Valid", "Is Valid");
+
+	fun isValid(): Boolean = content.equals(IsValid.content, true)
 }

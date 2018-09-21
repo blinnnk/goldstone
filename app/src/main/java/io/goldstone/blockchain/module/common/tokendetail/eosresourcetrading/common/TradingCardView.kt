@@ -59,6 +59,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX()).apply {
 				topMargin = 10.uiPX()
 			}
+			setNumberPadKeyboard()
 			setTitle("EOS Amount")
 			setHint("enter eos amount")
 		}

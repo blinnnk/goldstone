@@ -40,4 +40,12 @@ class ExampleUnitTest {
 			Assert.assertTrue("get wrong band width object", it.createObject() == expectResult)
 		}
 	}
+
+	@Test
+	fun compare() {
+		val list1 = listOf(Pair(1, 2), Pair(1, 3))
+		val list2 = listOf(Pair(1, 2), Pair(1, 1))
+		LogUtil.debug("compare", list1.containsAll(list2).toString())
+		LogUtil.debug("compare", (list1.asSequence().plus(list2).distinct().toList() - list1).toString())
+	}
 }

@@ -3,6 +3,9 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.error.EOSRPCError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
@@ -12,8 +15,6 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
-import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
@@ -80,33 +81,28 @@ object EOSAPI {
 
 	fun getAccountNameByPublicKey(
 		publicKey: String,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		targetNet: String = "",
 		@UiThread hold: (accountNames: List<EOSAccountInfo>) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey))
-		).let { it ->
-			val api =
-				if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
-				else EOSUrl.getKeyAccountInTargetNet(targetNet)
-			RequisitionUtil.postRequest(
-				it,
-				api,
-				errorCallBack,
-				false
-			) { result ->
-				val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
-				var names = listOf<String>()
-				(0 until namesJsonArray.length()).forEach {
-					names += namesJsonArray.get(it).toString()
-				}
-				// 生成指定的包含链信息的结果类型
-				val accountNames =
-					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
-				GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
+		val api =
+			if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
+			else EOSUrl.getKeyAccountInTargetNet(targetNet)
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey)),
+			api,
+			errorCallBack,
+			false
+		) { result ->
+			val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
+			var names = listOf<String>()
+			(0 until namesJsonArray.length()).forEach {
+				names += namesJsonArray.get(it).toString()
 			}
+			// 生成指定的包含链信息的结果类型
+			val accountNames =
+				names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
+			GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 		}
 	}
 

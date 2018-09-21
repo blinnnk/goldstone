@@ -35,7 +35,10 @@ class SplashPresenter(val activity: SplashActivity) {
 			if (!eosAccountNames.currentPublicKeyHasActivated()) {
 				EOSAPI.getAccountNameByPublicKey(
 					currentEOSAddress,
-					{ activity.alert("${it.message}") }
+					{
+						activity.alert(it.message.orEmpty())
+						activity.jump<MainActivity>()
+					}
 				) { accounts ->
 					updateEOSAccountName(accounts) { hasDefaultName ->
 						cacheDataAndSetNetBy(

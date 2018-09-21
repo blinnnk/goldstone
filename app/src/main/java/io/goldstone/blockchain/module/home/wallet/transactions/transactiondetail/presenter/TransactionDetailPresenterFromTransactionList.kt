@@ -51,7 +51,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 				}
 			}
 
-			EOSWalletUtils.isValidAccountName(fromAddress, false) -> {
+			EOSWalletUtils.isValidAccountName(fromAddress, false).isValid() -> {
 				dataFromList?.let {
 					// 本地没有 Miner 信息那么从链上拉取
 					fun updateUI(miner: String) {

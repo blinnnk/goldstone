@@ -24,9 +24,7 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
-import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -354,15 +352,15 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					else {
 						updateWalletDetail()
 						WalletTable.getCurrentWallet {
-							when (coinType) {
-								ChainType.ETH -> presenter.getEthereumAddresses(this)
-								ChainType.ETC -> presenter.getEthereumClassicAddresses(this)
-								ChainType.EOS -> presenter.getEOSAddresses(this)
-								ChainType.LTC -> {
+							when  {
+								coinType.isETH() -> presenter.getEthereumAddresses(this)
+								coinType.isETC() -> presenter.getEthereumClassicAddresses(this)
+								coinType.isEOS() -> presenter.getEOSAddresses(this)
+								coinType.isLTC() -> {
 									if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses(this)
 									else presenter.getLitecoinAddresses(this)
 								}
-								ChainType.BTC -> {
+								coinType.isBTC() -> {
 									if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
 									else presenter.getBitcoinAddresses(this)
 								}
@@ -377,8 +375,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				getParentFragment<WalletSettingsFragment> {
 					// `BCH` 需要在二维码页面下转换 `CashAddress` 和 `Legacy` 所以需要标记 `BCH Symbol`
 					val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
-					AddressManagerPresenter
-						.showQRCodeFragment(ContactModel(address, symbol), this)
+					AddressManagerPresenter.showQRCodeFragment(ContactModel(address, symbol), this)
 				}
 			},
 			exportPrivateKey = {

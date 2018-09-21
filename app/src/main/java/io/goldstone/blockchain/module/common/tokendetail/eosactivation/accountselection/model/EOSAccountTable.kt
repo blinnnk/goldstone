@@ -100,6 +100,7 @@ data class EOSAccountTable(
 			}
 		}
 
+		// 特殊情况下这几个字段的返回值会是 `null`
 		private fun checkRefundRequestOrGetObject(content: JSONObject): RefundRequestInfo? {
 			val data = content.safeGet("refund_request")
 			val hasData = !data.isNullValue()
@@ -131,7 +132,7 @@ interface EOSAccountDao {
 	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
 	fun getByKey(publicKey: String): List<EOSAccountTable>
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: EOSAccountTable)
 
 	@Update
