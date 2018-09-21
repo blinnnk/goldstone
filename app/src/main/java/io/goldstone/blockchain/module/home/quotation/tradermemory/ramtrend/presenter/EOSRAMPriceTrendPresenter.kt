@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.presenter
 
+import android.annotation.SuppressLint
+import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
@@ -14,6 +16,7 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.textColor
+import java.math.BigDecimal
 
 /**
  * @date: 2018/9/20.
@@ -26,21 +29,42 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	private var todayOpenPrice: String? = null
 	private var todayCurrentPrice: String? = null
 	
+	@SuppressLint("SetTextI18n")
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
 		getTodayPrice()
 		EOSRAMUtil.getRAMPrice(EOSUnit.KB) {
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.ramInformationHeader.apply {
-					currentPrice.text = it.toString()
+					currentPrice.text = BigDecimal(it.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
 					todayCurrentPrice = it.toString()
 					setTrendPercent()
-					
 				}
 			}
-			
+		}
+		
+		EOSAPI.getGlobalInformation( {
+			fragment.context.alert(it.toString().showAfterColonContent())
+		}) {
+			GoldStoneAPI.context.runOnUiThread {
+				if (!it.maxRamSize.isNull() && !it.totalRamBytesReserved.isNull()) {
+					val gbDivisior = Math.pow(1024.toDouble(), 3.toDouble())
+					var maxAmount = BigDecimal(it.maxRamSize)
+					var reservedAmount = BigDecimal(it.totalRamBytesReserved)
+					var percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
+					maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
+					reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
+					fragment.ramInformationHeader.apply {
+						ramTotalReserved.text = "占用${reservedAmount}GB"
+						ramMax.text = "总量${maxAmount}GB"
+						ramPercent.text = "${percent.stripTrailingZeros().toPlainString()}%"
+						percentProgressBar.progress = percent.toInt()
+					}
+				}
+			}
 		}
 	}
+	
 	
 	fun updateCandleData(
 		candleChart: EOSRAMPriceTrendCandleChart,
@@ -94,6 +118,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		
 	}
 	
+	@SuppressLint("SetTextI18n")
 	private fun getTodayPrice() {
 		GoldStoneAPI.getEOSRAMPriceToday( {
 			// Show the error exception to user
@@ -102,9 +127,9 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.ramInformationHeader.apply {
 					this@EOSRAMPriceTrendPresenter.todayOpenPrice = it.open
-					startPrice.text = it.open
-					highPrice.text = it.high
-					lowPrice.text = it.low
+					startPrice.text = "开盘价：" + BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					highPrice.text = "   最高：" + BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					lowPrice.text = "   最低：" + BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
 					setTrendPercent()
 				}
 			}
@@ -117,12 +142,13 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 			todayCurrentPrice?.let { current ->
 				var trend = (current.toDouble() - open.toDouble()) / open.toDouble()
 				trend *= 100.toDouble()
+				var trendBigDecimal = BigDecimal(trend).divide(BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP)
 				fragment.ramInformationHeader.apply {
 					if (trend > 0) {
-						trendcyPercent.text = "+$trend%"
+						trendcyPercent.text = "+$trendBigDecimal%"
 						trendcyPercent.textColor = Spectrum.green
 					} else {
-						trendcyPercent.text = "-$trend%"
+						trendcyPercent.text = "-$trendBigDecimal%"
 						trendcyPercent.textColor = Spectrum.red
 					}
 				}
