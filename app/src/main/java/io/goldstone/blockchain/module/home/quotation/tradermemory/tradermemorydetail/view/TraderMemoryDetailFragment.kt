@@ -44,10 +44,10 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 							topMargin = 10.uiPX()
 							bottomMargin = 10.uiPX()
 						}
-						id = ElementID.traderMemorySalesRecordAndLargeSingleRecord
+						id = ElementID.eosMemoryTransactionHistoryList
 					}
 					addFragmentAndSetArgument<EOSMemoryTransactionHistoryFragment>(
-						ElementID.traderMemorySalesRecordAndLargeSingleRecord
+						ElementID.eosMemoryTransactionHistoryList
 					) {
 					}
 
@@ -72,6 +72,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 				setAlignParentBottom()
 				setCenterInHorizontal()
 				onClick {
+
 					presenter.sendRAM()
 				}
 			}

@@ -31,7 +31,7 @@ object ElementID {
 	const val mask = 20017
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
-	const val traderMemorySalesRecordAndLargeSingleRecord = 20020
+	const val eosMemoryTransactionHistoryList = 20020
 	const val baseFragmentContainer = 20020
 }
 
