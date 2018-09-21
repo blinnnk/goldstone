@@ -10,8 +10,8 @@ import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -91,16 +91,16 @@ class CreateWalletPresenter(
 		confirmButton: RoundButton
 	) {
 		nameInput.afterTextChanged = Runnable {
-			nameInput.getContent { nameText = it }
+			nameText = nameInput.getContent()
 			setConfirmButtonStyle(confirmButton)
 		}
 		passwordInput.afterTextChanged = Runnable {
 			showPasswordSafeLevel(passwordInput)
-			passwordInput.getContent { passwordText = it }
+			passwordText = passwordInput.getContent()
 			setConfirmButtonStyle(confirmButton)
 		}
 		repeatPasswordInput.afterTextChanged = Runnable {
-			repeatPasswordInput.getContent { repeatPasswordText = it }
+			repeatPasswordText = repeatPasswordInput.getContent()
 			setConfirmButtonStyle(confirmButton)
 		}
 	}
@@ -303,7 +303,7 @@ class CreateWalletPresenter(
 				capitalAndLowercase = CreateWalletText.bothNumberAndLetter
 				weak = CreateWalletText.safetyLevelWeak
 				strong = CreateWalletText.safetyLevelStrong
-				normal = CreateWalletText.safetyLevelNoraml
+				normal = CreateWalletText.safetyLevelNormal
 				high = CreateWalletText.safetyLevelHigh
 			}
 

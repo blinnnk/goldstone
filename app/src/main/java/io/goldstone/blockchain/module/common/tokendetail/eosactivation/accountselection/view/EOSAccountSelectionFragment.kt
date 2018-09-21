@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
@@ -10,11 +11,12 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.GrayScale
@@ -95,6 +97,13 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 					}
 				}.into(this)
 			}
+		}
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter.showAvailableNames {
+			if (!it.isNone()) context.alert(it.message)
 		}
 	}
 

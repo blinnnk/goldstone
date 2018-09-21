@@ -89,7 +89,7 @@ object MultiChainUtils {
 			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
 			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH
 			EOSWalletUtils.isValidAddress(address) -> AddressType.EOS
-			EOSWalletUtils.isValidAccountName(address, false) ->
+			EOSWalletUtils.isValidAccountName(address, false).isValid() ->
 				AddressType.EOSAccountName
 			else -> null
 		}

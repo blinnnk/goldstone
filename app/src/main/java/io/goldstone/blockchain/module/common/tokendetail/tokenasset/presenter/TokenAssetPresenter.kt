@@ -120,7 +120,7 @@ class TokenAssetPresenter(
 			) { eosAccount ->
 				val newData =
 					if (localData.isNull()) eosAccount else eosAccount.apply { this.id = localData!!.id }
-				GoldStoneDataBase.database.eosAccountDao().update(newData)
+				GoldStoneDataBase.database.eosAccountDao().insert(newData)
 				GoldStoneAPI.context.runOnUiThread {
 					eosAccount.updateUIValue()
 				}

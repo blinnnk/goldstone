@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -64,16 +64,13 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 		currentAddress.setTitle(index)
 		val halfSize = if (chainType.isBTC()) 12 else 14
 		currentAddress.setSubtitle(CryptoUtils.scaleMiddleAddress(address, halfSize))
-		when (chainType) {
-			ChainType.ETH -> {
-				allAddressTitle.text = WalletSettingsText.allETHAndERCAddresses
-			}
-
-			ChainType.ETC -> {
-				allAddressTitle.text = WalletSettingsText.allETCAddresses
-			}
-
-			ChainType.BTC -> {
+		when {
+			chainType.isETH() -> allAddressTitle.text = WalletSettingsText.allETHSeriesAddresses
+			chainType.isETC() -> allAddressTitle.text = WalletSettingsText.allETCAddresses
+			chainType.isEOS() -> allAddressTitle.text = WalletSettingsText.allEOSAddresses
+			chainType.isBCH() -> allAddressTitle.text = WalletSettingsText.allBCHAddresses
+			chainType.isLTC() -> allAddressTitle.text = WalletSettingsText.allLTCAddresses
+			chainType.isBTC() -> {
 				allAddressTitle.text =
 					if (Config.isTestEnvironment()) WalletSettingsText.allBtCTestAddresses
 					else WalletSettingsText.allBtcAddresses

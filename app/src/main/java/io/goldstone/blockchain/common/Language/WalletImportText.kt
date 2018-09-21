@@ -151,6 +151,26 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
+	val registerEOSPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter the public key address corresponding to the account you want to register."
+		HoneyLanguage.Chinese.code -> "Enter the public key address corresponding to the account you want to register."
+		HoneyLanguage.Japanese.code -> "Enter the public key address corresponding to the account you want to register."
+		HoneyLanguage.Korean.code -> "Enter the public key address corresponding to the account you want to register."
+		HoneyLanguage.Russian.code -> "Enter the public key address corresponding to the account you want to register."
+		HoneyLanguage.TraditionalChinese.code -> "Enter the public key address corresponding to the account you want to register."
+		else -> ""
+	}
+	@JvmField
+	val eosAccountName = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account Name"
+		HoneyLanguage.Chinese.code -> "Account Name"
+		HoneyLanguage.Japanese.code -> "Account Name"
+		HoneyLanguage.Korean.code -> "Account Name"
+		HoneyLanguage.Russian.code -> "Account Name"
+		HoneyLanguage.TraditionalChinese.code -> "Account Name"
+		else -> ""
+	}
+	@JvmField
 	val keystoreIntro = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Keystore is a JSON encrypted private key file. You need to enter the wallet password corresponding to the keystore. You can change your password at any time after importing."
 		HoneyLanguage.Chinese.code -> "Keystore是一种JSON格式的加密私钥文件。您需要输入获得Keystore时对应的钱包密码。您可以在导入后随时修改密码。"

@@ -41,9 +41,9 @@ import org.jetbrains.anko.verticalLayout
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
 
 	private val confirmButton by lazy { RoundButton(context!!) }
+	private val walletNameInput by lazy { RoundInput(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
 	private val pathSettings by lazy { RoundCell(context!!) }
-	private val walletNameInput by lazy { RoundInput(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val hintInput by lazy { RoundInput(context!!) }

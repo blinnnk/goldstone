@@ -38,6 +38,12 @@ class AccountError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val InvalidAccountName = AccountError("invalid eos account name")
 		@JvmStatic
+		val InvalidAddress = AccountError("this public key is invalid")
+		@JvmStatic
+		val EmptyName = AccountError("please enter the account name which you decide to register")
+		@JvmStatic
+		val EmptyPublicKey = AccountError("please enter the public key which you decide to bind the account name")
+		@JvmStatic
 		val None = AccountError(GoldStoneError.None.message)
 	}
 }

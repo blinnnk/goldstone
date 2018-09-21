@@ -40,4 +40,6 @@ class WalletEditText(context: Context) : EditText(context) {
 			return@setOnTouchListener false
 		}
 	}
+
+	fun getContent(): String = text.toString()
 }

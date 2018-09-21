@@ -23,10 +23,7 @@ import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -136,7 +133,7 @@ class AddressManagerPresenter(
 	fun showAllETHSeriesAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETHAndERCAddresses,
+				WalletSettingsText.allETHSeriesAddresses,
 				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
 			)
@@ -643,28 +640,6 @@ class AddressManagerPresenter(
 					)
 				)
 				else -> listOf(Pair(seriesAddress, ""))
-			}
-		}
-
-		fun getCurrentAddressIndexByChainType(chainType: ChainType, hold: (String) -> Unit) {
-			fun getTargetAddressIndex(address: String, targetAddress: String): String {
-				return if (address.contains(",")) {
-					address.split(",").find {
-						it.contains(targetAddress)
-					}?.substringAfterLast("|").orEmpty()
-				} else address.substringAfterLast("|")
-			}
-			WalletTable.getCurrentWallet {
-				when (chainType) {
-					ChainType.ETH -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-					ChainType.ETC -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-					ChainType.LTC -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
-					ChainType.BCH -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					ChainType.BTC ->
-						if (Config.isTestEnvironment())
-							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
-						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-				}
 			}
 		}
 

@@ -117,6 +117,22 @@ open class RoundInput(context: Context) : EditText(context) {
 		}
 	}
 
+	fun setValidStatus(isValid: Boolean, description: String) {
+		showAlert = true
+		if (isValid) {
+			themeColor = Spectrum.green
+			safeLevel = description
+		} else {
+			themeColor = Spectrum.lightRed
+			safeLevel = description
+		}
+		alertPaint.color = themeColor
+		paint.color = themeColor
+		textPaint.color = themeColor
+		textColor = themeColor
+		invalidate()
+	}
+
 	fun setAlertStyle(style: SafeLevel) {
 		showAlert = true
 		when (style) {
@@ -147,8 +163,8 @@ open class RoundInput(context: Context) : EditText(context) {
 		invalidate()
 	}
 
-	fun getContent(hold: (String) -> Unit) {
-		hold(text.toString())
+	fun getContent(): String {
+		return text.toString()
 	}
 
 	override fun onTextContextMenuItem(id: Int): Boolean {

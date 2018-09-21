@@ -18,9 +18,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.WalletType
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -68,6 +66,27 @@ data class WalletTable(
 	var encryptMnemonic: String? = null,
 	var hasBackUpMnemonic: Boolean = false
 ) : Serializable {
+
+	fun getAddressIndexByChainType(chainType: ChainType, hold: (String) -> Unit) {
+		fun getTargetAddressIndex(address: String, targetAddress: String): String {
+			return if (address.contains(",")) {
+				address.split(",").find {
+					it.contains(targetAddress)
+				}?.substringAfterLast("|").orEmpty()
+			} else address.substringAfterLast("|")
+		}
+		when {
+			chainType.isETH() -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
+			chainType.isETC() -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
+			chainType.isLTC() -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
+			chainType.isBCH() -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
+			chainType.isEOS() -> hold(getTargetAddressIndex(eosAddresses, currentEOSAddress))
+			chainType.isBTC() ->
+				if (Config.isTestEnvironment())
+					hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
+				else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
+		}
+	}
 
 	fun getCurrentAddressAndSymbol(): List<Pair<String, String>> {
 		return arrayListOf<Pair<String, String>>().apply {
@@ -301,7 +320,7 @@ data class WalletTable(
 		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				val type = when {
-					EOSWalletUtils.isValidAccountName(currentEOSAccountName.getCurrent()) ->
+					EOSWalletUtils.isValidAccountName(currentEOSAccountName.getCurrent()).isValid() ->
 						EOSWalletType.Available
 					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 					eosAccountNames.filter {

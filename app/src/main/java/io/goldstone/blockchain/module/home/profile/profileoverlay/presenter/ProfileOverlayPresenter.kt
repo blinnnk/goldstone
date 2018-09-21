@@ -19,6 +19,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -55,6 +56,7 @@ class ProfileOverlayPresenter(
 			ProfileText.contactsInput -> showContactInput()
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
+			ProfileText.eosAccountRegister -> showEOSAccountRegisterFragment()
 			ProfileText.pinCode -> showPinCodeEditorFragment()
 			ProfileText.walletManager -> showWalletListFragment()
 			ProfileText.chain -> showChainSelectionFragment()
@@ -113,6 +115,10 @@ class ProfileOverlayPresenter(
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
 		}
+	}
+
+	private fun showEOSAccountRegisterFragment() {
+		fragment.addFragmentAndSetArgument<EOSAccountRegisterFragment>(ContainerID.content)
 	}
 
 	private fun showImportWalletFragment() {

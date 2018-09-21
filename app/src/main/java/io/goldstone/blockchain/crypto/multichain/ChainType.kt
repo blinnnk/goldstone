@@ -17,13 +17,6 @@ import java.io.Serializable
  */
 class ChainType(val id: Int) : Serializable {
 
-	fun isBTC() = id == ChainType.BTC.id
-	fun isLTC() = id == ChainType.LTC.id
-	fun isEOS() = id == ChainType.EOS.id
-	fun isETH() = id == ChainType.ETH.id
-	fun isETC() = id == ChainType.ETC.id
-	fun isBCH() = id == ChainType.BCH.id
-
 	fun getCurrentChainName(): String {
 		return when (id) {
 			ChainType.ETH.id -> Config.getCurrentChainName()
@@ -168,3 +161,11 @@ class ChainType(val id: Int) : Serializable {
 		}
 	}
 }
+
+fun ChainType?.isBTC() = this?.id == ChainType.BTC.id
+fun ChainType?.isLTC() = this?.id == ChainType.LTC.id
+fun ChainType?.isEOS() = this?.id == ChainType.EOS.id
+fun ChainType?.isETH() = this?.id == ChainType.ETH.id
+fun ChainType?.isETC() = this?.id == ChainType.ETC.id
+fun ChainType?.isBCH() = this?.id == ChainType.BCH.id
+fun ChainType?.isAllTest() = this?.id == ChainType.AllTest.id

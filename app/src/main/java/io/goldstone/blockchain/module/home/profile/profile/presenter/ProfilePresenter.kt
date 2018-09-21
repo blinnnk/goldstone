@@ -122,6 +122,7 @@ class ProfilePresenter(
 						override val textSize: Float = fragment.view?.fontSize(14).orZero()
 					}.getFixString()
 				),
+				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
