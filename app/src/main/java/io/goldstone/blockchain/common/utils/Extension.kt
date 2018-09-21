@@ -118,3 +118,6 @@ fun BigInteger.convertToTimeUnit(): String {
 	val result = CryptoUtils.toTargetUnit(value, decimal.toDouble(), hexadecimal).formatCount(5)
 	return result suffix diskUnit
 }
+
+fun String.isIntOnly(): Boolean = all { it.toString().matches(Regex(".*[0-9].*")) }
+fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0

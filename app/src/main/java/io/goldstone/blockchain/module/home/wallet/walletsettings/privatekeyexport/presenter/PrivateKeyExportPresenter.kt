@@ -17,7 +17,6 @@ import io.goldstone.blockchain.crypto.keystore.getPrivateKeyByWalletID
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import org.bitcoinj.core.ECKey
@@ -37,7 +36,7 @@ class PrivateKeyExportPresenter(
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
 	private val chainType by lazy {
-		fragment.arguments?.getInt(ArgumentKey.chainType)
+		fragment.arguments?.getInt(ArgumentKey.chainType)?.let { ChainType(it) }
 	}
 
 	fun getPrivateKey(password: String, hold: String?.() -> Unit) {
@@ -50,7 +49,7 @@ class PrivateKeyExportPresenter(
 		fun getPrivateKey(
 			context: Context,
 			address: String,
-			chainType: Int,
+			chainType: ChainType,
 			password: String,
 			@UiThread hold: String?.() -> Unit
 		) {
@@ -74,17 +73,15 @@ class PrivateKeyExportPresenter(
 
 		private fun Context.getPrivateKeyByAddress(
 			address: String,
-			chainType: Int,
+			chainType: ChainType,
 			password: String,
 			hold: String?.() -> Unit
 		) {
 			val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 			when (chainType) {
-				MultiChainType.BTC.id,
-				MultiChainType.BCH.id,
-				MultiChainType.EOS.id,
-				MultiChainType.AllTest.id -> getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
-				MultiChainType.LTC.id -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
+				ChainType.BTC, ChainType.BCH, ChainType.EOS, ChainType.AllTest ->
+					getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
+				ChainType.LTC -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
 				else -> getETHSeriesPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
 			}
 		}
@@ -123,7 +120,7 @@ class PrivateKeyExportPresenter(
 		private fun Context.getPrivateKeyByWalletID(
 			password: String,
 			walletID: Int,
-			chainType: Int,
+			chainType: ChainType,
 			@UiThread hold: String?.() -> Unit
 		) {
 			getPrivateKeyByWalletID(
@@ -140,11 +137,11 @@ class PrivateKeyExportPresenter(
 							if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
 						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(net)
 					}
-					ChainType(chainType).isLTC() ->
+					chainType.isLTC() ->
 						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(LitecoinNetParams())
-					ChainType(chainType).isEOS() ->
+					chainType.isEOS() ->
 						EOSWalletUtils.generateKeyPairByPrivateKey(privateKeyInteger).privateKey
-					ChainType(chainType).isETC() || ChainType(chainType).isETH() ->
+					chainType.isETC() || chainType.isETH() ->
 						privateKeyInteger.toString(16)
 					else -> null
 				})

@@ -9,7 +9,7 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.glideImage

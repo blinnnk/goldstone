@@ -30,21 +30,15 @@ class WalletDetailFragment :
 	) {
 		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
 			onClick {
-				model?.apply {
-					presenter.showMyTokenDetailFragment(this)
-				}
+				model?.apply { presenter.showMyTokenDetailFragment(this) }
 				preventDuplicateClicks()
 			}
 		}) {
 			headerView = this
 			currentAccount.onClick { presenter.showWalletSettingsFragment() }
 			addTokenButton.onClick { presenter.showTokenManagementFragment() }
-			sendButton.onClick {
-				presenter.setQuickTransferEvent(true)
-			}
-			depositButton.onClick {
-				presenter.setQuickTransferEvent(false)
-			}
+			sendButton.onClick { presenter.setQuickTransferEvent(true) }
+			depositButton.onClick { presenter.setQuickTransferEvent(false) }
 		}
 	}
 

@@ -19,13 +19,13 @@ import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.jetbrains.anko.*
 
@@ -193,11 +193,10 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}
 
-		fun chainError(reason: String?, error: Throwable?, context: Context) {
-			if (reason.equals(ErrorTag.chain, true)) {
-				showChainErrorDialog(context)
+		fun chainError(reason: GoldStoneError, context: Context?) {
+			if (reason.message.equals(ErrorTag.chain, true)) {
+				context?.apply { showChainErrorDialog(this) }
 			}
-			LogUtil.error("ChainErrorDialog", error)
 		}
 	}
 }

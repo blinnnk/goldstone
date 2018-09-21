@@ -1,9 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -33,7 +32,7 @@ fun TransactionDetailPresenter.observerBCHTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBCHTransactionSucceed()
-				val address = CoinSymbol.getBCH().getAddress()
+				val address = CoinSymbol.BCH.getAddress()
 				updateWalletDetailBCHValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -61,16 +60,15 @@ private fun TransactionDetailPresenter.updateWalletDetailBCHValue(
 
 private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
 	address: String,
-	callback: () -> Unit
+	@UiThread callback: () -> Unit
 ) {
 	val contract = TokenContract.getBCH()
 	MyTokenTable.getBalanceByContract(
 		contract,
 		address,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-			LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+		{
+			fragment.context.alert(it.message)
+			callback()
 		}
 	) {
 		MyTokenTable.updateBalanceByContract(it, address, contract)

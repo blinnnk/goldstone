@@ -8,7 +8,7 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.SplashContainer
+import io.goldstone.blockchain.common.component.container.SplashContainer
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil

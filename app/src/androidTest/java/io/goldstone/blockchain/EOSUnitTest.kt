@@ -16,16 +16,18 @@ import io.goldstone.blockchain.crypto.eos.accountregister.*
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.eos.eosram.EOSRamModel
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
-import io.goldstone.blockchain.crypto.eos.netcpumodel.EOSNetCPUModel
+import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.math.BigInteger
 
 
 /**
@@ -58,7 +60,7 @@ class EOSUnitTest {
 		val transactionInfo = EOSTransactionInfo(
 			"eosio.token",
 			"eosio",
-			200000L,
+			BigInteger.valueOf(200000L),
 			"dd",
 			CoinSymbol.eos
 		)
@@ -221,7 +223,7 @@ class EOSUnitTest {
 		val transactionInfo = EOSTransactionInfo(
 			"kingofdragon",
 			"wuxianyinli2",
-			2,
+			BigInteger.valueOf(20000),
 			"test trans",
 			CoinSymbol.eos
 		)
@@ -279,7 +281,7 @@ class EOSUnitTest {
 			authorizations,
 			"kingofdragon",
 			"snowsnowsnow",
-			50000
+			BigInteger.valueOf(50000)
 		)
 		LogUtil.debug("$position createBuyRamObject", ramModel.createObject())
 	}
@@ -288,12 +290,13 @@ class EOSUnitTest {
 	fun createCPUNetObject() {
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizations = listOf(authorization)
-		val netCPUModel = EOSNetCPUModel(
+		val netCPUModel = BandWidthModel(
 			authorizations,
 			"kingofdragon",
 			"snowsnowsnow",
-			50000,
-			50000,
+			BigInteger.valueOf(50000),
+			BigInteger.valueOf(50000),
+			StakeType.Delegate,
 			false
 		)
 		LogUtil.debug("$position createCPUNetObject", netCPUModel.createObject())
@@ -333,14 +336,15 @@ class EOSUnitTest {
 			authorizations,
 			"kingofdragon",
 			"xxrkissleo11",
-			50000
+			BigInteger.valueOf(50000)
 		)
-		val netCPUModel = EOSNetCPUModel(
+		val netCPUModel = BandWidthModel(
 			authorizations,
 			"kingofdragon",
 			"xxrkissleo11",
-			50000,
-			50000,
+			BigInteger.valueOf(50000),
+			BigInteger.valueOf(50000),
+			StakeType.Delegate,
 			false
 		)
 		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(EOSChain.Test, header, accountInfo, buyRamModel, netCPUModel, false)

@@ -90,11 +90,9 @@ private fun getBandWidthUsageAndUpdateDatabase(
 	txID: String,
 	hold: (cpuUsage: BigInteger, netUsage: BigInteger) -> Unit
 ) {
-	EOSAPI.getCPUAndNETUsageByTxID(
+	EOSAPI.getBandWidthByTxID(
 		txID,
-		{
-			LogUtil.error("getBandWidthUsageAndStatusBy", it)
-		}
+		{ LogUtil.error("getBandWidthByTxID", it) }
 	) { cpuUsage, netUsage, status ->
 		EOSTransactionTable.updateBandWidthAndStatusBy(txID, cpuUsage, netUsage, status)
 		GoldStoneAPI.context.runOnUiThread { hold(cpuUsage, netUsage) }
@@ -124,8 +122,8 @@ private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 			if (token.name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
 					token.contract,
-					{ error, reason ->
-						LogUtil.error("getCurrentChainToken $reason", error)
+					{
+						LogUtil.error("getCurrentChainToken", it)
 					},
 					contract.getCurrentChainName()
 				) {

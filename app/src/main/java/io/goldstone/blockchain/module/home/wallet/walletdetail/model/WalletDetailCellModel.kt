@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
+import io.goldstone.blockchain.common.error.EthereumRPCError
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -162,12 +163,11 @@ data class WalletDetailCellModel(
 											MyTokenTable.getBalanceByContract(
 												TokenContract(targetToken.contract),
 												token.ownerName,
-												{ error, reason ->
+												{
 													// 如果出错的话余额暂时设定用旧的值
 													tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
 													completeMark()
-													fragment.context?.apply { chainError(reason, error, this) }
-													LogUtil.error("targetToken.contract $reason", error)
+													chainError(it, fragment.context)
 												}
 											) { balance ->
 												// 更新数据的余额信息
@@ -192,15 +192,15 @@ data class WalletDetailCellModel(
 		}
 
 		private fun DefaultTokenTable.updateTokenNameFromChain(
-			errorCallback: (Throwable?) -> Unit,
+			errorCallback: (EthereumRPCError?) -> Unit,
 			callback: (DefaultTokenTable) -> Unit
 		) {
 			GoldStoneEthCall.getTokenName(
 				contract,
-				{ error, reason ->
+				{
 					callback(this)
-					LogUtil.error("getTokenName $reason", error)
-					errorCallback(error)
+					LogUtil.error("getTokenName ", it)
+					errorCallback(it)
 				},
 				Config.getCurrentChainName()
 			) {

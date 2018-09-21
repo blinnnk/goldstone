@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package io.goldstone.blockchain.common.component
+package io.goldstone.blockchain.common.component.edittext
 
 import android.app.Activity
 import android.content.Context

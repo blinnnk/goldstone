@@ -1,18 +1,14 @@
 package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.UiThread
-import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
-import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
-import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.eos.transaction.*
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import org.jetbrains.anko.runOnUiThread
+import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
+import java.io.Serializable
 import java.math.BigInteger
 
 
@@ -31,39 +27,10 @@ class EOSTransaction(
 	private val memo: String,
 	private val expirationType: ExpirationType,
 	private val symbol: String = CoinSymbol.eos
-) {
+) : Serializable, EOSTransactionInterface() {
 
-	fun send(
-		privateKey: EOSPrivateKey,
-		errorCallback: (Throwable) -> Unit,
-		@UiThread hold: (EOSResponse) -> Unit
-	) {
-		serialized(errorCallback) { data ->
-			val signature = privateKey.sign(Sha256.from(Hex.decode(data.serialized))).toString()
-			EOSAPI.pushTransaction(
-				listOf(signature),
-				data.packedTX,
-				{
-					LogUtil.error("EOSTransaction, Send", it)
-				}
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it) }
-			}
-		}
-	}
-
-	fun getSignHash(
-		privateKey: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (signedHash: String) -> String
-	) {
-		serialized(errorCallback) {
-			hold(EOSPrivateKey(privateKey).sign(Sha256.from(Hex.decode(it.serialized))).toString())
-		}
-	}
-
-	private fun serialized(
-		errorCallback: (Throwable) -> Unit,
+	override fun serialized(
+		errorCallback: (GoldStoneError) -> Unit,
 		@UiThread hold: (EOSTransactionSerialization) -> Unit
 	) {
 		val transactionInfo = EOSTransactionInfo(

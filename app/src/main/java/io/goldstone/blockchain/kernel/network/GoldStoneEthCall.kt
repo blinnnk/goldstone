@@ -4,16 +4,20 @@ package io.goldstone.blockchain.kernel.network
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
+import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toAscii
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
@@ -43,7 +47,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
 		hold: (
 			symbol: String,
@@ -63,7 +67,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getSymbolAndDecimalByContract(
 		contractAddress: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
 		hold: (
 			symbol: String,
@@ -109,7 +113,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getUsableNonce(
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
-		chainType: MultiChainType,
+		chainType: ChainType,
 		address: String,
 		holdValue: (BigInteger) -> Unit
 	) {
@@ -335,7 +339,7 @@ object GoldStoneEthCall {
 	fun getTokenBalanceWithContract(
 		contractAddress: String,
 		address: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (GoldStoneError) -> Unit,
 		chainName: String,
 		holdValue: (BigInteger) -> Unit
 	) {
@@ -352,7 +356,7 @@ object GoldStoneEthCall {
 				)
 			),
 			{ error, reason ->
-				errorCallback(error, reason)
+				errorCallback(RequestError.PostFailed(error.orElse(Throwable(reason))))
 				LogUtil.error(EthereumMethod.GetTokenBalance.display, error)
 			},
 			chainName
@@ -362,9 +366,9 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenSymbolByContract(
 		contractAddress: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
-		holdValue: (String) -> Unit = {}
+		hold: (String) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -379,19 +383,19 @@ object GoldStoneEthCall {
 				)
 			),
 			{ error, reason ->
-				errorCallback(error, reason)
+				errorCallback(EthereumRPCError.GetSymbol(error.orElse(Throwable(reason))))
 				LogUtil.error(EthereumMethod.GetSymbol.display, error)
 			},
 			chainName
 		) {
-			holdValue(it.toAscii())
+			hold(it.toAscii())
 		}
 	}
 
 	@JvmStatic
 	fun getTokenDecimal(
 		contractAddress: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
 		holdValue: (Int) -> Unit
 	) {
@@ -408,19 +412,19 @@ object GoldStoneEthCall {
 				)
 			),
 			{ error, reason ->
-				errorCallback(error, reason)
+				errorCallback(EthereumRPCError.GetTokenDecimal(error.orElse(Throwable(reason))))
 				LogUtil.error(EthereumMethod.GetTokenDecimal.display, error)
 			},
 			chainName
 		) {
-			holdValue(it.hexToDecimal().toInt())
+			holdValue(it.toIntFromHex())
 		}
 	}
 
 	@JvmStatic
 	fun getTokenName(
 		contractAddress: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
 		holdValue: (String) -> Unit
 	) {
@@ -437,7 +441,7 @@ object GoldStoneEthCall {
 				)
 			),
 			{ error, reason ->
-				errorCallback(error, reason)
+				errorCallback(EthereumRPCError.GetTokenName(error.orElse(Throwable(reason))))
 				LogUtil.error(EthereumMethod.GetTokenName.display, error)
 			},
 			chainName
@@ -448,9 +452,9 @@ object GoldStoneEthCall {
 
 	fun getEthBalance(
 		address: String,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		chainName: String,
-		holdValue: (BigInteger) -> Unit
+		@WorkerThread holdValue: (BigInteger) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -465,7 +469,7 @@ object GoldStoneEthCall {
 				)
 			),
 			{ error, reason ->
-				errorCallback(error, reason)
+				errorCallback(RequestError.PostFailed(error.orElse(Throwable(reason))))
 				LogUtil.error(EthereumMethod.GetBalance.display, error)
 			},
 			chainName
@@ -511,10 +515,10 @@ object GoldStoneEthCall {
 		if (substring(0, 2) == "0x") substring(2 until length) else this
 
 	@JvmStatic
-	private fun getCurrentEncryptStatusByChainType(type: MultiChainType): Boolean {
+	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
 		return when (type) {
-			MultiChainType.ETC -> Config.isEncryptETCNodeRequest()
-			MultiChainType.ETH -> Config.isEncryptERCNodeRequest()
+			ChainType.ETC -> Config.isEncryptETCNodeRequest()
+			ChainType.ETH -> Config.isEncryptERCNodeRequest()
 			else -> Config.isEncryptERCNodeRequest()
 		}
 	}

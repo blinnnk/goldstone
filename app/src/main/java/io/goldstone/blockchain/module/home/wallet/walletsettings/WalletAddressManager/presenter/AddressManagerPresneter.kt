@@ -24,8 +24,8 @@ import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -138,7 +138,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETHAndERCAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.ETH.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
 			)
 		}
 	}
@@ -148,7 +148,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allETCAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.ETC.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
 			)
 		}
 	}
@@ -158,7 +158,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allEOSAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.EOS.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.EOS.id) }
 			)
 		}
 	}
@@ -168,7 +168,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allBtcAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.BTC.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
 			)
 		}
 	}
@@ -178,7 +178,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allLTCAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.LTC.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
 			)
 		}
 	}
@@ -188,7 +188,7 @@ class AddressManagerPresenter(
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
 				WalletSettingsText.allBCHAddresses,
 				WalletSettingsText.viewAddresses,
-				Bundle().apply { putInt(ArgumentKey.coinType, MultiChainType.BCH.id) }
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
 			)
 		}
 	}
@@ -197,7 +197,7 @@ class AddressManagerPresenter(
 
 		fun showPrivateKeyExportFragment(
 			address: String,
-			chainType: Int,
+			chainType: ChainType,
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
@@ -208,7 +208,7 @@ class AddressManagerPresenter(
 						WalletSettingsText.viewAddresses,
 						Bundle().apply {
 							putString(ArgumentKey.address, address)
-							putInt(ArgumentKey.chainType, chainType)
+							putInt(ArgumentKey.chainType, chainType.id)
 						}
 					)
 				}
@@ -268,7 +268,7 @@ class AddressManagerPresenter(
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
 								address,
-								MultiChainType.ETH.id,
+								ChainType.ETH.id,
 								1,
 								wallet.id
 							)
@@ -306,7 +306,7 @@ class AddressManagerPresenter(
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
 								address,
-								MultiChainType.ETC.id,
+								ChainType.ETC.id,
 								1,
 								wallet.id
 							)
@@ -360,7 +360,7 @@ class AddressManagerPresenter(
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									eosKeyPair.address,
-									MultiChainType.EOS.id,
+									ChainType.EOS.id,
 									1,
 									wallet.id
 								)
@@ -414,7 +414,7 @@ class AddressManagerPresenter(
 								XinGePushReceiver.registerSingleAddress(
 									AddressCommissionModel(
 										address,
-										MultiChainType.BTC.id,
+										ChainType.BTC.id,
 										1,
 										wallet.id
 									)
@@ -486,7 +486,7 @@ class AddressManagerPresenter(
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									address,
-									MultiChainType.AllTest.id,
+									ChainType.AllTest.id,
 									1,
 									wallet.id
 								)
@@ -540,7 +540,7 @@ class AddressManagerPresenter(
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									bchKeyPair.address,
-									MultiChainType.BCH.id,
+									ChainType.BCH.id,
 									1,
 									wallet.id
 								)
@@ -596,7 +596,7 @@ class AddressManagerPresenter(
 							XinGePushReceiver.registerSingleAddress(
 								AddressCommissionModel(
 									ltcKeyPair.address,
-									MultiChainType.LTC.id,
+									ChainType.LTC.id,
 									1,
 									wallet.id
 								)
@@ -646,7 +646,7 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun getCurrentAddressIndexByChainType(chainType: Int, hold: (String) -> Unit) {
+		fun getCurrentAddressIndexByChainType(chainType: ChainType, hold: (String) -> Unit) {
 			fun getTargetAddressIndex(address: String, targetAddress: String): String {
 				return if (address.contains(",")) {
 					address.split(",").find {
@@ -656,11 +656,11 @@ class AddressManagerPresenter(
 			}
 			WalletTable.getCurrentWallet {
 				when (chainType) {
-					MultiChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-					MultiChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-					MultiChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
-					MultiChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					MultiChainType.BTC.id ->
+					ChainType.ETH -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
+					ChainType.ETC -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
+					ChainType.LTC -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
+					ChainType.BCH -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
+					ChainType.BTC ->
 						if (Config.isTestEnvironment())
 							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
 						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))

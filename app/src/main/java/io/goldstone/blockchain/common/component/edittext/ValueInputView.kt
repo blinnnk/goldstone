@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.component
+package io.goldstone.blockchain.common.component.edittext
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -18,6 +18,8 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import io.goldstone.blockchain.common.component.GradientType
+import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText

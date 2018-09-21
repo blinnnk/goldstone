@@ -1,15 +1,12 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view
 
 import android.content.Context
-import android.graphics.Color
 import android.widget.ImageView
 import android.widget.RelativeLayout
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.ImportMethodText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CornerSize

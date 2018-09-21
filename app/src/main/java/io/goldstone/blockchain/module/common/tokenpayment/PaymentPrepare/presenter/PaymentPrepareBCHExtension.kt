@@ -9,7 +9,8 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
-import io.goldstone.blockchain.crypto.error.TransferError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
@@ -29,7 +30,7 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	@UiThread callback: (TransferError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
 		callback(TransferError.IncorrectDecimal)
@@ -50,7 +51,7 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	@UiThread hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
+	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
@@ -96,7 +97,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.None, it)
+					hold(GoldStoneError.None, it)
 				}
 			}
 		}

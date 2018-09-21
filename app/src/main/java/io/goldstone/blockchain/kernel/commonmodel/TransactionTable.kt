@@ -4,9 +4,7 @@ import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toArrayList
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -261,10 +259,7 @@ data class TransactionTable(
 
 	companion object {
 		// `ERC` 类型的 `Transactions` 专用
-		fun getERCTransactionsByAddress(
-			address: String,
-			@UiThread hold: (List<TransactionListModel>) -> Unit
-		) {
+		fun getTokenTransactions(address: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, Config.getCurrentChain().id)
 			} then { it ->
@@ -272,22 +267,11 @@ data class TransactionTable(
 			}
 		}
 
-		fun getETCTransactionsByAddress(
-			address: String,
-			hold: (ArrayList<TransactionListModel>) -> Unit
-		) {
+		fun getETCTransactions(address: String, hold: (List<TransactionListModel>) -> Unit) {
 			load {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.getETCTransactionsByAddress(address)
-			} then { it ->
-				val result = if (it.isEmpty()) {
-					arrayListOf()
-				} else {
-					it.map { TransactionListModel(it) }.toArrayList()
-				}
-				hold(result)
+				GoldStoneDataBase.database.transactionDao().getETCTransactionsByAddress(address)
+			} then { data ->
+				hold(data.map { TransactionListModel(it) })
 			}
 		}
 
@@ -320,23 +304,8 @@ data class TransactionTable(
 		fun deleteByAddress(address: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.transactionDao().apply {
-					val data = getAllTransactionsByAddress(address)
-					if (data.isEmpty()) {
-						callback()
-						return@doAsync
-					}
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount: Int = data.size
-						override fun concurrentJobs() {
-							data.forEach {
-								delete(it)
-								completeMark()
-							}
-						}
-
-						override fun getResultInMainThread() = false
-						override fun mergeCallBack() = callback()
-					}.start()
+					deleteAll(getAllTransactionsByAddress(address))
+					callback()
 				}
 			}
 		}
@@ -379,23 +348,15 @@ data class TransactionTable(
 			}
 		}
 
-		fun getTransactionByHash(
-			taxHash: String,
-			hold: (List<TransactionTable>) -> Unit
-		) {
+		fun getTransactionByHash(taxHash: String, hold: (List<TransactionTable>) -> Unit) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				hold(getTransactionByTaxHash(taxHash))
 			}
 		}
 
-		fun getByHashAndReceivedStatus(
-			hash: String,
-			isReceived: Boolean,
-			hold: (TransactionTable?) -> Unit
-		) {
+		fun getByHashAndReceivedStatus(hash: String, isReceived: Boolean, hold: (TransactionTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.transactionDao()
-					.getByTaxHashAndReceivedStatus(hash, isReceived)
+				GoldStoneDataBase.database.transactionDao().getByTaxHashAndReceivedStatus(hash, isReceived)
 			} then (hold)
 		}
 	}
@@ -407,19 +368,13 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList")
 	fun getAll(): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
-	)
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC")
 	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC"
-	)
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
 	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = Config.getETCCurrentChain().id): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
-	)
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
@@ -428,9 +383,7 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
 	fun getByTaxHashAndReceivedStatus(taxHash: String, isReceive: Boolean): TransactionTable?
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC"
-	)
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC")
 	fun getByAddressAndContract(walletAddress: String, contract: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC")
@@ -450,4 +403,7 @@ interface TransactionDao {
 
 	@Delete
 	fun delete(token: TransactionTable)
+
+	@Delete
+	fun deleteAll(token: List<TransactionTable>)
 }

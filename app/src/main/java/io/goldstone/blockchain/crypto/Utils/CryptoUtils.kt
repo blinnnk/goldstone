@@ -8,7 +8,6 @@ import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -62,7 +61,7 @@ object CryptoUtils {
 		return (count.toBigDecimal() * Math.pow(10.0, decimal.toDouble()).toBigDecimal()).toBigInteger()
 	}
 
-	fun loadTransferInfoFromInputData(inputCode: String): InputCodeData? {
+	fun getTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
 		var amount: BigInteger
 		isTransferInputCode(inputCode) isTrue {
@@ -80,17 +79,9 @@ object CryptoUtils {
 		}
 	}
 
-	fun isERC20Transfer(transactionTable: TransactionTable, hold: () -> Unit): Boolean {
-		return if (
-			transactionTable.input.length >= 138 && isTransferInputCode(transactionTable.input)
-			// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
-			|| transactionTable.logIndex.isNotEmpty()
-		) {
-			hold()
-			true
-		} else {
-			false
-		}
+	fun isERC20Transfer(inputData: String): Boolean {
+		// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
+		return inputData.length >= 138 && isTransferInputCode(inputData)
 	}
 
 	fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit = {}): Boolean {
@@ -148,7 +139,7 @@ fun BigInteger.toEthCount(): Double {
 }
 
 fun BigDecimal.toEthCount(): Double {
-	return (this / BigDecimal.valueOf(1000000000000000000)).toDouble()
+	return CryptoUtils.toCountByDecimal(this.toBigInteger(), CryptoValue.ethDecimal)
 }
 
 fun Double.toEOSUnit(): BigInteger {
@@ -157,6 +148,10 @@ fun Double.toEOSUnit(): BigInteger {
 
 fun BigInteger.toEOSCount(): Double {
 	return CryptoUtils.toCountByDecimal(this, CryptoValue.eosDecimal)
+}
+
+fun BigInteger.toCount(decimal: Int): Double {
+	return CryptoUtils.toCountByDecimal(this, decimal)
 }
 
 fun Double.toBTCCount(): Double {
@@ -226,11 +221,7 @@ fun String.toAddressCode(hasPrefix: Boolean = true): String {
 
 @Throws
 fun String.toAddressFromCode(): String {
-	val address = if (length == 66) {
-		"0x" + substring(26, length)
-	} else {
-		""
-	}
+	val address = if (length == 66) substring(26, length).prepend0xPrefix() else ""
 	if (!Address(address).isValid()) throw Exception("It is a wrong address code format")
 	return address
 }

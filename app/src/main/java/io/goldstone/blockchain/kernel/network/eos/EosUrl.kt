@@ -23,6 +23,9 @@ object EOSUrl {
 	val getAccountEOSBalance: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.GetCurrencyBalance.method}"
 	}
+	val getTableRows: () -> String = {
+		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
+	}
 	val getTransactionHistory: () -> String = {
 		"${currentURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
 	}
@@ -36,7 +39,4 @@ object EOSUrl {
 		"${currentURL()}/v1/chain/${EOSMethod.PushTransaction.method}"
 	}
 	
-	val getTableRows:() -> String = {
-		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
-	}
 }

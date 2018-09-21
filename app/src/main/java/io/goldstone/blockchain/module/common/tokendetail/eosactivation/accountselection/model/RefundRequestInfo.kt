@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.safeGet
+import com.google.gson.annotations.SerializedName
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -15,9 +16,13 @@ import java.io.Serializable
  * {"cpu_amount":"1.5000 EOS","net_amount":"1.5000 EOS","owner":"hopehopehope","request_time":"2018-09-12T06:20:58"}
  */
 data class RefundRequestInfo(
+	@SerializedName("cpu_amount")
 	val cpuAmount: String,
+	@SerializedName("net_amount")
 	val netAmount: String,
+	@SerializedName("owner")
 	val owner: String, // owner
+	@SerializedName("request_time")
 	val requestTime: String // Formatted "2018-09-12T06:20:58"
 ): Serializable {
 	constructor(data: JSONObject) : this(
