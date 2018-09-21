@@ -10,7 +10,9 @@ import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.*
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
+import io.goldstone.blockchain.common.component.title.RadioWithTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize

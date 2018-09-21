@@ -19,13 +19,13 @@ import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.error.GoldStoneError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import org.jetbrains.anko.*
 

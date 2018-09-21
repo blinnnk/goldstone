@@ -10,8 +10,8 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.ExplanationTitle
+import io.goldstone.blockchain.common.component.title.AttentionTextView
+import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.utils.NetworkUtil

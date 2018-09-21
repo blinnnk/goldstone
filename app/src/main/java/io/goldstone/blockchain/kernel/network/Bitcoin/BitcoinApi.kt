@@ -2,8 +2,8 @@ package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
@@ -111,7 +111,7 @@ object BitcoinApi {
 					address,
 					CoinSymbol.pureBTCSymbol,
 					false,
-					MultiChainType.BTC.id
+					ChainType.BTC.id
 				)
 			)
 		}

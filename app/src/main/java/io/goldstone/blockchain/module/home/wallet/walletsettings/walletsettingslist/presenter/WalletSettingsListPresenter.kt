@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -24,6 +23,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -94,9 +94,7 @@ class WalletSettingsListPresenter(
 			!Config.getCurrentIsWatchOnlyOrNot()
 		) { passwordInput ->
 			if (Config.getCurrentIsWatchOnlyOrNot()) {
-				WalletTable.getWatchOnlyWallet {
-					deleteWatchOnlyWallet(it.orEmpty())
-				}
+				WalletTable.getWatchOnlyWallet { deleteWatchOnlyWallet(first, second) }
 			} else {
 				val password = passwordInput?.text.toString()
 				WalletTable.getCurrentWallet {
@@ -116,13 +114,13 @@ class WalletSettingsListPresenter(
 		// get current wallet address
 		WalletTable.getCurrentWallet {
 			val addresses = listOf(
-				Pair(ethAddresses, MultiChainType.ETH.id),
-				Pair(etcAddresses, MultiChainType.ETC.id),
-				Pair(btcAddresses, MultiChainType.BTC.id),
-				Pair(btcSeriesTestAddresses, MultiChainType.AllTest.id),
-				Pair(ltcAddresses, MultiChainType.LTC.id),
-				Pair(bchAddresses, MultiChainType.BCH.id),
-				Pair(eosAddresses, MultiChainType.EOS.id)
+				Pair(ethAddresses, ChainType.ETH),
+				Pair(etcAddresses, ChainType.ETC),
+				Pair(btcAddresses, ChainType.BTC),
+				Pair(btcSeriesTestAddresses, ChainType.AllTest),
+				Pair(ltcAddresses, ChainType.LTC),
+				Pair(bchAddresses, ChainType.BCH),
+				Pair(eosAddresses, ChainType.EOS)
 			)
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = addresses.size
@@ -157,7 +155,7 @@ class WalletSettingsListPresenter(
 	private fun Fragment.deleteRoutineWallet(
 		address: String,
 		password: String,
-		chainType: Int,
+		chainType: ChainType,
 		isSingleChainWallet: Boolean,
 		justDeleteData: Boolean = false,
 		callback: () -> Unit
@@ -182,6 +180,8 @@ class WalletSettingsListPresenter(
 					BTCSeriesTransactionTable.deleteByAddress(address, chainType)
 					// 删除 EOS 类型的转账记录
 					EOSTransactionTable.deleteByAddress(address)
+					// 删除 EOS Account Info 类型的记录
+					EOSAccountTable.deleteByRecordAddress(address)
 					// 删除余额记录
 					TokenBalanceTable.deleteByAddress(address) {
 						if (justDeleteData) {
@@ -200,9 +200,10 @@ class WalletSettingsListPresenter(
 		}
 	}
 
-	private fun deleteWatchOnlyWallet(address: String) {
+	private fun deleteWatchOnlyWallet(address: String, chainType: ChainType) {
 		MyTokenTable.deleteByAddress(address) {
 			TransactionTable.deleteByAddress(address) {
+				BTCSeriesTransactionTable.deleteByAddress(address, chainType)
 				TokenBalanceTable.deleteByAddress(address) {
 					WalletTable.deleteCurrentWallet { wallet ->
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址

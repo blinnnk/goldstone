@@ -5,6 +5,10 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.PasswordError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -12,10 +16,6 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
-import io.goldstone.blockchain.crypto.error.AccountError
-import io.goldstone.blockchain.crypto.error.GoldStoneError
-import io.goldstone.blockchain.crypto.error.PasswordError
-import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
@@ -148,7 +148,7 @@ class PaymentPreparePresenter(
 					PrivateKeyExportPresenter.getPrivateKey(
 						GoldStoneAPI.context,
 						Config.getCurrentEOSAddress(),
-						MultiChainType.EOS.id,
+						ChainType.EOS,
 						password
 					) {
 						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), GoldStoneError.None)

@@ -18,8 +18,8 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -102,15 +102,15 @@ data class WalletTable(
 		}
 	}
 
-	fun getCurrentAddressesAndChainID(): List<Pair<String, Int>> {
+	fun getCurrentAddressesAndChainID(): List<Pair<String, ChainType>> {
 		return listOf(
-			Pair(currentBTCAddress, MultiChainType.BTC.id),
-			Pair(currentLTCAddress, MultiChainType.LTC.id),
-			Pair(currentBCHAddress, MultiChainType.BCH.id),
-			Pair(currentBTCSeriesTestAddress, MultiChainType.AllTest.id),
-			Pair(currentETCAddress, MultiChainType.ETC.id),
-			Pair(currentETHAndERCAddress, MultiChainType.ETH.id),
-			Pair(currentEOSAddress, MultiChainType.EOS.id)
+			Pair(currentBTCAddress, ChainType.BTC),
+			Pair(currentLTCAddress, ChainType.LTC),
+			Pair(currentBCHAddress, ChainType.BCH),
+			Pair(currentBTCSeriesTestAddress, ChainType.AllTest),
+			Pair(currentETCAddress, ChainType.ETC),
+			Pair(currentETHAndERCAddress, ChainType.ETH),
+			Pair(currentEOSAddress, ChainType.EOS)
 		).filter { it.first.isNotEmpty() }
 	}
 
@@ -291,15 +291,9 @@ data class WalletTable(
 			}
 		}
 
-		fun getWatchOnlyWallet(hold: (String?) -> Unit) {
+		fun getWatchOnlyWallet(hold: Pair<String, ChainType>.() -> Unit) {
 			WalletTable.getCurrentWallet {
-				if (isWatchOnly) {
-					WalletTable.getCurrentAddresses {
-						hold(it.first())
-					}
-				} else {
-					hold(null)
-				}
+				if (isWatchOnly) getCurrentAddressesAndChainID().firstOrNull()?.let(hold)
 			}
 		}
 
@@ -677,10 +671,7 @@ data class WalletTable(
 			}
 		}
 
-		fun isWatchOnlyWalletShowAlertOrElse(
-			context: Context,
-			callback: () -> Unit
-		) {
+		fun isWatchOnlyWalletShowAlertOrElse(context: Context, callback: () -> Unit) {
 			Config.getCurrentIsWatchOnlyOrNot() isTrue {
 				context.alert(AlertText.watchOnly)
 				return
@@ -688,10 +679,7 @@ data class WalletTable(
 			callback()
 		}
 
-		fun getWalletByAddress(
-			address: String,
-			hold: (WalletTable?) -> Unit
-		) {
+		fun getWalletByAddress(address: String, hold: (WalletTable?) -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
 			} then (hold)
@@ -707,10 +695,7 @@ data class WalletTable(
 			}
 		}
 
-		private fun Context.hasBackUpOrElse(
-			confirmEvent: () -> Unit,
-			callback: () -> Unit
-		) {
+		private fun Context.hasBackUpOrElse(confirmEvent: () -> Unit, callback: () -> Unit) {
 			WalletTable.getCurrentWallet {
 				hasBackUpMnemonic isFalse {
 					GoldStoneDialog.show(this@hasBackUpOrElse) {

@@ -79,17 +79,9 @@ object CryptoUtils {
 		}
 	}
 
-	fun isERC20Transfer(inputData: String, logIndex: String, hold: () -> Unit): Boolean {
-		return if (
-			inputData.length >= 138 && isTransferInputCode(inputData)
-			// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
-			|| logIndex.isNotEmpty()
-		) {
-			hold()
-			true
-		} else {
-			false
-		}
+	fun isERC20Transfer(inputData: String): Boolean {
+		// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
+		return inputData.length >= 138 && isTransferInputCode(inputData)
 	}
 
 	fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit = {}): Boolean {
@@ -229,11 +221,7 @@ fun String.toAddressCode(hasPrefix: Boolean = true): String {
 
 @Throws
 fun String.toAddressFromCode(): String {
-	val address = if (length == 66) {
-		"0x" + substring(26, length)
-	} else {
-		""
-	}
+	val address = if (length == 66) substring(26, length).prepend0xPrefix() else ""
 	if (!Address(address).isValid()) throw Exception("It is a wrong address code format")
 	return address
 }

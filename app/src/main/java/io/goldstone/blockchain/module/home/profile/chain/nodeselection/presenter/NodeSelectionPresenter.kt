@@ -6,7 +6,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 
@@ -55,7 +54,7 @@ class NodeSelectionPresenter(
 		Config.updateEOSCurrentChain(ChainID.getChainIDByName(nodeName))
 	}
 
-	fun getCurrentChainName(isMainnet: Boolean, type: MultiChainType): String {
+	fun getCurrentChainName(isMainnet: Boolean, type: ChainType): String {
 		return if (isMainnet) ChainType(type.id).getMainnetChainName()
 		else ChainType(type.id).getTestnetChainName()
 

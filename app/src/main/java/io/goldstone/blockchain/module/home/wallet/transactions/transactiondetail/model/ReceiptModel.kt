@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSResponse
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel

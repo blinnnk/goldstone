@@ -15,8 +15,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.ChainNameID
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoName
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
@@ -187,24 +187,24 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		}
 	}
 
-	private fun getChainTypeByName(name: String): MultiChainType {
+	private fun getChainTypeByName(name: String): ChainType {
 		return when (name) {
-			CryptoName.eth -> MultiChainType.ETH
-			CryptoName.btc -> MultiChainType.BTC
-			CryptoName.ltc -> MultiChainType.LTC
-			CryptoName.bch -> MultiChainType.BCH
-			CryptoName.eos -> MultiChainType.EOS
-			else -> MultiChainType.ETC
+			CryptoName.eth -> ChainType.ETH
+			CryptoName.btc -> ChainType.BTC
+			CryptoName.ltc -> ChainType.LTC
+			CryptoName.bch -> ChainType.BCH
+			CryptoName.eos -> ChainType.EOS
+			else -> ChainType.ETC
 		}
 	}
 
-	private fun clearAllRadio(maxIndex: Int, type: MultiChainType) {
+	private fun clearAllRadio(maxIndex: Int, type: ChainType) {
 		val start = when (type) {
-			MultiChainType.ETC -> 10
-			MultiChainType.BTC -> 20
-			MultiChainType.LTC -> 30
-			MultiChainType.BCH -> 40
-			MultiChainType.EOS -> 50
+			ChainType.ETC -> 10
+			ChainType.BTC -> 20
+			ChainType.LTC -> 30
+			ChainType.BCH -> 40
+			ChainType.EOS -> 50
 			else -> 0
 		}
 		(start until maxIndex + start).forEach {

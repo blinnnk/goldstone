@@ -2,13 +2,12 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.GrayCardView
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.container.GrayCardView
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum

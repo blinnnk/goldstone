@@ -11,7 +11,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseCell
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.BasicRadiusButton
 import io.goldstone.blockchain.common.component.button.SquareIcon
 import io.goldstone.blockchain.common.utils.glideImage

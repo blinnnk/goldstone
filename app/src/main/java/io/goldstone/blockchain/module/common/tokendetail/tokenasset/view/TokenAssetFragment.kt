@@ -15,9 +15,9 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.GrayCardView
+import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
-import io.goldstone.blockchain.common.component.SessionTitleView
+import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText

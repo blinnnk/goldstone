@@ -5,8 +5,12 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -14,9 +18,6 @@ import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
-import io.goldstone.blockchain.crypto.error.AccountError
-import io.goldstone.blockchain.crypto.error.GoldStoneError
-import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
@@ -132,7 +133,13 @@ open class BaseTradingPresenter(
 		val fromAccount = Config.getCurrentEOSName()
 		val toAccountName = getInputValue(stakeType).first
 		val transferCount = getInputValue(stakeType).second
-		prepareTransaction(context, fromAccount, toAccountName, transferCount, CoinSymbol.EOS) { privateKey, error ->
+		prepareTransaction(
+			context,
+			fromAccount,
+			toAccountName,
+			transferCount,
+			CoinSymbol.EOS
+		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
 					Config.getEOSCurrentChain(),
@@ -164,6 +171,7 @@ open class BaseTradingPresenter(
 		) { newData ->
 			EOSAccountTable.getAccountByName(currentAccountName, false) { localData ->
 				localData?.let { local ->
+					// 新数据标记为老数据的 `主键` 值
 					GoldStoneDataBase.database.eosAccountDao().update(newData.apply { this.id = local.id })
 					setUsageValue()
 				}
@@ -183,7 +191,7 @@ open class BaseTradingPresenter(
 			hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			// 检出用户的输入值是否合规
-			isValidInputValue(Pair(toAccountName, tradingCount)) { error ->
+			isValidInputValue(Pair(toAccountName, tradingCount), isSellRam) { error ->
 				if (!error.isNone()) hold(null, error) else {
 					// 检查余额
 					if (isSellRam) EOSAPI.getAvailableRamBytes(
@@ -209,6 +217,7 @@ open class BaseTradingPresenter(
 
 		private fun isValidInputValue(
 			inputValue: Pair<String, Double>,
+			isSellRam: Boolean,
 			callback: (GoldStoneError) -> Unit
 		) {
 			if (!EOSWalletUtils.isValidAccountName(inputValue.first)) {
@@ -216,8 +225,11 @@ open class BaseTradingPresenter(
 				callback(AccountError.InvalidAccountName)
 			} else if (inputValue.second == 0.0) {
 				callback(TransferError.TradingInputIsEmpty)
+			} else if (isSellRam && !inputValue.second.isSameValueAsInt()) {
+				// 检查输的卖出的 `EOS` 的值是否正确
+				callback(TransferError.wrongRAMInputValue)
 			} else if (!inputValue.second.toString().isValidDecimal(CryptoValue.eosDecimal)) {
-				// 检出输入值的精度是否正确
+				// 检查输入值的精度是否正确
 				callback(TransferError.IncorrectDecimal)
 			} else callback(GoldStoneError.None)
 		}

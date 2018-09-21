@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -73,22 +74,20 @@ fun getTokenTransactions(
 	@UiThread hold: (List<TransactionListModel>) -> Unit
 ) {
 	getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
-		hasData isTrue {
-			TransactionTable.getERCTransactionsByAddress(Config.getCurrentEthereumAddress()) { transactions ->
-				checkAddressNameInContacts(transactions) {
-					hold(transactions)
-				}
+		if (hasData) TransactionTable.getTokenTransactions(
+			Config.getCurrentEthereumAddress()
+		) { transactions ->
+			checkAddressNameInContacts(transactions) {
+				hold(transactions)
 			}
-		} otherwise {
-			GoldStoneAPI.context.runOnUiThread { hold(arrayListOf()) }
-		}
+		} else GoldStoneAPI.context.runOnUiThread { hold(arrayListOf()) }
 	}
 }
 
 // 默认拉取全部的 `EtherScan` 的交易数据
 private fun getTransactionsFromEtherScan(
 	startBlock: String,
-	errorCallback: (Throwable) -> Unit,
+	errorCallback: (RequestError) -> Unit,
 	@WorkerThread hold: (hasData: Boolean) -> Unit
 ) {
 	// 请求所有链上的数据
@@ -103,7 +102,7 @@ private fun getTransactionsFromEtherScan(
 
 private fun mergeETHAndERC20Incoming(
 	startBlock: String,
-	errorCallback: (Throwable) -> Unit,
+	errorCallback: (RequestError) -> Unit,
 	@WorkerThread hold: (List<TransactionTable>) -> Unit
 ): ConcurrentAsyncCombine {
 	return object : ConcurrentAsyncCombine() {
@@ -120,7 +119,7 @@ private fun mergeETHAndERC20Incoming(
 					{
 						// 只弹出一次错误信息
 						if (!hasError) {
-							errorCallback(it)
+							errorCallback(RequestError.PostFailed(it))
 							hasError = true
 						}
 						completeMark()
@@ -136,7 +135,7 @@ private fun mergeETHAndERC20Incoming(
 						//error callback
 						// 只弹出一次错误信息
 						if (!hasError) {
-							errorCallback(it)
+							errorCallback(RequestError.PostFailed(it))
 							hasError = true
 						}
 						completeMark()
@@ -144,7 +143,10 @@ private fun mergeETHAndERC20Incoming(
 					Config.getCurrentEthereumAddress()
 				) { erc20Data ->
 					// 把请求回来的数据转换成 `TransactionTable` 格式
-					logData = erc20Data.map { TransactionTable(ERC20TransactionModel(it)) }
+					logData = erc20Data.map {
+						TransactionTable(ERC20TransactionModel(it)).apply {
+						}
+					}
 					completeMark()
 				}
 			}
@@ -157,8 +159,6 @@ private fun mergeETHAndERC20Incoming(
 					it.to.isNotEmpty()
 				}.distinctBy {
 					it.hash
-				}.sortedByDescending {
-					it.timeStamp
 				}.toList(), hold)
 		}
 	}
@@ -191,6 +191,8 @@ private fun diffNewDataAndUpdateLocalData(
 }
 
 private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTokenTable>) -> Unit) {
+	val unknownData =
+		arrayListOf<DefaultTokenTable>()
 	DefaultTokenTable.getCurrentChainTokens { localTokens ->
 		filter { transaction ->
 			transaction.isERC20Token && transaction.symbol.isEmpty()
@@ -201,10 +203,6 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 				it.contract.equals(unknownData.contractAddress, true)
 			}.isNull()
 		}.toList().let { filterData ->
-			if (filterData.isEmpty()) {
-				callback(localTokens)
-				return@getCurrentChainTokens
-			}
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = filterData.size
 				override fun concurrentJobs() {
@@ -217,7 +215,7 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 							},
 							Config.getCurrentChainName()
 						) { symbol, decimal ->
-							GoldStoneDataBase.database.defaultTokenDao().insert(DefaultTokenTable(transaction.contractAddress, symbol, decimal))
+							unknownData.add(DefaultTokenTable(transaction.contractAddress, symbol, decimal))
 							completeMark()
 						}
 					}
@@ -225,7 +223,10 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 
 				override fun getResultInMainThread() = false
 				override fun mergeCallBack() {
-					callback(localTokens)
+					GoldStoneDataBase.database.defaultTokenDao().insertAll(unknownData)
+					// 把更新数据的 `DefaultToken` 和内存中待使用的 `DefaultToken List` 合并更新方便在后
+					// 续缓解中使用最新的数据又不用重新开启数据库请求
+					callback(localTokens.asSequence().plus(unknownData).filterNot { it.symbol.isEmpty() }.toList())
 				}
 			}.start()
 		}
@@ -272,7 +273,7 @@ private fun completeTransactionInfo(
 		override var asyncCount: Int = data.size
 		override fun concurrentJobs() {
 			data.forEach { transaction ->
-				CryptoUtils.isERC20Transfer(transaction.input, transaction.logIndex) {
+				if (CryptoUtils.isERC20Transfer(transaction.input)) {
 					val contract =
 						if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
 						else transaction.to
@@ -291,7 +292,6 @@ private fun completeTransactionInfo(
 							count = CryptoUtils.toCountByDecimal(transactionInfo?.amount!!, tokenInfo.decimals.orZero())
 							receiveAddress = transactionInfo.address
 						}
-
 						transaction.updateModelInfo(
 							true,
 							tokenInfo.symbol,
@@ -300,7 +300,7 @@ private fun completeTransactionInfo(
 						)
 						completeMark()
 					}
-				} isFalse {
+				} else {
 					/** 不是 ERC20 币种直接默认为 `ETH` */
 					transaction.updateModelInfo(
 						false,

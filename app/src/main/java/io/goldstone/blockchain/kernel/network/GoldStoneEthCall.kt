@@ -9,16 +9,15 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
+import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.error.EthereumRPCError
-import io.goldstone.blockchain.crypto.error.GoldStoneError
-import io.goldstone.blockchain.crypto.error.RequestError
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toAscii
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
@@ -114,7 +113,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getUsableNonce(
 		errorCallback: (error: Throwable?, reason: String?) -> Unit,
-		chainType: MultiChainType,
+		chainType: ChainType,
 		address: String,
 		holdValue: (BigInteger) -> Unit
 	) {
@@ -418,7 +417,7 @@ object GoldStoneEthCall {
 			},
 			chainName
 		) {
-			holdValue(it.hexToDecimal().toInt())
+			holdValue(it.toIntFromHex())
 		}
 	}
 
@@ -516,10 +515,10 @@ object GoldStoneEthCall {
 		if (substring(0, 2) == "0x") substring(2 until length) else this
 
 	@JvmStatic
-	private fun getCurrentEncryptStatusByChainType(type: MultiChainType): Boolean {
+	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
 		return when (type) {
-			MultiChainType.ETC -> Config.isEncryptETCNodeRequest()
-			MultiChainType.ETH -> Config.isEncryptERCNodeRequest()
+			ChainType.ETC -> Config.isEncryptETCNodeRequest()
+			ChainType.ETH -> Config.isEncryptERCNodeRequest()
 			else -> Config.isEncryptERCNodeRequest()
 		}
 	}

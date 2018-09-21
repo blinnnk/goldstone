@@ -244,7 +244,7 @@ class GasSelectionPresenter(
 				0,
 				false,
 				true,
-				ChainType.getChainTypeBySymbol(getToken()?.symbol)
+				ChainType.getChainTypeBySymbol(getToken()?.symbol).id
 			).apply {
 				// 插入 PendingData
 				GoldStoneDataBase.database

@@ -15,7 +15,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
@@ -50,7 +49,7 @@ class ChainAddressesPresenter(
 	fun showMoreDashboard(
 		cell: GraySquareCellWithButtons,
 		address: String,
-		coinType: Int,
+		coinType: ChainType,
 		hasDefaultCell: Boolean = true
 	) {
 		AddressManagerFragment.showMoreDashboard(
@@ -59,7 +58,7 @@ class ChainAddressesPresenter(
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				ChainType(coinType).updateCurrentAddress(address) { isSwitchEOSAddress ->
+				coinType.updateCurrentAddress(address) { isSwitchEOSAddress ->
 					if (isSwitchEOSAddress)
 						AddressManagerFragment.showSwitchEOSAddressAlertAndJump(fragment.context)
 					else {
@@ -73,7 +72,7 @@ class ChainAddressesPresenter(
 				}
 			},
 			qrCellClickEvent = {
-				val symbol = if (ChainType(coinType).isBCH()) CoinSymbol.bch else ""
+				val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
 				showQRCode(ContactModel(address, symbol))
 			},
 			keystoreCellClickEvent = {
@@ -97,38 +96,38 @@ class ChainAddressesPresenter(
 				context?.apply {
 					AddressManagerFragment.verifyMultiChainWalletPassword(this) { password ->
 						when (fragment.coinType) {
-							MultiChainType.ETH.id ->
+							ChainType.ETH ->
 								AddressManagerPresenter.createETHAndERCAddress(this, password) {
-									updateAddressManagerDataBy(MultiChainType.ETH.id, it)
+									updateAddressManagerDataBy(ChainType.ETH, it)
 									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 								}
-							MultiChainType.ETC.id ->
+							ChainType.ETC ->
 								AddressManagerPresenter.createETCAddress(this, password) {
-									updateAddressManagerDataBy(MultiChainType.ETC.id, it)
+									updateAddressManagerDataBy(ChainType.ETC, it)
 									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 								}
 
-							MultiChainType.LTC.id ->
+							ChainType.LTC ->
 								AddressManagerPresenter.createLTCAddress(this, password) {
-									updateAddressManagerDataBy(MultiChainType.LTC.id, it)
+									updateAddressManagerDataBy(ChainType.LTC, it)
 									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 								}
 
-							MultiChainType.BCH.id ->
+							ChainType.BCH ->
 								AddressManagerPresenter.createBCHAddress(this, password) {
-									updateAddressManagerDataBy(MultiChainType.BCH.id, it)
+									updateAddressManagerDataBy(ChainType.BCH, it)
 									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 								}
 
-							MultiChainType.BTC.id -> {
+							ChainType.BTC -> {
 								if (Config.isTestEnvironment()) {
 									AddressManagerPresenter.createBTCTestAddress(this, password) {
-										updateAddressManagerDataBy(MultiChainType.AllTest.id, it)
+										updateAddressManagerDataBy(ChainType.AllTest, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 									}
 								} else {
 									AddressManagerPresenter.createBTCAddress(this, password) {
-										updateAddressManagerDataBy(MultiChainType.BTC.id, it)
+										updateAddressManagerDataBy(ChainType.BTC, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 									}
 								}
@@ -145,33 +144,33 @@ class ChainAddressesPresenter(
 	}
 
 	private fun updateAddressManagerDataBy(
-		coinType: Int,
+		chainType: ChainType,
 		data: ArrayList<Pair<String, String>>
 	) {
 		fragment.parentFragment?.getChildFragment<AddressManagerFragment>()?.apply {
-			when (coinType) {
-				MultiChainType.ETH.id -> setEthereumAddressesModel(data)
-				MultiChainType.ETC.id -> setEthereumClassicAddressesModel(data)
-				MultiChainType.BTC.id -> setBitcoinAddressesModel(data)
-				MultiChainType.BCH.id -> setBitcoinCashAddressesModel(data)
-				MultiChainType.LTC.id -> setLitecoinAddressesModel(data)
-				MultiChainType.AllTest.id -> setBitcoinAddressesModel(data)
+			when (chainType) {
+				ChainType.ETH -> setEthereumAddressesModel(data)
+				ChainType.ETC -> setEthereumClassicAddressesModel(data)
+				ChainType.BTC -> setBitcoinAddressesModel(data)
+				ChainType.BCH -> setBitcoinCashAddressesModel(data)
+				ChainType.LTC -> setLitecoinAddressesModel(data)
+				ChainType.AllTest -> setBitcoinAddressesModel(data)
 			}
 		}
 	}
 
-	private fun updateDefaultStyle(coinType: Int) {
+	private fun updateDefaultStyle(coinType: ChainType) {
 		fragment.parentFragment?.childFragmentManager?.fragments?.find {
 			it is AddressManagerFragment
 		}?.let {
 			if (it is AddressManagerFragment) {
 				WalletTable.getCurrentWallet {
 					when (coinType) {
-						MultiChainType.ETH.id -> it.presenter.getEthereumAddresses(this)
-						MultiChainType.ETC.id -> it.presenter.getEthereumClassicAddresses(this)
-						MultiChainType.LTC.id -> it.presenter.getLitecoinAddresses(this)
-						MultiChainType.BCH.id -> it.presenter.getBitcoinCashAddresses(this)
-						MultiChainType.BTC.id -> {
+						ChainType.ETH -> it.presenter.getEthereumAddresses(this)
+						ChainType.ETC -> it.presenter.getEthereumClassicAddresses(this)
+						ChainType.LTC -> it.presenter.getLitecoinAddresses(this)
+						ChainType.BCH -> it.presenter.getBitcoinCashAddresses(this)
+						ChainType.BTC -> {
 							if (Config.isTestEnvironment()) {
 								it.presenter.getBitcoinTestAddresses(this)
 							} else {
@@ -194,7 +193,7 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	private fun showPrivateKeyExportFragment(address: String, coinType: Int) {
+	private fun showPrivateKeyExportFragment(address: String, coinType: ChainType) {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			AddressManagerPresenter.showPrivateKeyExportFragment(address, coinType, this)
 		}
@@ -210,51 +209,51 @@ class ChainAddressesPresenter(
 		// 用户在这个界面更新 默认地址的时候会再次调用这个方法，所以方法内包含更新当前地址的方法.
 		WalletTable.getCurrentWallet {
 			when (fragment.coinType) {
-				MultiChainType.ETH.id -> {
+				ChainType.ETH -> {
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(ethAddresses).toArrayList()
-					AddressManagerPresenter.getCurrentAddressIndexByChainType(MultiChainType.ETH.id) {
-						setDefaultAddress(it, currentETHAndERCAddress, MultiChainType.ETH.id)
+					AddressManagerPresenter.getCurrentAddressIndexByChainType(ChainType.ETH) {
+						setDefaultAddress(it, currentETHAndERCAddress, ChainType.ETH)
 						Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
 					}
 				}
 
-				MultiChainType.ETC.id -> {
+				ChainType.ETC -> {
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(etcAddresses).toArrayList()
-					AddressManagerPresenter.getCurrentAddressIndexByChainType(MultiChainType.ETC.id) {
-						setDefaultAddress(it, currentETCAddress, MultiChainType.ETC.id)
+					AddressManagerPresenter.getCurrentAddressIndexByChainType(ChainType.ETC) {
+						setDefaultAddress(it, currentETCAddress, ChainType.ETC)
 						Config.updateCurrentETCAddress(currentETCAddress)
 					}
 				}
 
-				MultiChainType.LTC.id -> {
+				ChainType.LTC -> {
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(ltcAddresses).toArrayList()
-					AddressManagerPresenter.getCurrentAddressIndexByChainType(MultiChainType.LTC.id) {
-						setDefaultAddress(it, currentLTCAddress, MultiChainType.LTC.id)
+					AddressManagerPresenter.getCurrentAddressIndexByChainType(ChainType.LTC) {
+						setDefaultAddress(it, currentLTCAddress, ChainType.LTC)
 						Config.updateCurrentLTCAddress(currentLTCAddress)
 					}
 				}
 
-				MultiChainType.BCH.id -> {
+				ChainType.BCH -> {
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(bchAddresses).toArrayList()
-					AddressManagerPresenter.getCurrentAddressIndexByChainType(MultiChainType.BCH.id) {
-						setDefaultAddress(it, currentBCHAddress, MultiChainType.BCH.id)
+					AddressManagerPresenter.getCurrentAddressIndexByChainType(ChainType.BCH) {
+						setDefaultAddress(it, currentBCHAddress, ChainType.BCH)
 						Config.updateCurrentLTCAddress(currentBCHAddress)
 					}
 				}
 
-				MultiChainType.BTC.id -> {
+				ChainType.BTC -> {
 					val address =
 						if (Config.isTestEnvironment()) btcSeriesTestAddresses else btcAddresses
 					val currentAddress =
 						if (Config.isTestEnvironment()) currentBTCSeriesTestAddress else currentBTCAddress
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(address).toArrayList()
-					AddressManagerPresenter.getCurrentAddressIndexByChainType(MultiChainType.BTC.id) {
-						setDefaultAddress(it, currentAddress, MultiChainType.BTC.id)
+					AddressManagerPresenter.getCurrentAddressIndexByChainType(ChainType.BTC) {
+						setDefaultAddress(it, currentAddress, ChainType.BTC)
 						if (Config.isTestEnvironment())
 							Config.updateCurrentBTCSeriesTestAddress(currentBTCSeriesTestAddress)
 						else Config.updateCurrentBTCAddress(currentBTCAddress)
@@ -264,7 +263,7 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	private fun setDefaultAddress(index: String, address: String, chainType: Int) {
+	private fun setDefaultAddress(index: String, address: String, chainType: ChainType) {
 		fragment.recyclerView.getItemAtAdapterPosition<ChainAddressesHeaderView>(0) {
 			it.setDefaultAddress(index, address, chainType) {
 				showMoreDashboard(this, address, chainType, false)

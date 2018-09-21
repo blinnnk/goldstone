@@ -321,6 +321,9 @@ interface DefaultTokenDao {
 	@Insert
 	fun insert(token: DefaultTokenTable)
 
+	@Insert
+	fun insertAll(token: List<DefaultTokenTable>)
+
 	@Update
 	fun update(token: DefaultTokenTable)
 

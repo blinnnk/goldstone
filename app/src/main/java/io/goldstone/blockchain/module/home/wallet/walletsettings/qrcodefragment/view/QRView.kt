@@ -12,7 +12,7 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
-import io.goldstone.blockchain.common.component.AttentionTextView
+import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -23,7 +23,6 @@ import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.verticalLayout
-import org.jetbrains.anko.wrapContent
 
 /**
  * @date 2018/5/8 12:23 PM
