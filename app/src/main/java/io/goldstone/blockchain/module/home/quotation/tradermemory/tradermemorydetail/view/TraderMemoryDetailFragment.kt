@@ -65,8 +65,6 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 			}
 
 			linearLayout {
-				setAlignParentBottom()
-				setCenterInHorizontal()
 				val roundButton = RoundButton(context)
 				roundButton.into(this)
 				roundButton.apply {
@@ -86,6 +84,9 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						}
 					}
 				}
+			}.apply {
+				setAlignParentBottom()
+				setCenterInHorizontal()
 			}
 		}
 	}
