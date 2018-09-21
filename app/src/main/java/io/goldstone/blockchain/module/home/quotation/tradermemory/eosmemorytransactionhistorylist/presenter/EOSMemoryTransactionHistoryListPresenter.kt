@@ -32,10 +32,6 @@ class EOSMemoryTransactionHistoryListPresenter(
 					for (index: Int in 0 until it.txList.size) {
 						arrayList.add(EOSMemoryTransactionHistoryListTable(it.txList[index]))
 					}
-					arrayList.add(EOSMemoryTransactionHistoryListTable(1, 2, "3", 4))
-					arrayList.add(EOSMemoryTransactionHistoryListTable(1, 2, "3", 4))
-					arrayList.add(EOSMemoryTransactionHistoryListTable(1, 2, "3", 4))
-					Log.e("arrayList", "++" + arrayList)
 					fragment.asyncData.isNull() isTrue {
 						fragment.asyncData = arrayList
 					} otherwise {
