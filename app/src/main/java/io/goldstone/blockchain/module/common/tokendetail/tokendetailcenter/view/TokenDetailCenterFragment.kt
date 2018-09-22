@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.View
 import android.widget.RelativeLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
@@ -10,7 +13,9 @@ import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -37,6 +42,13 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 		arrayListOf("Transaction List", secondMenuTitle)
 	}
 	override val presenter = TokenDetailCenterPresenter(this)
+
+	override fun onResume() {
+		super.onResume()
+		getParentFragment<TokenDetailOverlayFragment> {
+			headerTitle = token?.symbol.orEmpty()
+		}
+	}
 
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {

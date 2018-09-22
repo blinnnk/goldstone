@@ -48,7 +48,7 @@ data class EOSTransactionTable(
 		System.currentTimeMillis(),
 		response.executedStatus,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
-		info.fromAccount,
+		info.fromAccount.accountName,
 		Config.getCurrentEOSAddress(),
 		Config.getEOSCurrentChain().id,
 		true

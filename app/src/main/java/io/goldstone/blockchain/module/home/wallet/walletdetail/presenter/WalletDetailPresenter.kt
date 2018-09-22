@@ -160,10 +160,7 @@ class WalletDetailPresenter(
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenDetail) isFalse {
-				addFragmentAndSetArguments<TokenDetailOverlayFragment>(
-					ContainerID.main,
-					FragmentTag.tokenDetail
-				) {
+				addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main, FragmentTag.tokenDetail) {
 					putSerializable(ArgumentKey.tokenDetail, model)
 				}
 			}

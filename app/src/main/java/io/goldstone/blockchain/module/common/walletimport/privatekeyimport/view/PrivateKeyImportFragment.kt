@@ -74,21 +74,21 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
 				passwordInput.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
 				}.into(this)
 
 				repeatPassword.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.repeatPassword
 				}.into(this)
 
 				passwordHintInput.apply {
 					title = CreateWalletText.hint
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 				}.into(this)
 
 				agreementView

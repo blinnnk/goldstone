@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -160,14 +161,14 @@ class PaymentPreparePresenter(
 
 		// 检查的是对应 `EOS` 个数的余额
 		fun checkResourceIsEnoughOrElse(
-			accountName: String,
+			account: EOSAccount,
 			checkCount: Double,
 			tradingType: TradingType,
 			errorCallback: (GoldStoneError) -> Unit,
 			@UiThread hold: (GoldStoneError) -> Unit
 		) {
 			EOSAPI.getAccountInfo(
-				accountName,
+				account,
 				errorCallback
 			) {
 				val isEnough = when (tradingType) {

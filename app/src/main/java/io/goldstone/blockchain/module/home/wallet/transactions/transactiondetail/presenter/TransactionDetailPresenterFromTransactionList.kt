@@ -4,7 +4,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
@@ -51,7 +51,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 				}
 			}
 
-			EOSWalletUtils.isValidAccountName(fromAddress, false).isValid() -> {
+			EOSAccount(fromAddress).isValid(false) -> {
 				dataFromList?.let {
 					// 本地没有 Miner 信息那么从链上拉取
 					fun updateUI(miner: String) {

@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.clickToCopy
@@ -20,6 +22,11 @@ class TransactionDetailFragment :
 	BaseRecyclerFragment<TransactionDetailPresenter, TransactionDetailModel>() {
 
 	override val presenter = TransactionDetailPresenter(this)
+
+	override fun setRecyclerViewLayoutManager(recyclerView: BaseRecyclerView) {
+		super.setRecyclerViewLayoutManager(recyclerView)
+		recyclerView.layoutParams
+	}
 
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,

@@ -17,10 +17,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 
 /**
  * @date 21/03/2018 11:00 PM
@@ -32,8 +29,8 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		invalidate()
 	}
 	var marginTop = 0
-	private val shadowSize = 1.uiPX().toFloat()
-	private val buttonHeight = 45.uiPX()
+	private val shadowSize = 4f
+	private val buttonHeight = 40.uiPX()
 	private val textPaint = Paint()
 	private var textSize: Float by observing(0f) {
 		textPaint.textSize = textSize
@@ -75,7 +72,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 						indeterminateDrawable.setColorFilter(
 							color, android.graphics.PorterDuff.Mode.MULTIPLY
 						)
-						layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
+						layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
 						setCenterInParent()
 					}.into(this)
 				}
@@ -109,7 +106,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			GrayScale.whiteGray,
 			Spectrum.green,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = GrayScale.midGray
 		invalidate()
@@ -125,7 +122,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			Spectrum.blue,
 			Spectrum.white,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = Spectrum.white
 		invalidate()
@@ -144,7 +141,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			GrayScale.Opacity3Black,
 			Spectrum.white,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = Spectrum.white
 		invalidate()
@@ -163,7 +160,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			Spectrum.green,
 			Spectrum.yellow,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = Spectrum.white
 		invalidate()

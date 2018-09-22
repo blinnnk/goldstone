@@ -83,26 +83,26 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 				walletNameInput.apply {
 					hint = UIUtils.generateDefaultName()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
 
 				passwordInput.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
 				}.into(this)
 
 				repeatPassword.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.repeatPassword
 				}.into(this)
 
 				hintInput.apply {
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
 

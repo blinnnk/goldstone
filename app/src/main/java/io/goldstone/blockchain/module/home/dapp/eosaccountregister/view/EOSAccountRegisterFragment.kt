@@ -29,7 +29,7 @@ import io.goldstone.blockchain.common.utils.convertToDouble
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSValue
-import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
@@ -67,9 +67,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				accountNameInput.apply {
 					title = ImportWalletText.eosAccountName
 					afterTextChanged = Runnable {
-						val checker =
-							EOSWalletUtils.isValidAccountName(getContent())
-						if (checker.isValid()) setValidStatus(true, "Available")
+						val checker = EOSAccount(getContent()).checker()
+						if (checker.isValid()) setValidStatus(true, "Valid")
 						else setValidStatus(false, checker.shortDescription)
 					}
 				}.into(this)
@@ -107,7 +106,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				}.click { button ->
 					button.showLoadingStatus()
 					presenter.registerAccount(
-						accountNameInput.getContent(),
+						EOSAccount(accountNameInput.getContent()),
 						publickeyInput.getContent(),
 						BigInteger.valueOf(assignResources[0].right.toLong()),
 						assignResources[1].right.toDouble(),

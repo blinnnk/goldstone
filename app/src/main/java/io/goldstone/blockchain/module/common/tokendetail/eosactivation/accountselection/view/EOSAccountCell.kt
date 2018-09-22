@@ -8,7 +8,7 @@ import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.container.GrayCardView
+import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize

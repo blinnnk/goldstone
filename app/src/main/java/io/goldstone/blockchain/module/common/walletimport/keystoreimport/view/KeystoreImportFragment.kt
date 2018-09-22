@@ -69,13 +69,13 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
 				passwordInput.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 				}.into(this)
 
 				hintInput.apply {
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
 

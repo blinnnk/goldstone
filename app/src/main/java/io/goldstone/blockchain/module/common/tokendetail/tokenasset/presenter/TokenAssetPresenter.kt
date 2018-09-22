@@ -72,7 +72,7 @@ class TokenAssetPresenter(
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
 			TokenDetailText.accountNameSelection,
 			TokenDetailText.tokenDetail,
-			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName()) },
+			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName().accountName) },
 			2
 		)
 	}
@@ -106,13 +106,13 @@ class TokenAssetPresenter(
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val accountName = Config.getCurrentEOSName()
-		EOSAccountTable.getAccountByName(accountName) { localData ->
+		val account = Config.getCurrentEOSName()
+		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
 			if (onlyUpdateLocalData) return@getAccountByName
 			EOSAPI.getAccountInfo(
-				accountName,
+				account,
 				{
 					LogUtil.error("getAccountInfo", it)
 				}
@@ -129,14 +129,14 @@ class TokenAssetPresenter(
 
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val accountName = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSName()
 		EOSTransactionTable.getTransactionByAccountName(
-			accountName,
+			account.accountName,
 			Config.getEOSCurrentChain()
 		) { localData ->
 			if (localData.isEmpty()) {
 				EOSAPI.getTransactionsLastIndex(
-					accountName,
+					account,
 					{
 						fragment.setTransactionCount(CommonText.calculating)
 						LogUtil.error("getTransactionsLastIndex", it)

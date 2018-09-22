@@ -41,28 +41,20 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			childFragmentManager.fragments.apply {
 				if (last() is R) removeChildFragment(last())
 				// 组内只有一个 `Fragment` 的时候销毁掉回退按钮
-				if (size == 2 || viewPagerSize > 0) {
-					overlayView.header.apply {
-						showBackButton(false)
-						showCloseButton(true)
-					}
+				if (size == 2 || viewPagerSize > 0) overlayView.header.apply {
+					showBackButton(false)
+					showCloseButton(true)
 				}
 
-				if (viewPagerSize > 0) {
-					(0 until size).forEach {
-						if (this[it].isHidden) {
-							showChildFragment(this[it])
-						}
+				when {
+					viewPagerSize > 0 -> (0 until size).forEach {
+						if (this[it].isHidden) showChildFragment(this[it])
 					}
-				} else {
-					if (size >= 2) {
-						this[size - 2]?.let {
-							showChildFragment(it)
-						}
-					} else {
-						this[size - 1]?.let {
-							showChildFragment(it)
-						}
+					size >= 2 -> this[size - 2]?.let {
+						showChildFragment(it)
+					}
+					else -> this[size - 1]?.let {
+						showChildFragment(it)
 					}
 				}
 			}
@@ -80,7 +72,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			if (viewPagerSize > 0) {
 				childFragmentManager.fragments.apply {
 					forEachIndexed { index, fragment ->
-						if (index in lastIndex - viewPagerSize..lastIndex) {
+						if (index in lastIndex - viewPagerSize .. lastIndex) {
 							hideChildFragment(fragment)
 						}
 					}

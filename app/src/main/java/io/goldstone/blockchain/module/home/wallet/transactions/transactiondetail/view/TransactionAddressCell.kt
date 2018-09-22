@@ -42,15 +42,14 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 	}
 
 	init {
-		y -= 15.uiPX()
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 35.uiPX())
 		addressTextView.apply {
 			gravity = Gravity.CENTER_VERTICAL
 			textSize = fontSize(14)
 			textColor = GrayScale.black
-			typeface = GoldStoneFont.medium(context)
+			typeface = GoldStoneFont.heavy(context)
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
-			x = PaddingSize.device.toFloat()
+			setPadding(10.uiPX(), 0, 10.uiPX(), 0)
 		}.into(this)
 		copyButton.into(this)
 	}

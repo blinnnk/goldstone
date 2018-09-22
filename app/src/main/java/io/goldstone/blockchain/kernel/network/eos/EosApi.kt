@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.error.EOSRPCError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -12,6 +11,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
@@ -34,14 +34,14 @@ object EOSAPI {
 
 	var hasRetry = false
 	fun getAccountInfo(
-		accountName: String,
+		account: EOSAccount,
 		errorCallBack: (GoldStoneError) -> Unit,
 		targetNet: String = "",
 		@WorkerThread hold: (EOSAccountTable) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
-			ParameterUtil.prepareObjectContent(Pair("account_name", accountName))
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.accountName))
 		).let { requestBody ->
 			val api =
 				if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
@@ -59,7 +59,7 @@ object EOSAPI {
 				// TODO 整体的链重试需要思考怎么封装
 				if (!hasRetry && result.contains("NODEOS_UNREACHABLE")) {
 					EOSUrl.currentEOSTestUrl = ChainURL.eosTestBackUp
-					getAccountInfo(accountName, errorCallBack, "", hold)
+					getAccountInfo(account, errorCallBack, "", hold)
 					hasRetry = true
 				}
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
@@ -69,9 +69,9 @@ object EOSAPI {
 	}
 
 	fun getAvailableRamBytes(
-		accountName: String,
+		accountName: EOSAccount,
 		errorCallBack: (GoldStoneError) -> Unit,
-		hold: (BigInteger) -> Unit
+		@WorkerThread hold: (BigInteger) -> Unit
 	) {
 		getAccountInfo(accountName, errorCallBack) {
 			val availableRAM = it.ramQuota - it.ramUsed
@@ -107,12 +107,12 @@ object EOSAPI {
 	}
 
 	fun getAccountEOSBalance(
-		accountName: String,
+		account: EOSAccount,
 		errorCallBack: (GoldStoneError) -> kotlin.Unit,
 		hold: (balance: Double) -> Unit
 	) {
 		getAccountBalanceBySymbol(
-			accountName,
+			account,
 			CoinSymbol.EOS,
 			EOSCodeName.EOSIOToken,
 			errorCallBack,
@@ -177,7 +177,7 @@ object EOSAPI {
 
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountBalanceBySymbol(
-		accountName: String,
+		account: EOSAccount,
 		symbol: CoinSymbol,
 		tokenCodeName: EOSCodeName,
 		errorCallBack: (GoldStoneError) -> Unit,
@@ -186,7 +186,7 @@ object EOSAPI {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("code", tokenCodeName.value),
-				Pair("account", accountName),
+				Pair("account", account.accountName),
 				Pair("symbol", symbol.symbol)
 			),
 			EOSUrl.getAccountEOSBalance(),
@@ -203,14 +203,14 @@ object EOSAPI {
 
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountResource(
-		accountName: String,
+		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
 		errorCallBack: (GoldStoneError) -> Unit,
 		@WorkerThread hold: (resource: TotalResources?) -> Unit
 	) {
 		RequisitionUtil.postSingle<TotalResources>(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", accountName),
+				Pair("scope", account.accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "userres"),
 				Pair("json", true)
@@ -266,7 +266,7 @@ object EOSAPI {
 	}
 
 	fun getTransactionsLastIndex(
-		accountName: String,
+		account: EOSAccount,
 		errorCallBack: (Throwable) -> Unit,
 		hold: (count: Int?) -> Unit
 	) {
@@ -274,7 +274,7 @@ object EOSAPI {
 		// 拉取下来最近一条获取到 `dataIndex` 即这个 `account` 的账单总数, 并计算映射出
 		// 实际的翻页参数
 		getAccountTransactionHistory(
-			accountName,
+			account.accountName,
 			-1,
 			-1,
 			errorCallBack
@@ -317,7 +317,7 @@ object EOSAPI {
 			false
 		) { jsonString ->
 			JSONArray(jsonString).toList().map {
-				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName())
+				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName().accountName)
 			}.let(hold)
 		}
 	}

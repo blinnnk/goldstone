@@ -28,9 +28,9 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionInfoCell
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -81,10 +81,8 @@ class TransactionDetailPresenter(
 
 	fun runBackEventBy(parent: Fragment) {
 		when (parent) {
-			is TokenDetailOverlayFragment -> {
-				parent.headerTitle = TokenDetailText.tokenDetail
+			is TokenDetailOverlayFragment ->
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
-			}
 
 			is NotificationFragment -> {
 				parent.headerTitle = NotificationText.notification
@@ -98,7 +96,7 @@ class TransactionDetailPresenter(
 		return CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
 	}
 
-	fun showAddContactsButton(cell: TransactionDetailCell) {
+	fun showAddContactsButton(cell: TransactionInfoCell) {
 		TransactionListModel
 			.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
 				ContactTable.hasContacts(address) { exist ->

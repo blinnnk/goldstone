@@ -43,12 +43,12 @@ open class DashboardOverlay(
 		verticalLayout {
 			titleView = textView {
 				visibility = View.GONE
-				textSize = fontSize(18)
+				textSize = fontSize(20)
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.black(context)
 				gravity = Gravity.CENTER_HORIZONTAL
 				bottomPadding = 20.uiPX()
-				topPadding = 20.uiPX()
+				topPadding = 16.uiPX()
 			}
 			lparams(matchParent, matchParent)
 			gravity = Gravity.CENTER_HORIZONTAL
