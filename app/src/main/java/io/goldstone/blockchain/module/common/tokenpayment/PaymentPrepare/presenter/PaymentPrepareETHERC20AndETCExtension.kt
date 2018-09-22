@@ -2,9 +2,8 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.os.Bundle
 import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.*
@@ -21,8 +20,9 @@ import java.math.BigInteger
  * @date 2018/7/25 3:24 PM
  * @author KaySaith
  */
-fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
-	count: Double, callback: () -> Unit
+fun PaymentPreparePresenter.prepareETHSeriesPaymentModel(
+	count: Double,
+	callback: (RequestError) -> Unit
 ) {
 	generatePaymentPrepareModel(
 		count,
@@ -37,29 +37,27 @@ fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(
 				Bundle().apply {
 					putSerializable(ArgumentKey.gasPrepareModel, model)
 				})
-			callback()
+			callback(RequestError.None)
 		}
 	}
 }
 
 /**
- * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommond` 的 `RawTransaction`
+ * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommend` 的 `RawTransaction`
  */
 private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
 	chainType: ChainType,
-	callback: () -> Unit,
+	errorCallback: (RequestError) -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {
 	GoldStoneEthCall.getUsableNonce(
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-		},
+		errorCallback,
 		chainType,
 		CoinSymbol(getToken()?.symbol).getAddress()
 	) {
-		generateTransaction(fragment.address!!, count, memo, it, callback, hold)
+		generateTransaction(fragment.address!!, count, memo, it, errorCallback, hold)
 	}
 }
 
@@ -68,7 +66,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	count: Double,
 	memo: String,
 	nonce: BigInteger,
-	callback: () -> Unit,
+	errorCallback: (RequestError) -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {
 	val countWithDecimal: BigInteger
@@ -95,10 +93,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 		to,
 		CoinSymbol(getToken()?.symbol).getAddress(),
 		data,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
-			callback()
-		},
+		errorCallback,
 		CoinSymbol(getToken()?.symbol).getCurrentChainName()
 	) { limit ->
 		hold(

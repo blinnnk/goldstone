@@ -101,6 +101,7 @@ class PrivateKeyExportPresenter(
 					hold("")
 					LogUtil.error("getPrivateKey", error)
 				},
+				true,
 				hold
 			)
 		}

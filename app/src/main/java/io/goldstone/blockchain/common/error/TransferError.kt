@@ -17,7 +17,7 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val GetChainInfoError = TransferError("get chain info error, please check your net environment")
 		@JvmStatic
-		val TradingInputIsEmpty = TransferError("please enter the count which you will trading")
+		val TradingInputIsEmpty = TransferError("please enter the count that you will trading")
 		@JvmStatic
 		val wrongRAMInputValue = TransferError("you must enter only Integer because of the unit of selling ram is byte")
 	}
@@ -31,7 +31,7 @@ class StakeBandWidthError(override val message: String) : GoldStoneError(message
 	}
 }
 
-class AccountError(val content: String) : GoldStoneError(content) {
+open class AccountError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
 		val DecryptKeyStoreError = AccountError("decrypt your keystore by password found error")
@@ -43,6 +43,8 @@ class AccountError(val content: String) : GoldStoneError(content) {
 		val EmptyName = AccountError("please enter the account name which you decide to register")
 		@JvmStatic
 		val EmptyPublicKey = AccountError("please enter the public key which you decide to bind the account name")
+		@JvmStatic
+		val WrongPassword = AccountError("Wrong Password")
 		@JvmStatic
 		val None = AccountError(GoldStoneError.None.message)
 	}
@@ -57,7 +59,7 @@ class PasswordError(val content: String) : GoldStoneError(content) {
 	}
 }
 
-class RequestError(override val message: String) : GoldStoneError(message) {
+open class RequestError(override val message: String) : GoldStoneError(message){
 	companion object {
 		@JvmStatic
 		val PostFailed: (errorDetail: Throwable) -> RequestError = { error ->
@@ -67,5 +69,7 @@ class RequestError(override val message: String) : GoldStoneError(message) {
 		val ResolveDataError: (errorDetail: Throwable) -> RequestError = { error ->
 			RequestError("resolve request result data failed || ${error.message}")
 		}
+		@JvmStatic
+		val None = RequestError(GoldStoneError.None.message)
 	}
 }

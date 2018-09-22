@@ -399,7 +399,7 @@ object RequisitionUtil {
 
 	fun callChainBy(
 		body: RequestBody,
-		errorCallback: (error: Throwable?, reason: String?) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		chainName: String = Config.getCurrentChainName(),
 		hold: (String) -> Unit
 	) {
@@ -417,7 +417,7 @@ object RequisitionUtil {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(error, "Call Ethereum Failed")
+						errorCallback(RequestError.PostFailed(error))
 					}
 				}
 
@@ -428,7 +428,7 @@ object RequisitionUtil {
 					checkChainErrorCode(data).let {
 						if (it.isNotEmpty()) {
 							GoldStoneAPI.context.runOnUiThread {
-								errorCallback(null, it)
+								errorCallback(RequestError.ResolveDataError(Throwable(it)))
 							}
 							return
 						}
@@ -438,7 +438,7 @@ object RequisitionUtil {
 						hold(dataObject.safeGet("result"))
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
-							errorCallback(error, "onResponse Error in $chainName")
+							errorCallback(RequestError.ResolveDataError(Throwable("$error onResponse Error in $chainName")))
 						}
 					}
 				}

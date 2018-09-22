@@ -1,5 +1,12 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model
 
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
+import io.goldstone.blockchain.crypto.ethereum.Transaction
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.getSelectedGasPrice
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -18,7 +25,25 @@ data class PaymentPrepareModel(
 	val toWalletAddress: String,
 	val memo: String,
 	var gasPrice: BigInteger = BigInteger.ZERO
-) : Serializable
+) : Serializable {
+	fun generateRawTransaction(
+		chainID: Long,
+		minerFeeType: MinerFeeType,
+		gasLimit: BigInteger
+	): Transaction {
+		return Transaction().apply transaction@{
+			this@transaction.chain = ChainDefinition(chainID)
+			this@transaction.nonce = this@PaymentPrepareModel.nonce
+			this@transaction.gasPrice = minerFeeType.getSelectedGasPrice()
+			this@transaction.gasLimit = gasLimit
+			this@transaction.to = Address(toAddress)
+			this@transaction.value =
+				if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
+				else countWithDecimal
+			this@transaction.input = inputData.hexToByteArray().toList()
+		}
+	}
+}
 
 data class PaymentBTCSeriesModel(
 	val toAddress: String,

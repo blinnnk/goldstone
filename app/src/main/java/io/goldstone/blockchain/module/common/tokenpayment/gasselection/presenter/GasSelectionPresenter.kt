@@ -8,6 +8,8 @@ import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -45,7 +47,7 @@ class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
 
-	var currentMinerType = MinerFeeType.Recommend.content
+	var currentMinerType = MinerFeeType.Recommend
 	var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
@@ -91,7 +93,7 @@ class GasSelectionPresenter(
 						index,
 						miner.toString().toLong(),
 						prepareBTCSeriesModel?.signedMessageSize ?: 226,
-						currentMinerType,
+						currentMinerType.type,
 						getToken()?.symbol.orEmpty()
 					)
 				else
@@ -99,11 +101,11 @@ class GasSelectionPresenter(
 						index,
 						miner.toString().toDouble(),
 						prepareGasLimit(miner.toDouble().toGwei()).toDouble(),
-						currentMinerType,
+						currentMinerType.type,
 						getUnitSymbol()
 					)
 
-				if (model.type == currentMinerType) {
+				if (model.type == currentMinerType.type) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -111,7 +113,7 @@ class GasSelectionPresenter(
 					gasUsedGasFee = getGasUnitCount(model.count)
 				}
 			}.click { it ->
-				currentMinerType = it.model.type
+				currentMinerType = MinerFeeType.getTypeByValue(it.model.type)
 				if (CoinSymbol(getToken()?.symbol).isBTCSeries())
 					updateBTCGasSettings(getToken()?.symbol.orEmpty(), parent)
 				else updateGasSettings(parent)
@@ -145,30 +147,23 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
-		// Prevent user click the other button at this time
-		fragment.showMaskView(true)
+	fun confirmTransfer(
+		footer: GasSelectionFooter,
+		callback: (GoldStoneError) -> Unit
+	) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
-			callback()
-			fragment.showMaskView(false)
-			return
-		}
-		// 检查网络并执行转账操作
-		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			when {
-				getToken()?.contract.isBTC() ->
-					prepareToTransferBTC(footer, callback)
-				getToken()?.contract.isLTC() ->
-					prepareToTransferLTC(footer, callback)
-				getToken()?.contract.isBCH() ->
-					prepareToTransferBCH(footer, callback)
-				getToken()?.contract.isEOS() -> {
-					// TODO EOS
-				}
-				else -> prepareToTransfer(footer, callback)
-			}
+			callback(TransferError.IncorrectDecimal)
+		} else if (NetworkUtil.hasNetworkWithAlert(fragment.context)) when {
+			// 检查网络并执行转账操作
+			getToken()?.contract.isBTC() ->
+				prepareToTransferBTC(footer, callback)
+			getToken()?.contract.isLTC() ->
+				prepareToTransferLTC(footer, callback)
+			getToken()?.contract.isBCH() ->
+				prepareToTransferBCH(footer, callback)
+			else -> prepareToTransfer(footer, callback)
 		}
 	}
 
@@ -184,7 +179,7 @@ class GasSelectionPresenter(
 
 	fun showConfirmAttentionView(
 		footer: GasSelectionFooter,
-		callback: () -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransaction,

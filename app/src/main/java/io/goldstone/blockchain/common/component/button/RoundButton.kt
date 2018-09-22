@@ -16,7 +16,6 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 
 /**
@@ -63,30 +62,19 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		if (needToShow) {
 			isEnabled = false
 			text = ""
-			try {
-				if (findViewById<ProgressBar>(ElementID.buttonLoading).isNull()) {
-					ProgressBar(
-						context, null, android.R.attr.progressBarStyleInverse
-					).apply {
-						id = ElementID.buttonLoading
-						indeterminateDrawable.setColorFilter(
-							color, android.graphics.PorterDuff.Mode.MULTIPLY
-						)
-						layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
-						setCenterInParent()
-					}.into(this)
-				}
-			} catch (error: Exception) {
-				LogUtil.error(this.javaClass.simpleName, error)
+			if (findViewById<ProgressBar>(ElementID.buttonLoading).isNull()) {
+				ProgressBar(context, null, android.R.attr.progressBarStyleInverse).apply {
+					id = ElementID.buttonLoading
+					indeterminateDrawable.setColorFilter(
+						color, android.graphics.PorterDuff.Mode.MULTIPLY
+					)
+					layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
+					setCenterInParent()
+				}.into(this)
 			}
-		}
-		if (!needToShow) {
-			try {
-				findViewById<ProgressBar>(ElementID.buttonLoading)?.let {
-					removeView(it)
-				}
-			} catch (error: Exception) {
-				LogUtil.error(this.javaClass.simpleName, error)
+		} else {
+			findViewById<ProgressBar>(ElementID.buttonLoading)?.let {
+				removeView(it)
 			}
 			text = recoveryText
 			isEnabled = true
