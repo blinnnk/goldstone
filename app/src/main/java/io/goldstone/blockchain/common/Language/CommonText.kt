@@ -81,7 +81,7 @@ object CommonText {
 	}
 	@JvmField
 	val succeed = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Success"
+		HoneyLanguage.English.code -> "SUCCESS"
 		HoneyLanguage.Chinese.code -> "成功"
 		HoneyLanguage.Japanese.code -> "成功"
 		HoneyLanguage.Korean.code -> "성공"

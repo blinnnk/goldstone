@@ -15,10 +15,10 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
-import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -44,7 +44,6 @@ import java.math.BigInteger
 class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInterface {
 
 	private val tokenInfoView by lazy { TokenInfoView(context!!) }
-
 	private val balanceCell by lazy {
 		GraySquareCell(context!!).apply {
 			setTitle(TokenDetailText.balance)
@@ -63,7 +62,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		GraySquareCell(context!!).apply {
 			showArrow()
 			setTitle(TokenDetailText.authority)
-			setSubtitle(Config.getCurrentEOSName())
+			setSubtitle(Config.getCurrentEOSName().accountName)
 			click { presenter.showPublicKeyAccountNames() }
 		}
 	}
@@ -202,15 +201,14 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
 			Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
 			Pair(R.drawable.ram_icon, TokenDetailText.tradeRAM)
-		).forEachIndexed { index, pair ->
-			generateCardView(index, pair)
+		).forEach { pair ->
+			generateCardView(pair)
 		}
 	}
 
-	private fun ViewGroup.generateCardView(position: Int, info: Pair<Int, String>) {
-		val cardWidth = (ScreenSize.widthWithPadding - 10.uiPX()) / 3
+	private fun ViewGroup.generateCardView(info: Pair<Int, String>) {
+		val cardWidth = (ScreenSize.widthWithPadding) / 3
 		GrayCardView(context).apply {
-			x = 5.uiPX() * position * 1f
 			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
 			getContainer().apply {
 				onClick {

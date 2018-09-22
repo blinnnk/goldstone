@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.value
 
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -53,8 +54,8 @@ object Config {
 
 	/** Coin Address In SharedPreference */
 	// EOS Account Name
-	fun getCurrentEOSName(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSName)
+	fun getCurrentEOSName(): EOSAccount =
+		EOSAccount(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSName))
 
 	fun updateCurrentEOSName(name: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEOSName, name)

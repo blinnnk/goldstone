@@ -26,8 +26,8 @@ data class ReceiptModel(
 		response: EOSResponse,
 		token: WalletDetailCellModel
 	) : this(
-		info.fromAccount,
-		info.toAccount,
+		info.fromAccount.accountName,
+		info.toAccount.accountName,
 		TransactionListModel.generateEOSMinerContent(response.cupUsageByte, response.netUsageByte),
 		info.amount,
 		token,

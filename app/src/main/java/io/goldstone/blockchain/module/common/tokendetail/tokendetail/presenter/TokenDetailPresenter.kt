@@ -244,9 +244,9 @@ class TokenDetailPresenter(
 	}
 
 	private fun getEOSSeriesData(callback: (List<EOSTransactionTable>) -> Unit) {
-		val accountName = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSName()
 		EOSTransactionTable.getTransactionByAccountName(
-			accountName,
+			account.accountName,
 			Config.getEOSCurrentChain()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
@@ -259,7 +259,7 @@ class TokenDetailPresenter(
 					}.sortedByDescending {
 						it.timeStamp
 					}.toList(),
-					accountName
+					account.accountName
 				)
 				fragment.removeLoadingView()
 			}

@@ -3,11 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import com.blinnnk.extension.resetViewHeightByText
-import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 
 /**
@@ -16,35 +11,22 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
  */
 class TransactionDetailAdapter(
 	override var dataSet: ArrayList<TransactionDetailModel>,
-	private val hold: TransactionDetailCell.() -> Unit
+	private val hold: TransactionInfoCell.() -> Unit
 ) :
-	HoneyBaseAdapterWithHeaderAndFooter<TransactionDetailModel, TransactionDetailHeaderView, TransactionDetailCell, View>() {
+	HoneyBaseAdapterWithHeaderAndFooter<TransactionDetailModel, TransactionDetailHeaderView, TransactionInfoCell, View>() {
 
-	override fun generateCell(context: Context) =
-		TransactionDetailCell(context)
+	override fun generateCell(context: Context) = TransactionInfoCell(context)
 
 	override fun generateFooter(context: Context) =
 		View(context)
 
 	override fun generateHeader(context: Context) = TransactionDetailHeaderView(context)
 
-	override fun TransactionDetailCell.bindCell(
+	override fun TransactionInfoCell.bindCell(
 		data: TransactionDetailModel,
 		position: Int
 	) {
 		model = data
-		if (
-			!model.description.equals(CommonText.from, true)
-			&& !model.description.equals(CommonText.to, true)
-		) {
-			resetViewHeightByText(
-				60.uiPX(),
-				data.info,
-				fontSize(12),
-				ScreenSize.widthWithPadding,
-				200.uiPX()
-			)
-		}
 		hold(this)
 	}
 }

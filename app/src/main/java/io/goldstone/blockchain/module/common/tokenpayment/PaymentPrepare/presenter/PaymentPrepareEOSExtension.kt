@@ -2,10 +2,11 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
@@ -29,7 +30,7 @@ fun PaymentPreparePresenter.transferEOS(
 	// 准备转账信息
 	EOSTransactionInfo(
 		Config.getCurrentEOSName(),
-		fragment.address!!,
+		EOSAccount(fragment.address!!),
 		count.toEOSUnit(),
 		fragment.getMemoContent(),
 		symbol.symbol!!
@@ -57,7 +58,7 @@ private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 	doAsync {
 		GoldStoneDataBase.database.eosTransactionDao().apply {
 			val dataIndex =
-				getDataByRecordAccount(info.fromAccount).maxBy { it.dataIndex }?.dataIndex ?: 0
+				getDataByRecordAccount(info.fromAccount.accountName).maxBy { it.dataIndex }?.dataIndex ?: 0
 			val transaction = EOSTransactionTable(info, response, dataIndex)
 			insert(transaction)
 		}

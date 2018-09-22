@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.TradingCardView
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import org.jetbrains.anko.*
@@ -34,7 +35,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val incomeTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(Config.getCurrentEOSName())
+			setAccountHint(Config.getCurrentEOSName().accountName)
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.gainConfirmEvent {
@@ -47,7 +48,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val expendTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(Config.getCurrentEOSName())
+			setAccountHint(Config.getCurrentEOSName().accountName)
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.refundOrSellConfirmEvent {
@@ -99,7 +100,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		expendTradingCard.setProcessValue(title, weight, available, total, isTime)
 	}
 
-	fun getInputValue(stakeType: StakeType): Pair<String, Double> {
+	fun getInputValue(stakeType: StakeType): Pair<EOSAccount, Double> {
 		return if (stakeType.isDelegate() || stakeType.isBuyRam()) incomeTradingCard.getInputValue()
 		else expendTradingCard.getInputValue()
 	}

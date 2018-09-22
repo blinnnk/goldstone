@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -71,7 +72,7 @@ class EOSAccountSelectionPresenter(
 						EOSAccountTable.getAccountByName(account.name, false) { localAccount ->
 							// 本地为空的话从网络获取数据
 							if (localAccount.isNull()) EOSAPI.getAccountInfo(
-								account.name,
+								EOSAccount(account.name),
 								{
 									completeMark()
 									LogUtil.error("getAccountInfo", it)

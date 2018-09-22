@@ -144,7 +144,7 @@ object CommonCellSize {
 
 object TransactionSize {
 	@JvmField
-	val headerView = 220.uiPX()
+	val headerView = 200.uiPX()
 }
 
 object HomeSize {

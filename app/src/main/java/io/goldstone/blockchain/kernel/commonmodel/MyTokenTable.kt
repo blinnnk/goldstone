@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -246,7 +245,7 @@ data class MyTokenTable(
 				contract.isEOS() -> {
 					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 					// 网络请求在这额外校验一次.
-					if (EOSWalletUtils.isValidAccountName(Config.getCurrentEOSName()).isValid()) {
+					if (Config.getCurrentEOSName().isValid()) {
 						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSName(), errorCallback, callback)
 					}
 				}

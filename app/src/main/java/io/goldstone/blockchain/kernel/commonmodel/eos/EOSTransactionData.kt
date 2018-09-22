@@ -21,8 +21,8 @@ data class EOSTransactionData(
 ) {
 
 	constructor(data: EOSTransactionInfo) : this(
-		data.fromAccount,
-		data.toAccount,
+		data.fromAccount.accountName,
+		data.toAccount.accountName,
 		"${CryptoUtils.toCountByDecimal(data.amount, data.decimal)} ${data.symbol}",
 		data.memo
 	)

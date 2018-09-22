@@ -11,7 +11,9 @@ import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -49,16 +51,16 @@ class EOSAccountRegisterPresenter(
 	}
 
 	fun registerAccount(
-		newAccountName: String,
+		newAccountName: EOSAccount,
 		publicKey: String,
 		ramAmount: BigInteger,
 		cpuEOSCount: Double,
 		netAEOSCount: Double,
 		callback: (GoldStoneError) -> Unit
 	) {
-		val creatorAccountName = Config.getCurrentEOSName()
+		val creatorAccount = Config.getCurrentEOSName()
 		val totalSpent = (cpuEOSCount + netAEOSCount) + 2.0 // TODO 内存假设就是 2 颗 EOS
-		checkNewAccountInfoInChain(newAccountName, publicKey) { validAccountName, validPublicKey, error ->
+		checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
 			if (!error.isNone()) {
 				callback(error)
 				return@checkNewAccountInfoInChain
@@ -66,8 +68,8 @@ class EOSAccountRegisterPresenter(
 			val chainID = Config.getEOSCurrentChain()
 			BaseTradingPresenter.prepareTransaction(
 				fragment.context,
-				creatorAccountName,
-				validAccountName!!,
+				creatorAccount,
+				validAccount!!,
 				totalSpent,
 				CoinSymbol.EOS,
 				false
@@ -75,13 +77,14 @@ class EOSAccountRegisterPresenter(
 				if (error.isNone() && !privateKey.isNull()) {
 					EOSRegisterTransaction(
 						chainID,
-						EOSAuthorization(creatorAccountName, EOSActor.Active),
-						validAccountName.orEmpty(),
+						EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
+						validAccount.accountName,
 						validPublicKey.orEmpty(),
 						ramAmount,
 						cpuEOSCount.toEOSUnit(),
 						netAEOSCount.toEOSUnit()
 					).send(privateKey!!, callback) {
+						fragment.getParentContainer()?.apply { it.showDialog(this) }
 						callback(GoldStoneError.None)
 					}
 				} else callback(privateKeyError)
@@ -90,14 +93,14 @@ class EOSAccountRegisterPresenter(
 	}
 
 	private fun checkNewAccountInfoInChain(
-		newAccountName: String,
+		newAccount: EOSAccount,
 		publicKey: String,
 		@UiThread hold: (
-			validAccountName: String?,
+			validAccount: EOSAccount?,
 			validPublicKey: String?,
 			error: GoldStoneError
 		) -> Unit) {
-		if (newAccountName.isEmpty()) {
+		if (newAccount.accountName.isEmpty()) {
 			hold(null, null, AccountError.EmptyName)
 			return
 		}
@@ -106,7 +109,7 @@ class EOSAccountRegisterPresenter(
 			return
 		}
 		// 检查 AccountName 是否是合规的公钥
-		if (!EOSWalletUtils.isValidAccountName(newAccountName).isValid()) {
+		if (!newAccount.isValid()) {
 			hold(null, null, AccountError.InvalidAccountName)
 			return
 		}
@@ -117,13 +120,13 @@ class EOSAccountRegisterPresenter(
 		}
 		// 检查当前合规的用户名是否可被注册
 		EOSAPI.getAccountResource(
-			newAccountName,
+			newAccount,
 			EOSCodeName.EOSIO,
 			{ hold(null, null, it) }
 		) {
 			fragment.context?.runOnUiThread {
 				if (!it.isNull()) hold(null, null, EOSRPCError.RegisteredName)
-				else hold(newAccountName, publicKey, GoldStoneError.None)
+				else hold(newAccount, publicKey, GoldStoneError.None)
 			}
 		}
 	}

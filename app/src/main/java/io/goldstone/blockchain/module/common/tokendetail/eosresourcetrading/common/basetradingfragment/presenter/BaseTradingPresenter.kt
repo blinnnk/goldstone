@@ -14,9 +14,11 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
-import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -62,7 +64,7 @@ open class BaseTradingPresenter(
 	}
 
 	private fun setUsageValue() {
-		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
+		EOSAccountTable.getAccountByName(Config.getCurrentEOSName().accountName) { account ->
 			when (fragment.tradingType) {
 				TradingType.CPU -> {
 					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
@@ -85,18 +87,20 @@ open class BaseTradingPresenter(
 	private fun BaseTradingFragment.tradingRam(stakeType: StakeType, callback: (GoldStoneError) -> Unit) {
 		val fromAccount = Config.getCurrentEOSName()
 		val chainID = Config.getEOSCurrentChain()
-		val toAccountName = getInputValue(stakeType).first
+		val toAccount = getInputValue(stakeType).first
 		val tradingCount = getInputValue(stakeType).second
 		prepareTransaction(
 			context,
 			fromAccount,
-			toAccountName,
+			toAccount,
 			tradingCount,
 			CoinSymbol.EOS,
 			stakeType.isSellRam()
 		) { privateKey, error ->
 			/** `Buy Ram` 是可以按照 `EOS Count` 来进行购买的, 但是 `Sell` 只能按照 `Byte` 进行销售 */
-			fun completeEvent() {
+			fun completeEvent(response: EOSResponse) {
+				// 显示成功的 `Dialog`
+				fragment.getParentContainer()?.apply { response.showDialog(this) }
 				// 清空输入框里面的值
 				fragment.clearInputValue()
 				// 成功提示
@@ -108,19 +112,19 @@ open class BaseTradingPresenter(
 			if (error.isNone() && !privateKey.isNull()) {
 				if (stakeType.isBuyRam()) EOSBuyRamTransaction(
 					chainID,
-					fromAccount,
-					toAccountName,
+					fromAccount.accountName,
+					toAccount.accountName,
 					tradingCount.toEOSUnit(),
 					ExpirationType.FiveMinutes
 				).send(privateKey!!, callback) {
-					completeEvent()
+					completeEvent(it)
 				} else EOSSellRamTransaction(
 					chainID,
-					fromAccount,
+					fromAccount.accountName,
 					tradingCount.toLong().toBigInteger(),
 					ExpirationType.FiveMinutes
 				).send(privateKey!!, callback) {
-					completeEvent()
+					completeEvent(it)
 				}
 			} else callback(error)
 		}
@@ -132,26 +136,28 @@ open class BaseTradingPresenter(
 		callback: (GoldStoneError) -> Unit
 	) {
 		val fromAccount = Config.getCurrentEOSName()
-		val toAccountName = getInputValue(stakeType).first
+		val toAccount = getInputValue(stakeType).first
 		val transferCount = getInputValue(stakeType).second
 		prepareTransaction(
 			context,
 			fromAccount,
-			toAccountName,
+			toAccount,
 			transferCount,
 			CoinSymbol.EOS
 		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
 					Config.getEOSCurrentChain(),
-					EOSAuthorization(fromAccount, EOSActor.Active),
-					toAccountName,
+					EOSAuthorization(fromAccount.accountName, EOSActor.Active),
+					toAccount.accountName,
 					transferCount.toEOSUnit(),
 					tradingType,
 					stakeType,
 					fragment.isSelectedTransfer(stakeType),
 					ExpirationType.FiveMinutes
 				).send(privateKey!!, callback) {
+					// 显示成功的 `Dialog`
+					fragment.getParentContainer()?.apply { it.showDialog(this) }
 					// 清空输入框里面的值
 					fragment.clearInputValue()
 					// 成功提示
@@ -165,12 +171,12 @@ open class BaseTradingPresenter(
 	}
 
 	private fun updateLocalDataAndUI() {
-		val currentAccountName = Config.getCurrentEOSName()
+		val currentAccount = Config.getCurrentEOSName()
 		EOSAPI.getAccountInfo(
-			currentAccountName,
+			currentAccount,
 			{ LogUtil.error("updateLocalResourceData", it) }
 		) { newData ->
-			EOSAccountTable.getAccountByName(currentAccountName, false) { localData ->
+			EOSAccountTable.getAccountByName(currentAccount.accountName, false) { localData ->
 				localData?.let { local ->
 					// 新数据标记为老数据的 `主键` 值
 					GoldStoneDataBase.database.eosAccountDao().update(newData.apply { this.id = local.id })
@@ -184,26 +190,26 @@ open class BaseTradingPresenter(
 
 		fun prepareTransaction(
 			context: Context?,
-			fromAccountName: String,
-			toAccountName: String,
+			fromAccount: EOSAccount,
+			toAccount: EOSAccount,
 			tradingCount: Double,
 			symbol: CoinSymbol,
 			isSellRam: Boolean = false,
 			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			// 检出用户的输入值是否合规
-			isValidInputValue(Pair(toAccountName, tradingCount), isSellRam) { error ->
+			isValidInputValue(Pair(toAccount, tradingCount), isSellRam) { error ->
 				if (!error.isNone()) hold(null, error) else {
 					// 检查余额
 					if (isSellRam) EOSAPI.getAvailableRamBytes(
-						fromAccountName,
+						fromAccount,
 						{ hold(null, error) }
 					) {
 						// 检查发起账户的 `RAM` 余额是否足够
 						if (it < tradingCount.toLong().toBigInteger()) hold(null, TransferError.BalanceIsNotEnough)
 						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
 					} else EOSAPI.getAccountBalanceBySymbol(
-						fromAccountName,
+						fromAccount,
 						symbol,
 						EOSCodeName.EOSIOToken,
 						{ hold(null, it) }
@@ -217,11 +223,11 @@ open class BaseTradingPresenter(
 		}
 
 		private fun isValidInputValue(
-			inputValue: Pair<String, Double>,
+			inputValue: Pair<EOSAccount, Double>,
 			isSellRam: Boolean,
 			callback: (GoldStoneError) -> Unit
 		) {
-			if (!EOSWalletUtils.isValidAccountName(inputValue.first).isValid()) {
+			if (!inputValue.first.isValid()) {
 				// 检查用户名是否正确
 				callback(AccountError.InvalidAccountName)
 			} else if (inputValue.second == 0.0) {
