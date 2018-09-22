@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.ethereum.walletfile
 
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.keystore.convertKeystoreToModel
@@ -16,7 +17,7 @@ object WalletUtil {
 	fun getKeyPairFromWalletFile(
 		walletJSON: String,
 		password: String,
-		errorCallback: (Throwable) -> Unit
+		errorCallback: (AccountError) -> Unit
 	): ECKeyPair? {
 		val keystoreModel = walletJSON.convertKeystoreToModel()
 		val cryptWallet = WalletCrypto(
@@ -43,7 +44,7 @@ object WalletUtil {
 			wallet.decrypt(password)
 		} catch (error: Exception) {
 			LogUtil.error("getKeyPairFromWalletFile", error)
-			GoldStoneAPI.context.runOnUiThread { errorCallback(error) }
+			GoldStoneAPI.context.runOnUiThread { errorCallback(AccountError.DecryptKeyStoreError) }
 			null
 		}
 	}

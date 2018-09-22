@@ -25,7 +25,7 @@ class ExampleUnitTest {
 	}
 
 	@Test
-	fun testEvent() {
+	fun generateObject() {
 		val expectResult = "{\"account\":\"eosio\",\"name\":\"delegatebw\",\"authorization\":[{\"actor\":\"hello\",\"permission\":\"active\"}],\"data\":{\"from\":\"hello\",\"receiver\":\"love\",\"stake_net_quantity\":\"1.0000 EOS\",\"stake_cpu_quantity\":\"1.0000 EOS\"},\"hex_data\":\"\"}"
 		// Test Everything
 		BandWidthModel(
@@ -47,5 +47,9 @@ class ExampleUnitTest {
 		val list2 = listOf(Pair(1, 2), Pair(1, 1))
 		LogUtil.debug("compare", list1.containsAll(list2).toString())
 		LogUtil.debug("compare", (list1.asSequence().plus(list2).distinct().toList() - list1).toString())
+	}
+
+	@Test
+	fun anyTest() {
 	}
 }

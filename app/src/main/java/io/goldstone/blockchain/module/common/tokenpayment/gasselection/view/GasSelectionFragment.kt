@@ -11,12 +11,14 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.title.ExplanationTitle
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
@@ -74,9 +76,14 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						}
 					}
 					getConfirmButton {
-						onClick {
+						onClick { _ ->
 							showLoadingStatus()
+							// Prevent user click the other button at this time
+							showMaskView(true)
 							presenter.confirmTransfer(footer) {
+								if (it !is AccountError) setCanUseStyle(false)
+								else if (!it.isNone()) this@GasSelectionFragment.context.alert(it.message)
+								showMaskView(false)
 								showLoadingStatus(false, Spectrum.white, CommonText.next)
 							}
 						}
@@ -113,23 +120,19 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	}
 
 	fun showMaskView(isShow: Boolean = false) {
-		if (isShow) {
-			if (container.findViewById<View>(ElementID.mask).isNull()) {
-				View(context).apply {
-					id = ElementID.mask
-					backgroundColor = Color.TRANSPARENT
-					isClickable = true
-					onClick {
-						this@apply.context.alert("Confirming transfer now please wait a momnet")
-					}
-					layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-				}.into(container)
+		if (isShow && container.findViewById<View>(ElementID.mask).isNull()) View(context).apply {
+			id = ElementID.mask
+			backgroundColor = Color.TRANSPARENT
+			isClickable = true
+			onClick {
+				this@apply.context.alert("Confirming transfer now please wait a moment")
 			}
-		} else {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+		}.into(container) else {
 			// When transfer is end that recovery custom miner
 			// gas price value and current miner type
 			MinerFeeType.Custom.value = 0
-			presenter.currentMinerType = MinerFeeType.Recommend.content
+			presenter.currentMinerType = MinerFeeType.Recommend
 			container.findViewById<View>(ElementID.mask)?.let {
 				container.removeView(it)
 			}

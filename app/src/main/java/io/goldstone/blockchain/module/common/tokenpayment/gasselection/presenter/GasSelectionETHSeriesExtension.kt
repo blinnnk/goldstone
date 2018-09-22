@@ -1,15 +1,16 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orElse
-import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
-import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
@@ -31,7 +32,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasS
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -103,18 +103,12 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 
 fun GasSelectionPresenter.prepareToTransfer(
 	footer: GasSelectionFooter,
-	callback: () -> Unit
+	callback: (GoldStoneError) -> Unit
 ) {
-	checkBalanceIsValid(getToken()) {
+	checkBalanceIsValid(getToken()) hasEnoughBalance@{
 		GoldStoneAPI.context.runOnUiThread {
-			isTrue {
-				showConfirmAttentionView(footer, callback)
-			} otherwise {
-				footer.setCanUseStyle(false)
-				fragment.context?.alert(AlertText.balanceNotEnough)
-				callback()
-				fragment.showMaskView(false)
-			}
+			if (this@hasEnoughBalance) showConfirmAttentionView(footer, callback)
+			else callback(TransferError.BalanceIsNotEnough)
 		}
 	}
 }
@@ -122,7 +116,7 @@ fun GasSelectionPresenter.prepareToTransfer(
 fun GasSelectionPresenter.insertCustomGasData() {
 	val gasPrice =
 		BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
-	currentMinerType = MinerFeeType.Custom.content
+	currentMinerType = MinerFeeType.Custom
 	if (defaultGasPrices.size == 4) {
 		defaultGasPrices.remove(defaultGasPrices.last())
 	}
@@ -142,89 +136,77 @@ private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
 
 private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	password: String,
-	hold: (String?) -> Unit
+	@WorkerThread hold: (String?) -> Unit
 ) {
-	doAsync {
-		val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
-		// 获取当前账户的私钥
-		fragment.context?.getPrivateKey(
-			getETHERC20OrETCAddress(),
-			password,
-			false,
-			isSingleChainWallet,
-			{
-				hold(null)
-				fragment.showMaskView(false)
-			},
-			hold
-		)
-	}
+	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
+	// 获取当前账户的私钥
+	fragment.context?.getPrivateKey(
+		getETHERC20OrETCAddress(),
+		password,
+		false,
+		isSingleChainWallet,
+		{
+			hold(null)
+			fragment.showMaskView(false)
+		},
+		false,
+		hold
+	)
 }
 
-fun GasSelectionPresenter.transfer(password: String, callback: () -> Unit) {
-	doAsync {
-		getCurrentETHORETCPrivateKey(password) { privateKey ->
-			if (privateKey.isNullOrBlank()) {
-				// 当私钥为 `null` 的时候意味着获取私钥出错, 直接返回
-				callback()
-				return@getCurrentETHORETCPrivateKey
+fun GasSelectionPresenter.transfer(
+	password: String,
+	callback: (RequestError) -> Unit
+) {
+//	alert(CommonText.wrongPassword) // TODO Alert 移到 UI 层
+	getCurrentETHORETCPrivateKey(password) { privateKey ->
+		if (privateKey.isNullOrBlank()) {
+			// 当私钥为 `null` 的时候意味着获取私钥出错, 直接返回
+			callback(RequestError.None)
+		} else prepareModel?.apply model@{
+			// 更新 `prepareModel`  的 `gasPrice` 的值
+			this.gasPrice = currentMinerType.getSelectedGasPrice()
+			// Generate Transaction Model
+			val raw = Transaction().apply {
+				chain = ChainDefinition(getToken()?.contract?.getCurrentChainID()?.id?.toLongOrNull().orElse(0))
+				nonce = this@model.nonce
+				gasPrice = currentMinerType.getSelectedGasPrice()
+				gasLimit = BigInteger.valueOf(prepareGasLimit(currentMinerType.getSelectedGasPrice().toLong()))
+				to = Address(toAddress)
+				value = if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
+				else countWithDecimal
+				input = inputData.hexToByteArray().toList()
 			}
-
-			prepareModel?.apply model@{
-				// 更新 `prepareModel`  的 `gasPrice` 的值
-				this.gasPrice = getSelectedGasPrice(currentMinerType)
-				// Generate Transaction Model
-				val raw = Transaction().apply {
-					chain =
-						ChainDefinition(getToken()?.contract?.getCurrentChainID()?.id?.toLongOrNull().orElse(0))
-					nonce = this@model.nonce
-					gasPrice = getSelectedGasPrice(currentMinerType)
-					gasLimit =
-						BigInteger.valueOf(prepareGasLimit(getSelectedGasPrice(currentMinerType).toLong()))
-					to = Address(toAddress)
-					value = if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
-					else countWithDecimal
-					input = inputData.hexToByteArray().toList()
+			val signedHex = raw.sign(privateKey!!)
+			// 发起 `sendRawTransaction` 请求
+			GoldStoneEthCall.sendRawTransaction(
+				signedHex,
+				callback,
+				CoinSymbol(getToken()?.symbol).getCurrentChainName()
+			) { taxHash ->
+				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
+				taxHash.isValidTaxHash() isTrue {
+					// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+					insertPendingDataToTransactionTable(
+						toWalletAddress,
+						countWithDecimal,
+						this@model,
+						taxHash,
+						prepareModel?.memo ?: TransactionText.noMemo
+					)
 				}
-				val signedHex = TransactionUtils.signTransaction(raw, privateKey!!)
-				// 发起 `sendRawTransaction` 请求
-				GoldStoneEthCall.sendRawTransaction(
-					signedHex,
-					{ error, reason ->
-						fragment.context?.apply {
-							alert(reason ?: error.toString())
-							fragment.showMaskView(false)
-							callback()
-						}
-					},
-					CoinSymbol(getToken()?.symbol).getCurrentChainName()
-				) { taxHash ->
-					LogUtil.debug(this.javaClass.simpleName, "taxHash: $taxHash")
-					// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
-					taxHash.isValidTaxHash() isTrue {
-						// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-						insertPendingDataToTransactionTable(
-							toWalletAddress,
-							countWithDecimal,
+				// 主线程跳转到账目详情界面
+				fragment.context?.runOnUiThread {
+					goToTransactionDetailFragment(
+						rootFragment,
+						fragment,
+						prepareReceiptModel(
 							this@model,
-							taxHash,
-							prepareModel?.memo ?: TransactionText.noMemo
+							countWithDecimal,
+							taxHash
 						)
-					}
-					// 主线程跳转到账目详情界面
-					fragment.context?.runOnUiThread {
-						goToTransactionDetailFragment(
-							rootFragment,
-							fragment,
-							prepareReceiptModel(
-								this@model,
-								countWithDecimal,
-								taxHash
-							)
-						)
-						callback()
-						fragment.showMaskView(false)
-					}
+					)
+					callback(RequestError.None)
 				}
 			}
 		}
@@ -254,13 +236,11 @@ fun GasSelectionPresenter.prepareGasLimit(gasPrice: Long): Long {
 	else prepareModel?.gasLimit?.toLong().orElse(0)
 }
 
-private fun getSelectedGasPrice(type: String): BigInteger {
-	return when (type) {
-		MinerFeeType.Fast.content -> BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei())
-		MinerFeeType.Cheap.content -> BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei())
-		MinerFeeType.Recommend.content -> BigInteger.valueOf(
-			MinerFeeType.Recommend.value.scaleToGwei()
-		)
+fun MinerFeeType.getSelectedGasPrice(): BigInteger {
+	return when {
+		isFast() -> BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei())
+		isCheap() -> BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei())
+		isRecommend() -> BigInteger.valueOf(MinerFeeType.Recommend.value.scaleToGwei())
 		else -> BigInteger.valueOf(MinerFeeType.Custom.value.scaleToGwei())
 	}
 }
@@ -272,7 +252,7 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 				index,
 				miner.toDouble(),
 				prepareGasLimit(miner.toDouble().toGwei()).toDouble(),
-				currentMinerType,
+				currentMinerType.type,
 				getUnitSymbol()
 			)
 		}
@@ -297,7 +277,7 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			fromAddress = getETHERC20OrETCAddress()
 			this.value = CryptoUtils.toCountByDecimal(value, token!!.decimal).formatCount()
 			hash = taxHash
-			gasPrice = getSelectedGasPrice(currentMinerType).toString()
+			gasPrice = currentMinerType.getSelectedGasPrice().toString()
 			gasUsed = raw.gasLimit.toString()
 			isPending = true
 			recordOwnerAddress = getETHERC20OrETCAddress()
@@ -309,8 +289,7 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			contractAddress = token?.contract?.contract.orEmpty()
 			chainID = TokenContract(contractAddress).getCurrentChainID().id
 			memo = memoData
-			minerFee =
-				CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
+			minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
 		}.let {
 			GoldStoneDataBase.database.transactionDao().insert(it)
 			GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })

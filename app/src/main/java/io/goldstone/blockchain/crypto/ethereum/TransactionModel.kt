@@ -4,17 +4,15 @@ package io.goldstone.blockchain.crypto.ethereum
  * @date 2018/6/17 6:57 PM
  * @author KaySaith
  */
+import io.goldstone.blockchain.crypto.extensions.hexToBigInteger
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.crypto.utils.toHexString
 import java.math.BigInteger
 
 private var DEFAULT_GAS_PRICE = BigInteger("20000000000")
 private var DEFAULT_GAS_LIMIT = BigInteger("21000")
 
-data class ChainDefinition(
-	val id: Long,
-	private val prefix: String = "ETH"
-) {
-	
+data class ChainDefinition(val id: Long, private val prefix: String = "ETH") {
 	override fun toString() = "$prefix:$id"
 }
 
@@ -30,7 +28,7 @@ data class Transaction(
 	var txHash: String?,
 	var value: BigInteger
 ) {
-	
+
 	constructor() : this(
 		chain = null,
 		creationEpochSecond = null,
@@ -43,6 +41,14 @@ data class Transaction(
 		txHash = null,
 		value = BigInteger.ZERO
 	)
+
+	fun sign(privateKey: String): String {
+		val publicKey = publicKeyFromPrivate(privateKey.hexToBigInteger())
+		val keyPair = ECKeyPair(privateKey.hexToBigInteger(), publicKey)
+		val signatureData =
+			signViaEIP155(keyPair, chain!!)
+		return encodeRLP(signatureData).toHexString()
+	}
 }
 
 fun Transaction.signViaEIP155(key: ECKeyPair, chainDefinition: ChainDefinition): SignatureData {

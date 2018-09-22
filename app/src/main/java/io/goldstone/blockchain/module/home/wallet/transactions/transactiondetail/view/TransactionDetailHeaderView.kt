@@ -51,7 +51,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			lparams {
 				width = (ScreenSize.Width * 0.8).toInt()
 				height = wrapContent
-				topMargin = 40.uiPX()
+				topMargin = 35.uiPX()
 			}
 			gravity = Gravity.CENTER_HORIZONTAL
 			icon.apply {
@@ -150,7 +150,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 							android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 50.uiPX()
+						y += 45.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()

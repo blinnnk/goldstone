@@ -108,7 +108,7 @@ object EOSAPI {
 
 	fun getAccountEOSBalance(
 		account: EOSAccount,
-		errorCallBack: (GoldStoneError) -> kotlin.Unit,
+		errorCallBack: (RequestError) -> kotlin.Unit,
 		hold: (balance: Double) -> Unit
 	) {
 		getAccountBalanceBySymbol(
@@ -180,7 +180,7 @@ object EOSAPI {
 		account: EOSAccount,
 		symbol: CoinSymbol,
 		tokenCodeName: EOSCodeName,
-		errorCallBack: (GoldStoneError) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		@UiThread hold: (balance: Double) -> Unit
 	) {
 		RequisitionUtil.post(

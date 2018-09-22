@@ -9,7 +9,7 @@ enum class EthereumMethod(
 	val code: String = "",
 	val display: String = ""
 ) {
-	
+
 	EthCall("eth_call", SolidityCode.ethCall, "EthCall"),
 	GetSymbol("eth_call", SolidityCode.ethCall, "GetSymbol"),
 	GetTokenBalance("eth_call", SolidityCode.getTokenBalance, "GetTokenBalance"),
@@ -19,11 +19,7 @@ enum class EthereumMethod(
 	GetTokenName("eth_call", SolidityCode.getTokenName, "GetTokenName"),
 	SendRawTransaction("eth_sendRawTransaction", SolidityCode.getTokenName, "SendRawTransaction"),
 	GetTransactionByHash("eth_getTransactionByHash", SolidityCode.ethCall, "GetTransactionByHash"),
-	GetTransactionReceiptByHash(
-		                           "eth_getTransactionReceipt",
-		SolidityCode.ethCall,
-		                           "GetTransactionReceiptByHash"
-	                           ),
+	GetTransactionReceiptByHash("eth_getTransactionReceipt", SolidityCode.ethCall, "GetTransactionReceiptByHash"),
 	GetEstimateGas("eth_estimateGas", SolidityCode.ethCall, "GetEstimateGas"),
 	GetBlockByHash("eth_getBlockByHash", SolidityCode.ethCall, "GetBlockByHash"),
 	GetBlockNumber("eth_blockNumber", SolidityCode.ethCall, "GetBlockNumber"),

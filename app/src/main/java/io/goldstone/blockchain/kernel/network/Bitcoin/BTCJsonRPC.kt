@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -25,6 +27,7 @@ object BTCSeriesJsonRPC {
 		chainName: String,
 		blocks: Int,
 		isSmartFee: Boolean,
+		errorCallback: (RequestError) -> Unit,
 		hold: (Double?) -> Unit
 	) {
 		val method =
@@ -43,9 +46,7 @@ object BTCSeriesJsonRPC {
 		).let { it ->
 			RequisitionUtil.callChainBy(
 				it,
-				{ error, reason ->
-					LogUtil.error("estimatesmartFee $reason", error)
-				},
+				errorCallback,
 				chainName
 			) {
 				if (it.isNotEmpty()) {
@@ -60,7 +61,8 @@ object BTCSeriesJsonRPC {
 	fun sendRawTransaction(
 		chainName: String,
 		signedMessage: String,
-		hold: (String?) -> Unit
+		errorCallback: (RequestError) -> Unit,
+		@WorkerThread hold: (String?) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -73,12 +75,10 @@ object BTCSeriesJsonRPC {
 				signedMessage,
 				true // anyone can pay by this signed message
 			)
-		).let { it ->
+		).let { requestBody ->
 			RequisitionUtil.callChainBy(
-				it,
-				{ error, reason ->
-					LogUtil.error("SendRawTansaction $reason", error)
-				},
+				requestBody,
+				errorCallback,
 				chainName
 			) {
 				// Return Transaction hash
@@ -90,7 +90,7 @@ object BTCSeriesJsonRPC {
 	fun getConfirmations(
 		chainName: String,
 		txID: String,
-		errorCallback: (Throwable?, String?) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (Int?) -> Unit
 	) {
 		RequestBody.create(

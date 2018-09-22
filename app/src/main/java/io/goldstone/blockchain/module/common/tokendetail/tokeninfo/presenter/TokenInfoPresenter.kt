@@ -7,9 +7,11 @@ import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
@@ -54,9 +56,6 @@ class TokenInfoPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		showBalance()
-		showAddress()
-		showTransactionInfo()
 		val info = getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName =
@@ -70,16 +69,16 @@ class TokenInfoPresenter(
 		return CoinSymbol(tokenInfo?.symbol).isBTCSeries()
 	}
 
-	private fun showBalance() {
+	fun getBalance(hold: (String) -> Unit) {
 		MyTokenTable.getTokenBalance(
 			tokenInfo?.contract.orEmpty(),
 			currentAddress
 		) {
-			fragment.showBalance("${it.orZero()} ${tokenInfo?.symbol}")
+			hold("${it.orZero()} ${tokenInfo?.symbol}")
 		}
 	}
 
-	private fun showAddress() {
+	fun getAddress(hold: (address: String, hash160: String?) -> Unit) {
 		val net = when (tokenInfo?.symbol) {
 			CoinSymbol.bch, CoinSymbol.btc() ->
 				if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
@@ -89,10 +88,10 @@ class TokenInfoPresenter(
 		val hash160 =
 			if (net.isNull()) null
 			else Address.fromBase58(net, currentAddress).hash160.toNoPrefixHexString()
-		fragment.showAddress(currentAddress, hash160)
+		hold(currentAddress, hash160)
 	}
 
-	private fun showTransactionInfo() {
+	fun showTransactionInfo(errorCallback: (RequestError) -> Unit) {
 		val chainType = tokenInfo?.contract.getChainType().id
 		when {
 			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
@@ -125,33 +124,29 @@ class TokenInfoPresenter(
 						fragment.updateLatestActivationDate(latestDate)
 					}
 				}
-			tokenInfo?.contract.isETC() -> {
-				TransactionTable.getETCTransactions(currentAddress) { transactions ->
-					fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
-					// 分别查询 `接收的总值` 和 `支出的总值`
-					val totalReceiveValue =
-						transactions.asSequence().filter { it.isReceived }.sumByDouble { it.value.toDoubleOrNull().orZero() }
-					val totalSentValue =
-						transactions.asSequence().filter { !it.isReceived && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
-					setTotalValue(totalReceiveValue, totalSentValue)
-					// 获取最近一笔交易的时间显示最后活跃时间
-					val latestDate =
-						HoneyDateUtil.getSinceTime(
-							transactions.maxBy {
-								it.timeStamp.toLongOrNull() ?: 0
-							}?.timeStamp?.toMillisecond().orElse(0L)
-						)
-					fragment.updateLatestActivationDate(latestDate)
-				}
+			tokenInfo?.contract.isETC() -> TransactionTable.getETCTransactions(currentAddress) { transactions ->
+				fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
+				// 分别查询 `接收的总值` 和 `支出的总值`
+				val totalReceiveValue =
+					transactions.asSequence().filter { it.isReceived }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+				val totalSentValue =
+					transactions.asSequence().filter { !it.isReceived && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+				setTotalValue(totalReceiveValue, totalSentValue)
+				// 获取最近一笔交易的时间显示最后活跃时间
+				val latestDate =
+					HoneyDateUtil.getSinceTime(
+						transactions.maxBy {
+							it.timeStamp.toLongOrNull() ?: 0
+						}?.timeStamp?.toMillisecond().orElse(0L)
+					)
+				fragment.updateLatestActivationDate(latestDate)
 			}
 
 			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->
 				if (transactions.isEmpty()) {
 					// 本地没有数据的话从链上获取 `Count`
 					GoldStoneEthCall.getUsableNonce(
-						{ error, reason ->
-							LogUtil.error("getUsableNonce $reason", error)
-						},
+						errorCallback,
 						ChainType.ETH,
 						currentAddress
 					) {

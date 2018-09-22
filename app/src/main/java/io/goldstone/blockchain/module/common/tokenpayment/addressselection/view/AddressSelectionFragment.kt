@@ -128,10 +128,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		}
 	}
 
-	private fun setScanButtonStatus(
-		isShow: Boolean = true,
-		callback: () -> Unit = {}
-	) {
+	private fun setScanButtonStatus(isShow: Boolean = true, callback: () -> Unit = {}) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			overlayView.header.showScanButton(isShow, isFromQuickTransfer) {
 				callback()

@@ -86,14 +86,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 				confirmButton.apply {
 					setGrayStyle(20.uiPX())
-					text = CommonText.next.toUpperCase()
-					setMargins<LinearLayout.LayoutParams> {
-						bottomMargin = 30.uiPX()
-					}
-				}.click {
-					it.showLoadingStatus()
+					text = CommonText.next
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.goToGasEditorFragmentOrTransfer {
-						it.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						button.showLoadingStatus(false)
 					}
 				}.into(this)
 				// 扫描二维码进入后的样式判断

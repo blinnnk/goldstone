@@ -7,6 +7,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
@@ -202,7 +203,7 @@ data class MyTokenTable(
 		fun getBalanceByContract(
 			contract: TokenContract,
 			ownerName: String,
-			errorCallback: (GoldStoneError) -> Unit,
+			errorCallback: (RequestError) -> Unit,
 			@WorkerThread callback: (balance: Double) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`

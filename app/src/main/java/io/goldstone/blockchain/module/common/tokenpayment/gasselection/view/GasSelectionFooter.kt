@@ -63,8 +63,8 @@ class GasSelectionFooter(context: Context) : LinearLayout(context) {
 		action(confirmButton)
 	}
 
-	fun getCustomButton(action: BaseCell.() -> Unit) {
-		action(customButton)
+	fun getCustomButton(hold: BaseCell.() -> Unit) {
+		hold(customButton)
 	}
 
 }
