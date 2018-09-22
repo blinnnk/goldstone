@@ -66,6 +66,11 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		}
 	}
 
+	fun setSellingRAMStyle() {
+		amountEditText.setTitle("Bytes")
+		amountEditText.setHint("enter ram byte amount")
+	}
+
 	private val radioCellWidth = 100.uiPX()
 	private val transferResourceRadio by lazy {
 		RadioWithTitle(context).apply { setTitle("Transfer") }.apply {

@@ -71,7 +71,7 @@ object EOSAPI {
 	fun getAvailableRamBytes(
 		accountName: EOSAccount,
 		errorCallBack: (GoldStoneError) -> Unit,
-		hold: (BigInteger) -> Unit
+		@WorkerThread hold: (BigInteger) -> Unit
 	) {
 		getAccountInfo(accountName, errorCallBack) {
 			val availableRAM = it.ramQuota - it.ramUsed

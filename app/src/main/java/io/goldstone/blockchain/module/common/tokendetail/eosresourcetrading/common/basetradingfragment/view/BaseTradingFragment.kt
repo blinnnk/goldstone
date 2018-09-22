@@ -49,6 +49,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 	private val expendTradingCard by lazy {
 		TradingCardView(context!!).apply {
 			setAccountHint(Config.getCurrentEOSName().accountName)
+			if (tradingType.isRAM()) setSellingRAMStyle()
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.refundOrSellConfirmEvent {

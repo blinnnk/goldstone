@@ -27,6 +27,7 @@ import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSBuyRamTransaction
@@ -36,7 +37,9 @@ import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.comm
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.TradingType
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
+import java.math.BigInteger
 
 /**
  * @author KaySaith
@@ -121,7 +124,7 @@ open class BaseTradingPresenter(
 				} else EOSSellRamTransaction(
 					chainID,
 					fromAccount.accountName,
-					tradingCount.toLong().toBigInteger(),
+					BigInteger.valueOf(tradingCount.toLong()),
 					ExpirationType.FiveMinutes
 				).send(privateKey!!, callback) {
 					completeEvent(it)
@@ -160,8 +163,6 @@ open class BaseTradingPresenter(
 					fragment.getParentContainer()?.apply { it.showDialog(this) }
 					// 清空输入框里面的值
 					fragment.clearInputValue()
-					// 成功提示
-					fragment.toast(CommonText.succeed)
 					// 更新数据库数据并且更新界面的数据
 					fragment.presenter.updateLocalDataAndUI()
 					callback(error)
@@ -206,8 +207,10 @@ open class BaseTradingPresenter(
 						{ hold(null, error) }
 					) {
 						// 检查发起账户的 `RAM` 余额是否足够
-						if (it < tradingCount.toLong().toBigInteger()) hold(null, TransferError.BalanceIsNotEnough)
-						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+						if (it < BigInteger.valueOf(tradingCount.toLong())) hold(null, TransferError.BalanceIsNotEnough)
+						else GoldStoneAPI.context.runOnUiThread {
+							PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
 						symbol,
