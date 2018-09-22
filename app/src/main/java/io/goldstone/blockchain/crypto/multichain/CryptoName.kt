@@ -14,7 +14,7 @@ object CryptoName {
 	const val btc = "Bitcoin"
 	const val ltc = "Litecoin"
 	const val bch = "Bitcoin Cash"
-	const val eos = "Eos.io"
+	const val eos = "EOS"
 	val allChainName = listOf(
 		etc.replace(" ", ""),
 		eth,
