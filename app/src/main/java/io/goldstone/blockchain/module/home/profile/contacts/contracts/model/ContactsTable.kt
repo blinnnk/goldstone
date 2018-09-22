@@ -5,6 +5,11 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isBCH
+import io.goldstone.blockchain.crypto.multichain.isBTC
+import io.goldstone.blockchain.crypto.multichain.isLTC
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
 
@@ -25,7 +30,7 @@ data class ContactTable(
 	var etcAddress: String,
 	var ltcAddress: String,
 	var bchAddress: String
-	) : Serializable {
+) : Serializable {
 
 	@Ignore constructor() : this(
 		0,
@@ -79,6 +84,37 @@ data class ContactTable(
 				}
 			} then {
 				callback()
+			}
+		}
+	}
+}
+
+fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<ContactTable> {
+	return when {
+		contract.isBTC() -> map {
+			it.apply {
+				defaultAddress =
+					if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+					else it.btcMainnetAddress
+			}
+		}
+		contract.isLTC() -> map {
+			it.apply {
+				defaultAddress =
+					if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+					else it.ltcAddress
+			}
+		}
+		contract.isBCH() -> map {
+			it.apply {
+				defaultAddress =
+					if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+					else it.bchAddress
+			}
+		}
+		else -> map {
+			it.apply {
+				defaultAddress = ethERCAndETCAddress
 			}
 		}
 	}

@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.multichain.QRCode
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.AddressSelectionPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -99,7 +100,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		if (data.isNull()) return
 		val intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
 		intentResult?.let {
-			presenter.showPaymentPrepareFragmentByQRCode(it.contents)
+			presenter.showPaymentPrepareFragmentByQRCode(QRCode(it.contents))
 		}
 	}
 
