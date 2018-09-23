@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.ethereum.walletfile
 
+import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
@@ -17,7 +18,7 @@ object WalletUtil {
 	fun getKeyPairFromWalletFile(
 		walletJSON: String,
 		password: String,
-		errorCallback: (AccountError) -> Unit
+		@UiThread errorCallback: (AccountError) -> Unit
 	): ECKeyPair? {
 		val keystoreModel = walletJSON.convertKeystoreToModel()
 		val cryptWallet = WalletCrypto(

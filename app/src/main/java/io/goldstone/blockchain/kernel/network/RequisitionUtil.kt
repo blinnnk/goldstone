@@ -219,7 +219,7 @@ object RequisitionUtil {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline errorCallback: (Exception) -> Unit,
+		crossinline errorCallback: (RequestError) -> Unit,
 		targetGoldStoneID: String? = null,
 		isEncrypt: Boolean,
 		maxConnectTime: Long = 20,
@@ -236,7 +236,7 @@ object RequisitionUtil {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(error)
+						errorCallback(RequestError.PostFailed(error))
 					}
 					LogUtil.error(keyName + "requestData", error)
 				}
@@ -247,15 +247,11 @@ object RequisitionUtil {
 						else response.body()?.string().orEmpty()
 					// 结果返回为 `Empty` 或 `Null`
 					if (data.isNullOrBlank()) {
-						LogUtil.error("$keyName requestData data.isNullOrBlank")
 						GoldStoneAPI.context.runOnUiThread {
-							errorCallback(Exception("result is null"))
+							errorCallback(RequestError.NullResponse(keyName))
 						}
 						GoldStoneCode.showErrorCodeReason(data)
-						return
-					}
-
-					try {
+					} else try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 						if (justGetData) {
@@ -267,11 +263,9 @@ object RequisitionUtil {
 						}
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
-							LogUtil.error("Error in onResponse Try Catch")
-							errorCallback(error)
+							errorCallback(RequestError.ResolveDataError(error))
 						}
 						GoldStoneCode.showErrorCodeReason(data)
-						LogUtil.error("$keyName requestData", error)
 					}
 				}
 			})

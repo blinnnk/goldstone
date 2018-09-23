@@ -5,12 +5,12 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.blinnnk.extension.getTargetChild
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getTargetChild
-import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.getAddress
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
@@ -85,7 +85,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getWatchOnlyAddress() {
 		WalletTable.getWatchOnlyWallet {
-			LogUtil.debug("getWatchOnlyAddress", "$it")
+			LogUtil.debug("getWatchOnlyAddress", "$this")
 		}
 	}
 
@@ -133,7 +133,7 @@ class GoldStoneUtilUnitTest {
 	fun getCoinInfo() {
 		GoldStoneAPI.getTokenInfoFromMarket(
 			CoinSymbol.btc(),
-			ChainID.BTCMain.id,
+			ChainID.BTC.id,
 			{
 				LogUtil.error("getCoinInfo", it)
 			}

@@ -101,7 +101,7 @@ class TokenSearchPresenter(
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
+				TokenManagementListPresenter.updateMyTokenInfoBy(switch, it)
 			}
 		}
 	}

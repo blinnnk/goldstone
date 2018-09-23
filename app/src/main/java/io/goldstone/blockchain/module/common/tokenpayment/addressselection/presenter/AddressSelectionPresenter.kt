@@ -97,7 +97,6 @@ class AddressSelectionPresenter(
 		// 检查地址是否合规
 		when (MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
 			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
-
 			AddressType.ETHSeries -> when {
 				token?.contract.isBTCSeries() || token?.contract.isEOS() -> fragment.context.alert("this is not a valid bitcoin address")
 				else -> WalletTable.getAllETHAndERCAddresses {
@@ -105,7 +104,7 @@ class AddressSelectionPresenter(
 				}
 			}
 
-			AddressType.EOS, AddressType.EOSAccountName -> when {
+			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
 				!token?.contract.isEOS() -> fragment.context.alert("this is not a valid eos account name")
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {

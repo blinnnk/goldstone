@@ -20,9 +20,11 @@ import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
@@ -73,7 +75,9 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 				context?.clickToCopy(Config.getCurrentEOSAddress())
 			}
 			setTitle(TokenDetailText.address)
-			setSubtitle(Config.getCurrentEOSAddress().scaleTo(20))
+			val address =
+				if (Config.getCurrentEOSAddress().isEmpty()) "Account Name Only" else Config.getCurrentEOSAddress().scaleTo(20)
+			setSubtitle(address)
 		}
 	}
 
@@ -212,7 +216,9 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
 			getContainer().apply {
 				onClick {
-					presenter.showResourceTradingFragmentByTitle(info.second)
+					if (Config.getCurrentIsWatchOnlyOrNot())
+						this@TokenAssetFragment.context.alert(AlertText.watchOnly)
+					else presenter.showResourceTradingFragmentByTitle(info.second)
 					preventDuplicateClicks()
 				}
 				imageView {

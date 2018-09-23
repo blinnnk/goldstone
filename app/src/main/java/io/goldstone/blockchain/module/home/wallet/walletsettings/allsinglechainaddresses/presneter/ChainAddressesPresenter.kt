@@ -212,7 +212,7 @@ class ChainAddressesPresenter(
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(ethAddresses).toArrayList()
 					getAddressIndexByChainType(ChainType.ETH) {
-						setDefaultAddress(it, currentETHAndERCAddress, ChainType.ETH)
+						setDefaultAddress(it, currentETHSeriesAddress, ChainType.ETH)
 					}
 				}
 

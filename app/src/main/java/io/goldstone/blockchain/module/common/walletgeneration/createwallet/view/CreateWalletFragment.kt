@@ -10,12 +10,13 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
-import io.goldstone.blockchain.common.component.title.AttentionView
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -107,13 +108,14 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 				createButton.apply {
 					text = CreateWalletText.create.toUpperCase()
 					setGrayStyle(20.uiPX())
-				}.click {
-					it.showLoadingStatus()
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.generateWalletWith(
 						agreementView.radioButton.isChecked,
 						hintInput
 					) {
-						it.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						button.showLoadingStatus(false)
 					}
 				}.into(this)
 			}

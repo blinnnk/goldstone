@@ -205,9 +205,6 @@ class GasSelectionPresenter(
 					prepareBTCSeriesModel?.apply {
 						transferBCH(this, it?.text.toString(), callback)
 					}
-				getToken()?.contract.isEOS() -> {
-					// TODO EOS
-				}
 				else -> transfer(it?.text.toString(), callback)
 			}
 		}

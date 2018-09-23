@@ -178,7 +178,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.getLTCMain()
+			ChainID.LTC
 		} else {
 			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain))
 		}
@@ -208,7 +208,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.getBCHMain()
+			ChainID.BCH
 		} else {
 			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain))
 		}
@@ -238,7 +238,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.getEOSMain()
+			ChainID.EOS
 		} else {
 			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain))
 		}
@@ -268,7 +268,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.getETCMain()
+			ChainID.ETC
 		} else {
 			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain))
 		}
@@ -297,7 +297,7 @@ object Config {
 				.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
 				.equals("Default", true)
 		) {
-			ChainID.getBTCMain()
+			ChainID.BTC
 		} else {
 			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain))
 		}

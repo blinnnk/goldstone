@@ -149,6 +149,17 @@ object WalletText {
 	}
 
 	@JvmField
+	val eosMainnet = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS MAINNET"
+		HoneyLanguage.Chinese.code -> "EOS MAINNET"
+		HoneyLanguage.Japanese.code -> "EOS MAINNET"
+		HoneyLanguage.Korean.code -> "EOS MAINNET"
+		HoneyLanguage.Russian.code -> "EOS MAINNET"
+		HoneyLanguage.TraditionalChinese.code -> "EOS MAINNET"
+		else -> ""
+	}
+
+	@JvmField
 	val eosWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "EOS WALLET"
 		HoneyLanguage.Chinese.code -> "EOS WALLET"
@@ -156,6 +167,17 @@ object WalletText {
 		HoneyLanguage.Korean.code -> "EOS WALLET"
 		HoneyLanguage.Russian.code -> "EOS WALLET"
 		HoneyLanguage.TraditionalChinese.code -> "EOS WALLET"
+		else -> ""
+	}
+
+	@JvmField
+	val eosJungle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS JUNGLE"
+		HoneyLanguage.Chinese.code -> "EOS JUNGLE"
+		HoneyLanguage.Japanese.code -> "EOS JUNGLE"
+		HoneyLanguage.Korean.code -> "EOS JUNGLE"
+		HoneyLanguage.Russian.code -> "EOS JUNGLE"
+		HoneyLanguage.TraditionalChinese.code -> "EOS JUNGLE"
 		else -> ""
 	}
 

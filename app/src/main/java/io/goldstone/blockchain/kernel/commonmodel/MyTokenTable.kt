@@ -6,7 +6,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -100,8 +99,7 @@ data class MyTokenTable(
 		) {
 			load {
 				addresses.map { address ->
-					GoldStoneDataBase.database.myTokenDao()
-						.getTokensBy(address).filter { ChainID(it.chainID).isCurrent() }
+					GoldStoneDataBase.database.myTokenDao().getTokensBy(address).filter { ChainID(it.chainID).isCurrent() }
 				}.flatten()
 			} then (hold)
 		}
@@ -289,7 +287,7 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :ownerName AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, ownerName: String, chainID: String): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress ORDER BY balance DESC ")
+	@Query("SELECT * FROM myTokens WHERE ownerName LIKE :walletAddress OR ownerAddress LIKE :walletAddress ORDER BY balance DESC ")
 	fun getTokensBy(walletAddress: String): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")

@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -64,19 +65,13 @@ class TokenManagementListPresenter(
 					val sortedList =
 						defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						if (isETHERCAndETCOnly) {
-							sortedList.filterNot {
-								TokenContract(it.contract).isBTCSeries()
-							}.let {
-								memoryTokenData = it.toArrayList()
-							}
-						} else {
-							memoryTokenData = sortedList
-						}
+						if (isETHERCAndETCOnly) sortedList.filterNot {
+							TokenContract(it.contract).isBTCSeries() || TokenContract(it.contract).isEOS()
+						}.let {
+							memoryTokenData = it.toArrayList()
+						} else memoryTokenData = sortedList
 						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
-					} else {
-						return
-					}
+					} else return
 				}
 			}.start()
 		}
@@ -84,10 +79,7 @@ class TokenManagementListPresenter(
 
 	companion object {
 
-		fun updateMyTokensInfoBy(
-			switch: HoneyBaseSwitch,
-			token: DefaultTokenTable
-		) {
+		fun updateMyTokenInfoBy(switch: HoneyBaseSwitch, token: DefaultTokenTable) {
 			switch.isClickable = false
 			if (switch.isChecked) {
 				// once it is checked then insert this symbol into `MyTokenTable` database

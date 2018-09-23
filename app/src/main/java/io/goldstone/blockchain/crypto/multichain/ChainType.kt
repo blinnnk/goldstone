@@ -78,7 +78,7 @@ class ChainType(val id: Int) : Serializable {
 			when (id) {
 				ChainType.ETH.id -> {
 					Config.updateCurrentEthereumAddress(newAddress)
-					currentWallet?.currentETHAndERCAddress = newAddress
+					currentWallet?.currentETHSeriesAddress = newAddress
 				}
 				ChainType.ETC.id -> {
 					currentWallet?.currentETCAddress = newAddress
