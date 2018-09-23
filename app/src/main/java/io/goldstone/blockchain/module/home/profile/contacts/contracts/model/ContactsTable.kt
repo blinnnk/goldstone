@@ -6,10 +6,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.multichain.isBCH
-import io.goldstone.blockchain.crypto.multichain.isBTC
-import io.goldstone.blockchain.crypto.multichain.isLTC
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
 
@@ -24,7 +21,9 @@ data class ContactTable(
 	var avatar: String = "",
 	var name: String = "",
 	var defaultAddress: String,
-	var ethERCAndETCAddress: String,
+	var ethSeriesAddress: String,
+	var eosAddress: String,
+	var eosJungle: String,
 	var btcMainnetAddress: String,
 	var btcSeriesTestnetAddress: String,
 	var etcAddress: String,
@@ -34,6 +33,8 @@ data class ContactTable(
 
 	@Ignore constructor() : this(
 		0,
+		"",
+		"",
 		"",
 		"",
 		"",
@@ -79,9 +80,7 @@ data class ContactTable(
 			callback: () -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.contactDao().apply {
-					getContacts(id)?.let { delete(it) }
-				}
+				GoldStoneDataBase.database.contactDao().deleteByID(id)
 			} then {
 				callback()
 			}
@@ -112,9 +111,16 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 					else it.bchAddress
 			}
 		}
+		contract.isEOS() -> map {
+			it.apply {
+				defaultAddress =
+					if (Config.isTestEnvironment()) it.eosJungle
+					else it.eosAddress
+			}
+		}
 		else -> map {
 			it.apply {
-				defaultAddress = ethERCAndETCAddress
+				defaultAddress = ethSeriesAddress
 			}
 		}
 	}
@@ -129,11 +135,14 @@ interface ContractDao {
 	@Query("SELECT * FROM contact WHERE id LIKE :id")
 	fun getContacts(id: Int): ContactTable?
 
-	@Query("SELECT * FROM contact WHERE (ethERCAndETCAddress LIKE :address OR bchAddress LIKE :address  OR ltcAddress LIKE :address  OR etcAddress LIKE :address  OR btcMainnetAddress LIKE :address OR btcSeriesTestnetAddress LIKE :address)")
+	@Query("SELECT * FROM contact WHERE (ethSeriesAddress LIKE :address OR bchAddress LIKE :address  OR ltcAddress LIKE :address  OR etcAddress LIKE :address  OR btcMainnetAddress LIKE :address OR btcSeriesTestnetAddress LIKE :address)")
 	fun getContactByAddress(address: String): ContactTable?
 
 	@Insert
 	fun insert(contact: ContactTable)
+
+	@Query("DELETE FROM contact WHERE id LIKE :id")
+	fun deleteByID(id: Int)
 
 	@Delete
 	fun delete(contact: ContactTable)

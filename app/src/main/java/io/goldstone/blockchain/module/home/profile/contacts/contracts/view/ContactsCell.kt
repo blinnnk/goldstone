@@ -77,14 +77,16 @@ open class ContactsCell(context: Context) : HorizontalScrollView(context) {
 
 	private fun ContactTable.generateSubtitleIntro(): String {
 		val addresses = listOf(
-			Pair("${CoinSymbol.etc}/${CoinSymbol.erc}", ethERCAndETCAddress.isNotEmpty()),
+			Pair("${CoinSymbol.etc}/${CoinSymbol.erc}", ethSeriesAddress.isNotEmpty()),
+			Pair(CoinSymbol.eos, eosAddress.isNotEmpty()),
+			Pair("${CoinSymbol.eos} JUNGLE", eosJungle.isNotEmpty()),
 			Pair(CoinSymbol.btc(), btcMainnetAddress.isNotEmpty()),
 			Pair(CoinSymbol.ltc, ltcAddress.isNotEmpty()),
 			Pair(CoinSymbol.bch, bchAddress.isNotEmpty()),
 			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())
 		)
 		val count = addresses.filter { it.second }.size
-		val allTypes = addresses.filter { it.second }.map { it.first }.toString()
+		val allTypes = addresses.asSequence().filter { it.second }.map { it.first }.toList().toString()
 		val type = "(${allTypes.substring(1, allTypes.lastIndex)})"
 		val unit = if (count > 1) "Addresses" else "Address"
 		return "$count $unit $type"
