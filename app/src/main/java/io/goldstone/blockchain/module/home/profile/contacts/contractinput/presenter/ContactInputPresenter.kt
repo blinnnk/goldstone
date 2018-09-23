@@ -79,7 +79,7 @@ class ContactInputPresenter(
 						ltcAddressText = it.address
 					}
 
-					AddressType.EOS, AddressType.EOSAccountName -> {
+					AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> {
 						// TODO
 					}
 				}

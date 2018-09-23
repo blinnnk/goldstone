@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.ChainPath
@@ -121,8 +122,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(10.uiPX())
-				}.click {
-					it.showLoadingStatus()
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.importWalletByMnemonic(
 						ChainPath(
 							defaultPath[0],
@@ -139,9 +140,10 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						hintInput.text.toString(),
 						agreementView.radioButton.isChecked,
 						walletNameInput.text.toString()
-					) { isSuccessful ->
-						it.showLoadingStatus(false)
-						if (isSuccessful) activity?.jump<SplashActivity>()
+					) {
+						button.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						else activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 

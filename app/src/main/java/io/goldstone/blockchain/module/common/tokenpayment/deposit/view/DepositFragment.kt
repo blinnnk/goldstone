@@ -141,7 +141,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 
 					token?.contract.isETC() ->
 						qrView.setAddressText(currentETCAddress)
-					else -> qrView.setAddressText(currentETHAndERCAddress)
+					else -> qrView.setAddressText(currentETHSeriesAddress)
 				}
 			}
 		}

@@ -34,6 +34,10 @@ data class EOSDefaultAllChainName(
 		}
 	}
 
+	fun getUnEmptyValue(): String {
+		return listOf(main, jungle).firstOrNull { it.isNotEmpty() } ?: ""
+	}
+
 	fun updateCurrent(name: String): EOSDefaultAllChainName {
 		val currentChainID = Config.getEOSCurrentChain()
 		return apply {

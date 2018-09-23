@@ -177,44 +177,24 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 	isFailed: Boolean
 ) {
 	// 交易过程中发生错误
-	if (hasError) {
-		updateDataWhenHasError()
-	}
+	if (hasError) updateDataWhenHasError()
 	// 交易流程全部成功, 但是合约的问题导致失败
-	if (isFailed) {
-		updateDataWhenFailed()
-	}
+	if (isFailed) updateDataWhenFailed()
 
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				TinyNumberUtils.hasTrue(hasError, isFailed)
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getTransactionFromChain {
-			if (!it.isNone()) fragment.context.alert(it.message)
-		}
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				TinyNumberUtils.hasTrue(hasError, isFailed)
-			)
-		)
-		getTransactionFromChain {
-			if (!it.isNone()) fragment.context.alert(it.message)
-		}
+	)
+	getTransactionFromChain {
+		if (!it.isNone()) fragment.context.alert(it.message)
 	}
 }
 

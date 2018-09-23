@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.*
 import android.content.Context
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orFalse
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
@@ -15,6 +12,7 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -24,6 +22,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.json.JSONArray
 import java.io.Serializable
 
 /**
@@ -36,7 +35,7 @@ data class WalletTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	var name: String,
-	var currentETHAndERCAddress: String,
+	var currentETHSeriesAddress: String,
 	var currentETCAddress: String,
 	var currentBTCAddress: String,
 	var currentBTCSeriesTestAddress: String,
@@ -67,6 +66,48 @@ data class WalletTable(
 	var hasBackUpMnemonic: Boolean = false
 ) : Serializable {
 
+	constructor(
+		walletName: String,
+		currentETHSeriesAddress: String,
+		currentBTCTestAddress: String,
+		currentBTCAddress: String,
+		currentETCAddress: String,
+		currentLTCAddress: String,
+		currentBCHAddress: String,
+		currentEOSAddress: String,
+		currentEOSAccountName: EOSDefaultAllChainName,
+		eosAccountNames: List<EOSAccountInfo>
+	) : this(
+		0,
+		walletName,
+		currentETHSeriesAddress = currentETHSeriesAddress,
+		isUsing = true,
+		isWatchOnly = true,
+		hasBackUpMnemonic = true,
+		currentBTCSeriesTestAddress = currentBTCTestAddress,
+		currentBTCAddress = currentBTCAddress,
+		currentETCAddress = currentETCAddress,
+		currentLTCAddress = currentLTCAddress,
+		currentBCHAddress = currentBCHAddress,
+		currentEOSAddress = currentEOSAddress,
+		currentEOSAccountName = currentEOSAccountName,
+		ethPath = "",
+		etcPath = "",
+		btcPath = "",
+		bchPath = "",
+		btcTestPath = "",
+		ltcPath = "",
+		eosPath = "",
+		ethAddresses = "",
+		etcAddresses = "",
+		btcAddresses = "",
+		bchAddresses = "",
+		btcSeriesTestAddresses = "",
+		ltcAddresses = "",
+		eosAddresses = "",
+		eosAccountNames = eosAccountNames
+	)
+
 	fun getAddressIndexByChainType(chainType: ChainType, hold: (String) -> Unit) {
 		fun getTargetAddressIndex(address: String, targetAddress: String): String {
 			return if (address.contains(",")) {
@@ -76,7 +117,7 @@ data class WalletTable(
 			} else address.substringAfterLast("|")
 		}
 		when {
-			chainType.isETH() -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
+			chainType.isETH() -> hold(getTargetAddressIndex(ethAddresses, currentETHSeriesAddress))
 			chainType.isETC() -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
 			chainType.isLTC() -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
 			chainType.isBCH() -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
@@ -109,9 +150,9 @@ data class WalletTable(
 				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.bch))
 			}
 			// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
-			if (currentETHAndERCAddress.isNotEmpty()) {
-				add(Pair(currentETHAndERCAddress, CoinSymbol.erc))
-				add(Pair(currentETHAndERCAddress, CoinSymbol.eth))
+			if (currentETHSeriesAddress.isNotEmpty()) {
+				add(Pair(currentETHSeriesAddress, CoinSymbol.erc))
+				add(Pair(currentETHSeriesAddress, CoinSymbol.eth))
 				add(Pair(currentETCAddress, CoinSymbol.etc))
 			}
 			// EOS.io Mainnet and Testnet Addresses
@@ -128,7 +169,7 @@ data class WalletTable(
 			Pair(currentBCHAddress, ChainType.BCH),
 			Pair(currentBTCSeriesTestAddress, ChainType.AllTest),
 			Pair(currentETCAddress, ChainType.ETC),
-			Pair(currentETHAndERCAddress, ChainType.ETH),
+			Pair(currentETHSeriesAddress, ChainType.ETH),
 			Pair(currentEOSAddress, ChainType.EOS)
 		).filter { it.first.isNotEmpty() }
 	}
@@ -138,10 +179,14 @@ data class WalletTable(
 			currentBTCAddress,
 			currentBTCSeriesTestAddress,
 			currentETCAddress,
-			currentETHAndERCAddress,
+			currentETHSeriesAddress,
 			currentLTCAddress,
 			currentBCHAddress,
-			currentEOSAddress
+			listOf(
+				currentEOSAddress,
+				currentEOSAccountName.getCurrent(),
+				currentEOSAccountName.getUnEmptyValue()
+			).firstOrNull { it.isNotEmpty() } ?: ""
 		).asSequence().filter { it.isNotEmpty() }.distinctBy { it }.toList()
 	}
 
@@ -150,10 +195,12 @@ data class WalletTable(
 		return when {
 			walletType.isLTC() -> currentLTCAddress
 			walletType.isBCH() -> currentBCHAddress
-			walletType.isETHSeries() -> currentETHAndERCAddress
-			walletType.isBTCTest() -> btcSeriesTestAddresses
-			walletType.isBTC() -> btcAddresses
-			walletType.isEOS() -> eosAddresses
+			walletType.isETHSeries() -> currentETHSeriesAddress
+			walletType.isBTCTest() -> currentBTCSeriesTestAddress
+			walletType.isBTC() -> currentBTCAddress
+			walletType.isEOS() -> currentEOSAddress
+			walletType.isEOSMainnet() || walletType.isEOSJungle() ->
+				currentEOSAccountName.getCurrent()
 			walletType.isBIP44() -> WalletText.bip44MultiChain
 			else -> WalletText.multiChain
 		}
@@ -163,21 +210,33 @@ data class WalletTable(
 		val types = listOf(
 			Pair(WalletType.btcOnly, currentBTCAddress),
 			Pair(WalletType.btcTestOnly, currentBTCSeriesTestAddress),
-			Pair(WalletType.ethSeries, currentETHAndERCAddress),
+			Pair(WalletType.ethSeries, currentETHSeriesAddress),
 			Pair(WalletType.ltcOnly, currentLTCAddress),
 			Pair(WalletType.bchOnly, currentBCHAddress),
-			Pair(WalletType.eosOnly, currentEOSAddress)
-		).filter {
-			it.second.isNotEmpty()
-		}
-		return when (types.size) {
-			6 -> {
-				// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
-				// BIP44 钱包还是单纯的多链钱包
-				if (ethPath.isNotEmpty()) WalletType.getBIP44()
-				else WalletType.getMultiChain()
-			}
+			Pair(WalletType.eosOnly, currentEOSAddress),
+			Pair(WalletType.eosMainnetOnly, currentEOSAccountName.main),
+			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle)
+		).filter { it.second.isNotEmpty() }
+		return when {
+			// 减 `2` 是去除掉 `EOS` 的两个网络状态的计数, 此计数并不影响判断是否是全链钱包
+			// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
+			// BIP44 钱包还是单纯的多链钱包
+			types.size > 6 -> if (ethPath.isNotEmpty()) WalletType.BIP44 else WalletType.MultiChain
 			else -> WalletType(types.firstOrNull()?.first)
+		}
+	}
+
+	fun insertWatchOnlyWallet(callback: (wallet: WalletTable) -> Unit) {
+		load {
+			GoldStoneDataBase.database.walletDao().apply {
+				findWhichIsUsing(true)?.let {
+					update(it.apply { isUsing = false })
+				}
+				insert(this@WalletTable)
+			}.findWhichIsUsing(true)
+		} then {
+			Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
+			it?.apply(callback)
 		}
 	}
 
@@ -214,23 +273,6 @@ data class WalletTable(
 			}
 		}
 
-		fun insert(
-			model: WalletTable,
-			callback: (wallet: WalletTable?) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { isUsing = false })
-					}
-					insert(model)
-				}.findWhichIsUsing(true)
-			} then {
-				Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
-				callback(it)
-			}
-		}
-
 		fun saveEncryptMnemonicIfUserSkip(
 			encryptMnemonic: String,
 			address: String,
@@ -254,7 +296,7 @@ data class WalletTable(
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
 			} then { it ->
-				hold(it.map { it.currentETHAndERCAddress })
+				hold(it.map { it.currentETHSeriesAddress })
 			}
 		}
 
@@ -320,8 +362,7 @@ data class WalletTable(
 		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
 			WalletTable.getCurrentWallet {
 				val type = when {
-					EOSAccount(currentEOSAccountName.getCurrent()).isValid() ->
-						EOSWalletType.Available
+					EOSAccount(currentEOSAccountName.getCurrent()).isValid() -> EOSWalletType.Available
 					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 					eosAccountNames.filter {
 						it.chainID.equals(Config.getEOSCurrentChain().id, true)
@@ -444,6 +485,12 @@ data class WalletTable(
 				} else eosAddresses
 				// 获取最近的 `Address Index` 数值
 				hold(this, pureAddresses.substringAfterLast("|").toInt())
+			}
+		}
+
+		fun getAllEOSAccounts(hold: List<EOSAccountInfo>.() -> Unit) {
+			load { GoldStoneDataBase.database.walletDao().getEOSAccountNames() } then { it ->
+				hold(it.map { JSONArray(it).toList() }.flatten().map { EOSAccountInfo(it) })
 			}
 		}
 
@@ -747,8 +794,11 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 
-	@Query("SELECT * FROM wallet WHERE currentETHAndERCAddress LIKE :walletAddress OR currentEOSAddress LIKE :walletAddress OR currentBCHAddress LIKE :walletAddress OR currentLTCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCSeriesTestAddress LIKE :walletAddress")
+	@Query("SELECT * FROM wallet WHERE currentETHSeriesAddress LIKE :walletAddress OR currentEOSAddress LIKE :walletAddress OR currentBCHAddress LIKE :walletAddress OR currentLTCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCSeriesTestAddress LIKE :walletAddress")
 	fun getWalletByAddress(walletAddress: String): WalletTable?
+
+	@Query("SELECT eosAccountNames FROM wallet")
+	fun getEOSAccountNames(): List<String>
 
 	@Query("SELECT * FROM wallet")
 	fun getAllWallets(): List<WalletTable>

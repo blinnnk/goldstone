@@ -23,6 +23,8 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.json.JSONArray
+import org.json.JSONObject
 import java.math.BigInteger
 
 /**
@@ -136,3 +138,11 @@ fun String.convertToDouble(decimal: Int): Double? {
 }
 
 class MutablePair<L, R>(var left: L, var right: R)
+
+fun JSONArray.toList(): List<JSONObject> {
+	var result = listOf<JSONObject>()
+	(0 until length()).forEach {
+		result += JSONObject(get(it).toString())
+	}
+	return result
+}

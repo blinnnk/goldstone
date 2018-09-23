@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
@@ -58,21 +59,19 @@ object GoldStoneAPI {
 	 */
 	@JvmStatic
 	fun getDefaultTokens(
-		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<DefaultTokenTable>) -> Unit
+		errorCallback: (RequestError) -> Unit,
+		@WorkerThread hold: (List<DefaultTokenTable>) -> Unit
 	) {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
 		AppConfigTable.getAppConfig { it ->
 			requestData<String>(
-				APIPath.defaultTokenList(
-					APIPath.currentUrl,
-					it?.defaultCoinListMD5.orEmpty()
-				),
+				APIPath.defaultTokenList(APIPath.currentUrl, it?.defaultCoinListMD5.orEmpty()),
 				"",
 				true,
 				errorCallback,
 				isEncrypt = true
 			) {
+				// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
 				val data = JSONObject(this[0])
 				val defaultTokens = data.safeGet("data")
 				// MD5 值存入数据库
@@ -93,10 +92,10 @@ object GoldStoneAPI {
 									)
 								} catch (error: Exception) {
 									listOf<DefaultTokenTable>()
-								}.map {
-									it.apply {
-										it.chainID = chainID
-										it.isDefault = true
+								}.map { defaultToken ->
+									defaultToken.apply {
+										this.chainID = chainID
+										this.isDefault = true
 									}
 								}.apply {
 									completeMark()
@@ -104,6 +103,7 @@ object GoldStoneAPI {
 						}
 					}
 
+					override fun getResultInMainThread(): Boolean = false
 					override fun mergeCallBack() = hold(allDefaultTokens)
 
 				}.start()
@@ -114,7 +114,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTokenInfoBySymbolFromServer(
 		symbolsOrContract: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (ArrayList<TokenSearchModel>) -> Unit
 	) {
 		requestData<TokenSearchModel>(
@@ -137,7 +137,7 @@ object GoldStoneAPI {
 		chainID: ChainID,
 		address: String,
 		startBlock: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (ArrayList<ETCTransactionModel>) -> Unit
 	) {
 		requestData<ETCTransactionModel>(
@@ -158,7 +158,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getNewVersionOrElse(
-		errorCallback: (Exception) -> Unit = {},
+		errorCallback: (RequestError) -> Unit = {},
 		hold: (VersionModel?) -> Unit
 	) {
 		requestData<String>(
@@ -186,7 +186,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (Double) -> Unit
 	) {
 		requestData<String>(
@@ -203,7 +203,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTerms(
 		md5: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (String) -> Unit
 	) {
 		requestData<String>(
@@ -219,7 +219,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getConfigList(
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		@UiThread hold: (List<ServerConfigModel>) -> Unit
 	) {
 		requestData<ServerConfigModel>(
@@ -237,7 +237,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getShareContent(
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (ShareContentModel) -> Unit
 	) {
 		requestData<String>(
@@ -256,7 +256,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (List<QuotationSelectionTable>) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
@@ -339,7 +339,7 @@ object GoldStoneAPI {
 
 	fun unregisterDevice(
 		targetGoldStoneID: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (Boolean) -> Unit
 	) {
 		requestData<String>(
@@ -474,7 +474,7 @@ object GoldStoneAPI {
 		pair: String,
 		period: String,
 		size: Int,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (ArrayList<CandleChartModel>) -> Unit
 	) {
 		requestData<CandleChartModel>(
@@ -489,7 +489,7 @@ object GoldStoneAPI {
 
 	fun getQuotationCurrencyInfo(
 		pair: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (JSONObject) -> Unit
 	) {
 		requestData<String>(
@@ -506,7 +506,7 @@ object GoldStoneAPI {
 	fun getTokenInfoFromMarket(
 		symbol: String,
 		chainID: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (CoinInfoModel) -> Unit
 	) {
 		requestData<String>(

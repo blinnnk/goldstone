@@ -8,10 +8,7 @@ import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -46,7 +43,7 @@ class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
-	var isGettingDataInAsyncThreadNow = false
+	var lockGettingChainModelsThread = false
 
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
@@ -65,19 +62,19 @@ class WalletDetailPresenter(
 		// Check the info of wallet currency list
 		WalletDetailCellModel.apply {
 			// 显示本地的 `Token` 据
-			getLocalModels { it ->
-				updateUIByData(it)
-				/** 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记 */
-				if (!isGettingDataInAsyncThreadNow) {
+			getLocalModels { models, myTokens ->
+				updateUIByData(models)
+				// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
+				if (!lockGettingChainModelsThread) {
 					// 再检查链上的最新价格和数量
-					getChainModels(fragment) {
-						isGettingDataInAsyncThreadNow = false
-						updateUIByData(it)
-						fragment.removeMiniLoadingView()
+					lockGettingChainModelsThread = getChainModels(myTokens) { model, error ->
+						lockGettingChainModelsThread = false
+						if (error.isNone() && !model.isNull()) {
+							updateUIByData(model!!)
+							fragment.removeMiniLoadingView()
+						} else fragment.context.alert(error.message)
 					}
-				} else {
-					fragment.removeMiniLoadingView()
-				}
+				} else fragment.removeMiniLoadingView()
 			}
 		}
 	}
@@ -93,23 +90,19 @@ class WalletDetailPresenter(
 		) {
 			MyTokenTable.getCurrentChainDefaultAndMyTokens { myTokens, defaultTokens ->
 				// Jump directly if there is only one type of token
-				if (myTokens.size == 1) {
-					defaultTokens.find {
-						it.contract.equals(myTokens.first().contract, true)
-					}?.let {
-						isShowAddress isTrue {
-							TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, it)
-						} otherwise {
-							TokenSelectionRecyclerView.showDepositFragment(fragment.context, it)
-						}
+				if (myTokens.size == 1) defaultTokens.find {
+					it.contract.equals(myTokens.first().contract, true)
+				}?.let {
+					isShowAddress isTrue {
+						TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, it)
+					} otherwise {
+						TokenSelectionRecyclerView.showDepositFragment(fragment.context, it)
 					}
-				} else {
-					fragment.showSelectionListOverlayView(
-						myTokens,
-						defaultTokens,
-						isShowAddress
-					)
-				}
+				} else fragment.showSelectionListOverlayView(
+					myTokens,
+					defaultTokens,
+					isShowAddress
+				)
 			}
 		}
 	}

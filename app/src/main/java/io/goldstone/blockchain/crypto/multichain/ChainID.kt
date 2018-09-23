@@ -102,20 +102,6 @@ class ChainID(val id: String) : Serializable {
 	}
 
 	companion object {
-		fun getETHMain(): ChainID = ChainID(ethMain)
-		fun getRopsten(): ChainID = ChainID(ropsten)
-		fun getRinkeby(): ChainID = ChainID(rinkeby)
-		fun getKovan(): ChainID = ChainID(kovan)
-		fun getETCMain(): ChainID = ChainID(etcMain)
-		fun getETCTest(): ChainID = ChainID(etcTest)
-		fun getBTCMain(): ChainID = ChainID(btcMain)
-		fun getBTCTest(): ChainID = ChainID(btcTest)
-		fun getBCHMain(): ChainID = ChainID(bchMain)
-		fun getBCHTest(): ChainID = ChainID(bchTest)
-		fun getLTCMain(): ChainID = ChainID(ltcMain)
-		fun getLTCTest(): ChainID = ChainID(ltcTest)
-		fun getEOSMain(): ChainID = ChainID(eosMain)
-		fun getEOSTest(): ChainID = ChainID(eosTest)
 		const val ethMain = "1"
 		const val ropsten = "3"
 		const val rinkeby = "4"
@@ -130,6 +116,21 @@ class ChainID(val id: String) : Serializable {
 		const val ltcTest = "4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"
 		const val eosMain = "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"
 		const val eosTest = "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca" // Jungle Testnet
+
+		val ETH = ChainID(ethMain)
+		val Ropsten = ChainID(ropsten)
+		val Rinkeby = ChainID(rinkeby)
+		val Kovan = ChainID(kovan)
+		val ETC = ChainID(etcMain)
+		val ETCTest = ChainID(etcTest)
+		val BTC = ChainID(btcMain)
+		val BTCTest = ChainID(btcTest)
+		val BCH = ChainID(bchMain)
+		val BCHTest = ChainID(bchTest)
+		val LTC = ChainID(ltcMain)
+		val LTCTest = ChainID(ltcTest)
+		val EOS = ChainID(eosMain)
+		val EOSTest = ChainID(eosTest)
 
 		fun getChainIDByName(chainName: String): String {
 			return when (chainName) {
