@@ -17,11 +17,9 @@ import com.blinnnk.util.SafeLevel
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.hintTextColor
-import org.jetbrains.anko.leftPadding
+import io.goldstone.blockchain.common.value.ScreenSize
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onFocusChange
-import org.jetbrains.anko.singleLine
-import org.jetbrains.anko.textColor
 
 /**
  * @date 22/03/2018 3:11 PM
@@ -38,7 +36,7 @@ open class RoundInput(context: Context) : EditText(context) {
 	private val alertPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 14.uiPX().toFloat()
-	private var maxCount = 16
+	private var maxCount = 100
 	private var themeColor = Spectrum.blue
 	private var showAlert = false
 
@@ -66,12 +64,14 @@ open class RoundInput(context: Context) : EditText(context) {
 
 		singleLine = true
 		hintTextColor = GrayScale.lightGray
+		this.setHorizontallyScrolling(false)
+		maxLines = Integer.MAX_VALUE
+
 
 		this.setWillNotDraw(false)
 
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 56.uiPX())
-
-		leftPadding = 35.uiPX()
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
+		this.setPadding(35.uiPX(), 20.uiPX(), 35.uiPX(), 20.uiPX())
 		backgroundTintMode = PorterDuff.Mode.CLEAR
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.black(context)

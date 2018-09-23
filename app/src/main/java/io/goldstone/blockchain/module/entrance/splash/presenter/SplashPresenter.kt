@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -36,7 +37,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			if (
 				!eosAccountNames.currentPublicKeyHasActivated() &&
 				!eosAccountNames.isActivatedWatchOnlyEOSAccount() &&
-				eosAccountNames.size > 1
+				getCurrentAddressesAndChainID().any { it.second.isEOS() }
 			) {
 				checkOrUpdateEOSAccount()
 			} else cacheDataAndSetNetBy(this) { activity.jump<MainActivity>() }
