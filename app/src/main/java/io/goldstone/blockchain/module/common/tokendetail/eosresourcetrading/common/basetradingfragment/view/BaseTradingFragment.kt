@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.title.SessionTitleView
@@ -30,10 +31,20 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	open val tradingType: TradingType = TradingType.CPU
 	private val delegateTitle by lazy {
-		SessionTitleView(context!!).setTitle(TokenDetailText.delegateCPUTitle)
+		val title = when (tradingType) {
+			TradingType.CPU -> TokenDetailText.delegateTitle suffix TokenDetailText.cpu
+			TradingType.NET -> TokenDetailText.delegateTitle suffix TokenDetailText.net
+			TradingType.RAM -> "BUY" + TokenDetailText.ram
+		}
+		SessionTitleView(context!!).setTitle(title)
 	}
 	private val refundTitle by lazy {
-		SessionTitleView(context!!).setTitle(TokenDetailText.refundCPUTitle)
+		val title = when (tradingType) {
+			TradingType.CPU -> TokenDetailText.refundTitle suffix TokenDetailText.cpu
+			TradingType.NET -> TokenDetailText.refundTitle suffix TokenDetailText.net
+			TradingType.RAM -> "SELL" + TokenDetailText.ram
+		}
+		SessionTitleView(context!!).setTitle(title)
 	}
 
 	private val incomeTradingCard by lazy {

@@ -61,37 +61,39 @@ class EOSAccountRegisterPresenter(
 		netAEOSCount: Double,
 		callback: (GoldStoneError) -> Unit
 	) {
-		val creatorAccount = Config.getCurrentEOSName()
-		val totalSpent = (cpuEOSCount + netAEOSCount) + 2.0 // TODO 内存假设就是 2 颗 EOS
-		checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
-			if (!error.isNone()) {
-				callback(error)
-				return@checkNewAccountInfoInChain
-			}
-			val chainID = Config.getEOSCurrentChain()
-			BaseTradingPresenter.prepareTransaction(
-				fragment.context,
-				creatorAccount,
-				validAccount!!,
-				totalSpent,
-				CoinSymbol.EOS,
-				false
-			) { privateKey, privateKeyError ->
-				if (error.isNone() && !privateKey.isNull()) {
-					EOSRegisterTransaction(
-						chainID,
-						EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
-						validAccount.accountName,
-						validPublicKey.orEmpty(),
-						ramAmount,
-						cpuEOSCount.toEOSUnit(),
-						netAEOSCount.toEOSUnit()
-					).send(privateKey!!, callback) {
-						fragment.getParentContainer()?.apply { it.showDialog(this) }
-						callback(GoldStoneError.None)
+		// 首先查询 `RAM` 每 `Byte` 对应的 `EOS Count` 计算出即将分配的 `RAM` 价值的 `EOS Count`
+		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, ramPriceError ->
+			if (!price.isNull() && ramPriceError.isNone()) {
+				val ramEOSCount = ramAmount.toDouble() * price!!
+				val creatorAccount = Config.getCurrentEOSName()
+				val totalSpent = cpuEOSCount + netAEOSCount + ramEOSCount
+				checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
+					if (!error.isNone()) callback(error)
+					else BaseTradingPresenter.prepareTransaction(
+						fragment.context,
+						creatorAccount,
+						validAccount!!,
+						totalSpent,
+						CoinSymbol.EOS,
+						false
+					) { privateKey, privateKeyError ->
+						if (error.isNone() && !privateKey.isNull()) {
+							EOSRegisterTransaction(
+								Config.getEOSCurrentChain(),
+								EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
+								validAccount.accountName,
+								validPublicKey.orEmpty(),
+								ramAmount,
+								cpuEOSCount.toEOSUnit(),
+								netAEOSCount.toEOSUnit()
+							).send(privateKey!!, callback) {
+								fragment.getParentContainer()?.apply { it.showDialog(this) }
+								callback(GoldStoneError.None)
+							}
+						} else callback(privateKeyError)
 					}
-				} else callback(privateKeyError)
-			}
+				}
+			} else callback(ramPriceError)
 		}
 	}
 

@@ -152,7 +152,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					val newValue = findViewById<RoundInput>(index)?.getContent()
 					if (!newValue.isNullOrEmpty()) {
 						val formattedNumber =
-							if (values[index].left.contains(TokenDetailText.ram, true)) "${newValue?.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
+							if (values[index].left.contains(TokenDetailText.ram, true))
+								"${newValue?.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
 							else "${newValue?.convertToDouble(CryptoValue.eosDecimal).orElse(EOSValue.defaultRegisterAssignBandWidth)}"
 						// 更新界面上的值
 						gridSessionTitle.updateValues(index, formattedNumber)
