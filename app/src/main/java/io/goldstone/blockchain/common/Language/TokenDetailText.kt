@@ -127,23 +127,23 @@ object TokenDetailText {
 		else -> ""
 	}
 	@JvmField
-	val delegateCPUTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Delegate CPU"
-		HoneyLanguage.Chinese.code -> "Delegate CPU"
-		HoneyLanguage.Japanese.code -> "Delegate CPU"
-		HoneyLanguage.Korean.code -> "Delegate CPU"
-		HoneyLanguage.Russian.code -> "Delegate CPU"
-		HoneyLanguage.TraditionalChinese.code -> "Delegate CPU"
+	val delegateTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DELEGATE"
+		HoneyLanguage.Chinese.code -> "DELEGATE"
+		HoneyLanguage.Japanese.code -> "DELEGATE"
+		HoneyLanguage.Korean.code -> "DELEGATE"
+		HoneyLanguage.Russian.code -> "DELEGATE"
+		HoneyLanguage.TraditionalChinese.code -> "DELEGATE"
 		else -> ""
 	}
 	@JvmField
-	val refundCPUTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Refund CPU"
-		HoneyLanguage.Chinese.code -> "Refund CPU"
-		HoneyLanguage.Japanese.code -> "Refund CPU"
-		HoneyLanguage.Korean.code -> "Refund CPU"
-		HoneyLanguage.Russian.code -> "Refund CPU"
-		HoneyLanguage.TraditionalChinese.code -> "Refund CPU"
+	val refundTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "REFUND"
+		HoneyLanguage.Chinese.code -> "REFUND"
+		HoneyLanguage.Japanese.code -> "REFUND"
+		HoneyLanguage.Korean.code -> "REFUND"
+		HoneyLanguage.Russian.code -> "REFUND"
+		HoneyLanguage.TraditionalChinese.code -> "REFUND"
 		else -> ""
 	}
 	@JvmField

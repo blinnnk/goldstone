@@ -108,6 +108,7 @@ class ContactInputPresenter(
 		// 至少有一个地址输入框有输入
 		if ((
 				ethSeriesAddressText.count()
+					+ eosAccountNameText.count()
 					+ eosJungleAccountNameText.count()
 					+ btcMainnetAddressText.count()
 					+ btcTestnetAddressText.count()
