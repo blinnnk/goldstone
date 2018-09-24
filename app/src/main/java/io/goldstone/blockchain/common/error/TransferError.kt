@@ -80,8 +80,8 @@ class PasswordError(val content: String) : GoldStoneError(content) {
 open class RequestError(override val message: String) : GoldStoneError(message) {
 	companion object {
 		@JvmStatic
-		val PostFailed: (errorDetail: Throwable) -> RequestError = { error ->
-			RequestError("post request failed || ${error.message}")
+		val PostFailed: (errorDetail: String) -> RequestError = { error ->
+			RequestError("post request failed || $error")
 		}
 		@JvmStatic
 		val ResolveDataError: (errorDetail: Throwable) -> RequestError = { error ->

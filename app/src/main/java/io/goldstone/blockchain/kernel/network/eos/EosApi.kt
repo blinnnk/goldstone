@@ -49,10 +49,7 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				{
-					errorCallBack(RequestError.PostFailed(it))
-					LogUtil.error("getAccountInfo", it)
-				},
+				errorCallBack,
 				false
 			) { result ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
