@@ -7,12 +7,14 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.TradingCardView
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -27,11 +29,9 @@ import java.math.BigInteger
 open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	open val tradingType: TradingType = TradingType.CPU
-
 	private val delegateTitle by lazy {
 		SessionTitleView(context!!).setTitle(TokenDetailText.delegateCPUTitle)
 	}
-
 	private val refundTitle by lazy {
 		SessionTitleView(context!!).setTitle(TokenDetailText.refundCPUTitle)
 	}
@@ -84,10 +84,10 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				topPadding = 10.uiPX()
 				bottomPadding = 10.uiPX()
 				delegateTitle.into(this)
-				delegateTitle.setSubtitle("0.0027 ", "Current Price: 0.0027 EOS/MS/Day", Spectrum.blue)
+				delegateTitle.setSubtitle(CommonText.calculating, "Current Price: ${CommonText.calculating} EOS/MS/Day", Spectrum.blue)
 				incomeTradingCard.into(this)
 				refundTitle.into(this)
-				refundTitle.setSubtitle("0.0019", "Current Price: 0.0019 EOS/Byte/Day", Spectrum.blue)
+				refundTitle.setSubtitle(CommonText.calculating, "Current Price: ${CommonText.calculating} EOS/Byte/Day", Spectrum.blue)
 				expendTradingCard.into(this)
 			}
 			// 某些行为不需要设置 `租赁或转出` 的选项
@@ -100,16 +100,24 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		}
 	}
 
-	fun setProcessUsage(weight: String, available: BigInteger, total: BigInteger) {
+	fun setProcessUsage(weight: String, available: BigInteger, total: BigInteger, priceEOS: Double) {
 		val title = when (tradingType) {
 			TradingType.CPU -> TokenDetailText.cpu
 			TradingType.NET -> TokenDetailText.net
 			TradingType.RAM -> TokenDetailText.ram
 		}
+		val unitDescription = when (tradingType) {
+			TradingType.CPU -> "EOS/MS/Day"
+			TradingType.NET -> "EOS/Bytes/Day"
+			TradingType.RAM -> "KB/PER EOS"
+		}
 		val isTime = when (tradingType) {
 			TradingType.CPU -> true
 			else -> false
 		}
+		val formattedPriceEOS = "≈ " + priceEOS.formatCount(4)
+		delegateTitle.setSubtitle(formattedPriceEOS, "Current Price: $formattedPriceEOS $unitDescription", Spectrum.blue)
+		refundTitle.setSubtitle(formattedPriceEOS, "Current Price: $formattedPriceEOS $$unitDescription", Spectrum.blue)
 		incomeTradingCard.setProcessValue(title, weight, available, total, isTime)
 		expendTradingCard.setProcessValue(title, weight, available, total, isTime)
 	}

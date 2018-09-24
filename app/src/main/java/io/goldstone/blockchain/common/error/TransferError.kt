@@ -81,15 +81,15 @@ open class RequestError(override val message: String) : GoldStoneError(message) 
 	companion object {
 		@JvmStatic
 		val PostFailed: (errorDetail: String) -> RequestError = { error ->
-			RequestError("post request failed || $error")
+			RequestError("post request failed \n[ERROR: $error]")
 		}
 		@JvmStatic
 		val ResolveDataError: (errorDetail: Throwable) -> RequestError = { error ->
-			RequestError("resolve request result data failed || ${error.message}")
+			RequestError("resolve request result data failed \n[ERROR: ${error.message}]")
 		}
 		@JvmStatic
 		val NullResponse: (description: String) -> RequestError = { description ->
-			RequestError("null response from server or chain || $description")
+			RequestError("null response from server or chain \n[ERROR: $description]")
 		}
 		@JvmStatic
 		val None = RequestError(GoldStoneError.None.message)
