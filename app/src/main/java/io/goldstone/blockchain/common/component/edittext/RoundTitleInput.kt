@@ -80,6 +80,10 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 		titleView.text = text
 	}
 
+	fun setContent(text: String) {
+		editText.setText(text)
+	}
+
 	fun setHint(text: String) {
 		editText.hint = text
 	}

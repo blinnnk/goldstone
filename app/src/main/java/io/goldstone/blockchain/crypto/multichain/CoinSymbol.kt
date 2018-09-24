@@ -114,17 +114,17 @@ fun CoinSymbol?.isBTCSeries() = CoinSymbol.allBTCSeriesSymbol().any { it.equals(
 fun CoinSymbol?.getContract(): TokenContract? {
 	return when {
 		CoinSymbol(this?.symbol).isBTC() ->
-			TokenContract.getBTC()
+			TokenContract.BTC
 		CoinSymbol(this?.symbol).isLTC() ->
-			TokenContract.getLTC()
+			TokenContract.LTC
 		CoinSymbol(this?.symbol).isBCH() ->
-			TokenContract.getBCH()
+			TokenContract.BCH
 		CoinSymbol(this?.symbol).isETC() ->
-			TokenContract.getETC()
+			TokenContract.ETC
 		CoinSymbol(this?.symbol).isETH() ->
-			TokenContract.getETH()
+			TokenContract.ETH
 		CoinSymbol(this?.symbol).isEOS() ->
-			TokenContract.getEOS()
+			TokenContract.EOS
 		else -> null // ERC20 Token 返回 `null`
 	}
 }

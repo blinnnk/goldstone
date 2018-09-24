@@ -89,9 +89,9 @@ class WalletSettingsListPresenter(
 		showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,
-			!Config.getCurrentIsWatchOnlyOrNot()
+			!Config.isWatchOnlyWallet()
 		) { passwordInput ->
-			if (Config.getCurrentIsWatchOnlyOrNot()) WalletTable.getWatchOnlyWallet {
+			if (Config.isWatchOnlyWallet()) WalletTable.getWatchOnlyWallet {
 				deleteWatchOnlyWallet(first, second)
 			} else {
 				val password = passwordInput?.text.toString()

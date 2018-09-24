@@ -49,6 +49,17 @@ class ChainType(val id: Int) : Serializable {
 		}
 	}
 
+	fun getContract(): TokenContract {
+		return when (id) {
+			ChainType.ETH.id -> TokenContract.ETH
+			ChainType.BTC.id -> TokenContract.BTC
+			ChainType.LTC.id -> TokenContract.LTC
+			ChainType.BCH.id -> TokenContract.BCH
+			ChainType.EOS.id -> TokenContract.EOS
+			else -> TokenContract.ETC
+		}
+	}
+
 	fun getTestnetChainName(): String {
 		return when (id) {
 			ChainType.ETH.id -> {

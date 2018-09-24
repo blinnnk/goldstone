@@ -100,29 +100,28 @@ class TransactionDetailPresenter(
 	}
 
 	fun showAddContactsButton(cell: TransactionInfoCell) {
-		TransactionListModel
-			.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
-				ContactTable.hasContacts(address) { exist ->
-					if (exist) return@hasContacts
-					cell.showAddContactButton(index) {
-						onClick {
-							fragment.parentFragment?.apply {
-								when (this) {
-									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-									is NotificationFragment -> presenter.removeSelfFromActivity()
-								}
+		TransactionListModel.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
+			ContactTable.hasContacts(address) { exist ->
+				if (exist) return@hasContacts
+				cell.showAddContactButton(index) {
+					onClick {
+						fragment.parentFragment?.apply {
+							when (this) {
+								is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+								is NotificationFragment -> presenter.removeSelfFromActivity()
 							}
-							fragment.getMainActivity()?.apply {
-								addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-									putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-									putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
-								}
-							}
-							preventDuplicateClicks()
 						}
+						fragment.getMainActivity()?.apply {
+							addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
+								putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
+								putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
+							}
+						}
+						preventDuplicateClicks()
 					}
 				}
 			}
+		}
 	}
 
 	fun showTransactionWebFragment() {

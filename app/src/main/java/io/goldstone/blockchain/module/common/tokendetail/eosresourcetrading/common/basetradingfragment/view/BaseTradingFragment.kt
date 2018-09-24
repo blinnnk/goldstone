@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.com
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -11,11 +12,13 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.TradingCardView
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.home.profile.contacts.component.showContactDashboard
 import org.jetbrains.anko.*
 import java.math.BigInteger
-
 
 /**
  * @author KaySaith
@@ -43,6 +46,11 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 					if (!it.isNone()) context.alert(it.message)
 				}
 			}
+			setContactButtonClickEvent {
+				getSelectedAccountFromContacts {
+					setAccount(it)
+				}
+			}
 		}
 	}
 
@@ -55,6 +63,11 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				presenter.refundOrSellConfirmEvent {
 					showLoading(false)
 					if (!it.isNone()) context.alert(it.message)
+				}
+			}
+			setContactButtonClickEvent {
+				getSelectedAccountFromContacts {
+					setAccount(it)
 				}
 			}
 		}
@@ -114,6 +127,12 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 	fun isSelectedTransfer(stakeType: StakeType): Boolean =
 		if (stakeType.isDelegate()) incomeTradingCard.isSelectedTransfer()
 		else expendTradingCard.isSelectedTransfer()
+
+	private fun getSelectedAccountFromContacts(hold: (address: String) -> Unit) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			showContactDashboard(ChainType.EOS, hold)
+		}
+	}
 }
 
 enum class TradingType(val value: String) {

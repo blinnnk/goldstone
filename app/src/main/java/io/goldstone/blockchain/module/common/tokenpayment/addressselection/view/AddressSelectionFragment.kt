@@ -47,8 +47,9 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		asyncData: ArrayList<ContactTable>?
 	) {
 		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-			clickEvent = Runnable {
+			onClick {
 				presenter.showPaymentPrepareFragment(model.defaultAddress)
+				preventDuplicateClicks()
 			}
 		}
 	}

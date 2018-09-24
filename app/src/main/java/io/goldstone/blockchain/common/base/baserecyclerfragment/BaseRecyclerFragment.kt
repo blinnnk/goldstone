@@ -9,14 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -116,6 +114,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		asyncData: ArrayList<D>?
 	)
 
+	/** 获取依赖的 `Adapter` */
+	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
+		recyclerView.adapter as? T
+
 	/**
 	 * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
 	 */
@@ -160,18 +162,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		presenter.onFragmentCreateView()
 		return UI {
 			// 这个高度判断是解决少数虚拟键盘高度可以手动隐藏的, 例如 `Samsung S8, S9`
-			val wrapperHeight = when {
-				activity?.navigationBarIsHidden() == true ->
-					context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight
-				this !is BaseOverlayFragment<*> ->
-					ScreenSize.Height + ScreenSize.statusBarHeight - HomeSize.tabBarHeight
-				else -> ScreenSize.Height + ScreenSize.statusBarHeight - HomeSize.headerHeight
-			}
 			wrapper = relativeLayout {
 				loadingView = RecyclerLoadingView(context!!)
 				loadingView.visibility = View.GONE
 				addView(loadingView, 0)
-				layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
+				layoutParams = setRecyclerViewParams(matchParent, matchParent)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
 				addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))

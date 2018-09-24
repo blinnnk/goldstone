@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.clickToCopy

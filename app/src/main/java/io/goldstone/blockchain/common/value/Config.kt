@@ -121,7 +121,7 @@ object Config {
 	fun updateCurrentWalletID(id: Int) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentID, id)
 
-	fun getCurrentIsWatchOnlyOrNot(): Boolean =
+	fun isWatchOnlyWallet(): Boolean =
 		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.currentIsWatchOrNot)
 
 	fun updateCurrentIsWatchOnlyOrNot(isWatchOnly: Boolean) =

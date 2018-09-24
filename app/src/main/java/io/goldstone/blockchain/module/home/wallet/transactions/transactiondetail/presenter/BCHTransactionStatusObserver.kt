@@ -62,7 +62,7 @@ private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
 	address: String,
 	@UiThread callback: () -> Unit
 ) {
-	val contract = TokenContract.getBCH()
+	val contract = TokenContract.BCH
 	MyTokenTable.getBalanceByContract(
 		contract,
 		address,

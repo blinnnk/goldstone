@@ -25,7 +25,6 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 enum class EmptyType {
-	
 	TokenDetail,
 	TransactionDetail,
 	Contact,

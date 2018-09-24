@@ -10,6 +10,7 @@ object ContainerID {
 	const val content = 10003
 	const val main = 10005
 	const val home = 10006
+	const val contentOverlay = 10007
 }
 
 object ElementID {

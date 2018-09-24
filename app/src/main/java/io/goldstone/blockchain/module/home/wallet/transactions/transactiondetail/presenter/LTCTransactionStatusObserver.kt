@@ -62,14 +62,14 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
 	callback: () -> Unit
 ) {
 	MyTokenTable.getBalanceByContract(
-		TokenContract.getLTC(),
+		TokenContract.LTC,
 		address,
 		{
 			fragment.context?.alert(it.message)
 			callback()
 		}
 	) {
-		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getLTC())
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.LTC)
 		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }

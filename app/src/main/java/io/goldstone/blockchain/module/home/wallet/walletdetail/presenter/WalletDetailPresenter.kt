@@ -81,12 +81,10 @@ class WalletDetailPresenter(
 
 	fun setQuickTransferEvent(isShowAddress: Boolean) {
 		// Check current wallet is watch only or not
-		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+		WalletTable.isAvailableWallet(
 			fragment.context!!,
-			{
-				// Click Dialog Confirm Button Event
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			}
+			// Click Dialog Confirm Button Event
+			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
 		) {
 			MyTokenTable.getCurrentChainDefaultAndMyTokens { myTokens, defaultTokens ->
 				// Jump directly if there is only one type of token

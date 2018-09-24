@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter
 
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -35,8 +34,7 @@ class WalletListPresenter(
 
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) { it ->
-			if (it.isNull()) return@switchCurrentWallet
-			val walletType = it?.getWalletType()!!
+			val walletType = it.getWalletType()
 			when {
 				walletType.isBTC() -> {
 					if (Config.isTestEnvironment()) {
