@@ -93,7 +93,7 @@ open class BaseTradingPresenter(
 						// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
 						if (!amount.isNull() && error.isNone()) {
 							val price = 1.0 / amount!!
-							val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price).formatCount(4) suffix CoinSymbol.eos
+							val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
 							setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amount)
 						} else {
 							context.alert(error.message)
