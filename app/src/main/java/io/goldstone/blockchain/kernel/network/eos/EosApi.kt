@@ -5,7 +5,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
@@ -17,8 +16,12 @@ import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.*
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
@@ -32,7 +35,6 @@ import java.math.BigInteger
 
 object EOSAPI {
 
-	var hasRetry = false
 	fun getAccountInfo(
 		account: EOSAccount,
 		errorCallBack: (GoldStoneError) -> Unit,
@@ -53,12 +55,6 @@ object EOSAPI {
 				false
 			) { result ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
-				// TODO 整体的链重试需要思考怎么封装
-				if (!hasRetry && result.contains("NODEOS_UNREACHABLE")) {
-					EOSUrl.currentEOSTestUrl = ChainURL.eosTestBackUp
-					getAccountInfo(account, errorCallBack, "", hold)
-					hasRetry = true
-				}
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
 				hold(EOSAccountTable(JSONObject(result), Config.getCurrentEOSAddress()))
 			}
@@ -358,4 +354,27 @@ object EOSAPI {
 			hold(JSONObject(jsonString))
 		}
 	}
+
+	fun getRAMMarket(
+		isMainThread: Boolean = false,
+		hold: (data: EOSRAMMarket?, error: RequestError) -> Unit) {
+		RequisitionUtil.postString(
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "rammarket"),
+				Pair("json", "true")
+			),
+			EOSUrl.getTableRows(),
+			"rows",
+			{ hold(null, it) },
+			false
+		) {
+			val data = JSONObject(JSONArray(it).get(0).toString())
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(EOSRAMMarket(data), RequestError.None)
+			} else hold(EOSRAMMarket(data), RequestError.None)
+		}
+	}
+
 }

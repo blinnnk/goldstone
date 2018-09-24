@@ -2,14 +2,15 @@ package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.EOSRPCError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -20,10 +21,10 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -36,17 +37,19 @@ class EOSAccountRegisterPresenter(
 	override val fragment: EOSAccountRegisterFragment
 ) : BasePresenter<EOSAccountRegisterFragment>() {
 
-	fun getEOSPrice(hold: (price: Double) -> Unit) {
+	fun getEOSCurrencyAndRAMPrice(
+		@UiThread hold: (currency: Double?, ramPrice: Double?, error: RequestError) -> Unit
+	) {
 		GoldStoneAPI.getPriceByContractAddress(
 			listOf(TokenContract.eosContract).toJsonArray(),
-			{
-				// 网络获取价格出错后从本地数据库获取价格
-				DefaultTokenTable.getCurrentChainToken(TokenContract.EOS) { token ->
-					hold(token?.price.orZero())
-				}
-			}
+			// 网络获取价格出错后从本地数据库获取价格
+			{ hold(null, null, it) }
 		) {
-			hold(it.first().price)
+			EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, error ->
+				if (!price.isNull() && error.isNone()) {
+					hold(it.first().price, price!!, error)
+				} else hold(null, null, error)
+			}
 		}
 	}
 

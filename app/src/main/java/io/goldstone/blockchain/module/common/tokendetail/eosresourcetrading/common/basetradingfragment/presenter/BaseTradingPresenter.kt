@@ -11,9 +11,12 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -23,6 +26,7 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
@@ -31,6 +35,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSBuyRamTransaction
+import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSSellRamTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
@@ -63,25 +68,39 @@ open class BaseTradingPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		setUsageValue()
+		fragment.setUsageValue()
 	}
 
-	private fun setUsageValue() {
+	private fun BaseTradingFragment.setUsageValue() {
 		EOSAccountTable.getAccountByName(Config.getCurrentEOSName().accountName) { account ->
-			when (fragment.tradingType) {
+			when (tradingType) {
 				TradingType.CPU -> {
 					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
 					val availableCPU = account?.cpuLimit?.max.orZero() - account?.cpuLimit?.used.orZero()
-					fragment.setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero())
+					// TODO 计算 CPU 的租赁价格
+					setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), 0.0027)
 				}
 				TradingType.NET -> {
 					val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
 					val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
-					fragment.setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero())
+					// TODO 计算 NET 的租赁价格
+					setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), 0.0027)
 				}
 				TradingType.RAM -> {
+					getMainActivity()?.showLoadingView()
 					val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
-					fragment.setProcessUsage(CommonText.calculating, availableRAM, account?.ramQuota.orZero())
+					EOSResourceUtil.getRAMAmountByCoin(Pair(1.0, CoinSymbol.EOS), EOSUnit.KB) { amount, error ->
+						// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
+						if (!amount.isNull() && error.isNone()) {
+							val price = 1.0 / amount!!
+							val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
+							setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amount)
+						} else {
+							context.alert(error.message)
+							setProcessUsage(CommonText.calculating, availableRAM, account?.ramQuota.orZero(), 0.0)
+						}
+						getMainActivity()?.removeLoadingView()
+					}
 				}
 			}
 		}
@@ -181,7 +200,7 @@ open class BaseTradingPresenter(
 				localData?.let { local ->
 					// 新数据标记为老数据的 `主键` 值
 					GoldStoneDataBase.database.eosAccountDao().update(newData.apply { this.id = local.id })
-					setUsageValue()
+					GoldStoneAPI.context.runOnUiThread { fragment.setUsageValue() }
 				}
 			}
 		}

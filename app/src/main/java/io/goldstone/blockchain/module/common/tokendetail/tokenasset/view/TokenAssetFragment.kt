@@ -144,6 +144,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	fun setResourcesValue(
 		ramAvailable: BigInteger,
 		ramTotal: BigInteger,
+		ramEOSCount: String,
 		cpuAvailable: BigInteger,
 		cpuTotal: BigInteger,
 		cpuWeight: String,
@@ -153,6 +154,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	) {
 		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available)
 		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total)
+		ramAssetCell.setSubtitle(ramEOSCount)
 		cpuAssetCell.setSubtitle(cpuWeight)
 		cpuAssetCell.setLeftValue(
 			cpuAvailable,
