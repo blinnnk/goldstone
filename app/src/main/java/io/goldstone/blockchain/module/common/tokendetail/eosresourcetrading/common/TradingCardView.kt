@@ -141,6 +141,10 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		accountNameEditText.setHint(hint)
 	}
 
+	fun setAccount(name: String) {
+		accountNameEditText.setContent(name)
+	}
+
 	fun getInputValue(): Pair<EOSAccount, Double> {
 		return Pair(EOSAccount(accountNameEditText.getContent()), amountEditText.getContent().toDoubleOrZero())
 	}
@@ -150,6 +154,10 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			action()
 			confirmButton.preventDuplicateClicks()
 		}
+	}
+
+	fun setContactButtonClickEvent(action: () -> Unit) {
+		accountNameEditText.setButtonClickEvent(action)
 	}
 
 	fun clearInput() {

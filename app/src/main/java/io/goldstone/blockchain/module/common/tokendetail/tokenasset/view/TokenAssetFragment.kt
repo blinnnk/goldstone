@@ -216,7 +216,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
 			getContainer().apply {
 				onClick {
-					if (Config.getCurrentIsWatchOnlyOrNot())
+					if (Config.isWatchOnlyWallet())
 						this@TokenAssetFragment.context.alert(AlertText.watchOnly)
 					else presenter.showResourceTradingFragmentByTitle(info.second)
 					preventDuplicateClicks()

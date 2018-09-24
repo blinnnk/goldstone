@@ -23,7 +23,10 @@ import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
-import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -198,7 +201,7 @@ class AddressManagerPresenter(
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
-				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				if (Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
 						WalletSettingsText.exportPrivateKey,
@@ -208,9 +211,8 @@ class AddressManagerPresenter(
 							putInt(ArgumentKey.chainType, chainType.id)
 						}
 					)
-				}
+				} else context.alert(WalletText.watchOnly)
 			}
-
 		}
 
 		fun showQRCodeFragment(addressModel: ContactModel, walletSettingsFragment: WalletSettingsFragment) {
@@ -230,14 +232,14 @@ class AddressManagerPresenter(
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
-				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				if (Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
 						WalletSettingsText.exportKeystore,
 						WalletSettingsText.viewAddresses,
 						Bundle().apply { putString(ArgumentKey.address, address) }
 					)
-				}
+				} else context.alert(WalletText.watchOnly)
 			}
 		}
 

@@ -122,7 +122,6 @@ fun BigInteger.convertToTimeUnit(): String {
 	return result suffix diskUnit
 }
 
-fun String.isIntOnly(): Boolean = all { it.toString().matches(Regex(".*[0-9].*")) }
 fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
 
 

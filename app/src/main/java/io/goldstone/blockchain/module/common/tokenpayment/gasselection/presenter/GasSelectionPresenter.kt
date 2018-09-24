@@ -284,12 +284,12 @@ class GasSelectionPresenter(
 	) {
 		val coinContract =
 			when {
-				getToken()?.contract.isETC() -> TokenContract.getETC()
-				getToken()?.contract.isBTC() -> TokenContract.getBTC()
-				getToken()?.contract.isLTC() -> TokenContract.getLTC()
-				getToken()?.contract.isEOS() -> TokenContract.getEOS()
-				getToken()?.contract.isBCH() -> TokenContract.getBCH()
-				else -> TokenContract.getETH()
+				getToken()?.contract.isETC() -> TokenContract.ETC
+				getToken()?.contract.isBTC() -> TokenContract.BTC
+				getToken()?.contract.isLTC() -> TokenContract.LTC
+				getToken()?.contract.isEOS() -> TokenContract.EOS
+				getToken()?.contract.isBCH() -> TokenContract.BCH
+				else -> TokenContract.ETH
 			}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(

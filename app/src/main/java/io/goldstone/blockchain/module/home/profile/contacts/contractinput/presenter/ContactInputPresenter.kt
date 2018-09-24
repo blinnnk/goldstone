@@ -66,7 +66,7 @@ class ContactInputPresenter(
 					}
 
 					AddressType.EOSJungle, AddressType.EOS, AddressType.EOSAccountName -> {
-						if (Config.isTestEnvironment()) {
+						if (!Config.isTestEnvironment()) {
 							eosInput.setText(it.address)
 							eosAccountNameText = it.address
 						} else {

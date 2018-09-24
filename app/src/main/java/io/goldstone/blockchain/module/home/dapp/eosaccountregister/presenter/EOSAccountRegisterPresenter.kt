@@ -41,7 +41,7 @@ class EOSAccountRegisterPresenter(
 			listOf(TokenContract.eosContract).toJsonArray(),
 			{
 				// 网络获取价格出错后从本地数据库获取价格
-				DefaultTokenTable.getCurrentChainToken(TokenContract.getEOS()) { token ->
+				DefaultTokenTable.getCurrentChainToken(TokenContract.EOS) { token ->
 					hold(token?.price.orZero())
 				}
 			}

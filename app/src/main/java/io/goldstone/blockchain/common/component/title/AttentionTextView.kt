@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.wrapContent
@@ -21,7 +22,8 @@ import org.jetbrains.anko.wrapContent
 class AttentionTextView(context: Context) : TextView(context) {
 	
 	init {
-		topPadding = 45.uiPX()
+		topPadding = 20.uiPX()
+		bottomPadding = 10.uiPX()
 		id = ElementID.attentionText
 		textSize = fontSize(14)
 		textColor = GrayScale.midGray

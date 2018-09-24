@@ -56,12 +56,10 @@ class TokenDetailOverlayPresenter(
 	}
 
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+		WalletTable.isAvailableWallet(
 			fragment.context!!,
-			{
-				// Click Dialog Confirm Button Event
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			}
+			// Click Dialog Confirm Button Event
+			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {
@@ -78,12 +76,10 @@ class TokenDetailOverlayPresenter(
 	}
 
 	fun showDepositFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+		WalletTable.isAvailableWallet(
 			fragment.context!!,
-			{
-				// Click Dialog Confirm Button Event
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			}
+			// Click Dialog Confirm Button Event
+			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
 		) {
 			if (isFromQuickTransfer) {
 				fragment.apply {

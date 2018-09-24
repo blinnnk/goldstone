@@ -84,7 +84,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			) { tokenBalance ->
 				// 查询 `ETH` 余额
 				MyTokenTable.getBalanceByContract(
-					TokenContract.getETH(),
+					TokenContract.ETH,
 					Config.getCurrentEthereumAddress(),
 					{
 						hold(false)

@@ -3,7 +3,10 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.*
 import android.content.Context
 import android.support.annotation.UiThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.orFalse
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
@@ -273,21 +276,6 @@ data class WalletTable(
 			}
 		}
 
-		fun saveEncryptMnemonicIfUserSkip(
-			encryptMnemonic: String,
-			address: String,
-			@UiThread callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					getWalletByAddress(address)?.let {
-						update(it.apply { this.encryptMnemonic = encryptMnemonic })
-						GoldStoneAPI.context.runOnUiThread { callback() }
-					}
-				}
-			}
-		}
-
 		fun getAll(hold: List<WalletTable>.() -> Unit) {
 			load { GoldStoneDataBase.database.walletDao().getAllWallets() } then (hold)
 		}
@@ -393,10 +381,7 @@ data class WalletTable(
 		}
 
 		fun getETCWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				etcChildAddressIndex: Int
-			) -> Unit
+			hold: (wallet: WalletTable, etcChildAddressIndex: Int) -> Unit
 		) {
 			WalletTable.getCurrentWallet {
 				// 清理数据格式
@@ -701,16 +686,14 @@ data class WalletTable(
 
 		fun switchCurrentWallet(
 			walletAddress: String,
-			callback: (WalletTable?) -> Unit
+			callback: (WalletTable) -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						update(it.apply { it.isUsing = false })
-					}
-					getWalletByAddress(walletAddress)?.let { wallet ->
-						update(wallet.apply { wallet.isUsing = true })
-						GoldStoneAPI.context.runOnUiThread { callback(wallet) }
+					updateLastUsingWalletOff()
+					getWalletByAddress(walletAddress)?.let {
+						update(it.apply { isUsing = true })
+						GoldStoneAPI.context.runOnUiThread { callback(it) }
 					}
 				}
 			}
@@ -734,46 +717,28 @@ data class WalletTable(
 			}
 		}
 
-		fun isWatchOnlyWalletShowAlertOrElse(context: Context, callback: () -> Unit) {
-			Config.getCurrentIsWatchOnlyOrNot() isTrue {
-				context.alert(AlertText.watchOnly)
-				return
-			}
-			callback()
-		}
-
 		fun getWalletByAddress(address: String, hold: (WalletTable?) -> Unit) {
-			load {
-				GoldStoneDataBase.database.walletDao().getWalletByAddress(address)
-			} then (hold)
+			load { GoldStoneDataBase.database.walletDao().getWalletByAddress(address) } then (hold)
 		}
 
-		fun checkIsWatchOnlyAndHasBackupOrElse(
+		fun isAvailableWallet(
 			context: Context,
 			confirmEvent: () -> Unit,
 			callback: () -> Unit
 		) {
-			WalletTable.isWatchOnlyWalletShowAlertOrElse(context) {
-				context.hasBackUpOrElse(confirmEvent, callback)
-			}
-		}
-
-		private fun Context.hasBackUpOrElse(confirmEvent: () -> Unit, callback: () -> Unit) {
-			WalletTable.getCurrentWallet {
-				hasBackUpMnemonic isFalse {
-					GoldStoneDialog.show(this@hasBackUpOrElse) {
-						showButtons(DialogText.goToBackUp) {
-							confirmEvent()
-							GoldStoneDialog.remove(this@hasBackUpOrElse)
-						}
-						setImage(R.drawable.succeed_banner)
-						setContent(
-							DialogText.backUpMnemonic, DialogText.backUpMnemonicDescription
-						)
+			if (Config.isWatchOnlyWallet()) context.alert(AlertText.watchOnly)
+			else WalletTable.getCurrentWallet {
+				if (!hasBackUpMnemonic) GoldStoneDialog.show(context) {
+					showButtons(DialogText.goToBackUp) {
+						confirmEvent()
+						GoldStoneDialog.remove(context)
 					}
-				} otherwise {
-					callback()
-				}
+					setImage(R.drawable.succeed_banner)
+					setContent(
+						DialogText.backUpMnemonic,
+						DialogText.backUpMnemonicDescription
+					)
+				} else callback()
 			}
 		}
 	}
@@ -794,8 +759,11 @@ interface WalletDao {
 	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
 	fun findWhichIsUsing(status: Boolean): WalletTable?
 
-	@Query("SELECT * FROM wallet WHERE currentETHSeriesAddress LIKE :walletAddress OR currentEOSAddress LIKE :walletAddress OR currentBCHAddress LIKE :walletAddress OR currentLTCAddress LIKE :walletAddress OR currentBTCAddress LIKE :walletAddress OR currentBTCSeriesTestAddress LIKE :walletAddress")
-	fun getWalletByAddress(walletAddress: String): WalletTable?
+	@Query("UPDATE wallet SET isUsing = :status WHERE isUsing LIKE :lastUsing")
+	fun updateLastUsingWalletOff(status: Boolean = false, lastUsing: Boolean = true)
+
+	@Query("SELECT * FROM wallet WHERE currentETHSeriesAddress LIKE :address OR currentEOSAddress LIKE :address OR currentBCHAddress LIKE :address OR currentLTCAddress LIKE :address OR currentBTCAddress LIKE :address OR currentBTCSeriesTestAddress LIKE :address")
+	fun getWalletByAddress(address: String): WalletTable?
 
 	@Query("SELECT eosAccountNames FROM wallet")
 	fun getEOSAccountNames(): List<String>

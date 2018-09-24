@@ -13,12 +13,12 @@ import java.io.Serializable
  */
 class TokenContract(val contract: String?) : Serializable {
 	companion object {
-		fun getETH(): TokenContract = TokenContract(TokenContract.ethContract)
-		fun getETC(): TokenContract = TokenContract(TokenContract.etcContract)
-		fun getBTC(): TokenContract = TokenContract(TokenContract.btcContract)
-		fun getLTC(): TokenContract = TokenContract(TokenContract.ltcContract)
-		fun getBCH(): TokenContract = TokenContract(TokenContract.bchContract)
-		fun getEOS(): TokenContract = TokenContract(TokenContract.eosContract)
+		val ETH = TokenContract(TokenContract.ethContract)
+		val ETC = TokenContract(TokenContract.etcContract)
+		val BTC = TokenContract(TokenContract.btcContract)
+		val LTC = TokenContract(TokenContract.ltcContract)
+		val BCH = TokenContract(TokenContract.bchContract)
+		val EOS = TokenContract(TokenContract.eosContract)
 		// GoldStone 业务约定的值
 		const val ethContract = "0x60"
 		const val etcContract = "0x61"

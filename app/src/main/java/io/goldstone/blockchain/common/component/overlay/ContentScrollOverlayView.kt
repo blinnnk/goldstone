@@ -12,6 +12,7 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
@@ -27,7 +28,7 @@ import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
  * @date 2018/6/5 1:50 AM
  * @author KaySaith
  */
-class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
+open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 	
 	var recoveryBackEvent: Runnable? = null
 	private var container: RelativeLayout
@@ -47,33 +48,35 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 			alpha = 0f
 			lparams(maxWidth, wrapContent)
 			minimumHeight = 400.uiPX()
-			updateAlphaAnimation(1f)
 			verticalLayout {
 				// Header
-				linearLayout {
+				relativeLayout {
 					backgroundColor = GrayScale.whiteGray
 					lparams(matchParent, headerHeight)
 					titleView = textView {
 						textSize = fontSize(14)
 						textColor = GrayScale.black
 						typeface = GoldStoneFont.heavy(context)
-						layoutParams = LinearLayout.LayoutParams(250.uiPX(), headerHeight)
-						gravity = Gravity.CENTER_VERTICAL
-						leftPadding = 20.uiPX()
+						layoutParams = LinearLayout.LayoutParams(matchParent, headerHeight)
+						gravity = Gravity.CENTER
 					}
 					closeButton = imageView(R.drawable.close_icon) {
 						layoutParams = LinearLayout.LayoutParams(headerHeight, headerHeight)
 						scaleType = ImageView.ScaleType.CENTER_INSIDE
 						setColorFilter(GrayScale.midGray)
+						x -= 5.uiPX()
 						addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 						onClick {
 							remove()
 						}
 					}
+					closeButton.setAlignParentRight()
 				}
 				scrollView {
 					lparams(matchParent, wrapContent)
 					contentLayout = verticalLayout {
+						id = ContainerID.contentOverlay
+						bottomPadding = 15.uiPX()
 						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					}
 				}
@@ -86,6 +89,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 			}
 			addCorner(CornerSize.small.toInt(), Spectrum.white)
 		}
+		container.updateAlphaAnimation(1f)
 		container.setCenterInParent()
 	}
 	
@@ -102,7 +106,7 @@ class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
 		titleView.text = text
 	}
 	
-	fun remove() {
+	open fun remove() {
 		(parent as? ViewGroup)?.apply {
 			findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
 				removeView(it)

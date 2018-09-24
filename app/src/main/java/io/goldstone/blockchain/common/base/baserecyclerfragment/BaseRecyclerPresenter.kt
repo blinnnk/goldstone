@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
-import android.support.v7.widget.RecyclerView
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.isFalse
@@ -62,15 +61,11 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
 	open fun onFragmentHiddenChanged(isHidden: Boolean) {}
 
-	/** 获取依赖的 `Adapter` */
-	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
-		fragment.recyclerView.adapter as? T
-
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(
 		newData: ArrayList<D>
 	) {
-		getAdapter<T>()?.apply {
+		fragment.getAdapter<T>()?.apply {
 			// Comparison the data, if they are different then update adapter
 			diffDataSetChanged(dataSet, newData) {
 				it.isFalse {
@@ -91,7 +86,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapter<D, *>> diffAndUpdateSingleCellAdapterData(newData: ArrayList<D>) {
-		getAdapter<T>()?.apply {
+		fragment.getAdapter<T>()?.apply {
 			// Comparison the data, if they are different then update adapter
 			diffDataSetChanged(dataSet, newData) {
 				it.isFalse {

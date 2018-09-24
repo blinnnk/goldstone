@@ -118,11 +118,12 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 					else it.eosAddress
 			}
 		}
-		else -> map {
+		contract.isETH() -> map {
 			it.apply {
 				defaultAddress = ethSeriesAddress
 			}
 		}
+		else -> listOf()
 	}
 }
 

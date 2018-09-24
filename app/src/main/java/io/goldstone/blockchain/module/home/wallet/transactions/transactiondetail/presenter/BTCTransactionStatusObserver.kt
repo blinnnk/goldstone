@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
@@ -32,7 +33,9 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 			if (confirmed) {
 				onBTCTransactionSucceed()
 				val address = CoinSymbol.BTC.getAddress()
-				updateWalletDetailBTCValue(address, currentActivity)
+				updateBTCBalanceByTransaction(address, currentActivity) {
+					if (!it.isNone()) fragment.context.alert(it.message)
+				}
 				if (confirmed) {
 					updateConformationBarFinished()
 				}
@@ -48,29 +51,21 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailBTCValue(
+fun updateBTCBalanceByTransaction(
 	address: String,
-	activity: MainActivity?
-) {
-	updateBTCBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
+	activity: MainActivity?,
+	callback: (RequestError) -> Unit
 ) {
 	MyTokenTable.getBalanceByContract(
-		TokenContract.getBTC(),
+		TokenContract.BTC,
 		address,
-		{
-			fragment.context?.alert(it.message)
-			callback()
-		}
+		callback
 	) {
-		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getBTC())
-		GoldStoneAPI.context.runOnUiThread { callback() }
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.BTC)
+		GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
+			callback(RequestError.None)
+		}
 	}
 }
 

@@ -83,18 +83,14 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 			) { myToken ->
 				WalletTable.getCurrentEOSWalletType { eosWalletType ->
 					// 准备数据
-					val model = WalletDetailCellModel(
-						token,
-						myToken?.balance.orZero(),
-						eosWalletType
-					)
+					val model = WalletDetailCellModel(token, myToken?.balance.orZero(), eosWalletType)
 					// 显示 `ContentOverlay`
-					(context as? MainActivity)?.showDashboard(model, putArgument)
+					(context as? MainActivity)?.showTokenDetailOverlayFragment(model, putArgument)
 				}
 			}
 		}
 
-		private fun MainActivity.showDashboard(
+		private fun MainActivity.showTokenDetailOverlayFragment(
 			model: WalletDetailCellModel,
 			putArgument: Bundle.() -> Unit
 		) {

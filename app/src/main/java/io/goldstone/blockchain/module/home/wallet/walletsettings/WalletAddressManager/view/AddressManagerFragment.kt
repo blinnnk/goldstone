@@ -431,7 +431,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			context.showAlertView(
 				WalletSettingsText.createSubAccount,
 				WalletSettingsText.createSubAccountIntro,
-				!Config.getCurrentIsWatchOnlyOrNot()
+				!Config.isWatchOnlyWallet()
 			) { passwordInput ->
 				val password = passwordInput?.text.toString()
 				context.verifyKeystorePassword(

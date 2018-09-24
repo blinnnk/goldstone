@@ -174,38 +174,20 @@ class CreateWalletPresenter(
 					ltcPath = DefaultPath.ltcPath,
 					eosPath = DefaultPath.eosPath,
 					hint = hint,
-					isUsing = true
+					isUsing = true,
+					// 防止用户跳过助记词, 把使用 `RSA` 加密后的助记词存入数据库
+					encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
 				).insertWatchOnlyWallet { wallet ->
 					generateMyTokenInfo(multiChainAddresses) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {
 							putString(ArgumentKey.mnemonicCode, mnemonic)
 						}
-						// 防止用户跳过助记词, 把使用 `RSA` 加密后的助记词存入数据库
-						saveEncryptMnemonic(mnemonic, multiChainAddresses.ethAddress) {
-							fragment.context?.runOnUiThread {
-								showMnemonicBackupFragment(arguments)
-								callback(GoldStoneError.None)
-							}
-						}
+						showMnemonicBackupFragment(arguments)
+						callback(it)
 					}
 					XinGePushReceiver.registerAddressesForPush(wallet)
 				}
-			}
-		}
-	}
-
-	private fun saveEncryptMnemonic(
-		mnemonic: String?,
-		address: String,
-		callback: () -> Unit
-	) {
-		mnemonic?.let {
-			WalletTable.saveEncryptMnemonicIfUserSkip(
-				JavaKeystoreUtil().encryptData(it),
-				address
-			) {
-				callback()
 			}
 		}
 	}
@@ -242,7 +224,10 @@ class CreateWalletPresenter(
 		/**
 		 * 拉取 `GoldStone` 默认显示的 `Token` 清单插入数据库
 		 */
-		fun generateMyTokenInfo(addresses: ChainAddresses, @UiThread callback: (RequestError) -> Unit) {
+		fun generateMyTokenInfo(
+			addresses: ChainAddresses,
+			@UiThread callback: (RequestError) -> Unit
+		) {
 			doAsync {
 				// 首先从本地查找数据
 				GoldStoneDataBase.database.defaultTokenDao().getAllTokens().apply {

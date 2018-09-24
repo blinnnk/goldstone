@@ -44,7 +44,7 @@ object RequisitionUtil {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				{ errorCallback(RequestError.PostFailed(it)) },
+				errorCallback,
 				isEncrypt,
 				hold
 			)
@@ -68,7 +68,7 @@ object RequisitionUtil {
 				keyName,
 				api,
 				false,
-				{ errorCallback(RequestError.PostFailed(it)) },
+				errorCallback,
 				isEncrypt,
 				hold
 			)
@@ -92,7 +92,7 @@ object RequisitionUtil {
 				keyName,
 				api,
 				false,
-				{ errorCallback(RequestError.PostFailed(it)) },
+				errorCallback,
 				isEncrypt
 			) {
 				holdSingle(it.firstOrNull())
@@ -117,7 +117,7 @@ object RequisitionUtil {
 				keyName,
 				api,
 				true,
-				{ errorCallback(RequestError.PostFailed(it)) },
+				errorCallback,
 				isEncrypt
 			) {
 				holdString(it.firstOrNull())
@@ -144,7 +144,7 @@ object RequisitionUtil {
 			client.newCall(requestBody).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed(error))
+						errorCallback(RequestError.PostFailed("[API: $path]\n[ERROR: $error]"))
 					}
 					LogUtil.error(path, error)
 				}
@@ -178,7 +178,7 @@ object RequisitionUtil {
 	fun postRequest(
 		body: RequestBody,
 		path: String,
-		netWorkError: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
 		hold: (String) -> Unit
 	) {
@@ -193,7 +193,7 @@ object RequisitionUtil {
 				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
 					GoldStoneAPI.context.runOnUiThread {
-						netWorkError(error)
+						errorCallback(RequestError.PostFailed("[API: $path]\n[ERROR: $error]"))
 					}
 				}
 
@@ -205,7 +205,7 @@ object RequisitionUtil {
 						hold(data.orEmpty())
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
-							netWorkError(error)
+							errorCallback(RequestError.PostFailed("[API: $path]\n[ERROR: $error]"))
 						}
 						LogUtil.error(path, error)
 					}
@@ -232,13 +232,12 @@ object RequisitionUtil {
 				.readTimeout(maxConnectTime, TimeUnit.SECONDS)
 				.build()
 
-		getcryptGetRequest(api, isEncrypt, targetGoldStoneID) {
+		getCryptoGetRequest(api, isEncrypt, targetGoldStoneID) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed(error))
+						errorCallback(RequestError.PostFailed("[API: $api]\n[ERROR: $error]"))
 					}
-					LogUtil.error(keyName + "requestData", error)
 				}
 
 				override fun onResponse(call: Call, response: Response) {
@@ -278,7 +277,7 @@ object RequisitionUtil {
 		api: String,
 		keyName: String,
 		justGetData: Boolean = false,
-		crossinline errorCallback: (GoldStoneError) -> Unit,
+		crossinline errorCallback: (RequestError) -> Unit,
 		crossinline hold: List<T>.() -> Unit
 	) {
 		val client =
@@ -291,7 +290,9 @@ object RequisitionUtil {
 			Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
-				GoldStoneAPI.context.runOnUiThread { errorCallback(RequestError.PostFailed(error)) }
+				GoldStoneAPI.context.runOnUiThread {
+					errorCallback(RequestError.PostFailed("[API: $api]\n[ERROR: $error]"))
+				}
 				LogUtil.error("$api $keyName", error)
 			}
 
@@ -368,7 +369,7 @@ object RequisitionUtil {
 		}
 	}
 
-	fun getcryptGetRequest(
+	fun getCryptoGetRequest(
 		api: String,
 		isEncrypt: Boolean,
 		targetGoldStoneID: String? = null,
@@ -411,7 +412,7 @@ object RequisitionUtil {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed(error))
+						errorCallback(RequestError.PostFailed("[CHAIN NAME: $chainName]\n[ERROR: $error]"))
 					}
 				}
 

@@ -272,7 +272,7 @@ object GoldStoneAPI {
 
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
-		errorCallback: (Throwable) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		address: String,
 		hold: (ArrayList<ERC20TransactionModel>) -> Unit
 	) {
@@ -293,7 +293,7 @@ object GoldStoneAPI {
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
 		address: String,
-		errorCallback: (Throwable) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: ArrayList<TransactionTable>.() -> Unit
 	) {
 		requestUnCryptoData<TransactionTable>(
@@ -313,7 +313,7 @@ object GoldStoneAPI {
 		isChina: Int,
 		isAndroid: Int,
 		country: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (String) -> Unit
 	) {
 		RequisitionUtil.postRequest(
@@ -379,7 +379,7 @@ object GoldStoneAPI {
 
 	fun registerWalletAddresses(
 		content: String,
-		errorCallback: (Exception) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (String) -> Unit
 	) {
 		RequisitionUtil.postRequest(
@@ -397,7 +397,7 @@ object GoldStoneAPI {
 	fun getUnreadCount(
 		deviceID: String,
 		time: Long,
-		errorCallback: (Exception) -> Unit = {},
+		errorCallback: (RequestError) -> Unit,
 		hold: (String) -> Unit
 	) {
 		RequisitionUtil.postRequest(

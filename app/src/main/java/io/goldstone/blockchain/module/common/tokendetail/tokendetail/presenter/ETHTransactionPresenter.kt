@@ -119,7 +119,7 @@ private fun mergeETHAndERC20Incoming(
 					{
 						// 只弹出一次错误信息
 						if (!hasError) {
-							errorCallback(RequestError.PostFailed(it))
+							errorCallback(it)
 							hasError = true
 						}
 						completeMark()
@@ -135,7 +135,7 @@ private fun mergeETHAndERC20Incoming(
 						//error callback
 						// 只弹出一次错误信息
 						if (!hasError) {
-							errorCallback(RequestError.PostFailed(it))
+							errorCallback(it)
 							hasError = true
 						}
 						completeMark()
