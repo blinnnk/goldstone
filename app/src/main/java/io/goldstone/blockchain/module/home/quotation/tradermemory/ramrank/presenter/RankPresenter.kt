@@ -4,7 +4,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view.RankFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMRankModel
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date: 2018/9/25.
@@ -18,10 +18,13 @@ class RankPresenter(override val fragment: RankFragment) : BasePresenter<RankFra
 	}
 	
 	private fun getRank() {
+		
 		GoldStoneAPI.getEOSRAMRank( {
 			LogUtil.error("geteosramrank", it)
 		}) {
-			fragment.ramRankView.setData(it)
+			GoldStoneAPI.context.runOnUiThread {
+				fragment.ramRankView.setData(it)
+			}
 		}
 	}
 }
