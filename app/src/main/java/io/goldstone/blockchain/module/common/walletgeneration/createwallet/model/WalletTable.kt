@@ -177,7 +177,7 @@ data class WalletTable(
 		).filter { it.first.isNotEmpty() }
 	}
 
-	fun getCurrentAddresses(): List<String> {
+	fun getCurrentAddresses(useEOSAccountName: Boolean = false): List<String> {
 		return listOf(
 			currentBTCAddress,
 			currentBTCSeriesTestAddress,
@@ -185,7 +185,8 @@ data class WalletTable(
 			currentETHSeriesAddress,
 			currentLTCAddress,
 			currentBCHAddress,
-			listOf(
+			if (useEOSAccountName) currentEOSAccountName.getCurrent()
+			else listOf(
 				currentEOSAddress,
 				currentEOSAccountName.getCurrent(),
 				currentEOSAccountName.getUnEmptyValue()
@@ -243,6 +244,18 @@ data class WalletTable(
 		}
 	}
 
+	fun getEOSWalletType(): EOSWalletType {
+		return when {
+			EOSAccount(currentEOSAccountName.getCurrent()).isValid() -> EOSWalletType.Available
+			// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
+			eosAccountNames.filter {
+				it.chainID.equals(Config.getEOSCurrentChain().id, true) &&
+					it.publicKey.equals(Config.getCurrentEOSAddress(), true)
+			}.size > 1 -> EOSWalletType.NoDefault
+			else -> EOSWalletType.Inactivated
+		}
+	}
+
 	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
@@ -266,6 +279,7 @@ data class WalletTable(
 								eosAddressCount
 						)
 					}
+					currentType.isMultiChain() -> hold(7)
 					currentType.isETHSeries() -> hold(1)
 					currentType.isBTCTest() -> hold(1)
 					currentType.isBTC() -> hold(1)
@@ -328,37 +342,19 @@ data class WalletTable(
 			}
 		}
 
-		fun getCurrentWallet(@UiThread hold: WalletTable.() -> Unit) {
-			load {
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
-					?.apply { balance = Config.getCurrentBalance() }
-			} then {
-				it?.apply(hold)
+		fun getCurrentWallet(isMainThread: Boolean = true, hold: WalletTable.() -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
+					balance = Config.getCurrentBalance()
+					if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
+					else hold(this)
+				}
 			}
 		}
 
 		fun getWatchOnlyWallet(hold: Pair<String, ChainType>.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				if (isWatchOnly) getCurrentAddressesAndChainID().firstOrNull()?.let(hold)
-			}
-		}
-
-		fun getCurrentAddresses(hold: (List<String>) -> Unit) {
-			WalletTable.getCurrentWallet { hold(getCurrentAddresses()) }
-		}
-
-		fun getCurrentEOSWalletType(hold: (EOSWalletType) -> Unit) {
-			WalletTable.getCurrentWallet {
-				val type = when {
-					EOSAccount(currentEOSAccountName.getCurrent()).isValid() -> EOSWalletType.Available
-					// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
-					eosAccountNames.filter {
-						it.chainID.equals(Config.getEOSCurrentChain().id, true) &&
-							it.publicKey.equals(Config.getCurrentEOSAddress(), true)
-					}.size > 1 -> EOSWalletType.NoDefault
-					else -> EOSWalletType.Inactivated
-				}
-				hold(type)
 			}
 		}
 

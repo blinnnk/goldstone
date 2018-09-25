@@ -193,7 +193,7 @@ object RequisitionUtil {
 				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed("[API: ${path.substringAfterLast("/")}]\n[ERROR: $error]"))
+						errorCallback(RequestError.PostFailed("[API: ${path.substringAfter("/")}]\n[ERROR: $error]"))
 					}
 				}
 

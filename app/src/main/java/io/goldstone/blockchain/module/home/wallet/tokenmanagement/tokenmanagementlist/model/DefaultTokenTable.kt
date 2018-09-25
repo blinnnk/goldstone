@@ -16,6 +16,7 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -173,6 +174,17 @@ data class DefaultTokenTable(
 		doAsync {
 			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
 			GoldStoneAPI.context.runOnUiThread { callback() }
+		}
+	}
+
+	fun updateTokenNameFromChain() {
+		GoldStoneEthCall.getTokenName(
+			contract,
+			{ },
+			Config.getCurrentChainName()
+		) {
+			val name = if (it.isEmpty()) symbol else it
+			DefaultTokenTable.updateTokenName(TokenContract(contract), name)
 		}
 	}
 

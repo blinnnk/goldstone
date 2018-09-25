@@ -100,12 +100,19 @@ class TokenInfoPresenter(
 			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
-					if (transactions.isEmpty()) getBTCSeriesTransactionCountFromChain { count, error ->
-						if (!count.isNull() && error.isNone())
-							fragment.showTransactionCount(count)
-						else fragment.context.alert(error.message)
-						// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
-						if (count == 0) setTotalValue(0.0, 0.0)
+					if (transactions.isEmpty()) {
+						getBTCSeriesTransactionCountFromChain { count, error ->
+							if (!count.isNull() && error.isNone()) {
+								fragment.showTransactionCount(count)
+							} else {
+								fragment.context.alert(error.message)
+							}
+
+							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
+							if (count == 0) {
+								setTotalValue(0.0, 0.0)
+							}
+						}
 					} else {
 						// 去除燃气费的部分剩下的计算为交易数量
 						fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)

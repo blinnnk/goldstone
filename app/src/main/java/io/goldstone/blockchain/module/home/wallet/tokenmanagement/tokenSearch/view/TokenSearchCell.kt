@@ -10,6 +10,8 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 
 class TokenSearchCell(context: Context) : TokenManagementListCell(context) {
 
+
+
   init {
 
   }

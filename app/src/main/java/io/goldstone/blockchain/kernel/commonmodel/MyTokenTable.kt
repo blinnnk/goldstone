@@ -109,20 +109,6 @@ data class MyTokenTable(
 			} then (hold)
 		}
 
-		fun getCurrentChainDefaultAndMyTokens(
-			hold: (
-				myTokens: List<MyTokenTable>,
-				defaultTokens: List<DefaultTokenTable>
-			) -> Unit
-		) {
-			DefaultTokenTable.getCurrentChainTokens { defaultTokens ->
-				// Check current wallet has more than on token or not
-				MyTokenTable.getMyTokens { myTokens ->
-					hold(myTokens, defaultTokens)
-				}
-			}
-		}
-
 		fun getTokenBalance(
 			contract: TokenContract,
 			ownerName: String,
@@ -249,7 +235,7 @@ data class MyTokenTable(
 						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSAccount(), { hold(null, it) }) {
 							hold(it, RequestError.None)
 						}
-					} else hold(null, AccountError.InvalidAccountName)
+					} else hold(null,RequestError.None)
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
