@@ -27,6 +27,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMRankModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -554,8 +555,23 @@ object GoldStoneAPI {
 				errorCallback(Exception("no values for ticks"))
 			}
 		}
+	}
+	
+	fun getEOSRAMRank(
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<EOSRAMRankModel>) -> Unit
+	) {
+		requestData<EOSRAMRankModel>(
+			APIPath.getEOSRAMRank(APIPath.currentUrl),
+			"rank",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
+		}
 		
 	}
+	
 	@JvmStatic
 	fun getEOSMemoryTransactionHistory(
 		account: String,

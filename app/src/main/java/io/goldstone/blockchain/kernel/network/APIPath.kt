@@ -77,6 +77,10 @@ object APIPath {
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}
+	
+	val getEOSRAMRank: (header: String) -> String = { header ->
+		"$header/eosram/holderRank"
+	}
 }
 
 object EtherScanApi {

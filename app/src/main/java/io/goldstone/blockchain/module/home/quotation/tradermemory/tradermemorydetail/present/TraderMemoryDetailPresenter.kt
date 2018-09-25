@@ -5,7 +5,9 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMMarketHeaderModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.model.RAMMarketModel
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view.TraderMemoryDetailFragment
 import org.jetbrains.anko.toast
@@ -24,5 +26,7 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 	fun getIsMainnet() {}
 
 	var ramMarketModel = RAMMarketModel(RAMMarketHeaderModel())
+	
+	
 
 }

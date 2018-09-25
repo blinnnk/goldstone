@@ -32,7 +32,8 @@ object ElementID {
 	const val miniOverlay = 20018
 	const val dashboardOverlay = 20019
 	const val eosMemoryTransactionHistoryList = 20020
-	const val baseFragmentContainer = 20020
+	const val baseFragmentContainer = 20021
+	const val rankList = 20022
 }
 
 object ViewPagerID {
