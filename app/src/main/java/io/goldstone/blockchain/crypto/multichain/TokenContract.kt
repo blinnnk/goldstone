@@ -107,7 +107,7 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 		TokenContract(this?.contract).isETC() ->
 			Config.getCurrentETCAddress()
 		TokenContract(this?.contract).isEOS() ->
-			if (isEOSAccountName) Config.getCurrentEOSName().accountName
+			if (isEOSAccountName) Config.getCurrentEOSAccount().accountName
 			else Config.getCurrentEOSAddress()
 		else ->
 			Config.getCurrentEthereumAddress()

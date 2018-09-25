@@ -6,6 +6,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
@@ -117,41 +118,51 @@ private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
 
 fun GasSelectionPresenter.prepareToTransferBTC(
 	footer: GasSelectionFooter,
-	callback: (GoldStoneError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
-	// 检查余额状况
-	checkBTCBalanceIsValid(gasUsedGasFee!!) {
-		if (this) GoldStoneAPI.context.runOnUiThread {
-			showConfirmAttentionView(footer, callback)
-		} else callback(TransferError.BalanceIsNotEnough)
+	checkBTCBalanceIsValid(gasUsedGasFee!!) { isEnough, error ->
+		when {
+			isEnough -> showConfirmAttentionView(footer, callback)
+			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+			else -> callback(error)
+		}
 	}
 }
 
-fun GasSelectionPresenter.checkBCHBalanceIsValid(fee: Double, hold: Boolean.() -> Unit) {
+fun GasSelectionPresenter.checkBCHBalanceIsValid(
+	fee: Double,
+	@UiThread hold: (isValid: Boolean, error: RequestError) -> Unit
+) {
 	prepareBTCSeriesModel?.apply {
-		BitcoinCashApi.getBalance(fromAddress) {
+		BitcoinCashApi.getBalance(fromAddress) { balance, error ->
 			GoldStoneAPI.context.runOnUiThread {
-				hold(it.toSatoshi() > value + fee.toSatoshi())
+				hold(balance?.toSatoshi().orElse(0) > value + fee.toSatoshi(), error)
 			}
 		}
 	}
 }
 
-fun GasSelectionPresenter.checkBTCBalanceIsValid(fee: Double, hold: Boolean.() -> Unit) {
+fun GasSelectionPresenter.checkBTCBalanceIsValid(
+	fee: Double,
+	@UiThread hold: (isValid: Boolean, error: RequestError) -> Unit
+) {
 	prepareBTCSeriesModel?.apply {
-		BitcoinApi.getBalance(fromAddress) {
+		BitcoinApi.getBalance(fromAddress) { balance, error ->
 			GoldStoneAPI.context.runOnUiThread {
-				hold(it > value + fee.toSatoshi())
+				hold(balance.orElse(0) > value + fee.toSatoshi(), error)
 			}
 		}
 	}
 }
 
-fun GasSelectionPresenter.checkLTCBalanceIsValid(fee: Double, hold: Boolean.() -> Unit) {
+fun GasSelectionPresenter.checkLTCBalanceIsValid(
+	fee: Double,
+	@UiThread hold: (isValid: Boolean, error: RequestError) -> Unit
+) {
 	prepareBTCSeriesModel?.apply {
-		LitecoinApi.getBalance(fromAddress) {
+		LitecoinApi.getBalance(fromAddress) { balance, error ->
 			GoldStoneAPI.context.runOnUiThread {
-				hold(it > value + fee.toSatoshi())
+				hold(balance.orElse(0) > value + fee.toSatoshi(), error)
 			}
 		}
 	}

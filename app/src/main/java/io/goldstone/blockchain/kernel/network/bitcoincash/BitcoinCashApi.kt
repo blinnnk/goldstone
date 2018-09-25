@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.network.bitcoincash
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -17,7 +18,10 @@ import org.json.JSONObject
 
 object BitcoinCashApi {
 
-	fun getBalance(address: String, hold: (Double) -> Unit) {
+	fun getBalance(
+		address: String,
+		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
+	) {
 		BTCSeriesApiUtils.getDoubleBalance(BitcoinCashUrl.getBalance(address), hold)
 	}
 
@@ -50,7 +54,7 @@ object BitcoinCashApi {
 
 	fun getTransactionCount(
 		address: String,
-		errorCallback: (Throwable) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
 		// `From` 值传巨大的目的是获取 `Count` 而不是拉取数据

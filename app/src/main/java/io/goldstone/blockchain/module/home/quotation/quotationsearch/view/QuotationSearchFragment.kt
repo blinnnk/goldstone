@@ -28,7 +28,7 @@ class QuotationSearchFragment :
 		asyncData: ArrayList<QuotationSelectionTable>?
 	) {
 		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { cell ->
-			cell.searchModel?.let { model ->
+			cell.quotationSearchModel?.let { model ->
 				cell.switch.onClick {
 					getMainActivity()?.showLoadingView()
 					presenter.setQuotationSelfSelection(model, cell.switch.isChecked) {

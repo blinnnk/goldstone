@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -20,24 +22,22 @@ import org.json.JSONObject
  */
 object BitcoinApi {
 
-	fun getBalance(address: String, hold: (Long) -> Unit) {
+	fun getBalance(
+		address: String,
+		@WorkerThread hold: (balance: Long?, error: RequestError) -> Unit
+	) {
 		// 向 `Insight` 发起余额查询请求
 		BTCSeriesApiUtils.getBalance(
-			BitcoinUrl.getBalance(address),
-			{ error ->
-				// 如果 `Insight` 的接口出错那么向 `BlockInfo` 发起请求
-				BTCSeriesApiUtils.getBalanceFromBlockInfo(
-					BitcoinUrl.getBalanceFromBlockInfo(address),
-					address,
-					{ blockInfoError ->
-						LogUtil.error("BitcoinApi GetBalance", blockInfoError)
-					},
-					hold
-				)
-				LogUtil.error("BitcoinApi GetBalance", error)
-			},
-			hold
-		)
+			BitcoinUrl.getBalance(address)
+		) { balance, error ->
+			if (!balance.isNull() && error.isNone()) {
+				hold(balance!!, error)
+			} else BTCSeriesApiUtils.getBalanceFromBlockInfo(
+				BitcoinUrl.getBalanceFromBlockInfo(address),
+				address,
+				hold
+			)
+		}
 	}
 
 	fun getBTCTransactions(
@@ -56,7 +56,7 @@ object BitcoinApi {
 
 	fun getTransactionCount(
 		address: String,
-		errorCallback: (Throwable) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
 		// `from` 传入一个特大值, `to` 传入 `0` 确保返回的数据只有 `count` 参数而不包含子集

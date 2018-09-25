@@ -21,6 +21,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenDefaultTableDao
 import java.math.BigInteger
 
 /**
@@ -74,6 +75,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun btcSeriesTransactionDao(): BTCSeriesTransactionDao
 	abstract fun eosTransactionDao(): EOSTransactionDao
 	abstract fun eosAccountDao(): EOSAccountDao
+	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
 
 	companion object {
 		const val databaseVersion = 6

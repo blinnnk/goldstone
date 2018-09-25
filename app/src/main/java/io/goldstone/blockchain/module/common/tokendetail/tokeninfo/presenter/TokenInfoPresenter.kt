@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
@@ -86,7 +86,11 @@ class TokenInfoPresenter(
 		}
 		val hash160 =
 			if (net.isNull()) null
-			else Address.fromBase58(net, currentAddress).hash160.toNoPrefixHexString()
+			else try {
+				Address.fromBase58(net, currentAddress).hash160.toNoPrefixHexString()
+			} catch (error: Exception) {
+				null
+			}
 		hold(currentAddress, hash160)
 	}
 
@@ -97,10 +101,15 @@ class TokenInfoPresenter(
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
 					if (transactions.isEmpty()) {
-						getBTCSeriesTransactionCountFromChain {
-							fragment.showTransactionCount(it)
+						getBTCSeriesTransactionCountFromChain { count, error ->
+							if (!count.isNull() && error.isNone()) {
+								fragment.showTransactionCount(count)
+							} else {
+								fragment.context.alert(error.message)
+							}
+
 							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
-							if (it == 0) {
+							if (count == 0) {
 								setTotalValue(0.0, 0.0)
 							}
 						}
@@ -187,38 +196,27 @@ class TokenInfoPresenter(
 		fragment.showTotalValue(content(receivedValue), content(sentValue))
 	}
 
-	private fun getBTCSeriesTransactionCountFromChain(
-		@UiThread hold: (Int) -> Unit
-	) {
+	private fun getBTCSeriesTransactionCountFromChain(@UiThread hold: (count: Int?, error: RequestError) -> Unit) {
 		when (tokenInfo?.symbol) {
 			CoinSymbol.btc() -> BitcoinApi.getTransactionCount(
 				currentAddress,
-				{
-					hold(0)
-					LogUtil.error("bitcoin showTransactionCount", it)
-				}
+				{ hold(null, it) }
 			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it) }
+				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
 			}
 			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(
 				currentAddress,
-				{
-					hold(0)
-					LogUtil.error("litecoin showTransactionCount", it)
-				}
+				{ hold(null, it) }
 			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it) }
+				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
 			}
 			CoinSymbol.bch -> BitcoinCashApi.getTransactionCount(
 				currentAddress,
-				{
-					hold(0)
-					LogUtil.error("bitcoin cash showTransactionCount", it)
-				}
+				{ hold(null, it) }
 			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it) }
+				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
 			}
-			else -> hold(0)
+			else -> hold(0, RequestError.None)
 		}
 	}
 

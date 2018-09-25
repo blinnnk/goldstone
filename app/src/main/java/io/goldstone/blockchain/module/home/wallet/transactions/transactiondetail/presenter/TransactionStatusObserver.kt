@@ -272,29 +272,22 @@ private fun TransactionDetailPresenter.updateWalletDetailValue(
 	address: String,
 	activity: MainActivity?
 ) {
-	updateMyTokenBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
-	address: String,
-	callback: (RequestError) -> Unit
-) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		CoinSymbol(getUnitSymbol()).getCurrentChainName(),
-		errorCallback = callback
+		errorCallback = {
+			LogUtil.error("updateWalletDetailValue", it)
+		}
 	) { transaction ->
 		val contract =
 			ChainURL.getContractByTransaction(transaction, CoinSymbol(getUnitSymbol()).getCurrentChainName())
 		MyTokenTable.getBalanceByContract(
 			contract,
-			address,
-			callback
-		) {
-			MyTokenTable.updateBalanceByContract(it, address, contract)
-			GoldStoneAPI.context.runOnUiThread { callback(RequestError.None) }
+			address
+		) { balance, error ->
+			if (!balance.isNull() && error.isNone()) {
+				MyTokenTable.updateBalanceByContract(balance!!, address, contract)
+			} else GoldStoneAPI.context.runOnUiThread { activity?.getWalletDetailFragment()?.presenter?.updateData() }
 		}
 	}
 }

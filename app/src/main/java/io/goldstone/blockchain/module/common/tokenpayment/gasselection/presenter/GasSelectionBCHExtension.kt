@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -21,16 +22,17 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-
 fun GasSelectionPresenter.prepareToTransferBCH(
 	footer: GasSelectionFooter,
-	callback: (GoldStoneError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
 	// 检查余额状况
-	checkBCHBalanceIsValid(gasUsedGasFee!!) {
-		if (this) GoldStoneAPI.context.runOnUiThread {
-			showConfirmAttentionView(footer, callback)
-		} else callback(TransferError.BalanceIsNotEnough)
+	checkBCHBalanceIsValid(gasUsedGasFee!!) { isEnough, error ->
+		when {
+			isEnough -> showConfirmAttentionView(footer, callback)
+			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+			else -> callback(error)
+		}
 	}
 }
 

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -24,38 +25,35 @@ import org.jetbrains.anko.runOnUiThread
 
 fun GasSelectionPresenter.prepareToTransferLTC(
 	footer: GasSelectionFooter,
-	callback: (GoldStoneError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
-	// 检查余额状况
-	checkLTCBalanceIsValid(gasUsedGasFee!!) {
-		if (this) GoldStoneAPI.context.runOnUiThread {
-			showConfirmAttentionView(footer, callback)
-		} else callback(TransferError.BalanceIsNotEnough)
+	checkLTCBalanceIsValid(gasUsedGasFee!!) { isEnough, error ->
+		when {
+			isEnough -> showConfirmAttentionView(footer, callback)
+			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+			else -> callback(error)
+		}
 	}
 }
 
 private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
 	walletAddress: String,
 	password: String,
-	hold: (privateKey: String?, error: AccountError) -> Unit
+	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
-	if (Config.isTestEnvironment()) {
-		fragment.context?.exportBase58PrivateKey(
-			walletAddress,
-			password,
-			isSingleChainWallet,
-			true,
-			hold
-		)
-	} else {
-		fragment.context?.exportLTCBase58PrivateKey(
-			walletAddress,
-			password,
-			isSingleChainWallet,
-			hold
-		)
-	}
+	if (Config.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
+		walletAddress,
+		password,
+		isSingleChainWallet,
+		true,
+		hold
+	) else fragment.context?.exportLTCBase58PrivateKey(
+		walletAddress,
+		password,
+		isSingleChainWallet,
+		hold
+	)
 }
 
 fun GasSelectionPresenter.transferLTC(

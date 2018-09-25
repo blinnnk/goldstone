@@ -1,8 +1,9 @@
 package io.goldstone.blockchain.kernel.network
 
-import com.blinnnk.extension.isNull
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
@@ -42,17 +43,14 @@ object BTCSeriesApiUtils {
 
 	fun getTransactionCount(
 		api: String,
-		errorCallback: (Throwable) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"totalItems",
 			true,
-			{
-				errorCallback(it)
-				LogUtil.error("getTransactionCount", it)
-			}
+			errorCallback
 		) {
 			hold(this.firstOrNull()?.toIntOrNull().orZero())
 		}
@@ -60,21 +58,16 @@ object BTCSeriesApiUtils {
 
 	fun getBalance(
 		api: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (Long) -> Unit
+		@WorkerThread hold: (balance: Long?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
 			true,
-			{
-				errorCallback(it)
-				LogUtil.error("getBalance", it)
-			}
+			{ hold(null, it) }
 		) {
 			val result = firstOrNull()?.toLongOrNull()
-			if (result.isNull()) errorCallback(Throwable("Wrong Result"))
-			else hold(result!!)
+			hold(result, RequestError.None)
 		}
 	}
 
@@ -82,32 +75,29 @@ object BTCSeriesApiUtils {
 	fun getBalanceFromBlockInfo(
 		api: String,
 		address: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (Long) -> Unit
+		hold: (balance: Long?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			address,
 			true,
-			{
-				errorCallback(it)
-				LogUtil.error("getBalanceFromBlockInfo", it)
-			}
+			{ hold(null, it) }
 		) {
-			if (isNotEmpty()) hold(JSONObject(first()).safeGet("final_balance").toLong())
+			if (isNotEmpty()) hold(JSONObject(first()).safeGet("final_balance").toLong(), RequestError.None)
 		}
 	}
 
-	fun getDoubleBalance(api: String, hold: (Double) -> Unit) {
+	fun getDoubleBalance(
+		api: String,
+		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
+	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
 			true,
-			{
-				LogUtil.error("getDoubleBalance", it)
-			}
+			{ hold(null, it) }
 		) {
-			hold(firstOrNull()?.toDoubleOrNull() ?: 0.0)
+			hold(firstOrNull()?.toDoubleOrNull() ?: 0.0, RequestError.None)
 		}
 	}
 

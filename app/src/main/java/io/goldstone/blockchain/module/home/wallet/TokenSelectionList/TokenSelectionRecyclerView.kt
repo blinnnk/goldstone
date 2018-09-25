@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
@@ -14,14 +13,9 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
@@ -34,21 +28,18 @@ import org.jetbrains.anko.wrapContent
  */
 class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 
-
 	init {
 		backgroundColor = Color.RED
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 	}
 
-	fun setAdapter(data: ArrayList<DefaultTokenTable>, isShowAddressList: Boolean = true) {
+	fun setAdapter(data: ArrayList<WalletDetailCellModel>, isShowAddressList: Boolean = true) {
 		adapter = TokenSelectionAdapter(data) {
 			model?.let { token ->
 				onClick {
-					if (isShowAddressList) {
+					if (isShowAddressList)
 						showTransferAddressFragment(this@TokenSelectionRecyclerView.context, token)
-					} else {
-						showDepositFragment(this@TokenSelectionRecyclerView.context, token)
-					}
+					else showDepositFragment(this@TokenSelectionRecyclerView.context, token)
 					preventDuplicateClicks()
 				}
 			}
@@ -57,38 +48,20 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 
 	companion object {
 
-		fun showTransferAddressFragment(
-			context: Context?,
-			token: DefaultTokenTable
-		) {
-			prepareContentOverlay(context, token) {
+		fun showTransferAddressFragment(context: Context?, token: WalletDetailCellModel) {
+			// 显示 `ContentOverlay`
+			(context as? MainActivity)?.showTokenDetailOverlayFragment(token) {
 				putBoolean(ArgumentKey.fromQuickTransfer, true)
 			}
 		}
 
-		fun showDepositFragment(context: Context?, token: DefaultTokenTable) {
-			prepareContentOverlay(context, token) {
-				putBoolean(ArgumentKey.fromQuickDeposit, true)
+		fun showDepositFragment(context: Context?, token: WalletDetailCellModel) {
+			// 显示 `ContentOverlay`
+			(context as? MainActivity)?.showTokenDetailOverlayFragment(token) {
+				putBoolean(ArgumentKey.fromQuickTransfer, true)
 			}
 		}
 
-		private fun prepareContentOverlay(
-			context: Context?,
-			token: DefaultTokenTable,
-			putArgument: Bundle.() -> Unit
-		) {
-			MyTokenTable.getMyTokenByContractAndWalletAddress(
-				TokenContract(token.contract),
-				CoinSymbol(token.symbol).getAddress()
-			) { myToken ->
-				WalletTable.getCurrentEOSWalletType { eosWalletType ->
-					// 准备数据
-					val model = WalletDetailCellModel(token, myToken?.balance.orZero(), eosWalletType)
-					// 显示 `ContentOverlay`
-					(context as? MainActivity)?.showTokenDetailOverlayFragment(model, putArgument)
-				}
-			}
-		}
 
 		private fun MainActivity.showTokenDetailOverlayFragment(
 			model: WalletDetailCellModel,
