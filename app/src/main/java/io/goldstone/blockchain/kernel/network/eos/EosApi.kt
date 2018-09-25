@@ -198,7 +198,7 @@ object EOSAPI {
 	fun getAccountResource(
 		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		errorCallBack: (GoldStoneError) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		@WorkerThread hold: (resource: TotalResources?) -> Unit
 	) {
 		RequisitionUtil.postSingle<TotalResources>(

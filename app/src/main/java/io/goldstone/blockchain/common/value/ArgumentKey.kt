@@ -35,6 +35,7 @@ object ArgumentKey {
 	const val coinType = "coinType"
 	const val defaultEOSAccountName = "defaultEOSAccountName"
 	const val contact = "contact"
+	const val eosAccountRegister = "eosAccountRegister"
 }
 
 object IntentKey {

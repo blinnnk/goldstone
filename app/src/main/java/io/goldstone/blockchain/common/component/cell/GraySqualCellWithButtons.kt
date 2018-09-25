@@ -82,7 +82,7 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 		container = relativeLayout {
 			lparams(ScreenSize.widthWithPadding, cellHeight)
 			setCenterInParent()
-			addCorner(CornerSize.cell, GrayScale.whiteGray)
+			addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 			lineView = View(context).apply {
 				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
 			}

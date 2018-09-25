@@ -21,8 +21,7 @@ class SpaceSplitLine(context: Context) : View(context) {
 		color = GrayScale.lightGray
 	}
 
-	var borderSize = BorderSize.bold
-
+	private var borderSize = BorderSize.bold
 
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
@@ -36,4 +35,5 @@ class SpaceSplitLine(context: Context) : View(context) {
 		paint.color = color
 		invalidate()
 	}
+
 }

@@ -64,7 +64,7 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		container = relativeLayout {
 			lparams(ScreenSize.widthWithPadding - shadowSize * 2, 45.uiPX())
 			setCenterInParent()
-			addCorner(CornerSize.cell, GrayScale.whiteGray)
+			addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 			elevation = 3f
 			addView(View(context).apply {
 				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)

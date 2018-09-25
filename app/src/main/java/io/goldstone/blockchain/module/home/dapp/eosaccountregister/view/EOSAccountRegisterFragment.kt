@@ -11,12 +11,12 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.ColumnSectionTitle
+import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
-import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -32,7 +32,10 @@ import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.verticalLayout
 import java.math.BigInteger
 
 
@@ -58,11 +61,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 			verticalLayout {
 				lparams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL
-				AttentionTextView(context).apply {
-					isCenter()
-					bottomPadding = 20.uiPX()
-					text = "The username must be 12 characters long, and the character content can only contain the letters A~Z or the numbers 1~5."
-				}.into(this)
+				DescriptionView(context).isNameRule().into(this)
 				accountNameInput.apply {
 					title = ImportWalletText.eosAccountName
 					afterTextChanged = Runnable {
@@ -72,11 +71,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					}
 				}.into(this)
 
-				AttentionTextView(context).apply {
-					isCenter()
-					topPadding = 20.uiPX()
-					text = "Registering an account requires injecting a certain amount of resources into the new account, so that the new account can complete the most basic operations."
-				}.into(this)
+				DescriptionView(context).isRegisterResource().into(this)
 
 				publickeyInput.apply {
 					hint = ImportWalletText.registerEOSPublicKey

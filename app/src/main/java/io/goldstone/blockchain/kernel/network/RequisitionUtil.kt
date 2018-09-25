@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.RequisitionUtil.getKeyName
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -143,7 +144,7 @@ object RequisitionUtil {
 			client.newCall(requestBody).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed("[API: $path]\n[ERROR: $error]"))
+						errorCallback(RequestError.PostFailed("[API: ${path.getKeyName()}]\n[ERROR: $error]"))
 					}
 					LogUtil.error(path, error)
 				}
@@ -192,7 +193,7 @@ object RequisitionUtil {
 				override fun onFailure(call: Call, error: IOException) {
 					LogUtil.error(path, error)
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed("[API: $path]\n[ERROR: $error]"))
+						errorCallback(RequestError.PostFailed("[API: ${path.substringAfterLast("/")}]\n[ERROR: $error]"))
 					}
 				}
 
@@ -204,7 +205,7 @@ object RequisitionUtil {
 						hold(data.orEmpty())
 					} catch (error: Exception) {
 						GoldStoneAPI.context.runOnUiThread {
-							errorCallback(RequestError.PostFailed("[API: $path]\n[ERROR: $error]"))
+							errorCallback(RequestError.PostFailed("[API: ${path.getKeyName()}]\n[ERROR: $error]"))
 						}
 						LogUtil.error(path, error)
 					}
@@ -235,7 +236,7 @@ object RequisitionUtil {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					GoldStoneAPI.context.runOnUiThread {
-						errorCallback(RequestError.PostFailed("[API: $api]\n[ERROR: $error]"))
+						errorCallback(RequestError.PostFailed("[API: ${api.getKeyName()}]\n[ERROR: $error]"))
 					}
 				}
 
@@ -290,7 +291,7 @@ object RequisitionUtil {
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
 				GoldStoneAPI.context.runOnUiThread {
-					errorCallback(RequestError.PostFailed("[API: $api]\n[ERROR: $error]"))
+					errorCallback(RequestError.PostFailed("[API: ${api.getKeyName()}]\n[ERROR: $error]"))
 				}
 				LogUtil.error("$api $keyName", error)
 			}
@@ -314,6 +315,11 @@ object RequisitionUtil {
 				}
 			}
 		})
+	}
+
+	fun String.getKeyName(): String {
+		return if (contains("/")) substringAfterLast("/")
+		else this
 	}
 
 	// `GoldStone` 加密规则的 `Header Request`
@@ -514,5 +520,6 @@ object GoldStoneCode {
 				}
 			}
 		}
+
 	}
 }
