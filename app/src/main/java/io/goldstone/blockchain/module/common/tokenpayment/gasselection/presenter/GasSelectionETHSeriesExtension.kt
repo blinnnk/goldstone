@@ -3,9 +3,11 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
@@ -136,7 +138,7 @@ private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
 
 private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	password: String,
-	@WorkerThread hold: (String?) -> Unit
+	@WorkerThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	// 获取当前账户的私钥
@@ -145,25 +147,14 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 		password,
 		false,
 		isSingleChainWallet,
-		{
-			hold(null)
-			fragment.showMaskView(false)
-		},
 		false,
 		hold
 	)
 }
 
-fun GasSelectionPresenter.transfer(
-	password: String,
-	callback: (RequestError) -> Unit
-) {
-//	alert(CommonText.wrongPassword) // TODO Alert 移到 UI 层
-	getCurrentETHORETCPrivateKey(password) { privateKey ->
-		if (privateKey.isNullOrBlank()) {
-			// 当私钥为 `null` 的时候意味着获取私钥出错, 直接返回
-			callback(RequestError.None)
-		} else prepareModel?.apply model@{
+fun GasSelectionPresenter.transfer(password: String, callback: (GoldStoneError) -> Unit) {
+	getCurrentETHORETCPrivateKey(password) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) prepareModel?.apply model@{
 			// 更新 `prepareModel`  的 `gasPrice` 的值
 			this.gasPrice = currentMinerType.getSelectedGasPrice()
 			// Generate Transaction Model
@@ -200,16 +191,12 @@ fun GasSelectionPresenter.transfer(
 					goToTransactionDetailFragment(
 						rootFragment,
 						fragment,
-						prepareReceiptModel(
-							this@model,
-							countWithDecimal,
-							taxHash
-						)
+						prepareReceiptModel(this@model, countWithDecimal, taxHash)
 					)
 					callback(RequestError.None)
 				}
 			}
-		}
+		} else callback(error)
 	}
 }
 

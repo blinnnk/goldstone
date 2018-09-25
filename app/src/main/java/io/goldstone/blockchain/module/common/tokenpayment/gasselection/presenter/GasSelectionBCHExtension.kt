@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -36,7 +37,7 @@ fun GasSelectionPresenter.prepareToTransferBCH(
 private fun GasSelectionPresenter.getCurrentWalletBCHPrivateKey(
 	walletAddress: String,
 	password: String,
-	hold: (String?) -> Unit
+	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	fragment.context?.exportBase58PrivateKey(
@@ -56,10 +57,8 @@ fun GasSelectionPresenter.transferBCH(
 	getCurrentWalletBCHPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
 		password
-	) { secret ->
-		if (secret.isNullOrBlank()) {
-			callback(AccountError.WrongPassword)
-		} else prepareBTCSeriesModel.apply model@{
+	) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) prepareBTCSeriesModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
 			BitcoinCashApi.getUnspentListByAddress(fromAddress) { unspents ->
 				BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
@@ -68,7 +67,7 @@ fun GasSelectionPresenter.transferBCH(
 					toAddress,
 					changeAddress,
 					unspents,
-					secret!!,
+					privateKey!!,
 					Config.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
@@ -92,6 +91,6 @@ fun GasSelectionPresenter.transferBCH(
 					}
 				}
 			}
-		}
+		} else callback(error)
 	}
 }

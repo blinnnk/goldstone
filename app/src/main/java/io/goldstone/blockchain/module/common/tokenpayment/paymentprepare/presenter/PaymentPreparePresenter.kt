@@ -118,8 +118,9 @@ class PaymentPreparePresenter(
 						Config.getCurrentEOSAddress(),
 						ChainType.EOS,
 						password
-					) {
-						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), GoldStoneError.None)
+					) { privateKey, error ->
+						if (!privateKey.isNull() && error.isNone())
+							hold(EOSPrivateKey(privateKey!!), GoldStoneError.None)
 						else hold(null, AccountError.DecryptKeyStoreError)
 					}
 				} else hold(null, PasswordError.InputIsEmpty)
