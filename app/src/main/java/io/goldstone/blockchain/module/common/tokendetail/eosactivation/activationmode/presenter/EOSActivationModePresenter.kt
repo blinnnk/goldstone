@@ -17,11 +17,11 @@ class EOSActivationModePresenter(
 ) : BasePresenter<EOSActivationModeFragment>() {
 	fun showRegisterByFriendFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
-			?.presenter?.showTargetFragment<RegisterByFriendFragment>("Register By Friend", "EOS")
+			?.presenter?.showTargetFragment<RegisterByFriendFragment>()
 	}
 
 	fun showRegisterBySmartContractFragment() {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
-			?.presenter?.showTargetFragment<SmartContractRegisterFragment>("Smart Contract Register", "EOS")
+			?.presenter?.showTargetFragment<SmartContractRegisterFragment>()
 	}
 }

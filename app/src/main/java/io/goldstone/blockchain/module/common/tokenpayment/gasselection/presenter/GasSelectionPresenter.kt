@@ -129,8 +129,6 @@ class GasSelectionPresenter(
 	fun goToGasEditorFragment() {
 		rootFragment?.apply {
 			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,

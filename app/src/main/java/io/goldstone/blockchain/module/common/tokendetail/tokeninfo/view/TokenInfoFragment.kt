@@ -24,6 +24,7 @@ import org.jetbrains.anko.*
 
 class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInterface {
 
+	override val pageTitle: String = "Token Info"
 	private val tokenInfoView by lazy {
 		TokenInfoView(context!!)
 	}

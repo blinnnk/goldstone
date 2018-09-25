@@ -28,6 +28,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.passwordSettings
 	private val oldPassword by lazy { RoundInput(context!!) }
 	private val newPassword by lazy { RoundInput(context!!) }
 	private val passwordHint by lazy { RoundInput(context!!) }

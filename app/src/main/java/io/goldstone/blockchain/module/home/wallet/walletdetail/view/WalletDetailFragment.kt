@@ -26,6 +26,7 @@ import java.util.*
 class WalletDetailFragment :
 	BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
 
+	override val pageTitle: String = "Wallet Detail"
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
 	private var headerView: WalletDetailHeaderView? = null
 	override val presenter = WalletDetailPresenter(this)
@@ -142,13 +143,14 @@ class WalletDetailFragment :
 	}
 
 	private fun showPinCodeFragment() {
-		if (activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull()) AppConfigTable.getAppConfig {
-			it?.showPincode?.isTrue {
-				activity?.addFragmentAndSetArguments<PasscodeFragment>(
-					ContainerID.main,
-					FragmentTag.pinCode
-				)
+		if (activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull())
+			AppConfigTable.getAppConfig {
+				it?.showPincode?.isTrue {
+					activity?.addFragmentAndSetArguments<PasscodeFragment>(
+						ContainerID.main,
+						FragmentTag.pinCode
+					)
+				}
 			}
-		}
 	}
 }

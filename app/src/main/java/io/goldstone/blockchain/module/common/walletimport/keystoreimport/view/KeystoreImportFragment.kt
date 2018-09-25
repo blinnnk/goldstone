@@ -36,6 +36,7 @@ import org.jetbrains.anko.*
  */
 class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
+	override val pageTitle: String = ImportMethodText.keystore
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	private val keystoreEditText by lazy { WalletEditText(context!!) }
@@ -86,10 +87,9 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					}.click {
 						getParentFragment<WalletImportFragment> {
 							presenter.showTargetFragment<WebViewFragment>(
-								ProfileText.terms,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.terms)
+									putString(ArgumentKey.webViewName, ProfileText.terms)
 								}
 							)
 						}
@@ -119,10 +119,9 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsKeystore,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
+									putString(ArgumentKey.webViewName, QAText.whatIsKeystore)
 								}
 							)
 						}

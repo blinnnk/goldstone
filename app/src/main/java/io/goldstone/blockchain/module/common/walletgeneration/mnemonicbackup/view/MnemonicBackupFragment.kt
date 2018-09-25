@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.TagCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
+import io.goldstone.blockchain.common.language.ImportMethodText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -29,6 +30,7 @@ import org.jetbrains.anko.*
  */
 class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 
+	override val pageTitle: String = CreateWalletText.mnemonicBackUp
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val skipButton by lazy { RoundButton(context!!) }

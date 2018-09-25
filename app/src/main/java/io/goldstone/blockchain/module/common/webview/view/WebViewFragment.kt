@@ -33,6 +33,7 @@ import org.jetbrains.anko.*
  */
 class WebViewFragment : BaseFragment<WebViewPresenter>() {
 
+	override val pageTitle: String get() = arguments?.getString(ArgumentKey.webViewName).orEmpty()
 	private val urlPath by lazy { arguments?.getString(ArgumentKey.webViewUrl) }
 	private val loading by lazy {
 		ProgressBar(this.context, null, R.attr.progressBarStyleInverse)

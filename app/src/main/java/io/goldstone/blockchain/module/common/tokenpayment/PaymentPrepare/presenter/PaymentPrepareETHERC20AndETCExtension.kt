@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 import android.os.Bundle
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.*
@@ -32,8 +31,6 @@ fun PaymentPreparePresenter.prepareETHSeriesPaymentModel(
 	) { model ->
 		fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putSerializable(ArgumentKey.gasPrepareModel, model)
 				})

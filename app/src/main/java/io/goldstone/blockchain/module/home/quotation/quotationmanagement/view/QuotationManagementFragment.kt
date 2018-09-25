@@ -4,6 +4,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -17,6 +18,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class QuotationManagementFragment :
 	BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
 
+	override val pageTitle: String = QuotationText.management
 	private var willDeletePair = listOf<String>()
 	override val presenter = QuotationManagementPresenter(this)
 	override fun setRecyclerViewAdapter(
@@ -61,7 +63,7 @@ class QuotationManagementFragment :
 			if (hidden) {
 				overlayView.header.showSearchButton(false)
 			} else overlayView.header.showSearchButton(true) {
-				presenter.showQutationSearchFragment()
+				presenter.showQuotationSearchFragment()
 			}
 		}
 	}

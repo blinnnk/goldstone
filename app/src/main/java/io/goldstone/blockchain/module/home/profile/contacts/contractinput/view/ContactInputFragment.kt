@@ -33,6 +33,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 
+	override val pageTitle: String = ProfileText.contacts
 	private val nameInput by lazy { RoundInput(context!!) }
 	private val ethSeriesAddressInput by lazy { RoundInput(context!!) }
 	private val eosAddressInput by lazy { RoundInput(context!!) }

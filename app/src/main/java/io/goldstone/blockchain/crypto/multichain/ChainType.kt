@@ -29,6 +29,18 @@ class ChainType(val id: Int) : Serializable {
 		}
 	}
 
+	fun getSymbol(): CoinSymbol {
+		return when (id) {
+			ChainType.ETH.id -> CoinSymbol.ETH
+			ChainType.ETC.id -> CoinSymbol.ETC
+			ChainType.BTC.id -> CoinSymbol.BTC
+			ChainType.LTC.id -> CoinSymbol.LTC
+			ChainType.BCH.id -> CoinSymbol.BCH
+			ChainType.EOS.id -> CoinSymbol.EOS
+			else -> CoinSymbol.ETH
+		}
+	}
+
 	fun getMainnetChainName(): String {
 		return when (id) {
 			ChainType.ETH.id -> {

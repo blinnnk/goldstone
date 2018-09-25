@@ -19,8 +19,8 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.Quotat
 class QuotationOverlayPresenter(
 	override val fragment: QuotationOverlayFragment
 ) : BaseOverlayPresenter<QuotationOverlayFragment>() {
-	
-	fun showQutationManagementFragment() {
+
+	fun showQuotationManagementFragment() {
 		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content)
 	}
 
@@ -35,12 +35,9 @@ class QuotationOverlayPresenter(
 			putSerializable(ArgumentKey.quotationCurrencyDetail, model)
 		}
 	}
-	
-	fun showQutationSearchFragment() {
-		showTargetFragment<QuotationSearchFragment>(
-			QuotationText.search,
-			QuotationText.management
-		)
+
+	fun showQuotationSearchFragment() {
+		showTargetFragment<QuotationSearchFragment>()
 		fragment.overlayView.header.apply {
 			showBackButton(false)
 			showSearchInput {

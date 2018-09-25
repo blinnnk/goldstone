@@ -45,6 +45,7 @@ import java.math.BigInteger
 
 class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInterface {
 
+	override val pageTitle: String = "Asset"
 	private val tokenInfoView by lazy { TokenInfoView(context!!) }
 	private val balanceCell by lazy {
 		GraySquareCell(context!!).apply {

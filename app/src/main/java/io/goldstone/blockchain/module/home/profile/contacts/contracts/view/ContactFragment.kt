@@ -10,6 +10,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -31,6 +32,7 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 	var selectedAddress: String? = null
 	var clickCellEvent: Runnable? = null
 
+	override val pageTitle: String = ProfileText.contacts
 	override val presenter = ContactPresenter(this)
 
 	override fun setRecyclerViewAdapter(

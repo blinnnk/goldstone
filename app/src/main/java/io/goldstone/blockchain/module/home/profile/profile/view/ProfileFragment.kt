@@ -20,6 +20,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 
+	override val pageTitle: String = "Settings"
 	private val slideHeader by lazy { ProfileSlideHeader(context!!) }
 	override val presenter = ProfilePresenter(this)
 

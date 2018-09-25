@@ -232,7 +232,7 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
-	val showQRCode = when (currentLanguage) {
+	val qrCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "QR Code"
 		HoneyLanguage.Chinese.code -> "二维码"
 		HoneyLanguage.Japanese.code -> "QRコード"

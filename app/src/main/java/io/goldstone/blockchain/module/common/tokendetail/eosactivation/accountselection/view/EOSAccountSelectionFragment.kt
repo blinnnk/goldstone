@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
@@ -32,6 +33,7 @@ import org.jetbrains.anko.*
  */
 class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>() {
 
+	override val pageTitle: String = TokenDetailText.accountNameSelection
 	private val defaultActorName by lazy { arguments?.getString(ArgumentKey.defaultEOSAccountName) }
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }

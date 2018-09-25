@@ -22,11 +22,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class ChainAddressesFragment
 	: BaseRecyclerFragment<ChainAddressesPresenter, Pair<String, String>>() {
 
-	val coinType by lazy {
-		arguments?.getInt(ArgumentKey.coinType)?.let { ChainType(it) }
-	}
+	val coinType by lazy { arguments?.getInt(ArgumentKey.coinType)?.let { ChainType(it) } }
+	override val pageTitle: String get() = coinType?.getSymbol()?.symbol.orEmpty()
 	override val presenter = ChainAddressesPresenter(this)
-
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<Pair<String, String>>?

@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
@@ -43,8 +42,6 @@ fun PaymentPreparePresenter.prepareLTCPaymentModel(
 	else generateLTCPaymentModel(count, changeAddress) { error, model ->
 		if (!model.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putSerializable(ArgumentKey.btcSeriesPrepareModel, model)
 				})

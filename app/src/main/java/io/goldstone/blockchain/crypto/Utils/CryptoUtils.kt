@@ -195,6 +195,10 @@ fun Double.formatCount(count: Int = 9): String {
 	return prefix + formatEditor.format(this)
 }
 
+fun Double.formatDecimal(count: Int = 9): Double {
+	return this.formatCount(count).toDouble()
+}
+
 fun Int.daysAgoInMills(): Long =
 	CryptoUtils.getTargetDayInMills(-this)
 

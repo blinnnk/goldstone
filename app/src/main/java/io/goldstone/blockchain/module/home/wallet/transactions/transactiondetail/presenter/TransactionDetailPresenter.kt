@@ -5,7 +5,10 @@ import android.support.v4.app.Fragment
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.NotificationText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -126,12 +129,6 @@ class TransactionDetailPresenter(
 
 	fun showTransactionWebFragment() {
 		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
-		val argument = Bundle().apply {
-			putString(
-				ArgumentKey.webViewUrl,
-				TransactionListModel.generateTransactionURL(currentHash, symbol)
-			)
-		}
 		fragment.parentFragment.apply {
 			val webTitle =
 				when {
@@ -139,13 +136,16 @@ class TransactionDetailPresenter(
 					CoinSymbol(symbol).isBTCSeries() -> TransactionText.transactionWeb
 					else -> TransactionText.etherScanTransaction
 				}
+			val argument = Bundle().apply {
+				putString(
+					ArgumentKey.webViewUrl,
+					TransactionListModel.generateTransactionURL(currentHash, symbol)
+				)
+				putString(ArgumentKey.webViewName, webTitle)
+			}
 			when (this) {
-				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(
-					webTitle, TokenDetailText.tokenDetail, argument
-				)
-				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(
-					webTitle, NotificationText.notification, argument
-				)
+				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(argument)
+				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(argument)
 			}
 		}
 	}

@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
@@ -18,6 +19,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, ChainSelectionModel>() {
 
+	override val pageTitle: String = ProfileText.chain
 	override val presenter = ChainSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(

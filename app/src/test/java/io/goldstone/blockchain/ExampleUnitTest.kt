@@ -1,6 +1,7 @@
 package io.goldstone.blockchain
 
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
@@ -51,6 +52,6 @@ class ExampleUnitTest {
 
 	@Test
 	fun anyTest() {
-
+		System.out.println(EOSUtils.convertMemoToCode("mainnet-tranfer"))
 	}
 }

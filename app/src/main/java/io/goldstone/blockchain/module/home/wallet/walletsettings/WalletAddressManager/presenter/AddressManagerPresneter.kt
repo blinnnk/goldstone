@@ -136,8 +136,6 @@ class AddressManagerPresenter(
 	fun showAllETHSeriesAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETHSeriesAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
 			)
 		}
@@ -146,8 +144,6 @@ class AddressManagerPresenter(
 	fun showAllETCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
 			)
 		}
@@ -156,8 +152,6 @@ class AddressManagerPresenter(
 	fun showAllEOSAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allEOSAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.EOS.id) }
 			)
 		}
@@ -166,8 +160,6 @@ class AddressManagerPresenter(
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBtcAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
 			)
 		}
@@ -176,8 +168,6 @@ class AddressManagerPresenter(
 	fun showAllLTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allLTCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
 			)
 		}
@@ -186,8 +176,6 @@ class AddressManagerPresenter(
 	fun showAllBCHAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBCHAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
 			)
 		}
@@ -204,8 +192,6 @@ class AddressManagerPresenter(
 				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
-						WalletSettingsText.exportPrivateKey,
-						WalletSettingsText.viewAddresses,
 						Bundle().apply {
 							putString(ArgumentKey.address, address)
 							putInt(ArgumentKey.chainType, chainType.id)
@@ -221,8 +207,6 @@ class AddressManagerPresenter(
 				showAddButton(false)
 				AddressManagerFragment.removeDashboard(context)
 				presenter.showTargetFragment<QRCodeFragment>(
-					WalletText.showQRCode,
-					WalletSettingsText.viewAddresses,
 					Bundle().apply { putSerializable(ArgumentKey.addressModel, addressModel) }
 				)
 			}
@@ -235,8 +219,6 @@ class AddressManagerPresenter(
 				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
-						WalletSettingsText.exportKeystore,
-						WalletSettingsText.viewAddresses,
 						Bundle().apply { putString(ArgumentKey.address, address) }
 					)
 				} else context.alert(WalletText.watchOnly)
@@ -615,7 +597,7 @@ class AddressManagerPresenter(
 		): List<Pair<Int, String>> {
 			return arrayListOf(
 				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
-				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
+				Pair(R.drawable.qr_code_icon, WalletText.qrCode),
 				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
 				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey),
 				Pair(R.drawable.bch_address_convert_icon, WalletText.getBCHLegacyAddress)

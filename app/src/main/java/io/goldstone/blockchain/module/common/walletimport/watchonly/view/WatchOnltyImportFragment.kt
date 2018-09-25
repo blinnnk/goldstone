@@ -39,6 +39,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
+	override val pageTitle: String = ImportMethodText.watchOnly
 	private val attentionView by lazy { AttentionTextView(context!!) }
 	private val typeSettings by lazy { RoundCell(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
@@ -104,10 +105,9 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				getParentFragment<WalletImportFragment> {
 					NetworkUtil.hasNetworkWithAlert(context) isTrue {
 						presenter.showTargetFragment<WebViewFragment>(
-							QAText.whatIsWatchOnlyWallet,
-							ImportWalletText.importWallet,
 							Bundle().apply {
 								putString(ArgumentKey.webViewUrl, WebUrl.whatIsWatchOnly)
+								putString(ArgumentKey.webViewName, WalletText.watchOnly)
 							}
 						)
 					}

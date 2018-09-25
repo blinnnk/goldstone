@@ -32,6 +32,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 
+	override val pageTitle: String = CreateWalletText.create
 	private val attentionView by lazy { AttentionView(context!!) }
 	private val nameEditText by lazy { RoundInput(context!!) }
 	private val passwordEditText by lazy { RoundInput(context!!) }

@@ -136,16 +136,13 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun showWebFragmentWithLink(
-		link: String,
-		title: String,
-		previousTitle: String
-	) {
+	fun showWebFragmentWithLink(link: String, title: String) {
 		marketCenter?.presenter
 			?.showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
-				title,
-				previousTitle,
-				Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+				Bundle().apply {
+					putString(ArgumentKey.webViewUrl, link)
+					putString(ArgumentKey.webViewName, title)
+				},
 				true
 			)
 	}
@@ -391,16 +388,6 @@ class MarketTokenDetailPresenter(
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
-
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
-	}
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		// 从 `WebViewFragment` 返回到这个界面更改 `HeaderTitle`
-		// 因为这个页面的 HeaderTitle 是动态数据所以无法用抽象方法实现.
-		fragment.getParentFragment<QuotationOverlayFragment> {
-			headerTitle = fragment.currencyInfo?.pairDisplay.orEmpty()
-		}
 	}
 }

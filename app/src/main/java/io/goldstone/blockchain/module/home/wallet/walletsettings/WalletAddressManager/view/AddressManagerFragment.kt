@@ -42,6 +42,7 @@ import org.jetbrains.anko.support.v4.toast
  */
 class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.viewAddresses
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 7) { cell, data, wallet, isDefault ->
 			val chainType = ChainType.getChainTypeBySymbol(data.second)
@@ -464,7 +465,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						cell.onClick {
 							when (title) {
 								WalletText.setDefaultAddress -> setDefaultAddressEvent()
-								WalletText.showQRCode -> qrCellClickEvent()
+								WalletText.qrCode -> qrCellClickEvent()
 								WalletSettingsText.exportPrivateKey -> exportPrivateKey()
 								WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
 								WalletText.getBCHLegacyAddress -> convertBCHAddressToLegacy()

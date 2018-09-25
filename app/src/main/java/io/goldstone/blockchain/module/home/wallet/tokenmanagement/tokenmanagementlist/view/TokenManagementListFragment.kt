@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -24,6 +25,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class TokenManagementListFragment :
 	BaseRecyclerFragment<TokenManagementListPresenter, DefaultTokenTable>() {
 
+	override val pageTitle: String = QuotationText.management
 	private var attentionView: AttentionTextView? = null
 	override val presenter = TokenManagementListPresenter(this)
 
