@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component.title
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.setMargins
@@ -70,6 +71,18 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 			textSize = fontSize(16)
 		}
 		subtitle.textColor = subtitleColor
+	}
+
+	fun setDescriptionTitles() {
+		title.apply {
+			typeface = GoldStoneFont.black(context)
+			textColor = GrayScale.midGray
+			textSize = fontSize(12)
+		}
+		subtitle.textColor = GrayScale.black
+		subtitle.textSize = fontSize(14)
+		val typeface = GoldStoneFont.black(context)
+		subtitle.setTypeface(typeface, Typeface.ITALIC)
 	}
 
 	fun setDialogStyle() {

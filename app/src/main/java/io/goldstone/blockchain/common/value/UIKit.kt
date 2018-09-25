@@ -102,9 +102,7 @@ object PaddingSize {
 
 object CornerSize {
 	@JvmField
-	val cell = 3.uiPX()
-	@JvmField
-	val small = 5.uiPX().toFloat()
+	val small = 3.uiPX().toFloat()
 	@JvmField
 	val normal = 7.uiPX().toFloat()
 	@JvmField

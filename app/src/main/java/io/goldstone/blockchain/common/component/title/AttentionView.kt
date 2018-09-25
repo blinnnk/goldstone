@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.padding
+import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.wrapContent
 
 /**
@@ -32,6 +33,12 @@ class AttentionView(context: Context) : TextView(context) {
 
 	override fun setBackgroundColor(color: Int) {
 		addCorner(CornerSize.small.toInt(), color)
+	}
+
+	fun isSmartContractRegister(): AttentionView {
+		text = "Transfer at least 2.0 EOS to the contract account (goldstone) by way of the exchange's coin and note/transfer from the wallet"
+		setBackgroundColor(Spectrum.lightRed)
+		return this
 	}
 
 }

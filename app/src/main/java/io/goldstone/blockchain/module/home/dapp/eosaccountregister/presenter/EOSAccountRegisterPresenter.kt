@@ -4,7 +4,6 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
-import io.goldstone.blockchain.common.error.EOSRPCError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.toJsonArray
@@ -124,14 +123,28 @@ class EOSAccountRegisterPresenter(
 			return
 		}
 		// 检查当前合规的用户名是否可被注册
-		EOSAPI.getAccountResource(
-			newAccount,
-			EOSCodeName.EOSIO,
-			{ hold(null, null, it) }
+		checkNameIsAvailableInChain(newAccount) { isAvailable, error ->
+			if (!isAvailable.isNull() && error.isNone()) {
+				hold(newAccount, publicKey, GoldStoneError.None)
+			} else hold(null, null, error)
+		}
+	}
+
+	companion object {
+		fun checkNameIsAvailableInChain(
+			newAccount: EOSAccount,
+			@UiThread hold: (isAvailable: Boolean?, error: RequestError) -> Unit
 		) {
-			fragment.context?.runOnUiThread {
-				if (!it.isNull()) hold(null, null, EOSRPCError.RegisteredName)
-				else hold(newAccount, publicKey, GoldStoneError.None)
+			// 检查当前合规的用户名是否可被注册
+			EOSAPI.getAccountResource(
+				newAccount,
+				EOSCodeName.EOSIO,
+				{ hold(null, it) }
+			) {
+				GoldStoneAPI.context.runOnUiThread {
+					if (!it.isNull()) hold(null, RequestError.RPCResult("this account name has been registered"))
+					else hold(true, RequestError.None)
+				}
 			}
 		}
 	}

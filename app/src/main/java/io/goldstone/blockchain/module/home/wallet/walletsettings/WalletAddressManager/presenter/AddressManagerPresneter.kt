@@ -201,7 +201,7 @@ class AddressManagerPresenter(
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
-				if (Config.isWatchOnlyWallet()) {
+				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
 						WalletSettingsText.exportPrivateKey,
@@ -232,7 +232,7 @@ class AddressManagerPresenter(
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
-				if (Config.isWatchOnlyWallet()) {
+				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
 						WalletSettingsText.exportKeystore,

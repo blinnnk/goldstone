@@ -93,5 +93,10 @@ open class RequestError(override val message: String) : GoldStoneError(message) 
 		}
 		@JvmStatic
 		val None = RequestError(GoldStoneError.None.message)
+
+		@JvmStatic
+		val RPCResult: (description: String) -> RequestError = { description ->
+			RequestError("Error Description\n\n[ERROR: $description]")
+		}
 	}
 }
