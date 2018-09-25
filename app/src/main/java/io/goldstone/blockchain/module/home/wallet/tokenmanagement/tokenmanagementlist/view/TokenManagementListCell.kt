@@ -11,8 +11,8 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseCell
-import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.SquareIcon
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
@@ -45,7 +45,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				else -> icon.image.glideImage(iconUrl)
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(name)
+			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
 			switch.isChecked = model?.isUsed.orFalse()
 		}
 	}

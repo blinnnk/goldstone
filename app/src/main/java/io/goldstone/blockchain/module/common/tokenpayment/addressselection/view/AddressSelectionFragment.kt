@@ -36,6 +36,7 @@ import org.jetbrains.anko.textColor
  */
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactTable>() {
 
+	override val pageTitle: String = TokenDetailText.address
 	private val buttonHeight = 50.uiPX()
 	private var viewHeight = 0
 	private var keyboardHeight = 0

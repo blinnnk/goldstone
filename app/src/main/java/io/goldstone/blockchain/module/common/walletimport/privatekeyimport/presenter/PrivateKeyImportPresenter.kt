@@ -2,12 +2,12 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 
 import android.content.Context
 import android.widget.EditText
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.removeStartAndEndValue
 import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.keystore.getWalletByPrivateKey
@@ -23,7 +23,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.prese
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 /**
@@ -140,23 +139,17 @@ class PrivateKeyImportPresenter(
 				currentPrivateKey,
 				password,
 				filename
-			) { address ->
-				if (address.equals(ImportWalletText.existAddress, true)) {
-					context.runOnUiThread {
-						callback(AccountError.ExistAddress)
-					}
-				} else {
-					address?.let {
-						WalletImportPresenter.insertWalletToDatabase(
-							ChainAddresses(it),
-							name,
-							"",
-							ChainPath(),
-							hint,
-							callback
-						)
-					}
-				}
+			) { address, error ->
+				if (!address.isNull() && error.isNone()) {
+					WalletImportPresenter.insertWalletToDatabase(
+						ChainAddresses(address!!),
+						name,
+						"",
+						ChainPath(),
+						hint,
+						callback
+					)
+				} else callback(error)
 			}
 		}
 	}

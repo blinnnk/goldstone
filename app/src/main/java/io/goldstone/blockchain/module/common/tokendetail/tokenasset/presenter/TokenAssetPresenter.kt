@@ -74,9 +74,9 @@ class TokenAssetPresenter(
 	fun showPublicKeyAccountNames() {
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
-			TokenDetailText.accountNameSelection,
-			TokenDetailText.tokenDetail,
-			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName().accountName) },
+			Bundle().apply {
+				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName().accountName)
+			},
 			2
 		)
 	}
@@ -87,22 +87,16 @@ class TokenAssetPresenter(
 		when (title) {
 			TokenDetailText.delegateCPU -> tokenDetailOverlayPresenter
 				?.showTargetFragment<CPUTradingFragment>(
-					TokenDetailText.tradingCPU,
-					TokenDetailText.tokenDetail,
 					Bundle(),
 					2
 				)
 			TokenDetailText.delegateNET -> tokenDetailOverlayPresenter
 				?.showTargetFragment<NETTradingFragment>(
-					TokenDetailText.tradingNET,
-					TokenDetailText.tokenDetail,
 					Bundle(),
 					2
 				)
 			TokenDetailText.tradeRAM -> tokenDetailOverlayPresenter
 				?.showTargetFragment<RAMTradingFragment>(
-					TokenDetailText.tradingRAM,
-					TokenDetailText.tokenDetail,
 					Bundle(),
 					2
 				)

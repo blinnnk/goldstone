@@ -9,7 +9,10 @@ import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.overlay.MiniOverlay
-import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.language.CreateWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -47,7 +50,7 @@ class ProfileOverlayPresenter(
 	}
 
 	fun showContactInputFragment() {
-		showTargetFragment<ContactInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
+		showTargetFragment<ContactInputFragment>()
 	}
 
 	fun showTargetFragmentByTitle(title: String) {
@@ -105,15 +108,13 @@ class ProfileOverlayPresenter(
 
 	private fun showWatchWalletImportFragment() {
 		fragment.overlayView.header.showAddButton(false)
-		showTargetFragment<WatchOnlyImportFragment>(
-			ImportMethodText.watchOnly,
-			WalletText.wallet
-		)
+		showTargetFragment<WatchOnlyImportFragment>()
 	}
 
 	private fun showAboutFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
+			putString(ArgumentKey.webViewName, ProfileText.aboutUs)
 		}
 	}
 
@@ -132,24 +133,28 @@ class ProfileOverlayPresenter(
 	private fun showPrivacyFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
+			putString(ArgumentKey.webViewName, ProfileText.privacy)
 		}
 	}
 
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+			putString(ArgumentKey.webViewName, ProfileText.terms)
 		}
 	}
 
 	private fun showSupportFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.support)
+			putString(ArgumentKey.webViewName, ProfileText.support)
 		}
 	}
 
 	private fun showHelpCenterFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.helpCenter)
+			putString(ArgumentKey.webViewName, ProfileText.helpCenter)
 		}
 	}
 

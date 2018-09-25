@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.KeyValueView
@@ -18,6 +19,7 @@ import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.detail.presenter.SmartContractRegisterDetailPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -30,8 +32,9 @@ import org.jetbrains.anko.verticalLayout
  */
 class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDetailPresenter>() {
 
+	override val pageTitle: String
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val accountName by lazy { arguments?.getString(ArgumentKey.eosAccountRegister) }
-
 	private val smartContractLink by lazy { TwoLineTitles(context!!) }
 	private val availableResultView by lazy { KeyValueView(context!!) }
 	private val copyResultButton by lazy { RoundButton(context!!) }

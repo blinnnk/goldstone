@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.support.annotation.UiThread
 import android.widget.LinearLayout
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -61,10 +62,8 @@ fun GasSelectionPresenter.transferBTC(
 	getCurrentWalletBTCPrivateKey(
 		prepareBTCModel.fromAddress,
 		password
-	) { secret ->
-		if (secret.isNullOrBlank()) {
-			callback(AccountError.WrongPassword)
-		} else prepareBTCModel.apply model@{
+	) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) prepareBTCModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
 			BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
 				BTCSeriesTransactionUtils.generateBTCSignedRawTransaction(
@@ -73,7 +72,7 @@ fun GasSelectionPresenter.transferBTC(
 					toAddress,
 					changeAddress,
 					unspents,
-					secret!!,
+					privateKey!!,
 					Config.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
@@ -97,14 +96,14 @@ fun GasSelectionPresenter.transferBTC(
 					}
 				}
 			}
-		}
+		} else callback(error)
 	}
 }
 
 private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
 	walletAddress: String,
 	password: String,
-	@UiThread hold: (String?) -> Unit
+	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	fragment.context?.exportBase58PrivateKey(

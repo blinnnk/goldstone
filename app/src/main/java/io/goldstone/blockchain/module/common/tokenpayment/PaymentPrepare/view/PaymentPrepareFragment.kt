@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -44,6 +45,7 @@ import kotlin.apply
  */
 class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
+	override val pageTitle: String = TokenDetailText.transferDetail
 	val address by lazy {
 		arguments?.getString(ArgumentKey.paymentAddress)
 	}

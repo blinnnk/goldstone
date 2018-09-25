@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -19,6 +20,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
@@ -33,6 +35,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.exportPrivateKey
 	private val privateKeyTextView by lazy { KeyValueView(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
@@ -63,10 +66,10 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				setBlueStyle(15.uiPX())
 			}.click { it ->
 				it.showLoadingStatus()
-				presenter.getPrivateKey(passwordInput.text.toString()) privateKey@{
-					this@privateKey?.let {
-						privateKeyTextView.text = it
-					}
+				presenter.getPrivateKey(passwordInput.text.toString()) { privateKey, error ->
+					if (!privateKey.isNull() && error.isNone()) {
+						privateKeyTextView.text = privateKey!!
+					} else context.alert(error.message)
 					it.showLoadingStatus(false)
 				}
 			}.into(this)

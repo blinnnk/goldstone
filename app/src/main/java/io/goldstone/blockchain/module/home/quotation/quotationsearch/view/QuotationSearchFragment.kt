@@ -21,6 +21,7 @@ import java.util.*
 class QuotationSearchFragment :
 	BaseRecyclerFragment<QuotationSearchPresenter, QuotationSelectionTable>() {
 
+	override val pageTitle: String = "Quotation Search"
 	override val presenter = QuotationSearchPresenter(this)
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,

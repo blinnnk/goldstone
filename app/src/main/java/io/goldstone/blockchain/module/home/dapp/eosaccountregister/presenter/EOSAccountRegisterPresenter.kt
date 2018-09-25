@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.utils.formatDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -61,9 +62,9 @@ class EOSAccountRegisterPresenter(
 		callback: (GoldStoneError) -> Unit
 	) {
 		// 首先查询 `RAM` 每 `Byte` 对应的 `EOS Count` 计算出即将分配的 `RAM` 价值的 `EOS Count`
-		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, ramPriceError ->
-			if (!price.isNull() && ramPriceError.isNone()) {
-				val ramEOSCount = ramAmount.toDouble() * price!!
+		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { priceInEOS, ramPriceError ->
+			if (!priceInEOS.isNull() && ramPriceError.isNone()) {
+				val ramEOSCount = (ramAmount.toDouble() * priceInEOS!!).formatDecimal(4)
 				val creatorAccount = Config.getCurrentEOSName()
 				val totalSpent = cpuEOSCount + netAEOSCount + ramEOSCount
 				checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->

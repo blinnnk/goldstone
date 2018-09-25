@@ -6,6 +6,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
@@ -29,6 +30,7 @@ import java.math.BigInteger
  */
 open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
+	override val pageTitle: String = "Trading Resource"
 	open val tradingType: TradingType = TradingType.CPU
 	private val delegateTitle by lazy {
 		val title = when (tradingType) {

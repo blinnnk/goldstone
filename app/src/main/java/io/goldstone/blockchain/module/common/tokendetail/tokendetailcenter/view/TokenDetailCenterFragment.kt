@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view
 
-import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
@@ -13,7 +11,6 @@ import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.isEOS
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -30,10 +27,8 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  */
 class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
-	val token by lazy {
-		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
-	}
-
+	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
+	override val pageTitle: String get() = token?.symbol.orEmpty()
 	private val menuBar by lazy { ViewPagerMenu(context!!) }
 	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
 	private val menuTitles by lazy {

@@ -33,6 +33,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.exportKeystore
 	private val privateKeyTextView by lazy { KeyValueView(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }

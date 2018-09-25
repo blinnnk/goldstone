@@ -47,8 +47,6 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 
 	// 当 `BaseFragment` 加载在 `BaseOverlayFragment` 的时候提供支持回退的加载卸载方法
 	inline fun <reified T : Fragment, reified Parent : BaseOverlayFragment<*>> showTargetFragment(
-		title: String,
-		popTitle: String,
 		arguments: Bundle? = null,
 		hasBackButton: Boolean = true
 	) {
@@ -62,11 +60,9 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 				overlayView.header.apply {
 					showBackButton(hasBackButton) {
 						presenter.popFragmentFrom<T>()
-						headerTitle = popTitle
 					}
 					showCloseButton(!hasBackButton)
 				}
-				headerTitle = title
 			}
 		}
 	}

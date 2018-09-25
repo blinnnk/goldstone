@@ -24,11 +24,8 @@ class SmartContractRegisterPresenter(
 	fun showSmartContractRegisterDetailFragment(accountName: String) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<SmartContractRegisterDetailFragment>(
-			"Smart Contract Register Detail",
-			"Smart Contract Register",
 			Bundle().apply { putString(ArgumentKey.eosAccountRegister, accountName) }
 		)
-
 	}
 
 	fun getEOSCurrencyPrice(hold: (currency: Double?, error: RequestError) -> Unit) {

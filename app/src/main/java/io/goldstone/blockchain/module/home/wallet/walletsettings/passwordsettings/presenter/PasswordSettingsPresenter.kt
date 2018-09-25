@@ -123,7 +123,7 @@ class PasswordSettingsPresenter(
 		passwordHint: String,
 		isBTCSeriesWallet: Boolean,
 		isSingleChainWallet: Boolean,
-		callback: () -> Unit
+		callback: (AccountError) -> Unit
 	) {
 		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 		fragment.context?.updatePassword(
@@ -131,17 +131,11 @@ class PasswordSettingsPresenter(
 			oldPassword,
 			newPassword,
 			isBTCSeriesWallet,
-			isSingleChainWallet,
-			{
-				// error callback
-				callback()
-			}
-		) {
+			isSingleChainWallet
+		) { _, error ->
 			// Update User Password Hint
-			passwordHint.isNotEmpty() isTrue {
-				WalletTable.updateHint(passwordHint)
-			}
-			callback()
+			if (error.isNone()) WalletTable.updateHint(passwordHint)
+			callback(error)
 		}
 	}
 

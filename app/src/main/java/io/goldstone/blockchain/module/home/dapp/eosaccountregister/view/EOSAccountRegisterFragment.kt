@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
@@ -45,6 +46,7 @@ import java.math.BigInteger
  */
 class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
+	override val pageTitle: String = ProfileText.eosAccountRegister
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val accountNameInput by lazy { RoundInput(context!!) }
 	private val publickeyInput by lazy { WalletEditText(context!!) }

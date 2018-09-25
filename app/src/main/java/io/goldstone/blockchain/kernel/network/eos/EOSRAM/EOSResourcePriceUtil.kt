@@ -17,7 +17,7 @@ object EOSResourceUtil {
 	// `Price` 是 `RAM` 在指定单位下对应的 `EOS` 个数
 	fun getRAMPrice(
 		unit: EOSUnit,
-		@UiThread hold: (price: Double?, error: RequestError) -> Unit
+		@UiThread hold: (priceInEOS: Double?, error: RequestError) -> Unit
 	) {
 		EOSAPI.getRAMMarket(true) { data, error ->
 			if (error.isNone() && !data.isNull()) {

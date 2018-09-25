@@ -42,13 +42,9 @@ class TokenSearchPresenter(
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
 						canSearch = if (Config.getCurrentWalletType().isBTCSeries()) {
-							fragment.context.alert(
-								"This is a single block chain wallet so you canot add other crypot currency"
-							)
+							fragment.context.alert("This is a single block chain wallet so you cannot add other crypto currency")
 							false
-						} else {
-							NetworkUtil.hasNetworkWithAlert(context)
-						}
+						} else NetworkUtil.hasNetworkWithAlert(context)
 					}
 				}
 			) { inputContent ->

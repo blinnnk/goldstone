@@ -8,6 +8,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.clickToCopy
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.KeyValueView
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbyfriend.presenter.RegisterByFriendPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -33,6 +35,8 @@ import org.jetbrains.anko.verticalLayout
  */
 class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 
+	override val pageTitle: String
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val accountNameInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val copyResultButton by lazy { RoundButton(context!!) }

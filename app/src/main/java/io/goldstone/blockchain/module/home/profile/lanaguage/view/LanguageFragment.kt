@@ -4,6 +4,7 @@ import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 import io.goldstone.blockchain.module.home.profile.lanaguage.presenter.LanguagePresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -13,9 +14,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class LanguageFragment : BaseRecyclerFragment<LanguagePresenter, LanguageModel>() {
-	
+
+	override val pageTitle: String = ProfileText.language
 	override val presenter = LanguagePresenter(this)
-	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<LanguageModel>?

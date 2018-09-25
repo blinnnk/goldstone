@@ -41,6 +41,7 @@ import org.jetbrains.anko.*
  */
 class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
+	override val pageTitle: String = ImportMethodText.privateKey
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	private val privateKeyInput by lazy { WalletEditText(context!!) }
@@ -97,10 +98,9 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					.click {
 						getParentFragment<WalletImportFragment> {
 							presenter.showTargetFragment<WebViewFragment>(
-								ProfileText.terms,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.terms)
+									putString(ArgumentKey.webViewName, ProfileText.terms)
 								}
 							)
 						}
@@ -133,10 +133,9 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsPrivateKey,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsPrivatekey)
+									putString(ArgumentKey.webViewName, QAText.whatIsPrivateKey)
 								}
 							)
 						}

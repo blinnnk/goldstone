@@ -56,12 +56,9 @@ class CreateWalletPresenter(
 	fun showAgreementFragment() {
 		val argument = Bundle().apply {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+			putString(ArgumentKey.webViewName, CreateWalletText.agreement)
 		}
-		showTargetFragment<WebViewFragment, WalletGenerationFragment>(
-			CreateWalletText.agreement,
-			CreateWalletText.mnemonicBackUp,
-			argument
-		)
+		showTargetFragment<WebViewFragment, WalletGenerationFragment>(argument)
 	}
 
 	fun generateWalletWith(

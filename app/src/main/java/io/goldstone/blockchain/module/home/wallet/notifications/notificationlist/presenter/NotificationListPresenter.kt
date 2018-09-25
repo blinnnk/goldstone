@@ -11,8 +11,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.language.NotificationText
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -46,8 +44,6 @@ class NotificationListPresenter(
 	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<TransactionDetailFragment>(
-				TransactionText.detail,
-				NotificationText.notification,
 				Bundle().apply {
 					putSerializable(ArgumentKey.notificationTransaction, transactionInfo)
 				})
@@ -57,10 +53,9 @@ class NotificationListPresenter(
 	fun showWebFragment(title: String, url: String) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<WebViewFragment>(
-				title,
-				NotificationText.notification,
 				Bundle().apply {
 					putString(ArgumentKey.webViewUrl, url)
+					putString(ArgumentKey.webViewName, title)
 				})
 		}
 	}

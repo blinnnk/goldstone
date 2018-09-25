@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 
 import android.app.Activity
 import android.content.Context
-import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.jump
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
@@ -165,14 +164,8 @@ class WalletSettingsListPresenter(
 			password,
 			ChainType.isBTCSeriesChainType(chainType),
 			isSingleChainWallet
-		) {
-			it isFalse {
-				fragment.context?.alert(CommonText.wrongPassword)
-				getMainActivity()?.removeLoadingView()
-				return@deleteAccount
-			}
-			// delete all records of this `address` in `myTokenTable`
-			MyTokenTable.deleteByAddress(address) {
+		) { error ->
+			if (error.isNone()) MyTokenTable.deleteByAddress(address) {
 				// 删除 以太坊 类型的转账记录
 				TransactionTable.deleteByAddress(address) {
 					// 删除 BTC 类型的转账记录
@@ -195,6 +188,9 @@ class WalletSettingsListPresenter(
 						}
 					}
 				}
+			} else {
+				fragment.context.alert(error.message)
+				getMainActivity()?.removeLoadingView()
 			}
 		}
 	}

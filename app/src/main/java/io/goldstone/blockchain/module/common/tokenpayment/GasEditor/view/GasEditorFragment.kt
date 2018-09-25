@@ -29,6 +29,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 
+	override val pageTitle: String = TokenDetailText.customGas
 	val getGasSize: () -> Long? = {
 		arguments?.getLong(ArgumentKey.gasSize)
 	}

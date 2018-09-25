@@ -41,6 +41,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
 
+	override val pageTitle: String = ImportMethodText.mnemonic
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val walletNameInput by lazy { RoundInput(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
@@ -110,10 +111,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 				agreementView.click {
 					getParentFragment<WalletImportFragment> {
 						presenter.showTargetFragment<WebViewFragment>(
-							ProfileText.terms,
-							ImportWalletText.importWallet,
 							Bundle().apply {
 								putString(ArgumentKey.webViewUrl, WebUrl.terms)
+								putString(ArgumentKey.webViewName, ProfileText.terms)
 							}
 						)
 					}
@@ -153,10 +153,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsMnemonic,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsMnemonic)
+									putString(ArgumentKey.webViewName, QAText.whatIsMnemonic)
 								}
 							)
 						}

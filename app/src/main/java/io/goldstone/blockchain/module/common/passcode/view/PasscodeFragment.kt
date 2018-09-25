@@ -29,6 +29,7 @@ import org.jetbrains.anko.textColor
 class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 
 	lateinit var container: RelativeLayout
+	override val pageTitle: String = "PIN Code"
 	private val keyboard by lazy { NumberKeyboard(context!!) }
 	private val passcodeInput by lazy { PasscodeInput(context!!) }
 	private var failedAttention: TextView? = null

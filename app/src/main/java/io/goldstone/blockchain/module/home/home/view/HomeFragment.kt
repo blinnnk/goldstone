@@ -23,6 +23,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class HomeFragment : BaseFragment<HomePresenter>() {
 
+	override val pageTitle: String = "Home"
 	private val tabBar by lazy { TabBarView(context!!) }
 	override val presenter = HomePresenter(this)
 

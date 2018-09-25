@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
@@ -249,9 +248,10 @@ class TokenInfoPresenter(
 			url: String
 		) {
 			fragment?.presenter?.showTargetFragment<WebViewFragment>(
-				TokenDetailText.addressDetail,
-				TokenDetailText.tokenDetail,
-				Bundle().apply { putString(ArgumentKey.webViewUrl, url) },
+				Bundle().apply {
+					putString(ArgumentKey.webViewUrl, url)
+					putString(ArgumentKey.webViewName, TokenDetailText.addressDetail)
+				},
 				2
 			)
 		}

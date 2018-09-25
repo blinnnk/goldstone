@@ -38,9 +38,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 
-	private val footer by lazy {
-		GasSelectionFooter(context!!)
-	}
+	override val pageTitle: String = TokenDetailText.customGas
+	private val footer by lazy { GasSelectionFooter(context!!) }
 	private val spendingCell by lazy { GraySquareCell(context!!) }
 	private lateinit var gasLayout: LinearLayout
 	private lateinit var container: RelativeLayout
@@ -95,10 +94,9 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 				}.click {
 					getParentFragment<TokenDetailOverlayFragment> {
 						presenter.showTargetFragment<WebViewFragment>(
-							QAText.whatIsGas,
-							TokenDetailText.customGas,
 							Bundle().apply {
 								putString(ArgumentKey.webViewUrl, WebUrl.whatIsGas)
+								putString(ArgumentKey.webViewName, QAText.whatIsGas)
 							}
 						)
 					}

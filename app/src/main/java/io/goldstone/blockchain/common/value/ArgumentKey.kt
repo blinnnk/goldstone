@@ -17,6 +17,7 @@ object ArgumentKey {
 	const val paymentCount = "count"
 	const val tokenModel = "tokenModel"
 	const val webViewUrl = "webViewUrl"
+	const val webViewName = "webViewName"
 	const val notificationTransaction = "notificationTransaction"
 	const val quotationOverlayTitle = "quotationOverlay"
 	const val quotationOverlayInfo = "quotationCurrencyInfo"

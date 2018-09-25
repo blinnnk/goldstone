@@ -42,8 +42,6 @@ fun PaymentPreparePresenter.prepareBTCPaymentModel(
 		if (!model.isNull()) {
 			fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(
-					TokenDetailText.customGas,
-					TokenDetailText.paymentValue,
 					Bundle().apply {
 						putSerializable(ArgumentKey.btcSeriesPrepareModel, model)
 					})

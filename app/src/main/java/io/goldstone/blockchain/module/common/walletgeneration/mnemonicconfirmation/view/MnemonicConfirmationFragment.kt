@@ -12,10 +12,10 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
-import io.goldstone.blockchain.common.component.edittext.WalletEditText
-import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.QAText
@@ -39,6 +39,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>() {
 
+	override val pageTitle: String = CreateWalletText.mnemonicConfirmation
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
@@ -116,10 +117,9 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 
 	private fun BaseOverlayFragment<*>.showWebView() {
 		presenter.showTargetFragment<WebViewFragment>(
-			QAText.whatIsMnemonic,
-			CreateWalletText.mnemonicConfirmation,
 			Bundle().apply {
 				putString(ArgumentKey.webViewUrl, WebUrl.whatIsMnemonic)
+				putString(ArgumentKey.webViewName, QAText.whatIsMnemonic)
 			}
 		)
 	}

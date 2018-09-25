@@ -32,6 +32,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class HintFragment : BaseFragment<HintPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.hint
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = HintPresenter(this)

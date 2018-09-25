@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -36,7 +37,7 @@ fun GasSelectionPresenter.prepareToTransferLTC(
 private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
 	walletAddress: String,
 	password: String,
-	hold: (String?) -> Unit
+	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	if (Config.isTestEnvironment()) {
@@ -65,10 +66,8 @@ fun GasSelectionPresenter.transferLTC(
 	getCurrentWalletLTCPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
 		password
-	) { secret ->
-		if (secret.isNullOrBlank()) {
-			callback(AccountError.WrongPassword)
-		} else prepareBTCSeriesModel.apply model@{
+	) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) prepareBTCSeriesModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
 			LitecoinApi.getUnspentListByAddress(fromAddress) { unspents ->
 				BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
@@ -77,7 +76,7 @@ fun GasSelectionPresenter.transferLTC(
 					toAddress,
 					changeAddress,
 					unspents,
-					secret!!,
+					privateKey!!,
 					Config.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
@@ -101,6 +100,6 @@ fun GasSelectionPresenter.transferLTC(
 					}
 				}
 			}
-		}
+		} else callback(error)
 	}
 }
