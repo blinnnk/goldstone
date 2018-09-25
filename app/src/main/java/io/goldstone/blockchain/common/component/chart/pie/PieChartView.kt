@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.chart.pie
 
 import android.content.Context
 import android.graphics.*
+import android.view.MotionEvent
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
@@ -24,7 +25,6 @@ class PieChartView(context: Context) : PieChart(context) {
     )
     post {
       initAttrs()
-      resetData()
     }
     
   }
@@ -42,7 +42,7 @@ class PieChartView(context: Context) : PieChart(context) {
     dragDecelerationFrictionCoef = 0.95f
 
     centerText = "成交分布"
-    setCenterTextSize(28f)
+    setCenterTextSize(18f)
     
     isDrawHoleEnabled = true
     setHoleColor(Color.TRANSPARENT)
@@ -77,23 +77,8 @@ class PieChartView(context: Context) : PieChart(context) {
     setEntryLabelTextSize(12f)
   }
   
-  private fun resetData() {
-    val mult = 100
-    val entries = ArrayList<PieEntry>()
-    
-    // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-    // the chart.
-    for (i in 0 until 4) {
-      entries.add(
-        PieEntry(
-          (Math.random() * mult).toFloat() + mult / 5,
-          "2344k"
-        )
-      )
-    }
-    entries.add(PieEntry(0f, ""))
-    
-    val colors = arrayListOf( Color.YELLOW, Color.GREEN, Color.RED, Color.BLUE, Color.GRAY)
+	fun resetData(entries: ArrayList<PieEntry>) {
+    val colors = arrayListOf( Color.YELLOW, Color.GREEN, Color.RED, Color.BLUE, Color.GRAY, Color.CYAN)
     
     val dataSet = PieDataSet(
       entries,
@@ -117,7 +102,6 @@ class PieChartView(context: Context) : PieChart(context) {
     data.setValueFormatter(PercentFormatter())
     data.setValueTextSize(11f)
     data.setValueTextColor(Color.BLACK)
-//    data.setValueTypeface(tf)
     setData(data)
     
     // undo all highlights
@@ -125,5 +109,9 @@ class PieChartView(context: Context) : PieChart(context) {
     
     invalidate()
   }
+	
+	override fun onTouchEvent(event: MotionEvent?): Boolean {
+		return false
+	}
   
 }

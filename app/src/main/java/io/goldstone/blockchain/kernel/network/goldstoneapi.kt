@@ -572,6 +572,21 @@ object GoldStoneAPI {
 		
 	}
 	
+	fun getEOSRAMTradeData(
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<Double>) -> Unit
+	) {
+		requestData<Double>(
+			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
+			"data",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
+		}
+		
+	}
+	
 	@JvmStatic
 	fun getEOSMemoryTransactionHistory(
 		account: String,

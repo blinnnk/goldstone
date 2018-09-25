@@ -81,6 +81,10 @@ object APIPath {
 	val getEOSRAMRank: (header: String) -> String = { header ->
 		"$header/eosram/holderRank"
 	}
+	
+	val getEOSRAMTradeData: (header: String) -> String = { header ->
+		"$header/eosram/tradeDataPerDay"
+	}
 }
 
 object EtherScanApi {

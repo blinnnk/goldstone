@@ -16,6 +16,7 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view.RAMRankView
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view.RankFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.tradepercent.view.RAMTradePercentFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -61,6 +62,11 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						ElementID.eosMemoryTransactionHistoryList
 					) {
 					}
+					
+					frameLayout {
+						id = ElementID.pieChart
+					}
+					addFragmentAndSetArgument<RAMTradePercentFragment>(ElementID.pieChart){}
 
 					textView {
 						text = "成交资金分布"

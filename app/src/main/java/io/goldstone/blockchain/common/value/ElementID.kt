@@ -34,6 +34,7 @@ object ElementID {
 	const val eosMemoryTransactionHistoryList = 20020
 	const val baseFragmentContainer = 20021
 	const val rankList = 20022
+	const val pieChart = 20023
 }
 
 object ViewPagerID {
