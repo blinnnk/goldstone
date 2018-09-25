@@ -1,13 +1,15 @@
 package io.goldstone.blockchain.crypto.litecoin
 
 import android.content.Context
+import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.crypto.keystore.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.ECKey
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
-import org.jetbrains.anko.doAsync
 import java.io.File
 
 /**
@@ -42,22 +44,17 @@ fun Context.exportLTCBase58PrivateKey(
 	walletAddress: String,
 	password: String,
 	isSingleChainWallet: Boolean,
-	hold: (String?) -> Unit
+	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	doAsync {
-		getPrivateKey(
-			walletAddress,
-			password,
-			true,
-			isSingleChainWallet,
-			{
-				hold(null)
-				LogUtil.error("exportBase58PrivateKey", it)
-			}
-		) {
-			hold(
-				LTCWalletUtils.generateWIFSecret(ECKey.fromPrivate(it.toBigInteger(16)).privKey)
-			)
+	getPrivateKey(
+		walletAddress,
+		password,
+		true,
+		isSingleChainWallet
+	) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) {
+			val key = LTCWalletUtils.generateWIFSecret(ECKey.fromPrivate(privateKey!!.toBigInteger(16)).privKey)
+			hold(key, AccountError.None)
 		}
 	}
 }

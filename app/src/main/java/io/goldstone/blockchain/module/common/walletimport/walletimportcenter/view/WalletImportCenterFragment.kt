@@ -10,8 +10,8 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.ExplanationTitle
+import io.goldstone.blockchain.common.component.title.AttentionTextView
+import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -31,6 +31,7 @@ import org.jetbrains.anko.*
 
 class WalletImportCenterFragment : BaseFragment<WalletImportCenterPresenter>() {
 
+	override val pageTitle: String = ImportWalletText.importWallet
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	override val presenter = WalletImportCenterPresenter(this)
@@ -46,8 +47,7 @@ class WalletImportCenterFragment : BaseFragment<WalletImportCenterPresenter>() {
 				}
 				attentionText.apply {
 					isCenter()
-					topPadding = 30.uiPX()
-					bottomPadding = 20.uiPX()
+					setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					text = ImportWalletText.importWalletDescription
 				}.into(this)
@@ -75,10 +75,9 @@ class WalletImportCenterFragment : BaseFragment<WalletImportCenterPresenter>() {
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsMnemonic,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsMnemonic)
+									putString(ArgumentKey.webViewName, QAText.whatIsMnemonic)
 								}
 							)
 						}

@@ -3,14 +3,13 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressm
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
-import android.widget.ImageView
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons
-import io.goldstone.blockchain.common.component.cell.GraySqualCellWithButtons.Companion
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -29,10 +28,10 @@ class AddressesListView(
 	context: Context,
 	maxCount: Int = 4,
 	private val hold: (
-		moreButton: ImageView,
-		address: String,
-		isDefault: Boolean,
-		title: String
+		cell: GraySquareCellWithButtons,
+		data: Pair<String, String>,
+		wallet: WalletTable?,
+		isDefault: Boolean
 	) -> Unit
 ) : TopBottomLineCell(context) {
 
@@ -40,45 +39,38 @@ class AddressesListView(
 		lparams(matchParent, matchParent)
 	}
 	var checkAllEvent: Runnable? = null
+	var currentWallet: WalletTable? = null
+	private val currentAddresses by lazy { currentWallet?.getCurrentAddresses() }
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
-			// 如果是当前使用的多链那么 　`data.second`` 会是对应的链的缩写用此判断做缩进
-			if (isNotEmpty() && this[0].second.toIntOrNull().isNull()) {
-				hideButton()
-			} else {
-				updateButtonTitle("${CommonText.checkAll} (${model?.size})")
-			}
-			// 最多只显示 `4` 个链下地址
-			val limitCount =
-				if (model?.size.orZero() > maxCount) maxCount
-				else model?.size.orZero()
+			// 如果是当前使用的多链那么 `data.second`` 会是对应的链的缩写用此判断做缩进
+			if (isNotEmpty() && firstOrNull()?.second?.toIntOrNull().isNull()) hideButton()
+			else updateButtonTitle("${CommonText.checkAll} (${model?.size})")
+			// 计算最大显示个数
+			val limitCount = if (model?.size.orZero() > maxCount) maxCount else model?.size.orZero()
+			// 动态计算 `View` 的总高
 			layoutParams.height = limitCount * 50.uiPX() + 60.uiPX()
 			requestLayout()
-			WalletTable.getCurrentAddresses { currentAddresses ->
-				reversed().forEachIndexed { index, data ->
-					var isDefault = false
-					// 默认最多显示 `4` 条地址
-					if (index >= maxCount) return@forEachIndexed
-					GraySqualCellWithButtons(context).apply cell@{
-						// 如果列表中有默认地址那么更改样式
-						if (currentAddresses.any { it.equals(data.first, true) }) {
-							isDefault = true
-							updateStyle(Companion.CellType.Default)
-						} else {
-							updateStyle(Companion.CellType.Normal)
-						}
+			reversed().forEachIndexed { index, data ->
+				var isDefault = false
+				// 默认最多显示 `4` 条地址
+				if (index >= maxCount) return@forEachIndexed
+				GraySquareCellWithButtons(context).apply cell@{
+					// 如果列表中有默认地址那么更改样式
+					if (currentAddresses?.any { it.equals(data.first, true) } == true) {
+						isDefault = true
+						updateStyle(Companion.CellType.Default)
+					} else updateStyle(Companion.CellType.Normal)
 
-						copyButton.onClick {
-							context.clickToCopy(data.first)
-							copyButton.preventDuplicateClicks()
-						}
-						hold(moreButton, data.first, isDefault, data.second)
-						setTitle("${data.second}.")
-
-						setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 12))
-					}.into(cellLayout)
-				}
+					copyButton.onClick {
+						context.clickToCopy(data.first)
+						copyButton.preventDuplicateClicks()
+					}
+					hold(this, data, currentWallet, isDefault)
+					setTitle(data.second)
+					setSubtitle(CryptoUtils.scaleMiddleAddress(data.first, 12))
+				}.into(cellLayout)
 			}
 		}
 	}

@@ -61,28 +61,28 @@ class CircleButton(context: Context) : LinearLayout(context) {
 	private var viewSize = Size(32.uiPX(), 65.uiPX())
 	private var iconSize = 30.uiPX()
 
-	private var redotView: TextView? = null
+	private var redDotView: TextView? = null
 
-	fun setRedotStyle(count: String) {
-		if (redotView.isNull()) {
-			redotView = TextView(context).apply {
+	fun setRedDotStyle(count: Int) {
+		if (redDotView.isNull()) {
+			redDotView = TextView(context).apply {
 				textSize = fontSize(15)
 				typeface = GoldStoneFont.black(context)
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 			}
-			redotView?.into(iconView)
+			redDotView?.into(iconView)
 			icon.visibility = View.GONE
 		}
 		setIconViewColor(Spectrum.lightRed)
-		redotView?.text = count
+		redDotView?.text = "$count"
 	}
 
 	fun removeRedDot() {
-		if (!redotView.isNull()) {
-			iconView.removeView(redotView)
-			redotView = null
+		if (!redDotView.isNull()) {
+			iconView.removeView(redDotView)
+			redDotView = null
 			icon.visibility = View.VISIBLE
 			setIconViewColor(Spectrum.opacity2White)
 		}
@@ -134,7 +134,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		updateOriginYAnimation(17.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(28.uiPX().toFloat())
 		setIconViewColor(Color.TRANSPARENT)
-		if (!redotView.isNull()) {
+		if (!redDotView.isNull()) {
 			setIconViewColor(Spectrum.lightRed)
 		}
 	}
@@ -144,7 +144,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		updateOriginYAnimation(27.uiPX().toFloat())
 		buttonTitle.updateOriginYAnimation(35.uiPX().toFloat())
 		setIconViewColor(Spectrum.opacity2White)
-		if (!redotView.isNull()) {
+		if (!redDotView.isNull()) {
 			setIconViewColor(Spectrum.lightRed)
 		}
 	}

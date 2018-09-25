@@ -15,11 +15,12 @@ import io.goldstone.blockchain.crypto.eos.eccutils.EosEcUtil
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.params.MainNetParams
+import java.io.Serializable
 import java.math.BigInteger
 import java.security.SecureRandom
 import kotlin.experimental.and
 
-class EosPrivateKey(base58: String) {
+class EOSPrivateKey(base58: String) : Serializable {
 
 	val asBigInteger: BigInteger
 	val publicKey: EosPublicKey

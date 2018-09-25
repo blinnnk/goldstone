@@ -110,11 +110,11 @@ object BTCSeriesTransactionUtils {
 		val utxos = arrayListOf<UTXO>()
 		unspentModel.forEach {
 			// 当消费列表某几个 `item` 的值加起来大于实际转账金额+手续费,
-			// 就跳出循环, 这个时候就得到了合符条件的utxos数组
+			// 就跳出循环, 这个时候就得到了合符条件的 `utxos` 数组
 			if (money >= (sendValue + fee)) {
 				return@forEach
 			}
-			// 遍历unspents, 组装合适的item
+			// 遍历 `unspents`, 组装合适的 `item`
 			val utxo = UTXO(
 				Sha256Hash.wrap(it.txid),
 				it.outputNumber,

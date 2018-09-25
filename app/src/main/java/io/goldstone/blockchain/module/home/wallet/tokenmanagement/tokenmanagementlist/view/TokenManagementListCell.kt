@@ -11,12 +11,12 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseCell
-import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.SquareIcon
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.imageResource
@@ -33,19 +33,19 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			// 显示默认图判断
 			when {
 				iconUrl.isBlank() -> icon.image.imageResource = R.drawable.default_token
-				symbol == CryptoSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
-				symbol == CryptoSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
-				symbol == CryptoSymbol.ltc -> icon.image.imageResource = R.drawable.ltc_icon
-				symbol == CryptoSymbol.bch -> icon.image.imageResource = R.drawable.bch_icon
-				symbol == CryptoSymbol.eos -> icon.image.imageResource = R.drawable.eos_icon
-				symbol == CryptoSymbol.btc() ->
+				TokenContract(contract).isETH() -> icon.image.imageResource = R.drawable.eth_icon
+				TokenContract(contract).isETC() -> icon.image.imageResource = R.drawable.etc_icon
+				TokenContract(contract).isLTC() -> icon.image.imageResource = R.drawable.ltc_icon
+				TokenContract(contract).isBCH() -> icon.image.imageResource = R.drawable.bch_icon
+				TokenContract(contract).isEOS() -> icon.image.imageResource = R.drawable.eos_icon
+				TokenContract(contract).isBTC() ->
 					icon.image.imageResource =
 						if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token
 						else R.drawable.btc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}
-			tokenInfo.title.text = CryptoSymbol.updateSymbolIfInReview(symbol)
-			tokenInfo.subtitle.text = CryptoSymbol.updateNameIfInReview(name)
+			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
+			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
 			switch.isChecked = model?.isUsed.orFalse()
 		}
 	}

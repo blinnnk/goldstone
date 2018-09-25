@@ -8,8 +8,6 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -36,64 +34,81 @@ class WalletListPresenter(
 
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) { it ->
-			it?.apply {
-				WalletTable.getTargetWalletType(this).let {
-					when (it) {
-						WalletType.BTCOnly -> {
-							if (Config.isTestEnvironment()) {
-								showConfirmationAlertView("Bitcoin Mainnet") {
-									NodeSelectionPresenter.setAllMainnet {
-										fragment.activity?.jump<SplashActivity>()
-									}
-								}
-							} else fragment.activity?.jump<SplashActivity>()
-						}
-
-						WalletType.BTCTestOnly -> {
-							if (!Config.isTestEnvironment()) {
-								showConfirmationAlertView("Bitcoin Testnet") {
-									NodeSelectionPresenter.setAllTestnet {
-										fragment.activity?.jump<SplashActivity>()
-									}
-								}
-							} else fragment.activity?.jump<SplashActivity>()
-						}
-
-						WalletType.LTCOnly -> {
-							if (Config.isTestEnvironment()) {
-								showConfirmationAlertView("Litecoin Mainnet") {
-									NodeSelectionPresenter.setAllMainnet {
-										fragment.activity?.jump<SplashActivity>()
-									}
-								}
-							} else fragment.activity?.jump<SplashActivity>()
-						}
-
-						WalletType.BCHOnly -> {
-							if (Config.isTestEnvironment()) {
-								showConfirmationAlertView(" Bitcoin Cash Mainnet") {
-									NodeSelectionPresenter.setAllMainnet {
-										fragment.activity?.jump<SplashActivity>()
-									}
-								}
-							} else fragment.activity?.jump<SplashActivity>()
-						}
-
-						WalletType.MultiChain -> {
-							if (Config.isTestEnvironment()) {
-								NodeSelectionPresenter.setAllTestnet {
-									fragment.activity?.jump<SplashActivity>()
-								}
-							} else {
-								NodeSelectionPresenter.setAllMainnet {
-									fragment.activity?.jump<SplashActivity>()
-								}
+			val walletType = it.getWalletType()
+			when {
+				walletType.isBTC() -> {
+					if (Config.isTestEnvironment()) {
+						showConfirmationAlertView("Bitcoin Mainnet") {
+							NodeSelectionPresenter.setAllMainnet {
+								fragment.activity?.jump<SplashActivity>()
 							}
 						}
-						// `EOS` 以及以太坊都不需要额外判断是否是测试网络
-						else -> fragment.activity?.jump<SplashActivity>()
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isBTCTest() -> {
+					if (!Config.isTestEnvironment()) {
+						showConfirmationAlertView("Bitcoin Testnet") {
+							NodeSelectionPresenter.setAllTestnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isLTC() -> {
+					if (Config.isTestEnvironment()) {
+						showConfirmationAlertView("Litecoin Mainnet") {
+							NodeSelectionPresenter.setAllMainnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isBCH() -> {
+					if (Config.isTestEnvironment()) {
+						showConfirmationAlertView("Bitcoin Cash Mainnet") {
+							NodeSelectionPresenter.setAllMainnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isEOSJungle() -> {
+					if (!Config.isTestEnvironment()) {
+						showConfirmationAlertView("EOS Jungle Testnet") {
+							NodeSelectionPresenter.setAllTestnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isEOSMainnet() -> {
+					if (Config.isTestEnvironment()) {
+						showConfirmationAlertView("EOS Mainnet Testnet") {
+							NodeSelectionPresenter.setAllMainnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isBIP44() -> {
+					if (Config.isTestEnvironment()) {
+						NodeSelectionPresenter.setAllTestnet {
+							fragment.activity?.jump<SplashActivity>()
+						}
+					} else {
+						NodeSelectionPresenter.setAllMainnet {
+							fragment.activity?.jump<SplashActivity>()
+						}
 					}
 				}
+				// `EOS` 以及以太坊都不需要额外判断是否是测试网络
+				else -> fragment.activity?.jump<SplashActivity>()
 			}
 		}
 	}
@@ -134,27 +149,23 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(WalletTable.getAddressesByWallet(wallet)) { myTokens ->
-								WalletTable.getTargetWalletType(wallet).let { walletType ->
-									if (myTokens.isEmpty()) {
-										data.add(WalletListModel(wallet, 0.0, walletType.content))
-										completeMark()
-									} else {
-										val balance = myTokens.sumByDouble { walletToken ->
-											val thisToken = allTokens.find {
-												it.contract.equals(walletToken.contract, true)
-											}!!
-											CryptoUtils.toCountByDecimal(
-												walletToken.balance,
-												thisToken.decimals
-											) * thisToken.price
-										}
+							MyTokenTable.getTokensByAddress(wallet.getCurrentAddresses()) { myTokens ->
+								val targetWalletType = wallet.getWalletType()
+								if (myTokens.isEmpty()) {
+									data.add(WalletListModel(wallet, 0.0, targetWalletType.type!!))
+									completeMark()
+								} else {
+									val balance = myTokens.sumByDouble { walletToken ->
+										val thisToken = allTokens.find {
+											it.contract.equals(walletToken.contract, true)
+										}!!
+										walletToken.balance * thisToken.price
+									}
 
-										// 计算当前钱包下的 `token` 对应的货币总资产
-										WalletListModel(wallet, balance, walletType.content).let {
-											data.add(it)
-											completeMark()
-										}
+									// 计算当前钱包下的 `token` 对应的货币总资产
+									WalletListModel(wallet, balance, targetWalletType.type!!).let {
+										data.add(it)
+										completeMark()
 									}
 								}
 							}

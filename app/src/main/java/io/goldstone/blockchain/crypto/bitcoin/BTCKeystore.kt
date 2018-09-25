@@ -1,10 +1,13 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
+import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.CryptoValue.singleChainFilename
-import io.goldstone.blockchain.crypto.getKeystoreFile
-import io.goldstone.blockchain.crypto.getPrivateKey
+import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
+import io.goldstone.blockchain.crypto.keystore.getPrivateKey
+import io.goldstone.blockchain.crypto.multichain.CryptoValue.singleChainFilename
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
@@ -47,20 +50,18 @@ fun Context.exportBase58PrivateKey(
 	password: String,
 	isSingleChainWallet: Boolean,
 	isTest: Boolean,
-	hold: (String?) -> Unit
+	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	getPrivateKey(
 		walletAddress,
 		password,
 		true,
-		isSingleChainWallet,
-		{
-			hold(null)
-			LogUtil.error("exportBase58PrivateKey", it)
-		}
-	) {
-		val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
-		hold(ECKey.fromPrivate(it.toBigInteger(16)).getPrivateKeyAsWiF(net))
+		isSingleChainWallet
+	) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) {
+			val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
+			hold(ECKey.fromPrivate(privateKey!!.toBigInteger(16)).getPrivateKeyAsWiF(net), AccountError.None)
+		} else hold(null, error)
 	}
 }
 

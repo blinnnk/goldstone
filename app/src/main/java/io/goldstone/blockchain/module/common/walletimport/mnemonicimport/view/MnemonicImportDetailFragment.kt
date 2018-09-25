@@ -7,18 +7,23 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.edittext.TitleEditText
+import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.DefaultPath
-import io.goldstone.blockchain.crypto.bitcoin.MultiChainPath
+import io.goldstone.blockchain.crypto.multichain.ChainPath
+import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -36,10 +41,11 @@ import org.jetbrains.anko.verticalLayout
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
 
+	override val pageTitle: String = ImportMethodText.mnemonic
 	private val confirmButton by lazy { RoundButton(context!!) }
+	private val walletNameInput by lazy { RoundInput(context!!) }
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
 	private val pathSettings by lazy { RoundCell(context!!) }
-	private val walletNameInput by lazy { RoundInput(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val hintInput by lazy { RoundInput(context!!) }
@@ -79,36 +85,35 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 				walletNameInput.apply {
 					hint = UIUtils.generateDefaultName()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
 
 				passwordInput.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
 				}.into(this)
 
 				repeatPassword.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.repeatPassword
 				}.into(this)
 
 				hintInput.apply {
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
 
 				agreementView.click {
 					getParentFragment<WalletImportFragment> {
 						presenter.showTargetFragment<WebViewFragment>(
-							ProfileText.terms,
-							ImportWalletText.importWallet,
 							Bundle().apply {
 								putString(ArgumentKey.webViewUrl, WebUrl.terms)
+								putString(ArgumentKey.webViewName, ProfileText.terms)
 							}
 						)
 					}
@@ -116,12 +121,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 				confirmButton.apply {
 					text = CommonText.confirm.toUpperCase()
-					setBlueStyle()
-					y += 10.uiPX()
-				}.click {
-					it.showLoadingStatus()
+					setBlueStyle(10.uiPX())
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.importWalletByMnemonic(
-						MultiChainPath(
+						ChainPath(
 							defaultPath[0],
 							defaultPath[1],
 							defaultPath[2],
@@ -136,9 +140,10 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						hintInput.text.toString(),
 						agreementView.radioButton.isChecked,
 						walletNameInput.text.toString()
-					) { isSuccessful ->
-						it.showLoadingStatus(false)
-						if (isSuccessful) activity?.jump<SplashActivity>()
+					) {
+						button.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						else activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 
@@ -148,10 +153,9 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsMnemonic,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsMnemonic)
+									putString(ArgumentKey.webViewName, QAText.whatIsMnemonic)
 								}
 							)
 						}

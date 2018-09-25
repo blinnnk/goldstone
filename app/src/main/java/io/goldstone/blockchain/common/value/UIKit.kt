@@ -11,9 +11,6 @@ import org.jetbrains.anko.px2sp
  * @author KaySaith
  * @description
  * Common interface parameters, including color, original size, etc.
- * @rewriteDate 10/09/2018 7:54 PM
- * @reWriter wcx
- * @description 添加密码解锁handler标识PasswordRetrievalHandlerMark
  */
 object GrayScale {
 	@JvmField
@@ -47,6 +44,8 @@ object Spectrum {
 	val deepBlue = Color.parseColor("#FF17446B")
 	@JvmField
 	val lightBlue = Color.parseColor("#FF2882D2")
+	@JvmField
+	val grayBlue = Color.parseColor("#FFA0BBD3")
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
 	@JvmField
@@ -103,9 +102,7 @@ object PaddingSize {
 
 object CornerSize {
 	@JvmField
-	val cell = 3.uiPX()
-	@JvmField
-	val small = 5.uiPX().toFloat()
+	val small = 3.uiPX().toFloat()
 	@JvmField
 	val normal = 7.uiPX().toFloat()
 	@JvmField
@@ -124,9 +121,16 @@ object BorderSize {
 }
 
 object ScreenSize {
+	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
+	@JvmStatic
+	val overlayContentWidth = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 4
+	@JvmStatic
 	val fullHeight = Resources.getSystem().displayMetrics.heightPixels
+	@JvmStatic
 	var heightWithOutHeader = fullHeight - HomeSize.headerHeight
+	@JvmStatic
+	var heightWithoutTabBar = fullHeight - HomeSize.tabBarHeight
 }
 
 object CommonCellSize {
@@ -138,7 +142,7 @@ object CommonCellSize {
 
 object TransactionSize {
 	@JvmField
-	val headerView = 220.uiPX()
+	val headerView = 200.uiPX()
 }
 
 object HomeSize {
@@ -160,11 +164,6 @@ object AvatarSize {
 object TokenDetailSize {
 	@JvmField
 	val headerHeight = 300.uiPX()
-}
-
-object PasswordRetrievalHandlerMark {
-	const val setNewPassword = 1
-	const val incompletePassword = 2
 }
 
 object Count {

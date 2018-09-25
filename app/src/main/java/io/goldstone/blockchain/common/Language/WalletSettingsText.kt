@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 
 /**
  * @date 2018/8/8 2:16 AM
@@ -55,7 +55,7 @@ object WalletSettingsText {
 
 	@JvmField
 	val newETHAndERCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ETH & ERC20 Token Address"
+		HoneyLanguage.English.code -> "New ETH Series Address"
 		HoneyLanguage.Chinese.code -> "新的ETH和ERC20代币地址"
 		HoneyLanguage.Japanese.code -> "新しいETHおよびERC20トークンアドレス"
 		HoneyLanguage.Korean.code -> "새로운 ETH 및 ERC20 토큰 주소"
@@ -85,12 +85,12 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val newBTCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ${CryptoSymbol.btc()} Address"
-		HoneyLanguage.Chinese.code -> "新的${CryptoSymbol.btc()}地址"
-		HoneyLanguage.Japanese.code -> "新しい${CryptoSymbol.btc()}アドレス"
-		HoneyLanguage.Korean.code -> "새로운 ${CryptoSymbol.btc()} 주소"
+		HoneyLanguage.English.code -> "New ${CoinSymbol.btc()} Address"
+		HoneyLanguage.Chinese.code -> "新的${CoinSymbol.btc()}地址"
+		HoneyLanguage.Japanese.code -> "新しい${CoinSymbol.btc()}アドレス"
+		HoneyLanguage.Korean.code -> "새로운 ${CoinSymbol.btc()} 주소"
 		HoneyLanguage.Russian.code -> "Новый адрес BTC"
-		HoneyLanguage.TraditionalChinese.code -> "新的${CryptoSymbol.btc()}地址"
+		HoneyLanguage.TraditionalChinese.code -> "新的${CoinSymbol.btc()}地址"
 		else -> ""
 	}
 	@JvmField
@@ -124,7 +124,7 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val allETHAndERCAddresses = when (currentLanguage) {
+	val allETHSeriesAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "All ETH & ERC20 Token Addresses"
 		HoneyLanguage.Chinese.code -> "所有ETH和ERC20代币地址"
 		HoneyLanguage.Japanese.code -> "すべてのETHおよびERC20トークンアドレス"

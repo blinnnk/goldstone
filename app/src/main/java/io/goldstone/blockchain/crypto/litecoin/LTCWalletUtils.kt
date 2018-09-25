@@ -1,11 +1,12 @@
 package io.goldstone.blockchain.crypto.litecoin
 
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.utils.hexToDecimal
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.toDoubleFromHex
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.bitcoinj.core.Base58
+import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.Sha256Hash
 import org.bitcoinj.params.MainNetParams
@@ -115,12 +116,21 @@ object LTCWalletUtils {
 		return end4Bytes.equals(first4Bytes, true) && versionCode.equals(version.privateKey, true)
 	}
 
+	fun isValidPrivateKey(privateKey: String): Boolean {
+		val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
+		val key = dpk.key
+		// checking our key object
+		val ltcTest = LitecoinNetParams()
+		val check = key.getPrivateKeyAsWiF(ltcTest)
+		return privateKey == check
+	}
+
 	/**
 	 * 压缩 `PublicKey` 规则, `Y `轴的数值 `ToDecimal` 后是奇数 + `02` 是偶数 + `03`
 	 */
 	private fun String.convertToCompresskey(): String {
 		val prefix =
-			if (substring(64).hexToDecimal() % 2 == 0.0) {
+			if (substring(64).toDoubleFromHex() % 2 == 0.0) {
 				"02"
 			} else "03"
 		return prefix + substring(0, 64)

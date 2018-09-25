@@ -1,10 +1,13 @@
 package io.goldstone.blockchain.crypto.eos.accountregister
 
+import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toIntOrZero
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EosPublicKey
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import org.json.JSONObject
 import java.io.Serializable
 
 /**
@@ -102,6 +105,12 @@ data class ActorKey(
 	val publicKey: String,
 	val weight: Int
 ) : Serializable, EOSModel {
+
+	constructor(data: JSONObject) : this(
+		data.safeGet("key"),
+		data.safeGet("weight").toIntOrZero()
+	)
+
 	override fun createObject(): String {
 		return "{\"key\":\"$publicKey\",\"weight\":$weight}"
 	}
@@ -127,5 +136,15 @@ data class AccountActor(
 
 enum class EOSActor(val value: String) {
 	Owner("owner"),
-	Active("active")
+	Active("active");
+
+	companion object {
+		fun getActorByValue(value: String): EOSActor? {
+			return when (value) {
+				Owner.value -> EOSActor.Owner
+				Active.value -> Active
+				else -> null
+			}
+		}
+	}
 }

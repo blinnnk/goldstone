@@ -34,10 +34,7 @@ class GradientView(context: Context) : View(context) {
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		val rectF = RectF(0f, 0f, width.toFloat(), height.toFloat())
-
-		shaderStyle?.let {
-			paint.shader = it
-		}
+		shaderStyle?.let { paint.shader = it }
 		canvas?.drawRect(rectF, paint)
 	}
 

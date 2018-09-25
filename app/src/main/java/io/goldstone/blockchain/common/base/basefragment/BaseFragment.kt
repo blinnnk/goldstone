@@ -6,9 +6,11 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -22,7 +24,10 @@ import org.jetbrains.anko.support.v4.UI
 abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment() {
 
 	abstract val presenter: T
+	abstract val pageTitle: String
 	abstract fun AnkoContext<Fragment>.initView()
+	open val isRelativeContainer = false
+	private lateinit var scrollView: ScrollView
 
 	override fun onAttach(context: Context?) {
 		super.onAttach(context)
@@ -35,9 +40,14 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		savedInstanceState: Bundle?
 	): View? {
 		presenter.onFragmentCreateView()
+		setPageTitle()
 		return UI {
 			initView()
 		}.view
+	}
+
+	fun <V : ViewGroup> getContainer(): V? {
+		return if (::scrollView.isInitialized) scrollView.findViewById(ElementID.baseFragmentContainer) else null
 	}
 
 	override fun onViewCreated(
@@ -66,6 +76,7 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (!hidden) {
+			setPageTitle()
 			presenter.onFragmentShowFromHidden()
 			/**
 			 * 软件为了防止重汇会在有新的窗口全屏的时候隐藏主要的 `HomeFragment` 但是隐藏操作会
@@ -123,6 +134,13 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 			parent.overlayView
 		} else {
 			null
+		}
+	}
+
+	private fun setPageTitle() {
+		val parent = parentFragment
+		if (parent is BaseOverlayFragment<*>) {
+			parent.headerTitle = pageTitle
 		}
 	}
 }

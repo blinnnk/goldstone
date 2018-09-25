@@ -29,7 +29,7 @@ data class TransactionHeader(
 		refBlockPrefix,
 		0,
 		0,
-		0
+		10
 	)
 
 	constructor(data: EOSChainInfo, expiration: ExpirationType) : this(

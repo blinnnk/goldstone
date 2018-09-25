@@ -1,10 +1,6 @@
 package io.goldstone.blockchain.module.common.webview.presenter
 
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.CreateWalletText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.NotificationText
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -24,10 +20,8 @@ class WebViewPresenter(
 	fun setBackEvent() {
 		fragment.parentFragment?.apply {
 			when (this) {
-				is WalletImportFragment -> {
-					headerTitle = ImportWalletText.importWallet
+				is WalletImportFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
-				}
 			}
 		}
 	}
@@ -35,28 +29,16 @@ class WebViewPresenter(
 	fun prepareBackEvent() {
 		fragment.parentFragment?.apply {
 			when (this) {
-				is TokenDetailOverlayFragment -> {
-					headerTitle = TransactionText.detail
+				is TokenDetailOverlayFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
-				}
-
-				is NotificationFragment -> {
-					headerTitle = NotificationText.notification
+				is NotificationFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
-				}
-
-				is WalletGenerationFragment -> {
-					headerTitle = CreateWalletText.create
+				is WalletGenerationFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
-				}
-
-				is QuotationOverlayFragment -> {
+				is QuotationOverlayFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
-				}
-
-				is WalletSettingsFragment -> {
+				is WalletSettingsFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
-				}
 			}
 		}
 	}

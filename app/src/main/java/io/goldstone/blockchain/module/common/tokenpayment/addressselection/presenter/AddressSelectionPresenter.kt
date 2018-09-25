@@ -12,18 +12,15 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.CryptoName
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.bitcoin.AddressType
-import io.goldstone.blockchain.crypto.bitcoin.BTCUtils.isValidMultiChainAddress
+import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -48,43 +45,38 @@ class AddressSelectionPresenter(
 		}
 	}
 
-	fun showPaymentPrepareFragmentByQRCode(result: String) {
-		if (isValidQRCodeContent(result)) {
-			if (result.contains("transfer")) {
-				DepositPresenter.convertERC20QRCode(result).let {
-					isCorrectCoinOrChainID(it) {
-						showPaymentPrepareFragment(it.walletAddress, it.amount)
+	fun showPaymentPrepareFragmentByQRCode(qrCode: QRCode) {
+		if (qrCode.isValid()) {
+			if (qrCode.content.contains("transfer")) {
+				if (token?.contract.isEOS()) qrCode.convertEOSQRCode().let {
+					isCorrectCoinOrChainID(it) { showPaymentPrepareFragment(it.walletAddress, it.amount) }
+				} else qrCode.convertERC20QRCode().let {
+					isCorrectCoinOrChainID(it) { showPaymentPrepareFragment(it.walletAddress, it.amount) }
+				}
+			} else when {
+				token?.contract.isBTCSeries() -> {
+					val qrModel = qrCode.convertBitcoinQRCode()
+					if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
+					else isCorrectCoinOrChainID(qrModel!!) {
+						showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
 					}
 				}
-			} else {
-				when {
-					CryptoSymbol.isBTCSeriesSymbol(token?.symbol) -> {
-						val qrModel =
-							DepositPresenter.convertBitcoinQRCode(result)
-						if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
-						else isCorrectCoinOrChainID(qrModel!!) {
-							showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
-						}
-					}
 
-					token?.symbol.equals(CryptoSymbol.etc, true)
-						|| token?.symbol.equals(CryptoSymbol.eth, true) -> {
-						DepositPresenter.convertETHOrETCQRCOde(result).let {
-							isCorrectCoinOrChainID(it) {
-								showPaymentPrepareFragment(it.walletAddress, it.amount)
-							}
+				token?.contract.isETC() || token?.contract.isETH() -> {
+					qrCode.convertETHSeriesQRCode().let {
+						isCorrectCoinOrChainID(it) {
+							showPaymentPrepareFragment(it.walletAddress, it.amount)
 						}
 					}
 				}
 			}
 		} else {
 			// 如果不是 `681` 格式的 `QRCode` 那么当作纯地址进行检测
-			val addressType = isValidMultiChainAddress(result, token?.symbol.orEmpty())
-			if (
-				addressType.isNull() ||
-				!addressType?.symbol.equals(token?.symbol, true)
-			) fragment.context.alert(QRText.invalidQRCodeAlert)
-			else showPaymentPrepareFragment(result, 0.0)
+			val addressType =
+				MultiChainUtils.isValidMultiChainAddress(qrCode.content, token?.symbol.orEmpty())
+			if (addressType.isNull() || !addressType?.symbol.equals(token?.symbol, true))
+				fragment.context.alert(QRText.invalidQRCodeAlert)
+			else showPaymentPrepareFragment(qrCode.content, 0.0)
 		}
 	}
 
@@ -103,192 +95,115 @@ class AddressSelectionPresenter(
 			}
 		}
 		// 检查地址是否合规
-		when (isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
-			null -> {
-				fragment.context?.alert(ImportWalletText.addressFromatAlert)
-				return
-			}
-
-			AddressType.ETHERCOrETC -> {
-				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
-					fragment.context.alert("this is not a valid bitcoin address")
-					return
-				}
-
-				WalletTable.getAllETHAndERCAddresses {
+		when (MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
+			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
+			AddressType.ETHSeries -> when {
+				token?.contract.isBTCSeries() || token?.contract.isEOS() -> fragment.context.alert("this is not a valid bitcoin address")
+				else -> WalletTable.getAllETHAndERCAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
-			AddressType.EOS -> {
-				if (CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
-					fragment.context.alert("this is not a valid bitcoin address")
-					return
-				}
-
-				WalletTable.getAllEOSAddresses {
+			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
+				!token?.contract.isEOS() -> fragment.context.alert("this is not a valid eos account name")
+				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
+				else -> WalletTable.getAllEOSAccountNames {
 					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
-			AddressType.LTC -> {
-				if (!token?.symbol.equals(CryptoSymbol.ltc, true)) {
-					fragment.context.alert(
-						"This is a invalid address type for ${CryptoSymbol.ltc}, Please check it agin"
-					)
-					return
-				} else {
-					WalletTable.getAllLTCAddresses {
-						showAlertIfLocalExistThisAddress(this)
-					}
+			AddressType.LTC -> when {
+				!token?.contract.isLTC() -> fragment.context.alert(
+					"This is a invalid address type for ${CoinSymbol.ltc}, Please check it again"
+				)
+				else -> WalletTable.getAllLTCAddresses {
+					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
-			AddressType.BCH -> {
-				if (!token?.symbol.equals(CryptoSymbol.bch, true)) {
-					fragment.context.alert(
-						"This is a invalid address type for ${CryptoSymbol.bch}, Please check it agin"
-					)
-					return
-				} else {
-					WalletTable.getAllBCHAddresses {
-						showAlertIfLocalExistThisAddress(this)
-					}
+			AddressType.BCH -> when {
+				!token?.contract.isBCH() -> fragment.context.alert(
+					"This is a invalid address type for ${CoinSymbol.bch}, Please check it again"
+				)
+				else -> WalletTable.getAllBCHAddresses {
+					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
-			AddressType.BTC -> {
-				if (Config.isTestEnvironment()) {
-					fragment.context.alert(
-						"this is a mainnet address, please switch your local net " +
-							"setting in settings first"
-					)
-					return
-				} else if (!token?.symbol.equals(CryptoSymbol.btc(), true)) {
-					fragment.context.alert(
-						"This is a invalid address type for ${CryptoSymbol.btc()}, Please check it agin"
-					)
-					return
-				} else {
-					WalletTable.getAllBTCMainnetAddresses {
-						showAlertIfLocalExistThisAddress(this)
-					}
+			AddressType.BTC -> when {
+				Config.isTestEnvironment() -> fragment.context.alert(
+					"this is a mainnet address, please switch your local net setting in settings first"
+				)
+				!token?.contract.isBTC() -> fragment.context.alert(
+					"This is a invalid address type for ${CoinSymbol.btc()}, Please check it again"
+				)
+				else -> WalletTable.getAllBTCMainnetAddresses {
+					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
-			AddressType.BTCSeriesTest -> {
-				if (!Config.isTestEnvironment()) {
-					fragment.context.alert(
-						"this is a testnet address, please switch your local net " +
-							"setting in settings first"
-					)
-					return
-				} else if (!CryptoSymbol.isBTCSeriesSymbol(token?.symbol)) {
-					fragment.context.alert(
-						"This is a invalid address type for Testnet, Please check it agin"
-					)
-					return
-				} else {
-					WalletTable.getAllBTCSeriesTestnetAddresses {
-						showAlertIfLocalExistThisAddress(this)
-					}
+			AddressType.BTCSeriesTest -> when {
+				!Config.isTestEnvironment() -> fragment.context.alert(
+					"this is a testnet address, please switch your local net setting in settings first"
+				)
+				!token?.contract.isBTCSeries() -> fragment.context.alert(
+					"This is a invalid address type for Testnet, Please check it again"
+				)
+				else -> WalletTable.getAllBTCSeriesTestnetAddresses {
+					showAlertIfLocalExistThisAddress(this)
 				}
 			}
-		}
-	}
-
-	private fun isValidQRCodeContent(content: String): Boolean {
-		return when {
-			content.isEmpty() -> false
-			!content.contains(":") -> false
-			CryptoName.allChainName.none {
-				content.contains(it.toLowerCase())
-			} -> false
-			content.length < CryptoValue.bitcoinAddressClassicLength -> false
-			else -> true
 		}
 	}
 
 	private fun isCorrectCoinOrChainID(qrModel: QRCodeModel, callback: () -> Unit) {
 		when {
-			token?.symbol.equals(CryptoSymbol.etc, true) -> {
-				when {
-					!qrModel.contractAddress.equals(CryptoValue.etcContract, true) -> {
-						fragment.context.alert(QRText.invalidContract)
-						return
-					}
-
-					!qrModel.chainID.equals(Config.getETCCurrentChain(), true) -> {
-						fragment.context.alert(CommonText.wrongChainID)
-						return
-					}
-
-					else -> callback()
-				}
+			token?.contract.isETC() -> when {
+				!TokenContract(qrModel.contractAddress).isETC() ->
+					fragment.context.alert(QRText.invalidContract)
+				!qrModel.chainID.equals(Config.getETCCurrentChain().id, true) ->
+					fragment.context.alert(CommonText.wrongChainID)
+				else -> callback()
 			}
 
-			token?.symbol.equals(CryptoSymbol.btc(), true) -> {
-				when {
-					!qrModel.contractAddress.equals(CryptoValue.btcContract, true) -> {
-						fragment.context.alert(QRText.invalidContract)
-						return
-					}
-
-					!qrModel.chainID.equals(Config.getBTCCurrentChain(), true) -> {
-						fragment.context.alert(CommonText.wrongChainID)
-						return
-					}
-
-					else -> callback()
-				}
+			token?.contract.isEOS() -> when {
+				!TokenContract(qrModel.contractAddress).isEOSCode() ->
+					fragment.context.alert(QRText.invalidContract)
+				!qrModel.chainID.equals(Config.getEOSCurrentChain().id, true) ->
+					fragment.context.alert(CommonText.wrongChainID)
+				else -> callback()
 			}
 
-			token?.symbol.equals(CryptoSymbol.ltc, true) -> {
-				when {
-					!qrModel.contractAddress.equals(CryptoValue.ltcContract, true) -> {
-						fragment.context.alert(QRText.invalidContract)
-						return
-					}
-
-					!qrModel.chainID.equals(Config.getLTCCurrentChain(), true) -> {
-						fragment.context.alert(CommonText.wrongChainID)
-						return
-					}
-
-					else -> callback()
-				}
+			token?.contract.isBTC() -> when {
+				!TokenContract(qrModel.contractAddress).isBTC() ->
+					fragment.context.alert(QRText.invalidContract)
+				!qrModel.chainID.equals(Config.getBTCCurrentChain().id, true) ->
+					fragment.context.alert(CommonText.wrongChainID)
+				else -> callback()
 			}
 
-			token?.symbol.equals(CryptoSymbol.bch, true) -> {
-				when {
-					!qrModel.contractAddress.equals(CryptoValue.bchContract, true) -> {
-						fragment.context.alert(QRText.invalidContract)
-						return
-					}
-
-					!qrModel.chainID.equals(Config.getBCHCurrentChain(), true) -> {
-						fragment.context.alert(CommonText.wrongChainID)
-						return
-					}
-
-					else -> callback()
-				}
+			token?.contract.isLTC() -> when {
+				!TokenContract(qrModel.contractAddress).isLTC() ->
+					fragment.context.alert(QRText.invalidContract)
+				!qrModel.chainID.equals(Config.getLTCCurrentChain().id, true) ->
+					fragment.context.alert(CommonText.wrongChainID)
+				else -> callback()
 			}
 
-			else -> {
-				when {
-					!qrModel.contractAddress.equals(token?.contract, true) -> {
-						fragment.context.alert(QRText.invalidContract)
-						return
-					}
+			token?.contract.isBCH() -> when {
+				!TokenContract(qrModel.contractAddress).isBCH() ->
+					fragment.context.alert(QRText.invalidContract)
+				!qrModel.chainID.equals(Config.getBCHCurrentChain().id, true) ->
+					fragment.context.alert(CommonText.wrongChainID)
+				else -> callback()
+			}
 
-					!qrModel.chainID.equals(Config.getCurrentChain(), true) -> {
-						fragment.context.alert(CommonText.wrongChainID)
-						return
-					}
-
-					else -> callback()
-				}
+			else -> when {
+				!qrModel.contractAddress.equals(token?.contract?.contract, true) ->
+					fragment.context.alert(QRText.invalidContract)
+				!qrModel.chainID.equals(Config.getCurrentChain().id, true) ->
+					fragment.context.alert(CommonText.wrongChainID)
+				else -> callback()
 			}
 		}
 	}
@@ -300,10 +215,7 @@ class AddressSelectionPresenter(
 		}.show()
 	}
 
-	private fun goToPaymentPrepareFragment(
-		address: String,
-		count: Double = 0.0
-	) {
+	private fun goToPaymentPrepareFragment(address: String, count: Double = 0.0) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			hideChildFragment(fragment)
 			addFragmentAndSetArgument<PaymentPrepareFragment>(ContainerID.content) {
@@ -328,7 +240,6 @@ class AddressSelectionPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			if (!isFromQuickTransfer) {
 				overlayView.header.showBackButton(true) {
-					setValueHeader(token)
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
 			}
@@ -340,39 +251,10 @@ class AddressSelectionPresenter(
 			contacts.isEmpty() isTrue {
 				fragment.asyncData = arrayListOf()
 			} otherwise {
-				if (fragment.asyncData.isNullOrEmpty()) {
-					// 根据当前的 `Coin Type` 来选择展示地址的哪一项
-					fragment.asyncData = when {
-						token?.symbol.equals(CryptoSymbol.btc(), true) -> contacts.map {
-							it.apply {
-								defaultAddress =
-									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
-									else it.btcMainnetAddress
-							}
-						}.toArrayList()
-						token?.symbol.equals(CryptoSymbol.ltc, true) -> contacts.map {
-							it.apply {
-								defaultAddress =
-									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
-									else it.ltcAddress
-							}
-						}.toArrayList()
-						token?.symbol.equals(CryptoSymbol.bch, true) -> contacts.map {
-							it.apply {
-								defaultAddress =
-									if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
-									else it.bchAddress
-							}
-						}.toArrayList()
-						else -> contacts.map {
-							it.apply {
-								defaultAddress = ethERCAndETCAddress
-							}
-						}.toArrayList()
-					}
-				} else {
-					diffAndUpdateSingleCellAdapterData<ContactsAdapter>(contacts)
-				}
+				// 根据当前的 `Coin Type` 来选择展示地址的哪一项
+				if (fragment.asyncData.isNullOrEmpty() && !token?.contract.isNull())
+					fragment.asyncData = contacts.getCurrentAddresses(token?.contract!!).toArrayList()
+				else diffAndUpdateSingleCellAdapterData<ContactsAdapter>(contacts)
 			}
 			callback()
 		}

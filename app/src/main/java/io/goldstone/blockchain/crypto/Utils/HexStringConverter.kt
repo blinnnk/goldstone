@@ -1,16 +1,13 @@
 package io.goldstone.blockchain.crypto.utils
 
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import java.io.ByteArrayOutputStream
 
 /**
  * @date 2018/6/13 4:21 PM
  * @author ZhangTaoShuai
  * @reWriter KaySaith
- */
-/**
- * @param [stringText] 将String文本（包括中文）转换成Hex16进制字符串
  */
 fun String.toCryptHexString(): String {
 	val hexStringRegular = "0123456789ABCDEF".toCharArray()
@@ -27,23 +24,20 @@ fun String.toCryptHexString(): String {
 	return stringBuilder.toString()
 }
 
-/**
- * @param [hexText] 将Hex16进制字符串转换成 String 文本（包括中文）
- */
 fun String.toStringFromHex(): String {
 	val hexStringRegular = "0123456789ABCDEF".toCharArray()
 	if (isEmpty()) return ""
-	val validFromatText =
+	val validFormattedText =
 		if (substring(0, 2).equals(SolidityCode.ethTransfer, true)) substring(2, length)
 		else this
-	val byteArrrayOutputStream = ByteArrayOutputStream(validFromatText.length / 2)
+	val byteArrayOutputStream = ByteArrayOutputStream(validFormattedText.length / 2)
 	var index = 0
 	// 将每2位16进制整数组装成一个字节
-	while (index < validFromatText.length) {
+	while (index < validFormattedText.length) {
 		try {
-			byteArrrayOutputStream.write(
-				hexStringRegular.indexOf(validFromatText[index]) shl 4 or hexStringRegular.indexOf(
-					validFromatText[index + 1]
+			byteArrayOutputStream.write(
+				hexStringRegular.indexOf(validFormattedText[index]) shl 4 or hexStringRegular.indexOf(
+					validFormattedText[index + 1]
 				)
 			)
 			index += 2
@@ -56,5 +50,5 @@ fun String.toStringFromHex(): String {
 			}
 		}
 	}
-	return String(byteArrrayOutputStream.toByteArray())
+	return String(byteArrayOutputStream.toByteArray())
 }

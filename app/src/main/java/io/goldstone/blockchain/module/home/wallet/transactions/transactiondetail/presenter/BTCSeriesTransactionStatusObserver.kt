@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import org.jetbrains.anko.doAsync
 
@@ -26,12 +25,9 @@ abstract class BTCSeriesTransactionStatusObserver {
 			BTCSeriesJsonRPC.getConfirmations(
 				chainName,
 				hash,
-				{ error, reason ->
+				{
 					// 出错失败最大重试次数设定
-					if (maxRetryTimes <= 0) removeObserver()
-					else maxRetryTimes -= 1
-					// TODO ERROR Alert
-					LogUtil.error("Observing getConfirmations $reason", error)
+					if (maxRetryTimes <= 0) removeObserver() else maxRetryTimes -= 1
 				}
 			) {
 				if (it.isNull()) {

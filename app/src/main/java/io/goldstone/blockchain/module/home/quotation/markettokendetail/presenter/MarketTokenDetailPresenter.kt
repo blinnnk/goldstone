@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.presente
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.content.ContextCompat.startActivity
 import android.text.format.DateUtils
 import android.view.ViewGroup
@@ -17,8 +18,8 @@ import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -135,16 +136,13 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun showWebFragmentWithLink(
-		link: String,
-		title: String,
-		previousTitle: String
-	) {
+	fun showWebFragmentWithLink(link: String, title: String) {
 		marketCenter?.presenter
 			?.showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
-				title,
-				previousTitle,
-				Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+				Bundle().apply {
+					putString(ArgumentKey.webViewUrl, link)
+					putString(ArgumentKey.webViewName, title)
+				},
 				true
 			)
 	}
@@ -263,7 +261,7 @@ class MarketTokenDetailPresenter(
 					try {
 						resetData(
 							dateType,
-							data.sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
+							data.asSequence().sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
 								CandleEntry(
 									index.toFloat(),
 									entry.high.toFloat(),
@@ -271,7 +269,7 @@ class MarketTokenDetailPresenter(
 									entry.open.toFloat(),
 									entry.close.toFloat(),
 									entry.time)
-							}
+							}.toList()
 						)
 					} catch (error: Exception) {
 						LogUtil.error("updateChartUI", error)
@@ -349,19 +347,11 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	// Async Function
 	private fun loadCoinInfoFromServer(
 		info: QuotationModel,
-		hold: (DefaultTokenTable) -> Unit
+		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
-		val chainID = when {
-			info.contract.equals(CryptoValue.etcContract, true) -> ChainID.ETCMain.id
-			info.symbol.equals(CryptoSymbol.btc(), true) -> ChainID.BTCMain.id
-			info.symbol.equals(CryptoSymbol.ltc, true) -> ChainID.LTCMain.id
-			info.symbol.equals(CryptoSymbol.bch, true) -> ChainID.BCHMain.id
-			info.symbol.equals(CryptoSymbol.etc, true) -> ChainID.ETCMain.id
-			else -> ChainID.Main.id
-		}
+		val chainID = TokenContract(info.contract).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(
 			info.symbol,
 			chainID,
@@ -398,16 +388,6 @@ class MarketTokenDetailPresenter(
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
-
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
-	}
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		// 从 `WebViewFragment` 返回到这个界面更改 `HeaderTitle`
-		// 因为这个页面的 HeaderTitle 是动态数据所以无法用抽象方法实现.
-		fragment.getParentFragment<QuotationOverlayFragment> {
-			headerTitle = fragment.currencyInfo?.pairDisplay.orEmpty()
-		}
 	}
 }

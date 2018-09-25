@@ -2,65 +2,59 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.os.Bundle
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAfterColonContent
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoValue
-import io.goldstone.blockchain.crypto.SolidityCode
+import io.goldstone.blockchain.crypto.ethereum.SolidityCode
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
-import io.goldstone.blockchain.crypto.utils.toAddressCode
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import java.math.BigInteger
 
 /**
  * @date 2018/7/25 3:24 PM
  * @author KaySaith
  */
-fun PaymentPreparePresenter.prepareETHERC20ETCPaymentModel(count: Double, callback: () -> Unit) {
+fun PaymentPreparePresenter.prepareETHSeriesPaymentModel(
+	count: Double,
+	callback: (RequestError) -> Unit
+) {
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
-		ChainURL.getChainTypeBySymbol(fragment.rootFragment?.token?.symbol.orEmpty()),
+		fragment.rootFragment?.token?.contract.getChainType(),
 		callback
 	) { model ->
 		fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putSerializable(ArgumentKey.gasPrepareModel, model)
 				})
-			callback()
+			callback(RequestError.None)
 		}
 	}
 }
 
 /**
- * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommond` 的 `RawTransaction`
+ * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommend` 的 `RawTransaction`
  */
 private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
 	chainType: ChainType,
-	callback: () -> Unit,
+	errorCallback: (RequestError) -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {
 	GoldStoneEthCall.getUsableNonce(
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-		},
+		errorCallback,
 		chainType,
-		WalletTable.getAddressBySymbol(getToken()?.symbol)
+		CoinSymbol(getToken()?.symbol).getAddress()
 	) {
-		generateTransaction(fragment.address!!, count, memo, it, callback, hold)
+		generateTransaction(fragment.address!!, count, memo, it, errorCallback, hold)
 	}
 }
 
@@ -69,7 +63,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	count: Double,
 	memo: String,
 	nonce: BigInteger,
-	callback: () -> Unit,
+	errorCallback: (RequestError) -> Unit,
 	hold: (PaymentPrepareModel) -> Unit
 ) {
 	val countWithDecimal: BigInteger
@@ -77,15 +71,14 @@ private fun PaymentPreparePresenter.generateTransaction(
 	val to: String
 	// `ETH`, `ETC` 和 `Token` 转账需要准备不同的 `Transaction`
 	when {
-		getToken()?.contract.equals(CryptoValue.ethContract, true)
-			or getToken()?.contract.equals(CryptoValue.etcContract, true) -> {
+		getToken()?.contract.isETH() || getToken()?.contract.isETC() -> {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count)
 		}
-		
+
 		else -> {
-			to = getToken()?.contract.orEmpty()
+			to = getToken()?.contract?.contract.orEmpty()
 			countWithDecimal = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
 			data = SolidityCode.contractTransfer + // 方法
 				toAddress.toAddressCode(false) + // 地址
@@ -95,17 +88,14 @@ private fun PaymentPreparePresenter.generateTransaction(
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		WalletTable.getAddressBySymbol(getToken()?.symbol),
+		CoinSymbol(getToken()?.symbol).getAddress(),
 		data,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
-			callback()
-		},
-		ChainURL.getChainNameBySymbol(getToken()?.symbol.orEmpty())
+		errorCallback,
+		CoinSymbol(getToken()?.symbol).getCurrentChainName()
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
-				WalletTable.getAddressBySymbol(getToken()?.symbol),
+				CoinSymbol(getToken()?.symbol).getAddress(),
 				nonce,
 				limit,
 				to,

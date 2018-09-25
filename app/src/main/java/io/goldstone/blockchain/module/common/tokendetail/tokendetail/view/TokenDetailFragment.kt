@@ -2,16 +2,17 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setAlignParentBottom
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter.TokenDetailPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
@@ -19,14 +20,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, TransactionListModel>() {
-
 	// 首页的 `cell` 点击进入详情界面传入的 `Symbol`
-	val token by lazy {
-		arguments?.getSerializable(ArgumentKey.tokenDetail) as? WalletDetailCellModel
-	}
-	private val footer by lazy {
-		TokenDetailFooter(context!!)
-	}
+	val token by lazy { (parentFragment as? TokenDetailCenterFragment)?.token }
+	override val pageTitle: String get() = token?.symbol.orEmpty()
+	private val footer by lazy { TokenDetailFooter(context!!) }
 	override val presenter = TokenDetailPresenter(this)
 
 	override fun setRecyclerViewAdapter(

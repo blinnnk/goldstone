@@ -1,18 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.runOnUiThread
@@ -34,8 +32,10 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBTCTransactionSucceed()
-				val address = WalletTable.getAddressBySymbol(CryptoSymbol.btc())
-				updateWalletDetailBTCValue(address, currentActivity)
+				val address = CoinSymbol.BTC.getAddress()
+				updateBTCBalanceByTransaction(address, currentActivity) {
+					if (!it.isNone()) fragment.context.alert(it.message)
+				}
 				if (confirmed) {
 					updateConformationBarFinished()
 				}
@@ -51,31 +51,21 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailBTCValue(
+fun updateBTCBalanceByTransaction(
 	address: String,
-	activity: MainActivity?
+	activity: MainActivity?,
+	callback: (RequestError) -> Unit
 ) {
-	updateBTCBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
-) {
-	MyTokenTable.getBalanceWithContract(
-		CryptoValue.btcContract,
+	MyTokenTable.getBalanceByContract(
+		TokenContract.BTC,
 		address,
-		false,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-			LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-			GoldStoneAPI.context.runOnUiThread { callback() }
-		}
+		callback
 	) {
-		MyTokenTable.updateBalanceWithContract(it, CryptoValue.btcContract, address)
-		GoldStoneAPI.context.runOnUiThread { callback() }
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.BTC)
+		GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
+			callback(RequestError.None)
+		}
 	}
 }
 
@@ -83,33 +73,19 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onBTCTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getBTCTransactionFromChain(false)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-		getBTCTransactionFromChain(false)
-	}
+	)
+	getBTCTransactionFromChain(false)
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法

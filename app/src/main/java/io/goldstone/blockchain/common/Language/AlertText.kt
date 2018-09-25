@@ -10,7 +10,7 @@ object AlertText {
 		HoneyLanguage.English.code -> "This is a btc testnet only account, you can't switch to mainnet"
 		HoneyLanguage.Chinese.code -> "这是一个仅限比特币 testnet的帐号，你不能切换到主网"
 		HoneyLanguage.Japanese.code -> "これは、ビットコムのテストネットに限定されたアカウントです。メインネットワークに切り替えることはできません。"
-		HoneyLanguage.Korean.code -> "이 계정은 bitcoin testnet으로 제한되며 주 네트워크로 전환 할 수 없습니다."
+		HoneyLanguage.Korean.code -> "이 계정은 bitcoin testnet 으로 제한되며 주 네트워크로 전환 할 수 없습니다."
 		HoneyLanguage.Russian.code -> "Это учетная запись, ограниченная тестовой сетью bitcoin, вы не можете переключиться на основную сеть."
 		HoneyLanguage.TraditionalChinese.code -> "這是一個僅限比特幣 testnet的帳號，你不能切換到主網"
 		else -> ""
@@ -27,7 +27,7 @@ object AlertText {
 	}
 	@JvmField
 	val btcWalletOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The current wallet tightly supports Bitcoin and cannot search for other types of digital currency information asset management."
+		HoneyLanguage.English.code -> "The current wallet tightly supports Bitcoin Series and cannot search for other types of digital currency information asset management."
 		HoneyLanguage.Chinese.code -> "目前的钱包仅支持比特币，无法搜索其他类型的数字货币进行资产管理。"
 		HoneyLanguage.Japanese.code -> "現在のウォレットはBitcoinのみをサポートしており、資産管理のために他の種類のデジタル通貨を検索することはできません。"
 		HoneyLanguage.Korean.code -> "현재 지갑은 Bitcoin 만 지원하며 자산 관리를 위해 다른 유형의 디지털 통화를 검색 할 수 없습니다."

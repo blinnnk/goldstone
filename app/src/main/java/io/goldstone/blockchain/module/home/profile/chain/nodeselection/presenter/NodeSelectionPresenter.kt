@@ -2,11 +2,10 @@ package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presente
 
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.value.ChainID
-import io.goldstone.blockchain.common.value.ChainNameID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.ChainType
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainNameID
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 
@@ -56,39 +55,9 @@ class NodeSelectionPresenter(
 	}
 
 	fun getCurrentChainName(isMainnet: Boolean, type: ChainType): String {
-		return if (isMainnet) {
-			when (type) {
-				ChainType.ETH -> {
-					if (Config.getCurrentChain() != ChainID.Main.id) ChainText.infuraMain
-					else Config.getCurrentChainName()
-				}
+		return if (isMainnet) ChainType(type.id).getMainnetChainName()
+		else ChainType(type.id).getTestnetChainName()
 
-				ChainType.BTC -> ChainText.btcMain
-				ChainType.LTC -> ChainText.ltcMain
-				ChainType.BCH -> ChainText.bchMain
-				ChainType.EOS -> ChainText.eosMain
-
-				else -> {
-					if (Config.getETCCurrentChain() != ChainID.ETCMain.id) ChainText.etcMainGasTracker
-					else Config.getETCCurrentChainName()
-				}
-			}
-		} else {
-			when (type) {
-				ChainType.ETH -> {
-					if (Config.getCurrentChain() == ChainID.Main.id) ChainText.infuraRopsten
-					else Config.getCurrentChainName()
-				}
-				ChainType.BTC -> ChainText.btcTest
-				ChainType.LTC -> ChainText.ltcTest
-				ChainType.BCH -> ChainText.bchTest
-				ChainType.EOS -> ChainText.eosTest
-				else -> {
-					if (Config.getETCCurrentChain() == ChainID.ETCMain.id) ChainText.etcMorden
-					else Config.getETCCurrentChainName()
-				}
-			}
-		}
 	}
 
 	private fun checkIsEncryptERCNode(nodeName: String): Boolean {
@@ -109,11 +78,11 @@ class NodeSelectionPresenter(
 				it?.apply {
 					AppConfigTable.updateChainStatus(false) {
 						Config.updateIsTestEnvironment(true)
-						Config.updateBTCCurrentChain(ChainID.BTCTest.id)
-						Config.updateLTCCurrentChain(ChainID.LTCTest.id)
-						Config.updateBCHCurrentChain(ChainID.BCHTest.id)
-						Config.updateETCCurrentChain(ChainID.ETCTest.id)
-						Config.updateEOSCurrentChain(ChainID.EOSTest.id)
+						Config.updateBTCCurrentChain(ChainID.btcTest)
+						Config.updateLTCCurrentChain(ChainID.ltcTest)
+						Config.updateBCHCurrentChain(ChainID.bchTest)
+						Config.updateETCCurrentChain(ChainID.etcTest)
+						Config.updateEOSCurrentChain(ChainID.eosTest)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
@@ -149,11 +118,11 @@ class NodeSelectionPresenter(
 				it?.apply {
 					AppConfigTable.updateChainStatus(true) {
 						Config.updateIsTestEnvironment(false)
-						Config.updateBTCCurrentChain(ChainID.BTCMain.id)
-						Config.updateLTCCurrentChain(ChainID.LTCMain.id)
-						Config.updateBCHCurrentChain(ChainID.BCHMain.id)
-						Config.updateETCCurrentChain(ChainID.ETCMain.id)
-						Config.updateEOSCurrentChain(ChainID.EOSMain.id)
+						Config.updateBTCCurrentChain(ChainID.btcMain)
+						Config.updateLTCCurrentChain(ChainID.ltcMain)
+						Config.updateBCHCurrentChain(ChainID.bchMain)
+						Config.updateETCCurrentChain(ChainID.etcMain)
+						Config.updateEOSCurrentChain(ChainID.eosMain)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHERC20AndETCChainNameID)

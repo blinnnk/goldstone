@@ -1,18 +1,15 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.runOnUiThread
@@ -34,7 +31,7 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onLTCTransactionSucceed()
-				val address = WalletTable.getAddressBySymbol(CryptoSymbol.ltc)
+				val address = CoinSymbol.LTC.getAddress()
 				updateWalletDetailLTCValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -64,17 +61,15 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
 	address: String,
 	callback: () -> Unit
 ) {
-	MyTokenTable.getBalanceWithContract(
-		CryptoValue.ltcContract,
+	MyTokenTable.getBalanceByContract(
+		TokenContract.LTC,
 		address,
-		false,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-			LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+		{
+			fragment.context?.alert(it.message)
+			callback()
 		}
 	) {
-		MyTokenTable.updateBalanceWithContract(it, CryptoValue.ltcContract, address)
+		MyTokenTable.updateBalanceByContract(it, address, TokenContract.LTC)
 		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }
@@ -83,33 +78,19 @@ private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onLTCTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getLTCTransactionFromChain(false)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-		getLTCTransactionFromChain(false)
-	}
+	)
+	getLTCTransactionFromChain(false)
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法

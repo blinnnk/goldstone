@@ -5,7 +5,7 @@ import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import io.goldstone.blockchain.crypto.eos.account.EosPrivateKey;
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey;
 import io.goldstone.blockchain.crypto.eos.account.EosPublicKey;
 import io.goldstone.blockchain.crypto.eos.eccutils.EcSignature;
 import io.goldstone.blockchain.crypto.eos.eccutils.EcTools;
@@ -49,7 +49,7 @@ public class EcDsa {
 
   private static void deterministicGenerateK(CurveParam curveParam, byte[] hash, BigInteger d, SigChecker checker, int nonce) {
     if (nonce > 0) {
-      hash = Sha256.from(hash, EosPrivateKey.secuRandom.generateSeed(nonce)).getBytes();
+      hash = Sha256.from(hash, EOSPrivateKey.secuRandom.generateSeed(nonce)).getBytes();
     }
 
     byte[] dBytes = d.toByteArray();
@@ -105,7 +105,7 @@ public class EcDsa {
     }
   }
 
-  public static EcSignature sign(Sha256 hash, EosPrivateKey key) {
+  public static EcSignature sign(Sha256 hash, EOSPrivateKey key) {
     BigInteger privateKeyAsBI = key.getAsBigInteger();
     SigChecker checker = new SigChecker(hash.getBytes(), privateKeyAsBI);
 
@@ -115,8 +115,8 @@ public class EcDsa {
     do {
       deterministicGenerateK(curveParam, hash.getBytes(), privateKeyAsBI, checker, nonce++);
 
-      if (checker.s.compareTo(curveParam.halfCurveOrder()) > 0) { //  Secp256k1Param.HALF_CURVE_ORDER) > 0) {
-        checker.s = curveParam.n().subtract(checker.s); //   Secp256k1Param.n.subtract(checker.s);
+      if (checker.s.compareTo(curveParam.halfCurveOrder()) > 0) {
+        checker.s = curveParam.n().subtract(checker.s);
       }
 
     } while (!checker.isRSEachLength());
@@ -152,7 +152,7 @@ public class EcDsa {
     // function)
     // 1.1 Let x = r + jn
 
-    BigInteger n = curveParam.n();// Secp256k1Param.n; // EcCurve order.
+    BigInteger n = curveParam.n(); // Secp256k1Param.n; // EcCurve order.
     BigInteger i = BigInteger.valueOf((long) recId / 2);
     BigInteger x = signature.r.add(i.multiply(n));
     // 1.2. Convert the integer x to an octet string X of length mlen using

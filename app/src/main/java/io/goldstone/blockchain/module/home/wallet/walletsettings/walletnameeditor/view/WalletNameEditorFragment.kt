@@ -10,10 +10,11 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter
@@ -27,11 +28,12 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
-	
+
+	override val pageTitle: String = WalletSettingsText.walletName
 	val confirmButton by lazy { RoundButton(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
 	override val presenter = WalletNameEditorPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -42,7 +44,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 					topMargin = 40.uiPX()
 					bottomMargin = 30.uiPX()
 				}
-				
+
 				addTextChangedListener(object : TextWatcher {
 					override fun beforeTextChanged(
 						p0: CharSequence?,
@@ -51,7 +53,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 						p3: Int
 					) {
 					}
-					
+
 					override fun onTextChanged(
 						p0: CharSequence?,
 						p1: Int,
@@ -59,15 +61,15 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 						p3: Int
 					) {
 					}
-					
+
 					override fun afterTextChanged(p0: Editable?) {
 						presenter.updateConfirmButtonStyle(nameInput)
 					}
 				})
 			}.into(this)
-			
+
 			presenter.showCurrentNameHint(nameInput)
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm
 				setGrayStyle()
@@ -76,7 +78,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 			}.into(this)
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

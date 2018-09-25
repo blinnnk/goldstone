@@ -17,10 +17,11 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationModel>() {
-	
+
+	override val pageTitle: String = "Quotation"
 	private val slideHeader by lazy { QuotationSlideHeader(context!!) }
 	override val presenter = QuotationPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationModel>?
@@ -32,14 +33,14 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 			}
 		}
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
-		
+
 		slideHeader.apply {
 			addTokenButton.apply {
 				onClick {
@@ -49,14 +50,14 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 			}
 		}
 	}
-	
+
 	override fun emptyClickEvent() {
 		presenter.showQuotationManagement()
 	}
-	
+
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
-	
+
 	override fun observingRecyclerViewVerticalOffset(
 		offset: Int,
 		range: Int
@@ -70,7 +71,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 			isShow = false
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		mainActivity?.getHomeFragment()?.presenter?.showWalletDetailFragment()
 	}

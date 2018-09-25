@@ -16,7 +16,6 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.*
 
 /**
@@ -24,19 +23,19 @@ import io.goldstone.blockchain.common.value.*
  * @author KaySaith
  */
 class RoundButton(context: Context) : RelativeLayout(context) {
-	
+
 	var text by observing("") {
 		invalidate()
 	}
 	var marginTop = 0
-	private val shadowSize = 1.uiPX().toFloat()
-	private val buttonHeight = 45.uiPX()
+	private val shadowSize = 3f
+	private val buttonHeight = 40.uiPX()
 	private val textPaint = Paint()
 	private var textSize: Float by observing(0f) {
 		textPaint.textSize = textSize
 		invalidate()
 	}
-	
+
 	init {
 		setWillNotDraw(false)
 		textPaint.isAntiAlias = true
@@ -45,7 +44,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		elevation = shadowSize
 		textSize = 14.uiPX().toFloat()
 	}
-	
+
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
@@ -54,7 +53,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		canvas?.drawText(text, textX, textY, textPaint)
 		canvas?.save()
 	}
-	
+
 	fun showLoadingStatus(
 		needToShow: Boolean = true,
 		color: Int = Spectrum.white,
@@ -63,55 +62,25 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 		if (needToShow) {
 			isEnabled = false
 			text = ""
-			try {
-				if (findViewById<ProgressBar>(ElementID.buttonLoading).isNull()) {
-					ProgressBar(
-						context, null, android.R.attr.progressBarStyleInverse
-					).apply {
-						id = ElementID.buttonLoading
-						indeterminateDrawable.setColorFilter(
-							color, android.graphics.PorterDuff.Mode.MULTIPLY
-						)
-						layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
-						setCenterInParent()
-					}.into(this)
-				}
-			} catch (error: Exception) {
-				LogUtil.error(this.javaClass.simpleName, error)
+			if (findViewById<ProgressBar>(ElementID.buttonLoading).isNull()) {
+				ProgressBar(context, null, android.R.attr.progressBarStyleInverse).apply {
+					id = ElementID.buttonLoading
+					indeterminateDrawable.setColorFilter(
+						color, android.graphics.PorterDuff.Mode.MULTIPLY
+					)
+					layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
+					setCenterInParent()
+				}.into(this)
 			}
-		}
-		if (!needToShow) {
-			try {
-				findViewById<ProgressBar>(ElementID.buttonLoading)?.let {
-					removeView(it)
-				}
-			} catch (error: Exception) {
-				LogUtil.error(this.javaClass.simpleName, error)
+		} else {
+			findViewById<ProgressBar>(ElementID.buttonLoading)?.let {
+				removeView(it)
 			}
 			text = recoveryText
 			isEnabled = true
 		}
 	}
-	
-	fun setWhiteStyle() {
-		layoutParams = LinearLayout.LayoutParams(
-			ScreenSize.widthWithPadding,
-			buttonHeight
-		).apply {
-			topMargin = marginTop
-			bottomMargin = 5.uiPX()
-		}
-		
-		addTouchRippleAnimation(
-			Spectrum.white,
-			Spectrum.yellow,
-			RippleMode.Square,
-			layoutParams.height / 2f
-		)
-		textPaint.color = Spectrum.blue
-		invalidate()
-	}
-	
+
 	fun setGrayStyle(top: Int? = null) {
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
@@ -120,33 +89,33 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		
+
 		addTouchRippleAnimation(
 			GrayScale.whiteGray,
 			Spectrum.green,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = GrayScale.midGray
 		invalidate()
 	}
-	
-	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding) {
-		layoutParams = LinearLayout.LayoutParams(width, buttonHeight).apply {
+
+	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding, height: Int = buttonHeight) {
+		layoutParams = LinearLayout.LayoutParams(width, height).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		
+
 		addTouchRippleAnimation(
 			Spectrum.blue,
 			Spectrum.white,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = Spectrum.white
 		invalidate()
 	}
-	
+
 	fun setDarkStyle(top: Int? = null) {
 		layoutParams = LinearLayout.LayoutParams(
 			ScreenSize.widthWithPadding,
@@ -155,12 +124,12 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		
+
 		addTouchRippleAnimation(
 			GrayScale.Opacity3Black,
 			Spectrum.white,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = Spectrum.white
 		invalidate()
@@ -179,7 +148,7 @@ class RoundButton(context: Context) : RelativeLayout(context) {
 			Spectrum.green,
 			Spectrum.yellow,
 			RippleMode.Square,
-			layoutParams.height / 2f
+			CornerSize.normal
 		)
 		textPaint.color = Spectrum.white
 		invalidate()

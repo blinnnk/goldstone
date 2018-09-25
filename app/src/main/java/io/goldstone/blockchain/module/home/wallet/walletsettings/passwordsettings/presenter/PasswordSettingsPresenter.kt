@@ -5,18 +5,19 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import com.blinnnk.util.getDeviceBrand
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.DeviceName
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.Address
-import io.goldstone.blockchain.crypto.isValid
-import io.goldstone.blockchain.crypto.updatePassword
-import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.common.value.DeviceName
+import io.goldstone.blockchain.crypto.ethereum.Address
+import io.goldstone.blockchain.crypto.ethereum.isValid
+import io.goldstone.blockchain.crypto.keystore.updatePassword
+import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
+import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.crypto.multichain.WalletType
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -38,26 +39,26 @@ class PasswordSettingsPresenter(
 		newPassword: String,
 		repeatPassword: String,
 		passwordHint: String,
-		callback: () -> Unit
+		@UiThread callback: (GoldStoneError) -> Unit
 	) {
-		if (oldPassword.isEmpty()) {
-			fragment.context.alert(CreateWalletText.emptyRepeatPasswordAlert)
-			return
-		}
-		CreateWalletPresenter.checkInputValue(
+		if (oldPassword.isEmpty()) callback(AccountError.EmptyRepeatPassword)
+		else CreateWalletPresenter.checkInputValue(
 			"",
 			newPassword,
 			repeatPassword,
 			true,
-			fragment.context,
-			callback // error callback
+			callback
 		) { password, _ ->
-			fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword) { isCorrect ->
-				if (isCorrect) updatePassword(oldPassword, password, passwordHint)
-				else {
-					callback()
-					fragment.context?.runOnUiThread {
-						alert(CommonText.wrongPassword)
+			WalletTable.getWalletType { type, wallet ->
+				fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
+					if (isCorrect) updatePassword(
+						oldPassword,
+						password,
+						type,
+						wallet,
+						passwordHint
+					) else GoldStoneAPI.context.runOnUiThread {
+						callback(AccountError.WrongPassword)
 					}
 				}
 			}
@@ -67,107 +68,50 @@ class PasswordSettingsPresenter(
 	private fun updatePassword(
 		oldPassword: String,
 		password: String,
+		type: WalletType,
+		wallet: WalletTable,
 		passwordHint: String
 	) {
-		WalletTable.getCurrentWallet {
-			when (Config.getCurrentWalletType()) {
-				// 删除多链钱包下的所有地址对应的数据
-				WalletType.MultiChain.content -> {
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount = 4
-
-						override fun concurrentJobs() {
-							listOf(
-								ethAddresses,
-								etcAddresses,
-								bchAddresses,
-								ltcAddresses,
-								btcAddresses,
-								btcSeriesTestAddresses
-							).forEach { addresses ->
-								AddressManagerPresenter.convertToChildAddresses(addresses).forEach {
-									updateKeystorePassword(
-										it.first,
-										oldPassword,
-										password,
-										passwordHint,
-										!Address(it.first).isValid(), // 不是合规的 `ETH` 地址就是 `BTC` 系列地址
-										false
-									) {
-										completeMark()
-									}
+		when {
+			// 删除多链钱包下的所有地址对应的数据
+			type.isBIP44() -> {
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount = 4
+					override fun concurrentJobs() {
+						listOf(
+							wallet.ethAddresses,
+							wallet.etcAddresses,
+							wallet.bchAddresses,
+							wallet.ltcAddresses,
+							wallet.btcAddresses,
+							wallet.btcSeriesTestAddresses
+						).forEach { addresses ->
+							AddressManagerPresenter.convertToChildAddresses(addresses).forEach {
+								updateKeystorePassword(
+									it.first,
+									oldPassword,
+									password,
+									passwordHint,
+									!Address(it.first).isValid(), // 不是合规的 `ETH` 地址就是 `BTC` 系列地址
+									false
+								) {
+									completeMark()
 								}
 							}
 						}
+					}
 
-						override fun mergeCallBack() = autoBack()
-					}.start()
-				}
-				// 删除 `BTCTest` 包下的所有地址对应的数据
-				WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentBTCSeriesTestAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.LTCOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentLTCAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.BCHOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentBCHAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.BTCOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentBTCAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						true,
-						true
-					) {
-						autoBack()
-					}
-				}
-				// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
-				WalletType.ETHERCAndETCOnly.content -> WalletTable.getCurrentWallet {
-					updateKeystorePassword(
-						currentETHAndERCAddress,
-						oldPassword,
-						password,
-						passwordHint,
-						false,
-						true
-					) {
-						autoBack()
-					}
-				}
+					override fun mergeCallBack() = autoBack()
+				}.start()
+			}
+			// 新的钱包结构只存在 Bip44 多链和 单私钥多链两种情况
+			else -> updateKeystorePasswordByWalletID(
+				wallet.id,
+				oldPassword,
+				password,
+				passwordHint
+			) {
+				autoBack()
 			}
 		}
 	}
@@ -179,7 +123,7 @@ class PasswordSettingsPresenter(
 		passwordHint: String,
 		isBTCSeriesWallet: Boolean,
 		isSingleChainWallet: Boolean,
-		callback: () -> Unit
+		callback: (AccountError) -> Unit
 	) {
 		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 		fragment.context?.updatePassword(
@@ -187,7 +131,25 @@ class PasswordSettingsPresenter(
 			oldPassword,
 			newPassword,
 			isBTCSeriesWallet,
-			isSingleChainWallet,
+			isSingleChainWallet
+		) { _, error ->
+			// Update User Password Hint
+			if (error.isNone()) WalletTable.updateHint(passwordHint)
+			callback(error)
+		}
+	}
+
+	private fun updateKeystorePasswordByWalletID(
+		walletID: Int,
+		oldPassword: String,
+		newPassword: String,
+		passwordHint: String,
+		callback: () -> Unit
+	) {
+		fragment.context?.updatePasswordByWalletID(
+			walletID,
+			oldPassword,
+			newPassword,
 			{
 				// error callback
 				callback()

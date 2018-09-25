@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.deposit.view
 
 import android.content.Context
 import io.goldstone.blockchain.common.component.GradientType
-import io.goldstone.blockchain.common.component.ValueInputView
+import io.goldstone.blockchain.common.component.edittext.ValueInputView
 
 /**
  * @date 2018/5/8 11:29 AM

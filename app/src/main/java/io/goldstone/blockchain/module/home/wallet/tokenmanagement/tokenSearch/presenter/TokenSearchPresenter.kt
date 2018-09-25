@@ -5,15 +5,11 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -41,33 +37,29 @@ class TokenSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenManagementFragment> {
-			overlayView.header.searchInputLinstener(
+			overlayView.header.searchInputListener(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						canSearch = if (WalletType.isBTCSeriesType(Config.getCurrentWalletType())) {
-							fragment.context.alert(
-								"This is a single block chain wallet so you canot add other crypot currency"
-							)
+						canSearch = if (Config.getCurrentWalletType().isBTCSeries()) {
+							fragment.context.alert("This is a single block chain wallet so you cannot add other crypto currency")
 							false
-						} else {
-							NetworkUtil.hasNetworkWithAlert(context)
-						}
+						} else NetworkUtil.hasNetworkWithAlert(context)
 					}
 				}
-			) { defaultTokens ->
-				canSearch isTrue {
-					searchTokenByContractOrSymbol(defaultTokens) { result ->
-						context?.runOnUiThread {
-							if (Config.getCurrentWalletType().equals(WalletType.ETHERCAndETCOnly.content, true)) {
-								// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
-								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot {
-									CryptoSymbol.isBTCSeriesSymbol(it.symbol)
-								}.toArrayList())
-							} else {
-								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result)
+			) { inputContent ->
+				if (canSearch) {
+					MyTokenTable.getMyTokens { myTokens ->
+						searchTokenByContractOrSymbol(inputContent, myTokens) { result ->
+							context?.runOnUiThread {
+								if (Config.getCurrentWalletType().isETHSeries()) {
+									// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
+									diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot { TokenContract(it.contract).isBTCSeries() }.toArrayList())
+								} else {
+									diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.toArrayList())
+								}
+								fragment.removeLoadingView()
 							}
-							fragment.removeLoadingView()
 						}
 					}
 				}
@@ -78,22 +70,21 @@ class TokenSearchPresenter(
 	fun setMyTokenStatus(cell: TokenSearchCell) {
 		cell.apply {
 			model?.let { searchToken ->
-				DefaultTokenTable.getCurrentChainToken(searchToken.contract) { localToken ->
+				DefaultTokenTable.getCurrentChainToken(TokenContract(searchToken.contract)) { localToken ->
 					localToken.isNotNull {
 						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
 						DefaultTokenTable.updateTokenDefaultStatus(
-							localToken?.contract.orEmpty(),
+							TokenContract(localToken?.contract),
 							switch.isChecked,
 							searchToken.name
 						) {
 							insertToMyToken(switch, localToken)
 						}
 					} otherwise {
-						DefaultTokenTable.insertToken(searchToken.apply {
+						searchToken.apply {
 							isDefault = switch.isChecked
-							// 区分 `ETC` 插入的 `ChainID`
-							chain_id = CryptoValue.chainID(contract)
-						}) {
+							chainID = TokenContract(contract).getCurrentChainID().id
+						} insertThen {
 							insertToMyToken(switch, searchToken)
 						}
 					}
@@ -106,14 +97,15 @@ class TokenSearchPresenter(
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
+				TokenManagementListPresenter.updateMyTokenInfoBy(switch, it)
 			}
 		}
 	}
 
 	private fun searchTokenByContractOrSymbol(
 		content: String,
-		hold: (ArrayList<DefaultTokenTable>) -> Unit
+		myTokens: List<MyTokenTable>,
+		hold: (List<DefaultTokenTable>) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		fragment.showLoadingView(LoadingText.searchingToken)
@@ -121,73 +113,66 @@ class TokenSearchPresenter(
 			content,
 			{ it ->
 				// Usually this kinds of Exception will be connect to the service Timeout
-				fragment.context?.alert(
-					it.toString().trimStart {
-						it.toString().startsWith(":", true)
-					}
-				)
+				fragment.context?.alert(it.toString().trimStart { it.toString().startsWith(":", true) })
 			}
 		) { result ->
-			MyTokenTable.getMyTokens { localTokens ->
-				if (!result.isNullOrEmpty()) {
-					// 从服务器请求目标结果
-					try {
-						hold(result.map { serverToken ->
-							// 更新使用中的按钮状态
-							DefaultTokenTable(serverToken).apply {
-								val status = localTokens.any {
-									it.contract.equals(serverToken.contract, true)
-								}
-								isDefault = status
-								isUsed = status
-							}
-						}.toArrayList())
-					} catch (error: Exception) {
-						LogUtil.error("getTokenInfoBySymbolFromServer", error)
-					}
-				} else {
-					if (isSearchingSymbol) {
-						hold(arrayListOf())
-						return@getMyTokens
-					}
-					// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
-					// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
-					GoldStoneEthCall.getTokenInfoByContractAddress(
-						content,
-						{ error, reason ->
-							fragment.context?.alert(reason ?: error.toString())
-						},
-						Config.getCurrentChainName()
-					) { symbol, name, decimal ->
-						if (symbol.isEmpty() || name.isEmpty()) {
-							hold(arrayListOf())
-						} else {
-							val status = localTokens.any {
-								it.contract.equals(content, true)
-							}
-							hold(
-								arrayListOf(
-									DefaultTokenTable(
-										0,
-										"",
-										content,
-										"",
-										symbol,
-										TinyNumber.False.value,
-										0.0,
-										name,
-										decimal,
-										null,
-										status,
-										0,
-										ChainID.getChainIDBySymbol(symbol),
-										isUsed = status
-									)
-								)
-							)
+			if (!result.isNullOrEmpty()) {
+				// 从服务器请求目标结果
+				hold(result.map { serverToken ->
+					// 更新使用中的按钮状态
+					DefaultTokenTable(serverToken).apply {
+						val status = myTokens.any {
+							it.contract.equals(serverToken.contract, true)
 						}
+						isDefault = status
+						isUsed = status
 					}
+				})
+			} else {
+				if (isSearchingSymbol) hold(arrayListOf())
+				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
+				// 判断搜索出来的 `Token` 是否是正在使用的 `Token`
+				else searchERCTokenByContractFromChain(content, myTokens, hold)
+			}
+		}
+	}
+
+	private fun searchERCTokenByContractFromChain(
+		contract: String,
+		myTokens: List<MyTokenTable>,
+		hold: (List<DefaultTokenTable>) -> Unit
+	) {
+		GoldStoneEthCall.getTokenInfoByContractAddress(
+			contract,
+			{ fragment.context?.alert(it.message) },
+			Config.getCurrentChainName()
+		) { symbol, name, decimal ->
+			if (symbol.isEmpty() || name.isEmpty()) {
+				hold(arrayListOf())
+			} else {
+				val status = myTokens.any {
+					it.contract.equals(contract, true)
 				}
+				hold(
+					listOf(
+						DefaultTokenTable(
+							0,
+							"",
+							contract,
+							"",
+							symbol,
+							TinyNumber.False.value,
+							0.0,
+							name,
+							decimal,
+							null,
+							status,
+							0,
+							CoinSymbol(symbol).getChainID().id,
+							isUsed = status
+						)
+					)
+				)
 			}
 		}
 	}

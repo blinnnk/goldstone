@@ -1,12 +1,15 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -15,9 +18,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -46,11 +47,11 @@ class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
 
-	var currentMinerType = MinerFeeType.Recommend.content
+	var currentMinerType = MinerFeeType.Recommend
 	var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
-	private val rootFragment by lazy {
+	val rootFragment by lazy {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
 	}
 	val prepareModel by lazy {
@@ -81,30 +82,30 @@ class GasSelectionPresenter(
 
 	fun generateGasSelections(parent: LinearLayout) {
 		val gasPrice =
-			if (CryptoSymbol.isBTCSeriesSymbol(getToken()?.symbol)) defaultSatoshiValue
+			if (CoinSymbol(getToken()?.symbol).isBTCSeries()) defaultSatoshiValue
 			else defaultGasPrices
 
-		gasPrice.forEachIndexed { index, minner ->
+		gasPrice.forEachIndexed { index, miner ->
 			GasSelectionCell(parent.context).apply {
 				id = index
-				model = if (CryptoSymbol.isBTCSeriesSymbol(getToken()?.symbol))
+				model = if (CoinSymbol(getToken()?.symbol).isBTCSeries())
 					GasSelectionModel(
 						index,
-						minner.toString().toLong(),
+						miner.toString().toLong(),
 						prepareBTCSeriesModel?.signedMessageSize ?: 226,
-						currentMinerType,
+						currentMinerType.type,
 						getToken()?.symbol.orEmpty()
 					)
 				else
 					GasSelectionModel(
 						index,
-						minner.toString().toDouble(),
-						prepareGasLimit(minner.toDouble().toGwei()).toDouble(),
-						currentMinerType,
+						miner.toString().toDouble(),
+						prepareGasLimit(miner.toDouble().toGwei()).toDouble(),
+						currentMinerType.type,
 						getUnitSymbol()
 					)
 
-				if (model.type == currentMinerType) {
+				if (model.type == currentMinerType.type) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -112,8 +113,8 @@ class GasSelectionPresenter(
 					gasUsedGasFee = getGasUnitCount(model.count)
 				}
 			}.click { it ->
-				currentMinerType = it.model.type
-				if (CryptoSymbol.isBTCSeriesSymbol(getToken()?.symbol))
+				currentMinerType = MinerFeeType.getTypeByValue(it.model.type)
+				if (CoinSymbol(getToken()?.symbol).isBTCSeries())
 					updateBTCGasSettings(getToken()?.symbol.orEmpty(), parent)
 				else updateGasSettings(parent)
 				getGasCurrencyPrice(it.model.count) {
@@ -128,45 +129,39 @@ class GasSelectionPresenter(
 	fun goToGasEditorFragment() {
 		rootFragment?.apply {
 			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,
-						if (CryptoSymbol.isBTCSeriesSymbol(getToken()?.symbol)) {
+						if (CoinSymbol(getToken()?.symbol).isBTCSeries()) {
 							prepareBTCSeriesModel?.signedMessageSize ?: 226L
 						} else prepareModel?.gasLimit?.toLong().orElse(0L)
 					)
 					putBoolean(
 						ArgumentKey.isBTCSeries,
-						CryptoSymbol.isBTCSeriesSymbol(getToken()?.symbol)
+						CoinSymbol(getToken()?.symbol).isBTCSeries()
 					)
 				}
 			)
 		}
 	}
 
-	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
-		// Prevent user click the other button at this time
-		fragment.showMaskView(true)
+	fun confirmTransfer(
+		footer: GasSelectionFooter,
+		callback: (GoldStoneError) -> Unit
+	) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
-			callback()
-			fragment.showMaskView(false)
-			return
-		}
-		// 检查网络并执行转账操作
-		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			when {
-				getToken()?.symbol.equals(CryptoSymbol.btc(), true) ->
-					prepareToTransferBTC(footer, callback)
-				getToken()?.symbol.equals(CryptoSymbol.ltc, true) ->
-					prepareToTransferLTC(footer, callback)
-				getToken()?.symbol.equals(CryptoSymbol.bch, true) ->
-					prepareToTransferBCH(footer, callback)
-				else -> prepareToTransfer(footer, callback)
-			}
+			callback(TransferError.IncorrectDecimal)
+		} else if (NetworkUtil.hasNetworkWithAlert(fragment.context)) when {
+			// 检查网络并执行转账操作
+			getToken()?.contract.isBTC() ->
+				prepareToTransferBTC(footer, callback)
+			getToken()?.contract.isLTC() ->
+				prepareToTransferLTC(footer, callback)
+			getToken()?.contract.isBCH() ->
+				prepareToTransferBCH(footer, callback)
+			else -> prepareToTransfer(footer, callback)
 		}
 	}
 
@@ -175,21 +170,14 @@ class GasSelectionPresenter(
 	}
 
 	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
-		return when {
-			getDecimalCount().isNull() -> return true
-
-			getDecimalCount().orZero() > token?.decimal.orElse(0.0) -> {
-				fragment.context?.alert(AlertText.transferWrongDecimal)
-				false
-			}
-
-			else -> true
-		}
+		val isValid = isValidDecimal(token?.decimal.orZero())
+		if (!isValid) fragment.context?.alert(AlertText.transferWrongDecimal)
+		return isValid
 	}
 
 	fun showConfirmAttentionView(
 		footer: GasSelectionFooter,
-		callback: () -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransaction,
@@ -203,41 +191,20 @@ class GasSelectionPresenter(
 				fragment.showMaskView(false)
 			}) {
 			when {
-				getToken()?.symbol.equals(CryptoSymbol.btc(), true) ->
+				getToken()?.contract.isBTC() ->
 					prepareBTCSeriesModel?.apply {
 						transferBTC(this, it?.text.toString(), callback)
 					}
-				getToken()?.symbol.equals(CryptoSymbol.ltc, true) ->
+				getToken()?.contract.isLTC() ->
 					prepareBTCSeriesModel?.apply {
 						transferLTC(this, it?.text.toString(), callback)
 					}
-				getToken()?.symbol.equals(CryptoSymbol.bch, true) ->
+				getToken()?.contract.isBCH() ->
 					prepareBTCSeriesModel?.apply {
 						transferBCH(this, it?.text.toString(), callback)
 					}
 				else -> transfer(it?.text.toString(), callback)
 			}
-		}
-	}
-
-	/**
-	 * 转账开始后跳转到转账监听界面
-	 */
-	fun goToTransactionDetailFragment(receiptModel: ReceiptModel) {
-		// 准备跳转到下一个界面
-		fragment.getParentFragment<TokenDetailOverlayFragment> {
-			// 如果有键盘收起键盘
-			activity?.apply { SoftKeyboard.hide(this) }
-			removeChildFragment(fragment)
-
-			addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
-				putSerializable(ArgumentKey.transactionDetail, receiptModel)
-			}
-			overlayView.header.apply {
-				showBackButton(false)
-				showCloseButton(true)
-			}
-			headerTitle = TokenDetailText.transferDetail
 		}
 	}
 
@@ -267,7 +234,7 @@ class GasSelectionPresenter(
 				0,
 				false,
 				true,
-				ChainType.getChainTypeBySymbol(getToken()?.symbol)
+				ChainType.getChainTypeBySymbol(getToken()?.symbol).id
 			).apply {
 				// 插入 PendingData
 				GoldStoneDataBase.database
@@ -315,19 +282,12 @@ class GasSelectionPresenter(
 	) {
 		val coinContract =
 			when {
-				rootFragment?.token?.contract.equals(
-					CryptoValue.etcContract,
-					true
-				) -> CryptoValue.etcContract
-				rootFragment?.token?.contract.equals(
-					CryptoValue.btcContract,
-					true
-				) -> CryptoValue.btcContract
-				rootFragment?.token?.contract.equals(
-					CryptoValue.ltcContract,
-					true
-				) -> CryptoValue.ltcContract
-				else -> CryptoValue.ethContract
+				getToken()?.contract.isETC() -> TokenContract.ETC
+				getToken()?.contract.isBTC() -> TokenContract.BTC
+				getToken()?.contract.isLTC() -> TokenContract.LTC
+				getToken()?.contract.isEOS() -> TokenContract.EOS
+				getToken()?.contract.isBCH() -> TokenContract.BCH
+				else -> TokenContract.ETH
 			}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(
@@ -342,16 +302,39 @@ class GasSelectionPresenter(
 			overlayView.header.showBackButton(true) {
 				backEvent(this@apply)
 			}
-			// 有可能从 `WebViewFragment` 返回 需要重新恢复 `ValueHeader`
-			setValueHeader(token)
 		}
 	}
 
 	fun backEvent(fragment: TokenDetailOverlayFragment) {
 		fragment.apply {
-			setValueHeader(token)
 			headerTitle = TokenDetailText.paymentValue
 			presenter.popFragmentFrom<GasSelectionFragment>()
+		}
+	}
+
+	companion object {
+		/**
+		 * 转账开始后跳转到转账监听界面
+		 */
+		fun <T : Fragment> goToTransactionDetailFragment(
+			fragment: TokenDetailOverlayFragment?,
+			currentFragment: T,
+			receiptModel: ReceiptModel
+		) {
+			// 准备跳转到下一个界面
+			fragment?.apply {
+				// 如果有键盘收起键盘
+				activity?.apply { SoftKeyboard.hide(this) }
+				removeChildFragment(currentFragment)
+				addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
+					putSerializable(ArgumentKey.transactionDetail, receiptModel)
+				}
+				overlayView.header.apply {
+					showBackButton(false)
+					showCloseButton(true)
+				}
+				headerTitle = TokenDetailText.transferDetail
+			}
 		}
 	}
 }

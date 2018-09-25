@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.multichain.QRCode
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.AddressSelectionPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -35,21 +36,11 @@ import org.jetbrains.anko.textColor
  */
 class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter, ContactTable>() {
 
+	override val pageTitle: String = TokenDetailText.address
 	private val buttonHeight = 50.uiPX()
 	private var viewHeight = 0
 	private var keyboardHeight = 0
-	private val confirmButton by lazy {
-		TextView(context).apply {
-			text = CommonText.confirm
-			typeface = GoldStoneFont.heavy(context)
-			layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
-			textSize = fontSize(14)
-			textColor = GrayScale.midGray
-			gravity = Gravity.CENTER
-			setAlignParentBottom()
-			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
-		}
-	}
+	private val confirmButton by lazy { generateConfirmButton() }
 	override val presenter = AddressSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(
@@ -57,8 +48,9 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		asyncData: ArrayList<ContactTable>?
 	) {
 		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-			clickEvent = Runnable {
+			onClick {
 				presenter.showPaymentPrepareFragment(model.defaultAddress)
+				preventDuplicateClicks()
 			}
 		}
 	}
@@ -110,7 +102,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		if (data.isNull()) return
 		val intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
 		intentResult?.let {
-			presenter.showPaymentPrepareFragmentByQRCode(it.contents)
+			presenter.showPaymentPrepareFragmentByQRCode(QRCode(it.contents))
 		}
 	}
 
@@ -138,10 +130,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		}
 	}
 
-	private fun setScanButtonStatus(
-		isShow: Boolean = true,
-		callback: () -> Unit = {}
-	) {
+	private fun setScanButtonStatus(isShow: Boolean = true, callback: () -> Unit = {}) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			overlayView.header.showScanButton(isShow, isFromQuickTransfer) {
 				callback()
@@ -157,6 +146,19 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 				headerTitle = TokenDetailText.tokenDetail
 				presenter.popFragmentFrom<AddressSelectionFragment>()
 			}
+		}
+	}
+
+	private fun generateConfirmButton(): TextView {
+		return TextView(context).apply {
+			text = CommonText.confirm
+			typeface = GoldStoneFont.heavy(context)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, buttonHeight)
+			textSize = fontSize(14)
+			textColor = GrayScale.midGray
+			gravity = Gravity.CENTER
+			setAlignParentBottom()
+			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
 		}
 	}
 }

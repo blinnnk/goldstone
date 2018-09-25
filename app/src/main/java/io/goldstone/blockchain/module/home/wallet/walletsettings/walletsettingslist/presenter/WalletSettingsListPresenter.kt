@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter
 
-import android.support.v4.app.Fragment
-import com.blinnnk.extension.isFalse
+import android.app.Activity
+import android.content.Context
 import com.blinnnk.extension.jump
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
@@ -13,16 +13,17 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.ChainType
-import io.goldstone.blockchain.crypto.deleteAccount
+import io.goldstone.blockchain.crypto.keystore.deleteAccount
+import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.crypto.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -73,169 +74,107 @@ class WalletSettingsListPresenter(
 
 	fun showTargetFragment(title: String) {
 		when {
-			title.equals(WalletSettingsText.delete, true) -> deleteWallet()
+			title.equals(WalletSettingsText.delete, true) -> fragment.context?.deleteWallet()
 			title.equals(WalletSettingsText.balance, true) -> return
-
-			else -> {
-				fragment.getParentFragment<WalletSettingsFragment>()?.apply {
-					headerTitle = title
-					presenter.showTargetFragmentByTitle(title)
-				}
+			else -> fragment.getParentFragment<WalletSettingsFragment>()?.apply {
+				headerTitle = title
+				presenter.showTargetFragmentByTitle(title)
 			}
 		}
 	}
 
 	/** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
-	private fun deleteWallet() {
-		fragment.context?.showAlertView(
+	private fun Context.deleteWallet() {
+		showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,
-			!Config.getCurrentIsWatchOnlyOrNot()
+			!Config.isWatchOnlyWallet()
 		) { passwordInput ->
-			if (Config.getCurrentIsWatchOnlyOrNot()) {
-				WalletTable.getWatchOnlyWallet {
-					deleteWatchOnlyWallet(it.orEmpty())
-				}
+			if (Config.isWatchOnlyWallet()) WalletTable.getWatchOnlyWallet {
+				deleteWatchOnlyWallet(first, second)
 			} else {
 				val password = passwordInput?.text.toString()
-				fragment.context?.verifyCurrentWalletKeyStorePassword(password) {
-					GoldStoneAPI.context.runOnUiThread {
-						if (it) fragment.deleteWalletData(password)
-						else fragment.context.alert(CommonText.wrongPassword)
+				WalletTable.getCurrentWallet {
+					verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
+						if (isCorrect) {
+							runOnUiThread { getMainActivity()?.showLoadingView() }
+							fragment.context?.deleteWalletData(this, password)
+						} else GoldStoneAPI.context.runOnUiThread {
+							fragment.context.alert(CommonText.wrongPassword)
+						}
 					}
 				}
 			}
 		}
 	}
 
-	private fun WalletSettingsListFragment.deleteWalletData(password: String) {
-		getMainActivity()?.showLoadingView()
+	private fun Context.deleteWalletData(wallet: WalletTable, password: String) {
 		// get current wallet address
-		WalletTable.getCurrentWallet {
-			when (Config.getCurrentWalletType()) {
-				// 删除多链钱包下的所有地址对应的数据
-				WalletType.MultiChain.content -> {
-					val addresses = listOf(
-						Pair(ethAddresses, ChainType.ETH.id),
-						Pair(etcAddresses, ChainType.ETC.id),
-						Pair(btcAddresses, ChainType.BTC.id),
-						Pair(btcSeriesTestAddresses, ChainType.AllTest.id),
-						Pair(ltcAddresses, ChainType.LTC.id),
-						Pair(bchAddresses, ChainType.BCH.id)
-					)
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount = addresses.size
-						override fun concurrentJobs() {
-							addresses.forEach { account ->
-								AddressManagerPresenter.convertToChildAddresses(account.first).forEach {
-									deleteRoutineWallet(
-										it.first,
-										password,
-										account.second,
-										false,
-										true
-									) {
-										completeMark()
-									}
-								}
+		wallet.apply {
+			val addresses = listOf(
+				Pair(ethAddresses, ChainType.ETH),
+				Pair(etcAddresses, ChainType.ETC),
+				Pair(btcAddresses, ChainType.BTC),
+				Pair(btcSeriesTestAddresses, ChainType.AllTest),
+				Pair(ltcAddresses, ChainType.LTC),
+				Pair(bchAddresses, ChainType.BCH),
+				Pair(eosAddresses, ChainType.EOS)
+			)
+			object : ConcurrentAsyncCombine() {
+				override var asyncCount = addresses.size
+				override fun concurrentJobs() {
+					addresses.forEach { account ->
+						AddressManagerPresenter.convertToChildAddresses(account.first).forEach {
+							deleteRoutineWallet(
+								it.first,
+								password,
+								account.second,
+								false,
+								true
+							) {
+								completeMark()
 							}
 						}
+					}
+				}
 
-						override fun mergeCallBack() {
-							// delete wallet record in `walletTable`
-							WalletTable.deleteCurrentWallet { wallet ->
-								// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-								XinGePushReceiver.registerAddressesForPush(wallet, true)
-								activity?.jump<SplashActivity>()
-							}
-						}
-					}.start()
-				}
-				// 删除 `BTCTest` 包下的所有地址对应的数据
-				WalletType.BTCTestOnly.content -> WalletTable.getCurrentWallet {
-					deleteRoutineWallet(
-						currentBTCSeriesTestAddress,
-						password,
-						ChainType.AllTest.id,
-						true
-					) {
-						activity?.jump<SplashActivity>()
+				override fun mergeCallBack() {
+					// delete wallet record in `walletTable`
+					WalletTable.deleteCurrentWallet { wallet ->
+						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
+						XinGePushReceiver.registerAddressesForPush(wallet, true)
+						(this@deleteWalletData as? Activity)?.jump<SplashActivity>()
 					}
 				}
-				// 删除 `BTCTest` 包下的所有地址对应的数据
-				WalletType.LTCOnly.content -> WalletTable.getCurrentWallet {
-					deleteRoutineWallet(
-						currentLTCAddress,
-						password,
-						ChainType.LTC.id,
-						true
-					) {
-						activity?.jump<SplashActivity>()
-					}
-				}
-				// 删除 `BTCTest` 包下的所有地址对应的数据
-				WalletType.BCHOnly.content -> WalletTable.getCurrentWallet {
-					deleteRoutineWallet(
-						currentBCHAddress,
-						password,
-						ChainType.BCH.id,
-						true
-					) {
-						activity?.jump<SplashActivity>()
-					}
-				}
-				// 删除 `BTCOnly` 包下的所有地址对应的数据
-				WalletType.BTCOnly.content -> WalletTable.getCurrentWallet {
-					deleteRoutineWallet(
-						currentBTCAddress,
-						password,
-						ChainType.BTC.id,
-						true
-					) {
-						activity?.jump<SplashActivity>()
-					}
-				}
-				// 删除 `ETHERCAndETCOnly` 包下的所有地址对应的数据
-				WalletType.ETHERCAndETCOnly.content -> WalletTable.getCurrentWallet {
-					// 以太坊和以太经典及 `ERC20 Token` 的账单不需要判断 `ChainType` 就可以删除, 这里传入的 `ChainType` 可以不传
-					// 这里只是预留以及符合大逻辑而保留了参数
-					deleteRoutineWallet(
-						currentETHAndERCAddress,
-						password,
-						ChainType.ETH.id,
-						true
-					) {
-						activity?.jump<SplashActivity>()
-					}
-				}
-			}
+			}.start()
 		}
 	}
 
-	private fun Fragment.deleteRoutineWallet(
+	private fun Context.deleteRoutineWallet(
 		address: String,
 		password: String,
-		chainType: Int,
+		chainType: ChainType,
 		isSingleChainWallet: Boolean,
 		justDeleteData: Boolean = false,
 		callback: () -> Unit
 	) {
 		// delete `keystore` file
-		context?.deleteAccount(
+		deleteAccount(
 			address,
 			password,
 			ChainType.isBTCSeriesChainType(chainType),
 			isSingleChainWallet
-		) {
-			it isFalse {
-				fragment.context?.alert(CommonText.wrongPassword)
-				getMainActivity()?.removeLoadingView()
-				return@deleteAccount
-			}
-			// delete all records of this `address` in `myTokenTable`
-			MyTokenTable.deleteByAddress(address) {
+		) { error ->
+			if (error.isNone()) MyTokenTable.deleteByAddress(address) {
+				// 删除 以太坊 类型的转账记录
 				TransactionTable.deleteByAddress(address) {
+					// 删除 BTC 类型的转账记录
 					BTCSeriesTransactionTable.deleteByAddress(address, chainType)
+					// 删除 EOS 类型的转账记录
+					EOSTransactionTable.deleteByAddress(address)
+					// 删除 EOS Account Info 类型的记录
+					EOSAccountTable.deleteByRecordAddress(address)
+					// 删除余额记录
 					TokenBalanceTable.deleteByAddress(address) {
 						if (justDeleteData) {
 							callback()
@@ -249,13 +188,17 @@ class WalletSettingsListPresenter(
 						}
 					}
 				}
+			} else {
+				fragment.context.alert(error.message)
+				getMainActivity()?.removeLoadingView()
 			}
 		}
 	}
 
-	private fun deleteWatchOnlyWallet(address: String) {
+	private fun deleteWatchOnlyWallet(address: String, chainType: ChainType) {
 		MyTokenTable.deleteByAddress(address) {
 			TransactionTable.deleteByAddress(address) {
+				BTCSeriesTransactionTable.deleteByAddress(address, chainType)
 				TokenBalanceTable.deleteByAddress(address) {
 					WalletTable.deleteCurrentWallet { wallet ->
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址

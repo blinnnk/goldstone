@@ -5,14 +5,13 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.getTargetChild
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.getAddress
+import io.goldstone.blockchain.crypto.ethereum.getAddress
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
@@ -25,6 +24,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import junit.framework.Assert
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -85,7 +85,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getWatchOnlyAddress() {
 		WalletTable.getWatchOnlyWallet {
-			LogUtil.debug("getWatchOnlyAddress", "$it")
+			LogUtil.debug("getWatchOnlyAddress", "$this")
 		}
 	}
 
@@ -132,8 +132,8 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getCoinInfo() {
 		GoldStoneAPI.getTokenInfoFromMarket(
-			CryptoSymbol.btc(),
-			ChainID.BTCMain.id,
+			CoinSymbol.btc(),
+			ChainID.BTC.id,
 			{
 				LogUtil.error("getCoinInfo", it)
 			}
@@ -167,5 +167,14 @@ class GoldStoneUtilUnitTest {
 		val status: Boolean,
 		var marketPrice: String
 	)
+
+	@Test
+	fun getMultiChildJSONObject() {
+		val expect = "kaysaith"
+		val data = JSONObject("{data : { value: { name: kaysaith }}}")
+		LogUtil.debug(position, data.getTargetChild("data", "value", "name"))
+		val result = data.getTargetChild("data", "value", "name")
+		Assert.assertTrue("convert to wrong value", expect == result)
+	}
 }
 

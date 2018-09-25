@@ -16,8 +16,8 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.RoundIcon
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -33,43 +33,42 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
-	
+
 	private val info = TwoLineTitles(context)
 	private val gradientView = GradientView(context)
 	private val icon = RoundIcon(context)
 	private var pendingIcon: ProgressBar? = null
 	private val conformationBar by lazy { TextView(context) }
-	
+
 	init {
+		bottomPadding = 10.uiPX()
 		gradientView.apply {
 			setStyle(GradientType.Tree, TransactionSize.headerView)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
-		
+
 		verticalLayout {
-			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), wrapContent).apply {
-					leftMargin = (ScreenSize.Width * 0.1).toInt()
-					topMargin = 50.uiPX()
-				}
-			
+			lparams {
+				width = (ScreenSize.Width * 0.8).toInt()
+				height = wrapContent
+				topMargin = 35.uiPX()
+			}
 			gravity = Gravity.CENTER_HORIZONTAL
-			
 			icon.apply {
 				y += 5.uiPX()
 				iconSize = 60.uiPX()
 				setColorFilter(GrayScale.Opacity2Black)
 				elevation = 10.uiPX().toFloat()
 			}.into(this)
-			
+
 			info.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
 				isCenter = true
 				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				setWildStyle()
 			}.into(this)
-		}
-		
+		}.setCenterInHorizontal()
+
 		conformationBar.apply {
 			visibility = View.GONE
 			textSize = fontSize(12)
@@ -81,14 +80,28 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		}.into(this)
 		conformationBar.setAlignParentBottom()
 	}
-	
+
 	@SuppressLint("SetTextI18n")
-	fun updateConformationBar(confirmedCount: Int) {
+	fun updateConformationBar(confirmedCount: Int, latestIrreversibleCount: Int) {
 		conformationBar.visibility = View.VISIBLE
-		conformationBar.text = "$confirmedCount / ${TransactionText.confirmedBlocks}"
+		conformationBar.text = "$confirmedCount / ${TransactionText.confirmedBlocks(latestIrreversibleCount)}"
 		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
 	}
-	
+
+	@SuppressLint("SetTextI18n")
+	fun updateEOSConformationBar(confirmedCount: Int, latestIrreversibleCount: Int) {
+		conformationBar.visibility = View.VISIBLE
+		conformationBar.text = "$confirmedCount / ${TransactionText.irreversibleConfirmedBlocks(latestIrreversibleCount)}"
+		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
+	}
+
+	@SuppressLint("SetTextI18n")
+	fun updateEOSConformationBarFinished() {
+		conformationBar.visibility = View.VISIBLE
+		conformationBar.text = TransactionText.irreversibleBlockConfirmed
+		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
+	}
+
 	@SuppressLint("SetTextI18n")
 	fun setIconStyle(
 		headerModel: TransactionHeaderModel
@@ -101,14 +114,14 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			"${headerModel.symbol} ${if (headerModel.isReceive)
 				TransactionText.transferResultFrom else TransactionText.transferResultTo}"
 		info.subtitle.text = headerModel.address
-		
+
 		if (headerModel.isError) {
 			icon.iconColor = Spectrum.lightRed
 			icon.src = R.drawable.error_icon
 			showPendingIcon(false)
 			return
 		}
-		
+
 		if (headerModel.isPending) {
 			icon.iconColor = Spectrum.lightRed
 			showPendingIcon()
@@ -124,7 +137,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+
 	private fun showPendingIcon(status: Boolean = true) {
 		pendingIcon isNotNull {
 			if (!status) removeView(pendingIcon)
@@ -137,7 +150,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 							android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 60.uiPX()
+						y += 45.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()

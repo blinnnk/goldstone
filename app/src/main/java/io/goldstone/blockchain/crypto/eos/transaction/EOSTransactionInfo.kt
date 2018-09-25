@@ -1,13 +1,24 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
+import android.content.Context
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.toCount
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @author KaySaith
@@ -15,9 +26,9 @@ import java.io.Serializable
  */
 
 data class EOSTransactionInfo(
-	val fromAccount: String,
-	val toAccount: String,
-	val amount: Long,
+	val fromAccount: EOSAccount,
+	val toAccount: EOSAccount,
+	val amount: BigInteger, // 这里是把精度包含进去的最小单位的值, 签名的时候会对这个值直接转换
 	val symbol: String,
 	val decimal: Int,
 	val memo: String,
@@ -28,33 +39,78 @@ data class EOSTransactionInfo(
 ) : Serializable, EOSModel {
 
 	constructor(
-		fromAccount: String,
-		toAccount: String,
-		amount: Long
+		fromAccount: EOSAccount,
+		toAccount: EOSAccount,
+		amount: BigInteger
 	) : this(
 		fromAccount,
 		toAccount,
 		amount,
-		CryptoSymbol.eos,
+		CoinSymbol.eos,
 		CryptoValue.eosDecimal,
 		"",
 		false
 	)
 
 	constructor(
-		fromAccount: String,
-		toAccount: String,
-		amount: Long,
-		memo: String
+		fromAccount: EOSAccount,
+		toAccount: EOSAccount,
+		amount: BigInteger,
+		memo: String,
+		symbol: String
 	) : this(
 		fromAccount,
 		toAccount,
 		amount,
-		CryptoSymbol.eos,
+		symbol,
 		CryptoValue.eosDecimal,
 		memo,
 		true
 	)
+
+	fun trade(context: Context?, callback: (error: GoldStoneError, response: EOSResponse?) -> Unit) {
+		prepare(context) { privateKey, error ->
+			if (error.isNone() && !privateKey.isNull()) {
+				transfer(
+					privateKey!!,
+					{ callback(it, null) }
+				) {
+					callback(GoldStoneError.None, it)
+				}
+			} else callback(error, null)
+		}
+	}
+
+	private fun prepare(
+		context: Context?,
+		hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+	) {
+		BaseTradingPresenter.prepareTransaction(
+			context,
+			fromAccount,
+			toAccount,
+			amount.toCount(decimal),
+			CoinSymbol(symbol),
+			false,
+			hold
+		)
+	}
+
+	private fun transfer(
+		privateKey: EOSPrivateKey,
+		errorCallback: (GoldStoneError) -> Unit,
+		hold: (EOSResponse) -> Unit
+	) {
+		EOSTransaction(
+			EOSAuthorization(fromAccount.accountName, EOSActor.Active),
+			toAccount.accountName,
+			amount,
+			memo,
+			// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
+			ExpirationType.FiveMinutes,
+			symbol
+		).send(privateKey, errorCallback, hold)
+	}
 
 	override fun createObject(): String {
 		return ParameterUtil.prepareObjectContent(
@@ -67,8 +123,8 @@ data class EOSTransactionInfo(
 	}
 
 	override fun serialize(): String {
-		val encryptFromAccount = EOSUtils.getLittleEndianCode(fromAccount)
-		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount)
+		val encryptFromAccount = EOSUtils.getLittleEndianCode(fromAccount.accountName)
+		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount.accountName)
 		val amountCode = EOSUtils.convertAmountToCode(amount)
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(decimal)
 		val symbolCode = symbol.toByteArray().toNoPrefixHexString()
@@ -77,13 +133,14 @@ data class EOSTransactionInfo(
 		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + completeZero + memoCode
 
 	}
+
 	companion object {
-	    fun serializedEOSAmount(amount: Long): String {
-				val amountCode = EOSUtils.convertAmountToCode(amount)
-				val decimalCode = EOSUtils.getEvenHexOfDecimal(CryptoValue.eosDecimal)
-				val symbolCode = CryptoSymbol.eos.toByteArray().toNoPrefixHexString()
-				val completeZero = "00000000"
-				return amountCode + decimalCode + symbolCode + completeZero
-			}
+		fun serializedEOSAmount(amount: BigInteger): String {
+			val amountCode = EOSUtils.convertAmountToCode(amount)
+			val decimalCode = EOSUtils.getEvenHexOfDecimal(CryptoValue.eosDecimal)
+			val symbolCode = CoinSymbol.eos.toByteArray().toNoPrefixHexString()
+			val completeZero = "00000000"
+			return amountCode + decimalCode + symbolCode + completeZero
+		}
 	}
 }

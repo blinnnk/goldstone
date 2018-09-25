@@ -4,10 +4,14 @@ import android.annotation.SuppressLint
 import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isEvenCount
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
+import io.goldstone.blockchain.crypto.eos.transaction.completeZero
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import kotlinx.serialization.toUtf8Bytes
+import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,7 +42,7 @@ object EOSUtils {
 		if (!content.isEvenCount()) throw Exception("content length must be even")
 		var endianValue = ""
 		var startIndex = content.length
-		(0 until content.length / 2).forEach {
+		for (index in 0 until content.length / 2) {
 			startIndex -= 2
 			endianValue += content.substring(startIndex, startIndex + 2)
 		}
@@ -75,16 +79,11 @@ object EOSUtils {
 		return writer.toBytes().toNoPrefixHexString()
 	}
 
-	fun convertAmountToCode(amount: Long): String {
+	fun convertAmountToCode(amount: BigInteger): String {
 		val amountHex = amount.toString(16)
 		val evenCountHex = amountHex.completeToEvent()
 		val littleEndianAmountHex = toLittleEndian(evenCountHex)
-		var completeZero = ""
-		val completeCount = 16 - littleEndianAmountHex.count()
-		(0 until completeCount).forEach {
-			completeZero += "0"
-		}
-		return littleEndianAmountHex + completeZero
+		return littleEndianAmountHex.completeZero(16 - littleEndianAmountHex.count())
 	}
 
 	fun getEvenHexOfDecimal(decimal: Int): String {
@@ -132,13 +131,21 @@ object EOSUtils {
 	@Throws
 	fun getRefBlockPrefix(headBlockID: String): Int {
 		if (headBlockID.length < 64) throw Exception("wrong head block id length")
-		return Integer.valueOf(toLittleEndian(headBlockID.substring(16, 24)), 16)
+		return try {
+			toLittleEndian(headBlockID.substring(16, 24)).hexToDecimal().toInt()
+		} catch (error: Exception) {
+			throw Exception("wrong head block id length wrong prefix")
+		}
 	}
 
 	@Throws
 	fun getRefBlockNumber(headBlockID: String): Int {
 		if (headBlockID.length < 64) throw Exception("wrong head block id length")
-		return Integer.valueOf(headBlockID.substring(0, 8), 16)
+		return try {
+			Integer.valueOf(headBlockID.substring(0, 8), 16)
+		} catch (error: Exception) {
+			throw Exception("wrong head block id length when Integer.valueOf")
+		}
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -162,6 +169,18 @@ object EOSUtils {
 		return writer.toBytes().toNoPrefixHexString()
 	}
 
+	@SuppressLint("SimpleDateFormat")
+	fun getUTCTimeStamp(date: String): Long {
+		if (!date.contains("T")) throw Exception("Wrong Date Formatted")
+		val formattedDate = date
+			.replace("T", " ")
+			.replace("-", "/")
+		val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+		// 按照 `UTC` 时间进行解析
+		dateFormat.timeZone = TimeZone.getTimeZone("UTC")
+		return dateFormat.parse(formattedDate).time
+	}
+
 	fun getExpirationCode(timeStamp: Long): String {
 		val writer = EosByteWriter(255)
 		writer.putIntLE(timeStamp.toInt())
@@ -177,7 +196,7 @@ object EOSUtils {
 		return dateFormat.parse(utcDate).time / 1000
 	}
 
-	fun convertAmountToValidFormat(amount: Long): String {
+	fun convertAmountToValidFormat(amount: BigInteger): String {
 		val count = CryptoUtils.toCountByDecimal(amount, CryptoValue.eosDecimal)
 		val decimalCount = count.getDecimalCount()
 		return when (decimalCount) {
@@ -189,7 +208,7 @@ object EOSUtils {
 
 	fun completeZero(count: Int): String {
 		var completeZero = ""
-		(0 until count).forEach {
+		for (index in 0 until count) {
 			completeZero += "0"
 		}
 		return completeZero
@@ -198,5 +217,9 @@ object EOSUtils {
 	fun getHexDataByteLengthCode(hexData: String): String {
 		val formattedHexData = if (hexData.isEvenCount()) hexData else hexData + "0"
 		return EOSUtils.getVariableUInt(Hex.decode(formattedHexData).size)
+	}
+
+	fun isValidMemoSize(memo: String): Boolean {
+		return memo.toUtf8Bytes().size <= EOSValue.memoMaxCharacterSize
 	}
 }

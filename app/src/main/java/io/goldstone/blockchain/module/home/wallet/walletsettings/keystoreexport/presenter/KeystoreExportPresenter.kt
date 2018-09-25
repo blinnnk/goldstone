@@ -3,13 +3,15 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58KeyStoreFile
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.getKeystoreFile
+import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
+import io.goldstone.blockchain.crypto.keystore.getKeystoreFileByWalletID
+import io.goldstone.blockchain.crypto.multichain.ChainAddresses
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.support.v4.toast
@@ -27,17 +29,33 @@ class KeystoreExportPresenter(
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
 
-	fun getKeystoreJson(password: String, hold: (String?) -> Unit) {
+	fun getKeystoreJSON(password: String, hold: (String?) -> Unit) {
 		if (password.isEmpty()) {
 			fragment.toast(ImportWalletText.exportWrongPassword)
 			hold(null)
 			return
 		}
-
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		address?.let { getKeystoreByAddress(password, it, hold) }
+
+		address?.let {
+			WalletTable.getWalletType { walletType, wallet ->
+				if (walletType.isMultiChain()) getKeystoreByWalletID(password, wallet.id, hold)
+				else getKeystoreByAddress(password, it, hold)
+			}
+		}
+	}
+
+	private fun getKeystoreByWalletID(password: String, walletID: Int, hold: (String?) -> Unit) {
+		fragment.context?.getKeystoreFileByWalletID(
+			password,
+			walletID,
+			{
+				LogUtil.error("getKeystoreByWalletID", it)
+			},
+			hold
+		)
 	}
 
 	private fun getKeystoreByAddress(
@@ -47,13 +65,13 @@ class KeystoreExportPresenter(
 	) {
 		doAsync {
 			val isSingleChainWallet =
-				!Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)
-			if (CryptoValue.isBTCSeriesAddress(address) || EOSWalletUtils.isValidAddress(address)) {
+				!Config.getCurrentWalletType().isBIP44()
+			if (ChainAddresses.isBTCSeriesAddress(address) || EOSWalletUtils.isValidAddress(address)) {
 				getBTCSeriesKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}
 			} else {
-				getETHERC20OrETCKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
+				getETHSeriesKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }
 				}
 			}
@@ -69,13 +87,12 @@ class KeystoreExportPresenter(
 		fragment.context?.exportBase58KeyStoreFile(
 			walletAddress,
 			password,
-			isSingleChainWallet
-		) {
-			hold(it)
-		}
+			isSingleChainWallet,
+			hold
+		)
 	}
 
-	private fun getETHERC20OrETCKeystoreFile(
+	private fun getETHSeriesKeystoreFile(
 		address: String,
 		password: String,
 		isSingleChainWallet: Boolean,
@@ -88,9 +105,8 @@ class KeystoreExportPresenter(
 			isSingleChainWallet,
 			{
 				hold(null)
-			}
-		) { it ->
-			hold(it)
-		}
+			},
+			hold
+		)
 	}
 }

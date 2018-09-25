@@ -6,11 +6,11 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -25,6 +25,9 @@ import org.jetbrains.anko.matchParent
  */
 
 class QRCodeFragment : BaseFragment<QRCodePresenter>() {
+
+	override val pageTitle: String = WalletText.qrCode
+
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = QRCodePresenter(this)
 
@@ -33,7 +36,7 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 		qrView.showAllButtons()
 		setSaveImageEvent()
 		setShareImageEvent()
-		if (presenter.addressModel?.symbol.equals(CryptoSymbol.bch)) {
+		if (presenter.addressModel?.symbol.equals(CoinSymbol.bch)) {
 			convertBCHAddress()
 		}
 	}

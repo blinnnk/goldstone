@@ -3,29 +3,37 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressm
 import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ChainID
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.common.value.WalletType
-import io.goldstone.blockchain.crypto.*
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
+import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.getTargetKeyName
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
@@ -44,17 +52,23 @@ class AddressManagerPresenter(
 	override val fragment: AddressManagerFragment
 ) : BasePresenter<AddressManagerFragment>() {
 
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		getMultiChainAddresses()
-	}
-
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		if (Config.getCurrentWalletType().equals(WalletType.MultiChain.content, true)) {
-			fragment.showCreatorDashboard()
-		}
+		if (Config.getCurrentWalletType().isBIP44()) fragment.showCreatorDashboard()
+	}
+
+	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
+		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
+			EOSAPI.getAccountNameByPublicKey(
+				key,
+				{ LogUtil.error("showEOSPublickeyDescription", it) }
+			) { chainNames ->
+				WalletTable.updateEOSAccountName(chainNames) {
+					val description = if (it) "available publickey" else "inactivation publickey"
+					cell.showDescriptionTitle(description)
+				}
+			} else cell.showDescriptionTitle("available publickey")
 	}
 
 	fun setBackEvent() {
@@ -68,95 +82,44 @@ class AddressManagerPresenter(
 		}
 	}
 
-	private fun getMultiChainAddresses() {
-		WalletTable.getCurrentWallet {
-			val addresses =
-				arrayListOf<Pair<String, String>>().apply {
-					// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
-					if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBTCAddress, CryptoSymbol.btc()))
-					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.btc()))
-					}
-					// Litecoin Mainnet and Testnet Addresses
-					if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentLTCAddress, CryptoSymbol.ltc))
-					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.ltc))
-					}
-					// Bitcoin Cash Mainnet and Testnet Addresses
-					if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-						add(Pair(currentBCHAddress, CryptoSymbol.bch))
-					} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-						add(Pair(currentBTCSeriesTestAddress, CryptoSymbol.bch))
-					}
-					// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
-					if (currentETHAndERCAddress.isNotEmpty()) {
-						add(Pair(currentETHAndERCAddress, CryptoSymbol.erc))
-						add(Pair(currentETHAndERCAddress, CryptoSymbol.eth))
-						add(Pair(currentETCAddress, CryptoSymbol.etc))
-					}
-					// EOS.io Mainnet and Testnet Addresses
-					if (currentEOSAddress.isNotEmpty()) {
-						add(Pair(currentEOSAddress, CryptoSymbol.eos))
-					}
-				}
-			fragment.setMultiChainAddresses(addresses)
-		}
+	fun getMultiChainAddresses(wallet: WalletTable) {
+		fragment.setMultiChainAddresses(wallet.getCurrentAddressAndSymbol())
 	}
 
-	fun getEthereumAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEthereumAddressesModel(convertToChildAddresses(ethAddresses))
-		}
+	fun getEthereumAddresses(wallet: WalletTable) {
+		fragment.setEthereumAddressesModel(convertToChildAddresses(wallet.ethAddresses))
 	}
 
-	fun getBitcoinCashAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(bchAddresses))
-		}
+	fun getBitcoinCashAddresses(wallet: WalletTable) {
+		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.bchAddresses))
 	}
 
-	fun getBitcoinCashTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinCashAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getBitcoinCashTestAddresses(wallet: WalletTable) {
+		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getEthereumClassicAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEthereumClassicAddressesModel(convertToChildAddresses(etcAddresses))
-		}
+	fun getEthereumClassicAddresses(wallet: WalletTable) {
+		fragment.setEthereumClassicAddressesModel(convertToChildAddresses(wallet.etcAddresses))
 	}
 
-	fun getBitcoinAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcAddresses))
-		}
+	fun getBitcoinAddresses(wallet: WalletTable) {
+		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcAddresses))
 	}
 
-	fun getBitcoinTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setBitcoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getBitcoinTestAddresses(wallet: WalletTable) {
+		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getLitecoinTestAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setLitecoinAddressesModel(convertToChildAddresses(btcSeriesTestAddresses))
-		}
+	fun getLitecoinTestAddresses(wallet: WalletTable) {
+		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
 	}
 
-	fun getLitecoinAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setLitecoinAddressesModel(convertToChildAddresses(ltcAddresses))
-		}
+	fun getLitecoinAddresses(wallet: WalletTable) {
+		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.ltcAddresses))
 	}
 
-	fun getEOSAddresses() {
-		WalletTable.getCurrentWallet {
-			fragment.setEOSAddressesModel(convertToChildAddresses(eosAddresses))
-		}
+	fun getEOSAddresses(wallet: WalletTable) {
+		fragment.setEOSAddressesModel(convertToChildAddresses(wallet.eosAddresses))
 	}
 
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
@@ -170,11 +133,9 @@ class AddressManagerPresenter(
 		)
 	}
 
-	fun showAllETHAndERCAddresses(): Runnable {
+	fun showAllETHSeriesAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETHAndERCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
 			)
 		}
@@ -183,8 +144,6 @@ class AddressManagerPresenter(
 	fun showAllETCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
 			)
 		}
@@ -193,8 +152,6 @@ class AddressManagerPresenter(
 	fun showAllEOSAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allEOSAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.EOS.id) }
 			)
 		}
@@ -203,8 +160,6 @@ class AddressManagerPresenter(
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBtcAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
 			)
 		}
@@ -213,8 +168,6 @@ class AddressManagerPresenter(
 	fun showAllLTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allLTCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
 			)
 		}
@@ -223,8 +176,6 @@ class AddressManagerPresenter(
 	fun showAllBCHAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBCHAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
 			)
 		}
@@ -234,23 +185,20 @@ class AddressManagerPresenter(
 
 		fun showPrivateKeyExportFragment(
 			address: String,
-			chainType: Int,
+			chainType: ChainType,
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
-				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
-						WalletSettingsText.exportPrivateKey,
-						WalletSettingsText.viewAddresses,
 						Bundle().apply {
 							putString(ArgumentKey.address, address)
-							putInt(ArgumentKey.chainType, chainType)
+							putInt(ArgumentKey.chainType, chainType.id)
 						}
 					)
-				}
+				} else context.alert(WalletText.watchOnly)
 			}
-
 		}
 
 		fun showQRCodeFragment(addressModel: ContactModel, walletSettingsFragment: WalletSettingsFragment) {
@@ -259,8 +207,6 @@ class AddressManagerPresenter(
 				showAddButton(false)
 				AddressManagerFragment.removeDashboard(context)
 				presenter.showTargetFragment<QRCodeFragment>(
-					WalletText.showQRCode,
-					WalletSettingsText.viewAddresses,
 					Bundle().apply { putSerializable(ArgumentKey.addressModel, addressModel) }
 				)
 			}
@@ -270,14 +216,12 @@ class AddressManagerPresenter(
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
-				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
-						WalletSettingsText.exportKeystore,
-						WalletSettingsText.viewAddresses,
 						Bundle().apply { putString(ArgumentKey.address, address) }
 					)
-				}
+				} else context.alert(WalletText.watchOnly)
 			}
 		}
 
@@ -295,8 +239,8 @@ class AddressManagerPresenter(
 						// 新创建的账号插入所有对应的链的默认 `Token`
 						ChainID.getAllEthereumChainID().forEach {
 							insertNewAddressToMyToken(
-								CryptoSymbol.eth,
-								CryptoValue.ethContract,
+								CoinSymbol.eth,
+								TokenContract.ethContract,
 								address,
 								it
 							)
@@ -333,8 +277,8 @@ class AddressManagerPresenter(
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 						ChainID.getAllETCChainID().forEach {
 							insertNewAddressToMyToken(
-								CryptoSymbol.etc,
-								CryptoValue.etcContract,
+								CoinSymbol.etc,
+								TokenContract.etcContract,
 								address,
 								it
 							)
@@ -387,8 +331,8 @@ class AddressManagerPresenter(
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							ChainID.getAllEOSChainID().forEach {
 								insertNewAddressToMyToken(
-									CryptoSymbol.eos,
-									CryptoValue.eosContract,
+									CoinSymbol.eos,
+									TokenContract.eosContract,
 									eosKeyPair.address,
 									it
 								)
@@ -442,10 +386,10 @@ class AddressManagerPresenter(
 								)
 								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 								insertNewAddressToMyToken(
-									CryptoSymbol.btc(),
-									CryptoValue.btcContract,
+									CoinSymbol.btc(),
+									TokenContract.btcContract,
 									address,
-									ChainID.BTCMain.id
+									ChainID.btcMain
 								)
 								// 注册新增的子地址
 								XinGePushReceiver.registerSingleAddress(
@@ -500,24 +444,24 @@ class AddressManagerPresenter(
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							// `BTCTest` 是 `BTCSeries` 公用的地址
 							insertNewAddressToMyToken(
-								CryptoSymbol.btc(),
-								CryptoValue.btcContract,
+								CoinSymbol.btc(),
+								TokenContract.btcContract,
 								address,
-								ChainID.BTCTest.id
+								ChainID.btcTest
 							)
 							// 插入 LTC 账号
 							insertNewAddressToMyToken(
-								CryptoSymbol.ltc,
-								CryptoValue.ltcContract,
+								CoinSymbol.ltc,
+								TokenContract.ltcContract,
 								address,
-								ChainID.LTCTest.id
+								ChainID.ltcTest
 							)
 							// 插入 BCH 账号
 							insertNewAddressToMyToken(
-								CryptoSymbol.bch,
-								CryptoValue.bchContract,
+								CoinSymbol.bch,
+								TokenContract.bchContract,
 								address,
-								ChainID.BCHTest.id
+								ChainID.bchTest
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
@@ -568,10 +512,10 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.bch,
-								CryptoValue.bchContract,
+								CoinSymbol.bch,
+								TokenContract.bchContract,
 								bchKeyPair.address,
-								ChainID.BCHMain.id
+								ChainID.bchMain
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
@@ -624,10 +568,10 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
-								CryptoSymbol.ltc,
-								CryptoValue.ltcContract,
+								CoinSymbol.ltc,
+								TokenContract.ltcContract,
 								ltcKeyPair.address,
-								ChainID.LTCMain.id
+								ChainID.ltcMain
 							)
 							// 注册新增的子地址
 							XinGePushReceiver.registerSingleAddress(
@@ -647,21 +591,13 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun setDefaultAddress(
-			chainType: Int,
-			defaultAddress: String,
-			callback: () -> Unit
-		) {
-			WalletTable.updateCurrentAddressByChainType(chainType, defaultAddress, callback)
-		}
-
 		fun getCellDashboardMenu(
 			hasDefaultCell: Boolean = true,
 			isBCH: Boolean = false
 		): List<Pair<Int, String>> {
 			return arrayListOf(
 				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
-				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
+				Pair(R.drawable.qr_code_icon, WalletText.qrCode),
 				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
 				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey),
 				Pair(R.drawable.bch_address_convert_icon, WalletText.getBCHLegacyAddress)
@@ -691,28 +627,6 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun getCurrentAddressIndexByChainType(chainType: Int, hold: (String) -> Unit) {
-			fun getTargetAddressIndex(address: String, targetAddress: String): String {
-				return if (address.contains(",")) {
-					address.split(",").find {
-						it.contains(targetAddress)
-					}?.substringAfterLast("|").orEmpty()
-				} else address.substringAfterLast("|")
-			}
-			WalletTable.getCurrentWallet {
-				when (chainType) {
-					ChainType.ETH.id -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-					ChainType.ETC.id -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-					ChainType.LTC.id -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
-					ChainType.BCH.id -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					ChainType.BTC.id ->
-						if (Config.isTestEnvironment())
-							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
-						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-				}
-			}
-		}
-
 		private fun insertNewAddressToMyToken(
 			symbol: String,
 			contract: String,
@@ -722,7 +636,7 @@ class AddressManagerPresenter(
 			DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(symbol, contract) { it ->
 				it?.let {
 					doAsync {
-						MyTokenTable.insert(MyTokenTable(it.apply { chain_id = chainID }, address))
+						MyTokenTable(it.apply { this.chainID = chainID }, address).insert()
 					}
 				}
 			}

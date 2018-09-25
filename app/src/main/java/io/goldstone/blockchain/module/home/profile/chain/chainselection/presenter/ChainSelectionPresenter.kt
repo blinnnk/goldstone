@@ -5,7 +5,6 @@ import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
@@ -20,7 +19,7 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
 class ChainSelectionPresenter(
 	override val fragment: ChainSelectionFragment
 ) : BaseRecyclerPresenter<ChainSelectionFragment, ChainSelectionModel>() {
-	
+
 	override fun updateData() {
 		AppConfigTable.getAppConfig {
 			it?.apply {
@@ -41,12 +40,10 @@ class ChainSelectionPresenter(
 			}
 		}
 	}
-	
+
 	fun showNodeSelectionFragment(isMainnet: Boolean) {
 		fragment.getParentFragment<ProfileOverlayFragment> {
 			presenter.showTargetFragment<NodeSelectionFragment>(
-				ChainText.nodeSelection,
-				ProfileText.chain,
 				Bundle().apply { putBoolean(ArgumentKey.isMainnet, isMainnet) }
 			)
 		}

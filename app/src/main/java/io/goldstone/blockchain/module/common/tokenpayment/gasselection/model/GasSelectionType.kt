@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.crypto.CryptoSymbol
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.*
 
 /**
@@ -15,7 +15,7 @@ data class GasSelectionModel(
 	val info: String = "≈ 0.00 Gwei (${TransactionText.gasPrice}) * 0.000 (${TransactionText.gasLimit})",
 	var type: String = LoadingText.calculating,
 	var currentType: String = "",
-	val unitSymbol: String = CryptoSymbol.eth
+	val unitSymbol: String = CoinSymbol.eth
 ) {
 
 	constructor(
@@ -43,32 +43,32 @@ data class GasSelectionModel(
 		id,
 		"${(price * bytes).toBTCCount().toBigDecimal()} $symbol",
 		"≈ $price Satoshi  * $bytes bytes",
-		calculateBTCSeruesType(id, price),
+		calculateBTCSeriesType(id, price),
 		currentType,
 		symbol
 	)
 
 	companion object {
 		fun calculateType(id: Int, gWei: Double): String {
-			return if (id == 3) MinerFeeType.Custom.content
+			return if (id == 3) MinerFeeType.Custom.type
 			else {
 				when (gWei.toGwei()) {
-					MinerFeeType.Cheap.value -> MinerFeeType.Cheap.content
-					MinerFeeType.Fast.value -> MinerFeeType.Fast.content
-					MinerFeeType.Recommend.value -> MinerFeeType.Recommend.content
-					else -> MinerFeeType.Custom.content
+					MinerFeeType.Cheap.value -> MinerFeeType.Cheap.type
+					MinerFeeType.Fast.value -> MinerFeeType.Fast.type
+					MinerFeeType.Recommend.value -> MinerFeeType.Recommend.type
+					else -> MinerFeeType.Custom.type
 				}
 			}
 		}
 
-		fun calculateBTCSeruesType(id: Int, satoshi: Long): String {
-			return if (id == 3) MinerFeeType.Custom.content
+		fun calculateBTCSeriesType(id: Int, satoshi: Long): String {
+			return if (id == 3) MinerFeeType.Custom.type
 			else {
 				when (satoshi) {
-					MinerFeeType.Cheap.satoshi -> MinerFeeType.Cheap.content
-					MinerFeeType.Fast.satoshi -> MinerFeeType.Fast.content
-					MinerFeeType.Recommend.satoshi -> MinerFeeType.Recommend.content
-					else -> MinerFeeType.Custom.content
+					MinerFeeType.Cheap.satoshi -> MinerFeeType.Cheap.type
+					MinerFeeType.Fast.satoshi -> MinerFeeType.Fast.type
+					MinerFeeType.Recommend.satoshi -> MinerFeeType.Recommend.type
+					else -> MinerFeeType.Custom.type
 				}
 			}
 		}

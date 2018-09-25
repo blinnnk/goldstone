@@ -84,7 +84,7 @@ class PasscodePresenter(
 				handler.postDelayed(refreshRunnable, 1000L)
 			} else {
 				resetConfig()
-				fragment.recoveryAfterFrezon()
+				fragment.recoveryAfterFreeze()
 			}
 		}
 	}
@@ -93,35 +93,36 @@ class PasscodePresenter(
 		handler.removeCallbacks(refreshRunnable)
 	}
 
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		fun AppCompatActivity.recoverBackEventAfterPinCode() {
-			supportFragmentManager.fragments.last()?.apply {
-				when (this) {
-					is HomeFragment -> {
-						(childFragmentManager.fragments.last() as? BaseRecyclerFragment<*, *>)?.apply {
-							if (this is WalletDetailFragment) {
-								getMainActivity()?.backEvent = null
-							} else {
-								recoveryBackEvent()
-							}
+	private fun AppCompatActivity.recoverBackEventAfterPinCode() {
+		supportFragmentManager.fragments.last()?.apply {
+			when (this) {
+				is HomeFragment -> {
+					(childFragmentManager.fragments.last() as? BaseRecyclerFragment<*, *>)?.apply {
+						if (this is WalletDetailFragment) {
+							getMainActivity()?.backEvent = null
+						} else {
+							recoveryBackEvent()
 						}
 					}
+				}
 
-					is BaseFragment<*> -> recoveryBackEvent()
-					is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
+				is BaseFragment<*> -> recoveryBackEvent()
+				is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
 
-					is BaseOverlayFragment<*> -> {
-						childFragmentManager.fragments.last()?.apply {
-							when (this) {
-								is BaseFragment<*> -> recoveryBackEvent()
-								is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
-							}
+				is BaseOverlayFragment<*> -> {
+					childFragmentManager.fragments.last()?.apply {
+						when (this) {
+							is BaseFragment<*> -> recoveryBackEvent()
+							is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
 						}
 					}
 				}
 			}
 		}
+	}
+
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
 		fragment.activity?.apply {
 			when (this) {
 				is SplashActivity -> recoverBackEventAfterPinCode()
@@ -156,11 +157,7 @@ class PasscodePresenter(
 		if (passcode.length >= Count.pinCode)
 		// 从数据库获取本机的 `Passcode`
 			AppConfigTable.getAppConfig {
-				if (it?.pincode == passcode.toInt()) {
-					hold(true)
-				} else {
-					hold(false)
-				}
+				hold(it?.pincode == passcode.toInt())
 			}
 	}
 }

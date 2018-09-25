@@ -1,13 +1,12 @@
 package io.goldstone.blockchain.crypto.eos
 
-import com.blinnnk.util.TinyNumberUtils
 import com.subgraph.orchid.encoders.Hex
-import io.goldstone.blockchain.crypto.CryptoSymbol
-import io.goldstone.blockchain.crypto.CryptoValue
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.bitcoinj.core.Base58
 import org.bitcoinj.core.DumpedPrivateKey
@@ -29,7 +28,7 @@ object EOSWalletUtils {
 		return BaseKeyPair(keyPair.address, keyPair.privateKey)
 	}
 
-	private fun generateKeyPairByPrivateKey(privateKey: BigInteger): BaseKeyPair {
+	fun generateKeyPairByPrivateKey(privateKey: BigInteger): BaseKeyPair {
 		val eckey = ECKey.fromPrivate(privateKey, true)
 		val compressPublicKey = eckey.publicKeyAsHex
 		val wifPrivateKey = eckey.getPrivateKeyAsWiF(MainNetParams.get())
@@ -54,22 +53,8 @@ object EOSWalletUtils {
 	fun isValidAddress(address: String): Boolean {
 		return when {
 			address.length != CryptoValue.eosAddressLength -> false
-			!address.substring(0, 3).equals(CryptoSymbol.eos, true) -> false
+			!address.substring(0, 3).equals(CoinSymbol.eos, true) -> false
 			else -> true
 		}
-	}
-
-	fun isValidAccountName(accountName: String, hold: (invalidReason: String) -> String): Boolean {
-		val illegalChars = Regex(".*[!@#\$%¥^&*()_=+?].*")
-		val isIllegalLength = accountName.length != 12
-		val containsIllegalCharacter = accountName.matches(illegalChars) || accountName.contains(" ")
-		val containsIllegalNumber = accountName.matches(Regex(".*[6-9].*")) || accountName.contains("0")
-		when {
-			isIllegalLength -> hold("Wrong Length")
-			containsIllegalCharacter -> hold("contains illegal character")
-			containsIllegalNumber -> hold("contains illegal number")
-			else -> hold("")
-		}
-		return TinyNumberUtils.allFalse(isIllegalLength, containsIllegalCharacter, containsIllegalNumber)
 	}
 }

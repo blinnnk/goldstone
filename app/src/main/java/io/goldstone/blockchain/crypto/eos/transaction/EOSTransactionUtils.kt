@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
 import com.subgraph.orchid.encoders.Hex
+import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 
@@ -51,7 +52,7 @@ object EOSTransactionUtils {
 		actions: List<EOSAction>,
 		authorizations: List<EOSAuthorization>,
 		transactionInfoCryptoData: String
-	): String {
+	): EOSTransactionSerialization {
 		val serializedHeader = header.serialize()
 		//  `contextFreeActions` 目前只有空的状态
 		val contextFreeActions = listOf<String>()
@@ -60,7 +61,7 @@ object EOSTransactionUtils {
 		// 一整个一整个的序列化 `Action` 的子值, 这里只考虑了单一 `Action Child` 的情况
 		var serializedActions = serializedActionSize
 		actions.forEach { action ->
-			serializedActions += EOSUtils.getLittleEndianCode(action.account) + EOSUtils.getLittleEndianCode(action.methodName)
+			serializedActions += EOSUtils.getLittleEndianCode(action.account.value) + EOSUtils.getLittleEndianCode(action.methodName.value)
 		}
 		val serializedAuthorizationSize = EOSUtils.getVariableUInt(authorizations.size)
 		var serializedAuthorizations = serializedAuthorizationSize
@@ -69,13 +70,15 @@ object EOSTransactionUtils {
 		}
 		val serializedDataByteLength = EOSUtils.getVariableUInt(Hex.decode(transactionInfoCryptoData).size)
 		val serializedTransactionExtension = "00"
-		val serializedData = chainID.id + serializedHeader +
+		val packedTX = serializedHeader +
 			serializedContextFreeActions + serializedActions + serializedAuthorizations +
 			serializedDataByteLength + transactionInfoCryptoData + serializedTransactionExtension
-		return serializedData.completeZero()
+		val serializedData = chainID.id + packedTX
+		return EOSTransactionSerialization(packedTX, serializedData.completeZero())
 	}
+}
 
-	private fun String.completeZero(): String {
-		return this + EOSUtils.completeZero(314 - length)
-	}
+fun String.completeZero(count: Int = 64): String {
+	// 在签名结尾补充 64 个占位的 0, 目前是通过多次实验找到的规律, 并未找到具体官方文档要求说明.
+	return this + EOSUtils.completeZero(count)
 }
