@@ -139,7 +139,7 @@ class WalletSettingsPresenter(
 
 	private fun showPasswordSettingsFragment() {
 		fragment.apply {
-			if (Config.isWatchOnlyWallet()) {
+			if (!Config.isWatchOnlyWallet()) {
 				recoveryHeaderStyle()
 				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content)
 			} else context.alert(WalletText.watchOnly)

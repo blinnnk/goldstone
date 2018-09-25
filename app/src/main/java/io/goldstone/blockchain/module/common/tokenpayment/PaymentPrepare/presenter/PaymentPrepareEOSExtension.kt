@@ -29,7 +29,7 @@ fun PaymentPreparePresenter.transferEOS(
 ) {
 	// 准备转账信息
 	EOSTransactionInfo(
-		Config.getCurrentEOSName(),
+		Config.getCurrentEOSAccount(),
 		EOSAccount(fragment.address!!),
 		count.toEOSUnit(),
 		fragment.getMemoContent(),

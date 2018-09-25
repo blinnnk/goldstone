@@ -239,7 +239,7 @@ class TokenDetailPresenter(
 	}
 
 	private fun getEOSSeriesData(callback: (List<EOSTransactionTable>) -> Unit) {
-		val account = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
 			account.accountName,
 			Config.getEOSCurrentChain()

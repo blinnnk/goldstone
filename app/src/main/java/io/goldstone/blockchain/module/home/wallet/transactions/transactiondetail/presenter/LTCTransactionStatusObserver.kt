@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
@@ -48,31 +49,22 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailLTCValue(
+private fun updateWalletDetailLTCValue(
 	address: String,
 	activity: MainActivity?
 ) {
-	updateLTCBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
+	MyTokenTable.getBalanceByContract(
+		TokenContract.LTC,
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, TokenContract.LTC)
+		} else GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
+		}
 	}
 }
 
-private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
-) {
-	MyTokenTable.getBalanceByContract(
-		TokenContract.LTC,
-		address,
-		{
-			fragment.context?.alert(it.message)
-			callback()
-		}
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, TokenContract.LTC)
-		GoldStoneAPI.context.runOnUiThread { callback() }
-	}
-}
 
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作

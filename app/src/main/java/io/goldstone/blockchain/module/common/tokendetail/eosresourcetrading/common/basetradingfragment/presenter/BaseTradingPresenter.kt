@@ -72,7 +72,7 @@ open class BaseTradingPresenter(
 	}
 
 	private fun BaseTradingFragment.setUsageValue() {
-		EOSAccountTable.getAccountByName(Config.getCurrentEOSName().accountName) { account ->
+		EOSAccountTable.getAccountByName(Config.getCurrentEOSAccount().accountName) { account ->
 			when (tradingType) {
 				TradingType.CPU -> {
 					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
@@ -107,7 +107,7 @@ open class BaseTradingPresenter(
 	}
 
 	private fun BaseTradingFragment.tradingRam(stakeType: StakeType, callback: (GoldStoneError) -> Unit) {
-		val fromAccount = Config.getCurrentEOSName()
+		val fromAccount = Config.getCurrentEOSAccount()
 		val chainID = Config.getEOSCurrentChain()
 		val toAccount = getInputValue(stakeType).first
 		val tradingCount = getInputValue(stakeType).second
@@ -157,7 +157,7 @@ open class BaseTradingPresenter(
 		stakeType: StakeType,
 		callback: (GoldStoneError) -> Unit
 	) {
-		val fromAccount = Config.getCurrentEOSName()
+		val fromAccount = Config.getCurrentEOSAccount()
 		val toAccount = getInputValue(stakeType).first
 		val transferCount = getInputValue(stakeType).second
 		prepareTransaction(
@@ -191,7 +191,7 @@ open class BaseTradingPresenter(
 	}
 
 	private fun updateLocalDataAndUI() {
-		val currentAccount = Config.getCurrentEOSName()
+		val currentAccount = Config.getCurrentEOSAccount()
 		EOSAPI.getAccountInfo(
 			currentAccount,
 			{ LogUtil.error("updateLocalResourceData", it) }

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain
 
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
@@ -48,10 +47,5 @@ class ExampleUnitTest {
 		val list2 = listOf(Pair(1, 2), Pair(1, 1))
 		LogUtil.debug("compare", list1.containsAll(list2).toString())
 		LogUtil.debug("compare", (list1.asSequence().plus(list2).distinct().toList() - list1).toString())
-	}
-
-	@Test
-	fun anyTest() {
-		System.out.println(EOSUtils.convertMemoToCode("mainnet-tranfer"))
 	}
 }

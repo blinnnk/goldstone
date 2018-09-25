@@ -17,7 +17,7 @@ import org.jetbrains.anko.runOnUiThread
 
 fun TokenDetailPresenter.loadEOSDataFromChain(localMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
-	val account = Config.getCurrentEOSName()
+	val account = Config.getCurrentEOSAccount()
 	EOSAPI.getTransactionsLastIndex(
 		account,
 		{ LogUtil.error("loadEOSChainData", it) }

@@ -6,12 +6,15 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -46,6 +49,14 @@ class WalletDetailPresenter(
 
 	var lockGettingChainModelsThread = false
 
+	override fun onFragmentResume() {
+		super.onFragmentResume()
+		// 更新汇率价格比较频繁, 放到 `Resume` 里面来实现
+		updateMyTokenCurrencyPrice {
+			if (!it.isNone()) fragment.context.alert(it.message)
+		}
+	}
+
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -61,12 +72,15 @@ class WalletDetailPresenter(
 				// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
 				if (!lockGettingChainModelsThread) {
 					// 再检查链上的最新价格和数量
-					lockGettingChainModelsThread = getChainModels(myTokens) { model, error ->
+					lockGettingChainModelsThread = getChainModels(myTokens) { chainModels, error ->
 						lockGettingChainModelsThread = false
-						if (error.isNone() && !model.isNull()) {
-							updateUIByData(model!!)
+						if (!chainModels.isNull()) {
+							updateUIByData(chainModels!!)
 							fragment.removeMiniLoadingView()
-						} else fragment.context.alert(error.message)
+						} else if (!error.message.equals(AccountError.InvalidAccountName.content, true) && !error.isNone())
+						// EOS Invalid Account Name 出现在用户未激活或未选择默认的
+						// Account Name 这里咱不提示这种错误
+							fragment.context.alert(error.message)
 					}
 				} else fragment.removeMiniLoadingView()
 			}
@@ -164,6 +178,25 @@ class WalletDetailPresenter(
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private fun updateMyTokenCurrencyPrice(callback: (RequestError) -> Unit) {
+		MyTokenTable.getMyTokens(false) { myTokens ->
+			GoldStoneAPI.getPriceByContractAddress(myTokens.map { it.contract }.toJsonArray(), callback) { newPrices ->
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = newPrices.size
+					override fun concurrentJobs() {
+						newPrices.forEach {
+							// 同时更新缓存里面的数据
+							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract), it.price)
+							completeMark()
+						}
+					}
+
+					override fun mergeCallBack() = callback(RequestError.None)
+				}.start()
 			}
 		}
 	}

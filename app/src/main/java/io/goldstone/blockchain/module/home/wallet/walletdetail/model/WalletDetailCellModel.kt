@@ -1,11 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -72,7 +73,7 @@ data class WalletDetailCellModel(
 
 	companion object {
 		fun getLocalModels(hold: (List<WalletDetailCellModel>, List<MyTokenTable>) -> Unit) {
-			MyTokenTable.getMyTokens { myTokens ->
+			MyTokenTable.getMyTokens(false) { myTokens ->
 				// 当前钱包没有指定 `Token` 直接返回
 				if (myTokens.isEmpty()) hold(arrayListOf(), myTokens)
 				else DefaultTokenTable.getCurrentChainTokens { localTokens ->
@@ -82,6 +83,7 @@ data class WalletDetailCellModel(
 							override var asyncCount: Int = myTokens.size
 							override fun concurrentJobs() {
 								myTokens.forEach { token ->
+									System.out.println("$+++++$token")
 									val type =
 										if (TokenContract(token.contract).isEOS()) eosWalletType else EOSWalletType.None
 									localTokens.find {
@@ -118,8 +120,9 @@ data class WalletDetailCellModel(
 
 		fun getChainModels(
 			myTokens: List<MyTokenTable>,
-			hold: (List<WalletDetailCellModel>?, RequestError) -> Unit
+			hold: (List<WalletDetailCellModel>?, GoldStoneError) -> Unit
 		): Boolean {
+			var balanceError = GoldStoneError.None
 			// 没有网络直接返回
 			return when {
 				!NetworkUtil.hasNetwork(GoldStoneAPI.context) -> false
@@ -129,47 +132,48 @@ data class WalletDetailCellModel(
 					false
 				}
 				else -> {
-					myTokens.updateMyTokensPrices { error ->
-						// 首先更新 `MyToken` 的 `Price`
-						DefaultTokenTable.getCurrentChainTokens { localTokens ->
-							WalletTable.getCurrentEOSWalletType { eosWalletType ->
-								object : ConcurrentAsyncCombine() {
-									val tokenList = ArrayList<WalletDetailCellModel>()
-									override var asyncCount: Int = myTokens.size
-									override fun concurrentJobs() {
-										myTokens.forEach { token ->
-											val type =
-												if (TokenContract(token.contract).isEOS()) eosWalletType
-												else EOSWalletType.None
-											localTokens.find {
-												it.contract.equals(token.contract, true)
-											}?.let { targetToken ->
-												// 链上查余额
-												MyTokenTable.getBalanceByContract(
-													TokenContract(targetToken.contract),
-													token.ownerName,
-													{
-														// 如果出错的话余额暂时设定用旧的值
-														tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
-														completeMark()
-													}
-												) { balance ->
-													// 更新数据的余额信息
+					// 首先更新 `MyToken` 的 `Price`
+					DefaultTokenTable.getCurrentChainTokens { localTokens ->
+						WalletTable.getCurrentEOSWalletType { eosWalletType ->
+							object : ConcurrentAsyncCombine() {
+								val tokenList = ArrayList<WalletDetailCellModel>()
+								override var asyncCount: Int = myTokens.size
+								override fun concurrentJobs() {
+									myTokens.forEach { token ->
+										val type =
+											if (TokenContract(token.contract).isEOS()) eosWalletType
+											else EOSWalletType.None
+										localTokens.find {
+											it.contract.equals(token.contract, true)
+										}?.let { targetToken ->
+											// 链上查余额
+											MyTokenTable.getBalanceByContract(
+												TokenContract(targetToken.contract),
+												token.ownerName
+											) { balance, error ->
+												// 更新数据的余额信息
+												if (!balance.isNull() && error.isNone()) {
 													MyTokenTable.updateBalanceByContract(
-														balance,
+														balance!!,
 														token.ownerName,
 														TokenContract(targetToken.contract)
 													)
+													System.out.println("fuck ${token.ownerName} and $balance")
 													tokenList.add(WalletDetailCellModel(targetToken, balance, type))
-													completeMark()
+												} else {
+													balanceError = error
+													// 如果有错的话那么直接显示本地的余额
+													tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
 												}
+												completeMark()
 											}
 										}
 									}
+								}
 
-									override fun mergeCallBack() = hold(tokenList, error)
-								}.start()
-							}
+								override fun mergeCallBack() = hold(tokenList, balanceError)
+
+							}.start()
 						}
 					}
 					true // 正在执行线程
@@ -193,23 +197,6 @@ data class WalletDetailCellModel(
 				val name = if (it.isEmpty()) symbol else it
 				DefaultTokenTable.updateTokenName(TokenContract(contract), name)
 				callback(apply { this.name = name })
-			}
-		}
-
-		private fun List<MyTokenTable>.updateMyTokensPrices(callback: (RequestError) -> Unit) {
-			GoldStoneAPI.getPriceByContractAddress(map { it.contract }.toJsonArray(), callback) { newPrices ->
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount: Int = newPrices.size
-					override fun concurrentJobs() {
-						newPrices.forEach {
-							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract), it.price)
-							completeMark()
-						}
-					}
-
-					override fun mergeCallBack() = callback(RequestError.None)
-				}.start()
 			}
 		}
 	}

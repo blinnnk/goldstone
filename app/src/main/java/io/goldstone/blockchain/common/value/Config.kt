@@ -54,7 +54,7 @@ object Config {
 
 	/** Coin Address In SharedPreference */
 	// EOS Account Name
-	fun getCurrentEOSName(): EOSAccount =
+	fun getCurrentEOSAccount(): EOSAccount =
 		EOSAccount(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSName))
 
 	fun updateCurrentEOSName(name: String) =

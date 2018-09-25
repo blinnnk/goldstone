@@ -9,13 +9,6 @@ import java.io.Serializable
  */
 
 class EOSAccount(private val value: String) : Serializable {
-	init {
-		if (value.isNotEmpty()) {
-			if (value.indexOf(charNotAllowed) >= 0 && !value.startsWith("eosio.")) {
-				throw IllegalArgumentException("account name must not contain '.': $value")
-			}
-		}
-	}
 
 	val accountName = value.toLowerCase()
 

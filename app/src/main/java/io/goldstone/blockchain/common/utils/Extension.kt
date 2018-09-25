@@ -147,3 +147,5 @@ fun JSONArray.toList(): List<JSONObject> {
 	}
 	return result
 }
+
+infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this

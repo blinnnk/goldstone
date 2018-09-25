@@ -49,11 +49,11 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 			}
 		}
 		if (chainType.isNull() && clickCellEvent.isNull()) {
-			recyclerView.addSwipeEvent(R.drawable.delete_icon, 20.uiPX()) { position ->
+			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX()) { position, cell ->
 				alert {
 					title = "DELETE CONTACT"
 					message = "are you sure that you want to delete this contact?"
-					yesButton { presenter.deleteContact(position) }
+					yesButton { cell?.apply { presenter.deleteContact(model.id) } }
 					cancelButton {
 						recyclerView.adapter?.notifyItemChanged(position)
 						it.dismiss()

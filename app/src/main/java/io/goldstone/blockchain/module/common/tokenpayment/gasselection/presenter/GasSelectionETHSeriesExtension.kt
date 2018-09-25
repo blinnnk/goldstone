@@ -1,18 +1,14 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
@@ -43,33 +39,25 @@ import java.math.BigInteger
  */
 fun GasSelectionPresenter.checkBalanceIsValid(
 	token: WalletDetailCellModel?,
-	hold: Boolean.() -> Unit
+	@WorkerThread hold: (isEnough: Boolean, error: GoldStoneError) -> Unit
 ) {
 	when {
 		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
 		token?.contract.isETH() -> {
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentEthereumAddress(),
-				{
-					hold(false)
-					GoldStoneDialog.chainError(it, fragment.context)
-				}
-			) {
-				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
+				Config.getCurrentEthereumAddress()
+			) { balance, error ->
+				hold(balance.orZero() >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0), error)
 			}
 		}
 
 		token?.contract.isETC() -> {
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentETCAddress(),
-				{
-					hold(false)
-					GoldStoneDialog.chainError(it, fragment.context)
-				}
-			) {
-				hold(it >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0))
+				Config.getCurrentETCAddress()
+			) { balance, error ->
+				hold(balance.orZero() >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0), error)
 			}
 		}
 
@@ -78,25 +66,16 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			// 首先查询 `Token Balance` 余额
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentEthereumAddress(),
-				{
-					hold(false)
-					GoldStoneDialog.chainError(it, fragment.context)
-				}
-			) { tokenBalance ->
+				Config.getCurrentEthereumAddress()
+			) { tokenBalance, error ->
 				// 查询 `ETH` 余额
 				MyTokenTable.getBalanceByContract(
 					TokenContract.ETH,
-					Config.getCurrentEthereumAddress(),
-					{
-						hold(false)
-						LogUtil.error("checkBalanceIsValid", it)
-					}
-				) { ethBalance ->
+					Config.getCurrentEthereumAddress()
+				) { ethBalance, ethError ->
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
-					hold(
-						tokenBalance >= getTransferCount().toDouble() && ethBalance > getUsedGasFee().orElse(0.0)
-					)
+					val isEnough = tokenBalance.orZero() >= getTransferCount().toDouble() && ethBalance.orZero() > getUsedGasFee().orElse(0.0)
+					hold(isEnough, RequestError.PostFailed(error.message + ethError.message))
 				}
 			}
 		}
@@ -105,12 +84,15 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 
 fun GasSelectionPresenter.prepareToTransfer(
 	footer: GasSelectionFooter,
-	callback: (GoldStoneError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
-	checkBalanceIsValid(getToken()) hasEnoughBalance@{
+	checkBalanceIsValid(getToken()) hasEnoughBalance@{ isEnough, error ->
 		GoldStoneAPI.context.runOnUiThread {
-			if (this@hasEnoughBalance) showConfirmAttentionView(footer, callback)
-			else callback(TransferError.BalanceIsNotEnough)
+			when {
+				isEnough -> showConfirmAttentionView(footer, callback)
+				error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+				else -> callback(error)
+			}
 		}
 	}
 }
@@ -132,8 +114,7 @@ fun GasSelectionPresenter.insertCustomGasData() {
  * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
  */
 private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
-	if (getToken()?.contract.isETC())
-		Config.getCurrentETCAddress()
+	if (getToken()?.contract.isETC()) Config.getCurrentETCAddress()
 	else Config.getCurrentEthereumAddress()
 
 private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
