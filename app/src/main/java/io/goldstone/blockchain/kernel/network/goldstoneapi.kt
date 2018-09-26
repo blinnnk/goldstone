@@ -29,6 +29,7 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytrans
 import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMRankModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -556,6 +557,37 @@ object GoldStoneAPI {
 			} else {
 				errorCallback(Exception("no values for ticks"))
 			}
+		}
+
+	}
+
+
+	fun getEOSRAMRank(
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<EOSRAMRankModel>) -> Unit
+	) {
+		requestData<EOSRAMRankModel>(
+			APIPath.getEOSRAMRank(APIPath.currentUrl),
+			"rank",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
+		}
+
+	}
+
+	fun getEOSRAMTradeData(
+		errorCallback: (Exception) -> Unit,
+		hold: (ArrayList<Float>) -> Unit
+	) {
+		requestData<Float>(
+			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
+			"data",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
 		}
 
 	}

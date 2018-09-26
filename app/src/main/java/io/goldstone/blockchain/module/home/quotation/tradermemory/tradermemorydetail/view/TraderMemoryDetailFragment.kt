@@ -21,7 +21,9 @@ import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view.RankFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.tradepercent.view.RAMTradePercentFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present.TraderMemoryDetailPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -45,12 +47,16 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 					frameLayout {
 						id = ElementID.chartView
 					}.lparams(matchParent, wrapContent)
-					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {}
-
-					// 内存交易记录列表
 					addFragmentAndSetArgument<EOSRAMPriceTrendFragment>(ElementID.chartView) {
 						putSerializable("model", presenter.ramMarketModel)
 					}
+
+					frameLayout {
+						id = ElementID.rankList
+					}.lparams(matchParent, 50.uiPX() * 11)
+					addFragmentAndSetArgument<RankFragment>(ElementID.rankList) {}
+
+					// 内存交易记录列表
 					frameLayout {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
 							topMargin = 10.uiPX()
@@ -63,9 +69,11 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 					) {
 					}
 
-					textView {
-						text = "持量大户"
+					frameLayout {
+						id = ElementID.pieChart
 					}
+					addFragmentAndSetArgument<RAMTradePercentFragment>(ElementID.pieChart) {}
+
 					textView {
 						text = "成交资金分布"
 					}
