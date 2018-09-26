@@ -36,7 +36,30 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment)
 						PieEntry((it / totalValue).toFloat(), "")
 					}.toArrayList()
 				)
+				
+				setChartData(it)
 			}
+		}
+	}
+	
+	private fun setChartData(dataRows: ArrayList<Float>) {
+		val maxValue = dataRows.max()
+		
+		fragment.apply {
+			ramPercentChartIn.setDataAndColors(
+				arrayOf(
+					dataRows[0],
+					dataRows[1],
+					dataRows[2]),
+				null,
+				maxValue!!)
+			ramPercentChartOut.setDataAndColors(
+				arrayOf(
+					dataRows[3],
+					dataRows[4],
+					dataRows[5]),
+				null,
+				maxValue)
 		}
 	}
 	

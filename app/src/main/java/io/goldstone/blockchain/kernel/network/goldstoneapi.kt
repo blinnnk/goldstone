@@ -574,9 +574,9 @@ object GoldStoneAPI {
 	
 	fun getEOSRAMTradeData(
 		errorCallback: (Exception) -> Unit,
-		hold: (ArrayList<Double>) -> Unit
+		hold: (ArrayList<Float>) -> Unit
 	) {
-		requestData<Double>(
+		requestData<Float>(
 			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
 			"data",
 			errorCallback = errorCallback,
