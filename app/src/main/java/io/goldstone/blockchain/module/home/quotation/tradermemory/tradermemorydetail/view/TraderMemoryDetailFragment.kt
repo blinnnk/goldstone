@@ -58,7 +58,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 
 					// 内存交易记录列表
 					frameLayout {
-						layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX()).apply {
+						layoutParams = LinearLayout.LayoutParams(matchParent, 400.uiPX()).apply {
 							topMargin = 10.uiPX()
 							bottomMargin = 10.uiPX()
 						}

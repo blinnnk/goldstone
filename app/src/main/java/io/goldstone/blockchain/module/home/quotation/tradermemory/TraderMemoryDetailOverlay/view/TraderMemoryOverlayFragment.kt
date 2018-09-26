@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytrans
 class TraderMemoryOverlayFragment : BaseOverlayFragment<TraderMemoryOverlayPresenter>() {
 
 	private val title by lazy { arguments?.getString("内存交易") }
+	private val account by lazy { arguments?.getString("account") }
 	private val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationOverlayInfo) as? QuotationModel
 	}
@@ -25,6 +26,9 @@ class TraderMemoryOverlayFragment : BaseOverlayFragment<TraderMemoryOverlayPrese
 		when (title) {
 			"内存交易" -> {
 				presenter.showTraderMemoryDetailFragment()
+			}
+			"个人交易" -> {
+				presenter.showPersonalMemoryTransactionRecord(account)
 			}
 		}
 		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytran
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.OneToTwoLinesOfText
 import io.goldstone.blockchain.common.utils.TimeUtils
@@ -20,7 +21,8 @@ class EOSMemoryTransactionHistoryListCell(
 
 	var model: EOSMemoryTransactionHistoryListTable by observing(EOSMemoryTransactionHistoryListTable()) {
 		model.apply {
-			val formatDate = TimeUtils.formatDate(time.toMillisecond())
+			val formatDate = TimeUtils.formatMdHmDate(time.toMillisecond())
+			Log.e("nHistoryListCell", "${model.type}++++")
 			if (type == 0) {
 				setText(
 					formatDate,

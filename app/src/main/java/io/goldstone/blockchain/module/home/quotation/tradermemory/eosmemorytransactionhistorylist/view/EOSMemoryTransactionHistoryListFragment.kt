@@ -23,7 +23,10 @@ class EOSMemoryTransactionHistoryListFragment(private val isSalesRecord: Boolean
 		recyclerView.adapter = EOSMemoryTransactionHistoryListAdapter(
 			asyncData.orEmptyArray(),
 			isSalesRecord
-		) {
+		) { it ->
+			it.setOnClickListener { _ ->
+				presenter.showPersonalMemoryTransactionRecord(it.model.account)
+			}
 		}
 	}
 

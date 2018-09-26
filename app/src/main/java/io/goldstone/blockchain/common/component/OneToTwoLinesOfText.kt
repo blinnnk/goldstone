@@ -20,7 +20,7 @@ open class OneToTwoLinesOfText(context: Context) : RelativeLayout(context) {
 	init {
 		layoutParams = RelativeLayout.LayoutParams(
 			matchParent,
-			60.uiPX()
+			50.uiPX()
 		).apply {
 			topMargin = 5.uiPX()
 			bottomMargin = 5.uiPX()

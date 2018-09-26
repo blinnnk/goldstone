@@ -27,7 +27,6 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordModel
-import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMRankModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -606,7 +605,6 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			val data = JSONObject(this[0])
-			Log.e("EOSMemory", "++" + data.toString())
 			val gson = Gson()
 			val eosMemoryTransactionHistoryListModel = gson.fromJson(data.toString(), EOSMemoryTransactionHistoryListModel::class.java)
 			GoldStoneAPI.context.runOnUiThread {

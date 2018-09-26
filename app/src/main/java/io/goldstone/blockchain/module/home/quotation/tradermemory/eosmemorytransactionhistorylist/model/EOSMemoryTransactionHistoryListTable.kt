@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName
 data class EOSMemoryTransactionHistoryListTable(
 	val account: String,
 	val price: Double,
-	val quantity: Int,
+	val quantity: Double,
 	val time: Long,
 	val txId: String,
 	val type: Int
@@ -21,7 +21,7 @@ data class EOSMemoryTransactionHistoryListTable(
 	constructor() : this(
 		"",
 		0.0,
-		0,
+		0.0,
 		0,
 		"",
 		0
@@ -49,7 +49,7 @@ data class EOSMemoryTransactionHistoryListModel(
 		@SerializedName("price")
 		val price: Double,
 		@SerializedName("quantity")
-		val quantity: Int,
+		val quantity: Double,
 		@SerializedName("time")
 		val time: Long,
 		@SerializedName("tx_id")

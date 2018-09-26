@@ -11,20 +11,23 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytrans
  */
 @Entity(tableName = "price_alarm_clock")
 data class PersonalMemoryTransactionRecordTable(
-	val quantity: Int,
-	val time: Int,
+	val id: Int,
+	val quantity: Double,
+	val time: Long,
 	val txId: String,
 	val type: Int
 ) {
 	@Ignore
 	constructor() : this(
-		0,
+		1,
+		0.0,
 		0,
 		"",
 		0
 	)
 
 	constructor(listModel: PersonalMemoryTransactionRecordModel.ListModel) : this(
+		listModel.id,
 		listModel.quantity,
 		listModel.time,
 		listModel.txId,
@@ -39,10 +42,12 @@ data class PersonalMemoryTransactionRecordModel(
 	val txList: List<ListModel>
 ) {
 	data class ListModel(
+		@SerializedName("id")
+		val id: Int,
 		@SerializedName("quantity")
-		val quantity: Int,
+		val quantity: Double,
 		@SerializedName("time")
-		val time: Int,
+		val time: Long,
 		@SerializedName("tx_id")
 		val txId: String,
 		@SerializedName("type")

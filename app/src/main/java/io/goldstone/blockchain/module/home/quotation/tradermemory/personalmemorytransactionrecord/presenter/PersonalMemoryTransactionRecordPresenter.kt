@@ -24,7 +24,7 @@ class PersonalMemoryTransactionRecordPresenter(
 		} else {
 
 		}
-		GoldStoneAPI.getPersonalMemoryTransactionRecord("wangchenxing", {}) { it ->
+		GoldStoneAPI.getPersonalMemoryTransactionRecord(fragment.getAccountName(), {}) { it ->
 			it?.let {
 				if (it.txList.isNotEmpty()) {
 					val arrayList = ArrayList<PersonalMemoryTransactionRecordTable>()
@@ -38,9 +38,9 @@ class PersonalMemoryTransactionRecordPresenter(
 					}
 				} else {
 					val arrayList = ArrayList<PersonalMemoryTransactionRecordTable>()
-					arrayList.add(PersonalMemoryTransactionRecordTable(1, 2, "3", 4))
-					arrayList.add(PersonalMemoryTransactionRecordTable(1, 2, "3", 4))
-					arrayList.add(PersonalMemoryTransactionRecordTable(1, 2, "3", 4))
+					arrayList.add(PersonalMemoryTransactionRecordTable(1, 1.0, 2, "3", 4))
+					arrayList.add(PersonalMemoryTransactionRecordTable(1, 1.0, 2, "3", 4))
+					arrayList.add(PersonalMemoryTransactionRecordTable(1, 1.0, 2, "3", 4))
 					fragment.asyncData.isNull() isTrue {
 						fragment.asyncData = arrayList
 					} otherwise {

@@ -1,14 +1,16 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.presenter
 
-import android.util.Log
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.module.home.quotation.tradermemory.TraderMemoryDetailOverlay.view.TraderMemoryOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.view.EOSMemoryTransactionHistoryListAdapter
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.view.EOSMemoryTransactionHistoryListFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.view.PersonalMemoryTransactionRecordFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view.TraderMemoryDetailFragment
 
 /**
  * @date 18/09/2018 6:36 PM
@@ -25,28 +27,29 @@ class EOSMemoryTransactionHistoryListPresenter(
 		val mode = if (isSalesRecord) 0 else 1
 		GoldStoneAPI.getEOSMemoryTransactionHistory(mode.toString(), {}) { it ->
 			it?.let {
-				if (it.txList.isNotEmpty()) {
-					val arrayList = ArrayList<EOSMemoryTransactionHistoryListTable>()
-					for (index: Int in 0 until it.txList.size) {
-						arrayList.add(EOSMemoryTransactionHistoryListTable(it.txList[index]))
-					}
-					fragment.asyncData.isNull() isTrue {
-						fragment.asyncData = arrayList
-					} otherwise {
-						diffAndUpdateSingleCellAdapterData<EOSMemoryTransactionHistoryListAdapter>(arrayList)
-					}
-				} else {
-					val arrayList = ArrayList<EOSMemoryTransactionHistoryListTable>()
-					arrayList.add(EOSMemoryTransactionHistoryListTable("0", 1.0, 1, 2, "3", 4))
-					arrayList.add(EOSMemoryTransactionHistoryListTable("0", 1.0, 1, 2, "3", 4))
-					arrayList.add(EOSMemoryTransactionHistoryListTable("0", 1.0, 1, 2, "3", 4))
-					fragment.asyncData.isNull() isTrue {
-						fragment.asyncData = arrayList
-					} otherwise {
-						diffAndUpdateSingleCellAdapterData<EOSMemoryTransactionHistoryListAdapter>(arrayList)
-					}
+				val arrayList = ArrayList<EOSMemoryTransactionHistoryListTable>()
+				for (index: Int in 0 until it.txList.size) {
+					arrayList.add(EOSMemoryTransactionHistoryListTable(it.txList[index]))
+				}
+				fragment.asyncData.isNull() isTrue {
+					fragment.asyncData = arrayList
+				} otherwise {
+					diffAndUpdateSingleCellAdapterData<EOSMemoryTransactionHistoryListAdapter>(arrayList)
 				}
 			}
+		}
+	}
+
+	fun showPersonalMemoryTransactionRecord(account: String) {
+		fragment.activity?.addFragmentAndSetArguments<TraderMemoryOverlayFragment>(ContainerID.main) {
+			putString(
+				"内存交易",
+				"个人交易"
+			)
+			putString(
+				"account",
+				account
+			)
 		}
 	}
 }

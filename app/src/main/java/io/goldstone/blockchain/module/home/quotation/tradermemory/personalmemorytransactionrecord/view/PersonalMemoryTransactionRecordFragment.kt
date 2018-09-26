@@ -2,8 +2,11 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemor
 
 import android.annotation.SuppressLint
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.presenter.PersonalMemoryTransactionRecordPresenter
 
@@ -12,19 +15,24 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemory
  * @author wcx
  */
 @SuppressLint("ValidFragment")
-class PersonalMemoryTransactionRecordFragment(private val isSalesRecord: Boolean) :
+class PersonalMemoryTransactionRecordFragment() :
 	BaseRecyclerFragment<PersonalMemoryTransactionRecordPresenter, PersonalMemoryTransactionRecordTable>() {
+	private val account by lazy { arguments?.getString("account") }
+	private val isSalesRecord by lazy { arguments?.getBoolean("isSalesRecord") }
 	override val presenter: PersonalMemoryTransactionRecordPresenter = PersonalMemoryTransactionRecordPresenter(
 		this,
-		isSalesRecord
+		isSalesRecord.orFalse()
 	)
 
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<PersonalMemoryTransactionRecordTable>?) {
 		recyclerView.adapter = PersonalMemoryTransactionRecordAdapter(
 			asyncData.orEmptyArray(),
-			isSalesRecord
+			isSalesRecord.orFalse()
 		) {
 		}
 	}
 
+	fun getAccountName(): String {
+		return account ?: ""
+	}
 }
