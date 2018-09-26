@@ -84,7 +84,7 @@ object EOSResourceUtil {
 		return cpuPrice
 	}
 	
-	fun getNETPriceByTime(
+	fun getNETPriceByUnit(
 		totalResourcesNETWeight: Double,
 		netLimitMax: Double,
 		unit: EOSUnit
