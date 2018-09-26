@@ -1,35 +1,30 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model
+package io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.Ignore
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListModel
 
 /**
  * @date 18/09/2018 6:36 PM
  * @author wcx
  */
 @Entity(tableName = "price_alarm_clock")
-data class EOSMemoryTransactionHistoryListTable(
-	val account: String,
-	val price: Double,
+data class PersonalMemoryTransactionRecordTable(
 	val quantity: Int,
-	val time: Long,
+	val time: Int,
 	val txId: String,
 	val type: Int
 ) {
 	@Ignore
 	constructor() : this(
-		"",
-		0.0,
 		0,
 		0,
 		"",
 		0
 	)
 
-	constructor(listModel: EOSMemoryTransactionHistoryListModel.ListModel) : this(
-		listModel.account,
-		listModel.price,
+	constructor(listModel: PersonalMemoryTransactionRecordModel.ListModel) : this(
 		listModel.quantity,
 		listModel.time,
 		listModel.txId,
@@ -37,21 +32,17 @@ data class EOSMemoryTransactionHistoryListTable(
 	)
 }
 
-data class EOSMemoryTransactionHistoryListModel(
+data class PersonalMemoryTransactionRecordModel(
 	@SerializedName("code")
 	val code: Int,
 	@SerializedName("tx_list")
 	val txList: List<ListModel>
 ) {
 	data class ListModel(
-		@SerializedName("account")
-		val account: String,
-		@SerializedName("price")
-		val price: Double,
 		@SerializedName("quantity")
 		val quantity: Int,
 		@SerializedName("time")
-		val time: Long,
+		val time: Int,
 		@SerializedName("tx_id")
 		val txId: String,
 		@SerializedName("type")

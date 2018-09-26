@@ -20,12 +20,10 @@ class EOSMemoryTransactionHistoryListPresenter(
 ) : BaseRecyclerPresenter<EOSMemoryTransactionHistoryListFragment, EOSMemoryTransactionHistoryListTable>() {
 
 	override fun updateData() {
-		if (isSalesRecord) {
-
-		} else {
-
-		}
-		GoldStoneAPI.getEOSMemoryTransactionHistory("wangchenxing", {}) { it ->
+		super.updateData()
+		// 0. 最近交易记录 ; 1. 最近大单记录
+		val mode = if (isSalesRecord) 0 else 1
+		GoldStoneAPI.getEOSMemoryTransactionHistory(mode.toString(), {}) { it ->
 			it?.let {
 				if (it.txList.isNotEmpty()) {
 					val arrayList = ArrayList<EOSMemoryTransactionHistoryListTable>()
@@ -39,9 +37,9 @@ class EOSMemoryTransactionHistoryListPresenter(
 					}
 				} else {
 					val arrayList = ArrayList<EOSMemoryTransactionHistoryListTable>()
-					arrayList.add(EOSMemoryTransactionHistoryListTable(1, 2, "3", 4))
-					arrayList.add(EOSMemoryTransactionHistoryListTable(1, 2, "3", 4))
-					arrayList.add(EOSMemoryTransactionHistoryListTable(1, 2, "3", 4))
+					arrayList.add(EOSMemoryTransactionHistoryListTable("0", 1.0, 1, 2, "3", 4))
+					arrayList.add(EOSMemoryTransactionHistoryListTable("0", 1.0, 1, 2, "3", 4))
+					arrayList.add(EOSMemoryTransactionHistoryListTable("0", 1.0, 1, 2, "3", 4))
 					fragment.asyncData.isNull() isTrue {
 						fragment.asyncData = arrayList
 					} otherwise {

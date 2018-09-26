@@ -26,6 +26,8 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.model.EOSMemoryTransactionHistoryListModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemorytransactionrecord.model.PersonalMemoryTransactionRecordTable
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
@@ -521,6 +523,7 @@ object GoldStoneAPI {
 			hold(CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID))
 		}
 	}
+
 	fun getEOSRAMPriceTendcyCandle(
 		period: String,
 		size: Int,
@@ -535,9 +538,9 @@ object GoldStoneAPI {
 		) {
 			hold(this.toArrayList())
 		}
-	
+
 	}
-	
+
 	fun getEOSRAMPriceToday(
 		errorCallback: (Exception) -> Unit,
 		hold: (CandleChartModel) -> Unit
@@ -554,16 +557,17 @@ object GoldStoneAPI {
 				errorCallback(Exception("no values for ticks"))
 			}
 		}
-		
+
 	}
+
 	@JvmStatic
 	fun getEOSMemoryTransactionHistory(
-		account: String,
+		mode: String,
 		errorCallback: (Exception) -> Unit = {},
 		hold: (EOSMemoryTransactionHistoryListModel?) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getEOSMemoryTransactionHistory(APIPath.currentUrl) + account,
+			APIPath.getEOSMemoryTransactionHistory(APIPath.currentUrl) + mode,
 			"",
 			true,
 			errorCallback,
@@ -575,6 +579,29 @@ object GoldStoneAPI {
 			val eosMemoryTransactionHistoryListModel = gson.fromJson(data.toString(), EOSMemoryTransactionHistoryListModel::class.java)
 			GoldStoneAPI.context.runOnUiThread {
 				hold(eosMemoryTransactionHistoryListModel)
+			}
+		}
+	}
+
+	@JvmStatic
+	fun getPersonalMemoryTransactionRecord(
+		account: String,
+		errorCallback: (Exception) -> Unit = {},
+		hold: (PersonalMemoryTransactionRecordModel?) -> Unit
+	) {
+		requestData<String>(
+			APIPath.getPersonalMemoryTransactionRecord(APIPath.currentUrl) + account,
+			"",
+			true,
+			errorCallback,
+			isEncrypt = true
+		) {
+			val data = JSONObject(this[0])
+			Log.e("PersonalMemory", "++" + data.toString())
+			val gson = Gson()
+			val personalMemoryTransactionRecordModel = gson.fromJson(data.toString(), PersonalMemoryTransactionRecordModel::class.java)
+			GoldStoneAPI.context.runOnUiThread {
+				hold(personalMemoryTransactionRecordModel)
 			}
 		}
 	}
