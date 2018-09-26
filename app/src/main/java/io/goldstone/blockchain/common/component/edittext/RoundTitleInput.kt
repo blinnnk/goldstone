@@ -109,6 +109,6 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setNumberPadKeyboard() {
-		editText.inputType = InputType.TYPE_CLASS_NUMBER
+		editText.inputType = InputType.TYPE_NUMBER_FLAG_DECIMAL
 	}
 }

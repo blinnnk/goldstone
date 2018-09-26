@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
-import android.support.annotation.WorkerThread
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.google.gson.annotations.SerializedName
@@ -119,28 +119,8 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun removeSelectionBy(
-			pair: String,
-			callback: () -> Unit = {}
-		) {
-			doAsync {
-				GoldStoneDataBase.database.quotationSelectionDao().apply {
-					getSelectionByPair(pair).let {
-						if (it.isNull()) {
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						} else {
-							delete(it!!)
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						}
-					}
-				}
-			}
-		}
-
-		fun getMySelections(@WorkerThread hold: (List<QuotationSelectionTable>) -> Unit) {
-			doAsync {
-				hold(GoldStoneDataBase.database.quotationSelectionDao().getQuotationSelfSelections())
-			}
+		fun getMySelections(@UiThread hold: (List<QuotationSelectionTable>) -> Unit) {
+			load { GoldStoneDataBase.database.quotationSelectionDao().getQuotationSelfSelections() } then (hold)
 		}
 
 		fun updateSelectionOrderIDBy(
@@ -250,4 +230,10 @@ interface QuotationSelectionDao {
 
 	@Delete
 	fun delete(table: QuotationSelectionTable)
+
+	@Delete
+	fun deleteAll(tables: List<QuotationSelectionTable>)
+
+	@Query("DELETE FROM quotationSelection WHERE pair IN (:pairs)")
+	fun deleteByPairs(pairs: List<String>)
 }

@@ -5,7 +5,6 @@ import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -40,19 +39,6 @@ class QuotationManagementFragment :
 					}
 				}
 			}
-		}
-	}
-
-	override fun onDetach() {
-		super.onDetach()
-		asyncData?.filter {
-			!it.isSelecting
-		}?.apply {
-			forEach { pair ->
-				QuotationSelectionTable.removeSelectionBy(pair.pair)
-			}
-			if (isNotEmpty())
-				getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
 		}
 	}
 

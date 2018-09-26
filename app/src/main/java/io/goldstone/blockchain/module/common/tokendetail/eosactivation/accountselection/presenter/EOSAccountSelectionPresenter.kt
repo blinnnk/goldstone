@@ -27,11 +27,11 @@ class EOSAccountSelectionPresenter(
 	override val fragment: EOSAccountSelectionFragment
 ) : BasePresenter<EOSAccountSelectionFragment>() {
 
+	/**
+	 * 1. 更新 `WalletTable` 里面的 `CurrentEOSAccountName`
+	 * 2. 更新 `MyTokenTable` 里面的 `OwnerName` 的名字
+	 */
 	fun setEOSDefaultName(name: String) {
-		/**
-		 * 1. 更新 `WalletTable` 里面的 `CurrentEOSAccountName`
-		 * 2. 更新 `MyTokenTable` 里面的 `OwnerName` 的名字
-		 */
 		WalletTable.updateEOSDefaultName(name) {
 			fragment.activity?.jump<SplashActivity>()
 		}

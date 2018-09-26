@@ -6,7 +6,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.load
@@ -85,13 +84,13 @@ data class MyTokenTable(
 	companion object {
 		fun updateEOSAccountName(name: String, address: String) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address)
+				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address, Config.getEOSCurrentChain().id)
 			}
 		}
 
 		fun getMyTokens(inMainThread: Boolean = true, hold: (List<MyTokenTable>) -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.getCurrentAddresses()?.let { addresses ->
+				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
 					GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).apply {
 						if (inMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
 						else hold(this)
@@ -235,7 +234,7 @@ data class MyTokenTable(
 						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSAccount(), { hold(null, it) }) {
 							hold(it, RequestError.None)
 						}
-					} else hold(null,RequestError.None)
+					} else hold(null, RequestError.None)
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
@@ -278,8 +277,8 @@ interface MyTokenDao {
 	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
 	fun updateBalanceByContract(balance: Double, contract: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
-	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address")
-	fun updateEOSAccountName(name: String, address: String)
+	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND chainID = :chainID")
+	fun updateEOSAccountName(name: String, address: String, chainID: String)
 
 	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
 	fun deleteByContractAndAddress(address: String, contract: String)
