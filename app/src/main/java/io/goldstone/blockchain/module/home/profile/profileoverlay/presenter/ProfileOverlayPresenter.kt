@@ -28,9 +28,9 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
-import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.profile.walletlock.view.WalletLockFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -60,7 +60,7 @@ class ProfileOverlayPresenter(
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
 			ProfileText.eosAccountRegister -> showEOSAccountRegisterFragment()
-			ProfileText.walletLock -> showPinCodeEditorFragment()
+			ProfileText.walletLock -> showWalletLockFragment()
 			ProfileText.walletManager -> showWalletListFragment()
 			ProfileText.chain -> showChainSelectionFragment()
 			ProfileText.privacy -> showPrivacyFragment()
@@ -162,8 +162,8 @@ class ProfileOverlayPresenter(
 		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content)
 	}
 
-	private fun showPinCodeEditorFragment() {
-		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content)
+	private fun showWalletLockFragment() {
+		fragment.addFragmentAndSetArgument<WalletLockFragment>(ContainerID.content)
 	}
 
 	private fun showContactsFragment() {
