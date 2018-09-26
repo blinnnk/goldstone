@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.tradepercent.view
 
 import android.support.v4.app.Fragment
+import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.uikit.ScreenSize
@@ -27,15 +28,11 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	}
 	
 	val ramPercentChartIn by lazy {
-		RAMPercentChartView(context!!).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, 100.uiPX())
-		}
+		RAMPercentChartView(context!!)
 	}
 	
 	val ramPercentChartOut by lazy {
-		RAMPercentChartView(context!!).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, 100.uiPX())
-		}
+		RAMPercentChartView(context!!)
 	}
 	
 	override fun AnkoContext<Fragment>.initView() {
@@ -45,6 +42,9 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 			linearLayout {
 				addView(ramPercentChartIn)
 				addView(ramPercentChartOut)
+				addView(View(context).apply {
+					layoutParams = LinearLayout.LayoutParams(matchParent,200.uiPX())
+				})
 			}
 		}
 	}
