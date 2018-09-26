@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -21,7 +20,6 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFra
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -29,8 +27,6 @@ import org.json.JSONObject
  * @date 26/03/2018 8:56 PM
  * @author KaySaith
  */
-var selectionMD5: String? = null
-var memoryData: ArrayList<QuotationModel>? = null
 
 class QuotationPresenter(
 	override val fragment: QuotationFragment
@@ -41,20 +37,10 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		// 如果内存有数据直接更新内存的数据
-		memoryData?.let {
-			diffAndUpdateAdapterData<QuotationAdapter>(it)
-		}
-		QuotationSelectionTable.getMySelections { selections ->
-			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
-			if (selectionMD5 == selections.getObjectMD5HexString()) {
-				return@getMySelections
-			}
-			selectionMD5 = selections.getObjectMD5HexString()
+		else QuotationSelectionTable.getMySelections { selections ->
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
-
-			selections.map { selection ->
+			selections.asSequence().map { selection ->
 				var linechart = listOf<ChartPoint>()
 				if (!selection.lineChartDay.isBlank()) {
 					linechart = convertDataToChartData(selection.lineChartDay)
@@ -68,23 +54,20 @@ class QuotationPresenter(
 				)
 			}.sortedByDescending {
 				it.orderID
-			}.toArrayList().let { it ->
+			}.toList().toArrayList().let { it ->
 				// 把数据存在内存里面方便下次打开使用
-				memoryData = it
 				// 更新 `UI`
-				fragment.context?.runOnUiThread {
-					diffAndUpdateAdapterData<QuotationAdapter>(it)
-					// 设定 `Socket` 并执行
-					currentSocket.isNull() isTrue {
-						// 初始化 `Socket`
-						setSocket {
-							hasInitSocket = true
-							currentSocket?.runSocket()
-						}
-					} otherwise {
-						// 更新 `Socket`
-						subscribeSocket()
+				diffAndUpdateAdapterData<QuotationAdapter>(it)
+				// 设定 `Socket` 并执行
+				currentSocket.isNull() isTrue {
+					// 初始化 `Socket`
+					setSocket {
+						hasInitSocket = true
+						currentSocket?.runSocket()
 					}
+				} otherwise {
+					// 更新 `Socket`
+					subscribeSocket()
 				}
 			}
 		}
@@ -211,6 +194,7 @@ class QuotationPresenter(
 				override fun onOpened() {
 					sendMessage("{\"t\":\"sub_tick\", \"pair_list\":${pairList?.toJsonArray()}}")
 				}
+
 				override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 					hold(CurrencyPriceInfoModel(content), isDisconnected)
 				}

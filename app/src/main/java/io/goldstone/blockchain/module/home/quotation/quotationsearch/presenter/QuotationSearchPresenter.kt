@@ -4,10 +4,8 @@ import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAfterColonContent
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -34,9 +32,7 @@ class QuotationSearchPresenter(
 			overlayView.header.searchInputListener(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
-					if (it) {
-						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
-					}
+					if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
 				}
 			) {
 				hasNetWork isTrue { searchTokenBy(it) }
@@ -49,16 +45,17 @@ class QuotationSearchPresenter(
 		isSelect: Boolean = true,
 		callback: () -> Unit
 	) {
-		isSelect isTrue {
-			// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
-			getLineChartDataByPair(model.pair) { chartData ->
-				QuotationSelectionTable.insertSelection(model.apply {
-					lineChartDay = chartData
-					isSelecting = isSelect
-				}) { callback() }
-			}
-		} otherwise {
-			QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
+		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
+		if (isSelect) getLineChartDataByPair(model.pair) { chartData ->
+			QuotationSelectionTable.insertSelection(model.apply {
+				lineChartDay = chartData
+				isSelecting = isSelect
+			}) { callback() }
+		}
+		else load {
+			GoldStoneDataBase.database.quotationSelectionDao().delete(model)
+		} then {
+			callback()
 		}
 	}
 

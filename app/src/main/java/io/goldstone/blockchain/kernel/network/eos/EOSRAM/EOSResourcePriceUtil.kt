@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network.eos.EOSRAM
+package io.goldstone.blockchain.kernel.network.eos.eosram
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
@@ -9,8 +9,10 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 
 
 /**
- * @author KaySaith
- * @date  2018/09/24
+ * @author LiHai
+ * @date  2018/09/21
+ * @ReWriter KaySaith
+ * @date 2018/09/24
  */
 
 object EOSResourceUtil {
