@@ -3,9 +3,12 @@ package io.goldstone.blockchain.kernel.network.eos.eosram
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.eos.EOSUnit
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import java.math.BigDecimal
 
 
 /**
@@ -64,4 +67,52 @@ object EOSResourceUtil {
 			} else hold(null, error)
 		}
 	}
+	
+	/**
+	 * @date: 2018/9/26
+	 * [unit] 如果不是毫秒单位，一律返回纳秒单位价格
+	 */
+	fun getCPUPriceByTime(
+		totalResourcesCPUWeight: Double,
+		cpuLimitMax: Double,
+		unit: EOSUnit
+	): Double {
+		var cpuPrice = totalResourcesCPUWeight / (cpuLimitMax * 3)
+		if (unit == EOSUnit.MS) {
+			cpuPrice *= 1000
+		}
+		return cpuPrice
+	}
+	
+	fun getNETPriceByTime(
+		totalResourcesNETWeight: Double,
+		netLimitMax: Double,
+		unit: EOSUnit
+	): Double {
+		var netPrice = totalResourcesNETWeight / (netLimitMax * 3)
+		val multiplier = when(unit.value) {
+			EOSUnit.Byte.value-> 1
+			EOSUnit.KB.value -> 1024
+			EOSUnit.MB.value -> 1024 * 1024
+			else -> 1
+		}
+		netPrice *= multiplier
+		return netPrice
+	}
+	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
