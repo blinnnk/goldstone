@@ -81,9 +81,7 @@ data class ContactTable(
 		) {
 			load {
 				GoldStoneDataBase.database.contactDao().deleteByID(id)
-			} then {
-				callback()
-			}
+			} then { callback() }
 		}
 	}
 }

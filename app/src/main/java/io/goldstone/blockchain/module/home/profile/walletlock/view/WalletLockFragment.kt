@@ -1,18 +1,23 @@
 package io.goldstone.blockchain.module.home.profile.walletlock.view
 
+import android.content.Intent
 import android.os.Build
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.component.HoneyBaseSwitch
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.orFalse
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionView
 import io.goldstone.blockchain.common.component.SingleLineSwitch
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
+import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.utils.FingerprintHelper
@@ -26,8 +31,6 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.profile.walletlock.presenter.WalletLockPresenter
 import org.jetbrains.anko.*
-import android.content.Intent
-import com.blinnnk.component.HoneyBaseSwitch
 
 
 /**
@@ -35,6 +38,7 @@ import com.blinnnk.component.HoneyBaseSwitch
  * @author wcx
  */
 class WalletLockFragment : BaseFragment<WalletLockPresenter>() {
+	override val pageTitle: String = ""
 
 	private val changePinCode by lazy { LinearLayout(context) }
 	private var pinCodeSingleLineSwitch: SingleLineSwitch? = null

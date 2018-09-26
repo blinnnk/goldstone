@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
@@ -19,6 +18,7 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
 
@@ -28,8 +28,36 @@ import org.jetbrains.anko.matchParent
  */
 open class TokenManagementListCell(context: Context) : BaseCell(context) {
 
-	var model: DefaultTokenTable? by observing(null) {
+	var model: WalletDetailCellModel? by observing(null) {
 		model?.apply {
+			// 显示默认图判断
+			when {
+				iconUrl.isBlank() -> icon.image.imageResource = R.drawable.default_token
+				contract.isETH() -> icon.image.imageResource = R.drawable.eth_icon
+				contract.isETC() -> icon.image.imageResource = R.drawable.etc_icon
+				contract.isLTC() -> icon.image.imageResource = R.drawable.ltc_icon
+				contract.isBCH() -> icon.image.imageResource = R.drawable.bch_icon
+				contract.isEOS() -> icon.image.imageResource = R.drawable.eos_icon
+				contract.isBTC() ->
+					icon.image.imageResource =
+						if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token
+						else R.drawable.btc_icon
+				else -> icon.image.glideImage(iconUrl)
+			}
+			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
+			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol else tokenName)
+		}
+	}
+	var quotationSearchModel: QuotationSelectionTable? by observing(null) {
+		quotationSearchModel?.apply {
+			tokenInfo.title.text = infoTitle
+			tokenInfo.subtitle.text = name
+			switch.isChecked = isSelecting
+		}
+	}
+
+	var tokenSearchModel: DefaultTokenTable? by observing(null) {
+		tokenSearchModel?.apply {
 			// 显示默认图判断
 			when {
 				iconUrl.isBlank() -> icon.image.imageResource = R.drawable.default_token
@@ -46,16 +74,10 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
 			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
-			switch.isChecked = model?.isUsed.orFalse()
+			switch.isChecked = isUsed
 		}
 	}
-	var searchModel: QuotationSelectionTable? by observing(null) {
-		searchModel?.apply {
-			tokenInfo.title.text = infoTitle
-			tokenInfo.subtitle.text = name
-			switch.isChecked = isSelecting
-		}
-	}
+
 	val switch by lazy { HoneyBaseSwitch(context) }
 	private val tokenInfo by lazy { TwoLineTitles(context) }
 	protected val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }

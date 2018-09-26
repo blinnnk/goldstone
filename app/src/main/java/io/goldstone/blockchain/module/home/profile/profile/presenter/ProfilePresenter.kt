@@ -46,9 +46,6 @@ import java.util.concurrent.Executors
 /**
  * @date 25/03/2018 10:52 PM
  * @author KaySaith
- * @rewriteDate 14/09/2018 11:35 PM
- * @reWriter wcx
- * @description pinCode相关逻辑修改为walletLock
  */
 class ProfilePresenter(
 	override val fragment: ProfileFragment

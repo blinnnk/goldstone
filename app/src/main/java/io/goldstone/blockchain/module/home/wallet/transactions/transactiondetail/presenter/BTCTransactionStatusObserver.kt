@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.error.RequestError
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
@@ -54,17 +55,17 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 fun updateBTCBalanceByTransaction(
 	address: String,
 	activity: MainActivity?,
-	callback: (RequestError) -> Unit
+	callback: (GoldStoneError) -> Unit
 ) {
 	MyTokenTable.getBalanceByContract(
 		TokenContract.BTC,
-		address,
-		callback
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, TokenContract.BTC)
-		GoldStoneAPI.context.runOnUiThread {
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, TokenContract.BTC)
+		} else GoldStoneAPI.context.runOnUiThread {
 			activity?.getWalletDetailFragment()?.presenter?.updateData()
-			callback(RequestError.None)
+			callback(error)
 		}
 	}
 }

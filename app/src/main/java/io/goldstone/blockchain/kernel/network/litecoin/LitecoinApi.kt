@@ -1,12 +1,17 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.getTargetObject
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
+import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONObject
 
@@ -16,15 +21,30 @@ import org.json.JSONObject
  */
 
 object LitecoinApi {
-	fun getBalance(address: String, hold: (Long) -> Unit) {
+	fun getBalance(
+		address: String,
+		@WorkerThread hold: (balance: Long?, error: RequestError) -> Unit
+	) {
 		BTCSeriesApiUtils.getBalance(
 			LitecoinUrl.getBalance(address),
-			{
-				// 当 Insight 接口挂掉的时候向其他备份 Litecoin 接口发起请求
-				LogUtil.error("getBalance Litecoin", it)
-			},
 			hold
 		)
+	}
+
+	fun getBalanceFromChainSo(
+		address: String,
+		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			LitecoinUrl.getBalanceFromChainSo(address),
+			"",
+			true,
+			{ hold(null, it) }
+		) {
+			val result = JSONObject(firstOrNull())
+			val balance = result.getTargetObject("data").safeGet("confirmed_balance").toDoubleOrNull().orZero()
+			hold(balance, RequestError.None)
+		}
 	}
 
 	fun getUnspentListByAddress(
@@ -56,7 +76,7 @@ object LitecoinApi {
 
 	fun getTransactionCount(
 		address: String,
-		errorCallback: (Throwable) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactionCount(

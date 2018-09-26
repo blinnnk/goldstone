@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.home.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.View
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setAlignParentBottom
@@ -54,8 +56,8 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 		}
 	}
 
-	override fun onStart() {
-		super.onStart()
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		presenter.showWalletDetailFragment()
 	}
 

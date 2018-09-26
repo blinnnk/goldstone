@@ -2,8 +2,6 @@ package io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
@@ -29,16 +27,8 @@ class ContactPresenter(
 	}
 
 	fun deleteContact(id: Int) {
-		fragment.context?.showAlertView(
-			ProfileText.deletContactAlertTitle,
-			ProfileText.deleteContactAlertDescription,
-			false
-		) {
-			fragment.getAdapter<ContactsAdapter>()?.dataSet.orEmptyArray().removeAt(id)
-			fragment.getAdapter<ContactsAdapter>()?.notifyDataSetChanged()
-			ContactTable.deleteContactByID(id) {
-				updateAddressList()
-			}
+		ContactTable.deleteContactByID(id) {
+			updateAddressList()
 		}
 	}
 

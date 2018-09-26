@@ -7,7 +7,7 @@ package io.goldstone.blockchain.common.value
  */
 
 object Current {
-	fun chianIDs(): List<String> = listOf(
+	fun chainIDs(): List<String> = listOf(
 		Config.getCurrentChain().id,
 		Config.getETCCurrentChain().id,
 		Config.getBTCCurrentChain().id,

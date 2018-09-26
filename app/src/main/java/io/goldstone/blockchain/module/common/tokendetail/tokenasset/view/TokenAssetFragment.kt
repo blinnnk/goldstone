@@ -65,7 +65,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		GraySquareCell(context!!).apply {
 			showArrow()
 			setTitle(TokenDetailText.authority)
-			setSubtitle(Config.getCurrentEOSName().accountName)
+			setSubtitle(Config.getCurrentEOSAccount().accountName)
 			click { presenter.showPublicKeyAccountNames() }
 		}
 	}
@@ -75,7 +75,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			showOnlyCopyButton {
 				context?.clickToCopy(Config.getCurrentEOSAddress())
 			}
-			setTitle(TokenDetailText.address)
+			setTitle("Public Key")
 			val address =
 				if (Config.getCurrentEOSAddress().isEmpty()) "Account Name Only" else Config.getCurrentEOSAddress().scaleTo(20)
 			setSubtitle(address)

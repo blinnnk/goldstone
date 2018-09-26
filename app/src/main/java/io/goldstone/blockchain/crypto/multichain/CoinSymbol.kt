@@ -21,7 +21,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 			CoinSymbol(symbol).isETC() ->
 				Config.getCurrentETCAddress()
 			CoinSymbol(symbol).isEOS() ->
-				if (isEOSAccountName) Config.getCurrentEOSName().accountName
+				if (isEOSAccountName) Config.getCurrentEOSAccount().accountName
 				else Config.getCurrentEOSAddress()
 			else ->
 				Config.getCurrentEthereumAddress()

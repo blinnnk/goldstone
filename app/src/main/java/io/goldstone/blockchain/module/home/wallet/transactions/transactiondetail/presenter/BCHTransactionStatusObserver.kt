@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
@@ -49,30 +49,20 @@ fun TransactionDetailPresenter.observerBCHTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailBCHValue(
+private fun updateWalletDetailBCHValue(
 	address: String,
 	activity: MainActivity?
-) {
-	updateBCHBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
-	address: String,
-	@UiThread callback: () -> Unit
 ) {
 	val contract = TokenContract.BCH
 	MyTokenTable.getBalanceByContract(
 		contract,
-		address,
-		{
-			fragment.context.alert(it.message)
-			callback()
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, contract)
+		} else GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
 		}
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, contract)
-		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }
 

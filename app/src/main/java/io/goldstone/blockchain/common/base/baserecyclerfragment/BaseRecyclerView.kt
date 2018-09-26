@@ -38,10 +38,10 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		itemAnimator?.changeDuration = 0
 	}
 
-	fun addSwipeEvent(
+	fun <T>addSwipeEvent(
 		icon: Int,
 		iconPaddingSize: Int,
-		callback: (position: Int) -> Unit
+		callback: (position: Int, itemView: T?) -> Unit
 	) {
 		object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.LEFT) {
 			override fun onMove(
@@ -94,7 +94,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 			override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
 				//Remove swiped item from list and notify the RecyclerView
 				val position = viewHolder.adapterPosition
-				callback(position)
+				callback(position, viewHolder.itemView as? T)
 			}
 		}.let { ItemTouchHelper(it).attachToRecyclerView(this) }
 	}

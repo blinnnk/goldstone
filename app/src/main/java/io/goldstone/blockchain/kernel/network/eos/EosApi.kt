@@ -310,7 +310,7 @@ object EOSAPI {
 			false
 		) { jsonString ->
 			JSONArray(jsonString).toList().map {
-				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName().accountName)
+				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSAccount().accountName)
 			}.let(hold)
 		}
 	}

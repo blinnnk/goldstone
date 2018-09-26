@@ -69,7 +69,7 @@ class DepositPresenter(
 				}
 
 				token?.contract.isEOS() -> {
-					val accountName = Config.getCurrentEOSName().accountName
+					val accountName = Config.getCurrentEOSAccount().accountName
 					QRCode.generateEOSCode(
 						accountName,
 						EOSCodeName.EOSIO.value, // `EOS` 的 `Token` 要支持传递对应的 `Token Code`

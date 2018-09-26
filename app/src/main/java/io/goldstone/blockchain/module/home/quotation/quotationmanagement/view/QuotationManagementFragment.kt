@@ -27,7 +27,7 @@ class QuotationManagementFragment :
 	) {
 		recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
 			cell.switch.onClick { _ ->
-				cell.searchModel?.apply {
+				cell.quotationSearchModel?.apply {
 					// 更新内存里面的数据防止复用的时候出错
 					asyncData?.find { selection ->
 						selection.pair.equals(pair, true)

@@ -26,6 +26,9 @@ import org.jetbrains.anko.runOnUiThread
  * @important
  * [goldStoneID] 这个 ID 是自身业务服务器和客户端用来做
  * 唯一校验的值, 不是常规意义的 `Device ID`
+ * @rewriteDate 10/09/2018 7:54 PM
+ * @reWriter wcx
+ * @description 添加showFingerprintUnlock指纹解锁判断属性和更新数据库方法setShowFingerprintUnlockStatus
  */
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
@@ -33,6 +36,7 @@ data class AppConfigTable(
 	var id: Int,
 	var pincode: Int? = null,
 	var showPincode: Boolean = false,
+	var showFingerprintUnlock: Boolean = false,
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
@@ -169,6 +173,25 @@ data class AppConfigTable(
 							if (!status) {
 								pincode = null
 							}
+						})
+						GoldStoneAPI.context.runOnUiThread {
+							callback()
+						}
+					}
+				}
+			}
+		}
+
+
+		fun setShowFingerprintUnlockStatus(
+			status: Boolean,
+			callback: () -> Unit
+		) {
+			AppConfigTable.getAppConfig { it ->
+				it?.let {
+					doAsync {
+						GoldStoneDataBase.database.appConfigDao().update(it.apply {
+							showFingerprintUnlock = status
 						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()

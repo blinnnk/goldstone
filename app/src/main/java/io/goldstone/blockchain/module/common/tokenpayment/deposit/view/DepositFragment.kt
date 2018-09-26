@@ -29,8 +29,7 @@ import org.jetbrains.anko.*
  */
 class DepositFragment : BaseFragment<DepositPresenter>() {
 
-	override val pageTitle: String
-		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+	override val pageTitle: String get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = DepositPresenter(this)
@@ -124,6 +123,10 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 						if (Config.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentLTCAddress)
+					}
+
+					token?.contract.isEOS() -> {
+						qrView.setAddressText(currentEOSAccountName.getCurrent())
 					}
 
 					token?.contract.isBCH() -> {

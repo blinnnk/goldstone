@@ -75,7 +75,7 @@ class TokenAssetPresenter(
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
 			Bundle().apply {
-				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName().accountName)
+				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSAccount().accountName)
 			},
 			2
 		)
@@ -104,7 +104,7 @@ class TokenAssetPresenter(
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val account = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSAccount()
 		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
@@ -127,7 +127,7 @@ class TokenAssetPresenter(
 
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val account = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
 			account.accountName,
 			Config.getEOSCurrentChain()

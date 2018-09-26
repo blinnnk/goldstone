@@ -1,21 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
-import io.goldstone.blockchain.common.error.EthereumRPCError
-import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -33,8 +23,26 @@ data class WalletDetailCellModel(
 	var currency: Double = 0.0,
 	var contract: TokenContract,
 	var weight: Int = 0,
+	var chainID: String,
 	var eosWalletType: EOSWalletType
 ) : Serializable {
+
+	constructor(
+		data: MyTokenWithDefaultTable,
+		eosWalletType: EOSWalletType
+	) : this(
+		data.iconUrl,
+		data.symbol,
+		data.tokenName,
+		data.decimal,
+		data.count,
+		data.price,
+		data.currency,
+		TokenContract(data.contract),
+		data.weight,
+		data.chainID,
+		eosWalletType
+	)
 
 	constructor(
 		data: DefaultTokenTable,
@@ -50,6 +58,7 @@ data class WalletDetailCellModel(
 		CryptoUtils.toCountByDecimal(amount, data.decimals) * data.price,
 		TokenContract(data.contract),
 		data.weight,
+		data.chainID,
 		eosWalletType
 	)
 
@@ -67,150 +76,7 @@ data class WalletDetailCellModel(
 		balance * data.price,
 		TokenContract(data.contract),
 		data.weight,
-		eosWalletType
+		data.chainID,
+		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None
 	)
-
-	companion object {
-		fun getLocalModels(hold: (List<WalletDetailCellModel>, List<MyTokenTable>) -> Unit) {
-			MyTokenTable.getMyTokens { myTokens ->
-				// 当前钱包没有指定 `Token` 直接返回
-				if (myTokens.isEmpty()) hold(arrayListOf(), myTokens)
-				else DefaultTokenTable.getCurrentChainTokens { localTokens ->
-					WalletTable.getCurrentEOSWalletType { eosWalletType ->
-						object : ConcurrentAsyncCombine() {
-							val tokenList = ArrayList<WalletDetailCellModel>()
-							override var asyncCount: Int = myTokens.size
-							override fun concurrentJobs() {
-								myTokens.forEach { token ->
-									val type =
-										if (TokenContract(token.contract).isEOS()) eosWalletType else EOSWalletType.None
-									localTokens.find {
-										it.contract.equals(token.contract, true)
-									}?.let { targetToken ->
-										/**
-										 * 需求会在账单拉取后把当前账号地址下的 `Token` 也显示出来, 拉取账单的地方因为数量和第三方的
-										 * 原因, 尽量提速的时候并没有拉取 `TokenName` 所以在这里显示以上原因插入的 `Token` 如
-										 * 果 `TokenName` 为空会额外拉取一次.
-										 */
-										if (targetToken.name.isEmpty()) targetToken.updateTokenNameFromChain(
-											{
-												LogUtil.error("updateTokenNameFromChain", it)
-												completeMark()
-											}
-										) {
-											// 这个 `token name` 的查询方法是 `Ethereum` 的特产, 顾不是 `EOS Wallet`
-											tokenList.add(WalletDetailCellModel(it, token.balance, EOSWalletType.None))
-											completeMark()
-										} else {
-											tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
-											completeMark()
-										}
-									}
-								}
-							}
-
-							override fun mergeCallBack() = hold(tokenList, myTokens)
-						}.start()
-					}
-				}
-			}
-		}
-
-		fun getChainModels(
-			myTokens: List<MyTokenTable>,
-			hold: (List<WalletDetailCellModel>?, RequestError) -> Unit
-		): Boolean {
-			// 没有网络直接返回
-			return when {
-				!NetworkUtil.hasNetwork(GoldStoneAPI.context) -> false
-				// 当前钱包没有指定 `Token` 直接返回
-				myTokens.isEmpty() -> {
-					hold(arrayListOf(), RequestError.None)
-					false
-				}
-				else -> {
-					myTokens.updateMyTokensPrices { error ->
-						// 首先更新 `MyToken` 的 `Price`
-						DefaultTokenTable.getCurrentChainTokens { localTokens ->
-							WalletTable.getCurrentEOSWalletType { eosWalletType ->
-								object : ConcurrentAsyncCombine() {
-									val tokenList = ArrayList<WalletDetailCellModel>()
-									override var asyncCount: Int = myTokens.size
-									override fun concurrentJobs() {
-										myTokens.forEach { token ->
-											val type =
-												if (TokenContract(token.contract).isEOS()) eosWalletType
-												else EOSWalletType.None
-											localTokens.find {
-												it.contract.equals(token.contract, true)
-											}?.let { targetToken ->
-												// 链上查余额
-												MyTokenTable.getBalanceByContract(
-													TokenContract(targetToken.contract),
-													token.ownerName,
-													{
-														// 如果出错的话余额暂时设定用旧的值
-														tokenList.add(WalletDetailCellModel(targetToken, token.balance, type))
-														completeMark()
-													}
-												) { balance ->
-													// 更新数据的余额信息
-													MyTokenTable.updateBalanceByContract(
-														balance,
-														token.ownerName,
-														TokenContract(targetToken.contract)
-													)
-													tokenList.add(WalletDetailCellModel(targetToken, balance, type))
-													completeMark()
-												}
-											}
-										}
-									}
-
-									override fun mergeCallBack() = hold(tokenList, error)
-								}.start()
-							}
-						}
-					}
-					true // 正在执行线程
-				}
-			}
-		}
-
-		private fun DefaultTokenTable.updateTokenNameFromChain(
-			errorCallback: (EthereumRPCError?) -> Unit,
-			callback: (DefaultTokenTable) -> Unit
-		) {
-			GoldStoneEthCall.getTokenName(
-				contract,
-				{
-					callback(this)
-					LogUtil.error("getTokenName ", it)
-					errorCallback(it)
-				},
-				Config.getCurrentChainName()
-			) {
-				val name = if (it.isEmpty()) symbol else it
-				DefaultTokenTable.updateTokenName(TokenContract(contract), name)
-				callback(apply { this.name = name })
-			}
-		}
-
-		private fun List<MyTokenTable>.updateMyTokensPrices(callback: (RequestError) -> Unit) {
-			GoldStoneAPI.getPriceByContractAddress(map { it.contract }.toJsonArray(), callback) { newPrices ->
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount: Int = newPrices.size
-					override fun concurrentJobs() {
-						newPrices.forEach {
-							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract), it.price)
-							completeMark()
-						}
-					}
-
-					override fun mergeCallBack() = callback(RequestError.None)
-				}.start()
-			}
-		}
-	}
 }

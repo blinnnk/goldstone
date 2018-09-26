@@ -65,7 +65,7 @@ class EOSAccountRegisterPresenter(
 		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { priceInEOS, ramPriceError ->
 			if (!priceInEOS.isNull() && ramPriceError.isNone()) {
 				val ramEOSCount = (ramAmount.toDouble() * priceInEOS!!).formatDecimal(4)
-				val creatorAccount = Config.getCurrentEOSName()
+				val creatorAccount = Config.getCurrentEOSAccount()
 				val totalSpent = cpuEOSCount + netAEOSCount + ramEOSCount
 				checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
 					if (!error.isNone()) callback(error)

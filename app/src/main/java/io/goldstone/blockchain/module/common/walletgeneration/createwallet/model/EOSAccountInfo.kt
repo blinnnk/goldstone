@@ -37,7 +37,7 @@ data class EOSAccountInfo(
 	}
 
 	fun isActivatedWatchOnlyEOSAccount(): Boolean {
-		return ChainID(chainID).isCurrent() && name.equals(Config.getCurrentEOSName().accountName, true)
+		return ChainID(chainID).isCurrent() && name.equals(Config.getCurrentEOSAccount().accountName, true)
 	}
 
 	override fun getObject(): String {
