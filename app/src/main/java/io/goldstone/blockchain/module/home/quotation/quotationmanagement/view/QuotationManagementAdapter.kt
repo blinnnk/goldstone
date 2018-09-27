@@ -17,7 +17,7 @@ class QuotationManagementAdapter(
   override fun generateCell(context: Context) = QuotationManagementCell(context)
 
   override fun QuotationManagementCell.bindCell(data: QuotationSelectionTable, position: Int) {
-    searchModel = data
+		quotationSearchModel = data
     hold(this)
   }
 

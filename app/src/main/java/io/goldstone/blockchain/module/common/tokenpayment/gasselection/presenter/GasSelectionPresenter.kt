@@ -8,6 +8,8 @@ import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -26,7 +28,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEdit
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
@@ -45,7 +46,7 @@ class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
 
-	var currentMinerType = MinerFeeType.Recommend.content
+	var currentMinerType = MinerFeeType.Recommend
 	var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
@@ -91,7 +92,7 @@ class GasSelectionPresenter(
 						index,
 						miner.toString().toLong(),
 						prepareBTCSeriesModel?.signedMessageSize ?: 226,
-						currentMinerType,
+						currentMinerType.type,
 						getToken()?.symbol.orEmpty()
 					)
 				else
@@ -99,11 +100,11 @@ class GasSelectionPresenter(
 						index,
 						miner.toString().toDouble(),
 						prepareGasLimit(miner.toDouble().toGwei()).toDouble(),
-						currentMinerType,
+						currentMinerType.type,
 						getUnitSymbol()
 					)
 
-				if (model.type == currentMinerType) {
+				if (model.type == currentMinerType.type) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -111,7 +112,7 @@ class GasSelectionPresenter(
 					gasUsedGasFee = getGasUnitCount(model.count)
 				}
 			}.click { it ->
-				currentMinerType = it.model.type
+				currentMinerType = MinerFeeType.getTypeByValue(it.model.type)
 				if (CoinSymbol(getToken()?.symbol).isBTCSeries())
 					updateBTCGasSettings(getToken()?.symbol.orEmpty(), parent)
 				else updateGasSettings(parent)
@@ -127,8 +128,6 @@ class GasSelectionPresenter(
 	fun goToGasEditorFragment() {
 		rootFragment?.apply {
 			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,
@@ -145,30 +144,20 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
-		// Prevent user click the other button at this time
-		fragment.showMaskView(true)
+	fun confirmTransfer(callback: (GoldStoneError) -> Unit) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
-			callback()
-			fragment.showMaskView(false)
-			return
-		}
-		// 检查网络并执行转账操作
-		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			when {
-				getToken()?.contract.isBTC() ->
-					prepareToTransferBTC(footer, callback)
-				getToken()?.contract.isLTC() ->
-					prepareToTransferLTC(footer, callback)
-				getToken()?.contract.isBCH() ->
-					prepareToTransferBCH(footer, callback)
-				getToken()?.contract.isEOS() -> {
-					// TODO EOS
-				}
-				else -> prepareToTransfer(footer, callback)
-			}
+			callback(TransferError.IncorrectDecimal)
+		} else if (NetworkUtil.hasNetworkWithAlert(fragment.context)) when {
+			// 检查网络并执行转账操作
+			getToken()?.contract.isBTC() ->
+				prepareToTransferBTC(callback)
+			getToken()?.contract.isLTC() ->
+				prepareToTransferLTC(callback)
+			getToken()?.contract.isBCH() ->
+				prepareToTransferBCH(callback)
+			else -> prepareToTransfer(callback)
 		}
 	}
 
@@ -182,38 +171,24 @@ class GasSelectionPresenter(
 		return isValid
 	}
 
-	fun showConfirmAttentionView(
-		footer: GasSelectionFooter,
-		callback: () -> Unit
-	) {
+	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransaction,
 			CommonText.enterPassword.toUpperCase(),
-			true,
-			{
-				// 点击 `Alert` 取消按钮
-				footer.getConfirmButton {
-					showLoadingStatus(false)
-				}
-				fragment.showMaskView(false)
-			}) {
+			true
+		) {
+			val password = it?.text.toString()
 			when {
-				getToken()?.contract.isBTC() ->
-					prepareBTCSeriesModel?.apply {
-						transferBTC(this, it?.text.toString(), callback)
+				getToken()?.contract.isBTC() -> prepareBTCSeriesModel?.apply {
+						transferBTC(this, password, callback)
 					}
-				getToken()?.contract.isLTC() ->
-					prepareBTCSeriesModel?.apply {
-						transferLTC(this, it?.text.toString(), callback)
+				getToken()?.contract.isLTC() -> prepareBTCSeriesModel?.apply {
+						transferLTC(this, password, callback)
 					}
-				getToken()?.contract.isBCH() ->
-					prepareBTCSeriesModel?.apply {
-						transferBCH(this, it?.text.toString(), callback)
+				getToken()?.contract.isBCH() -> prepareBTCSeriesModel?.apply {
+						transferBCH(this, password, callback)
 					}
-				getToken()?.contract.isEOS() -> {
-					// TODO EOS
-				}
-				else -> transfer(it?.text.toString(), callback)
+				else -> transfer(password, callback)
 			}
 		}
 	}
@@ -292,12 +267,12 @@ class GasSelectionPresenter(
 	) {
 		val coinContract =
 			when {
-				getToken()?.contract.isETC() -> TokenContract.getETC()
-				getToken()?.contract.isBTC() -> TokenContract.getBTC()
-				getToken()?.contract.isLTC() -> TokenContract.getLTC()
-				getToken()?.contract.isEOS() -> TokenContract.getEOS()
-				getToken()?.contract.isBCH() -> TokenContract.getBCH()
-				else -> TokenContract.getETH()
+				getToken()?.contract.isETC() -> TokenContract.ETC
+				getToken()?.contract.isBTC() -> TokenContract.BTC
+				getToken()?.contract.isLTC() -> TokenContract.LTC
+				getToken()?.contract.isEOS() -> TokenContract.EOS
+				getToken()?.contract.isBCH() -> TokenContract.BCH
+				else -> TokenContract.ETH
 			}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(

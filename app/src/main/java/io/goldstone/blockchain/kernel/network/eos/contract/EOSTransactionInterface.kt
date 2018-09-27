@@ -36,10 +36,7 @@ abstract class EOSTransactionInterface {
 			EOSAPI.pushTransaction(
 				listOf(signature),
 				data.packedTX,
-				{
-					errorCallback(RequestError.PostFailed(it))
-					LogUtil.error("EOSTransaction, Send", it)
-				}
+				errorCallback
 			) {
 				GoldStoneAPI.context.runOnUiThread { hold(it) }
 			}

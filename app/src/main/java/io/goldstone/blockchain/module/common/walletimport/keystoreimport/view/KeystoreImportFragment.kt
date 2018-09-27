@@ -7,7 +7,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.*
+import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
@@ -35,6 +36,7 @@ import org.jetbrains.anko.*
  */
 class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
+	override val pageTitle: String = ImportMethodText.keystore
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	private val keystoreEditText by lazy { WalletEditText(context!!) }
@@ -69,13 +71,13 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
 				passwordInput.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 				}.into(this)
 
 				hintInput.apply {
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
 
@@ -85,30 +87,29 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					}.click {
 						getParentFragment<WalletImportFragment> {
 							presenter.showTargetFragment<WebViewFragment>(
-								ProfileText.terms,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.terms)
+									putString(ArgumentKey.webViewName, ProfileText.terms)
 								}
 							)
 						}
 					}.into(this)
 
 				confirmButton.apply {
-					setBlueStyle()
+					setBlueStyle(10.uiPX())
 					text = CommonText.confirm.toUpperCase()
-					y += 10.uiPX()
-				}.click {
-					it.showLoadingStatus()
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.importKeystoreWallet(
 						keystoreEditText.text.toString(),
 						passwordInput,
 						nameInput,
 						agreementView.radioButton.isChecked,
 						hintInput
-					) { isSuccessful ->
-						it.showLoadingStatus(false)
-						if (isSuccessful) activity?.jump<SplashActivity>()
+					) {
+						button.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						else activity?.jump<SplashActivity>()
 					}
 				}.into(this)
 
@@ -118,10 +119,9 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsKeystore,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
+									putString(ArgumentKey.webViewName, QAText.whatIsKeystore)
 								}
 							)
 						}

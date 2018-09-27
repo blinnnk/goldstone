@@ -32,6 +32,8 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
 	}
 
+	override val pageTitle: String get() = currencyInfo?.pairDisplay.orEmpty()
+
 	private val menuBar by lazy {
 		ViewPagerMenu(context!!)
 	}

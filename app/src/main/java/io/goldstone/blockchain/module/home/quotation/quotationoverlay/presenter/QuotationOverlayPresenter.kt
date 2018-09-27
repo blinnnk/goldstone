@@ -22,7 +22,7 @@ class QuotationOverlayPresenter(
 	override val fragment: QuotationOverlayFragment
 ) : BaseOverlayPresenter<QuotationOverlayFragment>() {
 
-	fun showQutationManagementFragment() {
+	fun showQuotationManagementFragment() {
 		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content)
 	}
 
@@ -47,11 +47,8 @@ class QuotationOverlayPresenter(
 		}
 	}
 
-	fun showQutationSearchFragment() {
-		showTargetFragment<QuotationSearchFragment>(
-			QuotationText.search,
-			QuotationText.management
-		)
+	fun showQuotationSearchFragment() {
+		showTargetFragment<QuotationSearchFragment>()
 		fragment.overlayView.header.apply {
 			showBackButton(false)
 			showSearchInput {

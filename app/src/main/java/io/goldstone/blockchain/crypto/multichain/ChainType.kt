@@ -17,13 +17,6 @@ import java.io.Serializable
  */
 class ChainType(val id: Int) : Serializable {
 
-	fun isBTC() = id == ChainType.BTC.id
-	fun isLTC() = id == ChainType.LTC.id
-	fun isEOS() = id == ChainType.EOS.id
-	fun isETH() = id == ChainType.ETH.id
-	fun isETC() = id == ChainType.ETC.id
-	fun isBCH() = id == ChainType.BCH.id
-
 	fun getCurrentChainName(): String {
 		return when (id) {
 			ChainType.ETH.id -> Config.getCurrentChainName()
@@ -33,6 +26,18 @@ class ChainType(val id: Int) : Serializable {
 			ChainType.BCH.id -> Config.getBCHCurrentChainName()
 			ChainType.EOS.id -> Config.getEOSCurrentChainName()
 			else -> Config.getCurrentChainName()
+		}
+	}
+
+	fun getSymbol(): CoinSymbol {
+		return when (id) {
+			ChainType.ETH.id -> CoinSymbol.ETH
+			ChainType.ETC.id -> CoinSymbol.ETC
+			ChainType.BTC.id -> CoinSymbol.BTC
+			ChainType.LTC.id -> CoinSymbol.LTC
+			ChainType.BCH.id -> CoinSymbol.BCH
+			ChainType.EOS.id -> CoinSymbol.EOS
+			else -> CoinSymbol.ETH
 		}
 	}
 
@@ -53,6 +58,17 @@ class ChainType(val id: Int) : Serializable {
 				if (!Config.getETCCurrentChain().isETCMain()) ChainText.etcMainGasTracker
 				else Config.getETCCurrentChainName()
 			}
+		}
+	}
+
+	fun getContract(): TokenContract {
+		return when (id) {
+			ChainType.ETH.id -> TokenContract.ETH
+			ChainType.BTC.id -> TokenContract.BTC
+			ChainType.LTC.id -> TokenContract.LTC
+			ChainType.BCH.id -> TokenContract.BCH
+			ChainType.EOS.id -> TokenContract.EOS
+			else -> TokenContract.ETC
 		}
 	}
 
@@ -85,7 +101,7 @@ class ChainType(val id: Int) : Serializable {
 			when (id) {
 				ChainType.ETH.id -> {
 					Config.updateCurrentEthereumAddress(newAddress)
-					currentWallet?.currentETHAndERCAddress = newAddress
+					currentWallet?.currentETHSeriesAddress = newAddress
 				}
 				ChainType.ETC.id -> {
 					currentWallet?.currentETCAddress = newAddress
@@ -168,3 +184,14 @@ class ChainType(val id: Int) : Serializable {
 		}
 	}
 }
+
+fun ChainType?.isBTC() = this?.id == ChainType.BTC.id
+fun ChainType?.isLTC() = this?.id == ChainType.LTC.id
+fun ChainType?.isEOS() = this?.id == ChainType.EOS.id
+fun ChainType?.isETH() = this?.id == ChainType.ETH.id
+fun ChainType?.isETC() = this?.id == ChainType.ETC.id
+fun ChainType?.isBCH() = this?.id == ChainType.BCH.id
+fun ChainType?.isAllTest() = this?.id == ChainType.AllTest.id
+
+fun ChainType?.isStoredInKeyStoreByAddress() =
+	this?.id == ChainType.LTC.id || this?.id == ChainType.BCH.id || this?.id == ChainType.BTC.id || this?.id == ChainType.AllTest.id || this?.id == ChainType.EOS.id

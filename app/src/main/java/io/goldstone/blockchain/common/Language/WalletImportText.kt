@@ -73,31 +73,31 @@ object ImportWalletText {
 	@JvmField
 	val customLitecoinPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Litecoin Path"
-		HoneyLanguage.Chinese.code -> "Custom Litecoin Path"
-		HoneyLanguage.Japanese.code -> "Custom Litecoin Path"
-		HoneyLanguage.Korean.code -> "Custom Litecoin Path"
-		HoneyLanguage.Russian.code -> "Custom Litecoin Path"
-		HoneyLanguage.TraditionalChinese.code -> "Custom Litecoin Path"
+		HoneyLanguage.Chinese.code -> "自定义LTC(莱特币)路径"
+		HoneyLanguage.Japanese.code -> "カスタムLTC(リテコイン)パス"
+		HoneyLanguage.Korean.code -> "맞춤 LTC 경로"
+		HoneyLanguage.Russian.code -> "Пользовательский путь LTC"
+		HoneyLanguage.TraditionalChinese.code -> "自定義LTC(莱特幣)路徑"
 		else -> ""
 	}
 	@JvmField
 	val customBCHPath = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Custom Bitcoin Cash Path"
-		HoneyLanguage.Chinese.code -> "Custom Bitcoin Cash Path"
-		HoneyLanguage.Japanese.code -> "Custom Bitcoin Cash Path"
-		HoneyLanguage.Korean.code -> "Custom Bitcoin Cash Path"
-		HoneyLanguage.Russian.code -> "Custom Bitcoin Cash Path"
-		HoneyLanguage.TraditionalChinese.code -> "Custom Bitcoin Cash Path"
+		HoneyLanguage.English.code -> "Custom BCH Path"
+		HoneyLanguage.Chinese.code -> "自定义BCH(比特币现金)路径"
+		HoneyLanguage.Japanese.code -> "カスタムBCHパス"
+		HoneyLanguage.Korean.code -> "맞춤 BCH 경로"
+		HoneyLanguage.Russian.code -> "Пользовательский путь BCH"
+		HoneyLanguage.TraditionalChinese.code -> "自定義BCH(比特幣現金)路徑"
 		else -> ""
 	}
 	@JvmField
 	val customEOSPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom EOS Path"
-		HoneyLanguage.Chinese.code -> "Custom EOS Path"
-		HoneyLanguage.Japanese.code -> "Custom EOS Path"
-		HoneyLanguage.Korean.code -> "Custom EOS Path"
-		HoneyLanguage.Russian.code -> "Custom EOS Path"
-		HoneyLanguage.TraditionalChinese.code -> "Custom EOS Path"
+		HoneyLanguage.Chinese.code -> "自定义EOS路径"
+		HoneyLanguage.Japanese.code -> "カスタムEOSパス"
+		HoneyLanguage.Korean.code -> "맞춤 EOS 경로"
+		HoneyLanguage.Russian.code -> "Пользовательский путь EOS"
+		HoneyLanguage.TraditionalChinese.code -> "自定義EOS路徑"
 		else -> ""
 	}
 	@JvmField
@@ -122,32 +122,52 @@ object ImportWalletText {
 	}
 	@JvmField
 	val supportedChain = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Supported Chain Type"
-		HoneyLanguage.Chinese.code -> "Supported Chain Type"
-		HoneyLanguage.Japanese.code -> "Supported Chain Type"
-		HoneyLanguage.Korean.code -> "Supported Chain Type"
-		HoneyLanguage.Russian.code -> "Supported Chain Type"
-		HoneyLanguage.TraditionalChinese.code -> "Supported Chain Type"
+		HoneyLanguage.English.code -> "Chains Supported"
+		HoneyLanguage.Chinese.code -> "支持的链"
+		HoneyLanguage.Japanese.code -> "サポートされるチェーン"
+		HoneyLanguage.Korean.code -> "지원되는 체인"
+		HoneyLanguage.Russian.code -> "Поддерживаемые цепочки"
+		HoneyLanguage.TraditionalChinese.code -> "支持的鏈"
 		else -> ""
 	}
 	@JvmField
 	val importWatchWallet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Import Watch Wallet"
-		HoneyLanguage.Chinese.code -> "Import Watch Wallet"
-		HoneyLanguage.Japanese.code -> "Import Watch Wallet"
-		HoneyLanguage.Korean.code -> "Import Watch Wallet"
-		HoneyLanguage.Russian.code -> "Import Watch Wallet"
-		HoneyLanguage.TraditionalChinese.code -> "Import Watch Wallet"
+		HoneyLanguage.Chinese.code -> "导入观察钱包"
+		HoneyLanguage.Japanese.code -> "観測ウォレットをインポートする"
+		HoneyLanguage.Korean.code -> "수입 관측 지갑"
+		HoneyLanguage.Russian.code -> "Импорт только кошелька"
+		HoneyLanguage.TraditionalChinese.code -> "導入觀察錢包"
 		else -> ""
 	}
 	@JvmField
 	val mnemonicHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter your mnemonic, split with spaces"
+		HoneyLanguage.English.code -> "Enter your mnemonics, split with spaces"
 		HoneyLanguage.Chinese.code -> "按顺序输入助记词，使用空格间隔"
 		HoneyLanguage.Japanese.code -> "スペースで間隔を空けて順番にニーモニックを入力して下さい"
-		HoneyLanguage.Korean.code -> "순서대로 니모닉 프레이즈(Mnemonic Phrase)를 입력하고 스페이스로 분리시키십시오"
+		HoneyLanguage.Korean.code -> "순서대로 니모닉 프레이즈(Mnemonics Phrase)를 입력하고 스페이스로 분리시키십시오"
 		HoneyLanguage.Russian.code -> "Введите мнемоническую запись по порядку, для интервалов используйте пробел"
 		HoneyLanguage.TraditionalChinese.code -> "請按順序輸入助記詞，詞間使用空格符間隔"
+		else -> ""
+	}
+	@JvmField
+	val registerEOSPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter the public key you want to register."
+		HoneyLanguage.Chinese.code -> "填写你想绑定在这个账号上的EOS公钥"
+		HoneyLanguage.Japanese.code -> "アカウントにバインドするEOS公開鍵を入力します"
+		HoneyLanguage.Korean.code -> "계정에 바인딩하려는 EOS 공개 키를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Заполните открытый ключ EOS, который вы хотите привязать к своей учетной записи."
+		HoneyLanguage.TraditionalChinese.code -> "填寫你想綁定在这個賬號上的EOS公鑰"
+		else -> ""
+	}
+	@JvmField
+	val eosAccountName = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account Name"
+		HoneyLanguage.Chinese.code -> "用户名"
+		HoneyLanguage.Japanese.code -> "アカウント名"
+		HoneyLanguage.Korean.code -> "계정 이름"
+		HoneyLanguage.Russian.code -> "Имя пользователя"
+		HoneyLanguage.TraditionalChinese.code -> "用戶名"
 		else -> ""
 	}
 	@JvmField
@@ -212,12 +232,12 @@ object ImportWalletText {
 	}
 	@JvmField
 	val invalidLTCPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect Litecoin private key address format"
-		HoneyLanguage.Chinese.code -> "Incorrect Litecoin private key address format"
-		HoneyLanguage.Japanese.code -> "Incorrect Litecoin private key address format"
-		HoneyLanguage.Korean.code -> "Incorrect Litecoin private key address format"
-		HoneyLanguage.Russian.code -> "Incorrect Litecoin private key address format"
-		HoneyLanguage.TraditionalChinese.code -> "Incorrect Litecoin private key address format"
+		HoneyLanguage.English.code -> "Incorrect Litecoin main network private key address format"
+		HoneyLanguage.Chinese.code -> "不是正确的莱特币私钥格式"
+		HoneyLanguage.Japanese.code -> "正しいLitecoin秘密鍵またはアドレス形式ではありません。"
+		HoneyLanguage.Korean.code -> "올바른 Litecoin 개인 키 형식이 아닙니다."
+		HoneyLanguage.Russian.code -> "Не правильный формат частного ключа Litecoin"
+		HoneyLanguage.TraditionalChinese.code -> "不是正確的莱特幣私鑰格式"
 		else -> ""
 	}
 	@JvmField
@@ -237,7 +257,7 @@ object ImportWalletText {
 		HoneyLanguage.Japanese.code -> "正しいbitcoin秘密鍵またはアドレス形式ではありません。"
 		HoneyLanguage.Korean.code -> "올바른 비트 코인 개인 키 또는 주소 형식이 아닙니다."
 		HoneyLanguage.Russian.code -> "Не правильный личный ключ или адресный биткойн"
-		HoneyLanguage.TraditionalChinese.code -> "不是正確的比特幣私鑰或地址格式"
+		HoneyLanguage.TraditionalChinese.code -> "不是正確的比特幣私鑰格式"
 		else -> ""
 	}
 	@JvmField
@@ -282,12 +302,12 @@ object ImportWalletText {
 	}
 	@JvmField
 	val importWalletDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "we supported that import multi-chain wallet by any single mnemonic, private key or keystore file"
-		HoneyLanguage.Chinese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
-		HoneyLanguage.Japanese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
-		HoneyLanguage.Korean.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.English.code -> "Import mnemonics, you will get a multi-chain wallet based on BIP44 standard. When you import a private key or keystore file of a single chain account, GoldStone will generate a multi-chain wallet for you, containing the previous single-chain assets. "
+		HoneyLanguage.Chinese.code -> "导入助记词，您将获得一个基于BIP44标准的分层确定性(HD)多链钱包。如果你选择导入某个单链的私钥或是keystore文件，那么GoldStone会帮你创建一个包含之前单链资产的多链账户。"
+		HoneyLanguage.Japanese.code -> "ニーモニックをインポートして、BIP44標準に基づいたマルチチェーンウォレットを取得します。シングルチェーンの秘密キーまたはキーストアファイルをインポートする場合、GoldStoneは以前のシングルチェーンアセットを使用したマルチチェーンアカウントを作成するのに役立ちます。。"
+		HoneyLanguage.Korean.code -> "니모닉 가져 오기를 사용하면 BIP44 표준을 기반으로 다중 체인 지갑을 구할 수 있습니다. 단일 체인 개인 키 또는 키 저장소 파일을 가져 오도록 선택한 경우 GoldStone 은 이전 단일 체인 자산으로 다중 체인 계정을 만드는 데 도움을줍니다."
 		HoneyLanguage.Russian.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
-		HoneyLanguage.TraditionalChinese.code -> "we supported that import multi-chain wallet by any a single mnemonic, private key or keystore file"
+		HoneyLanguage.TraditionalChinese.code -> "Импортировать мнемонику для получения многоцелевого кошелька на основе стандарта BIP44. Если вы решите импортировать одноцелевой частный ключ или файл хранилища ключей, GoldStone поможет вам создать многоцелевую учетную запись с предыдущим одноцелевым активом."
 		else -> ""
 	}
 	@JvmField

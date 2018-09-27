@@ -18,6 +18,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @description:
  */
 class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
+	override val pageTitle: String
+		get() = ""
 	
 	val candleChart by lazy { EOSRAMPriceTrendCandleChart(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }

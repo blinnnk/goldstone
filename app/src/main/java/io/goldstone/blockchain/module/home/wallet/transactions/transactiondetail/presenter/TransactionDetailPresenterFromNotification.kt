@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
@@ -98,14 +99,12 @@ fun TransactionDetailPresenter.prepareHeaderValueFromNotification(
 
 fun TransactionDetailPresenter.updateByNotificationHash(
 	info: NotificationTransactionInfo,
-	callback: () -> Unit
+	callback: (RequestError) -> Unit
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		ChainID(info.chainID).getChainName(),
-		errorCallback = { error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
-		}
+		errorCallback = callback
 	) { receipt ->
 		// 通过 `Notification` 获取确实信息
 		receipt.apply {
@@ -120,7 +119,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 				if (fragment.asyncData.isNull()) fragment.asyncData = it
 				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
 				updateHeaderFromNotification(info)
-				callback()
+				callback(RequestError.None)
 			}
 		}
 	}

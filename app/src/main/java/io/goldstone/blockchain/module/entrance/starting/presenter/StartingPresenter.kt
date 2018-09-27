@@ -8,8 +8,8 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
@@ -54,10 +54,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 
 		fun updateShareContentFromServer() {
 			GoldStoneAPI.getShareContent(
-				{
-					BackupServerChecker.checkBackupStatusByException(it)
-					LogUtil.error("showShareChooser", it)
-				}
+				{ BackupServerChecker.checkBackupStatusByException(it) }
 			) {
 				val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
 					ProfileText.shareContent
@@ -106,7 +103,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 
-		fun updateLocalDefaultTokens(errorCallback: (Exception) -> Unit) {
+		fun updateLocalDefaultTokens(errorCallback: (GoldStoneError) -> Unit) {
 			doAsync {
 				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
 					// 没有网络数据直接返回
@@ -121,18 +118,14 @@ class StartingPresenter(override val fragment: StartingFragment) :
 									&& local.contract.equals(server.contract, true)
 							}
 						}.apply {
-							if (isEmpty()) return@getAllTokens
-							// 如果还有不一样的网络数据插入数据库
-							forEach {
-								GoldStoneDataBase.database.defaultTokenDao().insert(it)
-							}
+							GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 						}
 					}
 				}
 			}
 		}
 
-		private fun ArrayList<DefaultTokenTable>.updateLocalTokenIcon(localTokens: ArrayList<DefaultTokenTable>) {
+		private fun List<DefaultTokenTable>.updateLocalTokenIcon(localTokens: ArrayList<DefaultTokenTable>) {
 			doAsync {
 				val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
 				filter { server ->

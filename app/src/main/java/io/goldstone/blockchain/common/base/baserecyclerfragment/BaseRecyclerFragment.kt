@@ -39,6 +39,7 @@ import org.jetbrains.anko.support.v4.UI
 abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFragment<T, D>, D>, D>
 	: Fragment() {
 
+	abstract val pageTitle: String
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
 	private lateinit var loadingView: RecyclerLoadingView
@@ -116,6 +117,10 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		asyncData: ArrayList<D>?
 	)
 
+	/** 获取依赖的 `Adapter` */
+	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() =
+		recyclerView.adapter as? T
+
 	/**
 	 * 默认的尺寸是填充屏幕, 这个方法提供了修改的功能
 	 */
@@ -158,6 +163,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		savedInstanceState: Bundle?
 	): View? {
 		presenter.onFragmentCreateView()
+		setPageTitle()
 		return UI {
 			// 这个高度判断是解决少数虚拟键盘高度可以手动隐藏的, 例如 `Samsung S8, S9`
 			val wrapperHeight = when {
@@ -223,6 +229,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		// 如果键盘在显示那么销毁键盘
 		activity?.apply { SoftKeyboard.hide(this) }
 		if (!hidden) {
+			setPageTitle()
 			// 重置回退栈事件
 			getMainActivity()?.backEvent = Runnable {
 				setBackEvent(getMainActivity())
@@ -332,6 +339,13 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 			parent.presenter.removeSelfFromActivity()
 			// 如果阻碍 `Loading` 存在也一并销毁
 			mainActivity?.removeLoadingView()
+		}
+	}
+
+	private fun setPageTitle() {
+		val parent = parentFragment
+		if (parent is BaseOverlayFragment<*>) {
+			parent.headerTitle = pageTitle
 		}
 	}
 }

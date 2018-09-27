@@ -21,7 +21,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 			CoinSymbol(symbol).isETC() ->
 				Config.getCurrentETCAddress()
 			CoinSymbol(symbol).isEOS() ->
-				if (isEOSAccountName) Config.getCurrentEOSName()
+				if (isEOSAccountName) Config.getCurrentEOSAccount().accountName
 				else Config.getCurrentEOSAddress()
 			else ->
 				Config.getCurrentEthereumAddress()
@@ -46,12 +46,12 @@ class CoinSymbol(val symbol: String?) : Serializable {
 
 	fun getCurrentChainName(): String {
 		return when {
-			CoinSymbol(symbol).isETH() -> Config.getCurrentChainName()
-			CoinSymbol(symbol).isETC() -> Config.getETCCurrentChainName()
-			CoinSymbol(symbol).isBTC() -> Config.getBTCCurrentChainName()
-			CoinSymbol(symbol).isLTC() -> Config.getLTCCurrentChainName()
-			CoinSymbol(symbol).isBCH() -> Config.getBCHCurrentChainName()
-			CoinSymbol(symbol).isEOS() -> Config.getEOSCurrentChainName()
+			isETH() -> Config.getCurrentChainName()
+			isETC() -> Config.getETCCurrentChainName()
+			isBTC() -> Config.getBTCCurrentChainName()
+			isLTC() -> Config.getLTCCurrentChainName()
+			isBCH() -> Config.getBCHCurrentChainName()
+			isEOS() -> Config.getEOSCurrentChainName()
 			else -> Config.getCurrentChainName()
 		}
 	}
@@ -104,7 +104,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 }
 
 fun CoinSymbol?.isEOS() = this?.symbol.equals(CoinSymbol.eos, true)
-fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.etc, true)
+fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.eth, true)
 fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.btc(), true)
 fun CoinSymbol?.isLTC() = this?.symbol.equals(CoinSymbol.ltc, true)
 fun CoinSymbol?.isBCH() = this?.symbol.equals(CoinSymbol.bch, true)
@@ -114,17 +114,17 @@ fun CoinSymbol?.isBTCSeries() = CoinSymbol.allBTCSeriesSymbol().any { it.equals(
 fun CoinSymbol?.getContract(): TokenContract? {
 	return when {
 		CoinSymbol(this?.symbol).isBTC() ->
-			TokenContract.getBTC()
+			TokenContract.BTC
 		CoinSymbol(this?.symbol).isLTC() ->
-			TokenContract.getLTC()
+			TokenContract.LTC
 		CoinSymbol(this?.symbol).isBCH() ->
-			TokenContract.getBCH()
+			TokenContract.BCH
 		CoinSymbol(this?.symbol).isETC() ->
-			TokenContract.getETC()
+			TokenContract.ETC
 		CoinSymbol(this?.symbol).isETH() ->
-			TokenContract.getETH()
+			TokenContract.ETH
 		CoinSymbol(this?.symbol).isEOS() ->
-			TokenContract.getEOS()
+			TokenContract.EOS
 		else -> null // ERC20 Token 返回 `null`
 	}
 }

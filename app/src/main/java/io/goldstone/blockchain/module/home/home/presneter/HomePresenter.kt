@@ -38,6 +38,12 @@ class HomePresenter(
 		}
 	}
 
+	override fun onFragmentResume() {
+		super.onFragmentResume()
+		// `App` 频繁的检测更新所有需要使用的数据
+		object : SilentUpdater() {}.star()
+	}
+
 	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(
 		fragmentTag: String,
 		setArgument: Bundle.() -> Unit = {}

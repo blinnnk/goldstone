@@ -8,9 +8,10 @@ import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
@@ -19,6 +20,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.activationmode.presenter.EOSActivationModePresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import org.jetbrains.anko.*
 
 
@@ -28,6 +30,9 @@ import org.jetbrains.anko.*
  */
 
 class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
+
+	override val pageTitle: String
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val activationByFriendButton by lazy {
 		RoundButton(context!!)
 	}
@@ -63,10 +68,14 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 	}
 
 	private fun ViewGroup.showButtons() {
-		activationByFriendButton.into(this)
+		activationByFriendButton.click {
+			presenter.showRegisterByFriendFragment()
+		}.into(this)
 		activationByFriendButton.setBlueStyle()
 		activationByFriendButton.text = "Active By Friends"
-		activationByContractButton.into(this)
+		activationByContractButton.click {
+			presenter.showRegisterBySmartContractFragment()
+		}.into(this)
 		activationByContractButton.setBlueStyle(10.uiPX())
 		activationByContractButton.text = "Active By Smart Contract"
 		copyAddressButton.click {

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -54,7 +55,6 @@ class TokenAssetPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		checkAndSetAccountValue()
 		getAccountTransactionCount()
 		val info = TokenInfoPresenter.getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
@@ -71,9 +71,9 @@ class TokenAssetPresenter(
 	fun showPublicKeyAccountNames() {
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
-			TokenDetailText.accountNameSelection,
-			TokenDetailText.tokenDetail,
-			Bundle().apply { putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSName()) },
+			Bundle().apply {
+				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSAccount().accountName)
+			},
 			2
 		)
 	}
@@ -84,22 +84,16 @@ class TokenAssetPresenter(
 		when (title) {
 			TokenDetailText.delegateCPU -> tokenDetailOverlayPresenter
 				?.showTargetFragment<CPUTradingFragment>(
-					TokenDetailText.tradingCPU,
-					TokenDetailText.tokenDetail,
 					Bundle(),
 					2
 				)
 			TokenDetailText.delegateNET -> tokenDetailOverlayPresenter
 				?.showTargetFragment<NETTradingFragment>(
-					TokenDetailText.tradingNET,
-					TokenDetailText.tokenDetail,
 					Bundle(),
 					2
 				)
 			TokenDetailText.tradeRAM -> tokenDetailOverlayPresenter
 				?.showTargetFragment<RAMTradingFragment>(
-					TokenDetailText.tradingRAM,
-					TokenDetailText.tokenDetail,
 					Bundle(),
 					2
 				)
@@ -107,20 +101,20 @@ class TokenAssetPresenter(
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val accountName = Config.getCurrentEOSName()
-		EOSAccountTable.getAccountByName(accountName) { localData ->
+		val account = Config.getCurrentEOSAccount()
+		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
 			if (onlyUpdateLocalData) return@getAccountByName
 			EOSAPI.getAccountInfo(
-				accountName,
+				account,
 				{
 					LogUtil.error("getAccountInfo", it)
 				}
 			) { eosAccount ->
 				val newData =
 					if (localData.isNull()) eosAccount else eosAccount.apply { this.id = localData!!.id }
-				GoldStoneDataBase.database.eosAccountDao().update(newData)
+				GoldStoneDataBase.database.eosAccountDao().insert(newData)
 				GoldStoneAPI.context.runOnUiThread {
 					eosAccount.updateUIValue()
 				}
@@ -130,14 +124,14 @@ class TokenAssetPresenter(
 
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val accountName = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
-			accountName,
+			account.accountName,
 			Config.getEOSCurrentChain()
 		) { localData ->
 			if (localData.isEmpty()) {
 				EOSAPI.getTransactionsLastIndex(
-					accountName,
+					account,
 					{
 						fragment.setTransactionCount(CommonText.calculating)
 						LogUtil.error("getTransactionsLastIndex", it)
@@ -153,15 +147,20 @@ class TokenAssetPresenter(
 	}
 
 	private fun EOSAccountTable.updateUIValue() {
-		fragment.setEOSBalance(balance)
+		fragment.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
+		if (refundInfo.isNull()) fragment.setEOSRefunds("0.0")
+		else refundInfo!!.getRefundDescription().let { fragment.setEOSRefunds(it) }
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used
 		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
 		val availableNet = netLimit.max - netLimit.used
 		val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
+		val ramEOSCount =
+			"≈ " + (availableRAM.toDouble() * Config.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
 		fragment.setResourcesValue(
 			availableRAM,
 			ramQuota,
+			ramEOSCount,
 			availableCPU,
 			cpuLimit.max,
 			cpuEOSValue,
@@ -170,20 +169,4 @@ class TokenAssetPresenter(
 			netEOSValue
 		)
 	}
-
-	private fun checkAndSetAccountValue() {
-		EOSAccountTable.getAccountByName(Config.getCurrentEOSName()) { account ->
-			if (account.isNull()) EOSAPI.getAccountInfo(
-				Config.getCurrentEOSName(),
-				{
-					LogUtil.error("getAccountInfo", it)
-				}
-			) {
-				EOSAccountTable.preventDuplicateInsert(it)
-				GoldStoneAPI.context.runOnUiThread { it.updateUIValue() }
-			} else account?.updateUIValue()
-		}
-	}
-
-
 }

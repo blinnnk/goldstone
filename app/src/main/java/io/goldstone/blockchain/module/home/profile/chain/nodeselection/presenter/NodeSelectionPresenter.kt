@@ -85,7 +85,7 @@ class NodeSelectionPresenter(
 						Config.updateEOSCurrentChain(ChainID.eosTest)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
-								ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
+								ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID)
 							)
 						)
 						Config.updateETCCurrentChainName(
@@ -95,7 +95,7 @@ class NodeSelectionPresenter(
 							ChainNameID.getChainNameByID(currentEOSTestChainNameID)
 						)
 						Config.updateCurrentChainName(
-							ChainNameID.getChainNameByID(currentETHERC20AndETCTestChainNameID)
+							ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID)
 						)
 						Config.updateBTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentBTCTestChainNameID)
@@ -125,7 +125,7 @@ class NodeSelectionPresenter(
 						Config.updateEOSCurrentChain(ChainID.eosMain)
 						Config.updateCurrentChain(
 							ChainID.getChainIDByName(
-								ChainNameID.getChainNameByID(currentETHERC20AndETCChainNameID)
+								ChainNameID.getChainNameByID(currentETHSeriesChainNameID)
 							)
 						)
 						Config.updateETCCurrentChainName(
@@ -134,9 +134,7 @@ class NodeSelectionPresenter(
 						Config.updateEOSCurrentChainName(
 							ChainNameID.getChainNameByID(currentEOSChainNameID)
 						)
-						Config.updateCurrentChainName(ChainNameID.getChainNameByID(
-							currentETHERC20AndETCChainNameID)
-						)
+						Config.updateCurrentChainName(ChainNameID.getChainNameByID(currentETHSeriesChainNameID))
 						Config.updateBTCCurrentChainName(
 							ChainNameID.getChainNameByID(currentBTCChainNameID)
 						)

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
@@ -48,63 +49,40 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailLTCValue(
+private fun updateWalletDetailLTCValue(
 	address: String,
 	activity: MainActivity?
 ) {
-	updateLTCBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
+	MyTokenTable.getBalanceByContract(
+		TokenContract.LTC,
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, TokenContract.LTC)
+		} else GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
+		}
 	}
 }
 
-private fun TransactionDetailPresenter.updateLTCBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
-) {
-	MyTokenTable.getBalanceByContract(
-		TokenContract.getLTC(),
-		address,
-		{
-			fragment.context?.alert(it.message)
-			callback()
-		}
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getLTC())
-		GoldStoneAPI.context.runOnUiThread { callback() }
-	}
-}
 
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onLTCTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getLTCTransactionFromChain(false)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-		getLTCTransactionFromChain(false)
-	}
+	)
+	getLTCTransactionFromChain(false)
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法

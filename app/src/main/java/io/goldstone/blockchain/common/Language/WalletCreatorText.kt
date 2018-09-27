@@ -237,7 +237,7 @@ object CreateWalletText {
 		else -> ""
 	}
 	@JvmField
-	val safetyLevelNoraml = when (currentLanguage) {
+	val safetyLevelNormal = when (currentLanguage) {
 		HoneyLanguage.English.code -> "NORMAL"
 		HoneyLanguage.Chinese.code -> "一般"
 		HoneyLanguage.Japanese.code -> "普通"

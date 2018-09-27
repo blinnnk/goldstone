@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Config
@@ -49,30 +49,20 @@ fun TransactionDetailPresenter.observerBCHTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailBCHValue(
+private fun updateWalletDetailBCHValue(
 	address: String,
 	activity: MainActivity?
 ) {
-	updateBCHBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
-	address: String,
-	@UiThread callback: () -> Unit
-) {
-	val contract = TokenContract.getBCH()
+	val contract = TokenContract.BCH
 	MyTokenTable.getBalanceByContract(
 		contract,
-		address,
-		{
-			fragment.context.alert(it.message)
-			callback()
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, contract)
+		} else GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
 		}
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, contract)
-		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }
 
@@ -80,33 +70,19 @@ private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onBCHTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getBCHTransactionFromChain(false)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-		getBCHTransactionFromChain(false)
-	}
+	)
+	getBCHTransactionFromChain(false)
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法

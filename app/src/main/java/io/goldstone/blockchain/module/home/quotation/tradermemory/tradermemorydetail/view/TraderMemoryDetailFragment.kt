@@ -33,6 +33,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author wcx
  */
 class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
+	override val pageTitle: String
+		get() = ""
 	override val presenter: TraderMemoryDetailPresenter = TraderMemoryDetailPresenter(this)
 
 	@SuppressLint("ResourceType", "CommitTransaction")
@@ -188,7 +190,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						node.first.equals(CryptoName.etc, true)
 					}?.second.orEmpty()
 				),
-				ethERC20AndETCChainNameID = ChainNameID.getChainNameIDByName(
+				ethSeriesID = ChainNameID.getChainNameIDByName(
 					selectedNode.find { node ->
 						node.first.equals(CryptoName.eth, true)
 					}?.second.orEmpty()

@@ -19,7 +19,13 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class TransactionDetailFragment :
 	BaseRecyclerFragment<TransactionDetailPresenter, TransactionDetailModel>() {
 
+	override val pageTitle: String = TransactionText.detail
 	override val presenter = TransactionDetailPresenter(this)
+
+	override fun setRecyclerViewLayoutManager(recyclerView: BaseRecyclerView) {
+		super.setRecyclerViewLayoutManager(recyclerView)
+		recyclerView.layoutParams
+	}
 
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,

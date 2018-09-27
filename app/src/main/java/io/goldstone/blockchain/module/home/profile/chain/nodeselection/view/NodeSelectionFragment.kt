@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
@@ -30,6 +31,7 @@ import org.jetbrains.anko.*
  */
 class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 
+	override val pageTitle: String = ChainText.nodeSelection
 	private val fromMainnetSetting by lazy {
 		arguments?.getBoolean(ArgumentKey.isMainnet)
 	}
@@ -153,7 +155,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 									node.first.equals(CryptoName.etc, true)
 								}?.second.orEmpty()
 							),
-							ethERC20AndETCChainNameID = ChainNameID.getChainNameIDByName(
+							ethSeriesID = ChainNameID.getChainNameIDByName(
 								selectedNode.find { node ->
 									node.first.equals(CryptoName.eth, true)
 								}?.second.orEmpty()

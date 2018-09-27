@@ -17,6 +17,8 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.personalmemory
 @SuppressLint("ValidFragment")
 class PersonalMemoryTransactionRecordFragment() :
 	BaseRecyclerFragment<PersonalMemoryTransactionRecordPresenter, PersonalMemoryTransactionRecordTable>() {
+	override val pageTitle: String
+		get() = ""
 	private val account by lazy { arguments?.getString("account") }
 	private val isSalesRecord by lazy { arguments?.getBoolean("isSalesRecord") }
 	override val presenter: PersonalMemoryTransactionRecordPresenter = PersonalMemoryTransactionRecordPresenter(

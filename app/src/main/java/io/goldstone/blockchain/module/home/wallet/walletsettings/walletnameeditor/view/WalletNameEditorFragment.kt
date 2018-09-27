@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter
@@ -28,6 +29,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.walletName
 	val confirmButton by lazy { RoundButton(context!!) }
 	private val nameInput by lazy { RoundInput(context!!) }
 	override val presenter = WalletNameEditorPresenter(this)

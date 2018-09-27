@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.home.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.View
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setAlignParentBottom
@@ -23,6 +25,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class HomeFragment : BaseFragment<HomePresenter>() {
 
+	override val pageTitle: String = "Home"
 	private val tabBar by lazy { TabBarView(context!!) }
 	override val presenter = HomePresenter(this)
 
@@ -53,8 +56,8 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 		}
 	}
 
-	override fun onStart() {
-		super.onStart()
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		presenter.showWalletDetailFragment()
 	}
 

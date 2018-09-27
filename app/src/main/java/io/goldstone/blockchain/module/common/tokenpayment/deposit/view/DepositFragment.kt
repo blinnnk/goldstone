@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -28,6 +29,7 @@ import org.jetbrains.anko.*
  */
 class DepositFragment : BaseFragment<DepositPresenter>() {
 
+	override val pageTitle: String get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = DepositPresenter(this)
@@ -123,6 +125,10 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 						else qrView.setAddressText(currentLTCAddress)
 					}
 
+					token?.contract.isEOS() -> {
+						qrView.setAddressText(currentEOSAccountName.getCurrent())
+					}
+
 					token?.contract.isBCH() -> {
 						if (Config.isTestEnvironment()) {
 							val bchTestAddress =
@@ -141,7 +147,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 
 					token?.contract.isETC() ->
 						qrView.setAddressText(currentETCAddress)
-					else -> qrView.setAddressText(currentETHAndERCAddress)
+					else -> qrView.setAddressText(currentETHSeriesAddress)
 				}
 			}
 		}

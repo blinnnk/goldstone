@@ -5,22 +5,27 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.google.gson.Gson
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
-import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.*
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.model.EOSGolbalModel
 import io.goldstone.blockchain.kernel.network.eos.model.EosBalanceModel
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
@@ -33,16 +38,15 @@ import java.math.BigInteger
 
 object EOSAPI {
 
-	var hasRetry = false
 	fun getAccountInfo(
-		accountName: String,
+		account: EOSAccount,
 		errorCallBack: (GoldStoneError) -> Unit,
 		targetNet: String = "",
 		@WorkerThread hold: (EOSAccountTable) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
-			ParameterUtil.prepareObjectContent(Pair("account_name", accountName))
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.accountName))
 		).let { requestBody ->
 			val api =
 				if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
@@ -50,19 +54,10 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				{
-					errorCallBack(RequestError.PostFailed(it))
-					LogUtil.error("getAccountInfo", it)
-				},
+				errorCallBack,
 				false
 			) { result ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
-				// TODO 整体的链重试需要思考怎么封装
-				if (!hasRetry && result.contains("NODEOS_UNREACHABLE")) {
-					EOSUrl.currentEOSTestUrl = ChainURL.eosTestBackUp
-					getAccountInfo(accountName, errorCallBack, "", hold)
-					hasRetry = true
-				}
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
 				hold(EOSAccountTable(JSONObject(result), Config.getCurrentEOSAddress()))
 			}
@@ -70,9 +65,9 @@ object EOSAPI {
 	}
 
 	fun getAvailableRamBytes(
-		accountName: String,
+		accountName: EOSAccount,
 		errorCallBack: (GoldStoneError) -> Unit,
-		hold: (BigInteger) -> Unit
+		@WorkerThread hold: (BigInteger) -> Unit
 	) {
 		getAccountInfo(accountName, errorCallBack) {
 			val availableRAM = it.ramQuota - it.ramUsed
@@ -82,43 +77,38 @@ object EOSAPI {
 
 	fun getAccountNameByPublicKey(
 		publicKey: String,
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		targetNet: String = "",
 		@UiThread hold: (accountNames: List<EOSAccountInfo>) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey))
-		).let { it ->
-			val api =
-				if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
-				else EOSUrl.getKeyAccountInTargetNet(targetNet)
-			RequisitionUtil.postRequest(
-				it,
-				api,
-				errorCallBack,
-				false
-			) { result ->
-				val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
-				var names = listOf<String>()
-				(0 until namesJsonArray.length()).forEach {
-					names += namesJsonArray.get(it).toString()
-				}
-				// 生成指定的包含链信息的结果类型
-				val accountNames =
-					names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
-				GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
+		val api =
+			if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
+			else EOSUrl.getKeyAccountInTargetNet(targetNet)
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey)),
+			api,
+			errorCallBack,
+			false
+		) { result ->
+			val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
+			var names = listOf<String>()
+			(0 until namesJsonArray.length()).forEach {
+				names += namesJsonArray.get(it).toString()
 			}
+			// 生成指定的包含链信息的结果类型
+			val accountNames =
+				names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
+			GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 		}
 	}
 
 	fun getAccountEOSBalance(
-		accountName: String,
-		errorCallBack: (GoldStoneError) -> kotlin.Unit,
+		account: EOSAccount,
+		errorCallBack: (RequestError) -> kotlin.Unit,
 		hold: (balance: Double) -> Unit
 	) {
 		getAccountBalanceBySymbol(
-			accountName,
+			account,
 			CoinSymbol.EOS,
 			EOSCodeName.EOSIOToken,
 			errorCallBack,
@@ -183,16 +173,16 @@ object EOSAPI {
 
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountBalanceBySymbol(
-		accountName: String,
+		account: EOSAccount,
 		symbol: CoinSymbol,
 		tokenCodeName: EOSCodeName,
-		errorCallBack: (GoldStoneError) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		@UiThread hold: (balance: Double) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("code", tokenCodeName.value),
-				Pair("account", accountName),
+				Pair("account", account.accountName),
 				Pair("symbol", symbol.symbol)
 			),
 			EOSUrl.getAccountEOSBalance(),
@@ -209,14 +199,14 @@ object EOSAPI {
 
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountResource(
-		accountName: String,
+		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		errorCallBack: (GoldStoneError) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		@WorkerThread hold: (resource: TotalResources?) -> Unit
 	) {
 		RequisitionUtil.postSingle<TotalResources>(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", accountName),
+				Pair("scope", account.accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "userres"),
 				Pair("json", true)
@@ -272,7 +262,7 @@ object EOSAPI {
 	}
 
 	fun getTransactionsLastIndex(
-		accountName: String,
+		account: EOSAccount,
 		errorCallBack: (Throwable) -> Unit,
 		hold: (count: Int?) -> Unit
 	) {
@@ -280,7 +270,7 @@ object EOSAPI {
 		// 拉取下来最近一条获取到 `dataIndex` 即这个 `account` 的账单总数, 并计算映射出
 		// 实际的翻页参数
 		getAccountTransactionHistory(
-			accountName,
+			account.accountName,
 			-1,
 			-1,
 			errorCallBack
@@ -323,7 +313,7 @@ object EOSAPI {
 			false
 		) { jsonString ->
 			JSONArray(jsonString).toList().map {
-				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSName())
+				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSAccount().accountName)
 			}.let(hold)
 		}
 	}
@@ -365,6 +355,27 @@ object EOSAPI {
 			false
 		) { jsonString ->
 			hold(JSONObject(jsonString))
+		}
+	}
+	fun getRAMMarket(
+		isMainThread: Boolean = false,
+		hold: (data: EOSRAMMarket?, error: RequestError) -> Unit) {
+		RequisitionUtil.postString(
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "rammarket"),
+				Pair("json", "true")
+			),
+			EOSUrl.getTableRows(),
+			"rows",
+			{ hold(null, it) },
+			false
+		) {
+			val data = JSONObject(JSONArray(it).get(0).toString())
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(EOSRAMMarket(data), RequestError.None)
+			} else hold(EOSRAMMarket(data), RequestError.None)
 		}
 	}
 	
@@ -440,4 +451,6 @@ object EOSAPI {
 			}
 		}
 	}
+	
+	
 }

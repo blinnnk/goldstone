@@ -6,8 +6,6 @@ import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
@@ -103,10 +101,7 @@ class TokenDetailPresenter(
 			putSerializable(ArgumentKey.transactionFromList, model)
 		}
 		fragment.getGrandFather<TokenDetailOverlayFragment>()?.apply {
-			presenter.showTargetFragment<TransactionDetailFragment>(
-				TransactionText.detail,
-				TokenDetailText.tokenDetail, argument
-			)
+			presenter.showTargetFragment<TransactionDetailFragment>(argument)
 		}
 	}
 
@@ -244,9 +239,9 @@ class TokenDetailPresenter(
 	}
 
 	private fun getEOSSeriesData(callback: (List<EOSTransactionTable>) -> Unit) {
-		val accountName = Config.getCurrentEOSName()
+		val account = Config.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
-			accountName,
+			account.accountName,
 			Config.getEOSCurrentChain()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
@@ -259,7 +254,7 @@ class TokenDetailPresenter(
 					}.sortedByDescending {
 						it.timeStamp
 					}.toList(),
-					accountName
+					account.accountName
 				)
 				fragment.removeLoadingView()
 			}
@@ -288,7 +283,7 @@ class TokenDetailPresenter(
 			}
 	}
 
-	fun TokenDetailFragment.updatePageBy(
+	private fun TokenDetailFragment.updatePageBy(
 		data: List<TransactionListModel>,
 		ownerName: String
 	) {

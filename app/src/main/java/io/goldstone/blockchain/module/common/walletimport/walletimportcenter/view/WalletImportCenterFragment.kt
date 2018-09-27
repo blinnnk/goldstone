@@ -31,6 +31,7 @@ import org.jetbrains.anko.*
 
 class WalletImportCenterFragment : BaseFragment<WalletImportCenterPresenter>() {
 
+	override val pageTitle: String = ImportWalletText.importWallet
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	override val presenter = WalletImportCenterPresenter(this)
@@ -74,10 +75,9 @@ class WalletImportCenterFragment : BaseFragment<WalletImportCenterPresenter>() {
 					getParentFragment<WalletImportFragment> {
 						NetworkUtil.hasNetworkWithAlert(context) isTrue {
 							presenter.showTargetFragment<WebViewFragment>(
-								QAText.whatIsMnemonic,
-								ImportWalletText.importWallet,
 								Bundle().apply {
 									putString(ArgumentKey.webViewUrl, WebUrl.whatIsMnemonic)
+									putString(ArgumentKey.webViewName, QAText.whatIsMnemonic)
 								}
 							)
 						}

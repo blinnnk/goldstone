@@ -4,6 +4,7 @@ import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
+import io.goldstone.blockchain.crypto.multichain.ChainID
 
 /**
  * @author KaySaith

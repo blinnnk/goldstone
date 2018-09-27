@@ -1,14 +1,17 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view
 
 import android.graphics.Bitmap
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
 import com.blinnnk.extension.into
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoViewInterface
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
 import org.jetbrains.anko.*
@@ -21,6 +24,7 @@ import org.jetbrains.anko.*
 
 class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInterface {
 
+	override val pageTitle: String = "Token Info"
 	private val tokenInfoView by lazy {
 		TokenInfoView(context!!)
 	}
@@ -87,9 +91,13 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInter
 		}
 	}
 
-	fun showAddress(address: String, has160: String?) {
-		addressCell.setSubtitle(address)
-		has160?.let { hash160Cell.setSubtitle(it) }
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter.showTransactionInfo {
+			if (!it.isNone()) context.alert(it.message)
+		}
+		showBalance()
+		showAddress()
 	}
 
 	fun <T> showTransactionCount(count: T) {
@@ -110,12 +118,22 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInter
 		tokenInfoView.updateLatestActivationDate(date)
 	}
 
-	fun showBalance(balance: String) {
-		balanceCell.setSubtitle(balance)
-	}
 
 	fun showTotalValue(received: String, sent: String) {
 		totalReceiveCell.setSubtitle(received)
 		totalSentCell.setSubtitle(sent)
+	}
+
+	private fun showAddress() {
+		presenter.getAddress { address, hash160 ->
+			addressCell.setSubtitle(address)
+			hash160?.let { hash160Cell.setSubtitle(it) }
+		}
+	}
+
+	private fun showBalance() {
+		presenter.getBalance {
+			balanceCell.setSubtitle(it)
+		}
 	}
 }

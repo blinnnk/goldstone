@@ -11,6 +11,8 @@ import org.jetbrains.anko.*
  * @description:
  */
 class RankFragment : BaseFragment<RankPresenter>() {
+	override val pageTitle: String
+		get() = ""
 	override val presenter: RankPresenter = RankPresenter(this)
 	val ramRankView by lazy { RAMRankView(context!!) }
 	override fun AnkoContext<Fragment>.initView() {

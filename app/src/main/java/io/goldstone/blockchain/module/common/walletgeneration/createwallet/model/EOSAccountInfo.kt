@@ -26,8 +26,18 @@ data class EOSAccountInfo(
 		data.safeGet("publicKey")
 	)
 
+	constructor(accountName: String, chainID: String) : this(
+		accountName,
+		chainID,
+		""
+	)
+
 	fun hasActivated(): Boolean {
 		return ChainID(chainID).isCurrent() && publicKey.equals(Config.getCurrentEOSAddress(), true)
+	}
+
+	fun isActivatedWatchOnlyEOSAccount(): Boolean {
+		return ChainID(chainID).isCurrent() && name.equals(Config.getCurrentEOSAccount().accountName, true)
 	}
 
 	override fun getObject(): String {
@@ -37,6 +47,10 @@ data class EOSAccountInfo(
 
 fun List<EOSAccountInfo>.currentPublicKeyHasActivated(): Boolean {
 	return !find { it.hasActivated() }.isNull()
+}
+
+fun List<EOSAccountInfo>.isActivatedWatchOnlyEOSAccount(): Boolean {
+	return !find { it.isActivatedWatchOnlyEOSAccount() }.isNull()
 }
 
 fun List<EOSAccountInfo>.getTargetKeyName(key: String): String? {

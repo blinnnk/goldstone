@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.common.component.container
+package io.goldstone.blockchain.common.base.view
 
 import android.content.Context
 import android.view.Gravity
@@ -10,6 +10,7 @@ import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.verticalLayout
 
@@ -27,17 +28,11 @@ open class GrayCardView(context: Context) : RelativeLayout(context) {
 		gravity = Gravity.CENTER_HORIZONTAL
 		addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 		elevation = 4f
-	}
-
-	override fun onAttachedToWindow() {
-		super.onAttachedToWindow()
-		// 在这个生命周期的时候更改容器的部分参数, 让阴影能够完美的漏出来
-		measure(0, 0)
-		val width = measuredWidth
-		val height = measuredHeight
-		layoutParams.height = height + 6.uiPX()
-		container.layoutParams = RelativeLayout.LayoutParams(width - 4.uiPX(), height)
-		container.requestLayout()
+		lparams {
+			width = matchParent
+			height = matchParent
+			setMargins(4.uiPX(), 2.uiPX(), 4.uiPX(), 4.uiPX())
+		}
 	}
 
 	// 为了阴影内嵌了 双层 `RelativeLayout` 所以这里重写默认的 `addView` 方法

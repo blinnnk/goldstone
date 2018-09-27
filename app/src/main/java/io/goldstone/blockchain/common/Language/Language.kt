@@ -215,7 +215,7 @@ object ContactText {
 		else -> ""
 	}
 	@JvmField
-	val ethERCAndETChint = when (currentLanguage) {
+	val ethERCAndETHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的以太坊，ERC20或以太坊经典地址"
 		HoneyLanguage.Japanese.code -> "保存したいEthereum、ERC20またはEthereumクラシックアドレスを入力してください"
@@ -224,6 +224,29 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的以太坊，ERC20或以太坊經典地址"
 		else -> ""
 	}
+
+	@JvmField
+	val eosHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.Chinese.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.Japanese.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.Korean.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.Russian.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter EOS Account name that you want to store"
+		else -> ""
+	}
+
+	@JvmField
+	val eosJungleHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.Chinese.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.Japanese.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.Korean.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.Russian.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.TraditionalChinese.code -> "Enter EOS JUNGLE Account name that you want to store"
+		else -> ""
+	}
+
 	@JvmField
 	val btcMainnetAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"

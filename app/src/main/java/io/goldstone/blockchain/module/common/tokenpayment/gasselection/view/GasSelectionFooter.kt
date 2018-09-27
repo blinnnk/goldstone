@@ -59,12 +59,12 @@ class GasSelectionFooter(context: Context) : LinearLayout(context) {
 		else confirmButton.setGrayStyle(20.uiPX())
 	}
 
-	fun getConfirmButton(action: RoundButton.() -> Unit) {
-		action(confirmButton)
+	fun getConfirmButton(hold: RoundButton.() -> Unit) {
+		hold(confirmButton)
 	}
 
-	fun getCustomButton(action: BaseCell.() -> Unit) {
-		action(customButton)
+	fun getCustomButton(hold: BaseCell.() -> Unit) {
+		hold(customButton)
 	}
 
 }

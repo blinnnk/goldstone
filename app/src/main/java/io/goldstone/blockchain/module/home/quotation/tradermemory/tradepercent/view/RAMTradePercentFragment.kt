@@ -21,6 +21,8 @@ import org.jetbrains.anko.*
  * @description:
  */
 class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
+	override val pageTitle: String
+		get() = ""
 	
 	override val presenter: RAMTradePercentPresenter = RAMTradePercentPresenter(this)
 	

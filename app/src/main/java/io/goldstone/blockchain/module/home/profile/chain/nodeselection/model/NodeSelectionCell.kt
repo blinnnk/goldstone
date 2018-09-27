@@ -5,17 +5,19 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.radioButton
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
 
@@ -25,10 +27,7 @@ import org.jetbrains.anko.wrapContent
  */
 class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 
-	private val radio = HoneyRadioButton(context).apply {
-		layoutParams = LinearLayout.LayoutParams(50.uiPX(), 50.uiPX())
-		setColorStyle(GrayScale.midGray, Spectrum.green)
-	}
+	private var radio: RadioButton
 	private val title = TextView(context).apply {
 		textSize = fontSize(14)
 		textColor = GrayScale.black
@@ -47,9 +46,11 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		title.into(this)
 		title.x = 70.uiPX().toFloat()
 		title.setCenterInVertical()
-		radio.into(this)
+		radio = radioButton {
+			isDefaultStyle()
+			isClickable = false
+		}
 		radio.setAlignParentRight()
-		radio.isClickable = false
 	}
 
 	@SuppressLint("DrawAllocation")

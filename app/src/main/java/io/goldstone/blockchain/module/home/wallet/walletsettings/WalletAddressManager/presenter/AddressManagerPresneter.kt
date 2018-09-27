@@ -136,8 +136,6 @@ class AddressManagerPresenter(
 	fun showAllETHSeriesAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETHAndERCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETH.id) }
 			)
 		}
@@ -146,8 +144,6 @@ class AddressManagerPresenter(
 	fun showAllETCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allETCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.ETC.id) }
 			)
 		}
@@ -156,8 +152,6 @@ class AddressManagerPresenter(
 	fun showAllEOSAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allEOSAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.EOS.id) }
 			)
 		}
@@ -166,8 +160,6 @@ class AddressManagerPresenter(
 	fun showAllBTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBtcAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BTC.id) }
 			)
 		}
@@ -176,8 +168,6 @@ class AddressManagerPresenter(
 	fun showAllLTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allLTCAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.LTC.id) }
 			)
 		}
@@ -186,8 +176,6 @@ class AddressManagerPresenter(
 	fun showAllBCHAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
-				WalletSettingsText.allBCHAddresses,
-				WalletSettingsText.viewAddresses,
 				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.BCH.id) }
 			)
 		}
@@ -201,19 +189,16 @@ class AddressManagerPresenter(
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
-				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
-						WalletSettingsText.exportPrivateKey,
-						WalletSettingsText.viewAddresses,
 						Bundle().apply {
 							putString(ArgumentKey.address, address)
 							putInt(ArgumentKey.chainType, chainType.id)
 						}
 					)
-				}
+				} else context.alert(WalletText.watchOnly)
 			}
-
 		}
 
 		fun showQRCodeFragment(addressModel: ContactModel, walletSettingsFragment: WalletSettingsFragment) {
@@ -222,8 +207,6 @@ class AddressManagerPresenter(
 				showAddButton(false)
 				AddressManagerFragment.removeDashboard(context)
 				presenter.showTargetFragment<QRCodeFragment>(
-					WalletText.showQRCode,
-					WalletSettingsText.viewAddresses,
 					Bundle().apply { putSerializable(ArgumentKey.addressModel, addressModel) }
 				)
 			}
@@ -233,14 +216,12 @@ class AddressManagerPresenter(
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
-				WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+				if (!Config.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
-						WalletSettingsText.exportKeystore,
-						WalletSettingsText.viewAddresses,
 						Bundle().apply { putString(ArgumentKey.address, address) }
 					)
-				}
+				} else context.alert(WalletText.watchOnly)
 			}
 		}
 
@@ -616,7 +597,7 @@ class AddressManagerPresenter(
 		): List<Pair<Int, String>> {
 			return arrayListOf(
 				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
-				Pair(R.drawable.qr_code_icon, WalletText.showQRCode),
+				Pair(R.drawable.qr_code_icon, WalletText.qrCode),
 				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
 				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey),
 				Pair(R.drawable.bch_address_convert_icon, WalletText.getBCHLegacyAddress)
@@ -643,28 +624,6 @@ class AddressManagerPresenter(
 					)
 				)
 				else -> listOf(Pair(seriesAddress, ""))
-			}
-		}
-
-		fun getCurrentAddressIndexByChainType(chainType: ChainType, hold: (String) -> Unit) {
-			fun getTargetAddressIndex(address: String, targetAddress: String): String {
-				return if (address.contains(",")) {
-					address.split(",").find {
-						it.contains(targetAddress)
-					}?.substringAfterLast("|").orEmpty()
-				} else address.substringAfterLast("|")
-			}
-			WalletTable.getCurrentWallet {
-				when (chainType) {
-					ChainType.ETH -> hold(getTargetAddressIndex(ethAddresses, currentETHAndERCAddress))
-					ChainType.ETC -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-					ChainType.LTC -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
-					ChainType.BCH -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-					ChainType.BTC ->
-						if (Config.isTestEnvironment())
-							hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
-						else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-				}
 			}
 		}
 

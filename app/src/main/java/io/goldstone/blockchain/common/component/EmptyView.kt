@@ -25,7 +25,6 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 enum class EmptyType {
-	
 	TokenDetail,
 	TransactionDetail,
 	Contact,
@@ -49,10 +48,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 		
-		layoutParams = LinearLayout.LayoutParams(
-			(ScreenSize.Width * 0.6).toInt(),
-			emptyViewHeight
-		)
+		layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), emptyViewHeight)
 		
 		icon = imageView {
 			scaleType = ImageView.ScaleType.FIT_XY
@@ -61,8 +57,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
 		
 		introTitles.apply {
 			setGrayTitles()
-			y -= 30.uiPX()
-				.toFloat()
+			y -= 30.uiPX().toFloat()
 			isCenter = true
 		}.into(this)
 	}

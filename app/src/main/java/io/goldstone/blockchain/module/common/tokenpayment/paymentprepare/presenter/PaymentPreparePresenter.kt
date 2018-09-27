@@ -9,25 +9,19 @@ import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.PasswordError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.TradingType
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
-import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
 
@@ -58,50 +52,24 @@ class PaymentPreparePresenter(
 		return rootFragment?.token
 	}
 
-	fun goToGasEditorFragmentOrTransfer(callback: () -> Unit) {
+	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
 		val count = fragment.getTransferCount()
-		if (count == 0.0) {
-			fragment.context.alert(AlertText.emptyTransferValue)
-			callback()
-		} else {
-			fragment.toast(LoadingText.calculateGas)
-			when {
-				/** 准备 BTC 转账需要的参数 */
-				getToken()?.contract.isBTC() -> prepareBTCPaymentModel(
-					count, fragment.getChangeAddress()
-				) { error ->
-					if (!error.isNone()) fragment.context?.alert(error.message)
-					// 恢复 Loading 按钮
-					callback()
-				}
-				/** 准备 LTC 转账需要的参数 */
-				getToken()?.contract.isLTC() -> prepareLTCPaymentModel(
-					count, fragment.getChangeAddress()
-				) { error ->
-					if (error != GoldStoneError.None) fragment.context?.alert(error.message)
-					// 恢复 Loading 按钮
-					callback()
-				}
-				/** 准备 BCH 转账需要的参数 */
-				getToken()?.contract.isBCH() -> prepareBCHPaymentModel(
-					count, fragment.getChangeAddress()
-				) { error ->
-					if (!error.isNone()) fragment.context?.alert(error.message)
-					// 恢复 Loading 按钮
-					callback()
-				}
-				/** 准备 EOS 转账需要的参数 */
-				getToken()?.contract.isEOS() -> transferEOS(count, CoinSymbol(getToken()?.symbol)) { error ->
-					when (error) {
-						TransferError.BalanceIsNotEnough -> fragment.context.alert(AlertText.balanceNotEnough)
-						TransferError.IncorrectDecimal -> fragment.context?.alert(AlertText.transferWrongDecimal)
-						else -> callback()
-					}
-					// 恢复 Loading 按钮
-					callback()
-				}
-				else -> prepareETHERC20ETCPaymentModel(count, callback)
-			}
+		if (!getToken()?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
+		if (count == 0.0) callback(TransferError.TradingInputIsEmpty)
+		else when {
+			/** 准备 BTC 转账需要的参数 */
+			getToken()?.contract.isBTC() ->
+				prepareBTCPaymentModel(count, fragment.getChangeAddress(), callback)
+			/** 准备 LTC 转账需要的参数 */
+			getToken()?.contract.isLTC() ->
+				prepareLTCPaymentModel(count, fragment.getChangeAddress(), callback)
+			/** 准备 BCH 转账需要的参数 */
+			getToken()?.contract.isBCH() ->
+				prepareBCHPaymentModel(count, fragment.getChangeAddress(), callback)
+			/** 准备 EOS 转账需要的参数 */
+			getToken()?.contract.isEOS() ->
+				transferEOS(count, CoinSymbol(getToken()?.symbol), callback)
+			else -> prepareETHSeriesPaymentModel(count, callback)
 		}
 	}
 
@@ -150,34 +118,12 @@ class PaymentPreparePresenter(
 						Config.getCurrentEOSAddress(),
 						ChainType.EOS,
 						password
-					) {
-						if (!isNullOrEmpty()) hold(EOSPrivateKey(this!!), GoldStoneError.None)
+					) { privateKey, error ->
+						if (!privateKey.isNull() && error.isNone())
+							hold(EOSPrivateKey(privateKey!!), GoldStoneError.None)
 						else hold(null, AccountError.DecryptKeyStoreError)
 					}
 				} else hold(null, PasswordError.InputIsEmpty)
-			}
-		}
-
-		// 检查的是对应 `EOS` 个数的余额
-		fun checkResourceIsEnoughOrElse(
-			accountName: String,
-			checkCount: Double,
-			tradingType: TradingType,
-			errorCallback: (GoldStoneError) -> Unit,
-			@UiThread hold: (GoldStoneError) -> Unit
-		) {
-			EOSAPI.getAccountInfo(
-				accountName,
-				errorCallback
-			) {
-				val isEnough = when (tradingType) {
-					TradingType.CPU -> it.cpuWeight > checkCount.toEOSUnit()
-					TradingType.NET -> it.netWeight > checkCount.toEOSUnit()
-					TradingType.RAM -> true // 待处理内存的 `EOS` 余额判断　
-				}
-				GoldStoneAPI.context.runOnUiThread {
-					hold(if (isEnough) GoldStoneError.None else TransferError.BalanceIsNotEnough)
-				}
 			}
 		}
 	}

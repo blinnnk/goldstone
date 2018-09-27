@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto.multichain
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import java.io.Serializable
 
 
@@ -12,12 +13,12 @@ import java.io.Serializable
  */
 class TokenContract(val contract: String?) : Serializable {
 	companion object {
-		fun getETH(): TokenContract = TokenContract(TokenContract.ethContract)
-		fun getETC(): TokenContract = TokenContract(TokenContract.etcContract)
-		fun getBTC(): TokenContract = TokenContract(TokenContract.btcContract)
-		fun getLTC(): TokenContract = TokenContract(TokenContract.ltcContract)
-		fun getBCH(): TokenContract = TokenContract(TokenContract.bchContract)
-		fun getEOS(): TokenContract = TokenContract(TokenContract.eosContract)
+		val ETH = TokenContract(TokenContract.ethContract)
+		val ETC = TokenContract(TokenContract.etcContract)
+		val BTC = TokenContract(TokenContract.btcContract)
+		val LTC = TokenContract(TokenContract.ltcContract)
+		val BCH = TokenContract(TokenContract.bchContract)
+		val EOS = TokenContract(TokenContract.eosContract)
 		// GoldStone 业务约定的值
 		const val ethContract = "0x60"
 		const val etcContract = "0x61"
@@ -36,6 +37,10 @@ fun TokenContract?.orEmpty() = if (isNull()) TokenContract("") else this!!
 
 fun TokenContract?.isEOS(): Boolean {
 	return this?.contract.equals(TokenContract.eosContract, true)
+}
+
+fun TokenContract?.isEOSCode(): Boolean {
+	return this?.contract.equals(EOSCodeName.EOSIO.value, true)
 }
 
 fun TokenContract?.isETH(): Boolean {
@@ -102,7 +107,7 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 		TokenContract(this?.contract).isETC() ->
 			Config.getCurrentETCAddress()
 		TokenContract(this?.contract).isEOS() ->
-			if (isEOSAccountName) Config.getCurrentEOSName()
+			if (isEOSAccountName) Config.getCurrentEOSAccount().accountName
 			else Config.getCurrentEOSAddress()
 		else ->
 			Config.getCurrentEthereumAddress()

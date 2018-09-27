@@ -2,11 +2,14 @@
 
 package io.goldstone.blockchain.common.utils
 
+import android.R
 import android.content.Context
+import android.content.res.ColorStateList
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
+import android.widget.RadioButton
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
@@ -22,6 +25,8 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.json.JSONArray
+import org.json.JSONObject
 import java.math.BigInteger
 
 /**
@@ -119,5 +124,27 @@ fun BigInteger.convertToTimeUnit(): String {
 	return result suffix diskUnit
 }
 
-fun String.isIntOnly(): Boolean = all { it.toString().matches(Regex(".*[0-9].*")) }
 fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
+
+class MutablePair<L, R>(var left: L, var right: R)
+
+fun JSONArray.toList(): List<JSONObject> {
+	var result = listOf<JSONObject>()
+	(0 until length()).forEach {
+		result += JSONObject(get(it).toString())
+	}
+	return result
+}
+
+infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
+
+fun RadioButton.isDefaultStyle() {
+	buttonTintList = ColorStateList(
+		arrayOf(
+			intArrayOf(-R.attr.state_checked), //disabled
+			intArrayOf(R.attr.state_checked) //enabled
+		),
+		// disabled - enabled
+		intArrayOf(GrayScale.midGray, Spectrum.blue)
+	)
+}

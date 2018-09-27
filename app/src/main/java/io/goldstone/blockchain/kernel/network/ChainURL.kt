@@ -71,8 +71,8 @@ object ChainURL {
 			transaction.isERC20Token -> TokenContract(transaction.to)
 			ChainURL.etcChainName.any {
 				it.equals(chainName, true)
-			} -> TokenContract.getETH()
-			else -> TokenContract.getETH()
+			} -> TokenContract.ETH
+			else -> TokenContract.ETH
 		}
 	}
 

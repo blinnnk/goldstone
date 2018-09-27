@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
-import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
@@ -34,11 +34,9 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
 		callback(TransferError.IncorrectDecimal)
-	else generateBCHPaymentModel(count, changeAddress) { error, paymentModel ->
+	else generateBCHPaymentModel(count, changeAddress, callback) { error, paymentModel ->
 		if (!paymentModel.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putSerializable(ArgumentKey.btcSeriesPrepareModel, paymentModel)
 				})
@@ -51,6 +49,7 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
+	errorCallback: (RequestError) -> Unit,
 	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
@@ -60,7 +59,8 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
 		3,
-		false
+		false,
+		errorCallback
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
 			hold(TransferError.GetWrongFeeFromChain, null)

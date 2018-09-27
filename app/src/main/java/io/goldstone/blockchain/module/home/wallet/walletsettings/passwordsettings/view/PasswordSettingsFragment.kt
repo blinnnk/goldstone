@@ -8,11 +8,12 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
@@ -27,6 +28,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
+	override val pageTitle: String = WalletSettingsText.passwordSettings
 	private val oldPassword by lazy { RoundInput(context!!) }
 	private val newPassword by lazy { RoundInput(context!!) }
 	private val passwordHint by lazy { RoundInput(context!!) }
@@ -65,24 +67,22 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				text = CommonText.confirm
 				setBlueStyle()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-			}.click {
-				it.showLoadingStatus()
+			}.click { button ->
+				button.showLoadingStatus()
 				presenter.checkInputValueThenUpdatePassword(
 					oldPassword.text.toString(),
 					newPassword.text.toString(),
 					repeatPassword.text.toString(),
 					passwordHint.text.toString()
 				) {
-					it.showLoadingStatus(false)
+					button.showLoadingStatus(false)
+					if (!it.isNone()) context.alert(it.message)
 				}
 			}.into(this)
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<WalletSettingsFragment> {
 			headerTitle = WalletSettingsText.walletSettings
 			presenter.showWalletSettingListFragment()

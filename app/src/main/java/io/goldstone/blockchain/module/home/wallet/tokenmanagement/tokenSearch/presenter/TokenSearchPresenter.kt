@@ -42,13 +42,9 @@ class TokenSearchPresenter(
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
 						canSearch = if (Config.getCurrentWalletType().isBTCSeries()) {
-							fragment.context.alert(
-								"This is a single block chain wallet so you canot add other crypot currency"
-							)
+							fragment.context.alert("This is a single block chain wallet so you cannot add other crypto currency")
 							false
-						} else {
-							NetworkUtil.hasNetworkWithAlert(context)
-						}
+						} else NetworkUtil.hasNetworkWithAlert(context)
 					}
 				}
 			) { inputContent ->
@@ -73,7 +69,7 @@ class TokenSearchPresenter(
 
 	fun setMyTokenStatus(cell: TokenSearchCell) {
 		cell.apply {
-			model?.let { searchToken ->
+			tokenSearchModel?.let { searchToken ->
 				DefaultTokenTable.getCurrentChainToken(TokenContract(searchToken.contract)) { localToken ->
 					localToken.isNotNull {
 						// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
@@ -101,7 +97,7 @@ class TokenSearchPresenter(
 	private fun insertToMyToken(switch: HoneyBaseSwitch, model: DefaultTokenTable?) {
 		fragment.getMainActivity()?.apply {
 			model?.let {
-				TokenManagementListPresenter.updateMyTokensInfoBy(switch, it)
+				TokenManagementListPresenter.updateMyTokenInfoBy(switch, it)
 			}
 		}
 	}

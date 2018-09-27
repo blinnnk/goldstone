@@ -136,16 +136,13 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun showWebFragmentWithLink(
-		link: String,
-		title: String,
-		previousTitle: String
-	) {
+	fun showWebFragmentWithLink(link: String, title: String) {
 		marketCenter?.presenter
 			?.showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
-				title,
-				previousTitle,
-				Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+				Bundle().apply {
+					putString(ArgumentKey.webViewUrl, link)
+					putString(ArgumentKey.webViewName, title)
+				},
 				true
 			)
 	}
@@ -226,7 +223,7 @@ class MarketTokenDetailPresenter(
 			}
 		) {
 			// 把数据更新到数据库
-			it.updateCandleChartDataInDatabaseBy(period, pair)
+			it.updateLocalCandleChartData(period, pair)
 			// 更新 `UI` 界面
 			updateCandleChartUI(it, dateType)
 		}
@@ -284,27 +281,18 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	private fun List<CandleChartModel>.updateCandleChartDataInDatabaseBy(
-		period: String,
-		pair: String
-	) {
+	private fun List<CandleChartModel>.updateLocalCandleChartData(period: String, pair: String) {
 		map { JSONObject("{\"open\":\"${it.open}\",\"close\":\"${it.close}\",\"high\":\"${it.high}\",\"low\":\"${it.low}\",\"time\":${it.time}}") }.let {
 			when (period) {
-				MarketTokenDetailChartType.WEEK.info -> {
-					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
-				}
+				MarketTokenDetailChartType.WEEK.info ->
+					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.DAY.info ->
+					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.MONTH.info ->
+					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.Hour.info ->
+					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString()) {}
 
-				MarketTokenDetailChartType.DAY.info -> {
-					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
-				}
-
-				MarketTokenDetailChartType.MONTH.info -> {
-					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
-				}
-
-				MarketTokenDetailChartType.Hour.info -> {
-					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
-				}
 			}
 		}
 	}
@@ -391,16 +379,6 @@ class MarketTokenDetailPresenter(
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
-
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
-	}
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		// 从 `WebViewFragment` 返回到这个界面更改 `HeaderTitle`
-		// 因为这个页面的 HeaderTitle 是动态数据所以无法用抽象方法实现.
-		fragment.getParentFragment<QuotationOverlayFragment> {
-			headerTitle = fragment.currencyInfo?.pairDisplay.orEmpty()
-		}
 	}
 }

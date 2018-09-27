@@ -5,7 +5,7 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.error.EthereumRPCError
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Config
@@ -301,19 +301,11 @@ data class TransactionTable(
 			}
 		}
 
-		fun deleteByAddress(address: String, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.transactionDao().apply {
-					deleteAll(getAllTransactionsByAddress(address))
-					callback()
-				}
-			}
-		}
-
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
 			chainName: String,
+			errorCallback: (EthereumRPCError) -> Unit,
 			callback: (memo: String) -> Unit
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
@@ -323,10 +315,7 @@ data class TransactionTable(
 					GoldStoneEthCall.apply {
 						getInputCodeByHash(
 							hash,
-							{ error, reason ->
-								callback("")
-								LogUtil.error("getMemoByHashAndReceiveStatus $reason", error)
-							},
+							errorCallback,
 							chainName
 						) { input ->
 							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
@@ -406,4 +395,10 @@ interface TransactionDao {
 
 	@Delete
 	fun deleteAll(token: List<TransactionTable>)
+
+	@Query("DELETE FROM transactionList WHERE recordOwnerAddress IN (:addresses)")
+	fun deleteAllByAddress(addresses: List<String>)
+
+	@Query("DELETE FROM transactionList WHERE recordOwnerAddress = :recordAddress")
+	fun deleteRecordAddressData(recordAddress: String)
 }

@@ -56,7 +56,7 @@ fun checkAddressNameInContacts(
 				item.addressName =
 					contacts.find {
 						// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
-						it.ethERCAndETCAddress.equals(item.addressName, true)
+						it.ethSeriesAddress.equals(item.addressName, true)
 							|| it.btcSeriesTestnetAddress.contains(item.addressName, true)
 							|| it.btcMainnetAddress.contains(item.addressName, true)
 					}?.name ?: item.addressName
@@ -119,7 +119,7 @@ private fun mergeETHAndERC20Incoming(
 					{
 						// 只弹出一次错误信息
 						if (!hasError) {
-							errorCallback(RequestError.PostFailed(it))
+							errorCallback(it)
 							hasError = true
 						}
 						completeMark()
@@ -135,7 +135,7 @@ private fun mergeETHAndERC20Incoming(
 						//error callback
 						// 只弹出一次错误信息
 						if (!hasError) {
-							errorCallback(RequestError.PostFailed(it))
+							errorCallback(it)
 							hasError = true
 						}
 						completeMark()

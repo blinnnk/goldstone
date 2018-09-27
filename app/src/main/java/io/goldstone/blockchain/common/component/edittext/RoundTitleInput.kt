@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.edittext
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.widget.EditText
@@ -79,6 +80,10 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 		titleView.text = text
 	}
 
+	fun setContent(text: String) {
+		editText.setText(text)
+	}
+
 	fun setHint(text: String) {
 		editText.hint = text
 	}
@@ -101,5 +106,9 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 			action()
 			button.preventDuplicateClicks()
 		}
+	}
+
+	fun setNumberPadKeyboard() {
+		editText.inputType = InputType.TYPE_NUMBER_FLAG_DECIMAL
 	}
 }

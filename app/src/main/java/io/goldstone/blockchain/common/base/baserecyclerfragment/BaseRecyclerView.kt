@@ -1,6 +1,12 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -8,12 +14,15 @@ import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.matchParent
 import java.util.*
+
 
 /**
  * @date 23/03/2018 3:48 PM
@@ -22,10 +31,72 @@ import java.util.*
 @Suppress("UNCHECKED_CAST")
 open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 
+
 	init {
 		layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		itemAnimator?.changeDuration = 0
+	}
+
+	fun <T>addSwipeEvent(
+		icon: Int,
+		iconPaddingSize: Int,
+		callback: (position: Int, itemView: T?) -> Unit
+	) {
+		object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.LEFT) {
+			override fun onMove(
+				recyclerView: RecyclerView,
+				viewHolder: ViewHolder,
+				targetHolder: ViewHolder
+			): Boolean {
+				return false
+			}
+
+			var background: Drawable? = null
+			var markIcon: Drawable? = null
+			var initiated: Boolean = false
+			private fun init() {
+				background = ColorDrawable(Spectrum.red)
+				markIcon = ContextCompat.getDrawable(context, icon)
+				markIcon?.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP)
+				initiated = true
+			}
+
+			override fun onChildDraw(
+				canvas: Canvas,
+				recyclerView: RecyclerView,
+				viewHolder: RecyclerView.ViewHolder,
+				directionX: Float,
+				directionY: Float,
+				actionState: Int,
+				isCurrentlyActive: Boolean
+			) {
+				val itemView = viewHolder.itemView
+				// not interested in those
+				if (viewHolder.adapterPosition == -1) return
+				if (!initiated) init()
+				// draw red background
+				background?.setBounds(itemView.right + directionX.toInt(), itemView.top, itemView.right, itemView.bottom)
+				background?.draw(canvas)
+				val markLeft = (itemView.right + directionX).toInt()
+				val markRight = markLeft + (itemView.bottom - itemView.top)
+				val leftPadding = 5.uiPX()
+				markIcon?.setBounds(
+					markLeft + iconPaddingSize + leftPadding,
+					itemView.top + iconPaddingSize,
+					markRight - iconPaddingSize + leftPadding,
+					itemView.bottom - iconPaddingSize
+				)
+				markIcon?.draw(canvas)
+				super.onChildDraw(canvas, recyclerView, viewHolder, directionX, directionY, actionState, isCurrentlyActive)
+			}
+
+			override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+				//Remove swiped item from list and notify the RecyclerView
+				val position = viewHolder.adapterPosition
+				callback(position, viewHolder.itemView as? T)
+			}
+		}.let { ItemTouchHelper(it).attachToRecyclerView(this) }
 	}
 
 	override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
@@ -34,6 +105,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		}
 		return super.onInterceptTouchEvent(event)
 	}
+
 
 	inline fun <T> addDragEventAndReordering(
 		adapterDataSet: ArrayList<T>,
@@ -74,6 +146,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 				viewHolder: ViewHolder,
 				direction: Int
 			) {
+
 			}
 
 			override fun onSelectedChanged(

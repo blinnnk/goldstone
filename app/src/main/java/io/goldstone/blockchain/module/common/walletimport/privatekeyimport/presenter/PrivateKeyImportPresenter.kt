@@ -2,12 +2,12 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 
 import android.content.Context
 import android.widget.EditText
-import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.removeStartAndEndValue
 import com.blinnnk.extension.replaceWithPattern
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.keystore.getWalletByPrivateKey
@@ -23,7 +23,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.prese
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 /**
@@ -41,20 +40,15 @@ class PrivateKeyImportPresenter(
 		isAgree: Boolean,
 		nameInput: EditText,
 		hintInput: EditText,
-		callback: (Boolean) -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
-		privateKeyInput.text.isEmpty() isTrue {
-			fragment.context?.alert(ImportWalletText.privateKeyAlert)
-			callback(false)
-			return
-		}
-		CreateWalletPresenter.checkInputValue(
+		if (privateKeyInput.text.isEmpty()) callback(AccountError.InvalidPrivateKey)
+		else CreateWalletPresenter.checkInputValue(
 			nameInput.text.toString(),
 			passwordInput.text.toString(),
 			repeatPasswordInput.text.toString(),
 			isAgree,
-			fragment.context,
-			{ callback(false) } // Error Callback
+			callback
 		) { passwordValue, walletName ->
 			val rootPrivateKey =
 				MultiChainUtils.getRootPrivateKey(privateKeyInput.text.toString())
@@ -84,7 +78,7 @@ class PrivateKeyImportPresenter(
 			walletName: String,
 			password: String,
 			hint: String,
-			callback: (Boolean) -> Unit
+			callback: (GoldStoneError) -> Unit
 		) {
 			val multiChainAddresses =
 				MultiChainUtils.getMultiChainAddressesByRootKey(rootPrivateKey)
@@ -95,7 +89,6 @@ class PrivateKeyImportPresenter(
 				if (storeRootKeyByWalletID(thisWalletID, rootPrivateKey, password)) {
 					// 那么就存储可读信息到数据库
 					WalletImportPresenter.insertWalletToDatabase(
-						this,
 						multiChainAddresses,
 						walletName,
 						"",
@@ -117,7 +110,7 @@ class PrivateKeyImportPresenter(
 			context: Context?,
 			isSingleChainWallet: Boolean,
 			hint: String? = null,
-			callback: (Boolean) -> Unit
+			callback: (GoldStoneError) -> Unit
 		) {
 			// 如果是包含 `0x` 开头格式的私钥地址移除 `0x`
 			val formatPrivateKey = privateKey.clean0xPrefix()
@@ -129,8 +122,7 @@ class PrivateKeyImportPresenter(
 					.removeStartAndEndValue(" ")
 			// 首先检查私钥地址是否合规
 			if (!WalletUtil.isValidPrivateKey(currentPrivateKey)) {
-				context?.alert(ImportWalletText.invalidPrivateKey)
-				callback(false)
+				callback(AccountError.InvalidPrivateKey)
 				return
 			}
 			/**
@@ -147,25 +139,17 @@ class PrivateKeyImportPresenter(
 				currentPrivateKey,
 				password,
 				filename
-			) { address ->
-				if (address.equals(ImportWalletText.existAddress, true)) {
-					context.runOnUiThread {
-						alert(ImportWalletText.existAddress)
-						callback(false)
-					}
-				} else {
-					address?.let {
-						WalletImportPresenter.insertWalletToDatabase(
-							context,
-							ChainAddresses(it),
-							name,
-							"",
-							ChainPath(),
-							hint,
-							callback
-						)
-					}
-				}
+			) { address, error ->
+				if (!address.isNull() && error.isNone()) {
+					WalletImportPresenter.insertWalletToDatabase(
+						ChainAddresses(address!!),
+						name,
+						"",
+						ChainPath(),
+						hint,
+						callback
+					)
+				} else callback(error)
 			}
 		}
 	}

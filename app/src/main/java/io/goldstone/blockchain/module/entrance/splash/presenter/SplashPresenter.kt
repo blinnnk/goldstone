@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -15,6 +16,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.updateEOSAccountName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.currentPublicKeyHasActivated
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.isActivatedWatchOnlyEOSAccount
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -32,33 +34,34 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	fun hasAccountThenLogin() {
 		WalletTable.getCurrentWallet {
-			if (!eosAccountNames.currentPublicKeyHasActivated()) {
-				EOSAPI.getAccountNameByPublicKey(
-					currentEOSAddress,
-					{
-						activity.alert("${it.message}")
-						activity.jump<MainActivity>()
-					}
-				) { accounts ->
-					updateEOSAccountName(accounts) { hasDefaultName ->
-						cacheDataAndSetNetBy(
-							// 如果是含有 DefaultName 的钱包需要更新临时缓存钱包的内的值
-							this.apply { if (hasDefaultName) currentEOSAccountName.updateCurrent(accounts.first().name) }
-						) {
-							activity.jump<MainActivity>()
-						}
-					}
-				}
-			} else cacheDataAndSetNetBy(this) {
+			if (
+				!eosAccountNames.currentPublicKeyHasActivated() &&
+				!eosAccountNames.isActivatedWatchOnlyEOSAccount() &&
+				getCurrentAddressesAndChainID().any { it.second.isEOS() }
+			) {
+				checkOrUpdateEOSAccount()
+			} else cacheDataAndSetNetBy(this) { activity.jump<MainActivity>() }
+		}
+	}
+
+	private fun WalletTable.checkOrUpdateEOSAccount() {
+		EOSAPI.getAccountNameByPublicKey(
+			currentEOSAddress,
+			{
+				activity.alert(it.message)
 				activity.jump<MainActivity>()
+			}
+		) { accounts ->
+			updateEOSAccountName(accounts) { hasDefaultName ->
+				// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
+				cacheDataAndSetNetBy(apply { if (hasDefaultName) currentEOSAccountName.updateCurrent(accounts.first().name) }) {
+					activity.jump<MainActivity>()
+				}
 			}
 		}
 	}
 
-	private fun cacheDataAndSetNetBy(
-		wallet: WalletTable,
-		callback: () -> Unit
-	) {
+	private fun cacheDataAndSetNetBy(wallet: WalletTable, callback: () -> Unit) {
 		val type = wallet.getWalletType()
 		type.updateSharedPreference()
 		when {
@@ -71,7 +74,15 @@ class SplashPresenter(val activity: SplashActivity) {
 			type.isLTC() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
 			}
-			type.isEOS() -> NodeSelectionPresenter.setAllMainnet {
+			type.isEOS() -> if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+				cacheWalletData(wallet, callback)
+			} else NodeSelectionPresenter.setAllMainnet {
+				cacheWalletData(wallet, callback)
+			}
+			type.isEOSJungle() -> NodeSelectionPresenter.setAllTestnet {
+				cacheWalletData(wallet, callback)
+			}
+			type.isEOSMainnet() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
 			}
 			type.isBCH() -> NodeSelectionPresenter.setAllMainnet {
@@ -198,7 +209,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	private fun cacheWalletData(wallet: WalletTable, callback: () -> Unit) {
 		wallet.apply {
 			doAsync {
-				Config.updateCurrentEthereumAddress(currentETHAndERCAddress)
+				Config.updateCurrentEthereumAddress(currentETHSeriesAddress)
 				Config.updateCurrentBTCAddress(currentBTCAddress)
 				Config.updateCurrentBTCSeriesTestAddress(currentBTCSeriesTestAddress)
 				Config.updateCurrentETCAddress(currentETCAddress)

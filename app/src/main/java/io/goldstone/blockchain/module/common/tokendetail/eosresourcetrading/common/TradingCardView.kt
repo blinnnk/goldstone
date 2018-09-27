@@ -8,15 +8,16 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.SpaceSplitLine
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
 import io.goldstone.blockchain.common.component.title.RadioWithTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
@@ -41,7 +42,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	private val confirmButton by lazy {
 		RoundButton(context).apply {
-			setBlueStyle(15.uiPX(), contentWidth, 40.uiPX())
+			setBlueStyle(15.uiPX(), contentWidth)
 			text = CommonText.confirm
 		}
 	}
@@ -59,9 +60,15 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX()).apply {
 				topMargin = 10.uiPX()
 			}
+			setNumberPadKeyboard()
 			setTitle("EOS Amount")
 			setHint("enter eos amount")
 		}
+	}
+
+	fun setSellingRAMStyle() {
+		amountEditText.setTitle("Bytes")
+		amountEditText.setHint("enter ram byte amount")
 	}
 
 	private val radioCellWidth = 100.uiPX()
@@ -134,8 +141,12 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		accountNameEditText.setHint(hint)
 	}
 
-	fun getInputValue(): Pair<String, Double> {
-		return Pair(accountNameEditText.getContent(), amountEditText.getContent().toDoubleOrZero())
+	fun setAccount(name: String) {
+		accountNameEditText.setContent(name)
+	}
+
+	fun getInputValue(): Pair<EOSAccount, Double> {
+		return Pair(EOSAccount(accountNameEditText.getContent()), amountEditText.getContent().toDoubleOrZero())
 	}
 
 	fun setConfirmClickEvent(action: () -> Unit) {
@@ -143,6 +154,10 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			action()
 			confirmButton.preventDuplicateClicks()
 		}
+	}
+
+	fun setContactButtonClickEvent(action: () -> Unit) {
+		accountNameEditText.setButtonClickEvent(action)
 	}
 
 	fun clearInput() {

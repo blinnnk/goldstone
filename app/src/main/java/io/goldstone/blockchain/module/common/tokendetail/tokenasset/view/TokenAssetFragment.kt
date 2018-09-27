@@ -15,14 +15,15 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
-import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
-import io.goldstone.blockchain.common.component.container.GrayCardView
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
@@ -43,11 +44,18 @@ import java.math.BigInteger
 
 class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInterface {
 
+	override val pageTitle: String = "Asset"
 	private val tokenInfoView by lazy { TokenInfoView(context!!) }
-
 	private val balanceCell by lazy {
 		GraySquareCell(context!!).apply {
 			setTitle(TokenDetailText.balance)
+			setSubtitle(CommonText.calculating)
+		}
+	}
+
+	private val refundsCell by lazy {
+		GraySquareCell(context!!).apply {
+			setTitle(TokenDetailText.refunds)
 			setSubtitle(CommonText.calculating)
 		}
 	}
@@ -63,18 +71,22 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		GraySquareCell(context!!).apply {
 			showArrow()
 			setTitle(TokenDetailText.authority)
-			setSubtitle(Config.getCurrentEOSName())
+			setSubtitle(Config.getCurrentEOSAccount().accountName)
 			click { presenter.showPublicKeyAccountNames() }
 		}
 	}
 
 	private val accountAddress by lazy {
-		GraySquareCellWithButtons(context!!).apply {
-			showOnlyCopyButton {
-				context?.clickToCopy(Config.getCurrentEOSAddress())
+		GraySquareCell(context!!).apply {
+			setTitle("Public Key")
+			val address =
+				if (Config.getCurrentEOSAddress().isEmpty()) "Account Name Only"
+				else Config.getCurrentEOSAddress().scaleTo(24)
+			setSubtitle(address)
+			onClick {
+				this@apply.context?.clickToCopy(Config.getCurrentEOSAddress())
+				preventDuplicateClicks()
 			}
-			setTitle(TokenDetailText.address)
-			setSubtitle(Config.getCurrentEOSAddress().scaleTo(20))
 		}
 	}
 
@@ -114,8 +126,8 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 				bottomPadding = 20.uiPX()
 				gravity = Gravity.CENTER_HORIZONTAL
 				tokenInfoView.into(this)
-				showTransactionCells()
 				showAccountManagementCells()
+				showTransactionCells()
 				showAssetDashboard()
 				SessionTitleView(context).setTitle(TokenDetailText.assetTools).into(this)
 				linearLayout {
@@ -138,9 +150,14 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		balanceCell.setSubtitle(balance)
 	}
 
+	fun setEOSRefunds(description: String) {
+		refundsCell.setSubtitle(description)
+	}
+
 	fun setResourcesValue(
 		ramAvailable: BigInteger,
 		ramTotal: BigInteger,
+		ramEOSCount: String,
 		cpuAvailable: BigInteger,
 		cpuTotal: BigInteger,
 		cpuWeight: String,
@@ -150,6 +167,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	) {
 		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available)
 		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total)
+		ramAssetCell.setSubtitle(ramEOSCount)
 		cpuAssetCell.setSubtitle(cpuWeight)
 		cpuAssetCell.setLeftValue(
 			cpuAvailable,
@@ -185,6 +203,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	private fun ViewGroup.showTransactionCells() {
 		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
 		balanceCell.into(this)
+		refundsCell.into(this)
 		transactionCountCell.into(this)
 	}
 
@@ -202,19 +221,20 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
 			Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
 			Pair(R.drawable.ram_icon, TokenDetailText.tradeRAM)
-		).forEachIndexed { index, pair ->
-			generateCardView(index, pair)
+		).forEach { pair ->
+			generateCardView(pair)
 		}
 	}
 
-	private fun ViewGroup.generateCardView(position: Int, info: Pair<Int, String>) {
-		val cardWidth = (ScreenSize.widthWithPadding - 10.uiPX()) / 3
+	private fun ViewGroup.generateCardView(info: Pair<Int, String>) {
+		val cardWidth = (ScreenSize.widthWithPadding) / 3
 		GrayCardView(context).apply {
-			x = 5.uiPX() * position * 1f
 			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
 			getContainer().apply {
 				onClick {
-					presenter.showResourceTradingFragmentByTitle(info.second)
+					if (Config.isWatchOnlyWallet())
+						this@TokenAssetFragment.context.alert(AlertText.watchOnly)
+					else presenter.showResourceTradingFragmentByTitle(info.second)
 					preventDuplicateClicks()
 				}
 				imageView {

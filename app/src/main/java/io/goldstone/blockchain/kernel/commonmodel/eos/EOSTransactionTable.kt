@@ -48,7 +48,7 @@ data class EOSTransactionTable(
 		System.currentTimeMillis(),
 		response.executedStatus,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
-		info.fromAccount,
+		info.fromAccount.accountName,
 		Config.getCurrentEOSAddress(),
 		Config.getEOSCurrentChain().id,
 		true
@@ -101,14 +101,6 @@ data class EOSTransactionTable(
 				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id)
 			} then (hold)
 		}
-
-		fun deleteByAddress(address: String) {
-			doAsync {
-				GoldStoneDataBase.database.eosTransactionDao().apply {
-					deleteAll(getDataByRecordAddress(address))
-				}
-			}
-		}
 	}
 }
 
@@ -129,6 +121,9 @@ interface EOSTransactionDao {
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
 	fun getDataByRecordAddress(recordAddress: String): List<EOSTransactionTable>
+
+	@Query("DELETE FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
+	fun deleteDataByRecordAddress(recordAddress: String)
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID")
 	fun getDataByRecordAccount(recordAccountName: String, chainID: String): List<EOSTransactionTable>

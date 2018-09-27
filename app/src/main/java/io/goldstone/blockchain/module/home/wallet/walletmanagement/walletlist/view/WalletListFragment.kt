@@ -4,6 +4,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
@@ -15,13 +16,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListModel>() {
-	
+
+	override val pageTitle: String = ProfileText.walletManager
 	override val presenter = WalletListPresenter(this)
-	
-	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<WalletListModel>?
-	) {
+	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletListModel>?) {
 		asyncData?.let { it ->
 			recyclerView.adapter = WalletListAdapter(it) {
 				onClick {
@@ -31,7 +29,7 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
 			}
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()

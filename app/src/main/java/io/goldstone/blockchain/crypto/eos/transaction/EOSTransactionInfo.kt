@@ -2,12 +2,13 @@ package io.goldstone.blockchain.crypto.eos.transaction
 
 import android.content.Context
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
-import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
-import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -25,8 +26,8 @@ import java.math.BigInteger
  */
 
 data class EOSTransactionInfo(
-	val fromAccount: String,
-	val toAccount: String,
+	val fromAccount: EOSAccount,
+	val toAccount: EOSAccount,
 	val amount: BigInteger, // 这里是把精度包含进去的最小单位的值, 签名的时候会对这个值直接转换
 	val symbol: String,
 	val decimal: Int,
@@ -38,8 +39,8 @@ data class EOSTransactionInfo(
 ) : Serializable, EOSModel {
 
 	constructor(
-		fromAccount: String,
-		toAccount: String,
+		fromAccount: EOSAccount,
+		toAccount: EOSAccount,
 		amount: BigInteger
 	) : this(
 		fromAccount,
@@ -52,8 +53,8 @@ data class EOSTransactionInfo(
 	)
 
 	constructor(
-		fromAccount: String,
-		toAccount: String,
+		fromAccount: EOSAccount,
+		toAccount: EOSAccount,
 		amount: BigInteger,
 		memo: String,
 		symbol: String
@@ -101,8 +102,8 @@ data class EOSTransactionInfo(
 		hold: (EOSResponse) -> Unit
 	) {
 		EOSTransaction(
-			EOSAuthorization(fromAccount, EOSActor.Active),
-			toAccount,
+			EOSAuthorization(fromAccount.accountName, EOSActor.Active),
+			toAccount.accountName,
 			amount,
 			memo,
 			// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
@@ -122,8 +123,8 @@ data class EOSTransactionInfo(
 	}
 
 	override fun serialize(): String {
-		val encryptFromAccount = EOSUtils.getLittleEndianCode(fromAccount)
-		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount)
+		val encryptFromAccount = EOSUtils.getLittleEndianCode(fromAccount.accountName)
+		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount.accountName)
 		val amountCode = EOSUtils.convertAmountToCode(amount)
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(decimal)
 		val symbolCode = symbol.toByteArray().toNoPrefixHexString()

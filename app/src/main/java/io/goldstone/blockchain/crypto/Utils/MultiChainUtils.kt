@@ -4,6 +4,7 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.ethereum.getAddress
@@ -89,8 +90,7 @@ object MultiChainUtils {
 			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
 			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH
 			EOSWalletUtils.isValidAddress(address) -> AddressType.EOS
-			EOSWalletUtils.isValidAccountName(address, false) ->
-				AddressType.EOSAccountName
+			EOSAccount(address).isValid(false) -> AddressType.EOSAccountName
 			else -> null
 		}
 	}

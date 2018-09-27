@@ -102,9 +102,7 @@ object PaddingSize {
 
 object CornerSize {
 	@JvmField
-	val cell = 3.uiPX()
-	@JvmField
-	val small = 5.uiPX().toFloat()
+	val small = 3.uiPX().toFloat()
 	@JvmField
 	val normal = 7.uiPX().toFloat()
 	@JvmField
@@ -126,6 +124,8 @@ object ScreenSize {
 	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 	@JvmStatic
+	val overlayContentWidth = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 4
+	@JvmStatic
 	val fullHeight = Resources.getSystem().displayMetrics.heightPixels
 	@JvmStatic
 	var heightWithOutHeader = fullHeight - HomeSize.headerHeight
@@ -142,7 +142,7 @@ object CommonCellSize {
 
 object TransactionSize {
 	@JvmField
-	val headerView = 220.uiPX()
+	val headerView = 200.uiPX()
 }
 
 object HomeSize {

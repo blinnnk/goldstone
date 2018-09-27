@@ -9,6 +9,8 @@ import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -86,7 +88,7 @@ class WalletSettingsPresenter(
 	private fun showHintEditorFragment() {
 		fragment.apply {
 			// 判断是否是只读钱包
-			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+			if (!Config.isWatchOnlyWallet()) {
 				// 恢复 `Header` 样式
 				recoveryHeaderStyle()
 				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
@@ -100,13 +102,13 @@ class WalletSettingsPresenter(
 						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
 					}
 				}
-			}
+			} else context.alert(WalletText.watchOnly)
 		}
 	}
 
 	private fun showMnemonicBackUpFragment() {
 		fragment.apply {
-			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+			if (!Config.isWatchOnlyWallet()) {
 				WalletTable.getCurrentWallet {
 					encryptMnemonic?.let {
 						recoveryHeaderStyle()
@@ -117,7 +119,7 @@ class WalletSettingsPresenter(
 						}
 					}
 				}
-			}
+			} else context.alert(WalletText.watchOnly)
 		}
 	}
 
@@ -137,10 +139,10 @@ class WalletSettingsPresenter(
 
 	private fun showPasswordSettingsFragment() {
 		fragment.apply {
-			WalletTable.isWatchOnlyWalletShowAlertOrElse(context!!) {
+			if (!Config.isWatchOnlyWallet()) {
 				recoveryHeaderStyle()
 				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content)
-			}
+			} else context.alert(WalletText.watchOnly)
 		}
 	}
 

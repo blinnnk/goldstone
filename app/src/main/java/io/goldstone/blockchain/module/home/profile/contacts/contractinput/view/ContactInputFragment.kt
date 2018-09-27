@@ -10,14 +10,15 @@ import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.edittext.RoundInput
-import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -32,12 +33,15 @@ import org.jetbrains.anko.verticalLayout
  */
 class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 
+	override val pageTitle: String = ProfileText.contacts
 	private val nameInput by lazy { RoundInput(context!!) }
-	private val ethERCAndETCAddressInput by lazy { WalletEditText(context!!) }
-	private val btcMainnetAddressInput by lazy { WalletEditText(context!!) }
-	private val bchAddressInput by lazy { WalletEditText(context!!) }
-	private val ltcAddressInput by lazy { WalletEditText(context!!) }
-	private val btcTestnetAddressInput by lazy { WalletEditText(context!!) }
+	private val ethSeriesAddressInput by lazy { RoundInput(context!!) }
+	private val eosAddressInput by lazy { RoundInput(context!!) }
+	private val btcMainnetAddressInput by lazy { RoundInput(context!!) }
+	private val bchAddressInput by lazy { RoundInput(context!!) }
+	private val ltcAddressInput by lazy { RoundInput(context!!) }
+	private val btcTestnetAddressInput by lazy { RoundInput(context!!) }
+	private val eosJungleAddressInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = ContactInputPresenter(this)
 
@@ -53,31 +57,52 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 				}.into(this)
 
-				ethERCAndETCAddressInput.apply {
+				SessionTitleView(context).setTitle("Contact Address").into(this)
+
+				ethSeriesAddressInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-					hint = ContactText.ethERCAndETChint
+					title = CoinSymbol.eth
+					hint = ContactText.ethERCAndETHint
+				}.into(this)
+
+				eosAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+					title = CoinSymbol.eos
+					hint = ContactText.eosHint
 				}.into(this)
 
 				btcMainnetAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+					title = CoinSymbol.btc()
 					hint = ContactText.btcMainnetAddress
 				}.into(this)
 
 				bchAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+					title = CoinSymbol.bch
 					hint = ContactText.bchAddress
 				}.into(this)
 
 				ltcAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+					title = CoinSymbol.ltc
 					hint = ContactText.ltcAddress
 				}.into(this)
 
+				eosJungleAddressInput.apply {
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+					title = "${CoinSymbol.eos} JUNGLE"
+					hint = ContactText.eosJungleHint
+					visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
+				}.into(this)
+
 				btcTestnetAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+					title = "${CoinSymbol.btc()} TEST"
 					hint = ContactText.btcTestnetAddress
 					visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.into(this)
+
 
 				confirmButton.apply {
 					text = CommonText.confirm
@@ -87,7 +112,9 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}.into(this)
 
 				presenter.getAddressIfExist(
-					ethERCAndETCAddressInput,
+					ethSeriesAddressInput,
+					eosAddressInput,
+					eosJungleAddressInput,
 					btcMainnetAddressInput,
 					bchAddressInput,
 					btcTestnetAddressInput,
@@ -104,7 +131,9 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.setConfirmButtonStyle(
 			nameInput,
-			ethERCAndETCAddressInput,
+			ethSeriesAddressInput,
+			eosAddressInput,
+			eosJungleAddressInput,
 			btcMainnetAddressInput,
 			btcTestnetAddressInput,
 			ltcAddressInput,

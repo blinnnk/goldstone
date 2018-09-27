@@ -8,8 +8,8 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
@@ -29,6 +29,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 
+	override val pageTitle: String = TokenDetailText.customGas
 	val getGasSize: () -> Long? = {
 		arguments?.getLong(ArgumentKey.gasSize)
 	}
@@ -101,9 +102,7 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 	private fun setProcessValue() {
 		gasPriceInput.let { price ->
 			price.afterTextChanged = Runnable {
-				price.getContent {
-					gasPrice = if (it.isEmpty()) 0L else it.toLong()
-				}
+				gasPrice = if (price.getContent().isEmpty()) 0L else price.getContent().toLong()
 			}
 		}
 		if (isBTCSeries) {
@@ -111,9 +110,8 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 		} else {
 			gasLimitInput.let { limit ->
 				limit.afterTextChanged = Runnable {
-					limit.getContent {
-						dataSize = if (it.isEmpty()) getGasSize() ?: 0L else it.toLong()
-					}
+					dataSize = if (limit.getContent().isEmpty()) getGasSize().orElse(0)
+					else limit.getContent().toLong()
 				}
 			}
 		}

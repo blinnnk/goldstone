@@ -26,7 +26,9 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
 
 class EOSMemoryTransactionHistoryFragment
 	: BaseFragment<EOSMemoryTransactionHistoryPresenter>() {
-
+	override val pageTitle: String
+		get() = ""
+	
 	// 这个 `Model` 是服务 `ViewPager` 中的 `TraderMemorySalesRecordAndLargeSingleRecordListFragment`
 	val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel

@@ -16,6 +16,11 @@ object LitecoinUrl {
 		"${currentUrl()}/api/addr/$address/balance"
 	}
 
+	val getBalanceFromChainSo: (address: String) -> String = { address ->
+		val param = if (Config.isTestEnvironment()) "LTCTest" else "LTC"
+		"https://chain.so/api/v2/get_address_balance/$param/$address"
+	}
+
 	val getUnspentInfo: (address: String) -> String = { address ->
 		"${currentUrl()}/api/addr/$address/utxo"
 	}

@@ -16,8 +16,8 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.RoundIcon
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -41,20 +41,19 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	private val conformationBar by lazy { TextView(context) }
 
 	init {
+		bottomPadding = 10.uiPX()
 		gradientView.apply {
 			setStyle(GradientType.Tree, TransactionSize.headerView)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
 
 		verticalLayout {
-			layoutParams =
-				RelativeLayout.LayoutParams((ScreenSize.Width * 0.8).toInt(), wrapContent).apply {
-					leftMargin = (ScreenSize.Width * 0.1).toInt()
-					topMargin = 50.uiPX()
-				}
-
+			lparams {
+				width = (ScreenSize.Width * 0.8).toInt()
+				height = wrapContent
+				topMargin = 35.uiPX()
+			}
 			gravity = Gravity.CENTER_HORIZONTAL
-
 			icon.apply {
 				y += 5.uiPX()
 				iconSize = 60.uiPX()
@@ -68,7 +67,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				setWildStyle()
 			}.into(this)
-		}
+		}.setCenterInHorizontal()
 
 		conformationBar.apply {
 			visibility = View.GONE
@@ -151,7 +150,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 							android.graphics.PorterDuff.Mode.MULTIPLY
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 60.uiPX()
+						y += 45.uiPX()
 					}
 				addView(pendingIcon)
 				pendingIcon?.setCenterInHorizontal()

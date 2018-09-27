@@ -14,6 +14,8 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytrans
 @SuppressLint("ValidFragment")
 class EOSMemoryTransactionHistoryListFragment(private val isSalesRecord: Boolean) :
 	BaseRecyclerFragment<EOSMemoryTransactionHistoryListPresenter, EOSMemoryTransactionHistoryListTable>() {
+	override val pageTitle: String
+		get() = ""
 	override val presenter: EOSMemoryTransactionHistoryListPresenter = EOSMemoryTransactionHistoryListPresenter(
 		this,
 		isSalesRecord

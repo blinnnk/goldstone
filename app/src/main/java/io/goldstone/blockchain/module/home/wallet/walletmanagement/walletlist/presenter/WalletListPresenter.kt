@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter
 
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -35,8 +34,7 @@ class WalletListPresenter(
 
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) { it ->
-			if (it.isNull()) return@switchCurrentWallet
-			val walletType = it?.getWalletType()!!
+			val walletType = it.getWalletType()
 			when {
 				walletType.isBTC() -> {
 					if (Config.isTestEnvironment()) {
@@ -70,7 +68,27 @@ class WalletListPresenter(
 
 				walletType.isBCH() -> {
 					if (Config.isTestEnvironment()) {
-						showConfirmationAlertView(" Bitcoin Cash Mainnet") {
+						showConfirmationAlertView("Bitcoin Cash Mainnet") {
+							NodeSelectionPresenter.setAllMainnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isEOSJungle() -> {
+					if (!Config.isTestEnvironment()) {
+						showConfirmationAlertView("EOS Jungle Testnet") {
+							NodeSelectionPresenter.setAllTestnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isEOSMainnet() -> {
+					if (Config.isTestEnvironment()) {
+						showConfirmationAlertView("EOS Mainnet Testnet") {
 							NodeSelectionPresenter.setAllMainnet {
 								fragment.activity?.jump<SplashActivity>()
 							}

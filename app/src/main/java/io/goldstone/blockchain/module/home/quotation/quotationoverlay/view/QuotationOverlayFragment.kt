@@ -21,9 +21,9 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 	override fun ViewGroup.initView() {
 		when (title) {
 			QuotationText.management -> {
-				presenter.showQutationManagementFragment()
+				presenter.showQuotationManagementFragment()
 				overlayView.header.showSearchButton(true) {
-					presenter.showQutationSearchFragment()
+					presenter.showQuotationSearchFragment()
 				}
 			}
 			else -> {

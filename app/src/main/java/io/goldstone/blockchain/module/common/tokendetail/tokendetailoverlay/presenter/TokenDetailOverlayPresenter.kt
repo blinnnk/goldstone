@@ -56,46 +56,26 @@ class TokenDetailOverlayPresenter(
 	}
 
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+		WalletTable.isAvailableWallet(
 			fragment.context!!,
-			{
-				// Click Dialog Confirm Button Event
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			}
+			// Click Dialog Confirm Button Event
+			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
 		) {
 			if (isFromQuickTransfer) {
-				fragment.apply {
-					addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
-					headerTitle = TokenDetailText.address
-				}
-			} else {
-				showTargetFragment<AddressSelectionFragment>(
-					TokenDetailText.address,
-					TokenDetailText.tokenDetail
-				)
-			}
+				fragment.addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
+			} else showTargetFragment<AddressSelectionFragment>()
 		}
 	}
 
 	fun showDepositFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+		WalletTable.isAvailableWallet(
 			fragment.context!!,
-			{
-				// Click Dialog Confirm Button Event
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			}
+			// Click Dialog Confirm Button Event
+			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
 		) {
-			if (isFromQuickTransfer) {
-				fragment.apply {
-					addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
-					headerTitle = TokenDetailText.deposit
-				}
-			} else {
-				showTargetFragment<DepositFragment>(
-					TokenDetailText.deposit,
-					TokenDetailText.tokenDetail
-				)
-			}
+			if (isFromQuickTransfer)
+				fragment.addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
+			else showTargetFragment<DepositFragment>()
 		}
 	}
 

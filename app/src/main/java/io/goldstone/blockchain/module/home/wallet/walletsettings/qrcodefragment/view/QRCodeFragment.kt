@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -24,6 +25,9 @@ import org.jetbrains.anko.matchParent
  */
 
 class QRCodeFragment : BaseFragment<QRCodePresenter>() {
+
+	override val pageTitle: String = WalletText.qrCode
+
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = QRCodePresenter(this)
 

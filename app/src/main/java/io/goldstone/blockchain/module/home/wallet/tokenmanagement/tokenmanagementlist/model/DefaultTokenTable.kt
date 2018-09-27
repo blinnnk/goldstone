@@ -16,6 +16,7 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -176,6 +177,17 @@ data class DefaultTokenTable(
 		}
 	}
 
+	fun updateTokenNameFromChain() {
+		GoldStoneEthCall.getTokenName(
+			contract,
+			{ },
+			Config.getCurrentChainName()
+		) {
+			val name = if (it.isEmpty()) symbol else it
+			DefaultTokenTable.updateTokenName(TokenContract(contract), name)
+		}
+	}
+
 	companion object {
 
 		fun getAllTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
@@ -293,10 +305,10 @@ interface DefaultTokenDao {
 	fun updateTokenDefaultStatusAndName(isDefault: Boolean, newName: String, contract: String, chainID: String)
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID IN (:currentChainIDs)")
-	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chianIDs()): List<DefaultTokenTable>
+	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chainIDs()): List<DefaultTokenTable>
 
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chainID IN (:currentChainIDs)")
-	fun getDefaultTokens(currentChainIDs: List<String> = Current.chianIDs(), isDefault: Boolean = true): List<DefaultTokenTable>
+	fun getDefaultTokens(currentChainIDs: List<String> = Current.chainIDs(), isDefault: Boolean = true): List<DefaultTokenTable>
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chainID LIKE :chainID")
 	fun getTokenByContract(contract: String, chainID: String): DefaultTokenTable?

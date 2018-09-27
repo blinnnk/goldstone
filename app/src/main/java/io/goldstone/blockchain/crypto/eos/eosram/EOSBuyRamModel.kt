@@ -2,6 +2,7 @@ package io.goldstone.blockchain.crypto.eos.eosram
 
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -43,8 +44,8 @@ data class EOSBuyRamModel(
 			serializedAuthorizations += it.serialize()
 		}
 		val serializedBuyInfo = EOSTransactionInfo(
-			payerName,
-			receiverName,
+			EOSAccount(payerName),
+			EOSAccount(receiverName),
 			eosAmount
 		).serialize()
 		val hexDataLength = EOSUtils.getHexDataByteLengthCode(serializedBuyInfo)

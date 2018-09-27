@@ -23,7 +23,7 @@ import org.jetbrains.anko.textColor
 class WalletEditText(context: Context) : EditText(context) {
 
 	init {
-		addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
+		addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 90.uiPX())
 		padding = 20.uiPX()
 		hintTextColor = GrayScale.midGray
@@ -40,4 +40,6 @@ class WalletEditText(context: Context) : EditText(context) {
 			return@setOnTouchListener false
 		}
 	}
+
+	fun getContent(): String = text.toString()
 }
