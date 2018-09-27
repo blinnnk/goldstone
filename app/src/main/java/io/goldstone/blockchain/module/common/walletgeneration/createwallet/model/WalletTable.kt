@@ -177,6 +177,18 @@ data class WalletTable(
 		).filter { it.first.isNotEmpty() }
 	}
 
+	fun getCurrentAllAddressAndChainID(): List<Pair<String, ChainType>> {
+		return listOf(
+			Pair(btcAddresses, ChainType.BTC),
+			Pair(ltcAddresses, ChainType.LTC),
+			Pair(bchAddresses, ChainType.BCH),
+			Pair(btcSeriesTestAddresses, ChainType.AllTest),
+			Pair(etcAddresses, ChainType.ETC),
+			Pair(ethAddresses, ChainType.ETH),
+			Pair(eosAddresses, ChainType.EOS)
+		).filter { it.first.isNotEmpty() }
+	}
+
 	fun getCurrentAddresses(useEOSAccountName: Boolean = false): List<String> {
 		return listOf(
 			currentBTCAddress,

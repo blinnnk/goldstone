@@ -223,7 +223,7 @@ class MarketTokenDetailPresenter(
 			}
 		) {
 			// 把数据更新到数据库
-			it.updateCandleChartDataInDatabaseBy(period, pair)
+			it.updateLocalCandleChartData(period, pair)
 			// 更新 `UI` 界面
 			updateCandleChartUI(it, dateType)
 		}
@@ -281,27 +281,18 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	private fun List<CandleChartModel>.updateCandleChartDataInDatabaseBy(
-		period: String,
-		pair: String
-	) {
+	private fun List<CandleChartModel>.updateLocalCandleChartData(period: String, pair: String) {
 		map { JSONObject("{\"open\":\"${it.open}\",\"close\":\"${it.close}\",\"high\":\"${it.high}\",\"low\":\"${it.low}\",\"time\":${it.time}}") }.let {
 			when (period) {
-				MarketTokenDetailChartType.WEEK.info -> {
-					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
-				}
+				MarketTokenDetailChartType.WEEK.info ->
+					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.DAY.info ->
+					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.MONTH.info ->
+					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.Hour.info ->
+					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString()) {}
 
-				MarketTokenDetailChartType.DAY.info -> {
-					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
-				}
-
-				MarketTokenDetailChartType.MONTH.info -> {
-					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
-				}
-
-				MarketTokenDetailChartType.Hour.info -> {
-					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
-				}
 			}
 		}
 	}

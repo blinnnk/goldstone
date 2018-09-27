@@ -1,10 +1,15 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -40,22 +45,23 @@ class QuotationSearchPresenter(
 		}
 	}
 
-	fun setQuotationSelfSelection(
+	fun updateMyQuotation(
 		model: QuotationSelectionTable,
-		isSelect: Boolean = true,
-		callback: () -> Unit
+		isSelect: Boolean,
+		callback: (error: GoldStoneError) -> Unit
 	) {
 		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
-		if (isSelect) getLineChartDataByPair(model.pair) { chartData ->
-			QuotationSelectionTable.insertSelection(model.apply {
-				lineChartDay = chartData
-				isSelecting = isSelect
-			}) { callback() }
-		}
-		else load {
-			GoldStoneDataBase.database.quotationSelectionDao().delete(model)
-		} then {
-			callback()
+		if (isSelect) getLineChartDataByPair(model.pair) { chartData, error ->
+			if (!chartData.isNull() && error.isNone()) {
+				QuotationSelectionTable.insertSelection(model.apply {
+					lineChartDay = chartData!!
+					isSelecting = isSelect
+				})
+				callback(error)
+			} else callback(error)
+		} else {
+			GoldStoneDataBase.database.quotationSelectionDao().deleteByPairs(model.pair)
+			callback(RequestError.None)
 		}
 	}
 
@@ -101,19 +107,16 @@ class QuotationSearchPresenter(
 	}
 
 	companion object {
-		fun getLineChartDataByPair(pair: String, hold: (String) -> Unit) {
+		fun getLineChartDataByPair(
+			pair: String,
+			@WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
+		) {
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(
 				parameter,
-				{
-					LogUtil.error("getCurrencyLineChartData", it)
-				}
+				{ hold(null, it) }
 			) {
-				it.isNotEmpty() isTrue {
-					hold(it.first().pointList.toString())
-				} otherwise {
-					LogUtil.error("Empty pair data from server")
-				}
+				hold(it.first().pointList.toString().orEmpty(), RequestError.None)
 			}
 		}
 	}

@@ -7,13 +7,11 @@ import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -27,7 +25,6 @@ import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -52,14 +49,6 @@ class WalletDetailPresenter(
 	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
 	private var detailModels: List<WalletDetailCellModel>? = null
 
-	override fun onFragmentResume() {
-		super.onFragmentResume()
-		// 更新汇率价格比较频繁, 放到 `Resume` 里面来实现
-		updateMyTokenCurrencyPrice {
-			if (!it.isNone()) fragment.context.alert(it.message)
-		}
-	}
-
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -75,11 +64,11 @@ class WalletDetailPresenter(
 			// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
 			if (!lockGettingChainModelsThread) {
 				// 再检查链上的最新价格和数量
+				fragment.removeMiniLoadingView()
 				models.getChainModels { chainModels, error ->
 					// 更新内存的数据
 					detailModels = chainModels
 					updateUIByData(chainModels)
-					fragment.removeMiniLoadingView()
 					if (!error.isNone()) fragment.context.alert(error.message)
 				}
 			} else fragment.removeMiniLoadingView()
@@ -96,10 +85,10 @@ class WalletDetailPresenter(
 
 			fun getQuickDashboardData(data: List<WalletDetailCellModel>) {
 				// Jump directly if there is only one type of token
-				if (data.size == 1) isShowAddress isTrue {
-					TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, data.first())
-				} otherwise {
-					TokenSelectionRecyclerView.showDepositFragment(fragment.context, data.first())
+				if (data.size == 1) {
+					if (isShowAddress)
+						TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, data.first())
+					else TokenSelectionRecyclerView.showDepositFragment(fragment.context, data.first())
 				} else fragment.showSelectionListOverlayView(data, isShowAddress)
 			}
 
@@ -132,11 +121,7 @@ class WalletDetailPresenter(
 			findIsItExist(FragmentTag.walletSettings) isFalse {
 				addFragmentAndSetArguments<WalletSettingsFragment>(
 					ContainerID.main, FragmentTag.walletSettings
-				) {
-					putString(
-						ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings
-					)
-				}
+				) { putString(ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings) }
 			}
 		}
 	}
@@ -212,25 +197,6 @@ class WalletDetailPresenter(
 				override fun mergeCallBack() = hold(this@getChainModels, balanceError)
 
 			}.start()
-		}
-	}
-
-	private fun updateMyTokenCurrencyPrice(callback: (RequestError) -> Unit) {
-		MyTokenTable.getMyTokens(false) { myTokens ->
-			GoldStoneAPI.getPriceByContractAddress(myTokens.map { it.contract }.toJsonArray(), callback) { newPrices ->
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount: Int = newPrices.size
-					override fun concurrentJobs() {
-						newPrices.forEach {
-							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract), it.price)
-							completeMark()
-						}
-					}
-
-					override fun mergeCallBack() = callback(RequestError.None)
-				}.start()
-			}
 		}
 	}
 

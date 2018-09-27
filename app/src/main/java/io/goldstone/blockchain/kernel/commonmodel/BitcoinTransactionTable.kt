@@ -237,20 +237,15 @@ data class BTCSeriesTransactionTable(
 			}
 		}
 
-		fun deleteByAddress(address: String, chainType: ChainType, callback: () -> Unit = {}) {
+		fun deleteByAddress(address: String, chainType: ChainType) {
 			doAsync {
-				GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
-					// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
-					// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
-					val formattedAddress =
-						if (chainType.isBCH() && !BCHWalletUtils.isNewCashAddress(address))
-							BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
-						else address
-					val data =
-						getDataByAddressAndChainType(formattedAddress, chainType.id)
-					deleteAll(data)
-					callback()
-				}
+				// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
+				// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
+				val formattedAddress =
+					if (chainType.isBCH() && !BCHWalletUtils.isNewCashAddress(address))
+						BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
+					else address
+				GoldStoneDataBase.database.btcSeriesTransactionDao().deleteDataByAddressAndChainType(formattedAddress, chainType.id)
 			}
 		}
 
@@ -265,6 +260,9 @@ interface BTCSeriesTransactionDao {
 
 	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType ORDER BY timeStamp DESC")
 	fun getDataByAddressAndChainType(address: String, chainType: Int): List<BTCSeriesTransactionTable>
+
+	@Query("DELETE FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType")
+	fun deleteDataByAddressAndChainType(address: String, chainType: Int)
 
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
 	fun getDataByHash(hash: String, isReceive: Boolean): BTCSeriesTransactionTable?

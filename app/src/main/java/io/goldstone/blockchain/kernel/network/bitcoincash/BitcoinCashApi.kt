@@ -20,9 +20,10 @@ object BitcoinCashApi {
 
 	fun getBalance(
 		address: String,
-		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
+		isMainThread: Boolean,
+		hold: (balance: Double?, error: RequestError) -> Unit
 	) {
-		BTCSeriesApiUtils.getDoubleBalance(BitcoinCashUrl.getBalance(address), hold)
+		BTCSeriesApiUtils.getDoubleBalance(BitcoinCashUrl.getBalance(address), isMainThread, hold)
 	}
 
 	fun getUnspentListByAddress(

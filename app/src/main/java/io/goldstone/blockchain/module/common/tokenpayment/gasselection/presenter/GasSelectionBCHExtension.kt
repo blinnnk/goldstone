@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
-import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -13,7 +13,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import org.jetbrains.anko.runOnUiThread
 
@@ -22,16 +21,19 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun GasSelectionPresenter.prepareToTransferBCH(
-	footer: GasSelectionFooter,
-	@UiThread callback: (GoldStoneError) -> Unit
-) {
-	// 检查余额状况
-	checkBCHBalanceIsValid(gasUsedGasFee!!) { isEnough, error ->
-		when {
-			isEnough -> showConfirmAttentionView(footer, callback)
-			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
-			else -> callback(error)
+fun GasSelectionPresenter.prepareToTransferBCH(callback: (GoldStoneError) -> Unit) {
+	prepareBTCSeriesModel?.apply {
+		// 检查余额状况
+		BitcoinCashApi.getBalance(fromAddress, true) { balance, error ->
+			if (!balance.isNull() && error.isNone()) {
+				val isEnough =
+					balance?.toSatoshi().orElse(0) > value + gasUsedGasFee!!.toSatoshi()
+				when {
+					isEnough -> showConfirmAttentionView(callback)
+					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+					else -> callback(error)
+				}
+			} else callback(error)
 		}
 	}
 }

@@ -2,19 +2,20 @@
 
 package io.goldstone.blockchain.common.utils
 
+import android.R
 import android.content.Context
+import android.content.res.ColorStateList
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import com.blinnnk.extension.isNull
+import android.widget.RadioButton
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.CreateWalletText.illegalSymbol
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSUnit
@@ -125,19 +126,6 @@ fun BigInteger.convertToTimeUnit(): String {
 
 fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
 
-
-fun String.convertToDouble(decimal: Int): Double? {
-	val illegalSymbol = Regex(".*[!@#\$%¥^&*()_=+?].*")
-	val convertedNumber =
-		if (toLowerCase().matches(Regex(".*[a-z].*"))  || matches(illegalSymbol)) null
-		else if (filter { it.toString() == "." }.count() > 1) null
-		else if (!contains(".") && length > 0 && substring(0, 1) == "0") substring(0, 1) + "." + substring(1)
-		else this
-	return if (convertedNumber.isNull()) null
-	else if (convertedNumber!!.contains(".") && convertedNumber.substringAfter(".").length > decimal) convertedNumber.substring(0, convertedNumber.indexOf(".") + decimal).toDouble()
-	else convertedNumber.toDouble()
-}
-
 class MutablePair<L, R>(var left: L, var right: R)
 
 fun JSONArray.toList(): List<JSONObject> {
@@ -149,3 +137,14 @@ fun JSONArray.toList(): List<JSONObject> {
 }
 
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
+
+fun RadioButton.isDefaultStyle() {
+	buttonTintList = ColorStateList(
+		arrayOf(
+			intArrayOf(-R.attr.state_checked), //disabled
+			intArrayOf(R.attr.state_checked) //enabled
+		),
+		// disabled - enabled
+		intArrayOf(GrayScale.midGray, Spectrum.blue)
+	)
+}

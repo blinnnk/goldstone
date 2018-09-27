@@ -9,10 +9,8 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -20,7 +18,6 @@ import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.cputradingdetail.view.CPUTradingFragment
@@ -151,26 +148,25 @@ class TokenAssetPresenter(
 
 	private fun EOSAccountTable.updateUIValue() {
 		fragment.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
+		if (refundInfo.isNull()) fragment.setEOSRefunds("0.0")
+		else refundInfo!!.getRefundDescription().let { fragment.setEOSRefunds(it) }
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used
 		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
 		val availableNet = netLimit.max - netLimit.used
 		val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
-		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, error ->
-			if (!price.isNull() && error.isNone()) {
-				val ramEOSCount = "≈ " + (availableRAM.toDouble() * price!!).formatCount(4) suffix CoinSymbol.eos
-				fragment.setResourcesValue(
-					availableRAM,
-					ramQuota,
-					ramEOSCount,
-					availableCPU,
-					cpuLimit.max,
-					cpuEOSValue,
-					availableNet,
-					netLimit.max,
-					netEOSValue
-				)
-			} else fragment.context.alert(error.message)
-		}
+		val ramEOSCount =
+			"≈ " + (availableRAM.toDouble() * Config.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
+		fragment.setResourcesValue(
+			availableRAM,
+			ramQuota,
+			ramEOSCount,
+			availableCPU,
+			cpuLimit.max,
+			cpuEOSValue,
+			availableNet,
+			netLimit.max,
+			netEOSValue
+		)
 	}
 }

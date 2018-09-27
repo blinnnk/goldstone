@@ -79,8 +79,8 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 							showLoadingStatus()
 							// Prevent user click the other button at this time
 							showMaskView(true)
-							presenter.confirmTransfer(footer) {
-								if (it !is AccountError) setCanUseStyle(false)
+							presenter.confirmTransfer {
+								if (it is AccountError) setCanUseStyle(false)
 								else if (!it.isNone()) this@GasSelectionFragment.context.alert(it.message)
 								showMaskView(false)
 								showLoadingStatus(false, Spectrum.white, CommonText.next)

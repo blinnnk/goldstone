@@ -28,7 +28,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEdit
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
@@ -145,10 +144,7 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(
-		footer: GasSelectionFooter,
-		callback: (GoldStoneError) -> Unit
-	) {
+	fun confirmTransfer(callback: (GoldStoneError) -> Unit) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
@@ -156,12 +152,12 @@ class GasSelectionPresenter(
 		} else if (NetworkUtil.hasNetworkWithAlert(fragment.context)) when {
 			// 检查网络并执行转账操作
 			getToken()?.contract.isBTC() ->
-				prepareToTransferBTC(footer, callback)
+				prepareToTransferBTC(callback)
 			getToken()?.contract.isLTC() ->
-				prepareToTransferLTC(footer, callback)
+				prepareToTransferLTC(callback)
 			getToken()?.contract.isBCH() ->
-				prepareToTransferBCH(footer, callback)
-			else -> prepareToTransfer(footer, callback)
+				prepareToTransferBCH(callback)
+			else -> prepareToTransfer(callback)
 		}
 	}
 
@@ -175,35 +171,24 @@ class GasSelectionPresenter(
 		return isValid
 	}
 
-	fun showConfirmAttentionView(
-		footer: GasSelectionFooter,
-		callback: (GoldStoneError) -> Unit
-	) {
+	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransaction,
 			CommonText.enterPassword.toUpperCase(),
-			true,
-			{
-				// 点击 `Alert` 取消按钮
-				footer.getConfirmButton {
-					showLoadingStatus(false)
-				}
-				fragment.showMaskView(false)
-			}) {
+			true
+		) {
+			val password = it?.text.toString()
 			when {
-				getToken()?.contract.isBTC() ->
-					prepareBTCSeriesModel?.apply {
-						transferBTC(this, it?.text.toString(), callback)
+				getToken()?.contract.isBTC() -> prepareBTCSeriesModel?.apply {
+						transferBTC(this, password, callback)
 					}
-				getToken()?.contract.isLTC() ->
-					prepareBTCSeriesModel?.apply {
-						transferLTC(this, it?.text.toString(), callback)
+				getToken()?.contract.isLTC() -> prepareBTCSeriesModel?.apply {
+						transferLTC(this, password, callback)
 					}
-				getToken()?.contract.isBCH() ->
-					prepareBTCSeriesModel?.apply {
-						transferBCH(this, it?.text.toString(), callback)
+				getToken()?.contract.isBCH() -> prepareBTCSeriesModel?.apply {
+						transferBCH(this, password, callback)
 					}
-				else -> transfer(it?.text.toString(), callback)
+				else -> transfer(password, callback)
 			}
 		}
 	}

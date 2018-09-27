@@ -101,14 +101,6 @@ data class EOSTransactionTable(
 				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id)
 			} then (hold)
 		}
-
-		fun deleteByAddress(address: String) {
-			doAsync {
-				GoldStoneDataBase.database.eosTransactionDao().apply {
-					deleteAll(getDataByRecordAddress(address))
-				}
-			}
-		}
 	}
 }
 
@@ -129,6 +121,9 @@ interface EOSTransactionDao {
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
 	fun getDataByRecordAddress(recordAddress: String): List<EOSTransactionTable>
+
+	@Query("DELETE FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
+	fun deleteDataByRecordAddress(recordAddress: String)
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID")
 	fun getDataByRecordAccount(recordAccountName: String, chainID: String): List<EOSTransactionTable>

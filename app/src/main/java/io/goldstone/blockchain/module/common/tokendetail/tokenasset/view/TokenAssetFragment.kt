@@ -18,7 +18,6 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
-import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
@@ -54,6 +53,13 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		}
 	}
 
+	private val refundsCell by lazy {
+		GraySquareCell(context!!).apply {
+			setTitle(TokenDetailText.refunds)
+			setSubtitle(CommonText.calculating)
+		}
+	}
+
 	private val transactionCountCell by lazy {
 		GraySquareCell(context!!).apply {
 			setTitle(TokenDetailText.transactionCount)
@@ -71,14 +77,16 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	}
 
 	private val accountAddress by lazy {
-		GraySquareCellWithButtons(context!!).apply {
-			showOnlyCopyButton {
-				context?.clickToCopy(Config.getCurrentEOSAddress())
-			}
+		GraySquareCell(context!!).apply {
 			setTitle("Public Key")
 			val address =
-				if (Config.getCurrentEOSAddress().isEmpty()) "Account Name Only" else Config.getCurrentEOSAddress().scaleTo(20)
+				if (Config.getCurrentEOSAddress().isEmpty()) "Account Name Only"
+				else Config.getCurrentEOSAddress().scaleTo(24)
 			setSubtitle(address)
+			onClick {
+				this@apply.context?.clickToCopy(Config.getCurrentEOSAddress())
+				preventDuplicateClicks()
+			}
 		}
 	}
 
@@ -118,8 +126,8 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 				bottomPadding = 20.uiPX()
 				gravity = Gravity.CENTER_HORIZONTAL
 				tokenInfoView.into(this)
-				showTransactionCells()
 				showAccountManagementCells()
+				showTransactionCells()
 				showAssetDashboard()
 				SessionTitleView(context).setTitle(TokenDetailText.assetTools).into(this)
 				linearLayout {
@@ -140,6 +148,10 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 
 	fun setEOSBalance(balance: String) {
 		balanceCell.setSubtitle(balance)
+	}
+
+	fun setEOSRefunds(description: String) {
+		refundsCell.setSubtitle(description)
 	}
 
 	fun setResourcesValue(
@@ -191,6 +203,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	private fun ViewGroup.showTransactionCells() {
 		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
 		balanceCell.into(this)
+		refundsCell.into(this)
 		transactionCountCell.into(this)
 	}
 
