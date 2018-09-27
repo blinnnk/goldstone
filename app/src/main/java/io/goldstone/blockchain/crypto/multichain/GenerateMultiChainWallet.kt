@@ -20,10 +20,7 @@ object GenerateMultiChainWallet {
 	fun create(
 		context: Context,
 		password: String,
-		hold: (
-			multiChainAddresses: ChainAddresses,
-			mnemonic: String
-		) -> Unit
+		hold: (multiChainAddresses: ChainAddresses, mnemonic: String) -> Unit
 	) {
 		val path = ChainPath(
 			DefaultPath.ethPath,

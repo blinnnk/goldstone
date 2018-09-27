@@ -284,6 +284,17 @@ object TokenDetailText {
 	}
 
 	@JvmField
+	val refunds = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Refunds"
+		HoneyLanguage.Chinese.code -> "Refunds"
+		HoneyLanguage.Japanese.code -> "Refunds"
+		HoneyLanguage.Korean.code -> "Refunds"
+		HoneyLanguage.Russian.code -> "Refunds"
+		HoneyLanguage.TraditionalChinese.code -> "Refunds"
+		else -> ""
+	}
+
+	@JvmField
 	val transactionCount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Count"
 		HoneyLanguage.Chinese.code -> "Transaction Count"

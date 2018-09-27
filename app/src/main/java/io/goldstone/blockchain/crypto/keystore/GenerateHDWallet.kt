@@ -296,9 +296,10 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 					password,
 					Config.getCurrentBTCAddress(),
 					true,
-					false,
-					hold
-				)
+					false
+				) {
+					hold(it)
+				}
 			}
 			currentType.isMultiChain() -> {
 				verifyKeystorePasswordByWalletID(

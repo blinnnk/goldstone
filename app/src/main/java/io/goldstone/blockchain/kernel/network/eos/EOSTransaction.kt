@@ -12,7 +12,6 @@ import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterfa
 import java.io.Serializable
 import java.math.BigInteger
 
-
 /**
  * @author KaySaith
  * @date  2018/09/14
@@ -20,6 +19,7 @@ import java.math.BigInteger
  *  因为 EOS 的转账之前需要查询 链上的 ChainInf 做为签名的一部分,
  *  所以这个类放到了 NetWork EOS 里面
  */
+
 class EOSTransaction(
 	/** "{\"actor\":\"fromAccountName\",\"permission\":\"active\"}" */
 	private val fromAccount: EOSAuthorization,
@@ -53,7 +53,7 @@ class EOSTransaction(
 				authorizationObjects
 			)
 			EOSTransactionUtils.serialize(
-				EOSChain.Test,
+				EOSChain.getCurrent(),
 				header,
 				listOf(action),
 				listOf(authorization),

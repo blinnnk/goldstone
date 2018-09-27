@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network.eos.EOSRAM
+package io.goldstone.blockchain.kernel.network.eos.eosram
 
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils

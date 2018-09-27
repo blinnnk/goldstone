@@ -88,7 +88,7 @@ class WalletSettingsPresenter(
 	private fun showHintEditorFragment() {
 		fragment.apply {
 			// 判断是否是只读钱包
-			if (Config.isWatchOnlyWallet()) {
+			if (!Config.isWatchOnlyWallet()) {
 				// 恢复 `Header` 样式
 				recoveryHeaderStyle()
 				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
@@ -108,7 +108,7 @@ class WalletSettingsPresenter(
 
 	private fun showMnemonicBackUpFragment() {
 		fragment.apply {
-			if (Config.isWatchOnlyWallet()) {
+			if (!Config.isWatchOnlyWallet()) {
 				WalletTable.getCurrentWallet {
 					encryptMnemonic?.let {
 						recoveryHeaderStyle()

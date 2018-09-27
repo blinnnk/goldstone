@@ -147,18 +147,6 @@ data class MyTokenTable(
 			} then { callback() }
 		}
 
-		fun deleteByAddress(
-			address: String,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					deleteAll(getAll(address))
-					callback()
-				}
-			}
-		}
-
 		fun insertBySymbolAndContract(
 			symbol: String,
 			contract: TokenContract,
@@ -214,7 +202,7 @@ data class MyTokenTable(
 						hold(balance, RequestError.None)
 					}
 				contract.isBTC() ->
-					BitcoinApi.getBalance(ownerName) { balance, error ->
+					BitcoinApi.getBalance(ownerName, false) { balance, error ->
 						hold(balance?.toBTCCount(), error)
 					}
 				contract.isLTC() ->
@@ -223,7 +211,7 @@ data class MyTokenTable(
 					}
 
 				contract.isBCH() ->
-					BitcoinCashApi.getBalance(ownerName) { balance, error ->
+					BitcoinCashApi.getBalance(ownerName, false) { balance, error ->
 						hold(balance, error)
 					}
 
@@ -270,6 +258,9 @@ interface MyTokenDao {
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
+
+	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress")
+	fun deleteAllByAddress(walletAddress: String)
 
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>

@@ -7,13 +7,10 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
-import org.jetbrains.anko.doAsync
 
 /**
  * @date 23/03/2018 12:59 PM
@@ -41,18 +38,10 @@ class HomePresenter(
 		}
 	}
 
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		// `App` 启动后检查本地的 `DefaultToken` 是否有没有 `Name` 的部分, 在后台静默更新
-		updateUnknownDefaultToken()
-	}
-
-	private fun updateUnknownDefaultToken() {
-		doAsync {
-			GoldStoneDataBase.database.defaultTokenDao().getAllTokens().filter { ChainID(it.chainID).isETHMain() && it.name.isEmpty() }.forEach {
-				it.updateTokenNameFromChain()
-			}
-		}
+	override fun onFragmentResume() {
+		super.onFragmentResume()
+		// `App` 频繁的检测更新所有需要使用的数据
+		object : SilentUpdater() {}.star()
 	}
 
 	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(
