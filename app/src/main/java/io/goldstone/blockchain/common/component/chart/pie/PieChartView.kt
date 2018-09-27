@@ -33,10 +33,10 @@ class PieChartView(context: Context) : PieChart(context) {
     setUsePercentValues(true)
     description.isEnabled = false
     setExtraOffsets(
-      5f,
+      0f,
       10f,
-      5f,
-      5f
+      0f,
+      10f
     )
     
     dragDecelerationFrictionCoef = 0.95f
@@ -111,8 +111,9 @@ class PieChartView(context: Context) : PieChart(context) {
     invalidate()
   }
 	
-	override fun onTouchEvent(event: MotionEvent?): Boolean {
+	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
 		return false
 	}
+	
   
 }
