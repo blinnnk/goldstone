@@ -8,6 +8,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.isEOS
@@ -33,8 +34,8 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
 	private val menuTitles by lazy {
 		val secondMenuTitle =
-			if (token?.contract.isEOS()) "Asset" else "Information"
-		arrayListOf("Transaction List", secondMenuTitle)
+			if (token?.contract.isEOS()) TokenDetailText.assets else TokenDetailText.information
+		arrayListOf(TokenDetailText.transactionList, secondMenuTitle)
 	}
 	override val presenter = TokenDetailCenterPresenter(this)
 
