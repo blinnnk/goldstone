@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.tradepercent.presenter
 
+import android.graphics.Color
 import com.blinnnk.extension.toArrayList
 import com.github.mikephil.charting.data.PieEntry
+import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -16,6 +18,19 @@ import org.jetbrains.anko.runOnUiThread
 class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment)
 	: BasePresenter<RAMTradePercentFragment>() {
 	
+	private val buyColors = arrayOf(
+		Color.parseColor("#1874CD"),
+		Color.parseColor("#1E90FF"),
+		Color.parseColor("#00B2EE")
+	)
+	
+	private val saleColors = arrayOf(
+		
+		Color.parseColor("#EE3B3B"),
+		Color.parseColor("#EE6A50"),
+		Color.parseColor("#EE6AA7")
+	)
+	
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
 		
@@ -27,17 +42,17 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment)
 			fragment.context.alert(it.toString())
 		}) {
 			GoldStoneAPI.context.runOnUiThread {
-				var totalValue = 0.toDouble()
-				it.forEach {
-					totalValue += it
-				}
 				fragment.pieChart.resetData(
 					it.map {
-						PieEntry((it / totalValue).toFloat(), "")
-					}.toArrayList()
+						PieEntry(it, "")
+					}.toArrayList(),
+					(buyColors + saleColors).toList()
 				)
 				
-				setChartData(it)
+				if (it.size == 6) {
+					setChartData(it)
+					setOrderDescriptions(it)
+				}
 			}
 		}
 	}
@@ -51,16 +66,36 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment)
 					dataRows[0],
 					dataRows[1],
 					dataRows[2]),
-				null,
+				buyColors,
 				maxValue!!)
 			ramPercentChartOut.setDataAndColors(
 				arrayOf(
 					dataRows[3],
 					dataRows[4],
 					dataRows[5]),
-				null,
+				saleColors,
 				maxValue)
 		}
 	}
 	
+	private fun setOrderDescriptions(dataRows: ArrayList<Float>) {
+		fragment.apply {
+			val buyValue = dataRows[0] + dataRows[1] + dataRows[2]
+			buying.text = EOSRAMText.buying(buyValue.toString())
+			
+			val saleValue = dataRows[3] + dataRows[4] + dataRows[5]
+			saling.text = EOSRAMText.saling(saleValue.toString())
+		}
+	}
+	
 }
+
+
+
+
+
+
+
+
+
+

@@ -77,9 +77,10 @@ class PieChartView(context: Context) : PieChart(context) {
     setEntryLabelTextSize(12f)
   }
   
-	fun resetData(entries: ArrayList<PieEntry>) {
-    val colors = arrayListOf( Color.YELLOW, Color.GREEN, Color.RED, Color.BLUE, Color.GRAY, Color.CYAN)
-    
+	fun resetData(entries: ArrayList<PieEntry>, colors: List<Int>) {
+		if (entries.size != colors.size) {
+			throw RuntimeException("entries size must equals colors size")
+		}
     val dataSet = PieDataSet(
       entries,
       "Election Results"
