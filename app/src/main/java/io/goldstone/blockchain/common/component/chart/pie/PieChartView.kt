@@ -7,6 +7,7 @@ import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.PercentFormatter
+import io.goldstone.blockchain.common.Language.EOSRAMText
 import kotlin.collections.ArrayList
 
 /**
@@ -41,7 +42,7 @@ class PieChartView(context: Context) : PieChart(context) {
     
     dragDecelerationFrictionCoef = 0.95f
 
-    centerText = "成交分布"
+    centerText = EOSRAMText.tradeDistribute
     setCenterTextSize(18f)
     
     isDrawHoleEnabled = true

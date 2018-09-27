@@ -19,7 +19,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-class RAMRankItemView(context: Context): BaseCell(context) {
+class RAMRankCell(context: Context): BaseCell(context) {
 	
 	val maxHeight = 50.uiPX()
 	

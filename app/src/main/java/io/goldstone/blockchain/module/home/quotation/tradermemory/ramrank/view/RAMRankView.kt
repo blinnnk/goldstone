@@ -1,19 +1,15 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.*
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
+import android.widget.*
 import com.blinnnk.base.HoneyBaseAdapter
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMRankModel
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date: 2018/9/25.
@@ -48,22 +44,28 @@ class RAMRankView(context: Context): LinearLayout(context) {
 	}
 	
 	fun setData(dataRows: ArrayList<EOSRAMRankModel>) {
-		rankRecyclerView.adapter = RAMRankAdapter(dataRows)
+		rankRecyclerView.adapter = RAMRankAdapter(dataRows) { cell, position ->
+			cell.onClick {
+				Toast.makeText(cell.context, "position is $position", Toast.LENGTH_LONG).show()
+			}
+		}
 	}
 }
 
 class RAMRankAdapter(
-	override val dataSet: ArrayList<EOSRAMRankModel>
-): HoneyBaseAdapter<EOSRAMRankModel, RAMRankItemView>() {
+	override val dataSet: ArrayList<EOSRAMRankModel>,
+	val hold: (RAMRankCell, position: Int) -> Unit
+): HoneyBaseAdapter<EOSRAMRankModel, RAMRankCell>() {
 	
-	override fun generateCell(context: Context): RAMRankItemView {
-		return RAMRankItemView(context)
+	override fun generateCell(context: Context): RAMRankCell {
+		return RAMRankCell(context)
 	}
 	
-	override fun RAMRankItemView.bindCell(
+	override fun RAMRankCell.bindCell(
 		data: EOSRAMRankModel,
 		position: Int
 	) {
 		model = data
+		hold(this, position)
 	}
 }

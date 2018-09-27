@@ -73,10 +73,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						id = ElementID.pieChart
 					}
 					addFragmentAndSetArgument<RAMTradePercentFragment>(ElementID.pieChart) {}
-
-					textView {
-						text = "成交资金分布"
-					}
+					
 				}
 			}
 
