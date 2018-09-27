@@ -10,8 +10,8 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -65,7 +65,7 @@ class TokenManagementListFragment :
 	}
 
 	private fun supportTokenManagementOrHide() {
-		if (Config.getCurrentWalletType().isBTCSeries() || Config.getCurrentWalletType().isEOSSeries()) {
+		if (SharedWallet.getCurrentWalletType().isBTCSeries() || SharedWallet.getCurrentWalletType().isEOSSeries()) {
 			showAttentionView()
 			getParentFragment<TokenManagementFragment> {
 				overlayView.header.showSearchButton(false)

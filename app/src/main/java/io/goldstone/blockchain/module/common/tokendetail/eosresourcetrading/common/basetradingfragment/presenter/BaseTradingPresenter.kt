@@ -10,10 +10,12 @@ import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -69,7 +71,7 @@ open class BaseTradingPresenter(
 	}
 
 	private fun BaseTradingFragment.setUsageValue() {
-		EOSAccountTable.getAccountByName(Config.getCurrentEOSAccount().accountName) { account ->
+		EOSAccountTable.getAccountByName(SharedAddress.getCurrentEOSAccount().accountName) { account ->
 			when (tradingType) {
 				TradingType.CPU -> {
 					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
@@ -87,7 +89,7 @@ open class BaseTradingPresenter(
 					getMainActivity()?.showLoadingView()
 					val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
 					// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
-					val price = Config.getRAMUnitPrice()
+					val price = SharedValue.getRAMUnitPrice()
 					val amountKBInEOS = 1.0 / price
 					val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
 					setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
@@ -97,9 +99,12 @@ open class BaseTradingPresenter(
 		}
 	}
 
-	private fun BaseTradingFragment.tradingRam(stakeType: StakeType, callback: (GoldStoneError) -> Unit) {
-		val fromAccount = Config.getCurrentEOSAccount()
-		val chainID = Config.getEOSCurrentChain()
+	private fun BaseTradingFragment.tradingRam(
+		stakeType: StakeType,
+		@UiThread callback: (GoldStoneError) -> Unit
+	) {
+		val fromAccount = SharedAddress.getCurrentEOSAccount()
+		val chainID = SharedChain.getEOSCurrent()
 		val toAccount = getInputValue(stakeType).first
 		val tradingCount = getInputValue(stakeType).second
 		prepareTransaction(
@@ -148,7 +153,7 @@ open class BaseTradingPresenter(
 		stakeType: StakeType,
 		callback: (GoldStoneError) -> Unit
 	) {
-		val fromAccount = Config.getCurrentEOSAccount()
+		val fromAccount = SharedAddress.getCurrentEOSAccount()
 		val toAccount = getInputValue(stakeType).first
 		val transferCount = getInputValue(stakeType).second
 		prepareTransaction(
@@ -160,7 +165,7 @@ open class BaseTradingPresenter(
 		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
-					Config.getEOSCurrentChain(),
+					SharedChain.getEOSCurrent(),
 					EOSAuthorization(fromAccount.accountName, EOSActor.Active),
 					toAccount.accountName,
 					transferCount.toEOSUnit(),
@@ -182,7 +187,7 @@ open class BaseTradingPresenter(
 	}
 
 	private fun updateLocalDataAndUI() {
-		val currentAccount = Config.getCurrentEOSAccount()
+		val currentAccount = SharedAddress.getCurrentEOSAccount()
 		EOSAPI.getAccountInfo(
 			currentAccount,
 			{ LogUtil.error("updateLocalResourceData", it) }
@@ -217,9 +222,12 @@ open class BaseTradingPresenter(
 						{ hold(null, error) }
 					) {
 						// 检查发起账户的 `RAM` 余额是否足够
-						if (it < BigInteger.valueOf(tradingCount.toLong())) hold(null, TransferError.BalanceIsNotEnough)
-						else GoldStoneAPI.context.runOnUiThread {
-							PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+						GoldStoneAPI.context.runOnUiThread {
+							when {
+								it < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
+								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
+								else -> PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+							}
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,

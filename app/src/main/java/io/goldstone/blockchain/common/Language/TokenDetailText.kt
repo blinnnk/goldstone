@@ -6,8 +6,6 @@ package io.goldstone.blockchain.common.language
  */
 
 object TokenDetailText {
-
-	//	····················转账记录相关····················
 	@JvmField
 	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recipient Address"
@@ -99,7 +97,7 @@ object TokenDetailText {
 		else -> ""
 	}
 
-	//	····················Token/资产信息····················
+	//	Token/资产信息
 	//	tab标题
 	@JvmField
 	val assets = when (currentLanguage) {
@@ -256,19 +254,8 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "帳戶管理"
 		else -> ""
 	}
-//
-//	@JvmField
-//	val authority = when (currentLanguage) {
-//		HoneyLanguage.English.code -> "Authority Management"
-//		HoneyLanguage.Chinese.code -> "权限管理"
-//		HoneyLanguage.Japanese.code -> "権限管理"
-//		HoneyLanguage.Korean.code -> "권한 관리"
-//		HoneyLanguage.Russian.code -> "Управление полномочиями"
-//		HoneyLanguage.TraditionalChinese.code -> "權限管理"
-//		else -> ""
-//	}
 
-	//	····················EOS资源相关····················
+	//	EOS资源相关
 	@JvmField
 	val resources = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Resources"
@@ -395,7 +382,7 @@ object TokenDetailText {
 		else -> ""
 	}
 
-	//	····················EOS资产交易入口····················
+	//	EOS资产交易入口
 	@JvmField
 	val delegateCPU = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELEGATE CPU\nREFUND CPU"
@@ -440,7 +427,7 @@ object TokenDetailText {
 		else -> ""
 	}
 
-	//	····················CPU与NET租赁界面····················
+	//	CPU与NET租赁界面
 	@JvmField
 	val tradeForAccountTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account"
@@ -589,7 +576,7 @@ object EOSAccountText {
 		else -> ""
 	}
 
-	//	····················权限管理····················
+	//	权限管理
 	@JvmField
 	val authority = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Authority Management"
@@ -624,7 +611,7 @@ object EOSAccountText {
 		else -> ""
 	}
 
-	//	····················账户未激活的界面提示····················
+	// 账户未激活的界面提示
 	@JvmField
 	val inactivationAccount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account not activated"
@@ -678,7 +665,7 @@ object EOSAccountText {
 		else -> ""
 	}
 
-	//	····················好友激活····················
+	//	好友激活
 	@JvmField
 	val activeByFriendHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The steps for a friend to help activate the EOS account are as follows: \n\n1. Start a username (12-letter, consisting of the number 1~5 or English characters). Check whether the \n2 is available on this page. Copy the public key below, Your username and public key are given to friends who already have an EOS account\n3. Friends in the Settings > EOS Account to register \n4. After the friend registration is completed, re-enter the EOS asset interface, GoldStone will be Your status"
@@ -760,7 +747,7 @@ object EOSAccountText {
 		else -> ""
 	}
 
-	//	····················合约激活····················
+	//	合约激活
 	@JvmField
 	val activeByContractHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Contract registration was created using a smart contract deployed by the GoldStone team, with no manual action during the creation process. Once property damage is caused by improper operation, it will not be recovered."

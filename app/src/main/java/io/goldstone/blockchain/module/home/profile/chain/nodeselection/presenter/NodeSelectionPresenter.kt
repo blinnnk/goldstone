@@ -2,7 +2,8 @@ package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presente
 
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -21,37 +22,37 @@ class NodeSelectionPresenter(
 	 * `ChainID` 会重复使用导致获取 `Chain` 并不能准确, 所以切换 `Chain` 的时候存储
 	 */
 	fun updateERC20ChainID(nodeName: String) {
-		Config.updateCurrentChainName(nodeName)
-		Config.updateCurrentChain(ChainID.getChainIDByName(nodeName))
+		SharedChain.updateCurrentETHName(nodeName)
+		SharedChain.updateCurrentETH(ChainID.getChainIDByName(nodeName))
 		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
-		Config.updateEncryptERCNodeRequest(checkIsEncryptERCNode(nodeName))
+		SharedValue.updateEncryptERCNodeRequest(checkIsEncryptERCNode(nodeName))
 	}
 
 	fun updateETCChainID(nodeName: String) {
-		Config.updateETCCurrentChainName(nodeName)
-		Config.updateETCCurrentChain(ChainID.getChainIDByName(nodeName))
+		SharedChain.updateETCCurrentName(nodeName)
+		SharedChain.updateETCCurrent(ChainID.getChainIDByName(nodeName))
 		// 根据节点属性判断是否需要对 `JSON RPC` 加密或解密, `GoldStone`的节点请求全部加密了.
-		Config.updateEncryptETCNodeRequest(checkIsEncryptETCNode(nodeName))
+		SharedValue.updateEncryptETCNodeRequest(checkIsEncryptETCNode(nodeName))
 	}
 
 	fun updateBTCChainID(nodeName: String) {
-		Config.updateBTCCurrentChainName(nodeName)
-		Config.updateBTCCurrentChain(ChainID.getChainIDByName(nodeName))
+		SharedChain.updateBTCCurrentName(nodeName)
+		SharedChain.updateBTCCurrent(ChainID.getChainIDByName(nodeName))
 	}
 
 	fun updateBCHChainID(nodeName: String) {
-		Config.updateBCHCurrentChainName(nodeName)
-		Config.updateBCHCurrentChain(ChainID.getChainIDByName(nodeName))
+		SharedChain.updateBCHCurrentName(nodeName)
+		SharedChain.updateBCHCurrent(ChainID.getChainIDByName(nodeName))
 	}
 
 	fun updateLTCChainID(nodeName: String) {
-		Config.updateLTCCurrentChainName(nodeName)
-		Config.updateLTCCurrentChain(ChainID.getChainIDByName(nodeName))
+		SharedChain.updateLTCCurrentName(nodeName)
+		SharedChain.updateLTCCurrent(ChainID.getChainIDByName(nodeName))
 	}
 
 	fun updateEOSChainID(nodeName: String) {
-		Config.updateEOSCurrentChainName(nodeName)
-		Config.updateEOSCurrentChain(ChainID.getChainIDByName(nodeName))
+		SharedChain.updateEOSCurrentName(nodeName)
+		SharedChain.updateEOSCurrent(ChainID.getChainIDByName(nodeName))
 	}
 
 	fun getCurrentChainName(isMainnet: Boolean, type: ChainType): String {
@@ -77,33 +78,33 @@ class NodeSelectionPresenter(
 			AppConfigTable.getAppConfig {
 				it?.apply {
 					AppConfigTable.updateChainStatus(false) {
-						Config.updateIsTestEnvironment(true)
-						Config.updateBTCCurrentChain(ChainID.btcTest)
-						Config.updateLTCCurrentChain(ChainID.ltcTest)
-						Config.updateBCHCurrentChain(ChainID.bchTest)
-						Config.updateETCCurrentChain(ChainID.etcTest)
-						Config.updateEOSCurrentChain(ChainID.eosTest)
-						Config.updateCurrentChain(
+						SharedValue.updateIsTestEnvironment(true)
+						SharedChain.updateBTCCurrent(ChainID.btcTest)
+						SharedChain.updateLTCCurrent(ChainID.ltcTest)
+						SharedChain.updateBCHCurrent(ChainID.bchTest)
+						SharedChain.updateETCCurrent(ChainID.etcTest)
+						SharedChain.updateEOSCurrent(ChainID.eosTest)
+						SharedChain.updateCurrentETH(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID)
 							)
 						)
-						Config.updateETCCurrentChainName(
+						SharedChain.updateETCCurrentName(
 							ChainNameID.getChainNameByID(currentETCTestChainNameID)
 						)
-						Config.updateEOSCurrentChainName(
+						SharedChain.updateEOSCurrentName(
 							ChainNameID.getChainNameByID(currentEOSTestChainNameID)
 						)
-						Config.updateCurrentChainName(
+						SharedChain.updateCurrentETHName(
 							ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID)
 						)
-						Config.updateBTCCurrentChainName(
+						SharedChain.updateBTCCurrentName(
 							ChainNameID.getChainNameByID(currentBTCTestChainNameID)
 						)
-						Config.updateBCHCurrentChainName(
+						SharedChain.updateBCHCurrentName(
 							ChainNameID.getChainNameByID(currentBCHTestChainNameID)
 						)
-						Config.updateLTCCurrentChainName(
+						SharedChain.updateLTCCurrentName(
 							ChainNameID.getChainNameByID(currentLTCTestChainNameID)
 						)
 						callback()
@@ -117,31 +118,31 @@ class NodeSelectionPresenter(
 			AppConfigTable.getAppConfig {
 				it?.apply {
 					AppConfigTable.updateChainStatus(true) {
-						Config.updateIsTestEnvironment(false)
-						Config.updateBTCCurrentChain(ChainID.btcMain)
-						Config.updateLTCCurrentChain(ChainID.ltcMain)
-						Config.updateBCHCurrentChain(ChainID.bchMain)
-						Config.updateETCCurrentChain(ChainID.etcMain)
-						Config.updateEOSCurrentChain(ChainID.eosMain)
-						Config.updateCurrentChain(
+						SharedValue.updateIsTestEnvironment(false)
+						SharedChain.updateBTCCurrent(ChainID.btcMain)
+						SharedChain.updateLTCCurrent(ChainID.ltcMain)
+						SharedChain.updateBCHCurrent(ChainID.bchMain)
+						SharedChain.updateETCCurrent(ChainID.etcMain)
+						SharedChain.updateEOSCurrent(ChainID.eosMain)
+						SharedChain.updateCurrentETH(
 							ChainID.getChainIDByName(
 								ChainNameID.getChainNameByID(currentETHSeriesChainNameID)
 							)
 						)
-						Config.updateETCCurrentChainName(
+						SharedChain.updateETCCurrentName(
 							ChainNameID.getChainNameByID(currentETCChainNameID)
 						)
-						Config.updateEOSCurrentChainName(
+						SharedChain.updateEOSCurrentName(
 							ChainNameID.getChainNameByID(currentEOSChainNameID)
 						)
-						Config.updateCurrentChainName(ChainNameID.getChainNameByID(currentETHSeriesChainNameID))
-						Config.updateBTCCurrentChainName(
+						SharedChain.updateCurrentETHName(ChainNameID.getChainNameByID(currentETHSeriesChainNameID))
+						SharedChain.updateBTCCurrentName(
 							ChainNameID.getChainNameByID(currentBTCChainNameID)
 						)
-						Config.updateBCHCurrentChainName(
+						SharedChain.updateBCHCurrentName(
 							ChainNameID.getChainNameByID(currentBCHChainNameID)
 						)
-						Config.updateLTCCurrentChainName(
+						SharedChain.updateLTCCurrentName(
 							ChainNameID.getChainNameByID(currentLTCChainNameID)
 						)
 						callback()

@@ -8,8 +8,8 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -54,7 +54,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
-		if (Config.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
+		if (SharedValue.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
@@ -82,9 +82,9 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				fragment.address.orEmpty(),
 				changeAddress,
 				unspents,
-				if (Config.isTestEnvironment()) CryptoValue.signedSecret
+				if (SharedValue.isTestEnvironment()) CryptoValue.signedSecret
 				else CryptoValue.signedBTCMainnetSecret, // 测算 `MessageSize` 的默认无效私钥
-				Config.isTestEnvironment()
+				SharedValue.isTestEnvironment()
 			).messageSize
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000

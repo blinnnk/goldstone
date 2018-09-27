@@ -6,8 +6,8 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
@@ -35,7 +35,7 @@ class TokenManagementListPresenter(
 		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
 		fragment.getParentFragment<TokenManagementFragment> {
-			prepareMyDefaultTokens(Config.getCurrentWalletType().isETHSeries())
+			prepareMyDefaultTokens(SharedWallet.getCurrentWalletType().isETHSeries())
 		}
 	}
 

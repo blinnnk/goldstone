@@ -7,7 +7,9 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.toSatoshi
@@ -56,7 +58,7 @@ fun GasSelectionPresenter.transferBTC(
 	password: String,
 	@UiThread callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentWalletBTCPrivateKey(
+	getCurrentBTCPrivateKey(
 		prepareBTCModel.fromAddress,
 		password
 	) { privateKey, error ->
@@ -70,10 +72,10 @@ fun GasSelectionPresenter.transferBTC(
 					changeAddress,
 					unspents,
 					privateKey!!,
-					Config.isTestEnvironment()
+					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						Config.getBTCCurrentChainName(),
+						SharedChain.getBTCCurrentName(),
 						signedModel.signedMessage,
 						callback
 					) { hash ->
@@ -97,17 +99,15 @@ fun GasSelectionPresenter.transferBTC(
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentWalletBTCPrivateKey(
+private fun GasSelectionPresenter.getCurrentBTCPrivateKey(
 	walletAddress: String,
 	password: String,
 	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
-		Config.isTestEnvironment(),
+		SharedValue.isTestEnvironment(),
 		hold
 	)
 }

@@ -17,11 +17,12 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+
 import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -123,7 +124,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 			if (!currency.isNull() && !ramPrice.isNull() && error.isNone()) {
 				val eosCount = assignResources[1].right.toDouble() + assignResources[2].right.toDouble() + assignResources[0].right.toIntOrZero() * ramPrice!!
 				val totalCurrency = eosCount * currency!!
-				resourceCoast.setSubtitle("≈ ${eosCount.formatCount(4)} EOS ≈ ${totalCurrency.formatCurrency()} (${Config.getCurrencyCode()})")
+				resourceCoast.setSubtitle("≈ ${eosCount.formatCount(4)} EOS ≈ ${totalCurrency.formatCurrency()} (${SharedWallet.getCurrencyCode()})")
 			} else context.alert(error.message)
 		}
 	}

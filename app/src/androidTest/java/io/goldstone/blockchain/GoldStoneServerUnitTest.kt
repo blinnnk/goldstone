@@ -8,7 +8,6 @@ import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable

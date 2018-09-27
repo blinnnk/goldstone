@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.ChainID
 
 /**
@@ -11,9 +11,10 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 enum class EOSChain(val id: String) {
 	Main(ChainID.eosMain),
 	Test(ChainID.eosTest);
+
 	companion object {
 		fun getCurrent(): EOSChain {
-			return if (Config.getEOSCurrentChain().isEOSMain()) Main else Test
+			return if (SharedChain.getEOSCurrent().isEOSMain()) Main else Test
 		}
 	}
 }

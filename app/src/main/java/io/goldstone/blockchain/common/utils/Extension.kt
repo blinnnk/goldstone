@@ -61,6 +61,7 @@ fun Context.showAlertView(
 ) {
 	var input: EditText? = null
 	alert(subtitle, title) {
+		isCancelable = false
 		showEditText isTrue {
 			customView {
 				verticalLayout {

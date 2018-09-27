@@ -40,10 +40,10 @@ class AddressesListView(
 	}
 	var checkAllEvent: Runnable? = null
 	var currentWallet: WalletTable? = null
-	private val currentAddresses by lazy { currentWallet?.getCurrentAddresses() }
 	var model: List<Pair<String, String>>? by observing(null) {
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
+			val currentAddresses by lazy { currentWallet?.getCurrentAddresses() }
 			// 如果是当前使用的多链那么 `data.second`` 会是对应的链的缩写用此判断做缩进
 			if (isNotEmpty() && firstOrNull()?.second?.toIntOrNull().isNull()) hideButton()
 			else updateButtonTitle("${CommonText.checkAll} (${model?.size})")

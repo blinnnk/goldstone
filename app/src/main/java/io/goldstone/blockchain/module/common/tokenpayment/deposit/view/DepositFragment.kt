@@ -9,7 +9,8 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.*
@@ -114,13 +115,13 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 			getParentFragment<TokenDetailOverlayFragment> {
 				when {
 					token?.contract.isBTC() -> {
-						if (Config.isTestEnvironment())
+						if (SharedValue.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentBTCAddress)
 					}
 
 					token?.contract.isLTC() -> {
-						if (Config.isTestEnvironment())
+						if (SharedValue.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentLTCAddress)
 					}
@@ -130,7 +131,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 					}
 
 					token?.contract.isBCH() -> {
-						if (Config.isTestEnvironment()) {
+						if (SharedValue.isTestEnvironment()) {
 							val bchTestAddress =
 								if (convertBCHAddress) BCHUtil.instance.encodeCashAddressByLegacy(currentBTCSeriesTestAddress)
 								else currentBTCSeriesTestAddress

@@ -5,10 +5,11 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -41,7 +42,7 @@ class TokenSearchPresenter(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
 					if (it) {
-						canSearch = if (Config.getCurrentWalletType().isBTCSeries()) {
+						canSearch = if (SharedWallet.getCurrentWalletType().isBTCSeries()) {
 							fragment.context.alert("This is a single block chain wallet so you cannot add other crypto currency")
 							false
 						} else NetworkUtil.hasNetworkWithAlert(context)
@@ -52,7 +53,7 @@ class TokenSearchPresenter(
 					MyTokenTable.getMyTokens { myTokens ->
 						searchTokenByContractOrSymbol(inputContent, myTokens) { result ->
 							context?.runOnUiThread {
-								if (Config.getCurrentWalletType().isETHSeries()) {
+								if (SharedWallet.getCurrentWalletType().isETHSeries()) {
 									// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
 									diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot { TokenContract(it.contract).isBTCSeries() }.toArrayList())
 								} else {
@@ -145,7 +146,7 @@ class TokenSearchPresenter(
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
 			{ fragment.context?.alert(it.message) },
-			Config.getCurrentChainName()
+			SharedChain.getCurrentETHName()
 		) { symbol, name, decimal ->
 			if (symbol.isEmpty() || name.isEmpty()) {
 				hold(arrayListOf())

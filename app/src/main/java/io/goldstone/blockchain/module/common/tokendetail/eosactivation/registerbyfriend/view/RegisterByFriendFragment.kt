@@ -17,9 +17,9 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbyfriend.presenter.RegisterByFriendPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -70,9 +70,9 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
 				KeyValueView(context).apply {
 					gravity = Gravity.CENTER
-					text = Config.getCurrentEOSAddress()
+					text = SharedAddress.getCurrentEOS()
 				}.click {
-					it.context.clickToCopy(Config.getCurrentEOSAddress())
+					it.context.clickToCopy(SharedAddress.getCurrentEOS())
 				}.into(this)
 
 				// 检测成功后这个会显示出来, 默认是隐藏的
@@ -125,6 +125,6 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 		availableDescriptionView.visibility = View.VISIBLE
 		confirmButton.visibility = View.GONE
 		copyResultButton.visibility = View.VISIBLE
-		availableResultView.text = newAccount.accountName + "-" + Config.getCurrentEOSAddress()
+		availableResultView.text = newAccount.accountName + "-" + SharedAddress.getCurrentEOS()
 	}
 }

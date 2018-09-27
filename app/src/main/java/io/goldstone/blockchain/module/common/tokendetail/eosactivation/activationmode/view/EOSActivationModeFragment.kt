@@ -13,10 +13,9 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.EOSAccountText
-import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -56,7 +55,7 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 				gravity = Gravity.CENTER_HORIZONTAL
 				attentionView.apply {
 					gravity = Gravity.CENTER_HORIZONTAL
-					text = "${EOSAccountText.inactivationAccount} \n${EOSAccountText.publicKey}: ${Config.getCurrentEOSAddress()}"
+					text = "${EOSAccountText.inactivationAccount} \n${EOSAccountText.publicKey}: ${SharedAddress.getCurrentEOS()}"
 					textSize = fontSize(14)
 					typeface = GoldStoneFont.black(context)
 					textColor = Spectrum.white
@@ -80,7 +79,7 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 		activationByContractButton.setBlueStyle(10.uiPX())
 		activationByContractButton.text = EOSAccountText.activeByContract
 		copyAddressButton.click {
-			context?.clickToCopy(Config.getCurrentEOSAddress())
+			context?.clickToCopy(SharedAddress.getCurrentEOS())
 		}.into(this)
 		copyAddressButton.setBlueStyle(10.uiPX())
 		copyAddressButton.text = EOSAccountText.activeManually

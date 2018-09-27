@@ -73,7 +73,6 @@ object GenerateMultiChainWallet {
 							base58Privatekey,
 							btcAddress,
 							password,
-							false,
 							false
 						)
 						addresses.btcAddress = btcAddress
@@ -88,8 +87,7 @@ object GenerateMultiChainWallet {
 							btcTestBase58Privatekey,
 							btcSeriesTestAddress,
 							password,
-							true,
-							false
+							true
 						)
 						addresses.btcSeriesTestAddress = btcSeriesTestAddress
 						completeMark()
@@ -102,8 +100,7 @@ object GenerateMultiChainWallet {
 						context.storeLTCBase58PrivateKey(
 							ltcKeyPair.privateKey,
 							ltcKeyPair.address,
-							password,
-							false
+							password
 						)
 						addresses.ltcAddress = ltcKeyPair.address
 						completeMark()
@@ -117,7 +114,6 @@ object GenerateMultiChainWallet {
 							bchKeyPair.privateKey,
 							bchKeyPair.address,
 							password,
-							false,
 							false
 						)
 						addresses.bchAddress = bchKeyPair.address
@@ -133,7 +129,6 @@ object GenerateMultiChainWallet {
 							eosKeyPair.privateKey,
 							eosKeyPair.address,
 							password,
-							false,
 							false
 						)
 						addresses.eosAddress = eosKeyPair.address

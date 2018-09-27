@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.getAddress
@@ -265,12 +266,12 @@ class WalletDetailPresenter(
 	private fun generateHeaderModel(hold: (WalletDetailHeaderModel) -> Unit) {
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
-		Config.updateCurrentBalance(totalBalance.orElse(0.0))
+		SharedWallet.updateCurrentBalance(totalBalance.orElse(0.0))
 		WalletTable.getCurrentWallet {
 			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
 				null,
-				Config.getCurrentName(),
+				SharedWallet.getCurrentName(),
 				if (subtitle.equals(WalletText.multiChainWallet, true)) {
 					object : FixTextLength() {
 						override var text = WalletText.multiChainWallet

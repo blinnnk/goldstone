@@ -16,9 +16,13 @@ import io.goldstone.blockchain.common.component.button.RoundButtonWithIcon
 import io.goldstone.blockchain.common.component.button.StoneButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.WalletDetailSize
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import me.itangqi.waveloadingview.WaveLoadingView
@@ -32,20 +36,20 @@ import org.jetbrains.anko.*
  * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
-	
-	private val avatarBitmap = UnlimitedAvatar(Config.getCurrentWalletID(), context).getBitmap()
+
+	private val avatarBitmap = UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			if (avatar.isNull())
 				currentAccount.avatar.glideImage(avatarBitmap)
 			else currentAccount.avatar.glideImage(avatar)
-			
+
 			currentAccount.info.title.text = object : FixTextLength() {
 				override var text = model?.name.orEmpty()
 				override val maxWidth = 26.uiPX().toFloat()
 				override val textSize: Float = fontSize(16)
 			}.getFixString()
-			
+
 			currentAccount.info.subtitle.text = address
 			balanceTitle.text = totalBalance.toDouble().formatCurrency()
 		}
@@ -58,12 +62,12 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	private val sectionHeaderHeight = 25.uiPX()
 	val sendButton by lazy { StoneButton(context) }
 	val depositButton by lazy { StoneButton(context) }
-	
+
 	init {
 		setWillNotDraw(false)
-		
+
 		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight)
-		
+
 		waveView.apply {
 			layoutParams =
 				RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight - 50.uiPX())
@@ -74,13 +78,13 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			setAmplitudeRatio(50)
 			startAnimation()
 		}.into(this)
-		
+
 		currentAccount.into(this)
 		currentAccount.apply {
 			setCenterInHorizontal()
 			y += 30.uiPX()
 		}
-		
+
 		verticalLayout {
 			balanceTitle.apply {
 				textSize = fontSize(36)
@@ -88,7 +92,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.into(this)
-			
+
 			textView(WalletSlideHeader.setBalanceInfo()) {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
@@ -98,7 +102,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		}.apply {
 			setCenterInParent()
 		}
-		
+
 		relativeLayout {
 			lparams {
 				width = matchParent
@@ -106,24 +110,24 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				alignParentBottom()
 				y -= sectionHeaderHeight
 			}
-			
+
 			sendButton.apply {
 				text = CommonText.send
 			}.into(this)
 			sendButton.setMargins<RelativeLayout.LayoutParams> {
 				leftMargin = 15.uiPX()
 			}
-			
+
 			depositButton.apply {
 				text = CommonText.deposit
 			}.into(this)
 			depositButton.setMargins<RelativeLayout.LayoutParams> {
 				rightMargin = 15.uiPX()
 			}
-			
+
 			depositButton.setAlignParentRight()
 		}
-		
+
 		textView {
 			text = WalletText.section.toUpperCase()
 			typeface = GoldStoneFont.heavy(context)
@@ -134,13 +138,13 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			setAlignParentBottom()
 			x += PaddingSize.device
 		}
-		
+
 		addTokenButton.apply {
 			setTitle(WalletText.addToken.toUpperCase())
 			x -= PaddingSize.device
 			y -= 10.uiPX()
 		}.into(this)
-		
+
 		addTokenButton.apply {
 			removeIcon()
 			layoutParams.height = 24.uiPX()
@@ -148,7 +152,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			setAlignParentBottom()
 		}
 	}
-	
+
 	fun showLoadingView(status: Boolean) {
 		if (status && progressBar.isNull()) {
 			progressBar = ProgressBar(

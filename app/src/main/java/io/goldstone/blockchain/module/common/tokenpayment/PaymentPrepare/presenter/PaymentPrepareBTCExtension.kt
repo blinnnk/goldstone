@@ -10,10 +10,9 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -53,7 +52,7 @@ fun PaymentPreparePresenter.prepareBTCPaymentModel(
 
 fun PaymentPreparePresenter.isValidAddressOrElse(address: String): Boolean {
 	if (address.isNotEmpty()) {
-		val isValidAddress = if (Config.isTestEnvironment()) {
+		val isValidAddress = if (SharedValue.isTestEnvironment()) {
 			BTCUtils.isValidTestnetAddress(address)
 		} else {
 			BTCUtils.isValidMainnetAddress(address)
@@ -77,7 +76,7 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
-		if (Config.isTestEnvironment()) ChainText.btcTest else ChainText.btcMain
+		if (SharedValue.isTestEnvironment()) ChainText.btcTest else ChainText.btcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
@@ -105,9 +104,9 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 				changeAddress,
 				unspents,
 				// 测算 `MessageSize` 的默认无效私钥
-				if (Config.isTestEnvironment()) CryptoValue.signedSecret
+				if (SharedValue.isTestEnvironment()) CryptoValue.signedSecret
 				else CryptoValue.signedBTCMainnetSecret,
-				Config.isTestEnvironment()
+				SharedValue.isTestEnvironment()
 			).messageSize
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000

@@ -20,10 +20,11 @@ import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
@@ -79,9 +80,9 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
 				KeyValueView(context).apply {
 					gravity = Gravity.CENTER
-					text = Config.getCurrentEOSAddress()
+					text = SharedAddress.getCurrentEOS()
 				}.click {
-					it.context.clickToCopy(Config.getCurrentEOSAddress())
+					it.context.clickToCopy(SharedAddress.getCurrentEOS())
 				}.into(this)
 
 				DescriptionView(context).isRegisterResource().into(this)
@@ -93,7 +94,7 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 				resourceCoast.apply {
 					presenter.getEOSCurrencyPrice { currency, error ->
 						if (!currency.isNull() && error.isNone()) {
-							setSubtitle("2.0 EOS ≈ ${(2 * currency!!).formatCurrency() suffix Config.getCurrencyCode()}")
+							setSubtitle("2.0 EOS ≈ ${(2 * currency!!).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
 						} else context.alert(error.message)
 					}
 					setTitle(EOSAccountText.estimatedSpentOfActiveAccount)

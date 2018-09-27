@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.utils
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -77,11 +77,11 @@ object MultiChainUtils {
 			BTCUtils.isValidTestnetAddress(address) -> {
 				when {
 					CoinSymbol(symbol).isBCH() -> {
-						if (Config.isTestEnvironment()) AddressType.BCH
+						if (SharedValue.isTestEnvironment()) AddressType.BCH
 						else null
 					}
 					CoinSymbol(symbol).isLTC() -> {
-						if (Config.isTestEnvironment()) AddressType.LTC
+						if (SharedValue.isTestEnvironment()) AddressType.LTC
 						else null
 					}
 					else -> AddressType.BTCSeriesTest

@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.common.value
 
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+
 
 /**
  * @author KaySaith
@@ -8,11 +10,11 @@ package io.goldstone.blockchain.common.value
 
 object Current {
 	fun chainIDs(): List<String> = listOf(
-		Config.getCurrentChain().id,
-		Config.getETCCurrentChain().id,
-		Config.getBTCCurrentChain().id,
-		Config.getLTCCurrentChain().id,
-		Config.getBCHCurrentChain().id,
-		Config.getEOSCurrentChain().id
+		SharedChain.getCurrentETH().id,
+		SharedChain.getETCCurrent().id,
+		SharedChain.getBTCCurrent().id,
+		SharedChain.getLTCCurrent().id,
+		SharedChain.getBCHCurrent().id,
+		SharedChain.getEOSCurrent().id
 	)
 }

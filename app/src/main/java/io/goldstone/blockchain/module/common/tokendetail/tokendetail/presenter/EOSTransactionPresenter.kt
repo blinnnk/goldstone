@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.runOnUiThread
@@ -17,7 +17,7 @@ import org.jetbrains.anko.runOnUiThread
 
 fun TokenDetailPresenter.loadEOSDataFromChain(localMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
-	val account = Config.getCurrentEOSAccount()
+	val account = SharedAddress.getCurrentEOSAccount()
 	EOSAPI.getTransactionsLastIndex(
 		account,
 		{ LogUtil.error("loadEOSChainData", it) }
