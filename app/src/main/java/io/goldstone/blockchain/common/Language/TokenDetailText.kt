@@ -97,7 +97,7 @@ object TokenDetailText {
 		else -> ""
 	}
 
-	//	····················Token/资产信息····················
+	//	Token/资产信息
 	//	tab标题
 	@JvmField
 	val assets = when (currentLanguage) {
@@ -427,7 +427,7 @@ object TokenDetailText {
 		else -> ""
 	}
 
-	//	····················CPU与NET租赁界面····················
+	//	CPU与NET租赁界面
 	@JvmField
 	val tradeForAccountTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account"
@@ -747,7 +747,7 @@ object EOSAccountText {
 		else -> ""
 	}
 
-	//	····················合约激活····················
+	//	合约激活
 	@JvmField
 	val activeByContractHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Contract registration was created using a smart contract deployed by the GoldStone team, with no manual action during the creation process. Once property damage is caused by improper operation, it will not be recovered."
