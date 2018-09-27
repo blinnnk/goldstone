@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.common.value.Config
 import java.io.Serializable
 
 
@@ -19,40 +21,40 @@ class CoinSymbol(val symbol: String?) : Serializable {
 			CoinSymbol(symbol).isBCH() ->
 				AddressUtils.getCurrentBCHAddress()
 			CoinSymbol(symbol).isETC() ->
-				Config.getCurrentETCAddress()
+				SharedAddress.getCurrentETC()
 			CoinSymbol(symbol).isEOS() ->
-				if (isEOSAccountName) Config.getCurrentEOSAccount().accountName
-				else Config.getCurrentEOSAddress()
+				if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
+				else SharedAddress.getCurrentEOS()
 			else ->
-				Config.getCurrentEthereumAddress()
+				SharedAddress.getCurrentEthereum()
 		}
 	}
 
 	fun getChainID(): ChainID {
 		return when {
 			symbol.equals(CoinSymbol.btc(), true) ->
-				Config.getBTCCurrentChain()
+				SharedChain.getBTCCurrent()
 			symbol.equals(CoinSymbol.etc, true) ->
-				Config.getETCCurrentChain()
+				SharedChain.getETCCurrent()
 			symbol.equals(CoinSymbol.ltc, true) ->
-				Config.getLTCCurrentChain()
+				SharedChain.getLTCCurrent()
 			symbol.equals(CoinSymbol.bch, true) ->
-				Config.getBCHCurrentChain()
+				SharedChain.getBCHCurrent()
 			symbol.equals(CoinSymbol.eos, true) ->
-				Config.getEOSCurrentChain()
-			else -> Config.getCurrentChain()
+				SharedChain.getEOSCurrent()
+			else -> SharedChain.getCurrentETH()
 		}
 	}
 
 	fun getCurrentChainName(): String {
 		return when {
-			CoinSymbol(symbol).isETH() -> Config.getCurrentChainName()
-			CoinSymbol(symbol).isETC() -> Config.getETCCurrentChainName()
-			CoinSymbol(symbol).isBTC() -> Config.getBTCCurrentChainName()
-			CoinSymbol(symbol).isLTC() -> Config.getLTCCurrentChainName()
-			CoinSymbol(symbol).isBCH() -> Config.getBCHCurrentChainName()
-			CoinSymbol(symbol).isEOS() -> Config.getEOSCurrentChainName()
-			else -> Config.getCurrentChainName()
+			isETH() -> SharedChain.getCurrentETHName()
+			isETC() -> SharedChain.getETCCurrentName()
+			isBTC() -> SharedChain.getBTCCurrentName()
+			isLTC() -> SharedChain.getLTCCurrentName()
+			isBCH() -> SharedChain.getBCHCurrentName()
+			isEOS() -> SharedChain.getEOSCurrentName()
+			else -> SharedChain.getCurrentETHName()
 		}
 	}
 
@@ -78,7 +80,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 		val EOS: CoinSymbol = CoinSymbol(eos)
 		@JvmStatic
 		val btc: () -> String = {
-			if (Config.getYingYongBaoInReviewStatus()) "B.C." else "BTC"
+			if (SharedWallet.getYingYongBaoInReviewStatus()) "B.C." else "BTC"
 		}
 		@JvmStatic
 		val allBTCSeriesSymbol: () -> List<String> = {
@@ -88,7 +90,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 		fun updateSymbolIfInReview(symbol: String, isTest: Boolean = false): String {
 			return if (
 				symbol.contains(CoinSymbol.pureBTCSymbol, true) &&
-				Config.getYingYongBaoInReviewStatus()
+				SharedWallet.getYingYongBaoInReviewStatus()
 			) "B.C." + if (isTest) " Test" else ""
 			else symbol
 		}
@@ -96,7 +98,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 		fun updateNameIfInReview(name: String): String {
 			return if (
 				name.contains("Bitcoin", true) &&
-				Config.getYingYongBaoInReviewStatus()
+				SharedWallet.getYingYongBaoInReviewStatus()
 			) "Bitc."
 			else name
 		}
@@ -104,7 +106,7 @@ class CoinSymbol(val symbol: String?) : Serializable {
 }
 
 fun CoinSymbol?.isEOS() = this?.symbol.equals(CoinSymbol.eos, true)
-fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.etc, true)
+fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.eth, true)
 fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.btc(), true)
 fun CoinSymbol?.isLTC() = this?.symbol.equals(CoinSymbol.ltc, true)
 fun CoinSymbol?.isBCH() = this?.symbol.equals(CoinSymbol.bch, true)

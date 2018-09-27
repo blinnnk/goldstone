@@ -6,12 +6,14 @@ import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -181,7 +183,7 @@ class TokenDetailPresenter(
 			localEOSSeriesData: List<EOSTransactionTable>?
 		) -> Unit = { _, _, _ -> }
 	) {
-		val walletType = Config.getCurrentWalletType()
+		val walletType = SharedWallet.getCurrentWalletType()
 		when {
 			walletType.isBIP44() || walletType.isMultiChain() -> {
 				when {
@@ -216,7 +218,7 @@ class TokenDetailPresenter(
 			}
 
 			walletType.isETHSeries() ->
-				getETHSeriesData(Config.getCurrentEthereumAddress()) {
+				getETHSeriesData(SharedAddress.getCurrentEthereum()) {
 					callback(it, null, null)
 				}
 		}
@@ -239,10 +241,10 @@ class TokenDetailPresenter(
 	}
 
 	private fun getEOSSeriesData(callback: (List<EOSTransactionTable>) -> Unit) {
-		val account = Config.getCurrentEOSAccount()
+		val account = SharedAddress.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
 			account.accountName,
-			Config.getEOSCurrentChain()
+			SharedChain.getEOSCurrent()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(

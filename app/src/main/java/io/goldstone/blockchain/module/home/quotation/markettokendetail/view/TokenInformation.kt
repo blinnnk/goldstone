@@ -10,7 +10,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -31,7 +31,7 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 		marketCap.setSubtitle(
 			model.marketCap.replace(",", "")
 				.toDoubleOrNull().orZero()
-				.formatCurrency() + " " + Config.getCurrencyCode()
+				.formatCurrency() + " " + SharedWallet.getCurrencyCode()
 		)
 		startDate.setSubtitle(model.startDate)
 	}

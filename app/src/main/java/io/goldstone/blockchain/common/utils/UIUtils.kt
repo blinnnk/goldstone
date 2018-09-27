@@ -19,7 +19,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.language.WalletNameText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -71,8 +71,8 @@ object UIUtils {
 			WalletNameText.Wolf
 		)
 		val walletID =
-			if (Config.getMaxWalletID() == 100) 0
-			else Config.getMaxWalletID()
+			if (SharedWallet.getMaxWalletID() == 100) 0
+			else SharedWallet.getMaxWalletID()
 		return name[Math.abs(walletID) % name.size]
 	}
 }
@@ -139,10 +139,10 @@ fun Activity.transparentStatus() {
 		isTargetDevice(DeviceName.xiaomi8).orFalse(),
 		detectNotchScreenInAndroidP().orFalse()
 	) isTrue {
-		Config.updateNotchScreenStatus(false)
+		SharedWallet.updateNotchScreenStatus(false)
 		setTransparentStatusBar()
 	} otherwise {
-		Config.updateNotchScreenStatus(true)
+		SharedWallet.updateNotchScreenStatus(true)
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 			window.statusBarColor = Spectrum.deepBlue

@@ -49,11 +49,11 @@ object TransactionText {
 	@JvmField
 	val transactionWeb = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Info"
-		HoneyLanguage.Chinese.code -> "Transaction Info"
-		HoneyLanguage.Japanese.code -> "Transaction Info"
-		HoneyLanguage.Korean.code -> "Transaction Info"
-		HoneyLanguage.Russian.code -> "Transaction Info"
-		HoneyLanguage.TraditionalChinese.code -> "Transaction Info"
+		HoneyLanguage.Chinese.code -> "账单信息"
+		HoneyLanguage.Japanese.code -> "転送情報"
+		HoneyLanguage.Korean.code -> "정보 이전"
+		HoneyLanguage.Russian.code -> "Сделка"
+		HoneyLanguage.TraditionalChinese.code -> "賬單信息"
 		else -> ""
 	}
 	@JvmField
@@ -266,24 +266,24 @@ object TransactionText {
 	@JvmField
 	val irreversibleConfirmedBlocks: (IntervalCount: Int) -> String = {
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> "$it blocks confirmed later will be irreversible"
-			HoneyLanguage.Chinese.code -> "$it blocks confirmed later will be irreversible"
-			HoneyLanguage.Japanese.code -> "$it blocks confirmed later will be irreversible"
-			HoneyLanguage.Korean.code -> "$it blocks confirmed later will be irreversible"
-			HoneyLanguage.Russian.code -> "$it blocks confirmed later will be irreversible"
-			HoneyLanguage.TraditionalChinese.code -> "$it blocks confirmed later will be irreversible"
+			HoneyLanguage.English.code -> if (it == 1) {"Will become irreversible after $it block"} else {"Will become irreversible after $it blocks"}
+			HoneyLanguage.Chinese.code -> "将在$it 个区块后变为不可逆状态"
+			HoneyLanguage.Japanese.code -> "$it ブロック後に元に戻せません"
+			HoneyLanguage.Korean.code -> "$it 차단 후 돌이킬 수 없게 될 것입니다"
+			HoneyLanguage.Russian.code -> if (it == 1) {"$it блок должны быть необратимыми"} else {"$it блока должны быть необратимыми"}
+			HoneyLanguage.TraditionalChinese.code -> "將在$it 個區塊后變為不可逆狀態"
 			else -> ""
 		}
 	}
 
 	@JvmField
 	val irreversibleBlockConfirmed = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Irreversible block has confirmed this transaction"
-		HoneyLanguage.Chinese.code -> "Irreversible block has confirmed this transaction"
-		HoneyLanguage.Japanese.code -> "Irreversible block has confirmed this transaction"
-		HoneyLanguage.Korean.code -> "Irreversible block has confirmed this transaction"
-		HoneyLanguage.Russian.code -> "Irreversible block has confirmed this transaction"
-		HoneyLanguage.TraditionalChinese.code -> "Irreversible block has confirmed this transaction"
+		HoneyLanguage.English.code -> "This transaction is irreversible"
+		HoneyLanguage.Chinese.code -> "本次转账确认为不可逆状态"
+		HoneyLanguage.Japanese.code -> "この取引は不可逆的です"
+		HoneyLanguage.Korean.code -> "이 거래는 되돌릴 수 없습니다."
+		HoneyLanguage.Russian.code -> "Эта транзакция необратима"
+		HoneyLanguage.TraditionalChinese.code -> "本次轉賬確認為不可逆狀態"
 		else -> ""
 	}
 }

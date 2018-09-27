@@ -11,6 +11,8 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val BalanceIsNotEnough = TransferError("this account doesn't have enough balance")
 		@JvmStatic
+		val SellRAMTooLess = TransferError("the value you decide sell about RAM much greater than 1 byte")
+		@JvmStatic
 		val IncorrectDecimal = TransferError("this input count's decimal is wrong with its own decimal value")
 		@JvmStatic
 		val GetWrongFeeFromChain = TransferError("there is error when get fee from chain")

@@ -166,31 +166,31 @@ object WalletSettingsText {
 	@JvmField
 	val allBCHAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "All BCH Addresses"
-		HoneyLanguage.Chinese.code -> "所有 BCH 地址"
+		HoneyLanguage.Chinese.code -> "所有BCH(比特币现金)地址"
 		HoneyLanguage.Japanese.code -> "すべての BCH アドレス"
 		HoneyLanguage.Korean.code -> "모든 BCH 주소"
 		HoneyLanguage.Russian.code -> "Все адреса BCH"
-		HoneyLanguage.TraditionalChinese.code -> "所有 BCH 地址"
+		HoneyLanguage.TraditionalChinese.code -> "所有BCH(比特幣現金)地址"
 		else -> ""
 	}
 	@JvmField
 	val allLTCAddresses = when (currentLanguage) {
-		HoneyLanguage.English.code -> "All LTC Addresses"
-		HoneyLanguage.Chinese.code -> "All LTC Addresses"
-		HoneyLanguage.Japanese.code -> "All LTC Addresses"
-		HoneyLanguage.Korean.code -> "All LTC Addresses"
-		HoneyLanguage.Russian.code -> "All LTC Addresses"
-		HoneyLanguage.TraditionalChinese.code -> "All LTC Addresses"
+		HoneyLanguage.English.code -> "All Litecoin Addresses"
+		HoneyLanguage.Chinese.code -> "所有LTC(莱特币)地址"
+		HoneyLanguage.Japanese.code -> "すべてのLTC(リテコイン)アドレス"
+		HoneyLanguage.Korean.code -> "모든 Litecoin 주소"
+		HoneyLanguage.Russian.code -> "Все адреса Litecoin"
+		HoneyLanguage.TraditionalChinese.code -> "所有LTC(萊特幣)地址"
 		else -> ""
 	}
 	@JvmField
 	val allBtCTestAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "All BTC Testnet Addresses"
-		HoneyLanguage.Chinese.code -> "所有BTC测试网地址"
+		HoneyLanguage.Chinese.code -> "所有BTC(比特币)测试网地址"
 		HoneyLanguage.Japanese.code -> "すべてのBTCテストネットワークアドレス"
 		HoneyLanguage.Korean.code -> "모든 BTC 테스트 네트워크 주소"
 		HoneyLanguage.Russian.code -> "Все сетевые адреса тестовой сети BTC"
-		HoneyLanguage.TraditionalChinese.code -> "所有BTC測試網地址"
+		HoneyLanguage.TraditionalChinese.code -> "所有BTC(比特幣)測試網地址"
 		else -> ""
 	}
 	@JvmField
@@ -335,32 +335,32 @@ object WalletSettingsText {
 	}
 	@JvmField
 	val litecoinAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Litecoin Address"
-		HoneyLanguage.Chinese.code -> "Litecoin Address"
-		HoneyLanguage.Japanese.code -> "Litecoin Address"
-		HoneyLanguage.Korean.code -> "Litecoin Address"
-		HoneyLanguage.Russian.code -> "Litecoin Address"
-		HoneyLanguage.TraditionalChinese.code -> "Litecoin Address"
+		HoneyLanguage.English.code -> "Litecoin Cash Address"
+		HoneyLanguage.Chinese.code -> "LTC(莱特币)地址"
+		HoneyLanguage.Japanese.code -> "LTC(リテコイン)アドレス"
+		HoneyLanguage.Korean.code -> "Litecoin 주소"
+		HoneyLanguage.Russian.code -> "Адрес Litecoin"
+		HoneyLanguage.TraditionalChinese.code -> "LTC(萊特幣)地址"
 		else -> ""
 	}
 	@JvmField
 	val eosAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "EOS Address"
-		HoneyLanguage.Chinese.code -> "EOS Address"
-		HoneyLanguage.Japanese.code -> "EOS Address"
-		HoneyLanguage.Korean.code -> "EOS Address"
-		HoneyLanguage.Russian.code -> "EOS Address"
-		HoneyLanguage.TraditionalChinese.code -> "EOS Address"
+		HoneyLanguage.Chinese.code -> "EOS地址"
+		HoneyLanguage.Japanese.code -> "EOSアドレス"
+		HoneyLanguage.Korean.code -> "EOS 주소"
+		HoneyLanguage.Russian.code -> "Адрес EOS"
+		HoneyLanguage.TraditionalChinese.code -> "EOS地址"
 		else -> ""
 	}
 	@JvmField
 	val bitcoinCashAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bitcoin Cash Address"
-		HoneyLanguage.Chinese.code -> "Bitcoin Cash Address"
-		HoneyLanguage.Japanese.code -> "Bitcoin Cash Address"
-		HoneyLanguage.Korean.code -> "Bitcoin Cash Address"
+		HoneyLanguage.Chinese.code -> "BCH(比特币现金)地址"
+		HoneyLanguage.Japanese.code -> "BCHアドレス"
+		HoneyLanguage.Korean.code -> "Bitcoin Cash 주소"
 		HoneyLanguage.Russian.code -> "Bitcoin Cash Address"
-		HoneyLanguage.TraditionalChinese.code -> "Bitcoin Cash Address"
+		HoneyLanguage.TraditionalChinese.code -> "BCH(比特幣現金)地址"
 		else -> ""
 	}
 	@JvmField

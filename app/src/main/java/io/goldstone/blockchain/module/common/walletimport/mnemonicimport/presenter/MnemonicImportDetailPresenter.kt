@@ -44,8 +44,7 @@ class MnemonicImportDetailPresenter(
 			callback
 		) { passwordValue, walletName ->
 			val mnemonicContent =
-				mnemonic
-					.replaceWithPattern()
+				mnemonic.replaceWithPattern()
 					.replace("\n", " ")
 					.removeStartAndEndValue(" ")
 
@@ -101,7 +100,6 @@ class MnemonicImportDetailPresenter(
 			}
 			if (isExistent) {
 				callback(AccountError.ExistAddress)
-				return@getAll
 			} else {
 				GenerateMultiChainWallet.import(
 					fragment.context!!,

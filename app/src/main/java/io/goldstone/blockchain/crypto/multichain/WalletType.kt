@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import java.io.Serializable
 
 
@@ -25,7 +25,7 @@ class WalletType(val type: String?) : Serializable {
 	fun isEOSSeries(): Boolean = isEOSSeriesType(type!!)
 
 	fun updateSharedPreference() {
-		Config.updateCurrentWalletType(type!!)
+		SharedWallet.updateCurrentWalletType(type!!)
 	}
 
 	fun getDisplayName(): String {

@@ -158,12 +158,12 @@ object ProfileText {
 	}
 	@JvmField
 	val eosAccountRegister = when (currentLanguage) {
-		HoneyLanguage.English.code -> "EOS Account Register"
-		HoneyLanguage.Chinese.code -> "EOS Account Register"
-		HoneyLanguage.Japanese.code -> "EOS Account Register"
-		HoneyLanguage.Korean.code -> "EOS Account Register"
-		HoneyLanguage.Russian.code -> "EOS Account Register"
-		HoneyLanguage.TraditionalChinese.code -> "EOS Account Register"
+		HoneyLanguage.English.code -> "EOS Account Registration"
+		HoneyLanguage.Chinese.code -> "EOS账号注册"
+		HoneyLanguage.Japanese.code -> "EOSアカウントの登録"
+		HoneyLanguage.Korean.code -> "EOS 계정 등록"
+		HoneyLanguage.Russian.code -> "Регистрация учетной записи EOS"
+		HoneyLanguage.TraditionalChinese.code -> "EOS賬號註冊"
 		else -> ""
 	}
 	@JvmField

@@ -8,11 +8,11 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -20,7 +20,6 @@ import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.cputradingdetail.view.CPUTradingFragment
@@ -75,7 +74,7 @@ class TokenAssetPresenter(
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
 			Bundle().apply {
-				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSAccount().accountName)
+				putString(ArgumentKey.defaultEOSAccountName, SharedAddress.getCurrentEOSAccount().accountName)
 			},
 			2
 		)
@@ -95,7 +94,7 @@ class TokenAssetPresenter(
 					Bundle(),
 					2
 				)
-			TokenDetailText.tradeRAM -> tokenDetailOverlayPresenter
+			TokenDetailText.buySellRAM -> tokenDetailOverlayPresenter
 				?.showTargetFragment<RAMTradingFragment>(
 					Bundle(),
 					2
@@ -104,7 +103,7 @@ class TokenAssetPresenter(
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val account = Config.getCurrentEOSAccount()
+		val account = SharedAddress.getCurrentEOSAccount()
 		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
@@ -127,10 +126,10 @@ class TokenAssetPresenter(
 
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val account = Config.getCurrentEOSAccount()
+		val account = SharedAddress.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
 			account.accountName,
-			Config.getEOSCurrentChain()
+			SharedChain.getEOSCurrent()
 		) { localData ->
 			if (localData.isEmpty()) {
 				EOSAPI.getTransactionsLastIndex(
@@ -151,26 +150,25 @@ class TokenAssetPresenter(
 
 	private fun EOSAccountTable.updateUIValue() {
 		fragment.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
+		if (refundInfo.isNull()) fragment.setEOSRefunds("0.0")
+		else refundInfo!!.getRefundDescription().let { fragment.setEOSRefunds(it) }
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used
 		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos
 		val availableNet = netLimit.max - netLimit.used
 		val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
-		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, error ->
-			if (!price.isNull() && error.isNone()) {
-				val ramEOSCount = "≈ " + (availableRAM.toDouble() * price!!).formatCount(4) suffix CoinSymbol.eos
-				fragment.setResourcesValue(
-					availableRAM,
-					ramQuota,
-					ramEOSCount,
-					availableCPU,
-					cpuLimit.max,
-					cpuEOSValue,
-					availableNet,
-					netLimit.max,
-					netEOSValue
-				)
-			} else fragment.context.alert(error.message)
-		}
+		val ramEOSCount =
+			"≈ " + (availableRAM.toDouble() * SharedValue.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
+		fragment.setResourcesValue(
+			availableRAM,
+			ramQuota,
+			ramEOSCount,
+			availableCPU,
+			cpuLimit.max,
+			cpuEOSValue,
+			availableNet,
+			netLimit.max,
+			netEOSValue
+		)
 	}
 }

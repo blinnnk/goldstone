@@ -13,8 +13,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
@@ -121,7 +121,7 @@ object GoldStoneAPI {
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${Config.getCurrentChain().id},${Config.getETCCurrentChain().id},${Config.getBTCCurrentChain().id},${Config.getLTCCurrentChain().id},${Config.getEOSCurrentChain().id}"
+				"${SharedChain.getCurrentETH().id},${SharedChain.getETCCurrent().id},${SharedChain.getBTCCurrent().id},${SharedChain.getLTCCurrent().id},${SharedChain.getEOSCurrent().id}"
 			),
 			"list",
 			false,

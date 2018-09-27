@@ -2,7 +2,8 @@ package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
@@ -137,12 +138,12 @@ object ChainURL {
 
 	/** Address Detail URL*/
 	val btcAddressDetail: (address: String) -> String = {
-		val header = if (Config.isTestEnvironment()) btcTestnetWeb
+		val header = if (SharedValue.isTestEnvironment()) btcTestnetWeb
 		else btcMainnetWeb
 		"$header/address/$it"
 	}
 	val ethAddressDetail: (address: String) -> String = {
-		val currentChain = Config.getCurrentChain()
+		val currentChain = SharedChain.getCurrentETH()
 		val header = when {
 			currentChain.isRopsten() -> ethRopstenWeb
 			currentChain.isKovan() -> ethKovanWeb
@@ -152,53 +153,53 @@ object ChainURL {
 		"$header/address/$it"
 	}
 	val bchAddressDetail: (address: String) -> String = {
-		val header = if (Config.isTestEnvironment()) bchTestnetWeb
+		val header = if (SharedValue.isTestEnvironment()) bchTestnetWeb
 		else bchMainnetWeb
 		"$header/address/$it"
 	}
 
 	val etcAddressDetail: (address: String) -> String = {
-		val header = if (Config.isTestEnvironment()) etcTestnetWeb
+		val header = if (SharedValue.isTestEnvironment()) etcTestnetWeb
 		else etcMainnetWeb
 		"$header/addr/$it"
 	}
 
 	val ltcAddressDetail: (address: String) -> String = {
-		if (Config.isTestEnvironment()) ltcTestnetWeb("address") + it
+		if (SharedValue.isTestEnvironment()) ltcTestnetWeb("address") + it
 		else "$ltcMainnetWeb/address/$it"
 	}
 
 	val eosAddressDetail: (address: String) -> String = {
-		val header = if (Config.isTestEnvironment()) eosJungleWeb
+		val header = if (SharedValue.isTestEnvironment()) eosJungleWeb
 		else eosMainnetWeb
 		"$header/account/$it"
 	}
 
 	/** Transaction Detail URL */
 	val eosTransactionDetail: (txID: String) -> String = {
-		val header = if (Config.isTestEnvironment()) eosJungleWeb
+		val header = if (SharedValue.isTestEnvironment()) eosJungleWeb
 		else eosMainnetWeb
 		"$header/transaction/$it"
 	}
 	val etcWebHeader: () -> String = {
-		val header = if (Config.isTestEnvironment()) etcTestnetWeb
+		val header = if (SharedValue.isTestEnvironment()) etcTestnetWeb
 		else etcMainnetWeb
 		"$header/tx/"
 	}
 
 	val bchWebHeader: () -> String = {
-		val header = if (Config.isTestEnvironment()) bchTestnetWeb
+		val header = if (SharedValue.isTestEnvironment()) bchTestnetWeb
 		else bchMainnetWeb
 		"$header/tx/"
 	}
 
 	val ltcWebHeader: () -> String = {
-		if (Config.isTestEnvironment()) ltcTestnetWeb("tx")
+		if (SharedValue.isTestEnvironment()) ltcTestnetWeb("tx")
 		else "$ltcMainnetWeb/tx/"
 	}
 
 	val btcWebHeader: () -> String = {
-		val header = if (Config.isTestEnvironment()) btcTestnetWeb
+		val header = if (SharedValue.isTestEnvironment()) btcTestnetWeb
 		else btcMainnetWeb
 		"$header/tx/"
 	}

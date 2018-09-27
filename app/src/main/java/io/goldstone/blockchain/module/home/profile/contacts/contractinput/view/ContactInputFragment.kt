@@ -16,8 +16,8 @@ import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
@@ -93,14 +93,14 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = "${CoinSymbol.eos} JUNGLE"
 					hint = ContactText.eosJungleHint
-					visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
+					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.into(this)
 
 				btcTestnetAddressInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = "${CoinSymbol.btc()} TEST"
 					hint = ContactText.btcTestnetAddress
-					visibility = if (Config.isTestEnvironment()) View.VISIBLE else View.GONE
+					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.into(this)
 
 

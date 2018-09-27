@@ -2,10 +2,13 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
@@ -14,7 +17,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import org.jetbrains.anko.runOnUiThread
 
@@ -23,35 +25,35 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun GasSelectionPresenter.prepareToTransferLTC(
-	footer: GasSelectionFooter,
-	@UiThread callback: (GoldStoneError) -> Unit
-) {
-	checkLTCBalanceIsValid(gasUsedGasFee!!) { isEnough, error ->
-		when {
-			isEnough -> showConfirmAttentionView(footer, callback)
-			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
-			else -> callback(error)
+fun GasSelectionPresenter.prepareToTransferLTC(callback: (GoldStoneError) -> Unit) {
+	prepareBTCSeriesModel?.apply {
+		LitecoinApi.getBalance(fromAddress, true) { balance, error ->
+			if (!balance.isNull() && error.isNone()) {
+				val isEnough =
+					balance.orElse(0) > value + gasUsedGasFee!!.toSatoshi()
+				when {
+					isEnough -> showConfirmAttentionView(callback)
+					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+					else -> callback(error)
+				}
+			} else callback(error)
 		}
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
+private fun GasSelectionPresenter.getCurrentLTCPrivateKey(
 	walletAddress: String,
 	password: String,
 	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
-	if (Config.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
+	if (SharedValue.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
 		true,
 		hold
 	) else fragment.context?.exportLTCBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
 		hold
 	)
 }
@@ -61,7 +63,7 @@ fun GasSelectionPresenter.transferLTC(
 	password: String,
 	callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentWalletLTCPrivateKey(
+	getCurrentLTCPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
 		password
 	) { privateKey, error ->
@@ -75,10 +77,10 @@ fun GasSelectionPresenter.transferLTC(
 					changeAddress,
 					unspents,
 					privateKey!!,
-					Config.isTestEnvironment()
+					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						Config.getLTCCurrentChainName(),
+						SharedChain.getLTCCurrentName(),
 						signedModel.signedMessage,
 						callback
 					) { hash ->

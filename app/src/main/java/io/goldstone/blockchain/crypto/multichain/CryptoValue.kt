@@ -29,9 +29,6 @@ object CryptoValue {
 	const val signedBTCMainnetSecret = "KxJQeWFnRuTv7HtECL85ytaxQAyFxspzWs9RuY1Fa1oqXFGh6gJC"
 	const val ltcMainnetSignedSecret = "T99eF7JUK83YfnCBqcdsUP7pBPeLqYLmAW477PHdRX67g82MgQLk"
 
-	val singleChainFile: (btcAddress: String) -> String = {
-		singleChainFilename + it
-	}
 	val isBitcoinAddressLength: (address: String) -> Boolean = {
 		TinyNumberUtils.hasTrue(
 			it.length == bitcoinAddressLength,
@@ -40,12 +37,10 @@ object CryptoValue {
 	}
 	val filename: (
 		walletAddress: String,
-		isBTCSeriesWallet: Boolean,
-		isSingleChainWallet: Boolean
-	) -> String = { walletAddress, isBTCSeriesWallet, isSingleChainWallet ->
+		isBTCSeriesWallet: Boolean
+	) -> String = { walletAddress, isBTCSeriesWallet ->
 		when {
-			isBTCSeriesWallet && !isSingleChainWallet -> walletAddress
-			isSingleChainWallet -> singleChainFile(walletAddress)
+			isBTCSeriesWallet -> walletAddress
 			else -> keystoreFilename
 		}
 	}

@@ -7,7 +7,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseValueCell
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.multichain.getSymbol
@@ -55,7 +55,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			info.apply {
 				title.text = it.addressName.scaleTo(14)
 				subtitle.text =
-					if (Config.getCurrentLanguageCode() == 0) it.addressInfo.scaleTo(32)
+					if (SharedWallet.getCurrentLanguageCode() == 0) it.addressInfo.scaleTo(32)
 					else it.addressInfo.scaleTo(26)
 			}
 

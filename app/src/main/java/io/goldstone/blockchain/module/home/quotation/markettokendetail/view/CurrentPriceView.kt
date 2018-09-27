@@ -12,6 +12,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -32,7 +33,7 @@ data class CurrentPriceModel(
 	val usdtPrice: Double = 1.0,
 	var isDisconnected: Boolean = false
 ) {
-	
+
 	constructor(
 		data: CurrencyPriceInfoModel,
 		symbol: String,
@@ -44,7 +45,7 @@ data class CurrentPriceModel(
 		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0),
 		isDisconnected
 	)
-	
+
 	constructor(data: QuotationModel) : this(
 		data.price.toFloatOrNull().orElse(0f),
 		data.symbol,
@@ -55,14 +56,14 @@ data class CurrentPriceModel(
 
 @SuppressLint("SetTextI18n")
 class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
-	
+
 	var model: CurrentPriceModel by observing(CurrentPriceModel()) {
 		val value =
-			" ${model.baseCurrency} ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${Config.getCurrencyCode()}"
+			" ${model.baseCurrency} ≈ ${(model.currentPrice * model.usdtPrice).formatCurrency()} ${SharedWallet.getCurrencyCode()}"
 		priceTitles.text = CustomTargetTextStyle(
 			value, "${model.currentPrice.toBigDecimal()}" + value, GrayScale.black, 12.uiPX(), true, false
 		)
-		
+
 		percent.text = model.percent + "%"
 		// 增减显示不同的颜色
 		when {
@@ -73,7 +74,7 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 	}
 	private val priceTitles by lazy { TextView(context) }
 	private val percent by lazy { TextView(context) }
-	
+
 	init {
 		setHorizontalPadding(PaddingSize.device.toFloat())
 		orientation = VERTICAL

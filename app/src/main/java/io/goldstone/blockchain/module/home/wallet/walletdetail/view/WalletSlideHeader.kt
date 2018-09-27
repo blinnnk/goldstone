@@ -9,12 +9,13 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.SliderHeader
-import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.CircleButton
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -65,7 +66,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 			visibility = View.VISIBLE
 		}
 
-		setBalanceValue(Config.getCurrentBalance().formatCurrency())
+		setBalanceValue(SharedWallet.getCurrentBalance().formatCurrency())
 	}
 
 	override fun onHeaderHidesStyle() {
@@ -80,10 +81,10 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 
 	companion object {
 		fun setBalanceInfo(): String {
-			return if (!Config.isTestEnvironment()) {
-				WalletText.totalAssets + " " + Config.getCurrencyCode()
+			return if (!SharedValue.isTestEnvironment()) {
+				WalletText.totalAssets + " " + SharedWallet.getCurrencyCode()
 			} else {
-				ChainText.testnet + " · " + WalletText.totalAssets + " (" + Config.getCurrencyCode() + ")"
+				ChainText.testnet + " · " + WalletText.totalAssets + " (" + SharedWallet.getCurrencyCode() + ")"
 			}
 		}
 	}

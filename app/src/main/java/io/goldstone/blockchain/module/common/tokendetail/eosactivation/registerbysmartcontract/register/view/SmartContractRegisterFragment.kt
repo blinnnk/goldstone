@@ -18,11 +18,13 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
@@ -67,7 +69,7 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 						val checker = EOSAccount(getContent()).checker()
 						if (checker.isValid()) {
 							isValidAccountName = true
-							setValidStatus(true, "Valid")
+							setValidStatus(true, EOSAccountText.checkNameResultValid)
 						} else {
 							isValidAccountName = false
 							setValidStatus(false, checker.shortDescription)
@@ -75,12 +77,12 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 					}
 				}.into(this)
 				// 显示公钥地址
-				SessionTitleView(context).apply { setTitle("CLICK TO COPY") }.into(this)
+				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
 				KeyValueView(context).apply {
 					gravity = Gravity.CENTER
-					text = Config.getCurrentEOSAddress()
+					text = SharedAddress.getCurrentEOS()
 				}.click {
-					it.context.clickToCopy(Config.getCurrentEOSAddress())
+					it.context.clickToCopy(SharedAddress.getCurrentEOS())
 				}.into(this)
 
 				DescriptionView(context).isRegisterResource().into(this)
@@ -92,16 +94,16 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 				resourceCoast.apply {
 					presenter.getEOSCurrencyPrice { currency, error ->
 						if (!currency.isNull() && error.isNone()) {
-							setSubtitle("2.0 EOS ≈ ${(2 * currency!!).formatCurrency() suffix Config.getCurrencyCode()}")
+							setSubtitle("2.0 EOS ≈ ${(2 * currency!!).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
 						} else context.alert(error.message)
 					}
-					setTitle("Estimated Expenditure")
+					setTitle(EOSAccountText.estimatedSpentOfActiveAccount)
 					setSubtitle("2.0 EOS ${CommonText.calculating}")
 				}.into(this)
 
 				confirmButton.apply {
 					setBlueStyle(20.uiPX())
-					text = "Check Name Is Available In Chain"
+					text = EOSAccountText.checkNameAvailability
 				}.click {
 					val account = EOSAccount(accountNameInput.getContent())
 					when {
@@ -112,12 +114,12 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 								activity?.apply { SoftKeyboard.hide(this) }
 								if (!isAvailable.isNull() && error.isNone()) {
 									if (isAvailable!!) presenter.showSmartContractRegisterDetailFragment(account.accountName)
-									else context.alert("unavailable account name")
+									else context.alert(EOSAccountText.checkNameResultUnavailable)
 								} else context.alert(error.message)
 							}
 						}
-						account.accountName.isEmpty() -> context.alert("Empty Account Name")
-						else -> context.alert("Invalid Account Name")
+						account.accountName.isEmpty() -> context.alert(EOSAccountText.checkNameResultEmpty)
+						else -> context.alert(EOSAccountText.checkNameResultInvalid)
 					}
 				}.into(this)
 			}

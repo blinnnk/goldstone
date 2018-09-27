@@ -23,10 +23,12 @@ import org.json.JSONObject
 object LitecoinApi {
 	fun getBalance(
 		address: String,
-		@WorkerThread hold: (balance: Long?, error: RequestError) -> Unit
+		isMainThread: Boolean,
+		hold: (balance: Long?, error: RequestError) -> Unit
 	) {
 		BTCSeriesApiUtils.getBalance(
 			LitecoinUrl.getBalance(address),
+			isMainThread,
 			hold
 		)
 	}

@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
 import io.goldstone.blockchain.common.component.title.RadioWithTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.TokenManagementText
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import org.jetbrains.anko.bottomPadding
@@ -50,8 +51,8 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 	private val accountNameEditText by lazy {
 		RoundTitleInput(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX())
-			setTitle("Account")
-			setHint("enter account name")
+			setTitle(TokenDetailText.tradeForAccountTitle)
+			setHint(TokenDetailText.tradeForAccountPlaceholder)
 		}
 	}
 
@@ -61,26 +62,26 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 				topMargin = 10.uiPX()
 			}
 			setNumberPadKeyboard()
-			setTitle("EOS Amount")
-			setHint("enter eos amount")
+			setTitle(TokenDetailText.eosAmountTitle)
+			setHint(TokenDetailText.eosAmountPlaceholder)
 		}
 	}
 
 	fun setSellingRAMStyle() {
-		amountEditText.setTitle("Bytes")
-		amountEditText.setHint("enter ram byte amount")
+		amountEditText.setTitle(TokenDetailText.tradeRamByBytesTitle)
+		amountEditText.setHint(TokenDetailText.tradeRamByBytesPlaceholder)
 	}
 
 	private val radioCellWidth = 100.uiPX()
 	private val transferResourceRadio by lazy {
-		RadioWithTitle(context).apply { setTitle("Transfer") }.apply {
+		RadioWithTitle(context).apply { setTitle(TokenDetailText.delegateTypeTransfer) }.apply {
 			setRadioStatus(true)
 			layoutParams = LinearLayout.LayoutParams(radioCellWidth, matchParent)
 		}
 	}
 
 	private val rentResourceRadio by lazy {
-		RadioWithTitle(context).apply { setTitle("Rent") }.apply {
+		RadioWithTitle(context).apply { setTitle(TokenDetailText.delegateTypeRent) }.apply {
 			layoutParams = LinearLayout.LayoutParams(radioCellWidth, matchParent)
 		}
 	}

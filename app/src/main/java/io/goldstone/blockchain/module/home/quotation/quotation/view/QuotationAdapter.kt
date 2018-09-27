@@ -8,7 +8,7 @@ import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.keyboardHeightListener
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
 
@@ -21,20 +21,20 @@ class QuotationAdapter(
 	private val hold: QuotationCell.() -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, View, QuotationCell, View>() {
-	
+
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context) =
 		View(context).apply {
 			val barHeight =
 				if (
 					(!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
-					|| Config.isNotchScreen()
+					|| SharedWallet.isNotchScreen()
 				) {
 					60.uiPX()
 				} else 10.uiPX()
 			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
-	
+
 	override fun generateHeader(context: Context) =
 		View(context).apply {
 			/**
@@ -48,10 +48,10 @@ class QuotationAdapter(
 			}
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 		}
-	
+
 	override fun generateCell(context: Context) =
 		QuotationCell(context)
-	
+
 	override fun QuotationCell.bindCell(
 		data: QuotationModel,
 		position: Int

@@ -6,8 +6,9 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -21,8 +22,8 @@ import io.goldstone.blockchain.crypto.utils.formatDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
+import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
 import org.jetbrains.anko.runOnUiThread
@@ -65,7 +66,7 @@ class EOSAccountRegisterPresenter(
 		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { priceInEOS, ramPriceError ->
 			if (!priceInEOS.isNull() && ramPriceError.isNone()) {
 				val ramEOSCount = (ramAmount.toDouble() * priceInEOS!!).formatDecimal(4)
-				val creatorAccount = Config.getCurrentEOSAccount()
+				val creatorAccount = SharedAddress.getCurrentEOSAccount()
 				val totalSpent = cpuEOSCount + netAEOSCount + ramEOSCount
 				checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
 					if (!error.isNone()) callback(error)
@@ -79,7 +80,7 @@ class EOSAccountRegisterPresenter(
 					) { privateKey, privateKeyError ->
 						if (error.isNone() && !privateKey.isNull()) {
 							EOSRegisterTransaction(
-								Config.getEOSCurrentChain(),
+								SharedChain.getEOSCurrent(),
 								EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
 								validAccount.accountName,
 								validPublicKey.orEmpty(),

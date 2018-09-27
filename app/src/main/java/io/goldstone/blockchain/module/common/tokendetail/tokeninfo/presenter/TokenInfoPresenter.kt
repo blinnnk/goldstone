@@ -10,9 +10,9 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
@@ -58,7 +58,7 @@ class TokenInfoPresenter(
 		val info = getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName =
-			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + "CHAIN TYPE"
+			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + TokenDetailText.chainType
 		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {
 			showThirdPartyAddressDetail(fragment.getGrandFather<TokenDetailOverlayFragment>(), info.second)
 		}
@@ -80,8 +80,8 @@ class TokenInfoPresenter(
 	fun getAddress(hold: (address: String, hash160: String?) -> Unit) {
 		val net = when (tokenInfo?.symbol) {
 			CoinSymbol.bch, CoinSymbol.btc() ->
-				if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
-			CoinSymbol.ltc -> if (Config.isTestEnvironment()) TestNet3Params.get() else LitecoinNetParams()
+				if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
+			CoinSymbol.ltc -> if (SharedValue.isTestEnvironment()) TestNet3Params.get() else LitecoinNetParams()
 			else -> null
 		}
 		val hash160 =

@@ -8,16 +8,17 @@ import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.getKeyName
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -131,7 +132,7 @@ object RequisitionUtil {
 		path: String,
 		justData: Boolean = false,
 		noinline errorCallback: (RequestError) -> Unit,
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		isEncrypt: Boolean = SharedValue.isEncryptERCNodeRequest(),
 		crossinline hold: (List<T>) -> Unit
 	) {
 		val client =
@@ -179,7 +180,7 @@ object RequisitionUtil {
 		body: RequestBody,
 		path: String,
 		errorCallback: (RequestError) -> Unit,
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		isEncrypt: Boolean = SharedValue.isEncryptERCNodeRequest(),
 		hold: (String) -> Unit
 	) {
 		val client =
@@ -351,7 +352,7 @@ object RequisitionUtil {
 	fun getCryptoRequest(
 		body: RequestBody,
 		path: String,
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		isEncrypt: Boolean = SharedValue.isEncryptERCNodeRequest(),
 		targetGoldStoneID: String = "",
 		hold: (Request) -> Unit
 	) {
@@ -362,7 +363,7 @@ object RequisitionUtil {
 				}
 			}
 			targetGoldStoneID.isNotEmpty() ->
-				hold(generateRequest(path, Config.getGoldStoneID(), body))
+				hold(generateRequest(path, SharedWallet.getGoldStoneID(), body))
 			else -> hold(
 				Request.Builder()
 					.url(path)
@@ -385,7 +386,7 @@ object RequisitionUtil {
 				it?.apply { hold(generateRequest(api, goldStoneID, null)) }
 			}
 			targetGoldStoneID?.count().orZero() > 0 -> {
-				hold(generateRequest(api, Config.getGoldStoneID(), null))
+				hold(generateRequest(api, SharedWallet.getGoldStoneID(), null))
 			}
 			else -> {
 				val uncryptRequest = Request.Builder()
@@ -400,7 +401,7 @@ object RequisitionUtil {
 	fun callChainBy(
 		body: RequestBody,
 		errorCallback: (RequestError) -> Unit,
-		chainName: String = Config.getCurrentChainName(),
+		chainName: String = SharedChain.getCurrentETHName(),
 		hold: (String) -> Unit
 	) {
 		val isEncrypt = ChainURL.unencryptedChainName.none { it.equals(chainName, true) }

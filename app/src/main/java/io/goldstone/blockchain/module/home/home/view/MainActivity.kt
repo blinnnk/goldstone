@@ -116,9 +116,9 @@ class MainActivity : AppCompatActivity() {
 
 	// 防止重绘的专用方法
 	fun hideHomeFragment() {
-		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let {
-			(it as? HomeFragment)?.let {
-				supportFragmentManager.beginTransaction().hide(it).commitAllowingStateLoss()
+		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let { fragment ->
+			if (fragment is HomeFragment) {
+				supportFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss()
 			}
 		}
 	}

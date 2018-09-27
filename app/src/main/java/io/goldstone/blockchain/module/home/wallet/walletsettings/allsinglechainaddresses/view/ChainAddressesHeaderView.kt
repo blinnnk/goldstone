@@ -11,8 +11,8 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
@@ -72,7 +72,7 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 			chainType.isLTC() -> allAddressTitle.text = WalletSettingsText.allLTCAddresses
 			chainType.isBTC() -> {
 				allAddressTitle.text =
-					if (Config.isTestEnvironment()) WalletSettingsText.allBtCTestAddresses
+					if (SharedValue.isTestEnvironment()) WalletSettingsText.allBtCTestAddresses
 					else WalletSettingsText.allBtcAddresses
 			}
 		}

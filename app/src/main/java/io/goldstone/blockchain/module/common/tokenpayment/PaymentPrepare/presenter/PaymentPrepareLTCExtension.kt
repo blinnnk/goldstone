@@ -10,9 +10,9 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
@@ -58,7 +58,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 ) {
 	val myAddress = CoinSymbol.LTC.getAddress()
 	val chainName =
-		if (Config.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
+		if (SharedValue.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
@@ -80,7 +80,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 				return@getUnspentListByAddress
 			}
 			val calculateFeeSecret =
-				if (Config.isTestEnvironment()) CryptoValue.signedSecret
+				if (SharedValue.isTestEnvironment()) CryptoValue.signedSecret
 				else CryptoValue.ltcMainnetSignedSecret
 			val size = BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
 				count.toSatoshi(),
@@ -89,7 +89,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 				changeAddress,
 				unspents,
 				calculateFeeSecret, // 测算 `MessageSize` 的默认无效私钥
-				Config.isTestEnvironment()
+				SharedValue.isTestEnvironment()
 			).messageSize
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
@@ -112,7 +112,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 fun PaymentPreparePresenter.isValidLTCAddressOrElse(address: String): Boolean {
 	return if (address.isNotEmpty()) {
 		val isValidAddress =
-			if (Config.isTestEnvironment()) BTCUtils.isValidTestnetAddress(address)
+			if (SharedValue.isTestEnvironment()) BTCUtils.isValidTestnetAddress(address)
 			else LTCWalletUtils.isValidAddress(address)
 		if (isValidAddress) fragment.updateChangeAddress(address.scaleTo(22))
 		else fragment.context.alert(ImportWalletText.addressFormatAlert)

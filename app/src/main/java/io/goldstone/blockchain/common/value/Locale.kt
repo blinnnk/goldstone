@@ -11,11 +11,7 @@ import java.util.*
  */
 
 object CountryCode {
-	val china =
-		Locale(
-			"cn",
-			"CN"
-		)
+	val china = Locale("cn", "CN")
 	val currentCurrency =
 		Currency.getInstance(Resources.getSystem().configuration.locale).currencyCode!!
 	val currentCountry = Resources.getSystem().configuration.locale.country!!

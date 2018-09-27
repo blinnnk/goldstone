@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 
-import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -21,7 +19,6 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -77,12 +74,10 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 					getConfirmButton {
 						onClick { _ ->
 							showLoadingStatus()
-							// Prevent user click the other button at this time
-							showMaskView(true)
-							presenter.confirmTransfer(footer) {
-								if (it !is AccountError) setCanUseStyle(false)
+							presenter.confirmTransfer {
+								if (it is AccountError) setCanUseStyle(false)
 								else if (!it.isNone()) this@GasSelectionFragment.context.alert(it.message)
-								showMaskView(false)
+								resetMinerType()
 								showLoadingStatus(false, Spectrum.white, CommonText.next)
 							}
 						}
@@ -117,24 +112,9 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 		spendingCell.setSubtitle(value)
 	}
 
-	fun showMaskView(isShow: Boolean = false) {
-		if (isShow && container.findViewById<View>(ElementID.mask).isNull()) View(context).apply {
-			id = ElementID.mask
-			backgroundColor = Color.TRANSPARENT
-			isClickable = true
-			onClick {
-				this@apply.context.alert("Confirming transfer now please wait a moment")
-			}
-			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-		}.into(container) else {
-			// When transfer is end that recovery custom miner
-			// gas price value and current miner type
-			MinerFeeType.Custom.value = 0
-			presenter.currentMinerType = MinerFeeType.Recommend
-			container.findViewById<View>(ElementID.mask)?.let {
-				container.removeView(it)
-			}
-		}
+	fun resetMinerType() {
+		MinerFeeType.Custom.value = 0
+		presenter.currentMinerType = MinerFeeType.Recommend
 	}
 
 	override fun setBaseBackEvent(

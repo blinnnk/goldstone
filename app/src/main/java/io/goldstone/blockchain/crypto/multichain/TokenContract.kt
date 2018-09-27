@@ -1,8 +1,9 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import java.io.Serializable
 
@@ -105,36 +106,36 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 		TokenContract(this?.contract).isBCH() ->
 			AddressUtils.getCurrentBCHAddress()
 		TokenContract(this?.contract).isETC() ->
-			Config.getCurrentETCAddress()
+			SharedAddress.getCurrentETC()
 		TokenContract(this?.contract).isEOS() ->
-			if (isEOSAccountName) Config.getCurrentEOSAccount().accountName
-			else Config.getCurrentEOSAddress()
+			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
+			else SharedAddress.getCurrentEOS()
 		else ->
-			Config.getCurrentEthereumAddress()
+			SharedAddress.getCurrentEthereum()
 	}
 }
 
 fun TokenContract?.getCurrentChainID(): ChainID {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> Config.getETCCurrentChain()
-		this?.contract.equals(TokenContract.btcContract, true) -> Config.getBTCCurrentChain()
-		this?.contract.equals(TokenContract.ltcContract, true) -> Config.getLTCCurrentChain()
-		this?.contract.equals(TokenContract.bchContract, true) -> Config.getBCHCurrentChain()
-		this?.contract.equals(TokenContract.eosContract, true) -> Config.getEOSCurrentChain()
-		this?.contract.equals(TokenContract.ethContract, true) -> Config.getCurrentChain()
-		else -> Config.getCurrentChain() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrent()
+		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrent()
+		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrent()
+		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrent()
+		this?.contract.equals(TokenContract.eosContract, true) -> SharedChain.getEOSCurrent()
+		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETH()
+		else -> SharedChain.getCurrentETH() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }
 
 fun TokenContract?.getCurrentChainName(): String {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> Config.getETCCurrentChainName()
-		this?.contract.equals(TokenContract.btcContract, true) -> Config.getBTCCurrentChainName()
-		this?.contract.equals(TokenContract.ltcContract, true) -> Config.getLTCCurrentChainName()
-		this?.contract.equals(TokenContract.bchContract, true) -> Config.getBCHCurrentChainName()
-		this?.contract.equals(TokenContract.eosContract, true) -> Config.getEOSCurrentChainName()
-		this?.contract.equals(TokenContract.ethContract, true) -> Config.getCurrentChainName()
-		else -> Config.getCurrentChainName() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrentName()
+		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrentName()
+		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrentName()
+		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrentName()
+		this?.contract.equals(TokenContract.eosContract, true) -> SharedChain.getEOSCurrentName()
+		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETHName()
+		else -> SharedChain.getCurrentETHName() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }
 

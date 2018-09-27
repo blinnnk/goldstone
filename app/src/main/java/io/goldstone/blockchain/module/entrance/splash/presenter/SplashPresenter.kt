@@ -4,10 +4,12 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.otherwise
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -44,6 +46,24 @@ class SplashPresenter(val activity: SplashActivity) {
 		}
 	}
 
+	// 获取当前的汇率
+	fun updateCurrencyRateFromServer(config: AppConfigTable) {
+		doAsync {
+			SharedWallet.updateCurrencyCode(config.currencyCode)
+			GoldStoneAPI.getCurrencyRate(
+				config.currencyCode,
+				{
+					LogUtil.error("Request of get currency rate has error")
+				}
+			) {
+				// 更新 `SharePreference` 中的值
+				SharedWallet.updateCurrentRate(it)
+				// 更新数据库的值
+				SupportCurrencyTable.updateUsedRateValue(it)
+			}
+		}
+	}
+
 	private fun WalletTable.checkOrUpdateEOSAccount() {
 		EOSAPI.getAccountNameByPublicKey(
 			currentEOSAddress,
@@ -74,7 +94,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			type.isLTC() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
 			}
-			type.isEOS() -> if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+			type.isEOS() -> if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 				cacheWalletData(wallet, callback)
 			} else NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
@@ -89,21 +109,21 @@ class SplashPresenter(val activity: SplashActivity) {
 				cacheWalletData(wallet, callback)
 			}
 			type.isETHSeries() -> {
-				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
 				}
 			}
 			type.isBIP44() -> {
-				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
 				}
 			}
 			type.isMultiChain() -> {
-				if (Config.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
@@ -138,23 +158,6 @@ class SplashPresenter(val activity: SplashActivity) {
 		}
 	}
 
-	// 获取当前的汇率
-	fun updateCurrencyRateFromServer(config: AppConfigTable) {
-		doAsync {
-			Config.updateCurrencyCode(config.currencyCode)
-			GoldStoneAPI.getCurrencyRate(
-				config.currencyCode,
-				{
-					LogUtil.error("Request of get currency rate has error")
-				}
-			) {
-				// 更新 `SharePreference` 中的值
-				Config.updateCurrentRate(it)
-				// 更新数据库的值
-				SupportCurrencyTable.updateUsedRateValue(it)
-			}
-		}
-	}
 
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
@@ -162,12 +165,12 @@ class SplashPresenter(val activity: SplashActivity) {
 		WalletTable.getAll {
 			if (isEmpty()) {
 				cleanKeyStoreFile(activity.filesDir)
-				unregisterGoldStoneID(Config.getGoldStoneID())
+				unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 			} else {
 				val needUnregister =
-					!Config.getNeedUnregisterGoldStoneID().equals("Default", true)
+					!SharedWallet.getNeedUnregisterGoldStoneID().equals("Default", true)
 				if (needUnregister) {
-					unregisterGoldStoneID(Config.getNeedUnregisterGoldStoneID())
+					unregisterGoldStoneID(SharedWallet.getNeedUnregisterGoldStoneID())
 				}
 			}
 			callback()
@@ -180,17 +183,17 @@ class SplashPresenter(val activity: SplashActivity) {
 				targetGoldStoneID,
 				{
 					// 出现请求错误标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
-					Config.updateUnregisterGoldStoneID(targetGoldStoneID)
+					SharedWallet.updateUnregisterGoldStoneID(targetGoldStoneID)
 					LogUtil.error("unregisterDevice", it)
 				}
 			) { isSuccessful ->
 				// 服务器操作失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`, 成功的话清空.
 				val newID = if (isSuccessful) "Default" else targetGoldStoneID
-				Config.updateUnregisterGoldStoneID(newID)
+				SharedWallet.updateUnregisterGoldStoneID(newID)
 			}
 		} else {
 			// 没有网络的情况下标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
-			Config.updateUnregisterGoldStoneID(targetGoldStoneID)
+			SharedWallet.updateUnregisterGoldStoneID(targetGoldStoneID)
 		}
 	}
 
@@ -209,18 +212,18 @@ class SplashPresenter(val activity: SplashActivity) {
 	private fun cacheWalletData(wallet: WalletTable, callback: () -> Unit) {
 		wallet.apply {
 			doAsync {
-				Config.updateCurrentEthereumAddress(currentETHSeriesAddress)
-				Config.updateCurrentBTCAddress(currentBTCAddress)
-				Config.updateCurrentBTCSeriesTestAddress(currentBTCSeriesTestAddress)
-				Config.updateCurrentETCAddress(currentETCAddress)
-				Config.updateCurrentLTCAddress(currentLTCAddress)
-				Config.updateCurrentBCHAddress(currentBCHAddress)
-				Config.updateCurrentEOSAddress(currentEOSAddress)
-				Config.updateCurrentEOSName(currentEOSAccountName.getCurrent())
-				Config.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				Config.updateCurrentWalletID(id)
-				Config.updateCurrentBalance(balance.orElse(0.0))
-				Config.updateCurrentName(name)
+				SharedAddress.updateCurrentEthereum(currentETHSeriesAddress)
+				SharedAddress.updateCurrentBTC(currentBTCAddress)
+				SharedAddress.updateCurrentBTCSeriesTest(currentBTCSeriesTestAddress)
+				SharedAddress.updateCurrentETC(currentETCAddress)
+				SharedAddress.updateCurrentLTC(currentLTCAddress)
+				SharedAddress.updateCurrentBCH(currentBCHAddress)
+				SharedAddress.updateCurrentEOS(currentEOSAddress)
+				SharedAddress.updateCurrentEOSName(currentEOSAccountName.getCurrent())
+				SharedWallet.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
+				SharedWallet.updateCurrentWalletID(id)
+				SharedWallet.updateCurrentBalance(balance.orElse(0.0))
+				SharedWallet.updateCurrentName(name)
 				uiThread { callback() }
 			}
 		}

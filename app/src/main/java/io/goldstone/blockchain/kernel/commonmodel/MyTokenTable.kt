@@ -8,9 +8,10 @@ import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -84,7 +85,7 @@ data class MyTokenTable(
 	companion object {
 		fun updateEOSAccountName(name: String, address: String) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address, Config.getEOSCurrentChain().id)
+				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address, SharedChain.getEOSCurrent().id)
 			}
 		}
 
@@ -121,21 +122,6 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getMyTokenByContractAndWalletAddress(
-			contract: TokenContract,
-			walletAddress: String,
-			callback: (MyTokenTable?) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(
-						contract.contract.orEmpty(),
-						walletAddress,
-						contract.getCurrentChainID().id
-					)
-			} then (callback)
-		}
-
 		fun deleteByContract(
 			contract: TokenContract,
 			address: String,
@@ -145,18 +131,6 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.myTokenDao()
 					.deleteByContractAndAddress(address, contract.contract.orEmpty())
 			} then { callback() }
-		}
-
-		fun deleteByAddress(
-			address: String,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					deleteAll(getAll(address))
-					callback()
-				}
-			}
 		}
 
 		fun insertBySymbolAndContract(
@@ -214,7 +188,7 @@ data class MyTokenTable(
 						hold(balance, RequestError.None)
 					}
 				contract.isBTC() ->
-					BitcoinApi.getBalance(ownerName) { balance, error ->
+					BitcoinApi.getBalance(ownerName, false) { balance, error ->
 						hold(balance?.toBTCCount(), error)
 					}
 				contract.isLTC() ->
@@ -223,15 +197,15 @@ data class MyTokenTable(
 					}
 
 				contract.isBCH() ->
-					BitcoinCashApi.getBalance(ownerName) { balance, error ->
+					BitcoinCashApi.getBalance(ownerName, false) { balance, error ->
 						hold(balance, error)
 					}
 
 				contract.isEOS() -> {
 					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 					// 网络请求在这额外校验一次.
-					if (Config.getCurrentEOSAccount().isValid()) {
-						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSAccount(), { hold(null, it) }) {
+					if (SharedAddress.getCurrentEOSAccount().isValid()) {
+						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), { hold(null, it) }) {
 							hold(it, RequestError.None)
 						}
 					} else hold(null, RequestError.None)
@@ -270,6 +244,9 @@ interface MyTokenDao {
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
+
+	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress")
+	fun deleteAllByAddress(walletAddress: String)
 
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>

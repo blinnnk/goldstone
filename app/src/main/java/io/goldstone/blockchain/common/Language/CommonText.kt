@@ -41,11 +41,11 @@ object CommonText {
 	@JvmField
 	val calculating = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Calculating ..."
-		HoneyLanguage.Chinese.code -> "Calculating ..."
-		HoneyLanguage.Japanese.code -> "Calculating ..."
-		HoneyLanguage.Korean.code -> "Calculating ..."
-		HoneyLanguage.Russian.code -> "Calculating ..."
-		HoneyLanguage.TraditionalChinese.code -> "Calculating ..."
+		HoneyLanguage.Chinese.code -> "正在计算..."
+		HoneyLanguage.Japanese.code -> "計算中..."
+		HoneyLanguage.Korean.code -> "계산 중 ..."
+		HoneyLanguage.Russian.code -> "Расчет ..."
+		HoneyLanguage.TraditionalChinese.code -> "正在計算..."
 		else -> ""
 	}
 	@JvmField
