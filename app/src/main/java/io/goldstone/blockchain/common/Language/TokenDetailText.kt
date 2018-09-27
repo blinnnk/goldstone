@@ -6,6 +6,8 @@ package io.goldstone.blockchain.common.language
  */
 
 object TokenDetailText {
+
+	//	····················转账记录相关····················
 	@JvmField
 	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recipient Address"
@@ -96,6 +98,39 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "轉賬提示"
 		else -> ""
 	}
+
+	//	····················Token/资产信息····················
+	//	tab标题
+	@JvmField
+	val assets = when (currentLanguage) {  HoneyLanguage.English.code -> "Assets"
+		HoneyLanguage.Chinese.code -> "资产"
+		HoneyLanguage.Japanese.code -> "資産"
+		HoneyLanguage.Korean.code -> "자산"
+		HoneyLanguage.Russian.code -> "Активы"
+		HoneyLanguage.TraditionalChinese.code -> "資產"
+		else -> ""
+	}
+	@JvmField
+	val information = when (currentLanguage) {  HoneyLanguage.English.code -> "Information"
+		HoneyLanguage.Chinese.code -> "信息"
+		HoneyLanguage.Japanese.code -> "情報"
+		HoneyLanguage.Korean.code -> "통화 정보"
+		HoneyLanguage.Russian.code -> "Информация"
+		HoneyLanguage.TraditionalChinese.code -> "信息"
+		else -> ""
+	}
+	@JvmField
+	val transactionList = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Transaction List"
+		HoneyLanguage.Chinese.code -> "账单记录"
+		HoneyLanguage.Japanese.code -> "取引リスト"
+		HoneyLanguage.Korean.code -> "결제 기록"
+		HoneyLanguage.Russian.code -> "Список транзакций"
+		HoneyLanguage.TraditionalChinese.code -> "賬單記錄"
+		else -> ""
+	}
+
+	//	····················EOS资源相关····················
 	@JvmField
 	val resources = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Resources"
