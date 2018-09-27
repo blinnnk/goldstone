@@ -1,7 +1,8 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.value.WebUrl
 import java.io.Serializable
 
@@ -28,12 +29,12 @@ class ChainID(val id: String) : Serializable {
 
 	fun isCurrent(): Boolean {
 		return when (id) {
-			btcMain, btcTest -> id.equals(Config.getBTCCurrentChain().id, true)
-			ltcMain, ltcTest -> id.equals(Config.getLTCCurrentChain().id, true)
-			bchMain, bchTest -> id.equals(Config.getBCHCurrentChain().id, true)
-			ethMain, ropsten, rinkeby, kovan -> id.equals(Config.getCurrentChain().id, true)
-			etcMain, etcTest -> id.equals(Config.getETCCurrentChain().id, true)
-			eosMain, eosTest -> id.equals(Config.getEOSCurrentChain().id, true)
+			btcMain, btcTest -> id.equals(SharedChain.getBTCCurrent().id, true)
+			ltcMain, ltcTest -> id.equals(SharedChain.getLTCCurrent().id, true)
+			bchMain, bchTest -> id.equals(SharedChain.getBCHCurrent().id, true)
+			ethMain, ropsten, rinkeby, kovan -> id.equals(SharedChain.getCurrentETH().id, true)
+			etcMain, etcTest -> id.equals(SharedChain.getETCCurrent().id, true)
+			eosMain, eosTest -> id.equals(SharedChain.getEOSCurrent().id, true)
 			else -> false
 		}
 	}
@@ -51,13 +52,13 @@ class ChainID(val id: String) : Serializable {
 
 	fun getCurrentAddress(): String {
 		return when (id) {
-			etcMain, etcTest -> Config.getCurrentETCAddress()
-			btcTest, ltcTest, bchTest -> Config.getCurrentBTCSeriesTestAddress()
-			btcMain -> Config.getCurrentBTCAddress()
-			ltcMain -> Config.getCurrentLTCAddress()
-			bchMain -> Config.getCurrentBCHAddress()
-			eosMain, eosTest -> Config.getCurrentEOSAddress()
-			else -> Config.getCurrentETCAddress()
+			etcMain, etcTest -> SharedAddress.getCurrentETC()
+			btcTest, ltcTest, bchTest -> SharedAddress.getCurrentBTCSeriesTest()
+			btcMain -> SharedAddress.getCurrentBTC()
+			ltcMain -> SharedAddress.getCurrentLTC()
+			bchMain -> SharedAddress.getCurrentBCH()
+			eosMain, eosTest -> SharedAddress.getCurrentEOS()
+			else -> SharedAddress.getCurrentETC()
 		}
 	}
 

@@ -8,9 +8,11 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -72,7 +74,7 @@ class TokenAssetPresenter(
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
 			Bundle().apply {
-				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSAccount().accountName)
+				putString(ArgumentKey.defaultEOSAccountName, SharedAddress.getCurrentEOSAccount().accountName)
 			},
 			2
 		)
@@ -101,7 +103,7 @@ class TokenAssetPresenter(
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val account = Config.getCurrentEOSAccount()
+		val account = SharedAddress.getCurrentEOSAccount()
 		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
@@ -124,10 +126,10 @@ class TokenAssetPresenter(
 
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val account = Config.getCurrentEOSAccount()
+		val account = SharedAddress.getCurrentEOSAccount()
 		EOSTransactionTable.getTransactionByAccountName(
 			account.accountName,
-			Config.getEOSCurrentChain()
+			SharedChain.getEOSCurrent()
 		) { localData ->
 			if (localData.isEmpty()) {
 				EOSAPI.getTransactionsLastIndex(
@@ -156,7 +158,7 @@ class TokenAssetPresenter(
 		val availableNet = netLimit.max - netLimit.used
 		val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
 		val ramEOSCount =
-			"≈ " + (availableRAM.toDouble() * Config.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
+			"≈ " + (availableRAM.toDouble() * SharedValue.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
 		fragment.setResourcesValue(
 			availableRAM,
 			ramQuota,

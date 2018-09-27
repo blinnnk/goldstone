@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -108,7 +108,7 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
-			if (contract.isETC()) Config.getETCCurrentChainName()
+			if (contract.isETC()) SharedChain.getETCCurrentName()
 			else CoinSymbol(getUnitSymbol()).getCurrentChainName(),
 			errorCallback
 		) { memo ->

@@ -3,8 +3,8 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.AesCrypto
-import io.goldstone.blockchain.common.value.Config
 
 /**
  * @date 2018/6/17 2:16 PM
@@ -28,7 +28,7 @@ object ParameterUtil {
 	}
 
 	fun <T> prepareJsonRPC(
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		isEncrypt: Boolean = SharedValue.isEncryptERCNodeRequest(),
 		method: String,
 		id: Int?,
 		hasLatest: Boolean,
@@ -53,7 +53,7 @@ object ParameterUtil {
 	}
 
 	fun <T> preparePairJsonRPC(
-		isEncrypt: Boolean = Config.isEncryptERCNodeRequest(),
+		isEncrypt: Boolean = SharedValue.isEncryptERCNodeRequest(),
 		method: String,
 		hasLatest: Boolean,
 		isRPC2: Boolean,

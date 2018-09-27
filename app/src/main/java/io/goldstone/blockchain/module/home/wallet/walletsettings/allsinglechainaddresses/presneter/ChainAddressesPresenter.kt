@@ -9,9 +9,9 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -124,7 +124,7 @@ class ChainAddressesPresenter(
 								}
 
 							fragment.coinType.isBTC() -> {
-								if (Config.isTestEnvironment()) {
+								if (SharedValue.isTestEnvironment()) {
 									AddressManagerPresenter.createBTCTestAddress(this, password) {
 										updateAddressManagerDataBy(ChainType.AllTest, it)
 										diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
@@ -174,7 +174,7 @@ class ChainAddressesPresenter(
 					fragment.coinType.isBCH() -> presenter.getBitcoinCashAddresses(this)
 					fragment.coinType.isEOS() -> presenter.getEOSAddresses(this)
 					fragment.coinType.isBTC() -> {
-						if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
+						if (SharedValue.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
 						else presenter.getBitcoinAddresses(this)
 					}
 				}
@@ -250,9 +250,9 @@ class ChainAddressesPresenter(
 
 				fragment.coinType.isBTC() -> {
 					val addresses =
-						if (Config.isTestEnvironment()) btcSeriesTestAddresses else btcAddresses
+						if (SharedValue.isTestEnvironment()) btcSeriesTestAddresses else btcAddresses
 					val currentAddress =
-						if (Config.isTestEnvironment()) currentBTCSeriesTestAddress else currentBTCAddress
+						if (SharedValue.isTestEnvironment()) currentBTCSeriesTestAddress else currentBTCAddress
 					fragment.asyncData =
 						AddressManagerPresenter.convertToChildAddresses(addresses).toArrayList()
 					getAddressIndexByChainType(ChainType.BTC) {

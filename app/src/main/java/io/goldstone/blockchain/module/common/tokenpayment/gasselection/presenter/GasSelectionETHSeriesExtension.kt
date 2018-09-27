@@ -9,7 +9,8 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
@@ -31,7 +32,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
-import kotlin.math.sign
 
 /**
  * @date 2018/7/25 4:02 PM
@@ -46,7 +46,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		token?.contract.isETH() -> {
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentEthereumAddress()
+				SharedAddress.getCurrentEthereum()
 			) { balance, error ->
 				hold(balance.orZero() >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0), error)
 			}
@@ -55,7 +55,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		token?.contract.isETC() -> {
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentETCAddress()
+				SharedAddress.getCurrentETC()
 			) { balance, error ->
 				hold(balance.orZero() >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0), error)
 			}
@@ -66,12 +66,12 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 			// 首先查询 `Token Balance` 余额
 			MyTokenTable.getBalanceByContract(
 				token?.contract.orEmpty(),
-				Config.getCurrentEthereumAddress()
+				SharedAddress.getCurrentEthereum()
 			) { tokenBalance, error ->
 				// 查询 `ETH` 余额
 				MyTokenTable.getBalanceByContract(
 					TokenContract.ETH,
-					Config.getCurrentEthereumAddress()
+					SharedAddress.getCurrentEthereum()
 				) { ethBalance, ethError ->
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
 					val isEnough =
@@ -112,14 +112,14 @@ fun GasSelectionPresenter.insertCustomGasData() {
  * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
  */
 private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
-	if (getToken()?.contract.isETC()) Config.getCurrentETCAddress()
-	else Config.getCurrentEthereumAddress()
+	if (getToken()?.contract.isETC()) SharedAddress.getCurrentETC()
+	else SharedAddress.getCurrentEthereum()
 
 private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	password: String,
 	@WorkerThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
+	val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
 	// 获取当前账户的私钥
 	fragment.context?.getPrivateKey(
 		getETHERC20OrETCAddress(),

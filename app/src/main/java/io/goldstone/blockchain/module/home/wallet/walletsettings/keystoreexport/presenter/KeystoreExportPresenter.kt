@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58KeyStoreFile
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
@@ -65,7 +65,7 @@ class KeystoreExportPresenter(
 	) {
 		doAsync {
 			val isSingleChainWallet =
-				!Config.getCurrentWalletType().isBIP44()
+				!SharedWallet.getCurrentWalletType().isBIP44()
 			if (ChainAddresses.isBTCSeriesAddress(address) || EOSWalletUtils.isValidAddress(address)) {
 				getBTCSeriesKeystoreFile(address, password, isSingleChainWallet) { keystoreJSON ->
 					uiThread { hold(keystoreJSON) }

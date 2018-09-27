@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 
 
 /**
@@ -37,9 +37,9 @@ object CryptoName {
 
 	fun getBTCSeriesChainIDByName(name: String): ChainID? {
 		return listOf(
-			Pair(ltc, Config.getLTCCurrentChain()),
-			Pair(bch, Config.getBCHCurrentChain()),
-			Pair(btc, Config.getBTCCurrentChain())
+			Pair(ltc, SharedChain.getLTCCurrent()),
+			Pair(bch, SharedChain.getBCHCurrent()),
+			Pair(btc, SharedChain.getBTCCurrent())
 		).firstOrNull {
 			it.first
 				.replace(" ", "")

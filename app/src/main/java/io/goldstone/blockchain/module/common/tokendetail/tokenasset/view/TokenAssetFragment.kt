@@ -22,10 +22,11 @@ import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
@@ -71,7 +72,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		GraySquareCell(context!!).apply {
 			showArrow()
 			setTitle(TokenDetailText.authority)
-			setSubtitle(Config.getCurrentEOSAccount().accountName)
+			setSubtitle(SharedAddress.getCurrentEOSAccount().accountName)
 			click { presenter.showPublicKeyAccountNames() }
 		}
 	}
@@ -80,11 +81,11 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		GraySquareCell(context!!).apply {
 			setTitle("Public Key")
 			val address =
-				if (Config.getCurrentEOSAddress().isEmpty()) "Account Name Only"
-				else Config.getCurrentEOSAddress().scaleTo(24)
+				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
+				else SharedAddress.getCurrentEOS().scaleTo(24)
 			setSubtitle(address)
 			onClick {
-				this@apply.context?.clickToCopy(Config.getCurrentEOSAddress())
+				this@apply.context?.clickToCopy(SharedAddress.getCurrentEOS())
 				preventDuplicateClicks()
 			}
 		}
@@ -232,7 +233,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
 			getContainer().apply {
 				onClick {
-					if (Config.isWatchOnlyWallet())
+					if (SharedWallet.isWatchOnlyWallet())
 						this@TokenAssetFragment.context.alert(AlertText.watchOnly)
 					else presenter.showResourceTradingFragmentByTitle(info.second)
 					preventDuplicateClicks()

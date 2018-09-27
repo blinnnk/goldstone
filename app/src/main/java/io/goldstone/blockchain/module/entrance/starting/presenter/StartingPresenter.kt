@@ -10,7 +10,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -45,8 +45,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 	fun updateWalletInfoForUserInfo(walletList: List<WalletTable>) {
 		walletList.apply {
 			// 记录当前最大的钱包 `ID` 用来生成默认头像和名字
-			Config.updateMaxWalletID(maxBy { it.id }?.id.orZero())
-			Config.updateWalletCount(size)
+			SharedWallet.updateMaxWalletID(maxBy { it.id }?.id.orZero())
+			SharedWallet.updateWalletCount(size)
 		}
 	}
 
@@ -88,7 +88,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 								SupportCurrencyTable(item).apply {
 									isUsed = true
 									// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-									Config.updateCurrentRate(rate)
+									SharedWallet.updateCurrentRate(rate)
 								}
 							} else {
 								SupportCurrencyTable(item)

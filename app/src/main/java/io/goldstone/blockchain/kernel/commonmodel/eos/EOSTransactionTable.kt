@@ -3,9 +3,10 @@ package io.goldstone.blockchain.kernel.commonmodel.eos
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -49,8 +50,8 @@ data class EOSTransactionTable(
 		response.executedStatus,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
 		info.fromAccount.accountName,
-		Config.getCurrentEOSAddress(),
-		Config.getEOSCurrentChain().id,
+		SharedAddress.getCurrentEOS(),
+		SharedChain.getEOSCurrent().id,
 		true
 	)
 
@@ -65,8 +66,8 @@ data class EOSTransactionTable(
 		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
 		status = true,
 		recordAccountName = recordAccountName,
-		recordPublicKey = Config.getCurrentEOSAddress(),
-		chainID = Config.getEOSCurrentChain().id,
+		recordPublicKey = SharedAddress.getCurrentEOS(),
+		chainID = SharedChain.getEOSCurrent().id,
 		isPending = false
 	)
 

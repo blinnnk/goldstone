@@ -6,8 +6,9 @@ import android.support.annotation.UiThread
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -65,7 +66,7 @@ class PrivateKeyExportPresenter(
 			password: String,
 			hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
+			val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
 			when {
 				chainType.isBTC() || chainType.isBCH() || chainType.isEOS() || chainType.isAllTest() ->
 					getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
@@ -114,9 +115,9 @@ class PrivateKeyExportPresenter(
 				{ hold(null, it) }
 			) { privateKeyInteger ->
 				hold(when {
-					ChainType.isSamePrivateKeyRule(chainType) && Config.isTestEnvironment() -> {
+					ChainType.isSamePrivateKeyRule(chainType) && SharedValue.isTestEnvironment() -> {
 						val net =
-							if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
+							if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
 						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(net)
 					}
 					chainType.isLTC() ->

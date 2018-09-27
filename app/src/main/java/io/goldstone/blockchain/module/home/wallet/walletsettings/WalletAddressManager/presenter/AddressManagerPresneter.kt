@@ -11,10 +11,11 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -55,7 +56,7 @@ class AddressManagerPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		if (Config.getCurrentWalletType().isBIP44()) fragment.showCreatorDashboard()
+		if (SharedWallet.getCurrentWalletType().isBIP44()) fragment.showCreatorDashboard()
 	}
 
 	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
@@ -189,7 +190,7 @@ class AddressManagerPresenter(
 			walletSettingsFragment: WalletSettingsFragment
 		) {
 			walletSettingsFragment.apply {
-				if (!Config.isWatchOnlyWallet()) {
+				if (!SharedWallet.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
 						Bundle().apply {
@@ -216,7 +217,7 @@ class AddressManagerPresenter(
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false)
-				if (!Config.isWatchOnlyWallet()) {
+				if (!SharedWallet.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
 						Bundle().apply { putString(ArgumentKey.address, address) }
@@ -307,7 +308,7 @@ class AddressManagerPresenter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentEOSAddress(),
+				SharedAddress.getCurrentEOS(),
 				true,
 				false
 			) { isCorrect ->
@@ -362,7 +363,7 @@ class AddressManagerPresenter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentBTCAddress(),
+				SharedAddress.getCurrentBTC(),
 				true,
 				false
 			) { isCorrect ->
@@ -419,7 +420,7 @@ class AddressManagerPresenter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentBTCSeriesTestAddress(),
+				SharedAddress.getCurrentBTCSeriesTest(),
 				true,
 				false
 			) { isCorrect ->
@@ -488,7 +489,7 @@ class AddressManagerPresenter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentBCHAddress(),
+				SharedAddress.getCurrentBCH(),
 				true,
 				false
 			) { isCorrect ->
@@ -542,7 +543,7 @@ class AddressManagerPresenter(
 		) {
 			context.verifyKeystorePassword(
 				password,
-				Config.getCurrentLTCAddress(),
+				SharedAddress.getCurrentLTC(),
 				true,
 				false
 			) { isCorrect ->

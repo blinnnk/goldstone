@@ -6,13 +6,12 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -51,7 +50,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val incomeTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(Config.getCurrentEOSAccount().accountName)
+			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.gainConfirmEvent {
@@ -69,7 +68,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val expendTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(Config.getCurrentEOSAccount().accountName)
+			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
 			if (tradingType.isRAM()) setSellingRAMStyle()
 			setConfirmClickEvent {
 				showLoading(true)

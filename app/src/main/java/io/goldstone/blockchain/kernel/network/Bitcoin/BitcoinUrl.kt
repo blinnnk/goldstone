@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.WebUrl
 
 /**
@@ -10,12 +10,12 @@ import io.goldstone.blockchain.common.value.WebUrl
 object BitcoinUrl {
 
 	var currentUrl: () -> String = {
-		if (Config.isTestEnvironment()) WebUrl.btcTest
+		if (SharedValue.isTestEnvironment()) WebUrl.btcTest
 		else WebUrl.btcMain
 	}
 
 	val backUpUrl: () -> String = {
-		if (Config.isTestEnvironment()) WebUrl.backupBtcTest
+		if (SharedValue.isTestEnvironment()) WebUrl.backupBtcTest
 		else WebUrl.backUpBtcMain
 	}
 

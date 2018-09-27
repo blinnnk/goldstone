@@ -12,11 +12,14 @@ import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.utils.toList
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
@@ -126,7 +129,7 @@ data class WalletTable(
 			chainType.isBCH() -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
 			chainType.isEOS() -> hold(getTargetAddressIndex(eosAddresses, currentEOSAddress))
 			chainType.isBTC() ->
-				if (Config.isTestEnvironment())
+				if (SharedValue.isTestEnvironment())
 					hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
 				else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
 		}
@@ -135,21 +138,21 @@ data class WalletTable(
 	fun getCurrentAddressAndSymbol(): List<Pair<String, String>> {
 		return arrayListOf<Pair<String, String>>().apply {
 			// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
-			if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
+			if (currentBTCAddress.isNotEmpty() && !SharedValue.isTestEnvironment()) {
 				add(Pair(currentBTCAddress, CoinSymbol.btc()))
-			} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+			} else if (currentBTCSeriesTestAddress.isNotEmpty() && SharedValue.isTestEnvironment()) {
 				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.btc()))
 			}
 			// Litecoin Mainnet and Testnet Addresses
-			if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
+			if (currentLTCAddress.isNotEmpty() && !SharedValue.isTestEnvironment()) {
 				add(Pair(currentLTCAddress, CoinSymbol.ltc))
-			} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+			} else if (currentBTCSeriesTestAddress.isNotEmpty() && SharedValue.isTestEnvironment()) {
 				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.ltc))
 			}
 			// Bitcoin Cash Mainnet and Testnet Addresses
-			if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
+			if (currentBCHAddress.isNotEmpty() && !SharedValue.isTestEnvironment()) {
 				add(Pair(currentBCHAddress, CoinSymbol.bch))
-			} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
+			} else if (currentBTCSeriesTestAddress.isNotEmpty() && SharedValue.isTestEnvironment()) {
 				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.bch))
 			}
 			// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
@@ -251,7 +254,7 @@ data class WalletTable(
 				insert(this@WalletTable)
 			}.findWhichIsUsing(true)
 		} then {
-			Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
+			SharedWallet.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
 			it?.apply(callback)
 		}
 	}
@@ -261,8 +264,8 @@ data class WalletTable(
 			EOSAccount(currentEOSAccountName.getCurrent()).isValid() -> EOSWalletType.Available
 			// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 			eosAccountNames.filter {
-				it.chainID.equals(Config.getEOSCurrentChain().id, true) &&
-					it.publicKey.equals(Config.getCurrentEOSAddress(), true)
+				it.chainID.equals(SharedChain.getEOSCurrent().id, true) &&
+					it.publicKey.equals(SharedAddress.getCurrentEOS(), true)
 			}.size > 1 -> EOSWalletType.NoDefault
 			else -> EOSWalletType.Inactivated
 		}
@@ -271,7 +274,7 @@ data class WalletTable(
 	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
-				val currentType = Config.getCurrentWalletType()
+				val currentType = SharedWallet.getCurrentWalletType()
 				when {
 					currentType.isBIP44() -> {
 						val ethAddressCount = ethAddresses.split(",").size
@@ -357,7 +360,7 @@ data class WalletTable(
 		fun getCurrentWallet(isMainThread: Boolean = true, hold: WalletTable.() -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-					balance = Config.getCurrentBalance()
+					balance = SharedWallet.getCurrentBalance()
 					if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
 					else hold(this)
 				}
@@ -662,7 +665,7 @@ data class WalletTable(
 				GoldStoneDataBase.database.walletDao().apply {
 					// 增量存储同一公钥下的多 `AccountName`
 					var currentAccountNames =
-						getWalletByAddress(Config.getCurrentEOSAddress())?.eosAccountNames ?: listOf()
+						getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
 					currentAccountNames += accountNames
 					updateCurrentEOSAccountNames(currentAccountNames)
 				}
@@ -718,7 +721,7 @@ data class WalletTable(
 							callback(willDeleteWallet)
 						} otherwise {
 							update(wallets.first().apply { isUsing = true })
-							Config.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
+							SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
 							callback(willDeleteWallet)
 						}
 					}
@@ -735,7 +738,7 @@ data class WalletTable(
 			confirmEvent: () -> Unit,
 			callback: () -> Unit
 		) {
-			if (Config.isWatchOnlyWallet()) context.alert(AlertText.watchOnly)
+			if (SharedWallet.isWatchOnlyWallet()) context.alert(AlertText.watchOnly)
 			else WalletTable.getCurrentWallet {
 				if (!hasBackUpMnemonic) GoldStoneDialog.show(context) {
 					showButtons(DialogText.goToBackUp) {

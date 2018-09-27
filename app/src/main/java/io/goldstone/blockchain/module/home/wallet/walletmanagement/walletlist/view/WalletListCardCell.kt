@@ -12,6 +12,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -35,7 +36,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 		walletInfo.title.text = currentType
 		walletInfo.subtitle.text = WalletType(model.type).getDisplayName()
 		balanceInfo.title.text = model.balance.formatCurrency()
-		balanceInfo.subtitle.text = (WalletText.totalAssets + " (${Config.getCurrencyCode()})").toUpperCase()
+		balanceInfo.subtitle.text = (WalletText.totalAssets + " (${SharedWallet.getCurrencyCode()})").toUpperCase()
 		avatar.glideImage("")
 		avatar.glideImage(UnlimitedAvatar(model.id, context).getBitmap())
 		val colorSize = WalletColor.getAll().size

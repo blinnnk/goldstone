@@ -2,7 +2,7 @@
 
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.CountryCode
 
 /**
@@ -10,9 +10,9 @@ import io.goldstone.blockchain.common.value.CountryCode
  * @author KaySaith
  */
 var currentLanguage = when {
-	Config.getCurrentLanguageCode() == 100 ->
+	SharedWallet.getCurrentLanguageCode() == 100 ->
 		HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
-	HoneyLanguage.currentLanguageIsSupported() -> Config.getCurrentLanguageCode()
+	HoneyLanguage.currentLanguageIsSupported() -> SharedWallet.getCurrentLanguageCode()
 	else -> HoneyLanguage.English.code
 }
 

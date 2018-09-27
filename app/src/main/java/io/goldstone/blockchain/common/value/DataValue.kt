@@ -12,4 +12,9 @@ object DataValue {
 	const val candleChartCount = 100
 }
 
+object Count {
+	const val pinCode = 4
+	const val retry = 5
+}
+
 data class PageInfo(val from: Int, val to: Int, val maxDataIndex: Int) : Serializable

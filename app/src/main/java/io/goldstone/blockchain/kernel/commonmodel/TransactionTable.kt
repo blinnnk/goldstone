@@ -6,9 +6,10 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
@@ -20,7 +21,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.Serializable
@@ -77,7 +77,7 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = Config.getCurrentChain().id,
+	var chainID: String = SharedChain.getCurrentETH().id,
 	var isFee: Boolean = false,
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
@@ -134,10 +134,10 @@ data class TransactionTable(
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
-		data.fromAddress != Config.getCurrentEthereumAddress(),
+		data.fromAddress != SharedAddress.getCurrentEthereum(),
 		CryptoUtils.isERC20TransferByInputCode(data.input),
 		data.symbol,
-		Config.getCurrentEthereumAddress()
+		SharedAddress.getCurrentEthereum()
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -164,7 +164,7 @@ data class TransactionTable(
 		data.isReceive,
 		true,
 		data.symbol,
-		Config.getCurrentEthereumAddress(),
+		SharedAddress.getCurrentEthereum(),
 		data.to,
 		false,
 		data.logIndex
@@ -173,7 +173,7 @@ data class TransactionTable(
 	constructor(
 		data: JSONObject,
 		isETC: Boolean = false,
-		chainID: String = Config.getCurrentChain().id
+		chainID: String = SharedChain.getCurrentETH().id
 	) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
@@ -199,12 +199,12 @@ data class TransactionTable(
 		"",
 		"",
 		!data.safeGet("from").equals(
-			if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
+			if (isETC) SharedAddress.getCurrentETC() else SharedAddress.getCurrentEthereum(),
 			true
 		),
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
+		if (isETC) SharedAddress.getCurrentETC() else SharedAddress.getCurrentEthereum(),
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice")),
 		chainID = chainID
 	)
@@ -232,12 +232,12 @@ data class TransactionTable(
 		"",
 		"0",
 		"",
-		!data.from.equals(Config.getCurrentETCAddress(), true),
+		!data.from.equals(SharedAddress.getCurrentETC(), true),
 		false,
 		CoinSymbol.etc,
-		Config.getCurrentETCAddress(),
+		SharedAddress.getCurrentETC(),
 		tokenReceiveAddress = data.to,
-		chainID = Config.getETCCurrentChain().id,
+		chainID = SharedChain.getETCCurrent().id,
 		isFee = data.isFee,
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
@@ -248,12 +248,12 @@ data class TransactionTable(
 		value: String,
 		tokenReceiveAddress: String?
 	) {
-		this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
+		this.isReceive = SharedAddress.getCurrentEthereum().equals(tokenReceiveAddress, true)
 		this.isERC20Token = isERC20Token
 		this.symbol = symbol
 		this.value = value
 		this.tokenReceiveAddress = tokenReceiveAddress
-		this.recordOwnerAddress = Config.getCurrentEthereumAddress()
+		this.recordOwnerAddress = SharedAddress.getCurrentEthereum()
 		this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
 	}
 
@@ -261,7 +261,7 @@ data class TransactionTable(
 		// `ERC` 类型的 `Transactions` 专用
 		fun getTokenTransactions(address: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, Config.getCurrentChain().id)
+				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().id)
 			} then { it ->
 				hold(it.map { TransactionListModel(it) })
 			}
@@ -361,7 +361,7 @@ interface TransactionDao {
 	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
-	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = Config.getETCCurrentChain().id): List<TransactionTable>
+	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().id): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>

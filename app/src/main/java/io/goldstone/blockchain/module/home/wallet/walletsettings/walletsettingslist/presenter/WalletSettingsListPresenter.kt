@@ -8,11 +8,11 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -46,12 +46,12 @@ class WalletSettingsListPresenter(
 
 	override fun updateData() {
 		val balanceText =
-			Config.getCurrentBalance().formatCurrency() + " (${Config.getCurrencyCode()})"
+			SharedWallet.getCurrentBalance().formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
 		WalletTable.getCurrentWallet {
 			arrayListOf(
 				WalletSettingsListModel(WalletSettingsText.viewAddresses),
 				WalletSettingsListModel(WalletSettingsText.balance, balanceText),
-				WalletSettingsListModel(WalletSettingsText.walletName, Config.getCurrentName()),
+				WalletSettingsListModel(WalletSettingsText.walletName, SharedWallet.getCurrentName()),
 				WalletSettingsListModel(WalletSettingsText.hint, "******"),
 				WalletSettingsListModel(WalletSettingsText.passwordSettings),
 				WalletSettingsListModel(
@@ -85,9 +85,9 @@ class WalletSettingsListPresenter(
 		showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,
-			!Config.isWatchOnlyWallet()
+			!SharedWallet.isWatchOnlyWallet()
 		) { passwordInput ->
-			if (Config.isWatchOnlyWallet()) WalletTable.getWatchOnlyWallet {
+			if (SharedWallet.isWatchOnlyWallet()) WalletTable.getWatchOnlyWallet {
 				deleteWatchOnlyWallet(first, second)
 			} else {
 				val password = passwordInput?.text.toString()

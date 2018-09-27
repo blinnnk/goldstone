@@ -6,7 +6,9 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
@@ -44,8 +46,8 @@ private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
 	password: String,
 	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
-	if (Config.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
+	val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
+	if (SharedValue.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
 		isSingleChainWallet,
@@ -78,10 +80,10 @@ fun GasSelectionPresenter.transferLTC(
 					changeAddress,
 					unspents,
 					privateKey!!,
-					Config.isTestEnvironment()
+					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						Config.getLTCCurrentChainName(),
+						SharedChain.getLTCCurrentName(),
 						signedModel.signedMessage,
 						callback
 					) { hash ->

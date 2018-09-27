@@ -16,10 +16,12 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -152,7 +154,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	override val presenter = AddressManagerPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		if (Config.getCurrentWalletType().isBIP44()) showCreatorDashboard()
+		if (SharedWallet.getCurrentWalletType().isBIP44()) showCreatorDashboard()
 		scrollView {
 			lparams(matchParent, matchParent)
 			verticalLayout parent@{
@@ -185,7 +187,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						eosAddressesView.currentWallet = this
 						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 						presenter.getEOSAddresses(this)
-						if (!Config.isTestEnvironment()) {
+						if (!SharedValue.isTestEnvironment()) {
 							presenter.getBitcoinAddresses(this)
 							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
 							// BCH List
@@ -238,10 +240,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
-		val title = if (Config.isTestEnvironment()) {
+		val title = if (SharedValue.isTestEnvironment()) {
 			"${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
 		} else {
-			WalletSettingsText.bitcoinAddress(Config.getYingYongBaoInReviewStatus())
+			WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
 		}
 		btcAddressesView.setTitle(title)
 		btcAddressesView.model = model
@@ -301,7 +303,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					}
 
 				WalletSettingsText.newLTCAddress -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						AddressManagerPresenter.createBTCTestAddress(this, password) {
 							btcAddressesView.model = it
 						}
@@ -313,7 +315,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				}
 
 				WalletSettingsText.newBCHAddress -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						AddressManagerPresenter.createBTCTestAddress(this, password) {
 							btcAddressesView.model = it
 						}
@@ -325,7 +327,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				}
 
 				WalletSettingsText.newBTCAddress -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						AddressManagerPresenter.createBTCTestAddress(this, password) {
 							btcAddressesView.model = it
 						}
@@ -353,16 +355,16 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					else {
 						updateWalletDetail()
 						WalletTable.getCurrentWallet {
-							when  {
+							when {
 								coinType.isETH() -> presenter.getEthereumAddresses(this)
 								coinType.isETC() -> presenter.getEthereumClassicAddresses(this)
 								coinType.isEOS() -> presenter.getEOSAddresses(this)
 								coinType.isLTC() -> {
-									if (Config.isTestEnvironment()) presenter.getLitecoinTestAddresses(this)
+									if (SharedValue.isTestEnvironment()) presenter.getLitecoinTestAddresses(this)
 									else presenter.getLitecoinAddresses(this)
 								}
 								coinType.isBTC() -> {
-									if (Config.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
+									if (SharedValue.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
 									else presenter.getBitcoinAddresses(this)
 								}
 							}
@@ -432,12 +434,12 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			context.showAlertView(
 				WalletSettingsText.createSubAccount,
 				WalletSettingsText.createSubAccountIntro,
-				!Config.isWatchOnlyWallet()
+				!SharedWallet.isWatchOnlyWallet()
 			) { passwordInput ->
 				val password = passwordInput?.text.toString()
 				context.verifyKeystorePassword(
 					password,
-					Config.getCurrentBTCAddress(),
+					SharedAddress.getCurrentBTC(),
 					true,
 					false
 				) {

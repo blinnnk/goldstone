@@ -2,7 +2,9 @@ package io.goldstone.blockchain.crypto.multichain
 
 import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
@@ -19,13 +21,13 @@ class ChainType(val id: Int) : Serializable {
 
 	fun getCurrentChainName(): String {
 		return when (id) {
-			ChainType.ETH.id -> Config.getCurrentChainName()
-			ChainType.ETC.id -> Config.getETCCurrentChainName()
-			ChainType.BTC.id -> Config.getBTCCurrentChainName()
-			ChainType.LTC.id -> Config.getLTCCurrentChainName()
-			ChainType.BCH.id -> Config.getBCHCurrentChainName()
-			ChainType.EOS.id -> Config.getEOSCurrentChainName()
-			else -> Config.getCurrentChainName()
+			ChainType.ETH.id -> SharedChain.getCurrentETHName()
+			ChainType.ETC.id -> SharedChain.getETCCurrentName()
+			ChainType.BTC.id -> SharedChain.getBTCCurrentName()
+			ChainType.LTC.id -> SharedChain.getLTCCurrentName()
+			ChainType.BCH.id -> SharedChain.getBCHCurrentName()
+			ChainType.EOS.id -> SharedChain.getEOSCurrentName()
+			else -> SharedChain.getCurrentETHName()
 		}
 	}
 
@@ -45,8 +47,8 @@ class ChainType(val id: Int) : Serializable {
 		return when (id) {
 			ChainType.ETH.id -> {
 				// 这个是节点选择显示链名字的地方用到的, 如果当前不是主网链, 那么默认推荐使用 `InfuraMain`
-				if (!Config.getCurrentChain().isETHMain()) ChainText.infuraMain
-				else Config.getCurrentChainName()
+				if (!SharedChain.getCurrentETH().isETHMain()) ChainText.infuraMain
+				else SharedChain.getCurrentETHName()
 			}
 
 			ChainType.BTC.id -> ChainText.btcMain
@@ -55,8 +57,8 @@ class ChainType(val id: Int) : Serializable {
 			ChainType.EOS.id -> ChainText.eosMain
 
 			else -> {
-				if (!Config.getETCCurrentChain().isETCMain()) ChainText.etcMainGasTracker
-				else Config.getETCCurrentChainName()
+				if (!SharedChain.getETCCurrent().isETCMain()) ChainText.etcMainGasTracker
+				else SharedChain.getETCCurrentName()
 			}
 		}
 	}
@@ -76,16 +78,16 @@ class ChainType(val id: Int) : Serializable {
 		return when (id) {
 			ChainType.ETH.id -> {
 				// 这个是节点选择显示链名字的地方用到的, 如果当前是主网链, 那么默认推荐使用 `InfuraRopsten`
-				if (Config.getCurrentChain().isETHMain()) ChainText.infuraRopsten
-				else Config.getCurrentChainName()
+				if (SharedChain.getCurrentETH().isETHMain()) ChainText.infuraRopsten
+				else SharedChain.getCurrentETHName()
 			}
 			ChainType.BTC.id -> ChainText.btcTest
 			ChainType.LTC.id -> ChainText.ltcTest
 			ChainType.BCH.id -> ChainText.bchTest
 			ChainType.EOS.id -> ChainText.eosTest
 			else -> {
-				if (Config.getETCCurrentChain().isETCMain()) ChainText.etcMorden
-				else Config.getETCCurrentChainName()
+				if (SharedChain.getETCCurrent().isETCMain()) ChainText.etcMorden
+				else SharedChain.getETCCurrentName()
 			}
 		}
 	}
@@ -100,35 +102,35 @@ class ChainType(val id: Int) : Serializable {
 			val currentWallet = walletDao.findWhichIsUsing(true)
 			when (id) {
 				ChainType.ETH.id -> {
-					Config.updateCurrentEthereumAddress(newAddress)
+					SharedAddress.updateCurrentEthereum(newAddress)
 					currentWallet?.currentETHSeriesAddress = newAddress
 				}
 				ChainType.ETC.id -> {
 					currentWallet?.currentETCAddress = newAddress
-					Config.updateCurrentETCAddress(newAddress)
+					SharedAddress.updateCurrentETC(newAddress)
 				}
 				ChainType.LTC.id -> {
 					currentWallet?.currentLTCAddress = newAddress
-					Config.updateCurrentLTCAddress(newAddress)
+					SharedAddress.updateCurrentLTC(newAddress)
 				}
 				ChainType.BCH.id -> {
 					currentWallet?.currentBCHAddress = newAddress
-					Config.updateCurrentBCHAddress(newAddress)
+					SharedAddress.updateCurrentBCH(newAddress)
 				}
 				ChainType.EOS.id -> {
 					currentWallet?.currentEOSAddress = newAddress
 					// 切换 `EOS` 的默认地址, 把 `accountName` 的数据值为初始化状态,
 					// 好在其他流程中重新走检查 `Account Name` 的逻辑
 					currentWallet?.currentEOSAccountName = EOSDefaultAllChainName(newAddress, newAddress)
-					Config.updateCurrentEOSAddress(newAddress)
+					SharedAddress.updateCurrentEOS(newAddress)
 				}
 				ChainType.BTC.id -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						currentWallet?.currentBTCSeriesTestAddress = newAddress
-						Config.updateCurrentBTCSeriesTestAddress(newAddress)
+						SharedAddress.updateCurrentBTCSeriesTest(newAddress)
 					} else {
 						currentWallet?.currentBTCAddress = newAddress
-						Config.updateCurrentBTCAddress(newAddress)
+						SharedAddress.updateCurrentBTC(newAddress)
 					}
 				}
 			}

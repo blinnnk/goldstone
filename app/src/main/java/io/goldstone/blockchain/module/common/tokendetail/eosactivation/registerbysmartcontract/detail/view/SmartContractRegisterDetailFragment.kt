@@ -16,8 +16,12 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.BorderSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.detail.presenter.SmartContractRegisterDetailPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import org.jetbrains.anko.AnkoContext
@@ -76,7 +80,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 
 				SessionTitleView(context).apply { setTitle("REGISTER INFO") }.into(this)
 				availableResultView.apply {
-					text = accountName + "-" + Config.getCurrentEOSAddress()
+					text = accountName + "-" + SharedAddress.getCurrentEOS()
 				}.into(this)
 
 				copyResultButton.apply {

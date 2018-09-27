@@ -11,8 +11,9 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.getAddress
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
@@ -288,13 +289,13 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 	@WorkerThread hold: (Boolean) -> Unit
 ) {
 	doAsync {
-		val currentType = Config.getCurrentWalletType()
+		val currentType = SharedWallet.getCurrentWalletType()
 		when {
 			// 多链钱包随便找一个名下钱包地址进行验证即可
 			currentType.isBIP44() -> {
 				verifyKeystorePassword(
 					password,
-					Config.getCurrentBTCAddress(),
+					SharedAddress.getCurrentBTC(),
 					true,
 					false
 				) {
