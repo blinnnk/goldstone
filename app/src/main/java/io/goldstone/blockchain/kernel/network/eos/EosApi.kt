@@ -379,7 +379,7 @@ object EOSAPI {
 		}
 	}
 	
-	fun getRamBalance(
+	fun getRAMBalance(
 		errorCallBack: (Throwable) -> Unit,
 		@WorkerThread hold: (EosBalanceModel) -> Unit
 	) {

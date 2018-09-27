@@ -17,6 +17,10 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 abstract class BasePresenter<out T : BaseFragment<*>> {
 
 	abstract val fragment: T
+	
+	open fun onFragmentCreate(){
+	
+	}
 
 	open fun onFragmentAttach() {
 		// Do Something When fragment Attach
@@ -36,6 +40,10 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 
 	open fun onFragmentResume() {
 		// Do Something
+	}
+	
+	open fun onFragmentPause() {
+	
 	}
 
 	open fun onFragmentShowFromHidden() {

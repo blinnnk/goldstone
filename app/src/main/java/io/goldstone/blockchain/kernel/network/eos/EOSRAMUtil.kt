@@ -15,7 +15,7 @@ object EOSRAMUtil {
 		unit: EOSUnit,
 		hold:(Double) -> Unit
 	) {
-		EOSAPI.getRamBalance({
+		EOSAPI.getRAMBalance({
 			LogUtil.error("getRAMPrice", it)
 		}) { model ->
 			val divisor = when(unit.value) {
@@ -36,7 +36,7 @@ object EOSRAMUtil {
 		unit: EOSUnit,
 		hold:(Double) -> Unit
 	) {
-		EOSAPI.getRamBalance({
+		EOSAPI.getRAMBalance({
 			LogUtil.error("getRAMAmountByCoin", it)
 		}) { model ->
 			val ramTotal = model.supply.toDouble()

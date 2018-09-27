@@ -8,6 +8,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
@@ -34,7 +35,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 	override val pageTitle: String
-		get() = ""
+		get() = EOSRAMText.ramTradeRoom
 	override val presenter: TraderMemoryDetailPresenter = TraderMemoryDetailPresenter(this)
 
 	@SuppressLint("ResourceType", "CommitTransaction")
@@ -231,4 +232,10 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 			else -> ChainType.ETC
 		}
 	}
+	
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		presenter.onHiddenChanged(hidden)
+	}
+	
 }

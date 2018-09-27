@@ -2,6 +2,9 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytran
 
 import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
+import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI

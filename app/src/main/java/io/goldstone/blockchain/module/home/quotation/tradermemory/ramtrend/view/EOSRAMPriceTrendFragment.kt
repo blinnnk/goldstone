@@ -72,13 +72,4 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 		presenter.updateEosRamPriceTrend(period,  dateType)
 	}
 	
-	override fun onPause() {
-		super.onPause()
-		presenter.onPause()
-	}
-	
-	override fun onHiddenChanged(hidden: Boolean) {
-		super.onHiddenChanged(hidden)
-		presenter.onHiddenChanged(hidden)
-	}
 }

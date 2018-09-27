@@ -13,6 +13,8 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRAMUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradePresenterManager
+import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendCandleChart
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
 import org.jetbrains.anko.runOnUiThread
@@ -25,29 +27,24 @@ import java.math.BigDecimal
  * @description:
  */
 class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
-	: BasePresenter<EOSRAMPriceTrendFragment>() {
+	: BasePresenter<EOSRAMPriceTrendFragment>(), RefreshReceiver {
 	
 	private var todayOpenPrice: String? = null
 	private var todayCurrentPrice: String? = null
 	
-	private var needRefresh = true
-	
-	private val priceTrendHandler = Handler()
-	
-	private val priceTrendRunnable = Runnable {
-		updateHeaderData()
-		postPriceTrend()
-	}
-	
-	private fun postPriceTrend() {
-		if (needRefresh) {
-			priceTrendHandler.postDelayed(priceTrendRunnable, 20 *1000)
-		}
-	}
-	
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
 		updateHeaderData()
+	}
+	
+	override fun onFragmentCreate() {
+		super.onFragmentCreate()
+		RAMTradePresenterManager.register(this)
+	}
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		RAMTradePresenterManager.unRegister(this)
 	}
 	
 	@SuppressLint("SetTextI18n")
@@ -137,8 +134,8 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 				fragment.ramInformationHeader.apply {
 					this@EOSRAMPriceTrendPresenter.todayOpenPrice = it.open
 					startPrice.text = "开盘价：" + BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-					highPrice.text = "   最高：" + BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-					lowPrice.text = "   最低：" + BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					highPrice.text = "    最高：" + BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					lowPrice.text = "    最低：" + BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
 					setTrendPercent()
 				}
 			}
@@ -166,34 +163,11 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		}
 	}
 	
-	
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		needRefresh = false
-		priceTrendHandler.removeCallbacks(priceTrendRunnable)
+	override fun onReceive(any: Any) {
+		LogUtil.debug("refreshing", "刷新收到了")
 	}
 	
-	fun onPause(){
-		needRefresh = false
-		priceTrendHandler.removeCallbacks(priceTrendRunnable)
-	}
 	
-	override fun onFragmentResume() {
-		super.onFragmentResume()
-		priceTrendHandler.removeCallbacks(priceTrendRunnable)
-		needRefresh = true
-		postPriceTrend()
-	}
-	
-	fun onHiddenChanged(hidden: Boolean) {
-		if (hidden) {
-			needRefresh = false
-			priceTrendHandler.removeCallbacks(priceTrendRunnable)
-		} else {
-			needRefresh = true
-			postPriceTrend()
-		}
-	}
 	
 }
 

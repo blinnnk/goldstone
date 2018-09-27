@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.present
 
+import android.os.Handler
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradePresenterManager
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMMarketHeaderModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.model.RAMMarketModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view.TraderMemoryDetailFragment
@@ -76,6 +78,48 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 	}
 
 	var ramMarketModel = RAMMarketModel(RAMMarketHeaderModel())
+	
+	private val refreshRunnable = Runnable {
+		RAMTradePresenterManager.refreshData("")
+		postRefresh()
+	}
+	
+	private val refreshHandler = Handler()
+	
+	private fun postRefresh() {
+		refreshHandler.postDelayed(refreshRunnable, 1 *1000)
+	}
+	
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		refreshHandler.removeCallbacks(refreshRunnable)
+	}
+	
+	override fun onFragmentResume() {
+		super.onFragmentResume()
+		refreshHandler.removeCallbacks(refreshRunnable)
+		postRefresh()
+	}
+	
+	override fun onFragmentPause() {
+		super.onFragmentPause()
+		refreshHandler.removeCallbacks(refreshRunnable)
+	}
+	
+	fun onHiddenChanged(hidden: Boolean) {
+		if (hidden) {
+			refreshHandler.removeCallbacks(refreshRunnable)
+		} else {
+			refreshHandler.removeCallbacks(refreshRunnable)
+			postRefresh()
+		}
+	}
+	
+	
+	
+	
+	
+	
 
 
 }
