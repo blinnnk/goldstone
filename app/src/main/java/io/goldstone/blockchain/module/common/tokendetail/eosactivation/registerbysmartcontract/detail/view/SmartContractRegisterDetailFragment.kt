@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.detail.presenter.SmartContractRegisterDetailPresenter
@@ -51,7 +52,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				smartContractLink.apply {
 					isCenter = true
 					setDescriptionTitles()
-					title.text = "Smart Contract Address"
+					title.text = EOSAccountText.smartContract
 					subtitle.text = "https://github.com/kotlin/smartContract"
 				}.click {
 					context.clickToCopy(it.subtitle.text.toString())
@@ -64,24 +65,24 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				// 提醒界面
 				AttentionView(context).isSmartContractRegister().into(this)
 
-				SessionTitleView(context).apply { setTitle("TRANSACTION INFO") }.into(this)
+				SessionTitleView(context).apply { setTitle(EOSAccountText.transferTo) }.into(this)
 				GraySquareCellWithButtons(context).apply {
 					val smartContractName = "goldstonenew"
-					setTitle("Receiver")
+					setTitle(EOSAccountText.receiver)
 					setSubtitle(smartContractName)
 					showOnlyCopyButton {
 						context.clickToCopy(smartContractName)
 					}
 				}.into(this)
 
-				SessionTitleView(context).apply { setTitle("REGISTER INFO") }.into(this)
+				SessionTitleView(context).apply { setTitle(EOSAccountText.memoInfo) }.into(this)
 				availableResultView.apply {
 					text = accountName + "-" + Config.getCurrentEOSAddress()
 				}.into(this)
 
 				copyResultButton.apply {
 					setBlueStyle(20.uiPX())
-					text = "Copy The Result"
+					text = EOSAccountText.copyResult
 				}.click {
 					availableResultView.apply {
 						context.clickToCopy(getContent())

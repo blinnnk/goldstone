@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.BasicRadiusButton
 import io.goldstone.blockchain.common.component.button.SquareIcon
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
@@ -93,8 +94,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		valueInfo.visibility = View.GONE
 		if (statusButton.isNull()) {
 			val title = when (style) {
-				BasicRadiusButton.Companion.Style.Pending -> "Pending Activation"
-				else -> "Pending Default"
+				BasicRadiusButton.Companion.Style.Pending -> EOSAccountText.pendingActivation
+				else -> EOSAccountText.pendingConfirmation
 			}
 			statusButton = BasicRadiusButton(context)
 			statusButton?.setTitle(title)

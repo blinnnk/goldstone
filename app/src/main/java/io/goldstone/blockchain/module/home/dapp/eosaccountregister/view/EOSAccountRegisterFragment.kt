@@ -17,10 +17,7 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
@@ -92,7 +89,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				}.into(this)
 
 				resourceCoast.apply {
-					setTitle("Estimated Expenditure")
+					setTitle(EOSAccountText.estimatedSpentOfActiveAccount)
 					setSubtitle(CommonText.calculating)
 				}.into(this)
 
