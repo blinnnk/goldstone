@@ -26,12 +26,12 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Gas
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
+import kotlin.math.sign
 
 /**
  * @date 2018/7/25 4:02 PM
@@ -74,7 +74,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 					Config.getCurrentEthereumAddress()
 				) { ethBalance, ethError ->
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
-					val isEnough = tokenBalance.orZero() >= getTransferCount().toDouble() && ethBalance.orZero() > getUsedGasFee().orElse(0.0)
+					val isEnough =
+						tokenBalance.orZero() >= getTransferCount().toDouble() && ethBalance.orZero() > getUsedGasFee().orElse(0.0)
 					hold(isEnough, RequestError.PostFailed(error.message + ethError.message))
 				}
 			}
@@ -82,14 +83,11 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 	}
 }
 
-fun GasSelectionPresenter.prepareToTransfer(
-	footer: GasSelectionFooter,
-	@UiThread callback: (GoldStoneError) -> Unit
-) {
-	checkBalanceIsValid(getToken()) hasEnoughBalance@{ isEnough, error ->
+fun GasSelectionPresenter.prepareToTransfer(@UiThread callback: (GoldStoneError) -> Unit) {
+	checkBalanceIsValid(getToken()) { isEnough, error ->
 		GoldStoneAPI.context.runOnUiThread {
 			when {
-				isEnough -> showConfirmAttentionView(footer, callback)
+				isEnough -> showConfirmAttentionView(callback)
 				error.isNone() -> callback(TransferError.BalanceIsNotEnough)
 				else -> callback(error)
 			}

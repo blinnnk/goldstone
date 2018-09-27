@@ -10,6 +10,7 @@ import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
@@ -291,7 +292,7 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun sendRawTransaction(
 		signTransactions: String,
-		errorCallback: (EthereumRPCError) -> Unit,
+		errorCallback: (RequestError) -> Unit,
 		chainName: String,
 		@WorkerThread hold: (String) -> Unit
 	) {
@@ -306,10 +307,11 @@ object GoldStoneEthCall {
 				signTransactions
 			)
 		),
-			{ errorCallback(EthereumRPCError.GetRAWTransaction(it)) },
-			chainName,
-			hold
-		)
+			errorCallback,
+			chainName
+		) {
+			hold(it)
+		}
 	}
 
 	@JvmStatic

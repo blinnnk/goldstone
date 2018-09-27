@@ -16,15 +16,12 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.isStoredInKeyStoreByAddress
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
@@ -94,7 +91,7 @@ class WalletSettingsListPresenter(
 				deleteWatchOnlyWallet(first, second)
 			} else {
 				val password = passwordInput?.text.toString()
-				WalletTable.getCurrentWallet {
+				WalletTable.getCurrentWallet(false) {
 					verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
 						if (isCorrect) {
 							runOnUiThread { getMainActivity()?.showLoadingView() }
@@ -111,15 +108,8 @@ class WalletSettingsListPresenter(
 	private fun Context.deleteWalletData(wallet: WalletTable, password: String) {
 		// get current wallet address
 		wallet.apply {
-			val addresses = listOf(
-				Pair(ethAddresses, ChainType.ETH),
-				Pair(etcAddresses, ChainType.ETC),
-				Pair(btcAddresses, ChainType.BTC),
-				Pair(btcSeriesTestAddresses, ChainType.AllTest),
-				Pair(ltcAddresses, ChainType.LTC),
-				Pair(bchAddresses, ChainType.BCH),
-				Pair(eosAddresses, ChainType.EOS)
-			)
+			val addresses =
+				getCurrentAllAddressAndChainID()
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = addresses.size
 				override fun concurrentJobs() {
@@ -139,7 +129,6 @@ class WalletSettingsListPresenter(
 				}
 
 				override fun mergeCallBack() {
-					// delete wallet record in `walletTable`
 					WalletTable.deleteCurrentWallet { wallet ->
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 						XinGePushReceiver.registerAddressesForPush(wallet, true)
@@ -162,31 +151,26 @@ class WalletSettingsListPresenter(
 		deleteAccount(
 			address,
 			password,
-			ChainType.isBTCSeriesChainType(chainType),
+			chainType.isStoredInKeyStoreByAddress(),
 			isSingleChainWallet
 		) { error ->
-			if (error.isNone()) MyTokenTable.deleteByAddress(address) {
+			if (error.isNone()) {
+				GoldStoneDataBase.database.myTokenDao().deleteAllByAddress(address)
 				// 删除 以太坊 类型的转账记录
-				TransactionTable.deleteByAddress(address) {
-					// 删除 BTC 类型的转账记录
-					BTCSeriesTransactionTable.deleteByAddress(address, chainType)
-					// 删除 EOS 类型的转账记录
-					EOSTransactionTable.deleteByAddress(address)
-					// 删除 EOS Account Info 类型的记录
-					EOSAccountTable.deleteByRecordAddress(address)
-					// 删除余额记录
-					TokenBalanceTable.deleteByAddress(address) {
-						if (justDeleteData) {
-							callback()
-						} else {
-							// delete wallet record in `walletTable`
-							WalletTable.deleteCurrentWallet { wallet ->
-								// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-								XinGePushReceiver.registerAddressesForPush(wallet, true)
-								callback()
-							}
-						}
-					}
+				GoldStoneDataBase.database.transactionDao().deleteRecordAddressData(address)
+				// 删除 BTC 类型的转账记录
+				BTCSeriesTransactionTable.deleteByAddress(address, chainType)
+				// 删除 EOS 类型的转账记录
+				GoldStoneDataBase.database.eosTransactionDao().deleteDataByRecordAddress(address)
+				// 删除 EOS Account Info 类型的记录
+				GoldStoneDataBase.database.eosAccountDao().deleteByKey(address)
+				// 删除余额记录
+				GoldStoneDataBase.database.tokenBalanceDao().deleteTokenBalanceByAddress(address)
+				if (justDeleteData) callback()
+				else WalletTable.deleteCurrentWallet { wallet ->
+					// 删除 `push` 监听包地址不再监听用户删除的钱包地址
+					XinGePushReceiver.registerAddressesForPush(wallet, true)
+					callback()
 				}
 			} else {
 				fragment.context.alert(error.message)
@@ -196,19 +180,18 @@ class WalletSettingsListPresenter(
 	}
 
 	private fun deleteWatchOnlyWallet(address: String, chainType: ChainType) {
-		MyTokenTable.deleteByAddress(address) {
-			TransactionTable.deleteByAddress(address) {
-				BTCSeriesTransactionTable.deleteByAddress(address, chainType)
-				TokenBalanceTable.deleteByAddress(address) {
-					WalletTable.deleteCurrentWallet { wallet ->
-						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
-						XinGePushReceiver.registerAddressesForPush(wallet, true)
-						GoldStoneAPI.context.runOnUiThread {
-							fragment.getMainActivity()?.removeLoadingView()
-							fragment.activity?.jump<SplashActivity>()
-						}
-					}
-				}
+		GoldStoneDataBase.database.myTokenDao().deleteAllByAddress(address)
+		// 删除 以太坊 类型的转账记录
+		GoldStoneDataBase.database.transactionDao().deleteRecordAddressData(address)
+		BTCSeriesTransactionTable.deleteByAddress(address, chainType)
+		// 删除余额记录
+		GoldStoneDataBase.database.tokenBalanceDao().deleteTokenBalanceByAddress(address)
+		WalletTable.deleteCurrentWallet { wallet ->
+			// 删除 `push` 监听包地址不再监听用户删除的钱包地址
+			XinGePushReceiver.registerAddressesForPush(wallet, true)
+			GoldStoneAPI.context.runOnUiThread {
+				fragment.getMainActivity()?.removeLoadingView()
+				fragment.activity?.jump<SplashActivity>()
 			}
 		}
 	}

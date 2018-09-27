@@ -192,3 +192,6 @@ fun ChainType?.isETH() = this?.id == ChainType.ETH.id
 fun ChainType?.isETC() = this?.id == ChainType.ETC.id
 fun ChainType?.isBCH() = this?.id == ChainType.BCH.id
 fun ChainType?.isAllTest() = this?.id == ChainType.AllTest.id
+
+fun ChainType?.isStoredInKeyStoreByAddress() =
+	this?.id == ChainType.LTC.id || this?.id == ChainType.BCH.id || this?.id == ChainType.BTC.id || this?.id == ChainType.AllTest.id || this?.id == ChainType.EOS.id

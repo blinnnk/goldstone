@@ -155,7 +155,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 									node.first.equals(CryptoName.etc, true)
 								}?.second.orEmpty()
 							),
-							ethERC20AndETCChainNameID = ChainNameID.getChainNameIDByName(
+							ethSeriesID = ChainNameID.getChainNameIDByName(
 								selectedNode.find { node ->
 									node.first.equals(CryptoName.eth, true)
 								}?.second.orEmpty()

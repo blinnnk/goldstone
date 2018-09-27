@@ -11,12 +11,10 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
-import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -34,9 +32,8 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
-import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSBuyRamTransaction
-import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
-import io.goldstone.blockchain.kernel.network.eos.EOSRAM.EOSSellRamTransaction
+import io.goldstone.blockchain.kernel.network.eos.eosram.EOSBuyRamTransaction
+import io.goldstone.blockchain.kernel.network.eos.eosram.EOSSellRamTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
@@ -89,18 +86,12 @@ open class BaseTradingPresenter(
 				TradingType.RAM -> {
 					getMainActivity()?.showLoadingView()
 					val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
-					EOSResourceUtil.getRAMAmountByCoin(Pair(1.0, CoinSymbol.EOS), EOSUnit.KB) { amount, error ->
-						// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
-						if (!amount.isNull() && error.isNone()) {
-							val price = 1.0 / amount!!
-							val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
-							setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amount)
-						} else {
-							context.alert(error.message)
-							setProcessUsage(CommonText.calculating, availableRAM, account?.ramQuota.orZero(), 0.0)
-						}
-						getMainActivity()?.removeLoadingView()
-					}
+					// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
+					val price = Config.getRAMUnitPrice()
+					val amountKBInEOS = 1.0 / price
+					val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
+					setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
+					getMainActivity()?.removeLoadingView()
 				}
 			}
 		}

@@ -7,7 +7,6 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import org.jetbrains.anko.doAsync
 
 /**
  * @date 08/04/2018 5:10 PM
@@ -69,16 +68,6 @@ data class TokenBalanceTable(
 				}
 			}
 		}
-
-		fun deleteByAddress(address: String, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.tokenBalanceDao().apply {
-					val balances = getTokenBalanceByAddress(address)
-					deleteAll(balances)
-					callback()
-				}
-			}
-		}
 	}
 }
 
@@ -87,6 +76,9 @@ interface TokenBalanceDao {
 
 	@Query("SELECT * FROM tokenBalance WHERE address LIKE :address")
 	fun getTokenBalanceByAddress(address: String): List<TokenBalanceTable>
+
+	@Query("DELETE FROM tokenBalance WHERE address LIKE :address")
+	fun deleteTokenBalanceByAddress(address: String)
 
 	@Query("SELECT * FROM tokenBalance WHERE contract LIKE :contract AND address LIKE :address ORDER BY date DESC")
 	fun getTokenBalanceByContractAndAddress(

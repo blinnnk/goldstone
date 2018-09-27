@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.utils.toJsonArray
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
@@ -37,7 +34,7 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		else QuotationSelectionTable.getMySelections { selections ->
+		QuotationSelectionTable.getMySelections { selections ->
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 			selections.asSequence().map { selection ->
@@ -55,20 +52,13 @@ class QuotationPresenter(
 			}.sortedByDescending {
 				it.orderID
 			}.toList().toArrayList().let { it ->
-				// 把数据存在内存里面方便下次打开使用
 				// 更新 `UI`
 				diffAndUpdateAdapterData<QuotationAdapter>(it)
 				// 设定 `Socket` 并执行
-				currentSocket.isNull() isTrue {
-					// 初始化 `Socket`
-					setSocket {
-						hasInitSocket = true
-						currentSocket?.runSocket()
-					}
-				} otherwise {
-					// 更新 `Socket`
-					subscribeSocket()
-				}
+				if (currentSocket.isNull()) setSocket {
+					hasInitSocket = true
+					currentSocket?.runSocket()
+				} else subscribeSocket()
 			}
 		}
 	}
@@ -84,10 +74,8 @@ class QuotationPresenter(
 				subscribeSocket()
 			}
 		}
-		if (currentSocket.isNull() && hasInitSocket) {
-			setSocket {
-				currentSocket?.runSocket()
-			}
+		if (currentSocket.isNull() && hasInitSocket) setSocket {
+			currentSocket?.runSocket()
 		}
 	}
 
@@ -102,14 +90,16 @@ class QuotationPresenter(
 		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
 		if (maxDate + 1L < 0.daysAgoInMills()) {
-			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
-				QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
-					/** 防止服务器数据出错或不足, 可能导致的死循环 */
-					if (updateChartTimes.orZero() > 0) {
-						updateData()
-						updateChartTimes = updateChartTimes.orZero() - 1
+			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
+				if (!newChart.isNull() && error.isNone()) {
+					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {
+						/** 防止服务器数据出错或不足, 可能导致的死循环 */
+						if (updateChartTimes.orZero() > 0) {
+							updateData()
+							updateChartTimes = updateChartTimes.orZero() - 1
+						}
 					}
-				}
+				} else fragment.context.alert(error.message)
 			}
 		}
 	}

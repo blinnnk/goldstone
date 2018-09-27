@@ -24,7 +24,6 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.convertToDouble
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSValue

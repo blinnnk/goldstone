@@ -369,4 +369,11 @@ object Config {
 
 	fun updateYingYongBaoInReviewStatus(status: Boolean) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.yingYongBaoInReview, status)
+
+	// EOS KB
+	fun getRAMUnitPrice(): Double =
+		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.ramUnitPrice)
+
+	fun updateRAMUnitPrice(unitPrice: Double) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ramUnitPrice, unitPrice.toFloat())
 }

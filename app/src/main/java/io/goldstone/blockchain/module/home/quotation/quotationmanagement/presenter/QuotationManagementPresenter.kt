@@ -71,9 +71,7 @@ class QuotationManagementPresenter(
 				data.lastIndex -> data[toPosition - 1].orderID - 0.1
 				else -> (data[toPosition - 1].orderID + data[toPosition + 1].orderID) / 2.0
 			}
-			QuotationSelectionTable.updateSelectionOrderIDBy(
-				data[toPosition].pair, newOrderID
-			) {
+			QuotationSelectionTable.updateSelectionOrderIDBy(data[toPosition].pair, newOrderID) {
 				// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
 				fragment.asyncData?.find {
 					it.baseSymbol == data[toPosition].baseSymbol

@@ -40,7 +40,6 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
-
 	override val pageTitle: String = ImportMethodText.mnemonic
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val walletNameInput by lazy { RoundInput(context!!) }
@@ -72,16 +71,15 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				}.into(this)
 
-				pathSettings
-					.apply {
-						setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
-						setMargins<LinearLayout.LayoutParams> {
-							topMargin = 20.uiPX()
-							bottomMargin = 10.uiPX()
-						}
+				pathSettings.apply {
+					setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 20.uiPX()
+						bottomMargin = 10.uiPX()
 					}
-					.click { showPatSettingsDashboard() }
-					.into(this)
+				}.click {
+					showPatSettingsDashboard()
+				}.into(this)
 
 				walletNameInput.apply {
 					hint = UIUtils.generateDefaultName()

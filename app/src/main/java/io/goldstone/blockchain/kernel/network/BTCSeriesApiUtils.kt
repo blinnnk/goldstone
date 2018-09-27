@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.kernel.network
 
-import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
@@ -9,6 +8,7 @@ import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.kernel.network.bitcoin.model.BlockInfoUnspentModel
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -58,7 +58,8 @@ object BTCSeriesApiUtils {
 
 	fun getBalance(
 		api: String,
-		@WorkerThread hold: (balance: Long?, error: RequestError) -> Unit
+		isMainThread: Boolean,
+		hold: (balance: Long?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
@@ -67,7 +68,8 @@ object BTCSeriesApiUtils {
 			{ hold(null, it) }
 		) {
 			val result = firstOrNull()?.toLongOrNull()
-			hold(result, RequestError.None)
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, RequestError.None) }
+			else hold(result, RequestError.None)
 		}
 	}
 
@@ -89,7 +91,8 @@ object BTCSeriesApiUtils {
 
 	fun getDoubleBalance(
 		api: String,
-		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
+		isMainThread: Boolean,
+		hold: (balance: Double?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
@@ -97,7 +100,10 @@ object BTCSeriesApiUtils {
 			true,
 			{ hold(null, it) }
 		) {
-			hold(firstOrNull()?.toDoubleOrNull() ?: 0.0, RequestError.None)
+			val balance = firstOrNull()?.toDoubleOrNull() ?: 0.0
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(balance, RequestError.None)
+			} else hold(balance, RequestError.None)
 		}
 	}
 

@@ -83,4 +83,6 @@ object SharesPreference {
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"
+	// EOS
+	const val ramUnitPrice = "ramUnitPrice"
 }

@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 
 import android.content.Context
+import android.widget.RadioButton
 import android.widget.TextView
-import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
@@ -12,9 +12,9 @@ import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
+import org.jetbrains.anko.radioButton
 import org.jetbrains.anko.textColor
 
 /**
@@ -31,7 +31,7 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 		radioButton.isChecked = model.type == model.currentType
 	}
 
-	private val radioButton by lazy { HoneyRadioButton(context) }
+	private var radioButton: RadioButton
 	private val info by lazy { TwoLineTitles(context) }
 	private val feeTypeDescription by lazy { TextView(context) }
 
@@ -51,13 +51,9 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 			}
 			.into(this)
 
-		radioButton
-			.apply {
-				setColorStyle(GrayScale.lightGray, Spectrum.green)
-				isClickable = false
-			}
-			.into(this)
-		radioButton.apply {
+		radioButton = radioButton {
+			isClickable = false
+		}.apply {
 			setAlignParentRight()
 			setCenterInVertical()
 		}
@@ -66,9 +62,7 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 			setCenterInVertical()
 			x -= 35.uiPX()
 		}
-		info.apply {
-			setCenterInVertical()
-		}
+		info.setCenterInVertical()
 		setHorizontalPadding()
 		setGrayStyle()
 		hasArrow = false
