@@ -6,6 +6,8 @@ package io.goldstone.blockchain.common.language
  */
 
 object TokenDetailText {
+
+	//	····················转账记录相关····················
 	@JvmField
 	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recipient Address"
@@ -96,267 +98,300 @@ object TokenDetailText {
 		HoneyLanguage.TraditionalChinese.code -> "轉賬提示"
 		else -> ""
 	}
+
+	//	····················Token/资产信息····················
+	//	tab标题
+	@JvmField
+	val assets = when (currentLanguage) {  HoneyLanguage.English.code -> "Assets"
+		HoneyLanguage.Chinese.code -> "资产"
+		HoneyLanguage.Japanese.code -> "資産"
+		HoneyLanguage.Korean.code -> "자산"
+		HoneyLanguage.Russian.code -> "Активы"
+		HoneyLanguage.TraditionalChinese.code -> "資產"
+		else -> ""
+	}
+	@JvmField
+	val information = when (currentLanguage) {  HoneyLanguage.English.code -> "Information"
+		HoneyLanguage.Chinese.code -> "信息"
+		HoneyLanguage.Japanese.code -> "情報"
+		HoneyLanguage.Korean.code -> "통화 정보"
+		HoneyLanguage.Russian.code -> "Информация"
+		HoneyLanguage.TraditionalChinese.code -> "信息"
+		else -> ""
+	}
+	@JvmField
+	val transactionList = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Transaction List"
+		HoneyLanguage.Chinese.code -> "账单记录"
+		HoneyLanguage.Japanese.code -> "取引リスト"
+		HoneyLanguage.Korean.code -> "결제 기록"
+		HoneyLanguage.Russian.code -> "Список транзакций"
+		HoneyLanguage.TraditionalChinese.code -> "賬單記錄"
+		else -> ""
+	}
+
+	//	····················EOS资源相关····················
 	@JvmField
 	val resources = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Resources"
-		HoneyLanguage.Chinese.code -> "Resources"
-		HoneyLanguage.Japanese.code -> "Resources"
-		HoneyLanguage.Korean.code -> "Resources"
-		HoneyLanguage.Russian.code -> "Resources"
-		HoneyLanguage.TraditionalChinese.code -> "Resources"
+		HoneyLanguage.Chinese.code -> "资源"
+		HoneyLanguage.Japanese.code -> "リソース"
+		HoneyLanguage.Korean.code -> "자원"
+		HoneyLanguage.Russian.code -> "Ресурсы"
+		HoneyLanguage.TraditionalChinese.code -> "資源"
 		else -> ""
 	}
 	@JvmField
 	val accountManagement = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Account Management"
-		HoneyLanguage.Chinese.code -> "Account Management"
-		HoneyLanguage.Japanese.code -> "Account Management"
-		HoneyLanguage.Korean.code -> "Account Management"
-		HoneyLanguage.Russian.code -> "Account Management"
-		HoneyLanguage.TraditionalChinese.code -> "Account Management"
+		HoneyLanguage.English.code -> "Account Manage"
+		HoneyLanguage.Chinese.code -> "帐户管理"
+		HoneyLanguage.Japanese.code -> "アカウント管理"
+		HoneyLanguage.Korean.code -> "계정 관리"
+		HoneyLanguage.Russian.code -> "Управление учетной записью"
+		HoneyLanguage.TraditionalChinese.code -> "帳戶管理"
 		else -> ""
 	}
 	@JvmField
 	val assetTools = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Asset Tools"
-		HoneyLanguage.Chinese.code -> "Asset Tools"
-		HoneyLanguage.Japanese.code -> "Asset Tools"
-		HoneyLanguage.Korean.code -> "Asset Tools"
-		HoneyLanguage.Russian.code -> "Asset Tools"
-		HoneyLanguage.TraditionalChinese.code -> "Asset Tools"
+		HoneyLanguage.English.code -> "Resource Tools"
+		HoneyLanguage.Chinese.code -> "资源工具"
+		HoneyLanguage.Japanese.code -> "リソースツール"
+		HoneyLanguage.Korean.code -> "리소스 도구"
+		HoneyLanguage.Russian.code -> "Инструмент ресурса"
+		HoneyLanguage.TraditionalChinese.code -> "資源工具"
 		else -> ""
 	}
 	@JvmField
 	val delegateTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELEGATE"
-		HoneyLanguage.Chinese.code -> "DELEGATE"
-		HoneyLanguage.Japanese.code -> "DELEGATE"
-		HoneyLanguage.Korean.code -> "DELEGATE"
-		HoneyLanguage.Russian.code -> "DELEGATE"
-		HoneyLanguage.TraditionalChinese.code -> "DELEGATE"
+		HoneyLanguage.Chinese.code -> "代理"
+		HoneyLanguage.Japanese.code -> "デリゲート"
+		HoneyLanguage.Korean.code -> "대의원"
+		HoneyLanguage.Russian.code -> "Делегат"
+		HoneyLanguage.TraditionalChinese.code -> "代理"
 		else -> ""
 	}
 	@JvmField
 	val refundTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "REFUND"
-		HoneyLanguage.Chinese.code -> "REFUND"
-		HoneyLanguage.Japanese.code -> "REFUND"
-		HoneyLanguage.Korean.code -> "REFUND"
-		HoneyLanguage.Russian.code -> "REFUND"
-		HoneyLanguage.TraditionalChinese.code -> "REFUND"
+		HoneyLanguage.Chinese.code -> "赎回"
+		HoneyLanguage.Japanese.code -> "払い戻し"
+		HoneyLanguage.Korean.code -> "환불"
+		HoneyLanguage.Russian.code -> "Возврат"
+		HoneyLanguage.TraditionalChinese.code -> "贖回"
 		else -> ""
 	}
 	@JvmField
 	val ram = when (currentLanguage) {
 		HoneyLanguage.English.code -> "RAM"
-		HoneyLanguage.Chinese.code -> "RAM"
-		HoneyLanguage.Japanese.code -> "RAM"
-		HoneyLanguage.Korean.code -> "RAM"
+		HoneyLanguage.Chinese.code -> "RAM(内存)"
+		HoneyLanguage.Japanese.code -> "RAM(ラム)"
+		HoneyLanguage.Korean.code -> "RAM(램)"
 		HoneyLanguage.Russian.code -> "RAM"
-		HoneyLanguage.TraditionalChinese.code -> "RAM"
+		HoneyLanguage.TraditionalChinese.code -> "RAM(內存)"
 		else -> ""
 	}
 	@JvmField
 	val cpu = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CPU"
-		HoneyLanguage.Chinese.code -> "CPU"
+		HoneyLanguage.Chinese.code -> "CPU(计算)"
 		HoneyLanguage.Japanese.code -> "CPU"
 		HoneyLanguage.Korean.code -> "CPU"
 		HoneyLanguage.Russian.code -> "CPU"
-		HoneyLanguage.TraditionalChinese.code -> "CPU"
+		HoneyLanguage.TraditionalChinese.code -> "CPU(計算)"
 		else -> ""
 	}
 	@JvmField
 	val net = when (currentLanguage) {
 		HoneyLanguage.English.code -> "NET"
-		HoneyLanguage.Chinese.code -> "NET"
+		HoneyLanguage.Chinese.code -> "NET(网络)"
 		HoneyLanguage.Japanese.code -> "NET"
 		HoneyLanguage.Korean.code -> "NET"
 		HoneyLanguage.Russian.code -> "NET"
-		HoneyLanguage.TraditionalChinese.code -> "NET"
+		HoneyLanguage.TraditionalChinese.code -> "NET(網絡)"
 		else -> ""
 	}
 	@JvmField
 	val authority = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Authority Management"
-		HoneyLanguage.Chinese.code -> "Authority Management"
-		HoneyLanguage.Japanese.code -> "Authority Management"
-		HoneyLanguage.Korean.code -> "Authority Management"
-		HoneyLanguage.Russian.code -> "Authority Management"
-		HoneyLanguage.TraditionalChinese.code -> "Authority Management"
+		HoneyLanguage.Chinese.code -> "权限管理"
+		HoneyLanguage.Japanese.code -> "権限管理"
+		HoneyLanguage.Korean.code -> "권한 관리"
+		HoneyLanguage.Russian.code -> "Управление полномочиями"
+		HoneyLanguage.TraditionalChinese.code -> "權限管理"
 		else -> ""
 	}
 	@JvmField
 	val delegateCPU = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.Chinese.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.Japanese.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.Korean.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.Russian.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.TraditionalChinese.code -> "DELEGATE CPU\nREFUND CPU"
+		HoneyLanguage.Chinese.code -> "代理CPU\n赎回CPU"
+		HoneyLanguage.Japanese.code -> "CPUを委任する\nCPUを払い戻す"
+		HoneyLanguage.Korean.code -> "CPU 를 위임하십시오\nCPU 환불"
+		HoneyLanguage.Russian.code -> "Делегат CPU\nВозврат CPU"
+		HoneyLanguage.TraditionalChinese.code -> "代理CPU\n贖回CPU"
 		else -> ""
 	}
 	@JvmField
 	val delegateNET = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.Chinese.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.Japanese.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.Korean.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.Russian.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.TraditionalChinese.code -> "DELEGATE NET\nREFUND NET"
+		HoneyLanguage.Chinese.code -> "代理NET\n赎回NET"
+		HoneyLanguage.Japanese.code -> "NETを委任する\nNETを払い戻す"
+		HoneyLanguage.Korean.code -> "NET 를 위임하십시오\nNET 환불"
+		HoneyLanguage.Russian.code -> "Делегат NET\nВозврат NET"
+		HoneyLanguage.TraditionalChinese.code -> "代理NET\n贖回NET"
 		else -> ""
 	}
 	@JvmField
 	val tradeRAM = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.Chinese.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.Japanese.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.Korean.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.Russian.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.TraditionalChinese.code -> "BUY RAM\nSELL RAM"
+		HoneyLanguage.Chinese.code -> "买入RAM\n卖出RAM"
+		HoneyLanguage.Japanese.code -> "RAMを購入する\nRAMを販売する"
+		HoneyLanguage.Korean.code -> "RAM 구입\nRAM  판매"
+		HoneyLanguage.Russian.code -> "Купить RAM\nПродать RAM"
+		HoneyLanguage.TraditionalChinese.code -> "買入RAM\n賣出RAM"
 		else -> ""
 	}
 
 	@JvmField
 	val available = when (currentLanguage) {
 		HoneyLanguage.English.code -> "AVAILABLE"
-		HoneyLanguage.Chinese.code -> "AVAILABLE"
-		HoneyLanguage.Japanese.code -> "AVAILABLE"
-		HoneyLanguage.Korean.code -> "AVAILABLE"
-		HoneyLanguage.Russian.code -> "AVAILABLE"
-		HoneyLanguage.TraditionalChinese.code -> "AVAILABLE"
+		HoneyLanguage.Chinese.code -> "可用"
+		HoneyLanguage.Japanese.code -> "利用可能"
+		HoneyLanguage.Korean.code -> "가능합니다"
+		HoneyLanguage.Russian.code -> "ДОСТУПНЫ"
+		HoneyLanguage.TraditionalChinese.code -> "可用"
 		else -> ""
 	}
 
 	@JvmField
 	val total = when (currentLanguage) {
 		HoneyLanguage.English.code -> "TOTAL"
-		HoneyLanguage.Chinese.code -> "TOTAL"
-		HoneyLanguage.Japanese.code -> "TOTAL"
-		HoneyLanguage.Korean.code -> "TOTAL"
-		HoneyLanguage.Russian.code -> "TOTAL"
-		HoneyLanguage.TraditionalChinese.code -> "TOTAL"
+		HoneyLanguage.Chinese.code -> "总计"
+		HoneyLanguage.Japanese.code -> "合計"
+		HoneyLanguage.Korean.code -> "총"
+		HoneyLanguage.Russian.code -> "ВСЕГО"
+		HoneyLanguage.TraditionalChinese.code -> "總計"
 		else -> ""
 	}
 
 	@JvmField
 	val chainType = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CHAIN TYPE"
-		HoneyLanguage.Chinese.code -> "CHAIN TYPE"
-		HoneyLanguage.Japanese.code -> "CHAIN TYPE"
-		HoneyLanguage.Korean.code -> "CHAIN TYPE"
-		HoneyLanguage.Russian.code -> "CHAIN TYPE"
-		HoneyLanguage.TraditionalChinese.code -> "CHAIN TYPE"
+		HoneyLanguage.Chinese.code -> "链类型"
+		HoneyLanguage.Japanese.code -> "チェーンタイプ"
+		HoneyLanguage.Korean.code -> "세부 정보 확인"
+		HoneyLanguage.Russian.code -> "ТИП ЦЕПЕЙ"
+		HoneyLanguage.TraditionalChinese.code -> "鏈類型"
 		else -> ""
 	}
 
 	@JvmField
 	val checkDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CHECK DETAIL"
-		HoneyLanguage.Chinese.code -> "CHECK DETAIL"
-		HoneyLanguage.Japanese.code -> "CHECK DETAIL"
-		HoneyLanguage.Korean.code -> "CHECK DETAIL"
-		HoneyLanguage.Russian.code -> "CHECK DETAIL"
-		HoneyLanguage.TraditionalChinese.code -> "CHECK DETAIL"
+		HoneyLanguage.Chinese.code -> "查看详情"
+		HoneyLanguage.Japanese.code -> "詳細を確認"
+		HoneyLanguage.Korean.code -> "세부 정보 확인"
+		HoneyLanguage.Russian.code -> "ПРОВЕРИТЬ ДЕТАЛИ"
+		HoneyLanguage.TraditionalChinese.code -> "查看詳情"
 		else -> ""
 	}
 
 	@JvmField
 	val latestActivationTime = when (currentLanguage) {
 		HoneyLanguage.English.code -> "this account's latest active time is"
-		HoneyLanguage.Chinese.code -> "this account's latest active time is"
-		HoneyLanguage.Japanese.code -> "this account's latest active time is"
-		HoneyLanguage.Korean.code -> "this account's latest active time is"
-		HoneyLanguage.Russian.code -> "this account's latest active time is"
-		HoneyLanguage.TraditionalChinese.code -> "this account's latest active time is"
+		HoneyLanguage.Chinese.code -> "当前账户的最近活跃时间是"
+		HoneyLanguage.Japanese.code -> "このアカウントの最新のアクティブ時間があります"
+		HoneyLanguage.Korean.code -> "이 계정의 최근 활성 시간"
+		HoneyLanguage.Russian.code -> "Последнее активное время этой учетной записи"
+		HoneyLanguage.TraditionalChinese.code -> "當前賬戶的最近活躍時間是"
 		else -> ""
 	}
 
 	@JvmField
 	val balance = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Balance"
-		HoneyLanguage.Chinese.code -> "Balance"
-		HoneyLanguage.Japanese.code -> "Balance"
-		HoneyLanguage.Korean.code -> "Balance"
-		HoneyLanguage.Russian.code -> "Balance"
-		HoneyLanguage.TraditionalChinese.code -> "Balance"
+		HoneyLanguage.Chinese.code -> "余额"
+		HoneyLanguage.Japanese.code -> "残高"
+		HoneyLanguage.Korean.code -> "균형"
+		HoneyLanguage.Russian.code -> "баланс"
+		HoneyLanguage.TraditionalChinese.code -> "餘額"
 		else -> ""
 	}
 
 	@JvmField
 	val transactionCount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Count"
-		HoneyLanguage.Chinese.code -> "Transaction Count"
+		HoneyLanguage.Chinese.code -> "转账次数"
 		HoneyLanguage.Japanese.code -> "Transaction Count"
-		HoneyLanguage.Korean.code -> "Transaction Count"
-		HoneyLanguage.Russian.code -> "Transaction Count"
-		HoneyLanguage.TraditionalChinese.code -> "Transaction Count"
+		HoneyLanguage.Korean.code -> "거래 수"
+		HoneyLanguage.Russian.code -> "Количество транзакций"
+		HoneyLanguage.TraditionalChinese.code -> "轉賬次數"
 		else -> ""
 	}
 
 	@JvmField
 	val totalReceived = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Received"
-		HoneyLanguage.Chinese.code -> "Total Received"
-		HoneyLanguage.Japanese.code -> "Total Received"
-		HoneyLanguage.Korean.code -> "Total Received"
-		HoneyLanguage.Russian.code -> "Total Received"
-		HoneyLanguage.TraditionalChinese.code -> "Total Received"
+		HoneyLanguage.Chinese.code -> "总接收"
+		HoneyLanguage.Japanese.code -> "受信総数"
+		HoneyLanguage.Korean.code -> "총 접수"
+		HoneyLanguage.Russian.code -> "Всего получено"
+		HoneyLanguage.TraditionalChinese.code -> "總接收"
 		else -> ""
 	}
 
 	@JvmField
 	val totalSent = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Total Sent"
-		HoneyLanguage.Chinese.code -> "Total Sent"
-		HoneyLanguage.Japanese.code -> "Total Sent"
-		HoneyLanguage.Korean.code -> "Total Sent"
-		HoneyLanguage.Russian.code -> "Total Sent"
-		HoneyLanguage.TraditionalChinese.code -> "Total Sent"
+		HoneyLanguage.Chinese.code -> "总发送"
+		HoneyLanguage.Japanese.code -> "合計送信済み"
+		HoneyLanguage.Korean.code -> "총 보낸"
+		HoneyLanguage.Russian.code -> "Всего отправлено"
+		HoneyLanguage.TraditionalChinese.code -> "總發送"
 		else -> ""
 	}
 
 	@JvmField
 	val accountInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account Information"
-		HoneyLanguage.Chinese.code -> "Account Information"
-		HoneyLanguage.Japanese.code -> "Account Information"
-		HoneyLanguage.Korean.code -> "Account Information"
-		HoneyLanguage.Russian.code -> "Account Information"
-		HoneyLanguage.TraditionalChinese.code -> "Account Information"
+		HoneyLanguage.Chinese.code -> "账户信息"
+		HoneyLanguage.Japanese.code -> "アカウント情報"
+		HoneyLanguage.Korean.code -> "계정 정보"
+		HoneyLanguage.Russian.code -> "Информация об учетной записи"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶信息"
 		else -> ""
 	}
 
 	@JvmField
 	val transaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction"
-		HoneyLanguage.Chinese.code -> "Transaction"
-		HoneyLanguage.Japanese.code -> "Transaction"
-		HoneyLanguage.Korean.code -> "Transaction"
-		HoneyLanguage.Russian.code -> "Transaction"
-		HoneyLanguage.TraditionalChinese.code -> "Transaction"
+		HoneyLanguage.Chinese.code -> "账单"
+		HoneyLanguage.Japanese.code -> "取引"
+		HoneyLanguage.Korean.code -> "거래"
+		HoneyLanguage.Russian.code -> "Сделка"
+		HoneyLanguage.TraditionalChinese.code -> "賬單"
 		else -> ""
 	}
 
 	@JvmField
 	val addressDetail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Address Detail"
-		HoneyLanguage.Chinese.code -> "Address Detail"
-		HoneyLanguage.Japanese.code -> "Address Detail"
-		HoneyLanguage.Korean.code -> "Address Detail"
-		HoneyLanguage.Russian.code -> "Address Detail"
-		HoneyLanguage.TraditionalChinese.code -> "Address Detail"
+		HoneyLanguage.Chinese.code -> "地址详情"
+		HoneyLanguage.Japanese.code -> "アドレス情報"
+		HoneyLanguage.Korean.code -> "주소 세부 정보"
+		HoneyLanguage.Russian.code -> "Подробное описание адреса"
+		HoneyLanguage.TraditionalChinese.code -> "地址詳情"
 		else -> ""
 	}
 
 	@JvmField
 	val inactivationAccount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Inactivation Account"
-		HoneyLanguage.Chinese.code -> "Inactivation Account"
-		HoneyLanguage.Japanese.code -> "Inactivation Account"
-		HoneyLanguage.Korean.code -> "Inactivation Account"
-		HoneyLanguage.Russian.code -> "Inactivation Account"
-		HoneyLanguage.TraditionalChinese.code -> "Inactivation Account"
+		HoneyLanguage.Chinese.code -> "账户未激活"
+		HoneyLanguage.Japanese.code -> "活性化していない"
+		HoneyLanguage.Korean.code -> "활성화되지 않음"
+		HoneyLanguage.Russian.code -> "Не активировано"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶未激活"
 		else -> ""
 	}
 
@@ -374,44 +409,44 @@ object TokenDetailText {
 	@JvmField
 	val activationMethod = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Inactivation Account"
-		HoneyLanguage.Chinese.code -> "Inactivation Account"
-		HoneyLanguage.Japanese.code -> "Inactivation Account"
-		HoneyLanguage.Korean.code -> "Inactivation Account"
-		HoneyLanguage.Russian.code -> "Inactivation Account"
-		HoneyLanguage.TraditionalChinese.code -> "Inactivation Account"
+		HoneyLanguage.Chinese.code -> "账户未激活"
+		HoneyLanguage.Japanese.code -> "活性化していない"
+		HoneyLanguage.Korean.code -> "활성화되지 않음"
+		HoneyLanguage.Russian.code -> "Не активировано"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶未激活"
 		else -> ""
 	}
 
 	@JvmField
 	val tradingCPU = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Trading CPU"
-		HoneyLanguage.Chinese.code -> "Trading CPU"
-		HoneyLanguage.Japanese.code -> "Trading CPU"
-		HoneyLanguage.Korean.code -> "Trading CPU"
-		HoneyLanguage.Russian.code -> "Trading CPU"
-		HoneyLanguage.TraditionalChinese.code -> "Trading CPU"
+		HoneyLanguage.Chinese.code -> "交易CPU"
+		HoneyLanguage.Japanese.code -> "トランザクション CPU"
+		HoneyLanguage.Korean.code -> "트레이딩 CPU"
+		HoneyLanguage.Russian.code -> "Торговое CPU"
+		HoneyLanguage.TraditionalChinese.code -> "交易CPU"
 		else -> ""
 	}
 
 	@JvmField
 	val tradingNET = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Trading NET"
-		HoneyLanguage.Chinese.code -> "Trading NET"
-		HoneyLanguage.Japanese.code -> "Trading NET"
-		HoneyLanguage.Korean.code -> "Trading NET"
-		HoneyLanguage.Russian.code -> "Trading NET"
-		HoneyLanguage.TraditionalChinese.code -> "Trading NET"
+		HoneyLanguage.Chinese.code -> "交易NET"
+		HoneyLanguage.Japanese.code -> "トランザクション NET"
+		HoneyLanguage.Korean.code -> "트레이딩 NET"
+		HoneyLanguage.Russian.code -> "Торговое NET"
+		HoneyLanguage.TraditionalChinese.code -> "交易NET"
 		else -> ""
 	}
 
 	@JvmField
 	val tradingRAM = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Trading RAM"
-		HoneyLanguage.Chinese.code -> "Trading RAM"
-		HoneyLanguage.Japanese.code -> "Trading RAM"
-		HoneyLanguage.Korean.code -> "Trading RAM"
-		HoneyLanguage.Russian.code -> "Trading RAM"
-		HoneyLanguage.TraditionalChinese.code -> "Trading RAM"
+		HoneyLanguage.Chinese.code -> "交易RAM"
+		HoneyLanguage.Japanese.code -> "トランザクション RAM"
+		HoneyLanguage.Korean.code -> "트레이딩 RAM"
+		HoneyLanguage.Russian.code -> "Торговое RAM"
+		HoneyLanguage.TraditionalChinese.code -> "交易RAM"
 		else -> ""
 	}
 

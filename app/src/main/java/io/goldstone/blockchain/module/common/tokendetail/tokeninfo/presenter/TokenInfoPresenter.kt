@@ -58,7 +58,7 @@ class TokenInfoPresenter(
 		val info = getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName =
-			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + "CHAIN TYPE"
+			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + TokenDetailText.chainType
 		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {
 			showThirdPartyAddressDetail(fragment.getGrandFather<TokenDetailOverlayFragment>(), info.second)
 		}
