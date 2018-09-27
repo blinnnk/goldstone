@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
@@ -36,23 +37,23 @@ class DescriptionView(context: Context) : TextView(context) {
 	}
 
 	fun isRegisterResource(): DescriptionView {
-		text = "Registering an account requires injecting a certain amount of resources into the new account, so that the new account can complete the most basic operations."
+		text = EOSAccountText.activeByContractSpendDescription
 		return this
 	}
 
 	fun isRegisterByFriend(): DescriptionView {
-		text = "Copy the public key and user name and send it to your friends with EOS resources, and register them according to the conditions given."
+		text = EOSAccountText.activeByFriendHint
 		return this
 	}
 
 	fun isRegisterBySmartContract(isLeft: Boolean = false): DescriptionView {
 		if (isLeft) gravity = Gravity.START
-		text = "Contract registration is all done automatically, the contract code open source can be browsed at will. Note that the contract registration should be careful, once the error due to operational errors can not recover the loss."
+		text = EOSAccountText.activeByContractHint
 		return this
 	}
 
 	fun isResourceAssign(): DescriptionView {
-		text = "Contract registration is all done automatically, the contract code open source can be browsed at will. Note that the contract registration should be careful, once the error due to operational errors can not recover the loss."
+		text = EOSAccountText.activeByContractHint
 		return this
 	}
 

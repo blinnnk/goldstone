@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.component.KeyValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.alert
@@ -59,14 +60,14 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 						val checker = EOSAccount(getContent()).checker()
 						if (checker.isValid()) {
 							isValidAccountName = true
-							setValidStatus(true, "Valid")
+							setValidStatus(true, EOSAccountText.checkNameResultValid)
 						} else {
 							isValidAccountName = false
 							setValidStatus(false, checker.shortDescription)
 						}
 					}
 				}.into(this)
-				SessionTitleView(context).apply { setTitle("CLICK TO COPY") }.into(this)
+				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
 				KeyValueView(context).apply {
 					gravity = Gravity.CENTER
 					text = SharedAddress.getCurrentEOS()
@@ -95,7 +96,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 
 				confirmButton.apply {
 					setBlueStyle(20.uiPX())
-					text = "Check Name Is Available In Chain"
+					text = EOSAccountText.checkNameAvailability
 				}.click {
 					val account = EOSAccount(accountNameInput.getContent())
 					when {
@@ -106,12 +107,12 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 								activity?.apply { SoftKeyboard.hide(this) }
 								if (!isAvailable.isNull() && error.isNone()) {
 									if (isAvailable!!) showAvailableResult(account)
-									else context.alert("unavailable account name")
+									else context.alert(EOSAccountText.checkNameResultUnavailable)
 								} else context.alert(error.message)
 							}
 						}
-						account.accountName.isEmpty() -> context.alert("Empty Account Name")
-						else -> context.alert("Invalid Account Name")
+						account.accountName.isEmpty() -> context.alert(EOSAccountText.checkNameResultEmpty)
+						else -> context.alert(EOSAccountText.checkNameResultEmpty)
 					}
 				}.into(this)
 			}

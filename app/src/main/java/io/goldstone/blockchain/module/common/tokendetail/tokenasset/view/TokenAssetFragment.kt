@@ -72,7 +72,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	private val authorizationCell by lazy {
 		GraySquareCell(context!!).apply {
 			showArrow()
-			setTitle(TokenDetailText.authority)
+			setTitle(EOSAccountText.authority)
 			setSubtitle(SharedAddress.getCurrentEOSAccount().accountName)
 			click { presenter.showPublicKeyAccountNames() }
 		}
