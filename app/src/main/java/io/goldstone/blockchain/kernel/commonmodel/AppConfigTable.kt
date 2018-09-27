@@ -36,7 +36,8 @@ data class AppConfigTable(
 	var id: Int,
 	var pincode: Int? = null,
 	var showPincode: Boolean = false,
-	var showFingerprintUnlock: Boolean = false,
+	var showFingerprintUnlocker: Boolean = false,
+	var passwordRetrievalMark: Int = 0,
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
@@ -161,7 +162,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun setShowPinCodeStatus(
+		fun showPinCodeStatus(
 			status: Boolean,
 			callback: () -> Unit
 		) {
@@ -183,7 +184,7 @@ data class AppConfigTable(
 		}
 
 
-		fun setShowFingerprintUnlockStatus(
+		fun showFingerprintUnlockStatus(
 			status: Boolean,
 			callback: () -> Unit
 		) {
@@ -191,10 +192,28 @@ data class AppConfigTable(
 				it?.let {
 					doAsync {
 						GoldStoneDataBase.database.appConfigDao().update(it.apply {
-							showFingerprintUnlock = status
+							showFingerprintUnlocker = status
 						})
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
+						}
+					}
+				}
+			}
+		}
+
+		fun updatePasswordRetrievalMark(
+			passwordRetrievalMark: Int,
+			callback: () -> Unit
+		) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it.isNotEmpty() isTrue {
+							update(it[0].apply { this.passwordRetrievalMark = passwordRetrievalMark })
+							GoldStoneAPI.context.runOnUiThread {
+								callback()
+							}
 						}
 					}
 				}

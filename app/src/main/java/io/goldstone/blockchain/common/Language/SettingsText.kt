@@ -149,13 +149,13 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "分享GoldStone"
 		else -> ""
 	}
-	val walletLock = when (currentLanguage) {
-		HoneyLanguage.English.code -> "PIN"
-		HoneyLanguage.Chinese.code -> "设置钱包锁"
-		HoneyLanguage.Japanese.code -> "PINコード"
-		HoneyLanguage.Korean.code -> "PIN"
-		HoneyLanguage.Russian.code -> "PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
+	val walletSecurity = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Set wallet lock"
+		HoneyLanguage.Chinese.code -> "Set wallet lock"
+		HoneyLanguage.Japanese.code -> "Set wallet lock"
+		HoneyLanguage.Korean.code -> "Set wallet lock"
+		HoneyLanguage.Russian.code -> "Set wallet lock"
+		HoneyLanguage.TraditionalChinese.code -> "Set wallet lock"
 		else -> ""
 	}
 	@JvmField

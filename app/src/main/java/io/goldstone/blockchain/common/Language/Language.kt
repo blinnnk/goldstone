@@ -160,30 +160,30 @@ object PincodeText {
 		else -> ""
 	}
 	val setPinCode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "数字密码PIN设置"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Digital password PIN setting"
+		HoneyLanguage.Chinese.code -> "Digital password PIN setting"
+		HoneyLanguage.Japanese.code -> "Digital password PIN setting"
+		HoneyLanguage.Korean.code -> "Digital password PIN setting"
+		HoneyLanguage.Russian.code -> "Digital password PIN setting"
+		HoneyLanguage.TraditionalChinese.code -> "Digital password PIN setting"
 		else -> ""
 	}
 	val changePinCode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "更改数字PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Change the numeric PIN code"
+		HoneyLanguage.Chinese.code -> "Change the numeric PIN code"
+		HoneyLanguage.Japanese.code -> "Change the numeric PIN code"
+		HoneyLanguage.Korean.code -> "Change the numeric PIN code"
+		HoneyLanguage.Russian.code -> "Change the numeric PIN code"
+		HoneyLanguage.TraditionalChinese.code -> "Change the numeric PIN code"
 		else -> ""
 	}
 	val goToSetPinCode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "去设置数字密码"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "To set a numeric password"
+		HoneyLanguage.Chinese.code -> "To set a numeric password"
+		HoneyLanguage.Japanese.code -> "To set a numeric password"
+		HoneyLanguage.Korean.code -> "To set a numeric password"
+		HoneyLanguage.Russian.code -> "To set a numeric password"
+		HoneyLanguage.TraditionalChinese.code -> "To set a numeric password"
 		else -> ""
 	}
 	@JvmField
@@ -200,84 +200,96 @@ object PincodeText {
 
 object FingerprintUnlockText {
 	val fingerprintUnlock = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "指纹解锁"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Fingerprint unlock"
+		HoneyLanguage.Chinese.code -> "Fingerprint unlock"
+		HoneyLanguage.Japanese.code -> "Fingerprint unlock"
+		HoneyLanguage.Korean.code -> "Fingerprint unlock"
+		HoneyLanguage.Russian.code -> "Fingerprint unlock"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint unlock"
 		else -> ""
 	}
 	val attention = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "设置钱包后,需要解锁才能查看钱包。钱包锁可以更好的保护你的隐私。"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Chinese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Japanese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Korean.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Russian.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.TraditionalChinese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
 		else -> ""
 	}
 	val fingerprintIsOn = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "指纹已开启"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Fingerprint is on"
+		HoneyLanguage.Chinese.code -> "Fingerprint is on"
+		HoneyLanguage.Japanese.code -> "Fingerprint is on"
+		HoneyLanguage.Korean.code -> "Fingerprint is on"
+		HoneyLanguage.Russian.code -> "Fingerprint is on"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint is on"
 		else -> ""
 	}
 	val fingerprintOpeningPrompt = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "我们建议您同时开启数字密码,\n这样在您指纹未能正确识别时,\n还可以通过密码来解锁钱包。"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "We recommend that you turn on your digital password at the same time.\n" +
+			"This way, when your fingerprint is not recognized correctly,\n" +
+			"You can also unlock your wallet with a password."
+		HoneyLanguage.Chinese.code -> "We recommend that you turn on your digital password at the same time.\n" +
+			"This way, when your fingerprint is not recognized correctly,\n" +
+			"You can also unlock your wallet with a password."
+		HoneyLanguage.Japanese.code -> "We recommend that you turn on your digital password at the same time.\n" +
+			"This way, when your fingerprint is not recognized correctly,\n" +
+			"You can also unlock your wallet with a password."
+		HoneyLanguage.Korean.code -> "We recommend that you turn on your digital password at the same time.\n" +
+			"This way, when your fingerprint is not recognized correctly,\n" +
+			"You can also unlock your wallet with a password."
+		HoneyLanguage.Russian.code -> "We recommend that you turn on your digital password at the same time.\n" +
+			"This way, when your fingerprint is not recognized correctly,\n" +
+			"You can also unlock your wallet with a password."
+		HoneyLanguage.TraditionalChinese.code -> "We recommend that you turn on your digital password at the same time.\n" +
+			"This way, when your fingerprint is not recognized correctly,\n" +
+			"You can also unlock your wallet with a password."
 		else -> ""
 	}
 	val goToSetFingerprint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "去设置指纹"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Go to set the fingerprint"
+		HoneyLanguage.Chinese.code -> "Go to set the fingerprint"
+		HoneyLanguage.Japanese.code -> "Go to set the fingerprint"
+		HoneyLanguage.Korean.code -> "Go to set the fingerprint"
+		HoneyLanguage.Russian.code -> "Go to set the fingerprint"
+		HoneyLanguage.TraditionalChinese.code -> "Go to set the fingerprint"
 		else -> ""
 	}
 	val yourDeviceHasNotSetAFingerprintYet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "你的设备还没有设置指纹"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Chinese.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Japanese.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Korean.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Russian.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.TraditionalChinese.code -> "Your device has not set a fingerprint yet"
 		else -> ""
 	}
 	val fingerprintNotSetPrompt = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "我们检测到当前你并没有设置\n过指纹。去系统设置中录入指纹后\n再来开启指纹识别吧。"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Chinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Japanese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Korean.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Russian.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.TraditionalChinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
 		else -> ""
 	}
 	val theDeviceIsNotFingerprinted = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "该设备未录入指纹，请去系统->设置中添加指纹"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Chinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Japanese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Korean.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Russian.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.TraditionalChinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
 		else -> ""
 	}
 	val theDeviceHasNotDetectedTheFingerprintHardware = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show PIN"
-		HoneyLanguage.Chinese.code -> "该设备尚未检测到指纹硬件"
-		HoneyLanguage.Japanese.code -> "PINコードを表示します"
-		HoneyLanguage.Korean.code -> "PIN 코드 표시"
-		HoneyLanguage.Russian.code -> "Показать PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
+		HoneyLanguage.English.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Chinese.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Japanese.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Korean.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Russian.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.TraditionalChinese.code -> "The device has not detected the fingerprint hardware"
 		else -> ""
 	}
 }

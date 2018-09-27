@@ -7,9 +7,9 @@ import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
 import android.os.CancellationSignal
 import android.support.annotation.RequiresApi
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.language.FingerprintUnlockText
-import org.jetbrains.anko.toast
+import io.goldstone.blockchain.common.error.WalletSecurityError
 
 /**
  * @date 04/09/2018 3:32 PM
@@ -25,17 +25,30 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 		this.authenticationCallback = authenticationCallback
 	}
 
-	fun startFingerprintUnlock() {
-		when (checkFingerprintAvailable()) {
-			0 -> context.toast(FingerprintUnlockText.theDeviceIsNotFingerprinted)
-			1 -> {
-				// 可以指纹检测
-				authenticate()
+	fun startFingerprintUnlock(@UiThread hold: (error: WalletSecurityError) -> Unit) {
+		val checkFingerprintAvailable = checkFingerprintAvailable()
+		if (checkFingerprintAvailable == CheckFingerprintAvailable.Normal.status) {
+			// 可以指纹检测
+			authenticate()
+			hold(WalletSecurityError.None)
+		} else {
+			getCheckedFingerprintTips(checkFingerprintAvailable) {
+				hold(it)
 			}
-			-1 -> context.toast(FingerprintUnlockText.theDeviceHasNotDetectedTheFingerprintHardware)
 		}
 	}
 
+	private fun getCheckedFingerprintTips(
+		checkFingerprintAvailable: Int,
+		@UiThread hold: (error: WalletSecurityError) -> Unit
+	) {
+		when (checkFingerprintAvailable) {
+			CheckFingerprintAvailable.TheDeviceIsNotFingerprinted.status ->
+				hold(WalletSecurityError.TheDeviceIsNotFingerprinted)
+			CheckFingerprintAvailable.TheDeviceHasNotDetectedTheFingerprintHardware.status ->
+				hold(WalletSecurityError.TheDeviceHasNotDetectedTheFingerprintHardware)
+		}
+	}
 
 	private fun authenticate() {
 		if (cancellationSignal == null) {
@@ -50,19 +63,16 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 		)
 	}
 
-	/**
-	 * @return 0 支持指纹但是没有录入指纹; 1：有可用指纹; -1，手机不支持指纹
-	 */
 	fun checkFingerprintAvailable(): Int {
 		if (fingerprintManager.isNull()) {
 			fingerprintManager = context.getSystemService(FingerprintManager::class.java)
 		}
 		if (!fingerprintManager.isHardwareDetected) {
-			return -1
+			return CheckFingerprintAvailable.TheDeviceHasNotDetectedTheFingerprintHardware.status
 		} else if (!fingerprintManager.hasEnrolledFingerprints()) {
-			return 0
+			return CheckFingerprintAvailable.TheDeviceIsNotFingerprinted.status
 		}
-		return 1
+		return CheckFingerprintAvailable.Normal.status
 	}
 
 	fun stopAuthenticate() {
@@ -117,4 +127,13 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 			helpString: CharSequence
 		)
 	}
+}
+
+/**
+ *  0 支持指纹但是没有录入指纹; 1：有可用指纹; -1，手机不支持指纹
+ */
+enum class CheckFingerprintAvailable(val status: Int) {
+	Normal(1),
+	TheDeviceIsNotFingerprinted(0),
+	TheDeviceHasNotDetectedTheFingerprintHardware(-1)
 }

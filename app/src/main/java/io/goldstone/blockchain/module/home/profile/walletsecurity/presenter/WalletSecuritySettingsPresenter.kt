@@ -1,62 +1,25 @@
-package io.goldstone.blockchain.module.home.profile.walletlock.presenter
+package io.goldstone.blockchain.module.home.profile.walletsecurity.presenter
 
-import android.annotation.SuppressLint
-import android.os.Handler
-import android.os.Message
-import android.os.Parcel
-import android.os.Parcelable
 import android.widget.EditText
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Count
-import io.goldstone.blockchain.common.value.PasswordRetrievalHandlerMark
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.profile.walletlock.view.WalletLockFragment
+import io.goldstone.blockchain.module.home.profile.walletsecurity.view.WalletSecuritySettingsFragment
 
 /**
  * @date 11/09/2018 3:45 PM
  * @author wcx
  */
-class WalletLockPresenter(
-	override val fragment: WalletLockFragment
-) : BasePresenter<WalletLockFragment>() {
+class WalletSecuritySettingsPresenter(
+	override val fragment: WalletSecuritySettingsFragment
+) : BasePresenter<WalletSecuritySettingsFragment>() {
 
-	private val handler: Handler = @SuppressLint("HandlerLeak")
-	object : Handler(), Parcelable {
-		override fun writeToParcel(
-			p0: Parcel?,
-			p1: Int
-		) {
-		}
-
-		override fun describeContents(): Int {
-			return 0
-		}
-
-		override fun handleMessage(msg: Message?) {
-			super.handleMessage(msg)
-			when (msg?.what) {
-				PasswordRetrievalHandlerMark.setNewPassword -> {
-					setShowPinCodeStatus(true)
-					fragment.setChangePinCodeVisibility()
-					fragment.setPinCodeSingleLineSwitch(true)
-				}
-				PasswordRetrievalHandlerMark.incompletePassword -> {
-					fragment.getParentFragment<ProfileOverlayFragment> {
-						presenter.removeSelfFromActivity()
-					}
-				}
-			}
-		}
-	}
-
-	fun setShowPinCodeStatus(
+	fun showPinCodeStatus(
 		status: Boolean,
 		callback: () -> Unit = {}
 	) {
@@ -67,19 +30,19 @@ class WalletLockPresenter(
 					callback()
 					return@getAppConfig
 				}
-				setShowPinCodeStatus(status) {
+				showPinCodeStatus(status) {
 					callback()
 				}
 			}
 		}
 	}
 
-	fun setShowFingerprintStatus(
+	fun showFingerprintStatus(
 		status: Boolean,
 		callback: () -> Unit = {}
 	) {
 		AppConfigTable.apply {
-			setShowFingerprintUnlockStatus(status) {
+			showFingerprintUnlockStatus(status) {
 				callback()
 			}
 		}
@@ -107,7 +70,7 @@ class WalletLockPresenter(
 
 		AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
 			fragment.context?.alert(CommonText.succeed)
-			setShowPinCodeStatus(true)
+			showPinCodeStatus(true)
 			switch.isChecked = true
 		}
 	}

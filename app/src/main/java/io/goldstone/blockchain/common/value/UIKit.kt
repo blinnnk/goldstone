@@ -174,11 +174,6 @@ object Count {
 	const val retry = 5
 }
 
-object PasswordRetrievalHandlerMark {
-	const val setNewPassword = 1
-	const val incompletePassword = 2
-}
-
 object WalletDetailSize {
 	@JvmField
 	val headerHeight = 365.uiPX()

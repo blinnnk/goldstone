@@ -123,7 +123,7 @@ class ProfilePresenter(
 					}.getFixString()
 				),
 				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
-				ProfileModel(R.drawable.pin_code_icon, ProfileText.walletLock, ""),
+				ProfileModel(R.drawable.pin_code_icon, ProfileText.walletSecurity, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.contact_us_icon, ProfileText.support, ""),
