@@ -94,7 +94,7 @@ class TokenAssetPresenter(
 					Bundle(),
 					2
 				)
-			TokenDetailText.tradeRAM -> tokenDetailOverlayPresenter
+			TokenDetailText.buySellRAM -> tokenDetailOverlayPresenter
 				?.showTargetFragment<RAMTradingFragment>(
 					Bundle(),
 					2

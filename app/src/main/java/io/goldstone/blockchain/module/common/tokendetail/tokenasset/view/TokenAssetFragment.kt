@@ -21,6 +21,7 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -79,7 +80,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 
 	private val accountAddress by lazy {
 		GraySquareCell(context!!).apply {
-			setTitle("Public Key")
+			setTitle(EOSAccountText.publicKey)
 			val address =
 				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
 				else SharedAddress.getCurrentEOS().scaleTo(24)
@@ -221,7 +222,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		listOf(
 			Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
 			Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
-			Pair(R.drawable.ram_icon, TokenDetailText.tradeRAM)
+			Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM)
 		).forEach { pair ->
 			generateCardView(pair)
 		}
