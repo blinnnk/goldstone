@@ -2,12 +2,17 @@ package io.goldstone.blockchain.kernel.network.eos.eosram
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.crypto.eos.EOSCPUUnit
 import io.goldstone.blockchain.crypto.eos.EOSUnit
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.runOnUiThread
+import java.math.BigInteger
 
 
 /**
@@ -70,5 +75,70 @@ object EOSResourceUtil {
 				hold(ramAmount, error)
 			} else hold(null, error)
 		}
+	}
+
+	fun getCPUPrice(
+		account: EOSAccount,
+		unit: EOSCPUUnit = EOSCPUUnit.MS,
+		hold: (priceInEOS: Double?, error: GoldStoneError) -> Unit
+	) {
+		EOSAPI.getAccountInfo(
+			account,
+			{ hold(null, it) }
+		) { accountInfo ->
+			val priceInEOS =
+				getCPUPriceByTime(accountInfo.cpuWeight, accountInfo.cpuLimit.max, unit)
+			hold(priceInEOS, GoldStoneError.None)
+		}
+	}
+
+	fun getNETPrice(
+		account: EOSAccount,
+		unit: EOSUnit = EOSUnit.KB,
+		hold: (priceInEOS: Double?, error: GoldStoneError) -> Unit
+	) {
+		EOSAPI.getAccountInfo(
+			account,
+			{ hold(null, it) }
+		) { accountInfo ->
+			val priceInEOS =
+				getNETPriceByTime(accountInfo.netWeight, accountInfo.netLimit.max, unit)
+			hold(priceInEOS, GoldStoneError.None)
+		}
+	}
+
+	/**
+	 * @date: 2018/9/26
+	 * @author LiHai
+	 * [unit] 如果不是毫秒单位，一律返回纳秒单位价格
+	 */
+	private fun getCPUPriceByTime(
+		myDelegateCPUWeight: BigInteger,
+		myMaxCPULimit: BigInteger,
+		unit: EOSCPUUnit
+	): Double {
+		var cpuPrice =
+			myDelegateCPUWeight.toEOSCount() / (myMaxCPULimit * BigInteger.valueOf(3)).toDouble()
+		if (unit == EOSCPUUnit.MS) {
+			cpuPrice *= 1000
+		}
+		return cpuPrice
+	}
+
+	private fun getNETPriceByTime(
+		myDelegateNETWeight: BigInteger,
+		myMaxNETLimit: BigInteger,
+		unit: EOSUnit
+	): Double {
+		var netPrice =
+			myDelegateNETWeight.toEOSCount() / (myMaxNETLimit * BigInteger.valueOf(3)).toDouble()
+		val multiplier = when (unit.value) {
+			EOSUnit.Byte.value -> 1
+			EOSUnit.KB.value -> 1024
+			EOSUnit.MB.value -> 1024 * 1024
+			else -> 1
+		}
+		netPrice *= multiplier
+		return netPrice
 	}
 }

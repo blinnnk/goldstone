@@ -13,7 +13,10 @@ enum class EOSWalletType {
 enum class EOSUnit(val value: String) {
 	KB("KB"),
 	MB("MB"),
-	Byte("Byte"),
+	Byte("Byte")
+}
+
+enum class EOSCPUUnit(val value: String) {
 	SEC("SEC"),
 	MS("MS"),
 	MUS("MUS"),
