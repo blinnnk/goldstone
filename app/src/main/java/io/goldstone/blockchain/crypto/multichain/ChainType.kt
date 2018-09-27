@@ -6,10 +6,10 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.uiThread
 import java.io.Serializable
 
 
@@ -95,7 +95,7 @@ class ChainType(val id: Int) : Serializable {
 	// 与 `WalletTable` 有关联的非纯粹但是便捷的方法
 	fun updateCurrentAddress(
 		newAddress: String,
-		@UiThread callback: (isSwitchEOSAddress: Boolean) -> Unit
+		@UiThread callback: (isSwitchEOSAddress: Boolean, wallet: WalletTable) -> Unit
 	) {
 		doAsync {
 			val walletDao = GoldStoneDataBase.database.walletDao()
@@ -124,20 +124,18 @@ class ChainType(val id: Int) : Serializable {
 					currentWallet?.currentEOSAccountName = EOSDefaultAllChainName(newAddress, newAddress)
 					SharedAddress.updateCurrentEOS(newAddress)
 				}
-				ChainType.BTC.id -> {
-					if (SharedValue.isTestEnvironment()) {
-						currentWallet?.currentBTCSeriesTestAddress = newAddress
-						SharedAddress.updateCurrentBTCSeriesTest(newAddress)
-					} else {
-						currentWallet?.currentBTCAddress = newAddress
-						SharedAddress.updateCurrentBTC(newAddress)
-					}
+				ChainType.BTC.id -> if (SharedValue.isTestEnvironment()) {
+					currentWallet?.currentBTCSeriesTestAddress = newAddress
+					SharedAddress.updateCurrentBTCSeriesTest(newAddress)
+				} else {
+					currentWallet?.currentBTCAddress = newAddress
+					SharedAddress.updateCurrentBTC(newAddress)
 				}
 			}
 			currentWallet?.apply {
-				GoldStoneDataBase.database.walletDao().update(this)
-				GoldStoneAPI.context.runOnUiThread {
-					callback(ChainType(this@ChainType.id).isEOS())
+				walletDao.update(this)
+				uiThread {
+					callback(ChainType(it.id).isEOS(), this)
 				}
 			}
 		}

@@ -6,8 +6,6 @@ package io.goldstone.blockchain.common.language
  */
 
 object TokenDetailText {
-
-	//	····················转账记录相关····················
 	@JvmField
 	val address = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Recipient Address"

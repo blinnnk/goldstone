@@ -83,46 +83,6 @@ class AddressManagerPresenter(
 		}
 	}
 
-	fun getMultiChainAddresses(wallet: WalletTable) {
-		fragment.setMultiChainAddresses(wallet.getCurrentAddressAndSymbol())
-	}
-
-	fun getEthereumAddresses(wallet: WalletTable) {
-		fragment.setEthereumAddressesModel(convertToChildAddresses(wallet.ethAddresses))
-	}
-
-	fun getBitcoinCashAddresses(wallet: WalletTable) {
-		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.bchAddresses))
-	}
-
-	fun getBitcoinCashTestAddresses(wallet: WalletTable) {
-		fragment.setBitcoinCashAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
-	}
-
-	fun getEthereumClassicAddresses(wallet: WalletTable) {
-		fragment.setEthereumClassicAddressesModel(convertToChildAddresses(wallet.etcAddresses))
-	}
-
-	fun getBitcoinAddresses(wallet: WalletTable) {
-		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcAddresses))
-	}
-
-	fun getBitcoinTestAddresses(wallet: WalletTable) {
-		fragment.setBitcoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
-	}
-
-	fun getLitecoinTestAddresses(wallet: WalletTable) {
-		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.btcSeriesTestAddresses))
-	}
-
-	fun getLitecoinAddresses(wallet: WalletTable) {
-		fragment.setLitecoinAddressesModel(convertToChildAddresses(wallet.ltcAddresses))
-	}
-
-	fun getEOSAddresses(wallet: WalletTable) {
-		fragment.setEOSAddressesModel(convertToChildAddresses(wallet.eosAddresses))
-	}
-
 	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
 		return listOf(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHAndERCAddress),
@@ -255,7 +215,7 @@ class AddressManagerPresenter(
 								wallet.id
 							)
 						)
-						WalletTable.updateETHAndERCAddresses(address, newAddressIndex) {
+						wallet.updateETHSeriesAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
 						}
 					}
@@ -293,7 +253,7 @@ class AddressManagerPresenter(
 								wallet.id
 							)
 						)
-						WalletTable.updateETCAddresses(address, newAddressIndex) {
+						wallet.updateETCAddresses(address, newAddressIndex) {
 							hold(convertToChildAddresses(it).toArrayList())
 						}
 					}
@@ -309,8 +269,7 @@ class AddressManagerPresenter(
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentEOS(),
-				true,
-				false
+				true
 			) { isCorrect ->
 				if (!isCorrect) {
 					context.alert(CommonText.wrongPassword)
@@ -326,7 +285,6 @@ class AddressManagerPresenter(
 								eosKeyPair.privateKey,
 								eosKeyPair.address,
 								password,
-								false,
 								false
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
@@ -347,7 +305,7 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							WalletTable.updateEOSAddresses(eosKeyPair.address, newAddressIndex) {
+							wallet.updateEOSAddresses(eosKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}
@@ -364,52 +322,47 @@ class AddressManagerPresenter(
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBTC(),
-				true,
-				false
+				true
 			) { isCorrect ->
-				if (isCorrect) {
-					WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
-						wallet.encryptMnemonic?.let { encryptMnemonic ->
-							val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-							val newAddressIndex = childAddressIndex + 1
-							val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
-							BTCWalletUtils.getBitcoinWalletByMnemonic(
-								mnemonic,
-								newChildPath
-							) { address, secret ->
-								// 存入 `KeyStore`
-								context.storeBase58PrivateKey(
-									secret,
+				if (isCorrect) WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+					wallet.encryptMnemonic?.let { encryptMnemonic ->
+						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+						val newAddressIndex = childAddressIndex + 1
+						val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
+						BTCWalletUtils.getBitcoinWalletByMnemonic(
+							mnemonic,
+							newChildPath
+						) { address, secret ->
+							// 存入 `KeyStore`
+							context.storeBase58PrivateKey(
+								secret,
+								address,
+								password,
+								false
+							)
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							insertNewAddressToMyToken(
+								CoinSymbol.btc(),
+								TokenContract.btcContract,
+								address,
+								ChainID.btcMain
+							)
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommissionModel(
 									address,
-									password,
-									false,
-									false
+									ChainType.BTC.id,
+									1,
+									wallet.id
 								)
-								// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-								insertNewAddressToMyToken(
-									CoinSymbol.btc(),
-									TokenContract.btcContract,
-									address,
-									ChainID.btcMain
-								)
-								// 注册新增的子地址
-								XinGePushReceiver.registerSingleAddress(
-									AddressCommissionModel(
-										address,
-										ChainType.BTC.id,
-										1,
-										wallet.id
-									)
-								)
-								WalletTable.updateBTCAddresses(address, newAddressIndex) {
-									hold(convertToChildAddresses(it).toArrayList())
-								}
+							)
+							wallet.updateBTCAddresses(address, newAddressIndex) {
+								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}
 					}
-				} else {
-					context.alert(CommonText.wrongPassword)
 				}
+				else context.alert(CommonText.wrongPassword)
 			}
 		}
 
@@ -421,15 +374,10 @@ class AddressManagerPresenter(
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBTCSeriesTest(),
-				true,
-				false
+				true
 			) { isCorrect ->
-				if (!isCorrect) {
-					context.alert(CommonText.wrongPassword)
-					return@verifyKeystorePassword
-				}
-
-				WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				if (!isCorrect) context.alert(CommonText.wrongPassword)
+				else WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -439,8 +387,7 @@ class AddressManagerPresenter(
 								secret,
 								address,
 								password,
-								true,
-								false
+								true
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							// `BTCTest` 是 `BTCSeries` 公用的地址
@@ -473,7 +420,7 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							WalletTable.updateBTCTestAddresses(address, newAddressIndex) {
+							wallet.updateBTCSeriesTestAddresses(address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}
@@ -490,15 +437,10 @@ class AddressManagerPresenter(
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBCH(),
-				true,
-				false
+				true
 			) { isCorrect ->
-				if (!isCorrect) {
-					context.alert(CommonText.wrongPassword)
-					return@verifyKeystorePassword
-				}
-
-				WalletTable.getBCHWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				if (!isCorrect) context.alert(CommonText.wrongPassword)
+				else WalletTable.getBCHWalletLatestChildAddressIndex { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -508,7 +450,6 @@ class AddressManagerPresenter(
 								bchKeyPair.privateKey,
 								bchKeyPair.address,
 								password,
-								false,
 								false
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
@@ -527,7 +468,7 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							WalletTable.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
+							wallet.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}
@@ -544,15 +485,10 @@ class AddressManagerPresenter(
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentLTC(),
-				true,
-				false
+				true
 			) { isCorrect ->
-				if (!isCorrect) {
-					context.alert(CommonText.wrongPassword)
-					return@verifyKeystorePassword
-				}
-
-				WalletTable.getLTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				if (!isCorrect) context.alert(CommonText.wrongPassword)
+				else WalletTable.getLTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -564,8 +500,7 @@ class AddressManagerPresenter(
 							context.storeLTCBase58PrivateKey(
 								ltcKeyPair.privateKey,
 								ltcKeyPair.address,
-								password,
-								false
+								password
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							insertNewAddressToMyToken(
@@ -583,7 +518,7 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							WalletTable.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
+							wallet.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
 								hold(convertToChildAddresses(it).toArrayList())
 							}
 						}

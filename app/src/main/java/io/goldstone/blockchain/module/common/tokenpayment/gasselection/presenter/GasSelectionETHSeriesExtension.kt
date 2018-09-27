@@ -119,13 +119,11 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	password: String,
 	@WorkerThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
 	// 获取当前账户的私钥
 	fragment.context?.getPrivateKey(
 		getETHERC20OrETCAddress(),
 		password,
 		false,
-		isSingleChainWallet,
 		false,
 		hold
 	)

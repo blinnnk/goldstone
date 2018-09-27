@@ -164,46 +164,33 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				// 不为空才显示 `bip44` 规则的子地址界面
 				WalletTable.getCurrentWallet {
 					currentMultiChainAddressesView.into(this@parent)
-					currentMultiChainAddressesView.currentWallet = this
-					presenter.getMultiChainAddresses(this)
+					setMultiChainAddresses(this)
 					if (ethAddresses.isNotEmpty()) {
 						// ETHSeries List
 						ethSeriesView.into(this@parent)
-						ethSeriesView.currentWallet = this
-						ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
-						presenter.getEthereumAddresses(this)
+						setEthereumAddressesModel(this)
 						// ETC List
 						etcAddressesView.into(this@parent)
-						etcAddressesView.currentWallet = this
-						etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
-						presenter.getEthereumClassicAddresses(this)
+						setEthereumClassicAddressesModel(this)
 						// BTC List
 						btcAddressesView.into(this@parent)
-						btcAddressesView.currentWallet = this
-						btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 						// `比特币` 的主网测试网地址根据环境显示不同的数据
 						// EOS List
 						eosAddressesView.into(this@parent)
-						eosAddressesView.currentWallet = this
-						eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
-						presenter.getEOSAddresses(this)
+						setEOSAddressesModel(this)
 						if (!SharedValue.isTestEnvironment()) {
-							presenter.getBitcoinAddresses(this)
+							setBitcoinAddressesModel(this)
 							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
 							// BCH List
 							bchAddressesView.into(this@parent)
-							bchAddressesView.currentWallet = this
-							bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
-							presenter.getBitcoinCashAddresses(this)
+							setBitcoinCashAddressesModel(this)
 							// LTC List
 							ltcAddressesView.into(this@parent)
-							ltcAddressesView.currentWallet = this
-							ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
-							presenter.getLitecoinAddresses(this)
+							setLitecoinAddressesModel(this)
 						} else {
-							presenter.getBitcoinTestAddresses(this)
-							presenter.getBitcoinCashTestAddresses(this)
-							presenter.getLitecoinTestAddresses(this)
+							setBitcoinAddressesModel(this)
+							setBitcoinCashAddressesModel(this)
+							setLitecoinAddressesModel(this)
 						}
 					} else {
 						hideAddButton()
@@ -218,45 +205,64 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
 	}
 
-	fun setMultiChainAddresses(model: List<Pair<String, String>>) {
+	private fun setMultiChainAddresses(wallet: WalletTable) {
 		currentMultiChainAddressesView.setTitle(WalletSettingsText.currentMultiChainAddresses)
-		currentMultiChainAddressesView.model = model
+		currentMultiChainAddressesView.currentWallet = wallet
+		currentMultiChainAddressesView.model = wallet.getCurrentAddressAndSymbol()
 	}
 
-	fun setEthereumAddressesModel(model: List<Pair<String, String>>) {
+	fun setEthereumAddressesModel(wallet: WalletTable) {
+		ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
 		ethSeriesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
-		ethSeriesView.model = model
+		ethSeriesView.currentWallet = wallet
+		ethSeriesView.model = AddressManagerPresenter.convertToChildAddresses(wallet.ethAddresses)
 	}
 
-	fun setBitcoinCashAddressesModel(model: List<Pair<String, String>>) {
+	fun setBitcoinCashAddressesModel(wallet: WalletTable) {
+		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
+		else wallet.bchAddresses
+		bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashAddress)
-		bchAddressesView.model = model
+		bchAddressesView.currentWallet = wallet
+		bchAddressesView.model = AddressManagerPresenter.convertToChildAddresses(address)
 	}
 
-	fun setEthereumClassicAddressesModel(model: List<Pair<String, String>>) {
+	fun setEthereumClassicAddressesModel(wallet: WalletTable) {
+		etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
-		etcAddressesView.model = model
+		etcAddressesView.currentWallet = wallet
+		etcAddressesView.model = AddressManagerPresenter.convertToChildAddresses(wallet.etcAddresses)
 	}
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
-	fun setBitcoinAddressesModel(model: List<Pair<String, String>>) {
+	fun setBitcoinAddressesModel(wallet: WalletTable) {
 		val title = if (SharedValue.isTestEnvironment()) {
 			"${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
 		} else {
 			WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
 		}
+		val addresses = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
+		else wallet.btcAddresses
+		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 		btcAddressesView.setTitle(title)
-		btcAddressesView.model = model
+		btcAddressesView.currentWallet = wallet
+		btcAddressesView.model = AddressManagerPresenter.convertToChildAddresses(addresses)
 	}
 
-	fun setLitecoinAddressesModel(model: List<Pair<String, String>>) {
+	fun setLitecoinAddressesModel(wallet: WalletTable) {
+		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
+		else wallet.ltcAddresses
+		ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
-		ltcAddressesView.model = model
+		ltcAddressesView.currentWallet = wallet
+		ltcAddressesView.model = AddressManagerPresenter.convertToChildAddresses(address)
 	}
 
-	fun setEOSAddressesModel(model: List<Pair<String, String>>) {
+	fun setEOSAddressesModel(wallet: WalletTable) {
+		eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 		eosAddressesView.setTitle(WalletSettingsText.eosAddress)
-		eosAddressesView.model = model
+		eosAddressesView.currentWallet = wallet
+		eosAddressesView.model = AddressManagerPresenter.convertToChildAddresses(wallet.eosAddresses)
 	}
 
 	fun showCreatorDashboard() {
@@ -341,33 +347,30 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	private fun showCellMoreDashboard(top: Float, address: String, coinType: ChainType, hasDefaultCell: Boolean) {
+	private fun showCellMoreDashboard(
+		top: Float,
+		address: String,
+		coinType: ChainType,
+		hasDefaultCell: Boolean
+	) {
 		AddressManagerFragment.showMoreDashboard(
 			getParentContainer(),
 			top,
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				coinType.updateCurrentAddress(address) { isSwitchEOSAddress ->
+				coinType.updateCurrentAddress(address) { isSwitchEOSAddress, wallet ->
 					// 如果是更改了 `EOS` 的默认地址, 那么跳回首页重新走检测 `AccountName` 流程
 					if (isSwitchEOSAddress) showSwitchEOSAddressAlertAndJump(context)
 					// 更新默认地址后同时更新首页的列表
 					else {
 						updateWalletDetail()
-						WalletTable.getCurrentWallet {
-							when {
-								coinType.isETH() -> presenter.getEthereumAddresses(this)
-								coinType.isETC() -> presenter.getEthereumClassicAddresses(this)
-								coinType.isEOS() -> presenter.getEOSAddresses(this)
-								coinType.isLTC() -> {
-									if (SharedValue.isTestEnvironment()) presenter.getLitecoinTestAddresses(this)
-									else presenter.getLitecoinAddresses(this)
-								}
-								coinType.isBTC() -> {
-									if (SharedValue.isTestEnvironment()) presenter.getBitcoinTestAddresses(this)
-									else presenter.getBitcoinAddresses(this)
-								}
-							}
+						when {
+							coinType.isETH() -> setEthereumAddressesModel(wallet)
+							coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
+							coinType.isEOS() -> setEOSAddressesModel(wallet)
+							coinType.isLTC() -> setLitecoinAddressesModel(wallet)
+							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
 						}
 						toast(CommonText.succeed)
 						AddressManagerFragment.removeDashboard(context)
@@ -440,8 +443,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				context.verifyKeystorePassword(
 					password,
 					SharedAddress.getCurrentBTC(),
-					true,
-					false
+					true
 				) {
 					if (it) callback(password)
 					else context.alert(CommonText.wrongPassword)

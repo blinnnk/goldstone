@@ -99,7 +99,10 @@ open class BaseTradingPresenter(
 		}
 	}
 
-	private fun BaseTradingFragment.tradingRam(stakeType: StakeType, callback: (GoldStoneError) -> Unit) {
+	private fun BaseTradingFragment.tradingRam(
+		stakeType: StakeType,
+		@UiThread callback: (GoldStoneError) -> Unit
+	) {
 		val fromAccount = SharedAddress.getCurrentEOSAccount()
 		val chainID = SharedChain.getEOSCurrent()
 		val toAccount = getInputValue(stakeType).first
@@ -219,9 +222,12 @@ open class BaseTradingPresenter(
 						{ hold(null, error) }
 					) {
 						// 检查发起账户的 `RAM` 余额是否足够
-						if (it < BigInteger.valueOf(tradingCount.toLong())) hold(null, TransferError.BalanceIsNotEnough)
-						else GoldStoneAPI.context.runOnUiThread {
-							PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+						GoldStoneAPI.context.runOnUiThread {
+							when {
+								it < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
+								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
+								else -> PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+							}
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,

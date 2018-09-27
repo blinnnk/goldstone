@@ -41,22 +41,19 @@ fun GasSelectionPresenter.prepareToTransferLTC(callback: (GoldStoneError) -> Uni
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentWalletLTCPrivateKey(
+private fun GasSelectionPresenter.getCurrentLTCPrivateKey(
 	walletAddress: String,
 	password: String,
 	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
 	if (SharedValue.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
 		true,
 		hold
 	) else fragment.context?.exportLTCBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
 		hold
 	)
 }
@@ -66,7 +63,7 @@ fun GasSelectionPresenter.transferLTC(
 	password: String,
 	callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentWalletLTCPrivateKey(
+	getCurrentLTCPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
 		password
 	) { privateKey, error ->

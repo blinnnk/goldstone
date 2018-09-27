@@ -271,6 +271,105 @@ data class WalletTable(
 		}
 	}
 
+	// Update New Child Address
+	fun updateETHSeriesAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (ethereumSeriesAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$ethAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateETHAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
+	fun updateETCAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (ethereumClassicAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$etcAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateETCAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
+	fun updateBTCAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (bitcoinAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$btcAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateBTCAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
+	fun updateBCHAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (bitcoinCashAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$bchAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateBCHAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
+	fun updateBTCSeriesTestAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (bitcoinAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$btcSeriesTestAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateBTCSeriesTestAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
+	fun updateLTCAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (litecoinAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$ltcAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateLTCAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
+	fun updateEOSAddresses(
+		newAddress: String,
+		newAddressIndex: Int,
+		callback: (eosAddresses: String) -> Unit
+	) {
+		doAsync {
+			val addresses = "$eosAddresses,$newAddress|$newAddressIndex"
+			GoldStoneDataBase.database.walletDao().updateEOSAddress(addresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(addresses)
+			}
+		}
+	}
+
 	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
@@ -503,160 +602,6 @@ data class WalletTable(
 			load { GoldStoneDataBase.database.walletDao().updateHasBackUp() } then { callback() }
 		}
 
-		fun updateETHAndERCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (ethereumSeriesAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.ethAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								ethAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateETCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (ethereumClassicAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.etcAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								etcAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateBTCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (bitcoinAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.btcAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								btcAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateBCHAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (bitcoinCashAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.bchAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								bchAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateBTCTestAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (bitcoinAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.btcSeriesTestAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								btcSeriesTestAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateLTCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (litecoinAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.ltcAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								ltcAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateEOSAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (eosAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.eosAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								eosAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
 		fun updateEOSAccountName(
 			accountNames: List<EOSAccountInfo>,
 			@UiThread callback: (hasDefaultAccount: Boolean) -> Unit
@@ -794,4 +739,25 @@ interface WalletDao {
 
 	@Query("UPDATE wallet SET eosAccountNames = :accounts  WHERE isUsing = :status")
 	fun updateCurrentEOSAccountNames(accounts: List<EOSAccountInfo>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET ethAddresses = :ethAddresses  WHERE isUsing = :status")
+	fun updateETHAddress(ethAddresses: String, status: Boolean = true)
+
+	@Query("UPDATE wallet SET etcAddresses = :etcAddresses  WHERE isUsing = :status")
+	fun updateETCAddress(etcAddresses: String, status: Boolean = true)
+
+	@Query("UPDATE wallet SET btcAddresses = :btcAddresses  WHERE isUsing = :status")
+	fun updateBTCAddress(btcAddresses: String, status: Boolean = true)
+
+	@Query("UPDATE wallet SET btcSeriesTestAddresses = :btcSeriesTestAddresses  WHERE isUsing = :status")
+	fun updateBTCSeriesTestAddress(btcSeriesTestAddresses: String, status: Boolean = true)
+
+	@Query("UPDATE wallet SET ltcAddresses = :ltcAddresses  WHERE isUsing = :status")
+	fun updateLTCAddress(ltcAddresses: String, status: Boolean = true)
+
+	@Query("UPDATE wallet SET bchAddresses = :bchAddresses  WHERE isUsing = :status")
+	fun updateBCHAddress(bchAddresses: String, status: Boolean = true)
+
+	@Query("UPDATE wallet SET eosAddresses = :eosAddresses  WHERE isUsing = :status")
+	fun updateEOSAddress(eosAddresses: String, status: Boolean = true)
 }

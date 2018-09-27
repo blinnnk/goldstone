@@ -40,16 +40,14 @@ fun GasSelectionPresenter.prepareToTransferBCH(callback: (GoldStoneError) -> Uni
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentWalletBCHPrivateKey(
+private fun GasSelectionPresenter.getCurrentBCHPrivateKey(
 	walletAddress: String,
 	password: String,
 	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
 	fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
 		SharedValue.isTestEnvironment(),
 		hold
 	)
@@ -60,7 +58,7 @@ fun GasSelectionPresenter.transferBCH(
 	password: String,
 	callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentWalletBCHPrivateKey(
+	getCurrentBCHPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
 		password
 	) { privateKey, error ->

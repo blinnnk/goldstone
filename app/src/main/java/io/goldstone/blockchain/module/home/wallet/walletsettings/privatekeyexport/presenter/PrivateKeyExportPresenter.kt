@@ -3,17 +3,17 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpo
 import android.app.Activity
 import android.content.Context
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.keystore.getBigIntegerPrivateKeyByWalletID
 import io.goldstone.blockchain.crypto.keystore.getPrivateKey
-import io.goldstone.blockchain.crypto.keystore.getPrivateKeyByWalletID
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
@@ -52,9 +52,11 @@ class PrivateKeyExportPresenter(
 			password: String,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			if (password.isEmpty()) hold(null, AccountError.WrongPassword)
+			if (password.isEmpty())
+				hold(null, AccountError.WrongPassword)
 			else WalletTable.getWalletType { walletType, wallet ->
-				if (walletType.isMultiChain()) context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
+				if (walletType.isMultiChain())
+					context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
 				else context.getPrivateKeyByAddress(address, chainType, password, hold)
 			}
 			(context as? Activity)?.apply { SoftKeyboard.hide(this) }
@@ -66,26 +68,23 @@ class PrivateKeyExportPresenter(
 			password: String,
 			hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			val isSingleChainWallet = !SharedWallet.getCurrentWalletType().isBIP44()
 			when {
 				chainType.isBTC() || chainType.isBCH() || chainType.isEOS() || chainType.isAllTest() ->
-					getBTCPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
-				chainType.isLTC() -> exportLTCBase58PrivateKey(address, password, isSingleChainWallet, hold)
-				else -> getETHSeriesPrivateKeyByAddress(address, password, isSingleChainWallet, hold)
+					getBTCPrivateKeyByAddress(address, password, hold)
+				chainType.isLTC() -> exportLTCBase58PrivateKey(address, password, hold)
+				else -> getETHSeriesPrivateKeyByAddress(address, password, hold)
 			}
 		}
 
 		private fun Context.getETHSeriesPrivateKeyByAddress(
 			address: String,
 			password: String,
-			isSingleChainWallet: Boolean,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
 			getPrivateKey(
 				address,
 				password,
 				false,
-				isSingleChainWallet,
 				true,
 				hold
 			)
@@ -94,13 +93,12 @@ class PrivateKeyExportPresenter(
 		private fun Context.getBTCPrivateKeyByAddress(
 			address: String,
 			password: String,
-			isSingleChainWallet: Boolean,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
 			// 所有 `Get PrivateKey` 都在异步获取在主线程返回
 			val isTest = BTCUtils.isValidTestnetAddress(address)
 			// hold 会在 `exportBase58PrivateKey` 中返回到主线程
-			exportBase58PrivateKey(address, password, isSingleChainWallet, isTest, hold)
+			exportBase58PrivateKey(address, password, isTest, hold)
 		}
 
 		private fun Context.getPrivateKeyByWalletID(
@@ -109,25 +107,24 @@ class PrivateKeyExportPresenter(
 			chainType: ChainType,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			getPrivateKeyByWalletID(
+			getBigIntegerPrivateKeyByWalletID(
 				password,
-				walletID,
-				{ hold(null, it) }
-			) { privateKeyInteger ->
-				hold(when {
+				walletID
+			) { privateKeyInteger, error ->
+				if (!privateKeyInteger.isNull() && error.isNone()) hold(when {
 					ChainType.isSamePrivateKeyRule(chainType) && SharedValue.isTestEnvironment() -> {
 						val net =
 							if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
-						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(net)
+						ECKey.fromPrivate(privateKeyInteger!!).getPrivateKeyAsWiF(net)
 					}
 					chainType.isLTC() ->
 						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(LitecoinNetParams())
 					chainType.isEOS() ->
-						EOSWalletUtils.generateKeyPairByPrivateKey(privateKeyInteger).privateKey
+						EOSWalletUtils.generateKeyPairByPrivateKey(privateKeyInteger!!).privateKey
 					chainType.isETC() || chainType.isETH() ->
-						privateKeyInteger.toString(16)
+						privateKeyInteger!!.toString(16)
 					else -> null
-				}, AccountError.None)
+				}, AccountError.None) else hold(null, error)
 			}
 		}
 	}

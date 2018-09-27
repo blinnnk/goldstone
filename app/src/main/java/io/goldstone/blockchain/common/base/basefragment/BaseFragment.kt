@@ -24,7 +24,13 @@ import org.jetbrains.anko.support.v4.UI
 abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment() {
 
 	abstract val presenter: T
+	/**
+	 * 为了解耦, 每个页面自己管理自己的 `Title` 完全杜绝 `Title` 需要有上一个页面带入或者复杂的逻辑
+	 * 恢复自身 `Title` 的耦合业务. 这个 `Abstract `方法会在 `OnFragmentHidden`, `OnCreateView` 的时候
+	 * 检查和更新
+	 */
 	abstract val pageTitle: String
+
 	abstract fun AnkoContext<Fragment>.initView()
 	open val isRelativeContainer = false
 	private lateinit var scrollView: ScrollView

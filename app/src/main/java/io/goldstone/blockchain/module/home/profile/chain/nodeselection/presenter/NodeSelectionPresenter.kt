@@ -95,7 +95,7 @@ class NodeSelectionPresenter(
 						SharedChain.updateEOSCurrentName(
 							ChainNameID.getChainNameByID(currentEOSTestChainNameID)
 						)
-						SharedChain.updateCurrentETH(
+						SharedChain.updateCurrentETHName(
 							ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID)
 						)
 						SharedChain.updateBTCCurrentName(
