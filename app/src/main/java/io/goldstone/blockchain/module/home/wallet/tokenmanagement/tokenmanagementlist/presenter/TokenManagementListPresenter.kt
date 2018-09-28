@@ -44,12 +44,11 @@ class TokenManagementListPresenter(
 		updateData()
 	}
 
+	// 在异步线程更新数据
 	private fun prepareMyDefaultTokens(isETHERCAndETCOnly: Boolean) {
-		// 在异步线程更新数据
 		DefaultTokenTable.getDefaultTokens { defaultTokens ->
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = defaultTokens.size
-
 				override fun concurrentJobs() {
 					defaultTokens.forEach { default ->
 						MyTokenTable.getMyTokens { myTokens ->
@@ -62,8 +61,7 @@ class TokenManagementListPresenter(
 				}
 
 				override fun mergeCallBack() {
-					val sortedList =
-						defaultTokens.sortedByDescending { it.weight }.toArrayList()
+					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 						if (isETHERCAndETCOnly) sortedList.filterNot {
 							TokenContract(it.contract).isBTCSeries() || TokenContract(it.contract).isEOS()
@@ -78,22 +76,14 @@ class TokenManagementListPresenter(
 	}
 
 	companion object {
-
 		fun updateMyTokenInfoBy(switch: HoneyBaseSwitch, token: DefaultTokenTable) {
 			switch.isClickable = false
-			if (switch.isChecked) {
-				// once it is checked then insert this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbolAndContract(token.symbol, TokenContract(token.contract)) {
-					switch.isClickable = true
-				}
-			} else {
+			// once it is checked then insert this symbol into `MyTokenTable` database
+			if (switch.isChecked) MyTokenTable.insertBySymbolAndContract(token.symbol, TokenContract(token.contract)) {
+				switch.isClickable = true
+			} else MyTokenTable.deleteByContract(TokenContract(token.contract), CoinSymbol(token.symbol).getAddress()) {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
-				MyTokenTable.deleteByContract(
-					TokenContract(token.contract),
-					CoinSymbol(token.symbol).getAddress()
-				) {
-					switch.isClickable = true
-				}
+				switch.isClickable = true
 			}
 		}
 	}

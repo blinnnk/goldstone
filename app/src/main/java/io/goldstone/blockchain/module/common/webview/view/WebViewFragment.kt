@@ -88,13 +88,6 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				}
 			}
 		}
-		// 如果长时间没加载到 最长 `8s` 超时删除 `loading`
-		8000L timeUpThen {
-			context?.apply {
-				webView.alpha = 1f
-				removeView(loading)
-			}
-		}
 	}
 
 	private fun ViewGroup.showLocalContent() {

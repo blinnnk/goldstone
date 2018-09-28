@@ -9,6 +9,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
+import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -51,13 +52,9 @@ class SplashActivity : AppCompatActivity() {
 				gradientView.into(this)
 				initWaveView()
 			})
-		}
-	}
-
-	override fun onStart() {
-		super.onStart()
-		presenter.cleanWhenUpdateDatabaseOrElse {
-			runOnUiThread { prepareData() }
+			presenter.cleanWhenUpdateDatabaseOrElse {
+				prepareData(it)
+			}
 		}
 	}
 
@@ -92,15 +89,13 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun prepareData() {
+	private fun prepareData(allWallet: List<WalletTable>) {
 		prepareAppConfig config@{
 			// 如果本地的钱包数量不为空那么才开始注册设备
-			WalletTable.getAll {
-				if (isNotEmpty()) {
-					registerDeviceForPush()
-					// 把 `GoldStoneID` 存储到 `SharePreference` 里面
-					SharedWallet.updateGoldStoneID(goldStoneID)
-				}
+			if (allWallet.isNotEmpty()) {
+				registerDeviceForPush()
+				// 把 `GoldStoneID` 存储到 `SharePreference` 里面
+				SharedWallet.updateGoldStoneID(goldStoneID)
 			}
 			initLaunchLanguage(language)
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
@@ -161,13 +156,9 @@ class SplashActivity : AppCompatActivity() {
 	private fun prepareAppConfig(callback: AppConfigTable.() -> Unit) {
 		AppConfigTable.getAppConfig { config ->
 			config.isNull() isTrue {
-				AppConfigTable.insertAppConfig {
-					AppConfigTable.getAppConfig {
-						it?.apply {
-							callback(this)
-						}
-					}
-				}
+				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
+				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+				AppConfigTable.insertAppConfig(callback)
 			} otherwise {
 				config?.isRegisteredAddresses?.isFalse {
 					/**

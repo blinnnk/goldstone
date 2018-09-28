@@ -49,18 +49,14 @@ class TokenSearchPresenter(
 					}
 				}
 			) { inputContent ->
-				if (canSearch) {
-					MyTokenTable.getMyTokens { myTokens ->
-						searchTokenByContractOrSymbol(inputContent, myTokens) { result ->
-							context?.runOnUiThread {
-								if (SharedWallet.getCurrentWalletType().isETHSeries()) {
-									// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
-									diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot { TokenContract(it.contract).isBTCSeries() }.toArrayList())
-								} else {
-									diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.toArrayList())
-								}
-								fragment.removeLoadingView()
-							}
+				if (canSearch) MyTokenTable.getMyTokens { myTokens ->
+					searchTokenByContractOrSymbol(inputContent, myTokens) { result ->
+						context?.runOnUiThread {
+							if (SharedWallet.getCurrentWalletType().isETHSeries())
+							// 如果是以太坊钱包Only那么过滤掉比特币系列链的 Coin
+								diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.filterNot { TokenContract(it.contract).isBTCSeries() }.toArrayList())
+							else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.toArrayList())
+							fragment.removeLoadingView()
 						}
 					}
 				}
@@ -110,16 +106,10 @@ class TokenSearchPresenter(
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		fragment.showLoadingView(LoadingText.searchingToken)
-		GoldStoneAPI.getTokenInfoBySymbolFromServer(
-			content,
-			{ it ->
-				// Usually this kinds of Exception will be connect to the service Timeout
-				fragment.context?.alert(it.toString().trimStart { it.toString().startsWith(":", true) })
-			}
-		) { result ->
-			if (!result.isNullOrEmpty()) {
+		GoldStoneAPI.getTokenInfoBySymbolFromServer(content) { result, error ->
+			if (!result.isNull() && error.isNone()) {
 				// 从服务器请求目标结果
-				hold(result.map { serverToken ->
+				hold(result!!.map { serverToken ->
 					// 更新使用中的按钮状态
 					DefaultTokenTable(serverToken).apply {
 						val status = myTokens.any {
@@ -130,6 +120,7 @@ class TokenSearchPresenter(
 					}
 				})
 			} else {
+				fragment.context.alert(error.message)
 				if (isSearchingSymbol) hold(arrayListOf())
 				// 如果服务器没有结果返回, 那么确认是否是 `ContractAddress` 搜索, 如果是就从 `ethereum` 搜索结果
 				// 判断搜索出来的 `Token` 是否是正在使用的 `Token`

@@ -99,6 +99,8 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 		data: Intent?
 	) {
 		super.onActivityResult(requestCode, resultCode, data)
+		// `LG` 手机在 `Scan` 回到当前 `Activity` 后键盘监听不到变化. 这里强行归位确认按钮
+		confirmButton.y = ScreenSize.heightWithOutHeader - buttonHeight * 1f
 		if (data.isNull()) return
 		val intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
 		intentResult?.let {

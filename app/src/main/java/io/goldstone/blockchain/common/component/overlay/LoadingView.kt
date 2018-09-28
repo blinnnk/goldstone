@@ -49,7 +49,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 			}
 
 			introView.apply {
-				textSize = fontSize(14)
+				textSize = fontSize(12)
 				textColor = GrayScale.gray
 				gravity = Gravity.CENTER_HORIZONTAL
 				typeface = GoldStoneFont.heavy(context)
@@ -70,7 +70,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 			}
 		}
 
-		setIntroText(LoadingText.getTokenInformation)
+		setIntroText(LoadingText.gettingData)
 	}
 
 	private fun setIntroText(intro: String) {

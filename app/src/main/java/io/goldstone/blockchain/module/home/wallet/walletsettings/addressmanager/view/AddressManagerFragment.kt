@@ -1,9 +1,10 @@
-package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view
+package io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view
 
 import android.content.Context
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
+import com.blinnnk.animation.scale
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -31,6 +32,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressesListView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
@@ -314,38 +316,26 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					}
 
 				WalletSettingsText.newLTCAddress -> {
-					if (SharedValue.isTestEnvironment()) {
-						AddressManagerPresenter.createBTCTestAddress(this, password) {
-							btcAddressesView.model = it
-						}
-					} else {
-						AddressManagerPresenter.createLTCAddress(this, password) {
-							ltcAddressesView.model = it
-						}
+					if (SharedValue.isTestEnvironment()) AddressManagerPresenter.createBTCTestAddress(this, password) {
+						btcAddressesView.model = it
+					} else AddressManagerPresenter.createLTCAddress(this, password) {
+						ltcAddressesView.model = it
 					}
 				}
 
 				WalletSettingsText.newBCHAddress -> {
-					if (SharedValue.isTestEnvironment()) {
-						AddressManagerPresenter.createBTCTestAddress(this, password) {
-							btcAddressesView.model = it
-						}
-					} else {
-						AddressManagerPresenter.createBCHAddress(this, password) {
-							bchAddressesView.model = it
-						}
+					if (SharedValue.isTestEnvironment()) AddressManagerPresenter.createBTCTestAddress(this, password) {
+						btcAddressesView.model = it
+					} else AddressManagerPresenter.createBCHAddress(this, password) {
+						bchAddressesView.model = it
 					}
 				}
 
 				WalletSettingsText.newBTCAddress -> {
-					if (SharedValue.isTestEnvironment()) {
-						AddressManagerPresenter.createBTCTestAddress(this, password) {
-							btcAddressesView.model = it
-						}
-					} else {
-						AddressManagerPresenter.createBTCAddress(this, password) {
-							btcAddressesView.model = it
-						}
+					if (SharedValue.isTestEnvironment()) AddressManagerPresenter.createBTCTestAddress(this, password) {
+						btcAddressesView.model = it
+					} else AddressManagerPresenter.createBTCAddress(this, password) {
+						btcAddressesView.model = it
 					}
 				}
 			}
@@ -358,7 +348,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		coinType: ChainType,
 		hasDefaultCell: Boolean
 	) {
-		AddressManagerFragment.showMoreDashboard(
+		showMoreDashboard(
 			getParentContainer(),
 			top,
 			hasDefaultCell,
@@ -376,7 +366,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
 						}
 						toast(CommonText.succeed)
-						AddressManagerFragment.removeDashboard(context)
+						removeDashboard(context)
 					}
 				}
 				// `EOS` 和其他链的切换默认地址的逻辑不同
@@ -405,7 +395,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				val legacyAddress = BCHWalletUtils.formattedToLegacy(address, MainNetParams.get())
 				context.alert(legacyAddress)
 				context?.clickToCopy(legacyAddress)
-				AddressManagerFragment.removeDashboard(context)
+				removeDashboard(context)
 			}
 		)
 	}
@@ -471,7 +461,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					else context.alert(CommonText.wrongPassword)
 				}
 			}
-			AddressManagerFragment.removeDashboard(context)
+			removeDashboard(context)
 		}
 
 		fun showMoreDashboard(
@@ -499,6 +489,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							cell.preventDuplicateClicks()
 						}
 					}
+					creatorDashBoard.scale(2, false, 60)
 					creatorDashBoard.model =
 						AddressManagerPresenter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
 					creatorDashBoard.into(this)
