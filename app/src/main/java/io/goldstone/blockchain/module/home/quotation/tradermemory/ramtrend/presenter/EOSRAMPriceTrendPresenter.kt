@@ -116,8 +116,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		}
 	}
 	
-	private fun EOSRAMPriceTrendCandleChart.updateCandleChartUI(
-	) {
+	private fun EOSRAMPriceTrendCandleChart.updateCandleChartUI() {
 		candleDataMap[period]?.apply {
 			resetData(dateType, this.mapIndexed { index, entry ->
 				CandleEntry(
@@ -234,7 +233,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	}
 	
 	override fun onReceive(any: Any) {
-		if (NetworkUtil.hasNetworkWithAlert(fragment.context)) {
+		if (NetworkUtil.hasNetwork(fragment.context)) {
 			when(any.toString()) {
 				"" -> updateHeaderData()
 				"candle" -> updateRAMCandleData(period, dateType)

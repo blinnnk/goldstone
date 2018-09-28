@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.*
 import android.widget.*
 import com.blinnnk.base.HoneyBaseAdapter
+import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -44,11 +45,16 @@ class RAMRankView(context: Context): LinearLayout(context) {
 	}
 	
 	fun setData(dataRows: ArrayList<EOSRAMRankModel>) {
-		rankRecyclerView.adapter = RAMRankAdapter(dataRows) { cell, position ->
-			cell.onClick {
-				Toast.makeText(cell.context, "position is $position", Toast.LENGTH_LONG).show()
+		if (rankRecyclerView.adapter.isNull()) {
+			rankRecyclerView.adapter = RAMRankAdapter(dataRows) { cell, position ->
+				cell.onClick {
+					Toast.makeText(cell.context, "position is $position", Toast.LENGTH_LONG).show()
+				}
 			}
+		} else {
+			rankRecyclerView.adapter?.notifyDataSetChanged()
 		}
+		
 	}
 }
 
