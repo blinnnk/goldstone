@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.presenter
 
 import android.annotation.SuppressLint
+import android.text.format.DateUtils
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.*
 import com.github.mikephil.charting.data.CandleEntry
@@ -18,6 +19,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSRAMUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMInformationModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.*
 import org.jetbrains.anko.runOnUiThread
@@ -36,6 +38,9 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	private val sharedPreferencesKey = "eosRAMInfo"
 	
 	private lateinit var ramInformationModel: RAMInformationModel
+	
+	private var period: String = EOSRAMChartType.Hour.info
+	private var dateType: Int = DateUtils.FORMAT_SHOW_TIME
 	
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
@@ -75,6 +80,8 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		period: String,
 		dateType: Int
 	) {
+		this@EOSRAMPriceTrendPresenter.period = period
+		this@EOSRAMPriceTrendPresenter.dateType = dateType
 		// 请求的数据条目数量
 		val size = DataValue.candleChartCount
 		GoldStoneAPI.getEOSRAMPriceTendcyCandle(
@@ -213,7 +220,10 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	override fun onReceive(any: Any) {
 		if (NetworkUtil.hasNetworkWithAlert(fragment.context)) {
-			updateHeaderData()
+			when(any.toString()) {
+				"" -> updateHeaderData()
+				"candle" -> updateRAMCandleData(period, dateType)
+			}
 		}
 	}
 	

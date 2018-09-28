@@ -84,10 +84,19 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 		postRefresh()
 	}
 	
+	private val candlRefreshRunbale = Runnable {
+		RAMTradeRefreshEvent.refreshData("candle")
+		postRefreshCandle()
+	}
+	
 	private val refreshHandler = Handler()
 	
 	private fun postRefresh() {
 		refreshHandler.postDelayed(refreshRunnable, 20 *1000)
+	}
+	
+	private fun postRefreshCandle() {
+		refreshHandler.postDelayed(candlRefreshRunbale, 60 *1000)
 	}
 	
 	override fun onFragmentDestroy() {
@@ -99,19 +108,21 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 		super.onFragmentResume()
 		refreshHandler.removeCallbacks(refreshRunnable)
 		postRefresh()
+		refreshHandler.removeCallbacks(candlRefreshRunbale)
+		postRefreshCandle()
 	}
 	
 	override fun onFragmentPause() {
 		super.onFragmentPause()
-		refreshHandler.removeCallbacks(refreshRunnable)
+		refreshHandler.removeCallbacksAndMessages(null)
 	}
 	
 	fun onHiddenChanged(hidden: Boolean) {
+		refreshHandler.removeCallbacksAndMessages(null)
 		if (hidden) {
-			refreshHandler.removeCallbacks(refreshRunnable)
 		} else {
-			refreshHandler.removeCallbacks(refreshRunnable)
 			postRefresh()
+			postRefreshCandle()
 		}
 	}
 	
