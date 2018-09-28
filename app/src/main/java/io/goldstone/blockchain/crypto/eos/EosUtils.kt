@@ -9,6 +9,7 @@ import io.goldstone.blockchain.crypto.eos.transaction.completeZero
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import kotlinx.serialization.toUtf8Bytes
 import java.math.BigInteger
@@ -91,9 +92,10 @@ object EOSUtils {
 	}
 
 	fun convertMemoToCode(memo: String): String {
-		val lengthCode = memo.length.toString(16).completeToEvent()
-		return lengthCode + memo.toByteArray().toNoPrefixHexString()
+		val lengthCode = memo.toUtf8Bytes().size.toString(16).completeToEvent()
+		return lengthCode + memo.toCryptHexString()
 	}
+
 
 	private fun String.completeToEvent(): String {
 		return if (!isEvenCount()) "0$this"

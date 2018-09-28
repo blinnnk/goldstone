@@ -6,6 +6,8 @@ import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toBigIntegerOrZero
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -46,9 +48,14 @@ data class EOSAccountTable(
 	val refundInfo: RefundRequestInfo?,
 	@SerializedName("permissions")
 	val permissions: List<PermissionsInfo>,
-	val recordPublicKey: String
+	val recordPublicKey: String,
+	val chainID: String
 ) : Serializable {
-	constructor(data: JSONObject, recordPublicKey: String) : this(
+	constructor(
+		data: JSONObject,
+		recordPublicKey: String,
+		chainID: ChainID
+	) : this(
 		0,
 		data.safeGet("account_name"),
 		data.safeGet("core_liquid_balance"),
@@ -65,7 +72,8 @@ data class EOSAccountTable(
 		checkVoterDataOrGetObject(data),
 		checkRefundRequestOrGetObject(data),
 		PermissionsInfo.getPermissions(JSONArray(data.safeGet("permissions"))),
-		recordPublicKey
+		recordPublicKey,
+		chainID.id
 	)
 
 	companion object {
@@ -77,6 +85,18 @@ data class EOSAccountTable(
 		) {
 			doAsync {
 				val account = GoldStoneDataBase.database.eosAccountDao().getAccount(name)
+				if (getResultInUIThread) GoldStoneAPI.context.runOnUiThread { hold(account) }
+				else hold(account)
+			}
+		}
+
+		fun getAccountsByNames(
+			names: List<String>,
+			getResultInUIThread: Boolean = true,
+			hold: (accounts: List<EOSAccountTable>) -> Unit
+		) {
+			doAsync {
+				val account = GoldStoneDataBase.database.eosAccountDao().getAccounts(names)
 				if (getResultInUIThread) GoldStoneAPI.context.runOnUiThread { hold(account) }
 				else hold(account)
 			}
@@ -120,6 +140,9 @@ interface EOSAccountDao {
 
 	@Query("SELECT * FROM eosAccount WHERE name LIKE :name")
 	fun getAccount(name: String): EOSAccountTable?
+
+	@Query("SELECT * FROM eosAccount WHERE name IN (:names) AND chainID = :chainID")
+	fun getAccounts(names: List<String>, chainID: String = SharedChain.getEOSCurrent().id): List<EOSAccountTable>
 
 	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
 	fun getByKey(publicKey: String): List<EOSAccountTable>
