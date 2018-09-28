@@ -7,8 +7,6 @@ import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMMarketHeaderModel
-import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.model.RAMMarketModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemorydetail.view.TraderMemoryDetailFragment
 
 /**
@@ -76,8 +74,6 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 			nodeName.contains("gasTracker", true)
 		)
 	}
-
-	var ramMarketModel = RAMMarketModel(RAMMarketHeaderModel())
 	
 	private val refreshRunnable = Runnable {
 		RAMTradeRefreshEvent.refreshData("")

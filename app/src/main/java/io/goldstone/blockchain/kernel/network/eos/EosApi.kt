@@ -380,7 +380,7 @@ object EOSAPI {
 	}
 	
 	fun getRAMBalance(
-		errorCallBack: (Throwable) -> Unit,
+		errorCallBack: (RequestError) -> Unit,
 		@WorkerThread hold: (EosBalanceModel) -> Unit
 	) {
 		RequestBody.create(
@@ -418,7 +418,7 @@ object EOSAPI {
 					}
 					
 				} catch (error: JSONException) {
-					errorCallBack(error)
+					errorCallBack(RequestError.RPCResult("eos site error"))
 				}
 			}
 		}

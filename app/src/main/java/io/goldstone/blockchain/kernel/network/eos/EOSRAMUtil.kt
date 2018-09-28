@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.kernel.network.eos
 
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -13,11 +14,11 @@ object EOSRAMUtil {
 	
 	fun getRAMPrice(
 		unit: EOSUnit,
-		hold:(Double) -> Unit
+		callback:(Double, RequestError) -> Unit
 	) {
 		EOSAPI.getRAMBalance({
 			LogUtil.error("getRAMPrice", it)
-			hold(0.toDouble())
+			callback(0.toDouble(), it)
 		}) { model ->
 			val divisor = when(unit.value) {
 				EOSUnit.Byte.value -> 1
@@ -26,7 +27,7 @@ object EOSRAMUtil {
 				else -> 1
 			}
 			val price = 1 * model.quote.balance.toDouble() / (1 + (model.base.balance.toDouble() / divisor))
-			hold(price)
+			callback(price, RequestError.None)
 		}
 		
 	}

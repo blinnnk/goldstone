@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.Spectrum
@@ -162,13 +163,13 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	@SuppressLint("SetTextI18n")
 	private fun updateCurrentPrice() {
-		EOSRAMUtil.getRAMPrice(EOSUnit.KB) {
+		EOSRAMUtil.getRAMPrice(EOSUnit.KB) { price, error ->
 			GoldStoneAPI.context.runOnUiThread {
-				if (it != 0.toDouble()) {
-					val current = BigDecimal(it.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+				if (error.isNone()) {
+					val current = BigDecimal(price.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
 					ramInformationModel.currentPrice = current
-					fragment.ramInformationHeader.updateCurrentPriceUI()
 				}
+				fragment.ramInformationHeader.updateCurrentPriceUI()
 			}
 		}
 	}
