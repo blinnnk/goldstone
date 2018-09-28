@@ -26,27 +26,26 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 	}
 
 	fun startFingerprintUnlock(@UiThread hold: (error: WalletSecurityError) -> Unit) {
-		val checkFingerprintAvailable = checkFingerprintAvailable()
-		if (checkFingerprintAvailable == CheckFingerprintAvailable.Normal.status) {
+		val fingerprintAvailableStatus = checkIfTheFingerprintIsAvailable()
+		if (fingerprintAvailableStatus.isAvailable()) {
 			// 可以指纹检测
 			authenticate()
 			hold(WalletSecurityError.None)
 		} else {
-			getCheckedFingerprintTips(checkFingerprintAvailable) {
+			getCheckedFingerprintTips(fingerprintAvailableStatus) {
 				hold(it)
 			}
 		}
 	}
 
 	private fun getCheckedFingerprintTips(
-		checkFingerprintAvailable: Int,
+		fingerprintAvailableStatus: FingerprintAvailableStatus,
 		@UiThread hold: (error: WalletSecurityError) -> Unit
 	) {
-		when (checkFingerprintAvailable) {
-			CheckFingerprintAvailable.TheDeviceIsNotFingerprinted.status ->
-				hold(WalletSecurityError.TheDeviceIsNotFingerprinted)
-			CheckFingerprintAvailable.TheDeviceHasNotDetectedTheFingerprintHardware.status ->
-				hold(WalletSecurityError.TheDeviceHasNotDetectedTheFingerprintHardware)
+		if (fingerprintAvailableStatus.isUnregisteredFingerprint()) {
+			hold(WalletSecurityError.UnregisteredFingerprint)
+		} else {
+			hold(WalletSecurityError.HardwareDoesNotSupportFingerprints)
 		}
 	}
 
@@ -63,16 +62,16 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 		)
 	}
 
-	fun checkFingerprintAvailable(): Int {
+	fun checkIfTheFingerprintIsAvailable(): FingerprintAvailableStatus {
 		if (fingerprintManager.isNull()) {
 			fingerprintManager = context.getSystemService(FingerprintManager::class.java)
 		}
 		if (!fingerprintManager.isHardwareDetected) {
-			return CheckFingerprintAvailable.TheDeviceHasNotDetectedTheFingerprintHardware.status
+			return FingerprintAvailableStatus.HardwareDoesNotSupportFingerprints
 		} else if (!fingerprintManager.hasEnrolledFingerprints()) {
-			return CheckFingerprintAvailable.TheDeviceIsNotFingerprinted.status
+			return FingerprintAvailableStatus.NoFingerprintSaveRecord
 		}
-		return CheckFingerprintAvailable.Normal.status
+		return FingerprintAvailableStatus.Available
 	}
 
 	fun stopAuthenticate() {
@@ -132,8 +131,20 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 /**
  *  0 支持指纹但是没有录入指纹; 1：有可用指纹; -1，手机不支持指纹
  */
-enum class CheckFingerprintAvailable(val status: Int) {
-	Normal(1),
-	TheDeviceIsNotFingerprinted(0),
-	TheDeviceHasNotDetectedTheFingerprintHardware(-1)
+enum class FingerprintAvailableStatus(val status: Int) {
+	Available(1),
+	NoFingerprintSaveRecord(0),
+	HardwareDoesNotSupportFingerprints(-1);
+
+	fun isAvailable(): Boolean {
+		return status == 1
+	}
+
+	fun isUnregisteredFingerprint(): Boolean {
+		return status == 0
+	}
+
+	fun isHardwareDoesNotSupportFingerprints(): Boolean {
+		return status == -1
+	}
 }

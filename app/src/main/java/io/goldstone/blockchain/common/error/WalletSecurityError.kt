@@ -5,9 +5,9 @@ import io.goldstone.blockchain.common.language.FingerprintUnlockText
 class WalletSecurityError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val TheDeviceIsNotFingerprinted = WalletSecurityError(FingerprintUnlockText.theDeviceIsNotFingerprinted)
+		val UnregisteredFingerprint = WalletSecurityError(FingerprintUnlockText.unregisteredFingerprint)
 		@JvmStatic
-		val TheDeviceHasNotDetectedTheFingerprintHardware = WalletSecurityError(FingerprintUnlockText.theDeviceHasNotDetectedTheFingerprintHardware)
+		val HardwareDoesNotSupportFingerprints = WalletSecurityError(FingerprintUnlockText.hardwareDoesNotSupportFingerprints)
 		@JvmStatic
 		val None = WalletSecurityError(GoldStoneError.None.message)
 	}

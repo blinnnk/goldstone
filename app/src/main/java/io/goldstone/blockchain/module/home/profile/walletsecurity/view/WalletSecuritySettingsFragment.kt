@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
+import io.goldstone.blockchain.common.utils.FingerprintAvailableStatus
 import io.goldstone.blockchain.common.utils.FingerprintHelper
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -27,7 +28,6 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable.Companion.updatePasswordRetrievalMark
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.profile.walletsecurity.presenter.WalletSecuritySettingsPresenter
@@ -72,7 +72,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	}
 
 	private fun ViewGroup.initSwitchCell() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkIfTheSystemFingerprintExists() != -1) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().isHardwareDoesNotSupportFingerprints()) {
 			// 指纹解锁
 			SingleLineSwitch(
 				context,
@@ -83,15 +83,12 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				}
 				setOnclick { switch ->
 					if (switch.isChecked) {
-						val checkIfTheSystemFingerprintExists = checkIfTheSystemFingerprintExists()
-						when (checkIfTheSystemFingerprintExists) {
-							0 -> { // 系统未设置指纹
-								setFingerprintTips()
-								switch.isChecked = !switch.isChecked
-							}
-							1 -> { // 系统已设置指纹
-								openFingerprintEvent(switch)
-							}
+						if (checkIfTheSystemFingerprintExists().isAvailable()) {
+							// 系统已设置指纹
+							openFingerprintEvent(switch)
+						} else {
+							setFingerprintTips()
+							switch.isChecked = !switch.isChecked
 						}
 					} else {
 						openFingerprintEvent(switch)
@@ -121,7 +118,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					pinCodeSingleLineSwitch?.setSwitch(!switchChecked.orFalse())
 				} else {
 					changePinCode.visibility = View.GONE
-					AppConfigTable.showPinCodeStatus(false) {}
+					AppConfigTable.setPinCodeStatus(false) {}
 				}
 			}
 			setContent(PincodeText.show)
@@ -169,20 +166,19 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		changePinCode.visibility = View.VISIBLE
 	}
 
-	private fun checkIfTheSystemFingerprintExists(): Int {
+	private fun checkIfTheSystemFingerprintExists(): FingerprintAvailableStatus {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			context?.let {
 				val fingerprintHelper = FingerprintHelper(it)
-				return fingerprintHelper.checkFingerprintAvailable()
+				return fingerprintHelper.checkIfTheFingerprintIsAvailable()
 			}
-			return -1
 		}
-		return -1
+		return FingerprintAvailableStatus.HardwareDoesNotSupportFingerprints
 	}
 
 	// 点击后根据更新的数据库情况显示指紋解锁开关状态
 	private fun openFingerprintEvent(switch: HoneyBaseSwitch) {
-		presenter.showFingerprintStatus(switch.isChecked) {
+		presenter.setFingerprintStatus(switch.isChecked) {
 			AppConfigTable.getAppConfig {
 				switch.isChecked = it?.showFingerprintUnlocker.orFalse()
 				if (!pinCodeSingleLineSwitch?.getSwitchChecked().orFalse() && switch.isChecked) {
@@ -234,21 +230,10 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	override fun onHiddenChanged(hidden: Boolean) {
 		if (!hidden) {
 			AppConfigTable.getAppConfig {
-				when (it?.passwordRetrievalMark) {
-					// 设置新密码返回更新状态
-					1 -> {
-						presenter.showPinCodeStatus(true)
-						setChangePinCodeVisibility()
-						setPinCodeSingleLineSwitch(true)
-						updatePasswordRetrievalMark(0) {}
-					}
-					// 验证身份返回逻辑
-					2 -> {
-						getParentFragment<ProfileOverlayFragment> {
-							presenter.removeSelfFromActivity()
-						}
-						updatePasswordRetrievalMark(0) {}
-					}
+				// 设置新密码返回更新状态
+				if (it?.showPincode.orFalse()) {
+					setChangePinCodeVisibility()
+					setPinCodeSingleLineSwitch(true)
 				}
 			}
 		}

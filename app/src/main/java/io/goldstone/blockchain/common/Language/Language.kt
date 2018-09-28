@@ -274,7 +274,7 @@ object FingerprintUnlockText {
 		HoneyLanguage.TraditionalChinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
 		else -> ""
 	}
-	val theDeviceIsNotFingerprinted = when (currentLanguage) {
+	val unregisteredFingerprint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
 		HoneyLanguage.Chinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
 		HoneyLanguage.Japanese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
@@ -283,7 +283,7 @@ object FingerprintUnlockText {
 		HoneyLanguage.TraditionalChinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
 		else -> ""
 	}
-	val theDeviceHasNotDetectedTheFingerprintHardware = when (currentLanguage) {
+	val hardwareDoesNotSupportFingerprints = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The device has not detected the fingerprint hardware"
 		HoneyLanguage.Chinese.code -> "The device has not detected the fingerprint hardware"
 		HoneyLanguage.Japanese.code -> "The device has not detected the fingerprint hardware"
