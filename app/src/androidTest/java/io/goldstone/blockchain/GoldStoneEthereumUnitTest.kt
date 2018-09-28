@@ -5,8 +5,8 @@ package io.goldstone.blockchain
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -35,7 +35,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenInfoByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // symbol = GSC
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
 			{
@@ -54,7 +54,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTransactionByHash() {
 		val transactionHash = "0xfc71d21397ed9e4b3765d2b1fd37c388481bf023bdde1a9edbbd9a732884e3aa"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTransactionByHash(
 			transactionHash,
 			chainName,
@@ -69,7 +69,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getReceiptByHash() {
 		val transactionHash = "0XF3652ACBADF1EB216E21FF77B742B30786438D63E5EEF4FEB96F24C2CAF54715"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getReceiptByHash(
 			transactionHash,
 			{ LogUtil.error(position + "getTransactionByHash", it) },
@@ -84,7 +84,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getBlockTimeStampByBlockHash() {
 		val blockHash = "0x67d97f9de7747023c4340be566db53f48e2bc9c0d953c14d65accb2abcc242db"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getBlockTimeStampByBlockHash(
 			blockHash,
 			{ LogUtil.error(position + "getBlockTimeStampByBlockHash", it) },
@@ -98,7 +98,7 @@ class GoldStoneEthereumUnitTest {
 
 	@Test
 	fun getBlockNumber() {
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getBlockNumber(
 			{ LogUtil.error(position + "getBlockNumber", it) },
 			chainName
@@ -114,7 +114,7 @@ class GoldStoneEthereumUnitTest {
 	fun getTokenBalanceByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
 		val address = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTokenBalanceWithContract(
 			contract,
 			address,
@@ -130,7 +130,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenSymbolByContract() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTokenSymbolByContract(
 			contract,
 			{ LogUtil.error(position + "getTokenBalanceByContract", it) },
@@ -145,7 +145,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenDecimal() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTokenDecimal(
 			contract,
 			{ LogUtil.error(position + "getTokenDecimal", it) },
@@ -160,7 +160,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenName() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC Ropstan
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTokenName(
 			contract,
 			{ LogUtil.error(position + "getTokenName", it) },
@@ -175,7 +175,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getEthBalance() {
 		val contract = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getEthBalance(
 			contract,
 			{ LogUtil.error(position + "getEthBalance", it) },
@@ -190,7 +190,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getTokenTotalSupply() {
 		val contract = "0xe728460d9FFceEB836BfD2Bbf083536A596eaF93" // GSC In Ropsten
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTokenTotalSupply(
 			contract,
 			{ LogUtil.error(position + "getTokenTotalSupply", it) },
@@ -210,7 +210,7 @@ class GoldStoneEthereumUnitTest {
 		val from = "0x2D6FAE3553F082B0419c483309450CaF6bC4573E"
 		val to = "0x6E3DF901A984d50b68355eeDE503cBfC1eAd8F13"
 		val data = "0x"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getTransactionExecutedValue(
 			to,
 			from,
@@ -241,7 +241,7 @@ class GoldStoneEthereumUnitTest {
 	@Test
 	fun getInputCodeByTaxHash() {
 		val hash = "0x6fe5d4a28755b260d01654b0e5b7f74d8ca236bd69229bf57a712b480d39f2b6"
-		val chainName = Config.getCurrentChainName()
+		val chainName = SharedChain.getCurrentETHName()
 		GoldStoneEthCall.getInputCodeByHash(
 			hash,
 			{ LogUtil.error(position, it) },

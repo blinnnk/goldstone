@@ -99,6 +99,17 @@ object DateAndTimeText {
 		else -> ""
 	}
 
+	@JvmField
+	val later = when (currentLanguage) {
+		HoneyLanguage.English.code -> "later"
+		HoneyLanguage.Chinese.code -> "later"
+		HoneyLanguage.Japanese.code -> "later"
+		HoneyLanguage.Korean.code -> "later"
+		HoneyLanguage.Russian.code -> " later"
+		HoneyLanguage.TraditionalChinese.code -> "later"
+		else -> ""
+	}
+
 	fun getDateText(): HoneyDateUtil.DataText {
 		return HoneyDateUtil.DataText(
 			hour,
@@ -108,6 +119,7 @@ object DateAndTimeText {
 			minute,
 			second,
 			ago,
+			later,
 			HoneyLanguage.getPluralLanguageCode().any { it == currentLanguage }
 		)
 	}

@@ -1,11 +1,13 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
-import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.toSatoshi
@@ -13,7 +15,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import org.jetbrains.anko.runOnUiThread
 
@@ -22,31 +23,32 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun GasSelectionPresenter.prepareToTransferBCH(
-	footer: GasSelectionFooter,
-	@UiThread callback: (GoldStoneError) -> Unit
-) {
-	// 检查余额状况
-	checkBCHBalanceIsValid(gasUsedGasFee!!) { isEnough, error ->
-		when {
-			isEnough -> showConfirmAttentionView(footer, callback)
-			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
-			else -> callback(error)
+fun GasSelectionPresenter.prepareToTransferBCH(callback: (GoldStoneError) -> Unit) {
+	prepareBTCSeriesModel?.apply {
+		// 检查余额状况
+		BitcoinCashApi.getBalance(fromAddress, true) { balance, error ->
+			if (!balance.isNull() && error.isNone()) {
+				val isEnough =
+					balance?.toSatoshi().orElse(0) > value + gasUsedGasFee!!.toSatoshi()
+				when {
+					isEnough -> showConfirmAttentionView(callback)
+					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+					else -> callback(error)
+				}
+			} else callback(error)
 		}
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentWalletBCHPrivateKey(
+private fun GasSelectionPresenter.getCurrentBCHPrivateKey(
 	walletAddress: String,
 	password: String,
 	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	val isSingleChainWallet = !Config.getCurrentWalletType().isBIP44()
 	fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
-		isSingleChainWallet,
-		Config.isTestEnvironment(),
+		SharedValue.isTestEnvironment(),
 		hold
 	)
 }
@@ -56,7 +58,7 @@ fun GasSelectionPresenter.transferBCH(
 	password: String,
 	callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentWalletBCHPrivateKey(
+	getCurrentBCHPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
 		password
 	) { privateKey, error ->
@@ -70,10 +72,10 @@ fun GasSelectionPresenter.transferBCH(
 					changeAddress,
 					unspents,
 					privateKey!!,
-					Config.isTestEnvironment()
+					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						Config.getBCHCurrentChainName(),
+						SharedChain.getBCHCurrentName(),
 						signedModel.signedMessage,
 						callback
 					) { hash ->

@@ -7,8 +7,8 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.presenter.ChainSelectionPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -39,7 +39,7 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 	}
 
 	private fun checkIsSingleChainWalletOrElse(callback: () -> Unit) {
-		val type = Config.getCurrentWalletType()
+		val type = SharedWallet.getCurrentWalletType()
 		when {
 			type.isBTCTest() -> context.alert(AlertText.testnetOnly)
 			type.isEOSJungle() -> context.alert(AlertText.testnetOnly)

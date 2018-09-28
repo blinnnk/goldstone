@@ -11,8 +11,9 @@ import io.goldstone.blockchain.common.error.PasswordError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -91,7 +92,7 @@ class PaymentPreparePresenter(
 	private fun setSymbol() {
 		fragment.setSymbolAndPrice(
 			rootFragment?.token?.symbol.orEmpty(),
-			rootFragment?.token?.price?.formatCurrency().orEmpty() + " " + Config.getCurrencyCode()
+			rootFragment?.token?.price?.formatCurrency().orEmpty() + " " + SharedWallet.getCurrencyCode()
 		)
 	}
 
@@ -115,7 +116,7 @@ class PaymentPreparePresenter(
 				if (password.isNotEmpty()) WalletTable.getCurrentWallet {
 					PrivateKeyExportPresenter.getPrivateKey(
 						GoldStoneAPI.context,
-						Config.getCurrentEOSAddress(),
+						SharedAddress.getCurrentEOS(),
 						ChainType.EOS,
 						password
 					) { privateKey, error ->

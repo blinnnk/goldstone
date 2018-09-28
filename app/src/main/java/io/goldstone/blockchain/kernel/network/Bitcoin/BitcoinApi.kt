@@ -24,11 +24,13 @@ object BitcoinApi {
 
 	fun getBalance(
 		address: String,
-		@WorkerThread hold: (balance: Long?, error: RequestError) -> Unit
+		isMainThread: Boolean,
+		hold: (balance: Long?, error: RequestError) -> Unit
 	) {
 		// 向 `Insight` 发起余额查询请求
 		BTCSeriesApiUtils.getBalance(
-			BitcoinUrl.getBalance(address)
+			BitcoinUrl.getBalance(address),
+			isMainThread
 		) { balance, error ->
 			if (!balance.isNull() && error.isNone()) {
 				hold(balance!!, error)

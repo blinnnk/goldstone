@@ -5,8 +5,9 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
@@ -56,7 +57,7 @@ object EOSAPI {
 			) { result ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
-				hold(EOSAccountTable(JSONObject(result), Config.getCurrentEOSAddress()))
+				hold(EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS()))
 			}
 		}
 	}
@@ -94,7 +95,7 @@ object EOSAPI {
 			}
 			// 生成指定的包含链信息的结果类型
 			val accountNames =
-				names.map { EOSAccountInfo(it, Config.getEOSCurrentChain().id, Config.getCurrentEOSAddress()) }
+				names.map { EOSAccountInfo(it, SharedChain.getEOSCurrent().id, SharedAddress.getCurrentEOS()) }
 			GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
 		}
 	}
@@ -310,7 +311,7 @@ object EOSAPI {
 			false
 		) { jsonString ->
 			JSONArray(jsonString).toList().map {
-				EOSTransactionTable(JSONObject(it), Config.getCurrentEOSAccount().accountName)
+				EOSTransactionTable(JSONObject(it), SharedAddress.getCurrentEOSAccount().accountName)
 			}.let(hold)
 		}
 	}

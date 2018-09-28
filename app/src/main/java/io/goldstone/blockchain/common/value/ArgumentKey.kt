@@ -3,9 +3,11 @@ package io.goldstone.blockchain.common.value
 /**
  * @date 26/03/2018 1:03 AM
  * @author KaySaith
+ * @rewriteDate 28/09/2018 18:42 PM
+ * @reWriter wcx
+ * @description 添加PincodeIsOpened和FingerprintUnlockerIsOpened标记
  */
 object ArgumentKey {
-	
 	const val walletSettingsTitle = "walletSettingsTitle"
 	const val profileTitle = "profileTitle"
 	const val mnemonicCode = "mnemonicCode"
@@ -83,4 +85,10 @@ object SharesPreference {
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"
+	const val pincodeIsOpened = "pincodeIsOpened"
+	const val fingerprintUnlockerIsOpened = "fingerprintUnlockerIsOpened"
+	// EOS
+	const val ramUnitPrice = "ramUnitPrice"
+	const val cpuUnitPrice = "cpuUnitPrice"
+	const val netUnitPrice = "netUnitPrice"
 }

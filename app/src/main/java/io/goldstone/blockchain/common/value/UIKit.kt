@@ -132,8 +132,6 @@ object ScreenSize {
 	val fullHeight = Resources.getSystem().displayMetrics.heightPixels
 	@JvmStatic
 	var heightWithOutHeader = fullHeight - HomeSize.headerHeight
-	@JvmStatic
-	var heightWithoutTabBar = fullHeight - HomeSize.tabBarHeight
 }
 
 object CommonCellSize {
@@ -167,11 +165,6 @@ object AvatarSize {
 object TokenDetailSize {
 	@JvmField
 	val headerHeight = 300.uiPX()
-}
-
-object Count {
-	const val pinCode = 4
-	const val retry = 5
 }
 
 object WalletDetailSize {

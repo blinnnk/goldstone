@@ -6,13 +6,14 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Current
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -85,18 +86,45 @@ data class MyTokenTable(
 	companion object {
 		fun updateEOSAccountName(name: String, address: String) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address)
+				GoldStoneDataBase.database.myTokenDao().apply {
+					val chainID = SharedChain.getEOSCurrent().id
+					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
+					// 如果存在不存在则插入一条新数据
+					val pendingAccountTable =
+						getPendingEOSAccount(address, chainID)
+					if (pendingAccountTable.isNull()) {
+						val defaultToken =
+							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
+						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
+					} else updateEOSAccountName(name, address, chainID)
+				}
 			}
 		}
 
 		fun getMyTokens(inMainThread: Boolean = true, hold: (List<MyTokenTable>) -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.getCurrentAddresses()?.let { addresses ->
+				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
 					GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).apply {
 						if (inMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
 						else hold(this)
 					}
 				}
+			}
+		}
+
+		fun getEOSAccountNamesByAddress(
+			address: String,
+			@UiThread hold: (List<String>) -> Unit) {
+			load {
+				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
+			} then { myTokens ->
+				hold(
+					myTokens.asSequence().filter {
+						EOSAccount(it.ownerName).isValid()
+					}.map {
+						it.ownerName
+					}.toList()
+				)
 			}
 		}
 
@@ -122,21 +150,6 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getMyTokenByContractAndWalletAddress(
-			contract: TokenContract,
-			walletAddress: String,
-			callback: (MyTokenTable?) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(
-						contract.contract.orEmpty(),
-						walletAddress,
-						contract.getCurrentChainID().id
-					)
-			} then (callback)
-		}
-
 		fun deleteByContract(
 			contract: TokenContract,
 			address: String,
@@ -146,18 +159,6 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.myTokenDao()
 					.deleteByContractAndAddress(address, contract.contract.orEmpty())
 			} then { callback() }
-		}
-
-		fun deleteByAddress(
-			address: String,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
-					deleteAll(getAll(address))
-					callback()
-				}
-			}
 		}
 
 		fun insertBySymbolAndContract(
@@ -215,7 +216,7 @@ data class MyTokenTable(
 						hold(balance, RequestError.None)
 					}
 				contract.isBTC() ->
-					BitcoinApi.getBalance(ownerName) { balance, error ->
+					BitcoinApi.getBalance(ownerName, false) { balance, error ->
 						hold(balance?.toBTCCount(), error)
 					}
 				contract.isLTC() ->
@@ -224,18 +225,18 @@ data class MyTokenTable(
 					}
 
 				contract.isBCH() ->
-					BitcoinCashApi.getBalance(ownerName) { balance, error ->
+					BitcoinCashApi.getBalance(ownerName, false) { balance, error ->
 						hold(balance, error)
 					}
 
 				contract.isEOS() -> {
 					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 					// 网络请求在这额外校验一次.
-					if (Config.getCurrentEOSAccount().isValid()) {
-						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSAccount(), { hold(null, it) }) {
+					if (SharedAddress.getCurrentEOSAccount().isValid()) {
+						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), { hold(null, it) }) {
 							hold(it, RequestError.None)
 						}
-					} else hold(null,RequestError.None)
+					} else hold(null, RequestError.None)
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
@@ -272,14 +273,24 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID LIKE :chainID")
+	fun getByAddressAndChainID(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
+
+	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress OR ownerName LIKE :walletAddress")
+	fun deleteAllByAddress(walletAddress: String)
+
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>
 
 	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
 	fun updateBalanceByContract(balance: Double, contract: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
-	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address")
-	fun updateEOSAccountName(name: String, address: String)
+	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态
+	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND ownerName = :address AND chainID = :chainID")
+	fun updateEOSAccountName(name: String, address: String, chainID: String)
+
+	@Query("SELECT * FROM myTokens WHERE ownerName = :address AND ownerAddress = :address  AND chainID = :chainID")
+	fun getPendingEOSAccount(address: String, chainID: String): MyTokenTable?
 
 	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
 	fun deleteByContractAndAddress(address: String, contract: String)

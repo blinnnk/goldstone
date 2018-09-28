@@ -22,9 +22,7 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
  * @date 23/04/2018 11:04 AM
  * @author KaySaith
  */
-class PasscodePresenter(
-	override val fragment: PasscodeFragment
-) : BasePresenter<PasscodeFragment>() {
+class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter<PasscodeFragment>() {
 
 	private var currentFrozenTime = 0L
 	private val handler = Handler()

@@ -3,9 +3,10 @@ package io.goldstone.blockchain.kernel.commonmodel.eos
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -49,8 +50,8 @@ data class EOSTransactionTable(
 		response.executedStatus,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
 		info.fromAccount.accountName,
-		Config.getCurrentEOSAddress(),
-		Config.getEOSCurrentChain().id,
+		SharedAddress.getCurrentEOS(),
+		SharedChain.getEOSCurrent().id,
 		true
 	)
 
@@ -65,8 +66,8 @@ data class EOSTransactionTable(
 		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
 		status = true,
 		recordAccountName = recordAccountName,
-		recordPublicKey = Config.getCurrentEOSAddress(),
-		chainID = Config.getEOSCurrentChain().id,
+		recordPublicKey = SharedAddress.getCurrentEOS(),
+		chainID = SharedChain.getEOSCurrent().id,
 		isPending = false
 	)
 
@@ -101,14 +102,6 @@ data class EOSTransactionTable(
 				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id)
 			} then (hold)
 		}
-
-		fun deleteByAddress(address: String) {
-			doAsync {
-				GoldStoneDataBase.database.eosTransactionDao().apply {
-					deleteAll(getDataByRecordAddress(address))
-				}
-			}
-		}
 	}
 }
 
@@ -129,6 +122,9 @@ interface EOSTransactionDao {
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
 	fun getDataByRecordAddress(recordAddress: String): List<EOSTransactionTable>
+
+	@Query("DELETE FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
+	fun deleteDataByRecordAddress(recordAddress: String)
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID")
 	fun getDataByRecordAccount(recordAccountName: String, chainID: String): List<EOSTransactionTable>

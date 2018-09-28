@@ -13,6 +13,9 @@ import org.jetbrains.anko.runOnUiThread
 /**
  * @author KaySaith
  * @date  2018/09/26
+ * @description
+ *  `MyTokenTable`, `DefaultTokenTable` 这两个表经常关联查询,
+ *  为了优化性能和代码整洁, 这里封装一个连表查询类.
  */
 
 data class MyTokenWithDefaultTable(

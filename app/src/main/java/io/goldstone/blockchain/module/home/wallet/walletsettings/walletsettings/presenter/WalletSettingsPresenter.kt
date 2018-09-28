@@ -10,11 +10,11 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -88,14 +88,14 @@ class WalletSettingsPresenter(
 	private fun showHintEditorFragment() {
 		fragment.apply {
 			// 判断是否是只读钱包
-			if (Config.isWatchOnlyWallet()) {
+			if (!SharedWallet.isWatchOnlyWallet()) {
 				// 恢复 `Header` 样式
 				recoveryHeaderStyle()
 				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
 				AppConfigTable.getAppConfig {
 					it?.apply {
 						// 如果有私密验证首先要通过 `Pin Code`
-						showPincode.isTrue {
+						pincodeIsOpened.isTrue {
 							activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 						}
 						// 加载 `Hint` 编辑界面
@@ -108,7 +108,7 @@ class WalletSettingsPresenter(
 
 	private fun showMnemonicBackUpFragment() {
 		fragment.apply {
-			if (Config.isWatchOnlyWallet()) {
+			if (!SharedWallet.isWatchOnlyWallet()) {
 				WalletTable.getCurrentWallet {
 					encryptMnemonic?.let {
 						recoveryHeaderStyle()
@@ -139,7 +139,7 @@ class WalletSettingsPresenter(
 
 	private fun showPasswordSettingsFragment() {
 		fragment.apply {
-			if (!Config.isWatchOnlyWallet()) {
+			if (!SharedWallet.isWatchOnlyWallet()) {
 				recoveryHeaderStyle()
 				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content)
 			} else context.alert(WalletText.watchOnly)
@@ -160,7 +160,7 @@ class WalletSettingsPresenter(
 	private fun showCurrentWalletInfo() {
 		fragment.header?.apply {
 			walletInfo.apply {
-				title.text = Config.getCurrentName()
+				title.text = SharedWallet.getCurrentName()
 				WalletTable.getWalletAddressCount { count ->
 					val description = if (count == 1) "" else WalletSettingsText.containsBTCTest
 					subtitle.text = WalletSettingsText.addressCountSubtitle(count, description)
@@ -168,7 +168,7 @@ class WalletSettingsPresenter(
 				}
 			}
 			avatarImage.glideImage(
-				UnlimitedAvatar(Config.getCurrentWalletID(), context).getBitmap()
+				UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
 			)
 		}
 	}

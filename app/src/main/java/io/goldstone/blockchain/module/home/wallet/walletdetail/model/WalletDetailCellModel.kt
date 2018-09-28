@@ -41,7 +41,7 @@ data class WalletDetailCellModel(
 		TokenContract(data.contract),
 		data.weight,
 		data.chainID,
-		eosWalletType
+		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None
 	)
 
 	constructor(
@@ -59,7 +59,7 @@ data class WalletDetailCellModel(
 		TokenContract(data.contract),
 		data.weight,
 		data.chainID,
-		eosWalletType
+		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None
 	)
 
 	constructor(

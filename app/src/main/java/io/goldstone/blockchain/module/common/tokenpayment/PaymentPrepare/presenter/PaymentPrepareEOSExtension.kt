@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -29,7 +29,7 @@ fun PaymentPreparePresenter.transferEOS(
 ) {
 	// 准备转账信息
 	EOSTransactionInfo(
-		Config.getCurrentEOSAccount(),
+		SharedAddress.getCurrentEOSAccount(),
 		EOSAccount(fragment.address!!),
 		count.toEOSUnit(),
 		fragment.getMemoContent(),

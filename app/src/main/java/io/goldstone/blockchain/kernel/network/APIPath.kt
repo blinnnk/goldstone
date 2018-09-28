@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.getRandom
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -121,17 +121,17 @@ object EtherScanApi {
 		"${ChainURL.bchWebHeader()}$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
-		"${transactionDetailHeader(Config.getCurrentChain())}$it"
+		"${transactionDetailHeader(SharedChain.getCurrentETH())}$it"
 	}
 	val eosTransactionDetail: (taxHash: String) -> String = {
 		ChainURL.eosTransactionDetail(it)
 	}
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
-		"${etherScanHeader(Config.getCurrentChain())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
+		"${etherScanHeader(SharedChain.getCurrentETH())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
 	}
 	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
-			"${etherScanLogHeader(Config.getCurrentChain())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
+			"${etherScanLogHeader(SharedChain.getCurrentETH())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
 		}
 }
 

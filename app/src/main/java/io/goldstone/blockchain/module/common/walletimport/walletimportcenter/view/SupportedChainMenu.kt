@@ -31,7 +31,7 @@ class SupportedChainMenu(context: Context) : LinearLayout(context) {
 		Pair(R.drawable.ltc_creator_icon, PrivateKeyType.LTC),
 		Pair(R.drawable.bch_creator_icon, PrivateKeyType.BCH),
 		Pair(R.drawable.etc_creator_icon, PrivateKeyType.ETHSeries),
-		Pair(R.drawable.eos_creater_icon, PrivateKeyType.EOS)
+		Pair(R.drawable.eos_creator_icon, PrivateKeyType.EOS)
 	)
 	private val iconSize = 55.uiPX()
 

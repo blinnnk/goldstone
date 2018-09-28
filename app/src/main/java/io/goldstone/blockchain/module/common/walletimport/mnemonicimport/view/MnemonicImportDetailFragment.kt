@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
@@ -40,7 +41,6 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
-
 	override val pageTitle: String = ImportMethodText.mnemonic
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val walletNameInput by lazy { RoundInput(context!!) }
@@ -72,16 +72,15 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				}.into(this)
 
-				pathSettings
-					.apply {
-						setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
-						setMargins<LinearLayout.LayoutParams> {
-							topMargin = 20.uiPX()
-							bottomMargin = 10.uiPX()
-						}
+				pathSettings.apply {
+					setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
+					setMargins<LinearLayout.LayoutParams> {
+						topMargin = 20.uiPX()
+						bottomMargin = 10.uiPX()
 					}
-					.click { showPatSettingsDashboard() }
-					.into(this)
+				}.click {
+					showPatSettingsDashboard()
+				}.into(this)
 
 				walletNameInput.apply {
 					hint = UIUtils.generateDefaultName()
@@ -180,11 +179,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		Pair(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader),
 		Pair(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader),
 		Pair(
-			ImportWalletText.customBitcoinPath(Config.getYingYongBaoInReviewStatus()),
+			ImportWalletText.customBitcoinPath(SharedWallet.getYingYongBaoInReviewStatus()),
 			DefaultPath.btcPathHeader
 		),
 		Pair(
-			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
+			ImportWalletText.customBTCTestPath(SharedWallet.getYingYongBaoInReviewStatus()),
 			DefaultPath.testPathHeader
 		),
 		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader),

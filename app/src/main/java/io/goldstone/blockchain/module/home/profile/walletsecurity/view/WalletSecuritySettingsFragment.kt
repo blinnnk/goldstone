@@ -53,7 +53,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				matchParent
 			)
 			AppConfigTable.getAppConfig {
-				if (it?.showPincode.orFalse() || it?.showFingerprintUnlocker.orFalse()) {
+				if (it?.pincodeIsOpened.orFalse() || it?.fingerprintUnlockerIsOpened.orFalse()) {
 					presenter.showPassCodeFragment()
 				}
 
@@ -79,7 +79,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				true
 			).apply {
 				AppConfigTable.getAppConfig { config ->
-					setSwitch(config?.showFingerprintUnlocker.orFalse())
+					setSwitch(config?.fingerprintUnlockerIsOpened.orFalse())
 				}
 				setOnclick { switch ->
 					if (switch.isChecked) {
@@ -103,8 +103,8 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			true
 		).apply {
 			AppConfigTable.getAppConfig { config ->
-				setSwitch(config?.showPincode.orFalse())
-				if (config?.showPincode.orFalse()) {
+				setSwitch(config?.pincodeIsOpened.orFalse())
+				if (config?.pincodeIsOpened.orFalse()) {
 					changePinCode.visibility = View.VISIBLE
 				} else {
 					changePinCode.visibility = View.GONE
@@ -180,7 +180,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	private fun openFingerprintEvent(switch: HoneyBaseSwitch) {
 		presenter.setFingerprintStatus(switch.isChecked) {
 			AppConfigTable.getAppConfig {
-				switch.isChecked = it?.showFingerprintUnlocker.orFalse()
+				switch.isChecked = it?.fingerprintUnlockerIsOpened.orFalse()
 				if (!pinCodeSingleLineSwitch?.getSwitchChecked().orFalse() && switch.isChecked) {
 					setPinCodeTips()
 				}
@@ -231,7 +231,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		if (!hidden) {
 			AppConfigTable.getAppConfig {
 				// 设置新密码返回更新状态
-				if (it?.showPincode.orFalse()) {
+				if (it?.pincodeIsOpened.orFalse()) {
 					setChangePinCodeVisibility()
 					setPinCodeSingleLineSwitch(true)
 				}

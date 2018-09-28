@@ -6,7 +6,10 @@ import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -104,9 +107,9 @@ class WatchOnlyImportPresenter(
 				currentETCAddress,
 				currentLTCAddress,
 				currentBCHAddress,
-				getUnEmptyEOSAccountValue(), // 如果导入的是一个 `AccountName` 的钱包, 那么同时把这个 `AccountName` 作为 `CurrentEOSAddress` 录入, 以此来对接大逻辑
+				currentEOSAddress, // 如果导入的是一个 `AccountName` 的钱包, 那么同时把这个 `AccountName` 作为 `CurrentEOSAddress` 录入, 以此来对接大逻辑
 				EOSDefaultAllChainName(eosMainnetAccountName, eosTestnetAccountName),
-				if (getUnEmptyEOSAccountValue().isEmpty()) listOf()
+				if (eosMainnetAccountName.isEmpty() && eosTestnetAccountName.isEmpty()) listOf()
 				else listOf(
 					EOSAccountInfo(eosMainnetAccountName, ChainID.EOS.id),
 					EOSAccountInfo(eosTestnetAccountName, ChainID.EOSTest.id)
@@ -120,7 +123,7 @@ class WatchOnlyImportPresenter(
 						currentBTCTestAddress,
 						currentLTCAddress,
 						currentBCHAddress,
-						getUnEmptyEOSAccountValue()
+						currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName
 					)
 				) { error ->
 					if (error.isNone()) thisWallet.registerPushByAddress(callback)
@@ -138,7 +141,7 @@ class WatchOnlyImportPresenter(
 			Pair(currentBTCTestAddress, ChainType.AllTest),
 			Pair(currentETCAddress, ChainType.ETC),
 			Pair(currentETHSeriesAddress, ChainType.ETH),
-			Pair(getUnEmptyEOSAccountValue(), ChainType.EOS)
+			Pair(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS)
 		).first {
 			it.first.isNotEmpty()
 		}.apply {
@@ -146,14 +149,6 @@ class WatchOnlyImportPresenter(
 				AddressCommissionModel(first, second.id, 1, id))
 			callback(AccountError.None)
 		}
-	}
-
-	private fun getUnEmptyEOSAccountValue(): String {
-		return listOf(
-			currentEOSAddress,
-			eosTestnetAccountName,
-			eosMainnetAccountName
-		).firstOrNull { it.isNotEmpty() } ?: ""
 	}
 
 	private fun setAddressByChainType(address: String, addressType: String) {
@@ -164,35 +159,36 @@ class WatchOnlyImportPresenter(
 			}
 			AddressType.BTC.value -> {
 				currentBTCAddress = address
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.LTC.value -> {
 				currentLTCAddress = address
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.BCH.value -> {
 				currentBCHAddress = address
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.EOS.value -> {
 				if (EOSWalletUtils.isValidAddress(address)) currentEOSAddress = address
 				else if (EOSAccount(address).isValid()) {
 					eosMainnetAccountName = address
-					Config.updateCurrentEOSName(address)
+					SharedAddress.updateCurrentEOSName(address)
+					SharedChain.updateEOSCurrent(ChainID.eosMain)
 				}
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.EOSJungle.value -> {
 				if (EOSWalletUtils.isValidAddress(address)) currentEOSAddress = address
 				else if (EOSAccount(address).isValid()) {
 					eosTestnetAccountName = address
-					Config.updateCurrentEOSName(address)
-					Config.updateEOSCurrentChain(ChainID.eosTest)
+					SharedAddress.updateCurrentEOSName(address)
+					SharedChain.updateEOSCurrent(ChainID.eosTest)
 				}
-				Config.updateIsTestEnvironment(true)
+				SharedValue.updateIsTestEnvironment(true)
 			}
 			else -> {
-				Config.updateIsTestEnvironment(true)
+				SharedValue.updateIsTestEnvironment(true)
 				currentBTCTestAddress = address
 			}
 		}

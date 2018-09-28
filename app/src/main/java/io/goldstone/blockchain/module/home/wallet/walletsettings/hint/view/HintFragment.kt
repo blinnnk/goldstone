@@ -65,7 +65,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		WalletTable.getCurrentWallet {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
 			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
+				it?.pincodeIsOpened?.isTrue {
 					getParentFragment<ProfileOverlayFragment> {
 						activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 					}

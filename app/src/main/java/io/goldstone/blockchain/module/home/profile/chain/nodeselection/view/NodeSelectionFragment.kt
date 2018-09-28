@@ -10,18 +10,17 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
-import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionSectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import org.jetbrains.anko.*
 
@@ -81,12 +80,12 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				nodes.distinctBy { it.first }.forEach { chain ->
 					// Section Header
 					when (chain.first) {
-						CryptoName.eth -> NodeSelectionSectionCell(context).ethType().into(this)
-						CryptoName.btc -> NodeSelectionSectionCell(context).btcType().into(this)
-						CryptoName.ltc -> NodeSelectionSectionCell(context).ltcType().into(this)
-						CryptoName.bch -> NodeSelectionSectionCell(context).bchType().into(this)
-						CryptoName.eos -> NodeSelectionSectionCell(context).eosType().into(this)
-						else -> NodeSelectionSectionCell(context).etcType().into(this)
+						CryptoName.eth -> NodeCell(context).ethType().into(this)
+						CryptoName.btc -> NodeCell(context).btcType().into(this)
+						CryptoName.ltc -> NodeCell(context).ltcType().into(this)
+						CryptoName.bch -> NodeCell(context).bchType().into(this)
+						CryptoName.eos -> NodeCell(context).eosType().into(this)
+						else -> NodeCell(context).etcType().into(this)
 					}
 					// Nodes of Main or Test Chain
 					val chainChild = nodes.filter {
@@ -132,7 +131,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				}.click {
 					fromMainnetSetting?.let { fromMainnet ->
 						// 更新是否是测试环境的参数
-						Config.updateIsTestEnvironment(fromMainnet == false)
+						SharedValue.updateIsTestEnvironment(fromMainnet == false)
 						selectedNode.forEach { pair ->
 							when {
 								pair.first.equals(CryptoName.eth, true) ->
@@ -155,7 +154,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 									node.first.equals(CryptoName.etc, true)
 								}?.second.orEmpty()
 							),
-							ethERC20AndETCChainNameID = ChainNameID.getChainNameIDByName(
+							ethSeriesID = ChainNameID.getChainNameIDByName(
 								selectedNode.find { node ->
 									node.first.equals(CryptoName.eth, true)
 								}?.second.orEmpty()

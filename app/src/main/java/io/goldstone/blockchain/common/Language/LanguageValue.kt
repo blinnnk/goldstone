@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 
 /**
  * @date 2018/5/24 12:45 AM
@@ -22,7 +22,7 @@ enum class HoneyLanguage(
 	companion object {
 
 		fun currentLanguageIsSupported(): Boolean {
-			return Config.getCurrentLanguageCode() in 0..5
+			return SharedWallet.getCurrentLanguageCode() in 0..5
 		}
 
 		fun getPluralLanguageCode(): ArrayList<Int> {

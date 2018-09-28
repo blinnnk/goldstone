@@ -92,14 +92,6 @@ data class EOSAccountTable(
 			}
 		}
 
-		fun deleteByRecordAddress(address: String) {
-			doAsync {
-				GoldStoneDataBase.database.eosAccountDao().apply {
-					deleteAll(getByKey(address))
-				}
-			}
-		}
-
 		// 特殊情况下这几个字段的返回值会是 `null`
 		private fun checkRefundRequestOrGetObject(content: JSONObject): RefundRequestInfo? {
 			val data = content.safeGet("refund_request")
@@ -131,6 +123,9 @@ interface EOSAccountDao {
 
 	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
 	fun getByKey(publicKey: String): List<EOSAccountTable>
+
+	@Query("DELETE FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
+	fun deleteByKey(publicKey: String)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: EOSAccountTable)

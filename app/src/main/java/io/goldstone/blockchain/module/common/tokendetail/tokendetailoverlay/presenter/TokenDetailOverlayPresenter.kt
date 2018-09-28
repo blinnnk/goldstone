@@ -5,6 +5,7 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -39,7 +40,7 @@ class TokenDetailOverlayPresenter(
 
 	fun showEOSActivationModeFragment(token: WalletDetailCellModel?) {
 		fragment.apply {
-			headerTitle = TokenDetailText.activationMethod
+			headerTitle = EOSAccountText.activationMethod
 			addFragmentAndSetArgument<EOSActivationModeFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.tokenDetail, token)
 			}
@@ -48,7 +49,7 @@ class TokenDetailOverlayPresenter(
 
 	fun showEOSAccountSelectionFragment(token: WalletDetailCellModel?) {
 		fragment.apply {
-			headerTitle = TokenDetailText.accountNameSelection
+			headerTitle = EOSAccountText.accountNameSelection
 			addFragmentAndSetArgument<EOSAccountSelectionFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.tokenDetail, token)
 			}

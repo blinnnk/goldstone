@@ -1,12 +1,12 @@
 package io.goldstone.blockchain.kernel.network.eos
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.network.ChainURL
 
 object EOSUrl {
-	var currentEOSTestUrl = ChainURL.eosTest // 网络出问题后会在 `Error` 中更改这个值
+	private var currentEOSTestUrl = ChainURL.eosTest // 网络出问题后会在 `Error` 中更改这个值
 	private val currentURL: () -> String = {
-		if (Config.isTestEnvironment()) currentEOSTestUrl else ChainURL.eosMain
+		if (SharedValue.isTestEnvironment()) currentEOSTestUrl else ChainURL.eosMain
 	}
 	val getKeyAccount: () -> String = {
 		"${currentURL()}/v1/history/${EOSMethod.GetKeyAccountName.method}"

@@ -1,8 +1,9 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -42,8 +43,8 @@ private fun loadDataFromChain(
 	callback: () -> Unit
 ) {
 	GoldStoneAPI.getETCTransactions(
-		Config.getETCCurrentChain(),
-		Config.getCurrentETCAddress(),
+		SharedChain.getETCCurrent(),
+		SharedAddress.getCurrentETC(),
 		blockNumber,
 		{
 			LogUtil.error("loadDataFromChain", it)
@@ -70,7 +71,7 @@ private fun loadDataFromChain(
 			finalNewData.insertDataToDataBase()
 			// Copy 出燃气费的部分
 			val feeData = finalNewData.filter {
-				it.from.equals(Config.getCurrentETCAddress(), true)
+				it.from.equals(SharedAddress.getCurrentETC(), true)
 			}.apply {
 				forEach { it.isFee = true }
 			}

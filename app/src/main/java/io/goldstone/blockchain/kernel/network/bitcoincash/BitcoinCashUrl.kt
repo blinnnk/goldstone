@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoincash
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.WebUrl
 
 /**
@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.value.WebUrl
 
 object BitcoinCashUrl {
 	var currentUrl: () -> String = {
-		if (Config.isTestEnvironment()) WebUrl.bchTest else WebUrl.bchMain
+		if (SharedValue.isTestEnvironment()) WebUrl.bchTest else WebUrl.bchMain
 	}
 	val getBalance: (address: String) -> String = { address ->
 		"${currentUrl()}/api/addr/$address/balance"

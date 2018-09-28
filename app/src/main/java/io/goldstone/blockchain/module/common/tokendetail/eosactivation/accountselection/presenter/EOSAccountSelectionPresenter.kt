@@ -5,9 +5,10 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -27,11 +28,11 @@ class EOSAccountSelectionPresenter(
 	override val fragment: EOSAccountSelectionFragment
 ) : BasePresenter<EOSAccountSelectionFragment>() {
 
+	/**
+	 * 1. 更新 `WalletTable` 里面的 `CurrentEOSAccountName`
+	 * 2. 更新 `MyTokenTable` 里面的 `OwnerName` 的名字
+	 */
 	fun setEOSDefaultName(name: String) {
-		/**
-		 * 1. 更新 `WalletTable` 里面的 `CurrentEOSAccountName`
-		 * 2. 更新 `MyTokenTable` 里面的 `OwnerName` 的名字
-		 */
 		WalletTable.updateEOSDefaultName(name) {
 			fragment.activity?.jump<SplashActivity>()
 		}
@@ -45,10 +46,10 @@ class EOSAccountSelectionPresenter(
 			// 获取本地数据库里面的此公钥地址对应的用户名字
 			val currentChainNames =
 				eosAccountNames.filter {
-					it.chainID.equals(Config.getEOSCurrentChain().id, true)
+					it.chainID.equals(SharedChain.getEOSCurrent().id, true)
 				}
 			EOSAPI.getAccountNameByPublicKey(
-				Config.getCurrentEOSAddress(),
+				SharedAddress.getCurrentEOS(),
 				{
 					errorCallback(it)
 					// 如果请求出错的话, 仍要保持不阻碍用户的模式, 那么暂时通过只显示
@@ -104,7 +105,7 @@ class EOSAccountSelectionPresenter(
 	): List<AccountActor> {
 		return account.permissions.asSequence().map { permission ->
 			permission.requiredAuthorization.getKeys().asSequence().filter {
-				it.publicKey == Config.getCurrentEOSAddress()
+				it.publicKey == SharedAddress.getCurrentEOS()
 			}.map {
 				AccountActor(name, EOSActor.getActorByValue(permission.permissionName)!!, it.weight)
 			}.toList()

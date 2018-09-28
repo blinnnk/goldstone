@@ -80,7 +80,7 @@ dependencies {
   // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.5'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.2.7'
+  implementation 'com.blinnnk:honeyui:0.3.2.8'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin
@@ -112,6 +112,7 @@ dependencies {
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
   // MPAndroidChart
   implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 kotlin {

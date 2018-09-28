@@ -35,7 +35,7 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 	init {
 
 		setWillNotDraw(false)
-
+		isClickable = true
 		layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight + 2.uiPX())
 
 		walletButton.apply {

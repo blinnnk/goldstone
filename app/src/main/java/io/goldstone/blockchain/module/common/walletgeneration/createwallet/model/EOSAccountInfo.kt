@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.databaseinterface.RoomModel
 import org.json.JSONArray
@@ -33,11 +33,11 @@ data class EOSAccountInfo(
 	)
 
 	fun hasActivated(): Boolean {
-		return ChainID(chainID).isCurrent() && publicKey.equals(Config.getCurrentEOSAddress(), true)
+		return ChainID(chainID).isCurrent() && publicKey.equals(SharedAddress.getCurrentEOS(), true)
 	}
 
-	fun isActivatedWatchOnlyEOSAccount(): Boolean {
-		return ChainID(chainID).isCurrent() && name.equals(Config.getCurrentEOSAccount().accountName, true)
+	fun isActivatedOrWatchOnlyEOSAccount(): Boolean {
+		return ChainID(chainID).isCurrent() && name.equals(SharedAddress.getCurrentEOSAccount().accountName, true)
 	}
 
 	override fun getObject(): String {
@@ -49,8 +49,8 @@ fun List<EOSAccountInfo>.currentPublicKeyHasActivated(): Boolean {
 	return !find { it.hasActivated() }.isNull()
 }
 
-fun List<EOSAccountInfo>.isActivatedWatchOnlyEOSAccount(): Boolean {
-	return !find { it.isActivatedWatchOnlyEOSAccount() }.isNull()
+fun List<EOSAccountInfo>.hasActivatedOrWatchOnlyEOSAccount(): Boolean {
+	return !find { it.isActivatedOrWatchOnlyEOSAccount() }.isNull()
 }
 
 fun List<EOSAccountInfo>.getTargetKeyName(key: String): String? {

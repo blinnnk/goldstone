@@ -145,7 +145,7 @@ class WalletDetailFragment :
 	private fun showPinCodeFragment() {
 		if (activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull())
 			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
+				it?.pincodeIsOpened?.isTrue {
 					activity?.addFragmentAndSetArguments<PasscodeFragment>(
 						ContainerID.main,
 						FragmentTag.pinCode

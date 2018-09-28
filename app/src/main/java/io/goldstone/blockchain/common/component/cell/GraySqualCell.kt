@@ -7,17 +7,17 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 25/04/2018 8:56 AM
@@ -52,9 +52,6 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	private val radio by lazy {
-		HoneyRadioButton(context)
-	}
 
 	private var container: RelativeLayout
 	private val shadowSize = 3
@@ -84,27 +81,6 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		arrow.into(container)
 		arrow.setAlignParentRight()
 		subtitle.x -= 20.uiPX()
-	}
-
-	fun showRadio() {
-		radio.setColorStyle(GrayScale.midGray, Spectrum.blue)
-		radio.scaleX = 0.8f
-		radio.scaleY = 0.8f
-		radio.into(container)
-		radio.setAlignParentRight()
-		radio.setCenterInVertical()
-		radio.x -= 10.uiPX()
-	}
-
-	fun setRadioStatus(
-		status: Boolean,
-		action: () -> Unit = {}
-	) {
-		radio.isChecked = status
-		radio.onClick {
-			radio.preventDuplicateClicks()
-			action()
-		}
 	}
 
 	fun setPriceTitle(text: String) {
