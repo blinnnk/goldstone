@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view
 
-import android.app.Activity
 import android.content.Context
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -29,7 +28,6 @@ import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
@@ -213,6 +211,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumAddressesModel(wallet: WalletTable) {
+		setMultiChainAddresses(wallet)
 		ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
 		ethSeriesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
 		ethSeriesView.currentWallet = wallet
@@ -222,6 +221,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBitcoinCashAddressesModel(wallet: WalletTable) {
 		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.bchAddresses
+		setMultiChainAddresses(wallet)
 		bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashAddress)
 		bchAddressesView.currentWallet = wallet
@@ -229,6 +229,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumClassicAddressesModel(wallet: WalletTable) {
+		setMultiChainAddresses(wallet)
 		etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
 		etcAddressesView.currentWallet = wallet
@@ -244,6 +245,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 		val addresses = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.btcAddresses
+		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
@@ -253,6 +255,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setLitecoinAddressesModel(wallet: WalletTable) {
 		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.ltcAddresses
+		setMultiChainAddresses(wallet)
 		ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.currentWallet = wallet
@@ -260,6 +263,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEOSAddressesModel(wallet: WalletTable) {
+		setMultiChainAddresses(wallet)
 		eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 		eosAddressesView.setTitle(WalletSettingsText.eosAddress)
 		eosAddressesView.currentWallet = wallet
@@ -362,22 +366,17 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			setDefaultAddressEvent = {
 				// 因为在下面多种判断下调用同一套逻辑, 这是一个方法内的复用函数
 				fun update(address: String, eosAccountName: String) {
-					coinType.updateCurrentAddress(address, eosAccountName) { isSwitchEOSAddress, wallet ->
-						// 如果是更改了 `EOS` 的默认地址, 那么跳回首页重新走检测 `AccountName` 流程
-						if (isSwitchEOSAddress) showSwitchEOSAddressAlertAndJump(context)
-						// 更新默认地址后同时更新首页的列表
-						else {
-							updateWalletDetail()
-							when {
-								coinType.isETH() -> setEthereumAddressesModel(wallet)
-								coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
-								coinType.isEOS() -> setEOSAddressesModel(wallet)
-								coinType.isLTC() -> setLitecoinAddressesModel(wallet)
-								coinType.isBTC() -> setBitcoinAddressesModel(wallet)
-							}
-							toast(CommonText.succeed)
-							AddressManagerFragment.removeDashboard(context)
+					coinType.updateCurrentAddress(address, eosAccountName) { wallet ->
+						updateWalletDetail()
+						when {
+							coinType.isETH() -> setEthereumAddressesModel(wallet)
+							coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
+							coinType.isEOS() -> setEOSAddressesModel(wallet)
+							coinType.isLTC() -> setLitecoinAddressesModel(wallet)
+							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
 						}
+						toast(CommonText.succeed)
+						AddressManagerFragment.removeDashboard(context)
 					}
 				}
 				// `EOS` 和其他链的切换默认地址的逻辑不同
@@ -450,16 +449,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						hold(namesInMyTokenTable[index])
 					}
 				}
-			}
-		}
-
-		fun showSwitchEOSAddressAlertAndJump(context: Context?) {
-			context?.showAlertView(
-				"Switching EOS Address",
-				"eos account depends on eos public key, if you switch default address we will re-check the account name for you",
-				false
-			) {
-				(context as? Activity)?.jump<SplashActivity>()
 			}
 		}
 

@@ -27,7 +27,7 @@ class NodeCell(context: Context) : LinearLayout(context) {
 	private val cellHeight = 42.uiPX()
 
 	init {
-		topPadding = 20.uiPX()
+		topPadding = 10.uiPX()
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		icon.apply {
 			layoutParams = LinearLayout.LayoutParams(cellHeight, cellHeight)
@@ -37,7 +37,7 @@ class NodeCell(context: Context) : LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
 			x += 10.uiPX()
 			y += 4.uiPX()
-			setBlackTitles(fontSize(18))
+			setBlackTitles(fontSize(16))
 		}.into(this)
 	}
 

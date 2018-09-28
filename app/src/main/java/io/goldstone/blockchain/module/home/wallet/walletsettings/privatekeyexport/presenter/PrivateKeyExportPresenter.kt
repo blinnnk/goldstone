@@ -69,8 +69,10 @@ class PrivateKeyExportPresenter(
 			hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
 			when {
-				chainType.isBTC() || chainType.isBCH() || chainType.isEOS() || chainType.isAllTest() ->
-					getBTCPrivateKeyByAddress(address, password, hold)
+				chainType.isBTC() || chainType.isBCH() || chainType.isAllTest() ->
+					getBTCPrivateKeyByAddress(address, password, true, hold)
+				chainType.isEOS() ->
+					getBTCPrivateKeyByAddress(address, password, false, hold)
 				chainType.isLTC() -> exportLTCBase58PrivateKey(address, password, hold)
 				else -> getETHSeriesPrivateKeyByAddress(address, password, hold)
 			}
@@ -93,12 +95,13 @@ class PrivateKeyExportPresenter(
 		private fun Context.getBTCPrivateKeyByAddress(
 			address: String,
 			password: String,
+			isCompress: Boolean,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
 			// 所有 `Get PrivateKey` 都在异步获取在主线程返回
 			val isTest = BTCUtils.isValidTestnetAddress(address)
 			// hold 会在 `exportBase58PrivateKey` 中返回到主线程
-			exportBase58PrivateKey(address, password, isTest, hold)
+			exportBase58PrivateKey(address, password, isTest, isCompress, hold)
 		}
 
 		private fun Context.getPrivateKeyByWalletID(

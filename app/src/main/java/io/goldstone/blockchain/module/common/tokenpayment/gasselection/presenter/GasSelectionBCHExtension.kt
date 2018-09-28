@@ -49,6 +49,7 @@ private fun GasSelectionPresenter.getCurrentBCHPrivateKey(
 		walletAddress,
 		password,
 		SharedValue.isTestEnvironment(),
+		true,
 		hold
 	)
 }

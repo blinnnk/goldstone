@@ -95,7 +95,7 @@ class ChainType(val id: Int) : Serializable {
 	fun updateCurrentAddress(
 		newAddress: String,
 		newEOSAccountName: String,
-		@UiThread callback: (isSwitchEOSAddress: Boolean, wallet: WalletTable) -> Unit
+		@UiThread callback: (wallet: WalletTable) -> Unit
 	) {
 		doAsync {
 			val walletDao = GoldStoneDataBase.database.walletDao()
@@ -119,10 +119,9 @@ class ChainType(val id: Int) : Serializable {
 				}
 				ChainType.EOS.id -> {
 					currentWallet?.currentEOSAddress = newAddress
-					// 切换 `EOS` 的默认地址, 把 `accountName` 的数据值为初始化状态,
-					// 好在其他流程中重新走检查 `Account Name` 的逻辑
 					currentWallet?.currentEOSAccountName?.updateCurrent(newEOSAccountName)
 					SharedAddress.updateCurrentEOS(newAddress)
+					SharedAddress.updateCurrentEOSName(newEOSAccountName)
 				}
 				ChainType.BTC.id -> if (SharedValue.isTestEnvironment()) {
 					currentWallet?.currentBTCSeriesTestAddress = newAddress
@@ -135,7 +134,7 @@ class ChainType(val id: Int) : Serializable {
 			currentWallet?.apply {
 				walletDao.update(this)
 				uiThread {
-					callback(ChainType(it.id).isEOS(), this)
+					callback(this)
 				}
 			}
 		}

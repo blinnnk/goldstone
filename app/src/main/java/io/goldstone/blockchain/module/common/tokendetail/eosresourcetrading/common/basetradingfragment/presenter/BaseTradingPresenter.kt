@@ -247,7 +247,7 @@ open class BaseTradingPresenter(
 			isSellRam: Boolean,
 			callback: (GoldStoneError) -> Unit
 		) {
-			if (!inputValue.first.isValid()) {
+			if (!inputValue.first.isValid(false)) {
 				// 检查用户名是否正确
 				callback(AccountError.InvalidAccountName)
 			} else if (inputValue.second == 0.0) {
