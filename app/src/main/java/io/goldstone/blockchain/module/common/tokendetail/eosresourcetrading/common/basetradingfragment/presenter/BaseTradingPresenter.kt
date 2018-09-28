@@ -76,14 +76,13 @@ open class BaseTradingPresenter(
 				TradingType.CPU -> {
 					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
 					val availableCPU = account?.cpuLimit?.max.orZero() - account?.cpuLimit?.used.orZero()
-					// TODO 计算 CPU 的租赁价格
-					setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), 0.0027)
+					setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), SharedValue.getCPUUnitPrice())
 				}
 				TradingType.NET -> {
 					val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
 					val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
 					// TODO 计算 NET 的租赁价格
-					setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), 0.0027)
+					setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
 				}
 				TradingType.RAM -> {
 					getMainActivity()?.showLoadingView()

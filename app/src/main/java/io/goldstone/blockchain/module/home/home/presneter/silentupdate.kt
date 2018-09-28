@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -25,6 +26,8 @@ abstract class SilentUpdater {
 			updateUnknownDefaultToken()
 			updateRAMUnitPrice()
 			updateMyTokenCurrencyPrice()
+			updateCPUUnitPrice()
+			updateNETUnitPrice()
 		}
 	}
 
@@ -42,6 +45,26 @@ abstract class SilentUpdater {
 			if (!priceInEOS.isNull() && error.isNone()) {
 				SharedValue.updateRAMUnitPrice(priceInEOS!!)
 			} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+		}
+	}
+
+	private fun updateCPUUnitPrice() {
+		if (SharedAddress.getCurrentEOSAccount().isValid()) {
+			EOSResourceUtil.getCPUPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
+				if (!priceInEOS.isNull() && error.isNone()) {
+					SharedValue.updateCPUUnitPrice(priceInEOS!!)
+				} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+			}
+		}
+	}
+
+	private fun updateNETUnitPrice() {
+		if (SharedAddress.getCurrentEOSAccount().isValid()) {
+			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
+				if (!priceInEOS.isNull() && error.isNone()) {
+					SharedValue.updateNETUnitPrice(priceInEOS!!)
+				} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+			}
 		}
 	}
 

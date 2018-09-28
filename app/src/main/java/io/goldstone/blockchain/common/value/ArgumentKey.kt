@@ -85,4 +85,6 @@ object SharesPreference {
 	const val yingYongBaoInReview = "yingYongBaoInReview"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
+	const val cpuUnitPrice = "cpuUnitPrice"
+	const val netUnitPrice = "netUnitPrice"
 }

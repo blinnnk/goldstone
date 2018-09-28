@@ -20,6 +20,18 @@ object SharedValue {
 	fun updateRAMUnitPrice(unitPrice: Double) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ramUnitPrice, unitPrice.toFloat())
 
+	fun getCPUUnitPrice(): Double =
+		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.cpuUnitPrice)
+
+	fun updateCPUUnitPrice(unitPrice: Double) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.cpuUnitPrice, unitPrice.toFloat())
+
+	fun getNETUnitPrice(): Double =
+		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.netUnitPrice)
+
+	fun updateNETUnitPrice(unitPrice: Double) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.netUnitPrice, unitPrice.toFloat())
+
 
 	fun isEncryptERCNodeRequest(): Boolean =
 		if (SharedChain.getCurrentETHName().equals(ChainText.goldStoneMain, true)) {
