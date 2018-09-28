@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.pres
 
 import android.annotation.SuppressLint
 import com.blinnnk.extension.isNull
+import com.blinnnk.util.*
 import com.github.mikephil.charting.data.CandleEntry
+import com.google.android.gms.common.util.SharedPreferencesUtils
+import com.google.gson.Gson
 import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
@@ -15,10 +18,11 @@ import io.goldstone.blockchain.kernel.network.eos.EOSRAMUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendCandleChart
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMInformationModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.*
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.textColor
+import org.json.JSONException
 import java.math.BigDecimal
 
 /**
@@ -29,8 +33,9 @@ import java.math.BigDecimal
 class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	: BasePresenter<EOSRAMPriceTrendFragment>(), RefreshReceiver {
 	
-	private var todayOpenPrice: String? = null
-	private var todayCurrentPrice: String? = null
+	private val sharedPreferencesKey = "eosRAMInfo"
+	
+	private lateinit var ramInformationModel: RAMInformationModel
 	
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
@@ -39,52 +44,34 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	override fun onFragmentCreate() {
 		super.onFragmentCreate()
+		fragment.context?.apply {
+			ramInformationModel = try {
+				val jsonData = getStringFromSharedPreferences(sharedPreferencesKey)
+				Gson().fromJson(jsonData, RAMInformationModel::class.java)
+			} catch (error: Exception) {
+				RAMInformationModel(null, null, null, null, null, null, null)
+			}
+		}
 		RAMTradeRefreshEvent.register(this)
 	}
 	
 	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
 		RAMTradeRefreshEvent.unRegister(this)
+		fragment.context?.apply {
+			saveDataToSharedPreferences(sharedPreferencesKey, Gson().toJson(ramInformationModel).toString())
+		}
+		super.onFragmentDestroy()
 	}
 	
 	@SuppressLint("SetTextI18n")
 	private fun updateHeaderData() {
-		LogUtil.debug("updateheadData", "update")
-		getTodayPrice()
-		EOSRAMUtil.getRAMPrice(EOSUnit.KB) {
-			GoldStoneAPI.context.runOnUiThread {
-				fragment.ramInformationHeader.apply {
-					currentPrice.text = BigDecimal(it.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-					todayCurrentPrice = it.toString()
-					setTrendPercent()
-				}
-			}
-		}
-		
-		EOSAPI.getGlobalInformation( {
-			fragment.context.alert(it.toString().showAfterColonContent())
-		}) {
-			GoldStoneAPI.context.runOnUiThread {
-				if (!it.maxRamSize.isNull() && !it.totalRamBytesReserved.isNull()) {
-					val gbDivisior = Math.pow(1024.toDouble(), 3.toDouble())
-					var maxAmount = BigDecimal(it.maxRamSize)
-					var reservedAmount = BigDecimal(it.totalRamBytesReserved)
-					val percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
-					maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
-					reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
-					fragment.ramInformationHeader.apply {
-						ramTotalReserved.text = EOSRAMText.ramAccupyAmount(reservedAmount.toString())
-						ramMax.text = EOSRAMText.ramTotalAmount(maxAmount.toString())
-						ramPercent.text = "${percent.stripTrailingZeros().toPlainString()}%"
-						percentProgressBar.progress = percent.toInt()
-					}
-				}
-			}
-		}
+		updateTodayPrice()
+		updateCurrentPrice()
+		updateRAMAmount()
 	}
 	
 	
-	fun updateEosRamPriceTrend(
+	fun updateRAMCandleData(
 		period: String,
 		dateType: Int
 	) {
@@ -125,28 +112,89 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	}
 	
 	@SuppressLint("SetTextI18n")
-	private fun getTodayPrice() {
+	private fun updateTodayPrice() {
 		GoldStoneAPI.getEOSRAMPriceToday( {
 			// Show the error exception to user
 			fragment.context.alert(it.toString().showAfterColonContent())
+			fragment.ramInformationHeader.updateTodayPriceUI()
+			fragment.ramInformationHeader.updatePricePercentUI()
 		}) {
 			GoldStoneAPI.context.runOnUiThread {
-				fragment.ramInformationHeader.apply {
-					this@EOSRAMPriceTrendPresenter.todayOpenPrice = it.open
-					startPrice.text = EOSRAMText.openPrice(BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString())
-					highPrice.text = EOSRAMText.highPrice(BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString())
-					lowPrice.text = EOSRAMText.lowPrice(BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString())
-					setTrendPercent()
-				}
+				val open = BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+				val high = BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+				val low = BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+				ramInformationModel.openPrice = open
+				ramInformationModel.HighPrice = high
+				ramInformationModel.lowPrice = low
+				fragment.ramInformationHeader.updateTodayPriceUI()
+				fragment.ramInformationHeader.updatePricePercentUI()
 			}
 			
 		}
 	}
 	
+	private fun RAMInformationHeader.updateTodayPriceUI() {
+		startPrice.text = EOSRAMText.openPrice(ramInformationModel.openPrice ?: "")
+		highPrice.text = EOSRAMText.highPrice(ramInformationModel.HighPrice ?: "")
+		lowPrice.text = EOSRAMText.lowPrice(ramInformationModel.lowPrice ?: "")
+	}
+	
 	@SuppressLint("SetTextI18n")
-	private fun setTrendPercent() {
-		todayOpenPrice?.let { open ->
-			todayCurrentPrice?.let { current ->
+	private fun updateCurrentPrice() {
+		EOSRAMUtil.getRAMPrice(EOSUnit.KB) {
+			GoldStoneAPI.context.runOnUiThread {
+				if (it != 0.toDouble()) {
+					val current = BigDecimal(it.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					ramInformationModel.currentPrice = current
+					fragment.ramInformationHeader.updateCurrentPriceUI()
+				}
+			}
+		}
+	}
+	
+	private fun RAMInformationHeader.updateCurrentPriceUI() {
+		currentPrice.text = ramInformationModel.currentPrice
+		updatePricePercentUI()
+	}
+	
+	@SuppressLint("SetTextI18n")
+	private fun updateRAMAmount() {
+		EOSAPI.getGlobalInformation( {
+			fragment.context.alert(it.toString().showAfterColonContent())
+			fragment.ramInformationHeader.updateRAMAmountUI()
+		}) {
+			GoldStoneAPI.context.runOnUiThread {
+				if (!it.maxRamSize.isNull() && !it.totalRamBytesReserved.isNull()) {
+					val gbDivisior = Math.pow(1024.toDouble(), 3.toDouble())
+					var maxAmount = BigDecimal(it.maxRamSize)
+					var reservedAmount = BigDecimal(it.totalRamBytesReserved)
+					val percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
+					maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
+					reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
+					ramInformationModel.ramAmountPercent = percent.stripTrailingZeros().toPlainString()
+					ramInformationModel.occupyAmount = reservedAmount.toString()
+					ramInformationModel.maxAmount = maxAmount.toString()
+					
+					fragment.ramInformationHeader.updateRAMAmountUI()
+					
+				}
+			}
+		}
+	}
+	
+	private fun RAMInformationHeader.updateRAMAmountUI() {
+		ramTotalReserved.text = EOSRAMText.ramAccupyAmount(ramInformationModel.occupyAmount ?: "")
+		ramMax.text = EOSRAMText.ramTotalAmount(ramInformationModel.maxAmount ?: "")
+		ramInformationModel.ramAmountPercent?.apply {
+			ramPercent.text = "${this}%"
+			percentProgressBar.progress = this.toFloat().toInt()
+		}
+	}
+	
+	@SuppressLint("SetTextI18n")
+	private fun RAMInformationHeader.updatePricePercentUI() {
+		ramInformationModel.openPrice?.let { open ->
+			ramInformationModel.currentPrice?.let { current ->
 				var trend = (current.toDouble() - open.toDouble()) / open.toDouble()
 				trend *= 100.toDouble()
 				val trendBigDecimal = BigDecimal(trend).divide(BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP)
@@ -164,7 +212,9 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	}
 	
 	override fun onReceive(any: Any) {
-		LogUtil.debug("refreshing", "刷新收到了")
+		if (NetworkUtil.hasNetworkWithAlert(fragment.context)) {
+			updateHeaderData()
+		}
 	}
 	
 	

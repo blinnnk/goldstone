@@ -87,7 +87,7 @@ class TraderMemoryDetailPresenter(override val fragment: TraderMemoryDetailFragm
 	private val refreshHandler = Handler()
 	
 	private fun postRefresh() {
-		refreshHandler.postDelayed(refreshRunnable, 1 *1000)
+		refreshHandler.postDelayed(refreshRunnable, 20 *1000)
 	}
 	
 	override fun onFragmentDestroy() {

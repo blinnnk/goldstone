@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model
+package io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.model
 
 /**
  * @date: 2018/9/25.

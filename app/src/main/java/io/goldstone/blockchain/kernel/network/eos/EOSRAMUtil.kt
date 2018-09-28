@@ -17,6 +17,7 @@ object EOSRAMUtil {
 	) {
 		EOSAPI.getRAMBalance({
 			LogUtil.error("getRAMPrice", it)
+			hold(0.toDouble())
 		}) { model ->
 			val divisor = when(unit.value) {
 				EOSUnit.Byte.value -> 1

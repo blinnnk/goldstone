@@ -11,7 +11,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMRankModel
+import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.model.EOSRAMRankModel
 import org.jetbrains.anko.*
 
 /**

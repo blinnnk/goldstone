@@ -51,7 +51,7 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 			addView(ramInformationHeader)
 			addView(menu)
 			addView(candleChart)
-			presenter.updateEosRamPriceTrend(EOSRAMChartType.Minute.info, DateUtils.FORMAT_SHOW_TIME)
+			presenter.updateRAMCandleData(EOSRAMChartType.Minute.info, DateUtils.FORMAT_SHOW_TIME)
 		}
 	}
 	
@@ -69,7 +69,7 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 			EOSRAMChartType.Day.code -> EOSRAMChartType.Day.info
 			else -> EOSRAMChartType.Minute.info
 		}
-		presenter.updateEosRamPriceTrend(period,  dateType)
+		presenter.updateRAMCandleData(period,  dateType)
 	}
 	
 }
