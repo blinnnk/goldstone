@@ -113,8 +113,7 @@ class MarketTokenDetailPresenter(
 				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
-					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-						fragment.currencyInfo?.symbol.orEmpty(),
+					DefaultTokenTable.getTokenByContractFromAllChains(
 						fragment.currencyInfo?.contract.orEmpty()
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
@@ -325,10 +324,7 @@ class MarketTokenDetailPresenter(
 			priceData: PriceHistoryModel
 		) -> Unit
 	) {
-		DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-			info.symbol,
-			info.contract
-		) { default ->
+		DefaultTokenTable.getTokenByContractFromAllChains(info.contract) { default ->
 			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
 				val tokenData =
 					if (default.isNull()) TokenInformationModel()
@@ -352,10 +348,9 @@ class MarketTokenDetailPresenter(
 			}
 		) { coinInfo ->
 			DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
-				DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-					info.symbol,
-					info.contract
-				) { it?.let(hold) }
+				DefaultTokenTable.getTokenByContractFromAllChains(info.contract) {
+					it?.let(hold)
+				}
 			}
 		}
 	}

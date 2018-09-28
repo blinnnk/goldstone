@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Current
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -85,7 +86,18 @@ data class MyTokenTable(
 	companion object {
 		fun updateEOSAccountName(name: String, address: String) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address, SharedChain.getEOSCurrent().id)
+				GoldStoneDataBase.database.myTokenDao().apply {
+					val chainID = SharedChain.getEOSCurrent().id
+					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
+					// 如果存在不存在则插入一条新数据
+					val pendingAccountTable =
+						getPendingEOSAccount(address, chainID)
+					if (pendingAccountTable.isNull()) {
+						val defaultToken =
+							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
+						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
+					} else updateEOSAccountName(name, address, chainID)
+				}
 			}
 		}
 
@@ -97,6 +109,22 @@ data class MyTokenTable(
 						else hold(this)
 					}
 				}
+			}
+		}
+
+		fun getEOSAccountNamesByAddress(
+			address: String,
+			@UiThread hold: (List<String>) -> Unit) {
+			load {
+				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
+			} then { myTokens ->
+				hold(
+					myTokens.asSequence().filter {
+						EOSAccount(it.ownerName).isValid()
+					}.map {
+						it.ownerName
+					}.toList()
+				)
 			}
 		}
 
@@ -245,7 +273,10 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
-	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID LIKE :chainID")
+	fun getByAddressAndChainID(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
+
+	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress OR ownerName LIKE :walletAddress")
 	fun deleteAllByAddress(walletAddress: String)
 
 	@Query("SELECT * FROM myTokens")
@@ -254,8 +285,12 @@ interface MyTokenDao {
 	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
 	fun updateBalanceByContract(balance: Double, contract: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
-	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND chainID = :chainID")
+	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态
+	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND ownerName = :address AND chainID = :chainID")
 	fun updateEOSAccountName(name: String, address: String, chainID: String)
+
+	@Query("SELECT * FROM myTokens WHERE ownerName = :address AND ownerAddress = :address  AND chainID = :chainID")
+	fun getPendingEOSAccount(address: String, chainID: String): MyTokenTable?
 
 	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
 	fun deleteByContractAndAddress(address: String, contract: String)

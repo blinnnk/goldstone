@@ -44,17 +44,19 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		color = GrayScale.midGray
 	}
 
+	private val leftPadding = 60.uiPX()
 	init {
-		layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 46.uiPX())
 		setWillNotDraw(false)
 		title.into(this)
-		title.x = 70.uiPX().toFloat()
+		title.x = leftPadding.toFloat()
 		title.setCenterInVertical()
 		radio = radioButton {
 			isDefaultStyle()
 			isClickable = false
 		}
 		radio.setAlignParentRight()
+		radio.setCenterInVertical()
 	}
 
 	@SuppressLint("DrawAllocation")
@@ -62,10 +64,10 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		super.onDraw(canvas)
 
 		canvas?.drawLine(
-			70.uiPX().toFloat(),
-			height - BorderSize.default,
-			width - PaddingSize.device * 1f,
-			height - BorderSize.default,
+			leftPadding.toFloat(),
+			height.toFloat(),
+			width.toFloat(),
+			height.toFloat(),
 			paint
 		)
 	}

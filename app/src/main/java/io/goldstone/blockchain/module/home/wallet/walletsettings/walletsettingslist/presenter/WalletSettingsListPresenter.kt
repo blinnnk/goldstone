@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter
 
 import android.content.Context
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.jump
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
@@ -25,7 +26,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
@@ -177,6 +178,7 @@ class WalletSettingsListPresenter(
 		}
 	}
 
+	@WorkerThread
 	private fun deleteAllLocalDataByAddress(address: String, chainType: ChainType) {
 		GoldStoneDataBase.database.myTokenDao().deleteAllByAddress(address)
 		// 删除 以太坊 类型的转账记录
@@ -192,8 +194,8 @@ class WalletSettingsListPresenter(
 	}
 
 	private fun deleteWatchOnlyWallet(address: String, chainType: ChainType) {
-		deleteAllLocalDataByAddress(address, chainType)
 		WalletTable.deleteCurrentWallet { wallet ->
+			deleteAllLocalDataByAddress(address, chainType)
 			// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 			XinGePushReceiver.registerAddressesForPush(wallet, true)
 			GoldStoneAPI.context.runOnUiThread {

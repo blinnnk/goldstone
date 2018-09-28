@@ -12,7 +12,10 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -46,7 +49,7 @@ class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
-	var lockGettingChainModelsThread = false
+	private var lockGettingChainModelsThread = false
 	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
 	private var detailModels: List<WalletDetailCellModel>? = null
 
@@ -155,7 +158,7 @@ class WalletDetailPresenter(
 							time,
 							{ hold(null, it) }
 						) { unreadCount ->
-							this@doAsync.uiThread {
+							uiThread {
 								hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
 							}
 						}
@@ -165,7 +168,9 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun List<WalletDetailCellModel>.getChainModels(hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit) {
+	private fun List<WalletDetailCellModel>.getChainModels(
+		hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit
+	) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
@@ -228,23 +233,21 @@ class WalletDetailPresenter(
 	}
 
 	private fun updateUIByData(data: List<WalletDetailCellModel>) {
-		if (data.isNotEmpty()) {
-			load {
-				/** 先按照资产情况排序, 资产为零的按照权重排序 */
-				val hasPrice =
-					data.asSequence().filter { it.price * it.count != 0.0 }
-						.sortedByDescending { it.count * it.price }.toList()
-				val hasBalance =
-					data.asSequence().filter { it.count != 0.0 && it.price == 0.0 }
-						.sortedByDescending { it.count }.toList()
-				val others =
-					data.asSequence().filter { it.count == 0.0 }
-						.sortedByDescending { it.weight }.toList()
-				hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
-			} then {
-				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-				fragment.updateHeaderValue()
-			}
+		if (data.isNotEmpty()) load {
+			/** 先按照资产情况排序, 资产为零的按照权重排序 */
+			val hasPrice =
+				data.asSequence().filter { it.price * it.count != 0.0 }
+					.sortedByDescending { it.count * it.price }.toList()
+			val hasBalance =
+				data.asSequence().filter { it.count != 0.0 && it.price == 0.0 }
+					.sortedByDescending { it.count }.toList()
+			val others =
+				data.asSequence().filter { it.count == 0.0 }
+					.sortedByDescending { it.weight }.toList()
+			hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
+		} then {
+			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+			fragment.updateHeaderValue()
 		} else {
 			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())
 			fragment.updateHeaderValue()

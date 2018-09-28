@@ -16,11 +16,13 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesHeaderView
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment.Companion.showMoreDashboard
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressManagerFragment.Companion.switchEOSDefaultAddress
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.support.v4.toast
@@ -51,23 +53,29 @@ class ChainAddressesPresenter(
 		coinType: ChainType,
 		hasDefaultCell: Boolean = true
 	) {
-		AddressManagerFragment.showMoreDashboard(
+		showMoreDashboard(
 			fragment.wrapper,
 			cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
-				coinType.updateCurrentAddress(address) { isSwitchEOSAddress, _ ->
-					if (isSwitchEOSAddress)
-						AddressManagerFragment.showSwitchEOSAddressAlertAndJump(fragment.context)
-					else {
-						// 更新钱包默认地址, 同时更新首页的数据
-						updateWalletDetail()
-						updateData()
-						AddressManagerFragment.removeDashboard(fragment.context)
-						fragment.toast(CommonText.succeed)
+				fun update(address: String, eosAccountName: String) {
+					coinType.updateCurrentAddress(address, eosAccountName) { isSwitchEOSAddress, _ ->
+						if (isSwitchEOSAddress)
+							AddressManagerFragment.showSwitchEOSAddressAlertAndJump(fragment.context)
+						else {
+							// 更新钱包默认地址, 同时更新首页的数据
+							updateWalletDetail()
+							updateData()
+							AddressManagerFragment.removeDashboard(fragment.context)
+							fragment.toast(CommonText.succeed)
+						}
 					}
 				}
+				// `EOS` 和其他链的切换默认地址的逻辑不同
+				if (coinType.isEOS()) switchEOSDefaultAddress(fragment.context, address) { accountName ->
+					update(address, accountName)
+				} else update(address, address)
 			},
 			qrCellClickEvent = {
 				val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
@@ -95,7 +103,7 @@ class ChainAddressesPresenter(
 					AddressManagerFragment.verifyMultiChainWalletPassword(this) { password ->
 						when {
 							fragment.coinType.isETH() ->
-								AddressManagerPresenter.createETHAndERCAddress(this, password) {
+								AddressManagerPresenter.createETHSeriesAddress(this, password) {
 									updateAddressManagerDataBy(ChainType.ETH)
 									diffAndUpdateAdapterData<ChainAddressesAdapter>(it)
 								}

@@ -15,10 +15,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.getChainSymbol
-import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.crypto.multichain.isETC
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -133,7 +130,8 @@ class TransactionDetailPresenter(
 			val webTitle =
 				when {
 					CoinSymbol(symbol).isETC() -> TransactionText.gasTracker
-					CoinSymbol(symbol).isBTCSeries() -> TransactionText.transactionWeb
+					CoinSymbol(symbol).isBTCSeries() || CoinSymbol(symbol).isEOS() ->
+						TransactionText.transactionWeb
 					else -> TransactionText.etherScanTransaction
 				}
 			val argument = Bundle().apply {

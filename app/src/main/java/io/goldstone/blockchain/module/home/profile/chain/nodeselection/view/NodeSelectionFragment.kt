@@ -19,8 +19,8 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
-import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionSectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import org.jetbrains.anko.*
 
@@ -80,12 +80,12 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				nodes.distinctBy { it.first }.forEach { chain ->
 					// Section Header
 					when (chain.first) {
-						CryptoName.eth -> NodeSelectionSectionCell(context).ethType().into(this)
-						CryptoName.btc -> NodeSelectionSectionCell(context).btcType().into(this)
-						CryptoName.ltc -> NodeSelectionSectionCell(context).ltcType().into(this)
-						CryptoName.bch -> NodeSelectionSectionCell(context).bchType().into(this)
-						CryptoName.eos -> NodeSelectionSectionCell(context).eosType().into(this)
-						else -> NodeSelectionSectionCell(context).etcType().into(this)
+						CryptoName.eth -> NodeCell(context).ethType().into(this)
+						CryptoName.btc -> NodeCell(context).btcType().into(this)
+						CryptoName.ltc -> NodeCell(context).ltcType().into(this)
+						CryptoName.bch -> NodeCell(context).bchType().into(this)
+						CryptoName.eos -> NodeCell(context).eosType().into(this)
+						else -> NodeCell(context).etcType().into(this)
 					}
 					// Nodes of Main or Test Chain
 					val chainChild = nodes.filter {

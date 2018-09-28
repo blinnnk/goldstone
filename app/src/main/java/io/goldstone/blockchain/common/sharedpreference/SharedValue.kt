@@ -13,6 +13,9 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  * @date  2018/09/27
  */
 object SharedValue {
+
+	fun needShowPincCode(): Boolean = true
+
 	// EOS KB
 	fun getRAMUnitPrice(): Double =
 		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.ramUnitPrice)

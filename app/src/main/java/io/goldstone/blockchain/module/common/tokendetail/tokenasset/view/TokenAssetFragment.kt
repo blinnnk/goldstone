@@ -74,7 +74,14 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 			showArrow()
 			setTitle(EOSAccountText.authority)
 			setSubtitle(SharedAddress.getCurrentEOSAccount().accountName)
-			click { presenter.showPublicKeyAccountNames() }
+			click {
+				val type = SharedWallet.getCurrentWalletType()
+				when {
+					type.isEOSMainnet() -> context.alert("This is a single name  watch only")
+					type.isEOSJungle() -> context.alert("This is a single jungle name watch only")
+					else -> presenter.showPublicKeyAccountNames()
+				}
+			}
 		}
 	}
 
