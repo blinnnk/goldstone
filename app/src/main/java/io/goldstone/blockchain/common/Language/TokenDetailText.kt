@@ -611,10 +611,42 @@ object EOSAccountText {
 		else -> ""
 	}
 
+	// 三种激活方式
+	@JvmField
+	val activeByFriend = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Activate via an existing account"
+		HoneyLanguage.Chinese.code -> "找好友为我激活"
+		HoneyLanguage.Japanese.code -> "既存のアカウントで有効化"
+		HoneyLanguage.Korean.code -> "나를 위해 활성화 할 친구 찾기"
+		HoneyLanguage.Russian.code -> "Найти друга для активации для меня"
+		HoneyLanguage.TraditionalChinese.code -> "找好友為我激活"
+		else -> ""
+	}
+	@JvmField
+	val activeByContract = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Activate via EOS transfer"
+		HoneyLanguage.Chinese.code -> "通过EOS转账进行激活"
+		HoneyLanguage.Japanese.code -> "EOS転送による有効化"
+		HoneyLanguage.Korean.code -> "EOS 전송을 통해 활성화"
+		HoneyLanguage.Russian.code -> "Активировать путем передачи"
+		HoneyLanguage.TraditionalChinese.code -> "通過EOS轉賬進行激活"
+		else -> ""
+	}
+	@JvmField
+	val activeManually = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Copy public key"
+		HoneyLanguage.Chinese.code -> "手动激活 点击复制公钥"
+		HoneyLanguage.Japanese.code -> "公開鍵をコピーする"
+		HoneyLanguage.Korean.code -> "수동 활성화, 공개 키 복사"
+		HoneyLanguage.Russian.code -> "Копировать открытый ключ"
+		HoneyLanguage.TraditionalChinese.code -> "手動激活 點擊複製公鑰"
+		else -> ""
+	}
+
 	// 账户未激活的界面提示
 	@JvmField
 	val inactivationAccount = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Account not activated"
+		HoneyLanguage.English.code -> "Account is not activated"
 		HoneyLanguage.Chinese.code -> "账户尚未激活"
 		HoneyLanguage.Japanese.code -> "アカウントは有効"
 		HoneyLanguage.Korean.code -> "계정이 활성화되지 않았습니다."
@@ -624,51 +656,19 @@ object EOSAccountText {
 	}
 	@JvmField
 	val inactivationAccountHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "According to the rules of the EOS network, a certain amount of RAM (memory) needs to be paid when a new account is generated. Because new users don't have RAM yet, they need to rely on someone who already has EOS to help you pay for RAM. \n\nIf you already have an EOS account, or if you have a trusted friend who is willing to help you create an account, you can choose to activate with an existing account \n\n or you can choose through the exchange / Wallet transfer is activated. In this option, you can transfer a certain number of EOS from your own exchange or wallet to the contract, and the contract will automatically perform account activation for you. \n\nPlease do not reveal your private key to anyone."
-		HoneyLanguage.Chinese.code -> "根据EOS网络的规则，新的账号生成时需要消耗一定数量的资源（RAM/NET/CPU）。因为新用户还没有这些资源，所以需要依赖已经有EOS的人帮助你来支付。\n\n如果你已经拥有一个EOS账号，或是有一个可信赖的并愿意帮助你创建账号的朋友，你可以选择「使用已有账号激活」\n\n你也可以选择「通过交易所/钱包转账进行激活」。在此选项中，你可以从自己的交易所或钱包转出一定数目的EOS到合约中，合约将自动为您执行账户激活。\n\n请不要向任何人泄露您的私钥。"
-		HoneyLanguage.Japanese.code -> "EOSネットワークのルールによれば、新しいアカウントは一定量のリソース（RAM / NET / CPU）を消費する必要があります。 新規ユーザーはまだこれらのリソースを持っていないため、お支払いに役立つEOSを既に持っている人に頼る必要があります。 \n\n既にEOSアカウントをお持ちの場合、またはアカウントの作成をお手伝いする信頼できる友人がいる場合は、「既存のアカウントで有効にする」\n\nを選択するか、 /ウォレットの転送が有効になっています。 このオプションでは、自分の交換やウォレットから一定数のEOSを契約に転送することができ、契約によって自動的にアカウントの有効化が行われます。 \n\n秘密鍵を誰にも公開しないでください。"
-		HoneyLanguage.Korean.code -> "EOS 네트워크의 규칙에 따르면 새로운 계정은 일정량의 리소스 (RAM / NET / CPU)를 소비해야합니다. 신규 사용자는 아직 이러한 리소스가 없으므로 이미 EOS를 보유한 사람이 비용을 지불해야합니다. \n\n이미 EOS 계정이 있거나 친구를 사귈 수있는 신뢰할 수있는 친구가있는 경우 \"기존 계정으로 활성화\"를 선택하거나 \n\n또는 \"교환을 통해\"선택할 수 있습니다. / 월렛 이체가 활성화되었습니다. ' 이 옵션에서는 교환기 나 지갑에서 EOS의 특정 번호를 계약서로 전송할 수 있으며 계약서는 자동으로 계정 활성화를 수행합니다. \n\n다른 사람에게 비공개 키를 공개하지 마십시오."
-		HoneyLanguage.Russian.code -> "Согласно правилам сети EOS, новая учетная запись должна потреблять определенный объем ресурсов (RAM / NET / CPU). Поскольку у новых пользователей еще нет этих ресурсов, им нужно полагаться на тех, у кого уже есть EOS, чтобы помочь вам заплатить. \n\nЕсли у вас уже есть учетная запись EOS или у вас есть доверенный друг, который хочет помочь вам создать учетную запись, вы можете выбрать «активировать с существующей учетной записью» \n\nили вы можете выбрать «через обмен», / Передача кошелька активирована. \" В этом случае вы можете перенести определенное количество EOS с вашей собственной биржи или кошелька на контракт, и контракт автоматически выполнит активацию учетной записи для вас. \n\nПожалуйста, не раскрывайте свой личный ключ никому."
-		HoneyLanguage.TraditionalChinese.code -> "根據EOS網絡的規則，新的賬號生成時需要消耗一定數量的資源（RAM/NET/CPU）。因為新用戶還沒有這些資源，所以需要依賴已經有EOS的人幫助你來支付。 \\n\\n如果你已經擁有一個EOS賬號，或是有一個可信賴的並願意幫助你創建賬號的朋友，你可以選擇「使用已有賬號激活」\\n\\n你也可以選擇「通過交易所/錢包轉賬進行激活」。在此選項中，你可以從自己的交易所或錢包轉出一定數目的EOS到合約中，合約將自動為您執行賬戶激活。 \n\n請不要向任何人洩露您的私鑰。"
-		else -> ""
-	}
-
-	// 三种激活方式
-	@JvmField
-	val activeByFriend = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Find a friend to activate for me"
-		HoneyLanguage.Chinese.code -> "找好友为我激活"
-		HoneyLanguage.Japanese.code -> "私のために活性化する友達を見つける"
-		HoneyLanguage.Korean.code -> "나를 위해 활성화 할 친구 찾기"
-		HoneyLanguage.Russian.code -> "Найти друга для активации для меня"
-		HoneyLanguage.TraditionalChinese.code -> "找好友為我激活"
-		else -> ""
-	}
-	@JvmField
-	val activeByContract = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Activate via exchange/wallet transfer"
-		HoneyLanguage.Chinese.code -> "通过交易所/钱包转账进行激活"
-		HoneyLanguage.Japanese.code -> "交換/ウォレット転送を使用して有効化"
-		HoneyLanguage.Korean.code -> "교환 / 지갑 전송을 통해 활성화"
-		HoneyLanguage.Russian.code -> "Активировать с помощью обмена / кошелька"
-		HoneyLanguage.TraditionalChinese.code -> "通過交易所/錢包轉賬進行激活"
-		else -> ""
-	}
-	@JvmField
-	val activeManually = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Manual activation Click to copy the public key"
-		HoneyLanguage.Chinese.code -> "手动激活 点击复制公钥"
-		HoneyLanguage.Japanese.code -> "手動によるアクティベーションクリックすると公開鍵がコピーされます"
-		HoneyLanguage.Korean.code -> "수동 활성화 공개 키를 복사하려면 클릭하십시오."
-		HoneyLanguage.Russian.code -> "Ручная активация Нажмите, чтобы скопировать открытый ключ"
-		HoneyLanguage.TraditionalChinese.code -> "手動激活 點擊複製公鑰"
+		HoneyLanguage.English.code -> "According to the rules of the EOS network, a certain amount of Resource(RAM/NET/CPU) needs to be paid when a new account is generated. Because new users don't have resource yet, they need to rely on someone who already has EOS account to help to pay for resources. \n\nIf you already have an EOS account, or if you have a trusted friend who is willing to help you to create an account, you can choose '$activeByFriend' \n\n Or you can choose '$activeByContract'. In this option, you can transfer a certain number of EOS from your own exchange or wallet to the contract, and the contract will automatically perform account activation for you. \n\nPlease do not reveal your private key to anyone."
+		HoneyLanguage.Chinese.code -> "根据EOS网络的规则，新的账号生成时需要消耗一定数量的资源（RAM/NET/CPU）。因为新用户还没有这些资源，所以需要依赖已经有EOS的人帮助你来支付。\n\n如果你已经拥有一个EOS账号，或是有一个可信赖的并愿意帮助你创建账号的朋友，你可以选择「$activeByFriend」\n\n你也可以选择「$activeByContract 」。在此选项中，你可以从自己的交易所或钱包转出一定数目的EOS到合约中，合约将自动为您执行账户激活。\n\n请不要向任何人泄露您的私钥。"
+		HoneyLanguage.Japanese.code -> "EOSネットワークのルールによれば、新しいアカウントは一定量のリソース（RAM / NET / CPU）を消費する必要があります。 新規ユーザーはまだこれらのリソースを持っていないため、お支払いに役立つEOSを既に持っている人に頼る必要があります。 \n\n既にEOSアカウントをお持ちの場合、またはアカウントの作成をお手伝いする信頼できる友人がいる場合は、「$activeByFriend」\n\n「${activeByContract}」のオプションでは、自分の交換やウォレットから一定数のEOSを契約に転送することができ、契約によって自動的にアカウントの有効化が行われます。 \n\n秘密鍵を誰にも公開しないでください。"
+		HoneyLanguage.Korean.code -> "EOS 네트워크의 규칙에 따르면 새로운 계정은 일정량의 리소스 (RAM / NET / CPU)를 소비해야합니다. 신규 사용자는 아직 이러한 리소스가 없으므로 이미 EOS를 보유한 사람이 비용을 지불해야합니다. \n\n이미 EOS 계정을 가지고 있거나 친구를 사귈 수있는 신뢰할 수있는 친구가있는 경우 친구, \"$activeByFriend\"n을 선택할 수 있습니다. \n\n\"$activeByContract\"를 선택할 수도 있습니다.이 옵션을 사용하면 교환 또는 지갑에서 계약 금액으로 EOS를 전송할 수 있으며 계약이 자동으로 활성화됩니다. 귀하의 계정. \n\n다른 사람에게 비공개 키를 공개하지 마십시오."
+		HoneyLanguage.Russian.code -> "Согласно правилам сети EOS, новая учетная запись должна потреблять определенный объем ресурсов (RAM / NET / CPU). \n\nЕсли у вас уже есть учетная запись EOS или у вас есть доверенный друг, который хочет помочь вам создать учетную запись, вы можете выбрать 'activeByFriend' \n\nили вы можете выбрать '$activeByContract', / Передача кошелька активирована. \" В этом случае вы можете перенести определенное количество EOS с вашей собственной биржи или кошелька на контракт, и контракт автоматически выполнит активацию учетной записи для вас. \n\nПожалуйста, не раскрывайте свой личный ключ никому."
+		HoneyLanguage.TraditionalChinese.code -> "根據EOS網絡的規則，新的賬號生成時需要消耗一定數量的資源（RAM/NET/CPU）。因為新用戶還沒有這些資源，所以需要依賴已經有EOS的人幫助你來支付。 \\n\\n如果你已經擁有一個EOS賬號，或是有一個可信賴的並願意幫助你創建賬號的朋友，你可以選擇「$activeByFriend」\\n\\n你也可以選擇「$activeByContract」。在此選項中，你可以從自己的交易所或錢包轉出一定數目的EOS到合約中，合約將自動為您執行賬戶激活。 \n\n請不要向任何人洩露您的私鑰。"
 		else -> ""
 	}
 
 	//	好友激活
 	@JvmField
 	val activeByFriendHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The steps for a friend to help activate the EOS account are as follows: \n\n1. Start a username (12-letter, consisting of the number 1~5 or English characters). Check whether the \n2 is available on this page. Copy the public key below, Your username and public key are given to friends who already have an EOS account\n3. Friends in the Settings > EOS Account to register \n4. After the friend registration is completed, re-enter the EOS asset interface, GoldStone will be Your status"
+		HoneyLanguage.English.code -> "The steps for a friend to help activate the EOS account are as follows: \n\n1. Set a account name (12-letter, consisting of the number 1~5 or English characters). Check whether it is available on chain. 2. Copy the public key below. Give Your account name and public key to a trusted friend who already have an EOS account\n3. Friends in the Settings > EOS Account to register \n4. After registration is completed, re-enter the EOS asset interface, GoldStone will update your status"
 		HoneyLanguage.Chinese.code -> "好友帮忙激活EOS账号步骤如下: \n\n1. 起一个用户名(12位字母，由数字1~5或英文字符组成)，在本页面检测是否可用\n2. 复制下方公钥，将你的用户名和公钥给已拥有EOS账号的好友\n3. 好友在「设置>EOS账号」中按步骤进行注册\n4. 好友注册完成后，重新进入EOS资产界面，GoldStone会为您更状态"
 		HoneyLanguage.Japanese.code -> "\n \n1.ユーザー名（1〜5文字または英字で構成された12文字）を開始するこのページで\n2. 利用可能かどうかを確認する下記の公開キーをコピーし、あなたのユーザー名と公開鍵は、既にEOSアカウントを持っている友達に与えられます。\n3. 設定> EOSアカウントの友達は、ステップごとに\n4登録してください。あなたのステータス"
 		HoneyLanguage.Korean.code -> "친구 계정 활성화 EOS 단계 도움 : 사용자 이름에서 \n \n1 (12 글자, 한 5 영어 문자에 숫자를),이 페이지는 것이다 검출 가능합니다 \n2 아래의 공개 키를 복사합니다. 단계별로 사용자 이름과 공개 키가 이미 등록에서 설정> EOS 계정에 EOS 친구 \n 3. 의 계정. 친구가 \n4 단계. 친구 등록이 완료되면 EOS 자산 인터페이스를 다시 입력, 골드 스톤은 제공 할 것입니다 내 상태"
@@ -688,7 +688,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val checkNameAvailability = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Check if username is available"
+		HoneyLanguage.English.code -> "Check if account name is available"
 		HoneyLanguage.Chinese.code -> "检测用户名是否在链上可用"
 		HoneyLanguage.Japanese.code -> "チェーンでユーザー名の可用性の検出"
 		HoneyLanguage.Korean.code -> "사용자 이름을 사용할 수 있는지 확인하십시오."
@@ -698,7 +698,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val checkNameResultAvailable = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This username is available"
+		HoneyLanguage.English.code -> "This account name is available"
 		HoneyLanguage.Chinese.code -> "该用户名可用"
 		HoneyLanguage.Japanese.code -> "このユーザー名は利用可能です"
 		HoneyLanguage.Korean.code -> "이 사용자 이름을 사용할 수 있습니다."
@@ -718,7 +718,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val checkNameResultUnavailable = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The username has already been registered by someone else, change it."
+		HoneyLanguage.English.code -> "The account name has already been registered by someone else, change it."
 		HoneyLanguage.Chinese.code -> "该用户名已经被别人注册，换一个吧"
 		HoneyLanguage.Japanese.code -> "ユーザー名は既にバーのために、他の人が登録されています"
 		HoneyLanguage.Korean.code -> "사용자 이름이 이미 다른 사람이 등록한 경우 변경하십시오."
@@ -839,4 +839,35 @@ object EOSAccountText {
 		else -> ""
 	}
 
+	// 为好友注册功能
+	@JvmField
+	val activateForFriendHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account name must be 12 characters. It can only be composed of number 1~5 or English letters."
+		HoneyLanguage.Chinese.code -> "账户名必须为12个字符。且只能用1~5或英文字母组成。"
+		HoneyLanguage.Japanese.code -> "アカウント名は12文字でなければなりません。 1〜5文字または英字のみで構成することができます。"
+		HoneyLanguage.Korean.code -> "계정 이름은 12 자 여야합니다. 1 ~ 5 자 또는 영문자로만 구성 할 수 있습니다."
+		HoneyLanguage.Russian.code -> "Имя учетной записи должно быть 12 символов. Он может состоять только из 1 ~ 5 или английских букв."
+		HoneyLanguage.TraditionalChinese.code -> "賬戶名必須為12個字符。且只能用1~5或英文字母組成"
+		else -> ""
+	}
+	@JvmField
+	val advancedSettings = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Advanced Settings"
+		HoneyLanguage.Chinese.code -> "高级设置"
+		HoneyLanguage.Japanese.code -> "詳細設定"
+		HoneyLanguage.Korean.code -> "고급 설정"
+		HoneyLanguage.Russian.code -> "Расширенные настройки"
+		HoneyLanguage.TraditionalChinese.code -> "高級設置"
+		else -> ""
+	}
+	@JvmField
+	val customizeResource = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Custom resource"
+		HoneyLanguage.Chinese.code -> "自定义资源分配"
+		HoneyLanguage.Japanese.code -> "カスタムリソース"
+		HoneyLanguage.Korean.code -> "맞춤 리소스"
+		HoneyLanguage.Russian.code -> "Пользовательский ресурс"
+		HoneyLanguage.TraditionalChinese.code -> "自定義資源"
+		else -> ""
+	}
 }

@@ -84,7 +84,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 				settingButton.apply {
 					showArrow()
-					setTitle("Advanced Settings")
+					setTitle(EOSAccountText.advancedSettings)
 				}.click {
 					getParentContainer()?.showCustomDashboard(assignResources)
 				}.into(this)
@@ -159,7 +159,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				}
 				activity?.let { SoftKeyboard.hide(it) }
 			}
-		}.showTitle("CUSTOM ASSIGN RESOURCES").into(this)
+		}.showTitle(EOSAccountText.customizeResource).into(this)
 	}
 
 }
