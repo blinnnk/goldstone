@@ -543,19 +543,20 @@ object GoldStoneAPI {
 	}
 
 	fun getEOSRAMPriceToday(
-		errorCallback: (RequestError) -> Unit,
-		hold: (CandleChartModel) -> Unit
+		hold: (CandleChartModel?, RequestError) -> Unit
 	) {
 		requestData<CandleChartModel>(
 			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
 			"ticks",
-			errorCallback = errorCallback,
+			errorCallback = {
+				hold(null, it)
+			},
 			isEncrypt = true
 		) {
 			if (isNotEmpty()) {
-				hold(this[0])
+				hold(this[0], RequestError.None)
 			} else {
-				errorCallback(RequestError.NullResponse("no values for ticks"))
+				hold(null, RequestError.NullResponse("no values for ticks"))
 			}
 		}
 
@@ -563,31 +564,33 @@ object GoldStoneAPI {
 
 
 	fun getEOSRAMRank(
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<EOSRAMRankModel>) -> Unit
+		hold: (ArrayList<EOSRAMRankModel>?, RequestError) -> Unit
 	) {
 		requestData<EOSRAMRankModel>(
 			APIPath.getEOSRAMRank(APIPath.currentUrl),
 			"rank",
-			errorCallback = errorCallback,
+			errorCallback = {
+				hold(null, it)
+			},
 			isEncrypt = true
 		) {
-			hold(this.toArrayList())
+			hold(this.toArrayList(), RequestError.None)
 		}
 
 	}
 
 	fun getEOSRAMTradeData(
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<Float>) -> Unit
+		hold: (ArrayList<Float>?, RequestError) -> Unit
 	) {
 		requestData<Float>(
 			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
 			"data",
-			errorCallback = errorCallback,
+			errorCallback = {
+				hold(null, it)
+			},
 			isEncrypt = true
 		) {
-			hold(this.toArrayList())
+			hold(this.toArrayList(), RequestError.None)
 		}
 
 	}

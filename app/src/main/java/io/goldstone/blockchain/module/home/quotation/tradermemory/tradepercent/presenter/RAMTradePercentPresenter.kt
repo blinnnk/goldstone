@@ -71,17 +71,19 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment)
 	}
 	
 	private fun getTradeData() {
-		GoldStoneAPI.getEOSRAMTradeData( {
-			fragment.context.alert(it.toString())
-			updateUI()
-		}) {
-			if (it.size == 6) {
-				tradeDistributeList.clear()
-				tradeDistributeList.addAll(it)
-				GoldStoneAPI.context.runOnUiThread {
-					updateUI()
+		GoldStoneAPI.getEOSRAMTradeData {data, error ->
+			if (error.isNone()){
+				data?.let {
+					if (it.size == 6) {
+						tradeDistributeList.clear()
+						tradeDistributeList.addAll(it)
+					}
 				}
 			}
+			GoldStoneAPI.context.runOnUiThread {
+				updateUI()
+			}
+			
 		}
 	}
 	

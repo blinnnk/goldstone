@@ -83,7 +83,6 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		super.onFragmentDestroy()
 	}
 	
-	@SuppressLint("SetTextI18n")
 	private fun updateHeaderData() {
 		updateTodayPrice()
 		updateCurrentPrice()
@@ -135,19 +134,18 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	@SuppressLint("SetTextI18n")
 	private fun updateTodayPrice() {
-		GoldStoneAPI.getEOSRAMPriceToday( {
-			// Show the error exception to user
-			fragment.context.alert(it.toString().showAfterColonContent())
-			fragment.ramInformationHeader.updateTodayPriceUI()
-			fragment.ramInformationHeader.updatePricePercentUI()
-		}) {
+		GoldStoneAPI.getEOSRAMPriceToday { model, error ->
+			if (error.isNone()) {
+				model?.let {
+					val open = BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					val high = BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					val low = BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					ramInformationModel.openPrice = open
+					ramInformationModel.HighPrice = high
+					ramInformationModel.lowPrice = low
+				}
+			}
 			GoldStoneAPI.context.runOnUiThread {
-				val open = BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-				val high = BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-				val low = BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-				ramInformationModel.openPrice = open
-				ramInformationModel.HighPrice = high
-				ramInformationModel.lowPrice = low
 				fragment.ramInformationHeader.updateTodayPriceUI()
 				fragment.ramInformationHeader.updatePricePercentUI()
 			}
@@ -164,11 +162,11 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	@SuppressLint("SetTextI18n")
 	private fun updateCurrentPrice() {
 		EOSRAMUtil.getRAMPrice(EOSUnit.KB) { price, error ->
+			if (error.isNone()) {
+				val current = BigDecimal(price.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+				ramInformationModel.currentPrice = current
+			}
 			GoldStoneAPI.context.runOnUiThread {
-				if (error.isNone()) {
-					val current = BigDecimal(price.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-					ramInformationModel.currentPrice = current
-				}
 				fragment.ramInformationHeader.updateCurrentPriceUI()
 			}
 		}
@@ -181,25 +179,24 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	@SuppressLint("SetTextI18n")
 	private fun updateRAMAmount() {
-		EOSAPI.getGlobalInformation( {
-			fragment.context.alert(it.toString().showAfterColonContent())
-			fragment.ramInformationHeader.updateRAMAmountUI()
-		}) {
-			GoldStoneAPI.context.runOnUiThread {
-				if (!it.maxRamSize.isNull() && !it.totalRamBytesReserved.isNull()) {
-					val gbDivisior = Math.pow(1024.toDouble(), 3.toDouble())
-					var maxAmount = BigDecimal(it.maxRamSize)
-					var reservedAmount = BigDecimal(it.totalRamBytesReserved)
-					val percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
-					maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
-					reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
-					ramInformationModel.ramAmountPercent = percent.stripTrailingZeros().toPlainString()
-					ramInformationModel.occupyAmount = reservedAmount.toString()
-					ramInformationModel.maxAmount = maxAmount.toString()
-					
-					fragment.ramInformationHeader.updateRAMAmountUI()
-					
+		EOSAPI.getGlobalInformation { model, error ->
+			if (error.isNone()) {
+				model?.let {
+					if (!it.maxRamSize.isNull() && !it.totalRamBytesReserved.isNull()) {
+						val gbDivisior = Math.pow(1024.toDouble(), 3.toDouble())
+						var maxAmount = BigDecimal(it.maxRamSize)
+						var reservedAmount = BigDecimal(it.totalRamBytesReserved)
+						val percent = reservedAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
+						maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
+						reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
+						ramInformationModel.ramAmountPercent = percent.stripTrailingZeros().toPlainString()
+						ramInformationModel.occupyAmount = reservedAmount.toString()
+						ramInformationModel.maxAmount = maxAmount.toString()
+					}
 				}
+			}
+			GoldStoneAPI.context.runOnUiThread {
+				fragment.ramInformationHeader.updateRAMAmountUI()
 			}
 		}
 	}

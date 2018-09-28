@@ -60,11 +60,13 @@ class RankPresenter(override val fragment: RankFragment)
 	}
 	
 	private fun getRank() {
-		GoldStoneAPI.getEOSRAMRank( {
-			LogUtil.error("geteosramrank", it)
-			fragment.ramRankView.updateRankUI()
-		}) {
-			rankList.addAll(it)
+		GoldStoneAPI.getEOSRAMRank { data, error ->
+			if (error.isNone()) {
+				data?.let {
+					rankList.clear()
+					rankList.addAll(it)
+				}
+			}
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.ramRankView.updateRankUI()
 			}

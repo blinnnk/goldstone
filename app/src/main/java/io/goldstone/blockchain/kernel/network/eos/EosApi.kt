@@ -425,8 +425,7 @@ object EOSAPI {
 	}
 	
 	fun getGlobalInformation(
-		errorCallBack: (Throwable) -> Unit,
-		@WorkerThread hold: (EOSGolbalModel) -> Unit
+		@WorkerThread hold: (EOSGolbalModel?, RequestError) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -440,13 +439,15 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				it,
 				EOSUrl.getTableRows(),
-				errorCallBack,
+				{
+					hold(null, it)
+				},
 				false
 			) {
 				val globalInformation = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
 				globalInformation?.apply {
 					val model = Gson().fromJson(globalInformation.toString(), EOSGolbalModel::class.java)
-					hold(model)
+					hold(model, RequestError.None)
 				}
 			}
 		}
