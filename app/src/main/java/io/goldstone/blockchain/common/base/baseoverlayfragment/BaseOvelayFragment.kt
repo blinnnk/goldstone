@@ -10,16 +10,15 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
-import com.blinnnk.extension.timeUpThen
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.setTransparentStatusBar
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
@@ -85,7 +84,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		super.onCreate(savedInstanceState)
 		// 全屏幕悬浮层展开的时候隐藏 `StatusBar`
 		activity?.apply {
-			if (!Config.isNotchScreen()) {
+			if (!SharedWallet.isNotchScreen()) {
 				hideStatusBar()
 			}
 		}
@@ -160,7 +159,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
 	open fun setTransparentStatus() {
 		activity?.apply {
-			if (!Config.isNotchScreen()) {
+			if (!SharedWallet.isNotchScreen()) {
 				setTransparentStatusBar()
 			}
 		}

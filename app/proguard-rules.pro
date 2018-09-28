@@ -100,6 +100,8 @@
 -keep class android.support.v8.renderscript.** { *; }
 
 # Xin Ge
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
 -keep class com.tencent.android.tpush.** {* ;}
 -keep class com.tencent.mid.** {* ;}
 -keep class com.qq.taf.jce.** {*;}
@@ -151,13 +153,6 @@
 }
 
 -adaptclassstrings com.example.Test
-
-# Instabug
--dontwarn org.apache.http.**
--dontwarn android.net.http.AndroidHttpClient
--dontwarn com.google.android.gms.**
--dontwarn com.android.volley.toolbox.**
--dontwarn com.instabug.**
 
 # Anko
 -dontwarn kotlin.jvm.internal.Intrinsics

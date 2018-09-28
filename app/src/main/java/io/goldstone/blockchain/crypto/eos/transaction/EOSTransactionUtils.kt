@@ -4,6 +4,7 @@ import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
+import io.goldstone.blockchain.crypto.multichain.ChainID
 
 /**
  * @author KaySaith
@@ -76,9 +77,9 @@ object EOSTransactionUtils {
 		val serializedData = chainID.id + packedTX
 		return EOSTransactionSerialization(packedTX, serializedData.completeZero())
 	}
+}
 
-	private fun String.completeZero(): String {
-		// 在签名结尾补充 64 个占位的 0, 目前是通过多次实验找到的规律, 并未找到具体官方文档要求说明.
-		return this + EOSUtils.completeZero(64)
-	}
+fun String.completeZero(count: Int = 64): String {
+	// 在签名结尾补充 64 个占位的 0, 目前是通过多次实验找到的规律, 并未找到具体官方文档要求说明.
+	return this + EOSUtils.completeZero(count)
 }

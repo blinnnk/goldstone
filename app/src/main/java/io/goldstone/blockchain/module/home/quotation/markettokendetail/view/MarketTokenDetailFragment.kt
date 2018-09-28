@@ -3,7 +3,10 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -29,6 +32,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	val currencyInfo by lazy {
 		getParentFragment<MarketTokenCenterFragment>()?.currencyInfo
 	}
+	override val pageTitle: String = "Market Detail"
 	val currentPriceInfo by lazy { CurrentPriceView(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
 	private val candleChart by lazy { MarketTokenCandleChart(context!!) }
@@ -37,7 +41,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 	private val tokenInformation by lazy { TokenInformation(context!!) }
 	private val tokenInfoLink by lazy {
 		TokenInfoLink(context!!) { link, title ->
-			presenter.showWebFragmentWithLink(link, title, currencyInfo?.pairDisplay.orEmpty())
+			presenter.showWebFragmentWithLink(link, title)
 		}
 	}
 	private val tokenSocialMedia by lazy {

@@ -1,18 +1,28 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
+import android.content.Context
+import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.AlertText
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.PasswordError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.error.TransferError
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
 
@@ -43,50 +53,24 @@ class PaymentPreparePresenter(
 		return rootFragment?.token
 	}
 
-	fun goToGasEditorFragmentOrTransfer(callback: () -> Unit) {
+	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
 		val count = fragment.getTransferCount()
-		if (count == 0.0) {
-			fragment.context.alert(AlertText.emptyTransferValue)
-			callback()
-		} else {
-			fragment.toast(LoadingText.calculateGas)
-			when {
-				/** 准备 BTC 转账需要的参数 */
-				TokenContract(getToken()?.contract).isBTC() -> prepareBTCPaymentModel(
-					count, fragment.getChangeAddress()
-				) { error ->
-					if (error != TransferError.None) fragment.context?.alert(error.content)
-					// 恢复 Loading 按钮
-					callback()
-				}
-				/** 准备 LTC 转账需要的参数 */
-				TokenContract(getToken()?.contract).isLTC() -> prepareLTCPaymentModel(
-					count, fragment.getChangeAddress()
-				) { error ->
-					if (error != TransferError.None) fragment.context?.alert(error.content)
-					// 恢复 Loading 按钮
-					callback()
-				}
-				/** 准备 BCH 转账需要的参数 */
-				TokenContract(getToken()?.contract).isBCH() -> prepareBCHPaymentModel(
-					count, fragment.getChangeAddress()
-				) { error ->
-					if (error != TransferError.None) fragment.context?.alert(error.content)
-					// 恢复 Loading 按钮
-					callback()
-				}
-				/** 准备 EOS 转账需要的参数 */
-				TokenContract(getToken()?.contract).isEOS() -> transferEOS(count, getToken()?.symbol!!) { error ->
-					when (error) {
-						TransferError.BalanceIsNotEnough -> fragment.context.alert(AlertText.balanceNotEnough)
-						TransferError.IncorrectDecimal -> fragment.context?.alert(AlertText.transferWrongDecimal)
-						else -> callback()
-					}
-					// 恢复 Loading 按钮
-					callback()
-				}
-				else -> prepareETHERC20ETCPaymentModel(count, callback)
-			}
+		if (!getToken()?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
+		if (count == 0.0) callback(TransferError.TradingInputIsEmpty)
+		else when {
+			/** 准备 BTC 转账需要的参数 */
+			getToken()?.contract.isBTC() ->
+				prepareBTCPaymentModel(count, fragment.getChangeAddress(), callback)
+			/** 准备 LTC 转账需要的参数 */
+			getToken()?.contract.isLTC() ->
+				prepareLTCPaymentModel(count, fragment.getChangeAddress(), callback)
+			/** 准备 BCH 转账需要的参数 */
+			getToken()?.contract.isBCH() ->
+				prepareBCHPaymentModel(count, fragment.getChangeAddress(), callback)
+			/** 准备 EOS 转账需要的参数 */
+			getToken()?.contract.isEOS() ->
+				transferEOS(count, CoinSymbol(getToken()?.symbol), callback)
+			else -> prepareETHSeriesPaymentModel(count, callback)
 		}
 	}
 
@@ -108,7 +92,40 @@ class PaymentPreparePresenter(
 	private fun setSymbol() {
 		fragment.setSymbolAndPrice(
 			rootFragment?.token?.symbol.orEmpty(),
-			rootFragment?.token?.price?.formatCurrency().orEmpty() + " " + Config.getCurrencyCode()
+			rootFragment?.token?.price?.formatCurrency().orEmpty() + " " + SharedWallet.getCurrencyCode()
 		)
+	}
+
+	companion object {
+
+		fun showGetPrivateKeyDashboard(
+			context: Context?,
+			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+		) {
+			context?.showAlertView(
+				"Transfer EOS Token",
+				"prepare to transfer eos token, now you should enter your password",
+				true,
+				{
+					// User click cancel button
+					hold(null, AccountError.None)
+				}
+			) { passwordInput ->
+				if (passwordInput.isNull()) return@showAlertView
+				val password = passwordInput!!.text.toString()
+				if (password.isNotEmpty()) WalletTable.getCurrentWallet {
+					PrivateKeyExportPresenter.getPrivateKey(
+						GoldStoneAPI.context,
+						SharedAddress.getCurrentEOS(),
+						ChainType.EOS,
+						password
+					) { privateKey, error ->
+						if (!privateKey.isNull() && error.isNone())
+							hold(EOSPrivateKey(privateKey!!), GoldStoneError.None)
+						else hold(null, AccountError.DecryptKeyStoreError)
+					}
+				} else hold(null, PasswordError.InputIsEmpty)
+			}
+		}
 	}
 }

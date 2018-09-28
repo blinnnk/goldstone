@@ -11,7 +11,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel

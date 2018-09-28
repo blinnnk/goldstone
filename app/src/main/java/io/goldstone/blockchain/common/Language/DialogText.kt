@@ -30,7 +30,7 @@ object DialogText {
 		HoneyLanguage.English.code -> "You have not backed up your mnemonic yet. It is extremely important that take care of your mnemonic. If you lose it, you will lose your digital assets."
 		HoneyLanguage.Chinese.code -> "你还没有备份您的钱包。GoldStone不会为您保存任何形式的私钥/助记词/keystore，一旦您忘记就无法找回。请您一定确保钱包妥善备份后再用这个钱包接收转账。"
 		HoneyLanguage.Japanese.code -> "まだお客様のウォレットがバックアップされていません。GoldStoneどのような形式であれプライペートキー/ニーモニック/Keystoreは保存されません。忘れてしまった場合は探し出すことは出来ません。必ずウォレットが適切にバックアップされていることを確認してから、このウォレットを使用して振込を受け付けて下さい。"
-		HoneyLanguage.Korean.code -> "귀하의 지갑을 백업하지 않았습니다.                                                       GoldStone는 귀하의 임의의 형식의 개인키/니모닉/keystore를 저장하지 않으며, 일단 귀하께서 분실할 경우 찾을수 없습니다. 지갑을 정확히 백업한후 이 지갑으로 이체금액을 수령하십시오. "
+		HoneyLanguage.Korean.code -> "귀하의 지갑을 백업하지 않았습니다. GoldStone는 귀하의 임의의 형식의 개인키/니모닉/keystore를 저장하지 않으며, 일단 귀하께서 분실할 경우 찾을수 없습니다. 지갑을 정확히 백업한후 이 지갑으로 이체금액을 수령하십시오. "
 		HoneyLanguage.Russian.code -> "Вы еще не сделали резервную копию Вашего кошелька. Никакой формат закрытого ключа / мнемонической записи / keystore не будет сохранен, если Вы его забудете, Вы уже не сможете его восстановить. Пожалуйста, убедитесь, что кошелек имеет должную резервную копию, а затем получите перевод с этого кошелька."
 		HoneyLanguage.TraditionalChinese.code -> "你還沒有備份您的錢包。GoldStone不會為您保存任何形式的私鑰/助記詞/密鑰庫，一旦您忘記就無法找回。“請您一定確保錢包妥善備份後再用這個錢包接收轉賬。"
 		else -> ""

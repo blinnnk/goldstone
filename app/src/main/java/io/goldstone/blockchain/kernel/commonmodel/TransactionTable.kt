@@ -4,16 +4,13 @@ import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toArrayList
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
@@ -24,7 +21,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.Serializable
@@ -81,7 +77,7 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = Config.getCurrentChain(),
+	var chainID: String = SharedChain.getCurrentETH().id,
 	var isFee: Boolean = false,
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
@@ -131,15 +127,17 @@ data class TransactionTable(
 		data.hasError,
 		data.txReceiptStatus,
 		data.input,
+		// 奇怪的情况, 极其少见的情况下自己给自己转账解析为 Contract 转账, 待研究
+		// eg: https://ropsten.etherscan.io/tx/0xbda369f2ddc689d6039bf2dc96fc73af2bee1be8a87d88ceb4a9b552066f92ff
 		if (CryptoUtils.isERC20TransferByInputCode(data.input)) data.to
 		else TokenContract.ethContract,
 		data.cumulativeGasUsed,
 		data.gasUsed,
 		data.confirmations,
-		data.fromAddress != Config.getCurrentEthereumAddress(),
+		data.fromAddress != SharedAddress.getCurrentEthereum(),
 		CryptoUtils.isERC20TransferByInputCode(data.input),
 		data.symbol,
-		Config.getCurrentEthereumAddress()
+		SharedAddress.getCurrentEthereum()
 	)
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
@@ -166,7 +164,7 @@ data class TransactionTable(
 		data.isReceive,
 		true,
 		data.symbol,
-		Config.getCurrentEthereumAddress(),
+		SharedAddress.getCurrentEthereum(),
 		data.to,
 		false,
 		data.logIndex
@@ -175,7 +173,7 @@ data class TransactionTable(
 	constructor(
 		data: JSONObject,
 		isETC: Boolean = false,
-		chainID: String = Config.getCurrentChain()
+		chainID: String = SharedChain.getCurrentETH().id
 	) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
@@ -201,12 +199,12 @@ data class TransactionTable(
 		"",
 		"",
 		!data.safeGet("from").equals(
-			if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
+			if (isETC) SharedAddress.getCurrentETC() else SharedAddress.getCurrentEthereum(),
 			true
 		),
 		CryptoUtils.isERC20TransferByInputCode(data.safeGet("input")),
 		"",
-		if (isETC) Config.getCurrentETCAddress() else Config.getCurrentEthereumAddress(),
+		if (isETC) SharedAddress.getCurrentETC() else SharedAddress.getCurrentEthereum(),
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice")),
 		chainID = chainID
 	)
@@ -234,12 +232,12 @@ data class TransactionTable(
 		"",
 		"0",
 		"",
-		!data.from.equals(Config.getCurrentETCAddress(), true),
+		!data.from.equals(SharedAddress.getCurrentETC(), true),
 		false,
 		CoinSymbol.etc,
-		Config.getCurrentETCAddress(),
+		SharedAddress.getCurrentETC(),
 		tokenReceiveAddress = data.to,
-		chainID = Config.getETCCurrentChain(),
+		chainID = SharedChain.getETCCurrent().id,
 		isFee = data.isFee,
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
@@ -250,118 +248,56 @@ data class TransactionTable(
 		value: String,
 		tokenReceiveAddress: String?
 	) {
-		this.isReceive = Config.getCurrentEthereumAddress().equals(tokenReceiveAddress, true)
+		this.isReceive = SharedAddress.getCurrentEthereum().equals(tokenReceiveAddress, true)
 		this.isERC20Token = isERC20Token
 		this.symbol = symbol
 		this.value = value
 		this.tokenReceiveAddress = tokenReceiveAddress
-		this.recordOwnerAddress = Config.getCurrentEthereumAddress()
+		this.recordOwnerAddress = SharedAddress.getCurrentEthereum()
 		this.minerFee = CryptoUtils.toGasUsedEther(gas, gasPrice, false)
 	}
 
 	companion object {
 		// `ERC` 类型的 `Transactions` 专用
-		fun getERCTransactionsByAddress(
-			address: String,
-			@UiThread hold: (ArrayList<TransactionListModel>) -> Unit
-		) {
+		fun getTokenTransactions(address: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
 			load {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.getTransactionsByAddress(address, chainID = Config.getCurrentChain())
+				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().id)
 			} then { it ->
-				val result = if (it.isEmpty()) {
-					arrayListOf()
-				} else {
-					it.map { TransactionListModel(it) }.toArrayList()
-				}
-				hold(result)
+				hold(it.map { TransactionListModel(it) })
 			}
 		}
 
-		fun getETCTransactionsByAddress(
-			address: String,
-			hold: (ArrayList<TransactionListModel>) -> Unit
-		) {
+		fun getETCTransactions(address: String, hold: (List<TransactionListModel>) -> Unit) {
 			load {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.getETCTransactionsByAddress(address)
-			} then { it ->
-				val result = if (it.isEmpty()) {
-					arrayListOf()
-				} else {
-					it.map { TransactionListModel(it) }.toArrayList()
-				}
-				hold(result)
+				GoldStoneDataBase.database.transactionDao().getETCTransactionsByAddress(address)
+			} then { data ->
+				hold(data.map { TransactionListModel(it) })
 			}
 		}
 
-		fun getCurrentChainByAddressAndContract(
+		fun getByAddressAndContract(
 			walletAddress: String,
-			contract: String,
-			chainID: String,
+			contract: TokenContract,
 			hold: (List<TransactionListModel>) -> Unit
 		) {
-			doAsync {
-				var transactions = GoldStoneDataBase
-					.database
-					.transactionDao()
-					.getCurrentChainByAddressAndContract(walletAddress, contract, chainID)
+			val chainID = contract.getCurrentChainID().id
+			load {
+				val dao = GoldStoneDataBase.database.transactionDao()
+				var transactions = dao.getByAddressAndContract(walletAddress, contract.contract.orEmpty(), chainID)
 				// 如果是 `ETH` or `ETC` 需要查询出所有相关的 `Miner` 作为账单记录
 				var fee = listOf<TransactionTable>()
-				if (!TokenContract(contract).isERC20Token()) {
-					fee = GoldStoneDataBase
-						.database
-						.transactionDao()
-						.getCurrentChainFee(walletAddress, true, chainID)
+				if (!contract.isERC20Token()) {
+					fee = dao.getCurrentChainFee(walletAddress, true, chainID)
 				}
 				transactions += fee.filter { TokenContract(it.contractAddress).isERC20Token() }
-				GoldStoneAPI.context.runOnUiThread {
-					hold(
-						if (TokenContract(contract).isERC20Token()) {
-							transactions.asSequence().filter {
-								!it.isFee
-							}.map {
-								TransactionListModel(it)
-							}.sortedByDescending {
-								it.timeStamp
-							}.toList()
-						} else {
-							transactions.asSequence().map {
-								TransactionListModel(it)
-							}.sortedByDescending {
-								it.timeStamp
-							}.toList()
-						}
-					)
-				}
-			}
-		}
-
-		fun deleteByAddress(address: String, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.transactionDao().apply {
-					val data = getAllTransactionsByAddress(address)
-					if (data.isEmpty()) {
-						callback()
-						return@doAsync
-					}
-					object : ConcurrentAsyncCombine() {
-						override var asyncCount: Int = data.size
-						override fun concurrentJobs() {
-							data.forEach {
-								delete(it)
-								completeMark()
-							}
-						}
-
-						override fun getResultInMainThread() = false
-						override fun mergeCallBack() = callback()
-					}.start()
-				}
+				transactions
+			} then { transactions ->
+				hold(
+					if (contract.isERC20Token()) transactions.asSequence().filter { !it.isFee }.map {
+						TransactionListModel(it)
+					}.sortedByDescending { it.timeStamp }.toList()
+					else transactions.asSequence().map { TransactionListModel(it) }.sortedByDescending { it.timeStamp }.toList()
+				)
 			}
 		}
 
@@ -369,6 +305,7 @@ data class TransactionTable(
 			hash: String,
 			isReceive: Boolean,
 			chainName: String,
+			errorCallback: (EthereumRPCError) -> Unit,
 			callback: (memo: String) -> Unit
 		) {
 			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
@@ -378,10 +315,7 @@ data class TransactionTable(
 					GoldStoneEthCall.apply {
 						getInputCodeByHash(
 							hash,
-							{ error, reason ->
-								callback("")
-								LogUtil.error("getMemoByHashAndReceiveStatus $reason", error)
-							},
+							errorCallback,
 							chainName
 						) { input ->
 							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
@@ -403,23 +337,15 @@ data class TransactionTable(
 			}
 		}
 
-		fun getTransactionByHash(
-			taxHash: String,
-			hold: (List<TransactionTable>) -> Unit
-		) {
+		fun getTransactionByHash(taxHash: String, hold: (List<TransactionTable>) -> Unit) {
 			GoldStoneDataBase.database.transactionDao().apply {
 				hold(getTransactionByTaxHash(taxHash))
 			}
 		}
 
-		fun getByHashAndReceivedStatus(
-			hash: String,
-			isReceived: Boolean,
-			hold: (TransactionTable?) -> Unit
-		) {
+		fun getByHashAndReceivedStatus(hash: String, isReceived: Boolean, hold: (TransactionTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.transactionDao()
-					.getByTaxHashAndReceivedStatus(hash, isReceived)
+				GoldStoneDataBase.database.transactionDao().getByTaxHashAndReceivedStatus(hash, isReceived)
 			} then (hold)
 		}
 	}
@@ -431,71 +357,48 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList")
 	fun getAll(): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC"
-	)
-	fun getTransactionsByAddress(
-		walletAddress: String,
-		chainID: String
-	): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC")
+	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC"
-	)
-	fun getETCTransactionsByAddress(
-		walletAddress: String,
-		symbol: String = CoinSymbol.etc,
-		chainID: String = Config.getETCCurrentChain()
-	): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
+	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().id): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC"
-	)
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash")
-	fun getTransactionByTaxHash(
-		taxHash: String
-	): List<TransactionTable>
+	fun getTransactionByTaxHash(taxHash: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash LIKE :taxHash AND isReceive LIKE :isReceive")
-	fun getByTaxHashAndReceivedStatus(
-		taxHash: String,
-		isReceive: Boolean
-	): TransactionTable?
+	fun getByTaxHashAndReceivedStatus(taxHash: String, isReceive: Boolean): TransactionTable?
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC"
-	)
-	fun getByAddressAndContract(
-		walletAddress: String,
-		contract: String
-	): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract ORDER BY timeStamp DESC")
+	fun getByAddressAndContract(walletAddress: String, contract: String): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC"
-	)
-	fun getCurrentChainByAddressAndContract(
-		walletAddress: String,
-		contract: String,
-		chainID: String = Config.getCurrentChain()
-	): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC")
+	fun getByAddressAndContract(walletAddress: String, contract: String, chainID: String): List<TransactionTable>
 
-	@Query(
-		"SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND isFee LIKE :isFee AND chainID LIKE :chainID ORDER BY timeStamp DESC"
-	)
-	fun getCurrentChainFee(
-		walletAddress: String,
-		isFee: Boolean,
-		chainID: String
-	): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND isFee LIKE :isFee AND chainID LIKE :chainID ORDER BY timeStamp DESC")
+	fun getCurrentChainFee(walletAddress: String, isFee: Boolean, chainID: String): List<TransactionTable>
 
 	@Insert
 	fun insert(token: TransactionTable)
+
+	@Insert
+	fun insertAll(tokens: List<TransactionTable>)
 
 	@Update
 	fun update(token: TransactionTable)
 
 	@Delete
 	fun delete(token: TransactionTable)
+
+	@Delete
+	fun deleteAll(token: List<TransactionTable>)
+
+	@Query("DELETE FROM transactionList WHERE recordOwnerAddress IN (:addresses)")
+	fun deleteAllByAddress(addresses: List<String>)
+
+	@Query("DELETE FROM transactionList WHERE recordOwnerAddress = :recordAddress")
+	fun deleteRecordAddressData(recordAddress: String)
 }

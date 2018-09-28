@@ -41,28 +41,20 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			childFragmentManager.fragments.apply {
 				if (last() is R) removeChildFragment(last())
 				// 组内只有一个 `Fragment` 的时候销毁掉回退按钮
-				if (size == 2 || viewPagerSize > 0) {
-					overlayView.header.apply {
-						showBackButton(false)
-						showCloseButton(true)
-					}
+				if (size == 2 || viewPagerSize > 0) overlayView.header.apply {
+					showBackButton(false)
+					showCloseButton(true)
 				}
 
-				if (viewPagerSize > 0) {
-					(0 until size).forEach {
-						if (this[it].isHidden) {
-							showChildFragment(this[it])
-						}
+				when {
+					viewPagerSize > 0 -> (0 until size).forEach {
+						if (this[it].isHidden) showChildFragment(this[it])
 					}
-				} else {
-					if (size >= 2) {
-						this[size - 2]?.let {
-							showChildFragment(it)
-						}
-					} else {
-						this[size - 1]?.let {
-							showChildFragment(it)
-						}
+					size >= 2 -> this[size - 2]?.let {
+						showChildFragment(it)
+					}
+					else -> this[size - 1]?.let {
+						showChildFragment(it)
 					}
 				}
 			}
@@ -70,27 +62,24 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	}
 
 	inline fun <reified T : Fragment> showTargetFragment(
-		title: String,
-		previousTitle: String,
 		bundle: Bundle = Bundle(),
 		viewPagerSize: Int = 0
 	) {
 		fragment.apply {
-			headerTitle = title
 			if (viewPagerSize > 0) {
 				childFragmentManager.fragments.apply {
 					forEachIndexed { index, fragment ->
-						if (index in lastIndex - viewPagerSize..lastIndex) {
+						if (index in lastIndex - viewPagerSize .. lastIndex) {
 							hideChildFragment(fragment)
 						}
 					}
-					addSubFragment<T>(bundle, previousTitle, viewPagerSize)
+					addSubFragment<T>(bundle, viewPagerSize)
 				}
 			} else {
 				try {
 					childFragmentManager.fragments.last()?.let {
 						hideChildFragment(it)
-						addSubFragment<T>(bundle, previousTitle, 0)
+						addSubFragment<T>(bundle, 0)
 					}
 				} catch (error: Exception) {
 					LogUtil.error("showTargetFragment", error)
@@ -101,7 +90,6 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 
 	inline fun <reified T : Fragment> BaseOverlayFragment<*>.addSubFragment(
 		bundle: Bundle,
-		previousTitle: String,
 		viewPagerSize: Int
 	) {
 		addFragmentAndSetArgument<T>(ContainerID.content) {
@@ -109,7 +97,6 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 		}
 		overlayView.header.apply {
 			showBackButton(true) {
-				headerTitle = previousTitle
 				popFragmentFrom<T>(viewPagerSize)
 			}
 			showCloseButton(false)

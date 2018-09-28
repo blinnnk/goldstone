@@ -25,9 +25,14 @@ import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
@@ -101,7 +106,7 @@ class ProfilePresenter(
 				ProfileModel(
 					R.drawable.currency_icon,
 					ProfileText.currency,
-					Config.getCurrencyCode()
+					SharedWallet.getCurrencyCode()
 				),
 				ProfileModel(
 					R.drawable.language_icon,
@@ -111,17 +116,18 @@ class ProfilePresenter(
 				ProfileModel(
 					R.drawable.chain_icon,
 					ProfileText.chain,
-					if (Config.isTestEnvironment()) ChainText.testnet else ChainText.mainnet
+					if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet
 				),
 				ProfileModel(
 					R.drawable.wallet_icon,
 					ProfileText.walletManager,
 					object : FixTextLength() {
-						override var text = Config.getCurrentName()
+						override var text = SharedWallet.getCurrentName()
 						override val maxWidth = 40.uiPX().toFloat()
 						override val textSize: Float = fragment.view?.fontSize(14).orZero()
 					}.getFixString()
 				),
+				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
@@ -410,5 +416,5 @@ class ProfilePresenter(
 	}
 
 	private fun getCurrentLanguageSymbol() =
-		HoneyLanguage.getLanguageByCode(Config.getCurrentLanguageCode())
+		HoneyLanguage.getLanguageByCode(SharedWallet.getCurrentLanguageCode())
 }

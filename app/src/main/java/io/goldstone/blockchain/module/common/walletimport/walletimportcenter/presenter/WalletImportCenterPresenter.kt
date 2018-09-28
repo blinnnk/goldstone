@@ -1,11 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimportcenter.presenter
 
-import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.ImportMethodText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
@@ -21,24 +16,15 @@ class WalletImportCenterPresenter(
 	override val fragment: WalletImportCenterFragment
 ) : BasePresenter<WalletImportCenterFragment>() {
 
-		fun showMnemonicImportFragment() {
-			showTargetFragment<MnemonicImportDetailFragment, WalletImportFragment>(
-				ImportMethodText.mnemonic,
-				ImportWalletText.importWallet
-			)
-		}
+	fun showMnemonicImportFragment() {
+		showTargetFragment<MnemonicImportDetailFragment, WalletImportFragment>()
+	}
 
 	fun showPrivateKeyImportFragment() {
-		showTargetFragment<PrivateKeyImportFragment, WalletImportFragment>(
-			ImportMethodText.privateKey,
-			ImportWalletText.importWallet
-		)
+		showTargetFragment<PrivateKeyImportFragment, WalletImportFragment>()
 	}
 
 	fun showKeystoreImportFragment() {
-		showTargetFragment<KeystoreImportFragment, WalletImportFragment>(
-			ImportMethodText.keystore,
-			ImportWalletText.importWallet
-		)
+		showTargetFragment<KeystoreImportFragment, WalletImportFragment>()
 	}
 }

@@ -8,17 +8,17 @@ import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -28,7 +28,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEdit
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFooter
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
@@ -47,7 +46,7 @@ class GasSelectionPresenter(
 	override val fragment: GasSelectionFragment
 ) : BasePresenter<GasSelectionFragment>() {
 
-	var currentMinerType = MinerFeeType.Recommend.content
+	var currentMinerType = MinerFeeType.Recommend
 	var gasFeeFromCustom: () -> GasFee? = {
 		fragment.arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 	}
@@ -93,7 +92,7 @@ class GasSelectionPresenter(
 						index,
 						miner.toString().toLong(),
 						prepareBTCSeriesModel?.signedMessageSize ?: 226,
-						currentMinerType,
+						currentMinerType.type,
 						getToken()?.symbol.orEmpty()
 					)
 				else
@@ -101,11 +100,11 @@ class GasSelectionPresenter(
 						index,
 						miner.toString().toDouble(),
 						prepareGasLimit(miner.toDouble().toGwei()).toDouble(),
-						currentMinerType,
+						currentMinerType.type,
 						getUnitSymbol()
 					)
 
-				if (model.type == currentMinerType) {
+				if (model.type == currentMinerType.type) {
 					getGasCurrencyPrice(model.count) {
 						fragment.setSpendingValue(it)
 					}
@@ -113,7 +112,7 @@ class GasSelectionPresenter(
 					gasUsedGasFee = getGasUnitCount(model.count)
 				}
 			}.click { it ->
-				currentMinerType = it.model.type
+				currentMinerType = MinerFeeType.getTypeByValue(it.model.type)
 				if (CoinSymbol(getToken()?.symbol).isBTCSeries())
 					updateBTCGasSettings(getToken()?.symbol.orEmpty(), parent)
 				else updateGasSettings(parent)
@@ -129,8 +128,6 @@ class GasSelectionPresenter(
 	fun goToGasEditorFragment() {
 		rootFragment?.apply {
 			presenter.showTargetFragment<GasEditorFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,
@@ -147,30 +144,20 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(footer: GasSelectionFooter, callback: () -> Unit) {
-		// Prevent user click the other button at this time
-		fragment.showMaskView(true)
+	fun confirmTransfer(callback: (GoldStoneError) -> Unit) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
-			callback()
-			fragment.showMaskView(false)
-			return
-		}
-		// 检查网络并执行转账操作
-		NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-			when {
-				TokenContract(getToken()?.contract).isBTC() ->
-					prepareToTransferBTC(footer, callback)
-				TokenContract(getToken()?.contract).isLTC() ->
-					prepareToTransferLTC(footer, callback)
-				TokenContract(getToken()?.contract).isBCH() ->
-					prepareToTransferBCH(footer, callback)
-				TokenContract(getToken()?.contract).isEOS() -> {
-					// TODO EOS
-				}
-				else -> prepareToTransfer(footer, callback)
-			}
+			callback(TransferError.IncorrectDecimal)
+		} else if (NetworkUtil.hasNetworkWithAlert(fragment.context)) when {
+			// 检查网络并执行转账操作
+			getToken()?.contract.isBTC() ->
+				prepareToTransferBTC(callback)
+			getToken()?.contract.isLTC() ->
+				prepareToTransferLTC(callback)
+			getToken()?.contract.isBCH() ->
+				prepareToTransferBCH(callback)
+			else -> prepareToTransfer(callback)
 		}
 	}
 
@@ -179,43 +166,29 @@ class GasSelectionPresenter(
 	}
 
 	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
-		val isValid = isValidDecimal(token?.decimal?.toInt().orZero())
+		val isValid = isValidDecimal(token?.decimal.orZero())
 		if (!isValid) fragment.context?.alert(AlertText.transferWrongDecimal)
 		return isValid
 	}
 
-	fun showConfirmAttentionView(
-		footer: GasSelectionFooter,
-		callback: () -> Unit
-	) {
+	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransaction,
 			CommonText.enterPassword.toUpperCase(),
-			true,
-			{
-				// 点击 `Alert` 取消按钮
-				footer.getConfirmButton {
-					showLoadingStatus(false)
-				}
-				fragment.showMaskView(false)
-			}) {
+			true
+		) {
+			val password = it?.text.toString()
 			when {
-				TokenContract(getToken()?.contract).isBTC() ->
-					prepareBTCSeriesModel?.apply {
-						transferBTC(this, it?.text.toString(), callback)
-					}
-				TokenContract(getToken()?.contract).isLTC() ->
-					prepareBTCSeriesModel?.apply {
-						transferLTC(this, it?.text.toString(), callback)
-					}
-				TokenContract(getToken()?.contract).isBCH() ->
-					prepareBTCSeriesModel?.apply {
-						transferBCH(this, it?.text.toString(), callback)
-					}
-				TokenContract(getToken()?.contract).isEOS() -> {
-					// TODO EOS
+				getToken()?.contract.isBTC() -> prepareBTCSeriesModel?.apply {
+					transferBTC(this, password, callback)
 				}
-				else -> transfer(it?.text.toString(), callback)
+				getToken()?.contract.isLTC() -> prepareBTCSeriesModel?.apply {
+					transferLTC(this, password, callback)
+				}
+				getToken()?.contract.isBCH() -> prepareBTCSeriesModel?.apply {
+					transferBCH(this, password, callback)
+				}
+				else -> transfer(password, callback)
 			}
 		}
 	}
@@ -246,7 +219,7 @@ class GasSelectionPresenter(
 				0,
 				false,
 				true,
-				ChainType.getChainTypeBySymbol(getToken()?.symbol)
+				ChainType.getChainTypeBySymbol(getToken()?.symbol).id
 			).apply {
 				// 插入 PendingData
 				GoldStoneDataBase.database
@@ -294,16 +267,16 @@ class GasSelectionPresenter(
 	) {
 		val coinContract =
 			when {
-				TokenContract(rootFragment?.token?.contract).isETC() -> TokenContract.etcContract
-				TokenContract(rootFragment?.token?.contract).isBTC() -> TokenContract.btcContract
-				TokenContract(rootFragment?.token?.contract).isLTC() -> TokenContract.ltcContract
-				TokenContract(rootFragment?.token?.contract).isEOS() -> TokenContract.eosContract
-				TokenContract(rootFragment?.token?.contract).isBCH() -> TokenContract.bchContract
-				else -> TokenContract.ethContract
+				getToken()?.contract.isETC() -> TokenContract.ETC
+				getToken()?.contract.isBTC() -> TokenContract.BTC
+				getToken()?.contract.isLTC() -> TokenContract.LTC
+				getToken()?.contract.isEOS() -> TokenContract.EOS
+				getToken()?.contract.isBCH() -> TokenContract.BCH
+				else -> TokenContract.ETH
 			}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(
-				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + Config.getCurrencyCode()
+				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + SharedWallet.getCurrencyCode()
 			)
 		}
 	}

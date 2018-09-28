@@ -6,7 +6,8 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -24,6 +25,9 @@ import org.jetbrains.anko.matchParent
  */
 
 class QRCodeFragment : BaseFragment<QRCodePresenter>() {
+
+	override val pageTitle: String = WalletText.qrCode
+
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = QRCodePresenter(this)
 
@@ -52,7 +56,7 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 		qrView.convertEvent = Runnable {
 			hasConvertedBCH = !hasConvertedBCH
 			val default = presenter.addressModel?.address.orEmpty()
-			val net = if (Config.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
+			val net = if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
 			val address = if (!hasConvertedBCH) BCHWalletUtils.formattedToLegacy(default, net)
 			else {
 				if (BCHWalletUtils.isNewCashAddress(default)) default

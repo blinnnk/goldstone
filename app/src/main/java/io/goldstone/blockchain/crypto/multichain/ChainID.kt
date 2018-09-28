@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.value.WebUrl
 import java.io.Serializable
 
@@ -25,6 +27,18 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 
+	fun isCurrent(): Boolean {
+		return when (id) {
+			btcMain, btcTest -> id.equals(SharedChain.getBTCCurrent().id, true)
+			ltcMain, ltcTest -> id.equals(SharedChain.getLTCCurrent().id, true)
+			bchMain, bchTest -> id.equals(SharedChain.getBCHCurrent().id, true)
+			ethMain, ropsten, rinkeby, kovan -> id.equals(SharedChain.getCurrentETH().id, true)
+			etcMain, etcTest -> id.equals(SharedChain.getETCCurrent().id, true)
+			eosMain, eosTest -> id.equals(SharedChain.getEOSCurrent().id, true)
+			else -> false
+		}
+	}
+
 	fun getContract(): String? {
 		return when (id) {
 			etcMain, etcTest -> TokenContract.etcContract
@@ -33,6 +47,18 @@ class ChainID(val id: String) : Serializable {
 			bchMain, bchTest -> TokenContract.bchContract
 			eosMain, eosTest -> TokenContract.eosContract
 			else -> null
+		}
+	}
+
+	fun getCurrentAddress(): String {
+		return when (id) {
+			etcMain, etcTest -> SharedAddress.getCurrentETC()
+			btcTest, ltcTest, bchTest -> SharedAddress.getCurrentBTCSeriesTest()
+			btcMain -> SharedAddress.getCurrentBTC()
+			ltcMain -> SharedAddress.getCurrentLTC()
+			bchMain -> SharedAddress.getCurrentBCH()
+			eosMain, eosTest -> SharedAddress.getCurrentEOS()
+			else -> SharedAddress.getCurrentETC()
 		}
 	}
 
@@ -92,6 +118,21 @@ class ChainID(val id: String) : Serializable {
 		const val eosMain = "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"
 		const val eosTest = "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca" // Jungle Testnet
 
+		val ETH = ChainID(ethMain)
+		val Ropsten = ChainID(ropsten)
+		val Rinkeby = ChainID(rinkeby)
+		val Kovan = ChainID(kovan)
+		val ETC = ChainID(etcMain)
+		val ETCTest = ChainID(etcTest)
+		val BTC = ChainID(btcMain)
+		val BTCTest = ChainID(btcTest)
+		val BCH = ChainID(bchMain)
+		val BCHTest = ChainID(bchTest)
+		val LTC = ChainID(ltcMain)
+		val LTCTest = ChainID(ltcTest)
+		val EOS = ChainID(eosMain)
+		val EOSTest = ChainID(eosTest)
+
 		fun getChainIDByName(chainName: String): String {
 			return when (chainName) {
 				// GoldStone ERC Node
@@ -133,7 +174,8 @@ class ChainID(val id: String) : Serializable {
 				kovan,
 				rinkeby,
 				ltcTest,
-				bchTest
+				bchTest,
+				eosTest
 			)
 		}
 

@@ -5,7 +5,9 @@ import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.NotificationText
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
@@ -19,6 +21,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class NotificationListFragment :
 	BaseRecyclerFragment<NotificationListPresenter, NotificationTable>() {
 
+	override val pageTitle: String = NotificationText.notification
 	override val presenter = NotificationListPresenter(this)
 
 	override fun setRecyclerViewAdapter(

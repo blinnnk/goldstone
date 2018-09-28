@@ -8,14 +8,15 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
-import io.goldstone.blockchain.common.component.AttentionView
-import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.title.AttentionView
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -30,7 +31,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
-	
+
+	override val pageTitle: String = CreateWalletText.create
 	private val attentionView by lazy { AttentionView(context!!) }
 	private val nameEditText by lazy { RoundInput(context!!) }
 	private val passwordEditText by lazy { RoundInput(context!!) }
@@ -39,7 +41,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 	private val agreementView by lazy { AgreementView(context!!) }
 	private val createButton by lazy { RoundButton(context!!) }
 	override val presenter = CreateWalletPresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)
@@ -54,7 +56,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						topMargin = 20.uiPX()
 					}
 				}.into(this)
-				
+
 				nameEditText.apply {
 					title = CreateWalletText.name
 					hint = generateDefaultName()
@@ -62,7 +64,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						topMargin = 30.uiPX()
 					}
 				}.into(this)
-				
+
 				textView {
 					text = CreateWalletText.passwordRules
 					textSize = fontSize(12)
@@ -72,7 +74,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 					layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 					y += 12.uiPX()
 				}
-				
+
 				passwordEditText.apply {
 					title = CreateWalletText.password
 					setPasswordInput()
@@ -80,7 +82,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						topMargin = 30.uiPX()
 					}
 				}.into(this)
-				
+
 				repeatPasswordEditText.apply {
 					title = CreateWalletText.repeatPassword
 					setPasswordInput()
@@ -88,7 +90,7 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						topMargin = 10.uiPX()
 					}
 				}.into(this)
-				
+
 				hintInput.apply {
 					title = CreateWalletText.hint
 					setTextInput()
@@ -96,30 +98,31 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						topMargin = 10.uiPX()
 					}
 				}.into(this)
-				
+
 				agreementView.apply {
 					radioButton.onClick { setRadioStatus() }
 					textView.onClick {
 						presenter.showAgreementFragment()
 					}
 				}.into(this)
-				
+
 				createButton.apply {
 					text = CreateWalletText.create.toUpperCase()
 					setGrayStyle(20.uiPX())
-				}.click {
-					it.showLoadingStatus()
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.generateWalletWith(
 						agreementView.radioButton.isChecked,
 						hintInput
 					) {
-						it.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						button.showLoadingStatus(false)
 					}
 				}.into(this)
 			}
 		}
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?

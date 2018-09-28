@@ -5,13 +5,17 @@ import android.support.v4.app.Fragment
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.NotificationText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -25,9 +29,9 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailCell
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionInfoCell
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -57,7 +61,9 @@ class TransactionDetailPresenter(
 
 	override fun updateData() {
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
-		updateDataFromTransactionList()
+		updateDataFromTransactionList {
+			if (!it.isNone()) fragment.context.alert(it.message)
+		}
 		/** 这个是转账完毕后进入的初始数据 */
 		updateDataFromTransfer()
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
@@ -78,10 +84,8 @@ class TransactionDetailPresenter(
 
 	fun runBackEventBy(parent: Fragment) {
 		when (parent) {
-			is TokenDetailOverlayFragment -> {
-				parent.headerTitle = TokenDetailText.tokenDetail
+			is TokenDetailOverlayFragment ->
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
-			}
 
 			is NotificationFragment -> {
 				parent.headerTitle = NotificationText.notification
@@ -92,64 +96,54 @@ class TransactionDetailPresenter(
 
 	fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return when {
-			CoinSymbol(symbol).isETC() -> CoinSymbol.etc
-			CoinSymbol(symbol).isBTC() -> CoinSymbol.btc()
-			CoinSymbol(symbol).isLTC() -> CoinSymbol.ltc
-			CoinSymbol(symbol).isBCH() -> CoinSymbol.bch
-			CoinSymbol(symbol).isEOS() -> CoinSymbol.eos
-			else -> CoinSymbol.eth
-		}
+		return CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
 	}
 
-	fun showAddContactsButton(cell: TransactionDetailCell) {
-		TransactionListModel
-			.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
-				ContactTable.hasContacts(address) { exist ->
-					if (exist) return@hasContacts
-					cell.showAddContactButton(index) {
-						onClick {
-							fragment.parentFragment?.apply {
-								when (this) {
-									is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-									is NotificationFragment -> presenter.removeSelfFromActivity()
-								}
+	fun showAddContactsButton(cell: TransactionInfoCell) {
+		TransactionListModel.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
+			ContactTable.hasContacts(address) { exist ->
+				if (exist) return@hasContacts
+				cell.showAddContactButton(index) {
+					onClick {
+						fragment.parentFragment?.apply {
+							when (this) {
+								is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
+								is NotificationFragment -> presenter.removeSelfFromActivity()
 							}
-							fragment.getMainActivity()?.apply {
-								addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-									putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-									putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
-								}
-							}
-							preventDuplicateClicks()
 						}
+						fragment.getMainActivity()?.apply {
+							addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
+								putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
+								putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
+							}
+						}
+						preventDuplicateClicks()
 					}
 				}
 			}
+		}
 	}
 
 	fun showTransactionWebFragment() {
 		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
-		val argument = Bundle().apply {
-			putString(
-				ArgumentKey.webViewUrl,
-				TransactionListModel.generateTransactionURL(currentHash, symbol)
-			)
-		}
 		fragment.parentFragment.apply {
 			val webTitle =
 				when {
 					CoinSymbol(symbol).isETC() -> TransactionText.gasTracker
-					CoinSymbol(symbol).isBTCSeries() -> TransactionText.transactionWeb
+					CoinSymbol(symbol).isBTCSeries() || CoinSymbol(symbol).isEOS() ->
+						TransactionText.transactionWeb
 					else -> TransactionText.etherScanTransaction
 				}
+			val argument = Bundle().apply {
+				putString(
+					ArgumentKey.webViewUrl,
+					TransactionListModel.generateTransactionURL(currentHash, symbol)
+				)
+				putString(ArgumentKey.webViewName, webTitle)
+			}
 			when (this) {
-				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(
-					webTitle, TokenDetailText.tokenDetail, argument
-				)
-				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(
-					webTitle, NotificationText.notification, argument
-				)
+				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(argument)
+				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(argument)
 			}
 		}
 	}

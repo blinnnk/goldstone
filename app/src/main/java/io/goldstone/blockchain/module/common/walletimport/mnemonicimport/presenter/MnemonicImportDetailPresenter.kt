@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presen
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
@@ -31,33 +31,25 @@ class MnemonicImportDetailPresenter(
 		passwordHint: String,
 		isAgree: Boolean,
 		name: String,
-		callback: (Boolean) -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
-		mnemonic.isEmpty() isTrue {
-			fragment.context?.alert(ImportWalletText.mnemonicAlert)
-			callback(false)
-			return
-		}
-
-		if (!isValidPath(multiChainPath)) return
-
-		CreateWalletPresenter.checkInputValue(
+		if (mnemonic.isEmpty()) {
+			callback(AccountError.InvalidMnemonic)
+		} else if (!isValidPath(multiChainPath).isNone()) callback(AccountError.InvalidBip44Path)
+		else CreateWalletPresenter.checkInputValue(
 			name,
 			password,
 			repeatPassword,
 			isAgree,
-			fragment.context,
-			failedCallback = { callback(false) }
+			callback
 		) { passwordValue, walletName ->
 			val mnemonicContent =
-				mnemonic
-					.replaceWithPattern()
+				mnemonic.replaceWithPattern()
 					.replace("\n", " ")
 					.removeStartAndEndValue(" ")
 
 			Mnemonic.validateMnemonic(mnemonicContent) isFalse {
-				fragment.context?.alert(ImportWalletText.mnemonicAlert)
-				callback(false)
+				callback(AccountError.InvalidMnemonic)
 			} otherwise {
 				importWallet(
 					mnemonicContent,
@@ -71,23 +63,18 @@ class MnemonicImportDetailPresenter(
 		}
 	}
 
-	private fun isValidPath(multiChainPath: ChainPath): Boolean {
-		return if (multiChainPath.ethPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.ethPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			false
-		} else if (multiChainPath.btcPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.btcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			false
-		} else if (multiChainPath.testPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.testPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			false
-		} else if (multiChainPath.ltcPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.ltcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			false
-		} else if (multiChainPath.etcPath.isNotEmpty() && !isVaildBIP44Path(multiChainPath.etcPath)) {
-			fragment.context?.alert(ImportWalletText.pathAlert)
-			false
-		} else true
+	private fun isValidPath(multiChainPath: ChainPath): AccountError {
+		return if (multiChainPath.ethPath.isNotEmpty() && !isValidBIP44Path(multiChainPath.ethPath)) {
+			AccountError.InvalidBip44Path
+		} else if (multiChainPath.btcPath.isNotEmpty() && !isValidBIP44Path(multiChainPath.btcPath)) {
+			AccountError.InvalidBip44Path
+		} else if (multiChainPath.testPath.isNotEmpty() && !isValidBIP44Path(multiChainPath.testPath)) {
+			AccountError.InvalidBip44Path
+		} else if (multiChainPath.ltcPath.isNotEmpty() && !isValidBIP44Path(multiChainPath.ltcPath)) {
+			AccountError.InvalidBip44Path
+		} else if (multiChainPath.etcPath.isNotEmpty() && !isValidBIP44Path(multiChainPath.etcPath)) {
+			AccountError.InvalidBip44Path
+		} else AccountError.None
 	}
 
 	private fun importWallet(
@@ -96,7 +83,7 @@ class MnemonicImportDetailPresenter(
 		password: String,
 		name: String,
 		hint: String? = null,
-		callback: (Boolean) -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
 		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
@@ -112,9 +99,7 @@ class MnemonicImportDetailPresenter(
 				}
 			}
 			if (isExistent) {
-				fragment.context.alert(ImportWalletText.existAddress)
-				callback(false)
-				return@getAll
+				callback(AccountError.ExistAddress)
 			} else {
 				GenerateMultiChainWallet.import(
 					fragment.context!!,
@@ -124,13 +109,12 @@ class MnemonicImportDetailPresenter(
 				) { multiChainAddresses ->
 					// 如果地址已经存在则会返回空的多链地址 `Model`
 					WalletImportPresenter.insertWalletToDatabase(
-						fragment.context,
 						multiChainAddresses,
 						name,
 						encryptMnemonic,
 						multiChainPath,
-						hint = hint,
-						callback = callback
+						hint,
+						callback
 					)
 				}
 			}
@@ -142,7 +126,7 @@ class MnemonicImportDetailPresenter(
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 	}
 
-	private fun isVaildBIP44Path(path: String): Boolean {
+	private fun isValidBIP44Path(path: String): Boolean {
 		// 最小 3 位数字
 		if (path.length < 3) return false
 		// 格式化无用信息

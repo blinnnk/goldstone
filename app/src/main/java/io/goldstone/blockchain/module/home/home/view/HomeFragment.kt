@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.home.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.View
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setAlignParentBottom
@@ -22,10 +24,11 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class HomeFragment : BaseFragment<HomePresenter>() {
-	
+
+	override val pageTitle: String = "Home"
 	private val tabBar by lazy { TabBarView(context!!) }
 	override val presenter = HomePresenter(this)
-	
+
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
@@ -33,7 +36,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 			verticalLayout {
 				id = ContainerID.home
 			}
-			
+
 			tabBar.apply {
 				walletButton.onClick {
 					presenter.showWalletDetailFragment()
@@ -48,16 +51,16 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 					preventDuplicateClicks()
 				}
 			}.into(this)
-			
+
 			tabBar.setAlignParentBottom()
 		}
 	}
-	
-	override fun onStart() {
-		super.onStart()
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		presenter.showWalletDetailFragment()
 	}
-	
+
 	private fun TabItem.setStyleAndClick(callback: () -> Unit) {
 		tabBar.apply {
 			walletButton.resetStyle()
@@ -67,23 +70,23 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 		callback()
 		setSelectedStyle()
 	}
-	
+
 	fun selectWalletDetail(callback: () -> Unit) {
 		tabBar.walletButton.setStyleAndClick(callback)
 	}
-	
+
 	fun selectQuotation(callback: () -> Unit) {
 		tabBar.marketButton.setStyleAndClick(callback)
 	}
-	
+
 	fun setProfile(callback: () -> Unit) {
 		tabBar.settingsButton.setStyleAndClick(callback)
 	}
-	
+
 	fun hideTabbarView() {
 		tabBar.alpha = 0f
 	}
-	
+
 	fun showTabbarView() {
 		tabBar.alpha = 1f
 	}

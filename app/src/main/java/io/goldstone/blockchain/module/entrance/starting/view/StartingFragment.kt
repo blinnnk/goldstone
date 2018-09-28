@@ -32,6 +32,7 @@ import org.jetbrains.anko.*
  */
 class StartingFragment : BaseFragment<StartingPresenter>() {
 
+	override val pageTitle: String = "Starting"
 	override val presenter = StartingPresenter(this)
 	private val createButton by lazy { RoundButton(context!!) }
 	private val importButton by lazy { RoundButton(context!!) }

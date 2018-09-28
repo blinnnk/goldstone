@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
 import android.widget.*
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.google.gson.JsonArray
@@ -9,6 +10,13 @@ import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.showAfterColonContent
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -41,12 +49,10 @@ class QuotationSearchPresenter(
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.getFilterSearchInput().showFilterImage(true)
-			overlayView.header.searchInputLinstener(
+			overlayView.header.searchInputListener(
 				{
 					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
-					if (it) {
-						hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
-					}
+					if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
 				}
 			) {
 				hasNetWork isTrue { searchTokenBy(it) }
@@ -131,19 +137,21 @@ class QuotationSearchPresenter(
 	
 	fun setQuotationSelfSelection(
 		model: QuotationSelectionTable,
-		isSelect: Boolean = true,
-		callback: () -> Unit
+		isSelect: Boolean,
+		callback: (error: GoldStoneError) -> Unit
 	) {
-		isSelect isTrue {
-			// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
-			getLineChartDataByPair(model.pair) { chartData ->
+		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
+		if (isSelect) getLineChartDataByPair(model.pair) { chartData, error ->
+			if (!chartData.isNull() && error.isNone()) {
 				QuotationSelectionTable.insertSelection(model.apply {
-					lineChartDay = chartData
+					lineChartDay = chartData!!
 					isSelecting = isSelect
-				}) { callback() }
-			}
-		} otherwise {
-			QuotationSelectionTable.removeSelectionBy(model.pair) { callback() }
+				})
+				callback(error)
+			} else callback(error)
+		} else {
+			GoldStoneDataBase.database.quotationSelectionDao().deleteByPairs(model.pair)
+			callback(RequestError.None)
 		}
 	}
 	
@@ -275,18 +283,14 @@ class QuotationSearchPresenter(
 	companion object {
 		fun getLineChartDataByPair(
 			pair: String,
-			hold: (String) -> Unit
+			@WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
 		) {
 			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(parameter, {
-					LogUtil.error("getCurrencyLineChartData", it)
-				}
+			GoldStoneAPI.getCurrencyLineChartData(
+				parameter,
+				{ hold(null, it) }
 			) {
-				it.isNotEmpty() isTrue {
-					hold(it.first().pointList.toString())
-				} otherwise {
-					LogUtil.error("Empty pair data from server")
-				}
+				hold(it.first().pointList.toString().orEmpty(), RequestError.None)
 			}
 		}
 		
@@ -294,10 +298,11 @@ class QuotationSearchPresenter(
 			ExchangeTable.getAll { it ->
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
-					StartingPresenter.updateExchangesTables ( {
-						LogUtil.error(it.toString())
-					}) {
-						getMarketList(callback)
+					StartingPresenter.updateExchangesTables {
+						if (it.isNone()) {
+							getMarketList(callback)
+						} else {
+						}
 					}
 				} else {
 					//数据库有数据

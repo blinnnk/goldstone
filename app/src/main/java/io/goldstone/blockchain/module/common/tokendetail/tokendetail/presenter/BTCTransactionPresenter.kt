@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.MultiChainType
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
@@ -62,7 +62,7 @@ private fun loadTransactionsFromChain(
 		errorCallback
 	) { transactions ->
 		// Calculate All Inputs to get transfer value
-		successCallback(transactions.mapIndexed { index, item ->
+		successCallback(transactions.asSequence().mapIndexed { index, item ->
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
@@ -70,7 +70,7 @@ private fun loadTransactionsFromChain(
 				address,
 				CoinSymbol.pureBTCSymbol,
 				false,
-				MultiChainType.BTC.id
+				ChainType.BTC.id
 			)
 		}.map {
 			// 插入转账数据到数据库
@@ -80,6 +80,6 @@ private fun loadTransactionsFromChain(
 				BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, true, it.apply { isFee = true })
 			}
 			TransactionListModel(it)
-		}.isNotEmpty())
+		}.toList().isNotEmpty())
 	}
 }

@@ -1,24 +1,27 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -26,7 +29,7 @@ import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
@@ -46,14 +49,9 @@ class WalletDetailPresenter(
 	override val fragment: WalletDetailFragment
 ) : BaseRecyclerPresenter<WalletDetailFragment, WalletDetailCellModel>() {
 
-	var isGettingDataInAsyncThreadNow = false
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		updateData()
-		updateUnreadCount()
-		fragment.getMainActivity()?.backEvent = null
-	}
+	private var lockGettingChainModelsThread = false
+	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
+	private var detailModels: List<WalletDetailCellModel>? = null
 
 	override fun updateData() {
 		fragment.showMiniLoadingView()
@@ -62,68 +60,47 @@ class WalletDetailPresenter(
 			fragment.asyncData = arrayListOf()
 			fragment.updateHeaderValue()
 		}
-		// Check the info of wallet currency list
-		WalletDetailCellModel.apply {
-			// 显示本地的 `Token` 据
-			getLocalModels { it ->
-				updateUIByData(it)
-				/** 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记 */
-				if (!isGettingDataInAsyncThreadNow) {
-					// 再检查链上的最新价格和数量
-					getChainModels(fragment) {
-						isGettingDataInAsyncThreadNow = false
-						updateUIByData(it)
-						fragment.removeMiniLoadingView()
-					}
-				} else {
-					fragment.removeMiniLoadingView()
+		// 显示本地的 `Token` 据
+		MyTokenWithDefaultTable.getMyDefaultTokens(true) { models ->
+			// 把数据存在内存里面
+			detailModels = models
+			updateUIByData(models)
+			// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
+			if (!lockGettingChainModelsThread) {
+				// 再检查链上的最新价格和数量
+				fragment.removeMiniLoadingView()
+				models.getChainModels { chainModels, error ->
+					// 更新内存的数据
+					detailModels = chainModels
+					updateUIByData(chainModels)
+					if (!error.isNone()) fragment.context.alert(error.message)
 				}
-			}
+			} else fragment.removeMiniLoadingView()
 		}
 	}
 
 	fun setQuickTransferEvent(isShowAddress: Boolean) {
 		// Check current wallet is watch only or not
-		WalletTable.checkIsWatchOnlyAndHasBackupOrElse(
+		WalletTable.isAvailableWallet(
 			fragment.context!!,
-			{
-				// Click Dialog Confirm Button Event
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			}
+			// Click Dialog Confirm Button Event
+			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
 		) {
-			MyTokenTable.getCurrentChainDefaultAndMyTokens { myTokens, defaultTokens ->
-				// Jump directly if there is only one type of token
-				if (myTokens.size == 1) {
-					defaultTokens.find {
-						it.contract.equals(myTokens.first().contract, true)
-					}?.let {
-						isShowAddress isTrue {
-							TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, it)
-						} otherwise {
-							TokenSelectionRecyclerView.showDepositFragment(fragment.context, it)
-						}
-					}
-				} else {
-					fragment.showSelectionListOverlayView(
-						myTokens,
-						defaultTokens,
-						isShowAddress
-					)
-				}
-			}
-		}
-	}
 
-	/**
-	 * 每次后台到前台更新首页的 `token` 信息, 除了第一次初始化加载的时候
-	 */
-	override fun onFragmentResume() {
-		if (!fragment.asyncData.isNullOrEmpty()) {
-			updateData()
+			fun getQuickDashboardData(data: List<WalletDetailCellModel>) {
+				// Jump directly if there is only one type of token
+				if (data.size == 1) {
+					if (isShowAddress)
+						TokenSelectionRecyclerView.showTransferAddressFragment(fragment.context, data.first())
+					else TokenSelectionRecyclerView.showDepositFragment(fragment.context, data.first())
+				} else fragment.showSelectionListOverlayView(data, isShowAddress)
+			}
+
+			if (detailModels.isNull())
+				MyTokenWithDefaultTable.getMyDefaultTokens(true) {
+					getQuickDashboardData(it)
+				} else getQuickDashboardData(detailModels!!)
 		}
-		showPinCodeFragment()
-		updateUnreadCount()
-		fragment.getMainActivity()?.backEvent = null
 	}
 
 	fun showNotificationListFragment() {
@@ -148,11 +125,7 @@ class WalletDetailPresenter(
 			findIsItExist(FragmentTag.walletSettings) isFalse {
 				addFragmentAndSetArguments<WalletSettingsFragment>(
 					ContainerID.main, FragmentTag.walletSettings
-				) {
-					putString(
-						ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings
-					)
-				}
+				) { putString(ArgumentKey.walletSettingsTitle, WalletSettingsText.walletSettings) }
 			}
 		}
 	}
@@ -160,17 +133,14 @@ class WalletDetailPresenter(
 	fun showMyTokenDetailFragment(model: WalletDetailCellModel) {
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.tokenDetail) isFalse {
-				addFragmentAndSetArguments<TokenDetailOverlayFragment>(
-					ContainerID.main,
-					FragmentTag.tokenDetail
-				) {
+				addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main, FragmentTag.tokenDetail) {
 					putSerializable(ArgumentKey.tokenDetail, model)
 				}
 			}
 		}
 	}
 
-	fun updateUnreadCount() {
+	fun updateUnreadCount(@UiThread hold: (unreadCount: Int?, error: GoldStoneError) -> Unit) {
 		doAsync {
 			AppConfigTable.getAppConfig { config ->
 				NotificationTable.getAllNotifications { notifications ->
@@ -183,13 +153,13 @@ class WalletDetailPresenter(
 							goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
 						).toLong()
 						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
-						GoldStoneAPI.getUnreadCount(goldStoneID, time) { unreadCount ->
+						GoldStoneAPI.getUnreadCount(
+							goldStoneID,
+							time,
+							{ hold(null, it) }
+						) { unreadCount ->
 							uiThread {
-								if (unreadCount.isNotEmpty() && unreadCount.toIntOrZero() > 0) {
-									fragment.setNotificationUnreadCount(unreadCount)
-								} else {
-									fragment.recoveryNotifyButtonStyle()
-								}
+								hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
 							}
 						}
 					}
@@ -198,9 +168,46 @@ class WalletDetailPresenter(
 		}
 	}
 
+	private fun List<WalletDetailCellModel>.getChainModels(
+		hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit
+	) {
+		var balanceError = GoldStoneError.None
+		// 没有网络直接返回
+		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
+		else {
+			lockGettingChainModelsThread = true
+			object : ConcurrentAsyncCombine() {
+				override var asyncCount: Int = size
+				override fun concurrentJobs() {
+					forEach { model ->
+						// 链上查余额
+						val ownerName = model.contract.getAddress(true)
+						MyTokenTable.getBalanceByContract(
+							model.contract,
+							ownerName
+						) { balance, error ->
+							// 更新数据的余额信息
+							if (!balance.isNull() && error.isNone()) {
+								MyTokenTable.updateBalanceByContract(
+									balance!!,
+									ownerName,
+									model.contract
+								)
+								model.count = balance
+							} else balanceError = error
+							completeMark()
+						}
+					}
+				}
+
+				override fun mergeCallBack() = hold(this@getChainModels, balanceError)
+
+			}.start()
+		}
+	}
+
 	private fun WalletDetailFragment.showSelectionListOverlayView(
-		myTokens: List<MyTokenTable>,
-		defaultTokens: List<DefaultTokenTable>,
+		tokens: List<WalletDetailCellModel>,
 		isShowAddress: Boolean
 	) {
 		// Prepare token list and show content scroll overlay view
@@ -212,14 +219,11 @@ class WalletDetailPresenter(
 					setTitle(TransactionText.tokenSelection)
 					addContent {
 						topPadding = 10.uiPX()
-						defaultTokens.filter { default ->
-							myTokens.any { it.contract.equals(default.contract, true) }
-						}.let { it ->
-							val data = it.sortedByDescending { it.weight }.toArrayList()
-							val tokenList = TokenSelectionRecyclerView(context)
-							tokenList.into(this)
-							tokenList.setAdapter(data, isShowAddress)
-						}
+						val data =
+							tokens.sortedByDescending { it.weight }.toArrayList()
+						val tokenList = TokenSelectionRecyclerView(context)
+						tokenList.into(this)
+						tokenList.setAdapter(data, isShowAddress)
 					}
 				}
 				// 重置回退栈首先关闭悬浮层
@@ -229,41 +233,24 @@ class WalletDetailPresenter(
 	}
 
 	private fun updateUIByData(data: List<WalletDetailCellModel>) {
-		if (data.isNotEmpty()) {
-			load {
-				/** 先按照资产情况排序, 资产为零的按照权重排序 */
-				val hasPrice =
-					data.asSequence().filter { it.price * it.count != 0.0 }
-						.sortedByDescending { it.count * it.price }.toList()
-				val hasBalance =
-					data.asSequence().filter { it.count != 0.0 && it.price == 0.0 }
-						.sortedByDescending { it.count }.toList()
-				val others =
-					data.asSequence().filter { it.count == 0.0 }
-						.sortedByDescending { it.weight }.toList()
-				hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
-			} then {
-				diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-				fragment.updateHeaderValue()
-			}
+		if (data.isNotEmpty()) load {
+			/** 先按照资产情况排序, 资产为零的按照权重排序 */
+			val hasPrice =
+				data.asSequence().filter { it.price * it.count != 0.0 }
+					.sortedByDescending { it.count * it.price }.toList()
+			val hasBalance =
+				data.asSequence().filter { it.count != 0.0 && it.price == 0.0 }
+					.sortedByDescending { it.count }.toList()
+			val others =
+				data.asSequence().filter { it.count == 0.0 }
+					.sortedByDescending { it.weight }.toList()
+			hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
+		} then {
+			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+			fragment.updateHeaderValue()
 		} else {
 			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())
 			fragment.updateHeaderValue()
-		}
-	}
-
-	private fun showPinCodeFragment() {
-		fragment.activity?.supportFragmentManager?.findFragmentByTag(
-			FragmentTag.pinCode
-		).isNull() isTrue {
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main,
-						FragmentTag.pinCode
-					)
-				}
-			}
 		}
 	}
 
@@ -279,17 +266,15 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun generateHeaderModel(
-		hold: (WalletDetailHeaderModel) -> Unit
-	) {
+	private fun generateHeaderModel(hold: (WalletDetailHeaderModel) -> Unit) {
 		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
-		Config.updateCurrentBalance(totalBalance.orElse(0.0))
+		SharedWallet.updateCurrentBalance(totalBalance.orElse(0.0))
 		WalletTable.getCurrentWallet {
 			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
 				null,
-				Config.getCurrentName(),
+				SharedWallet.getCurrentName(),
 				if (subtitle.equals(WalletText.multiChainWallet, true)) {
 					object : FixTextLength() {
 						override var text = WalletText.multiChainWallet

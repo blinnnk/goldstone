@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 
 
 /**
@@ -14,7 +14,7 @@ object CryptoName {
 	const val btc = "Bitcoin"
 	const val ltc = "Litecoin"
 	const val bch = "Bitcoin Cash"
-	const val eos = "Eos.io"
+	const val eos = "EOS"
 	val allChainName = listOf(
 		etc.replace(" ", ""),
 		eth,
@@ -35,11 +35,11 @@ object CryptoName {
 		}
 	}
 
-	fun getBTCSeriesChainIDByName(name: String): String? {
+	fun getBTCSeriesChainIDByName(name: String): ChainID? {
 		return listOf(
-			Pair(ltc, Config.getLTCCurrentChain()),
-			Pair(bch, Config.getBCHCurrentChain()),
-			Pair(btc, Config.getBTCCurrentChain())
+			Pair(ltc, SharedChain.getLTCCurrent()),
+			Pair(bch, SharedChain.getBCHCurrent()),
+			Pair(btc, SharedChain.getBTCCurrent())
 		).firstOrNull {
 			it.first
 				.replace(" ", "")

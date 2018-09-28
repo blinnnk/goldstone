@@ -2,10 +2,12 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toBigIntegerOrZero
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.isNullValue
-import io.goldstone.blockchain.common.utils.toBigIntegerOrZero
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -35,7 +37,7 @@ data class EOSAccountTable(
 	val ramUsed: BigInteger,
 	val ramQuota: BigInteger,
 	val cpuWeight: BigInteger,
-	val netWeight: BigInteger,
+	var netWeight: BigInteger,
 	@Embedded(prefix = "totalResource")
 	val totalResource: TotalResources,
 	@Embedded(prefix = "delegateInfo")
@@ -45,9 +47,15 @@ data class EOSAccountTable(
 	@Embedded(prefix = "refundInfo")
 	val refundInfo: RefundRequestInfo?,
 	@SerializedName("permissions")
-	val permissions: List<PermissionsInfo>
+	val permissions: List<PermissionsInfo>,
+	val recordPublicKey: String,
+	val chainID: String
 ) : Serializable {
-	constructor(data: JSONObject) : this(
+	constructor(
+		data: JSONObject,
+		recordPublicKey: String,
+		chainID: ChainID
+	) : this(
 		0,
 		data.safeGet("account_name"),
 		data.safeGet("core_liquid_balance"),
@@ -63,7 +71,9 @@ data class EOSAccountTable(
 		checkDelegateBandWidthDataOrGetObject(data),
 		checkVoterDataOrGetObject(data),
 		checkRefundRequestOrGetObject(data),
-		PermissionsInfo.getPermissions(JSONArray(data.safeGet("permissions")))
+		PermissionsInfo.getPermissions(JSONArray(data.safeGet("permissions"))),
+		recordPublicKey,
+		chainID.id
 	)
 
 	companion object {
@@ -80,6 +90,18 @@ data class EOSAccountTable(
 			}
 		}
 
+		fun getAccountsByNames(
+			names: List<String>,
+			getResultInUIThread: Boolean = true,
+			hold: (accounts: List<EOSAccountTable>) -> Unit
+		) {
+			doAsync {
+				val account = GoldStoneDataBase.database.eosAccountDao().getAccounts(names)
+				if (getResultInUIThread) GoldStoneAPI.context.runOnUiThread { hold(account) }
+				else hold(account)
+			}
+		}
+
 		fun preventDuplicateInsert(account: EOSAccountTable) {
 			doAsync {
 				GoldStoneDataBase.database.eosAccountDao().apply {
@@ -90,6 +112,7 @@ data class EOSAccountTable(
 			}
 		}
 
+		// 特殊情况下这几个字段的返回值会是 `null`
 		private fun checkRefundRequestOrGetObject(content: JSONObject): RefundRequestInfo? {
 			val data = content.safeGet("refund_request")
 			val hasData = !data.isNullValue()
@@ -118,7 +141,16 @@ interface EOSAccountDao {
 	@Query("SELECT * FROM eosAccount WHERE name LIKE :name")
 	fun getAccount(name: String): EOSAccountTable?
 
-	@Insert
+	@Query("SELECT * FROM eosAccount WHERE name IN (:names) AND chainID = :chainID")
+	fun getAccounts(names: List<String>, chainID: String = SharedChain.getEOSCurrent().id): List<EOSAccountTable>
+
+	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
+	fun getByKey(publicKey: String): List<EOSAccountTable>
+
+	@Query("DELETE FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
+	fun deleteByKey(publicKey: String)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: EOSAccountTable)
 
 	@Update
@@ -126,4 +158,8 @@ interface EOSAccountDao {
 
 	@Delete
 	fun delete(table: EOSAccountTable)
+
+	@Delete
+	fun deleteAll(table: List<EOSAccountTable>)
+
 }

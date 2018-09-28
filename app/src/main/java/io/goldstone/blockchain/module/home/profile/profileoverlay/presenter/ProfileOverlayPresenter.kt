@@ -9,7 +9,10 @@ import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.overlay.MiniOverlay
-import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.language.CreateWalletText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -19,6 +22,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -46,7 +50,7 @@ class ProfileOverlayPresenter(
 	}
 
 	fun showContactInputFragment() {
-		showTargetFragment<ContactInputFragment>(ProfileText.contactsInput, ProfileText.contacts)
+		showTargetFragment<ContactInputFragment>()
 	}
 
 	fun showTargetFragmentByTitle(title: String) {
@@ -55,6 +59,7 @@ class ProfileOverlayPresenter(
 			ProfileText.contactsInput -> showContactInput()
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
+			ProfileText.eosAccountRegister -> showEOSAccountRegisterFragment()
 			ProfileText.pinCode -> showPinCodeEditorFragment()
 			ProfileText.walletManager -> showWalletListFragment()
 			ProfileText.chain -> showChainSelectionFragment()
@@ -103,16 +108,18 @@ class ProfileOverlayPresenter(
 
 	private fun showWatchWalletImportFragment() {
 		fragment.overlayView.header.showAddButton(false)
-		showTargetFragment<WatchOnlyImportFragment>(
-			ImportMethodText.watchOnly,
-			WalletText.wallet
-		)
+		showTargetFragment<WatchOnlyImportFragment>()
 	}
 
 	private fun showAboutFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
+			putString(ArgumentKey.webViewName, ProfileText.aboutUs)
 		}
+	}
+
+	private fun showEOSAccountRegisterFragment() {
+		fragment.addFragmentAndSetArgument<EOSAccountRegisterFragment>(ContainerID.content)
 	}
 
 	private fun showImportWalletFragment() {
@@ -126,24 +133,28 @@ class ProfileOverlayPresenter(
 	private fun showPrivacyFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
+			putString(ArgumentKey.webViewName, ProfileText.privacy)
 		}
 	}
 
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+			putString(ArgumentKey.webViewName, ProfileText.terms)
 		}
 	}
 
 	private fun showSupportFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.support)
+			putString(ArgumentKey.webViewName, ProfileText.support)
 		}
 	}
 
 	private fun showHelpCenterFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
 			putString(ArgumentKey.webViewUrl, WebUrl.helpCenter)
+			putString(ArgumentKey.webViewName, ProfileText.helpCenter)
 		}
 	}
 

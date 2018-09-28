@@ -2,30 +2,32 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
@@ -54,25 +56,21 @@ class CreateWalletPresenter(
 	fun showAgreementFragment() {
 		val argument = Bundle().apply {
 			putString(ArgumentKey.webViewUrl, WebUrl.terms)
+			putString(ArgumentKey.webViewName, CreateWalletText.agreement)
 		}
-		showTargetFragment<WebViewFragment, WalletGenerationFragment>(
-			CreateWalletText.agreement,
-			CreateWalletText.mnemonicBackUp,
-			argument
-		)
+		showTargetFragment<WebViewFragment, WalletGenerationFragment>(argument)
 	}
 
 	fun generateWalletWith(
 		isAgree: Boolean,
 		hintInput: EditText,
-		callback: () -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
 		checkInputValue(
 			nameText,
 			passwordText,
 			repeatPasswordText,
 			isAgree,
-			fragment.context,
 			callback
 		) { password, walletName ->
 			fragment.context?.generateWalletWith(
@@ -91,16 +89,16 @@ class CreateWalletPresenter(
 		confirmButton: RoundButton
 	) {
 		nameInput.afterTextChanged = Runnable {
-			nameInput.getContent { nameText = it }
+			nameText = nameInput.getContent()
 			setConfirmButtonStyle(confirmButton)
 		}
 		passwordInput.afterTextChanged = Runnable {
 			showPasswordSafeLevel(passwordInput)
-			passwordInput.getContent { passwordText = it }
+			passwordText = passwordInput.getContent()
 			setConfirmButtonStyle(confirmButton)
 		}
 		repeatPasswordInput.afterTextChanged = Runnable {
-			repeatPasswordInput.getContent { repeatPasswordText = it }
+			repeatPasswordText = repeatPasswordInput.getContent()
 			setConfirmButtonStyle(confirmButton)
 		}
 	}
@@ -117,7 +115,7 @@ class CreateWalletPresenter(
 		password: String,
 		name: String,
 		hint: String? = null,
-		callback: () -> Unit
+		callback: (GoldStoneError) -> Unit
 	) {
 		doAsync {
 			GenerateMultiChainWallet.create(
@@ -125,92 +123,68 @@ class CreateWalletPresenter(
 				password
 			) { multiChainAddresses, mnemonic ->
 				// 将基础的不存在安全问题的信息插入数据库
-				WalletTable.insert(
-					WalletTable(
-						0,
-						name,
+				WalletTable(
+					0,
+					name,
+					multiChainAddresses.ethAddress,
+					multiChainAddresses.etcAddress,
+					multiChainAddresses.btcAddress,
+					multiChainAddresses.btcSeriesTestAddress,
+					multiChainAddresses.ltcAddress,
+					multiChainAddresses.bchAddress,
+					multiChainAddresses.eosAddress,
+					EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
+					ethAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.ethAddress,
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+					),
+					etcAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.etcAddress,
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+					),
+					btcAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.btcAddress,
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+					),
+					btcSeriesTestAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.btcSeriesTestAddress,
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+					),
+					ltcAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.ltcAddress,
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
+					),
+					bchAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.bchAddress,
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
+					),
+					eosAddresses = WalletImportPresenter.childAddressValue(
 						multiChainAddresses.eosAddress,
-						EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
-						ethAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.ethAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-						),
-						etcAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.etcAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-						),
-						btcAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.btcAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-						),
-						btcSeriesTestAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.btcSeriesTestAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-						),
-						ltcAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.ltcAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
-						),
-						bchAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.bchAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
-						),
-						eosAddresses = WalletImportPresenter.childAddressValue(
-							multiChainAddresses.eosAddress,
-							WalletImportPresenter.getAddressIndexFromPath(DefaultPath.eosPath)
-						),
-						eosAccountNames = listOf(),
-						ethPath = DefaultPath.ethPath,
-						btcPath = DefaultPath.btcPath,
-						etcPath = DefaultPath.etcPath,
-						btcTestPath = DefaultPath.testPath,
-						bchPath = DefaultPath.bchPath,
-						ltcPath = DefaultPath.ltcPath,
-						eosPath = DefaultPath.eosPath,
-						hint = hint,
-						isUsing = true
-					)
-				) { wallet ->
-					generateMyTokenInfo(
-						multiChainAddresses,
-						{
-							LogUtil.error("generateWalletWith", it)
-						}) {
+						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.eosPath)
+					),
+					eosAccountNames = listOf(),
+					ethPath = DefaultPath.ethPath,
+					btcPath = DefaultPath.btcPath,
+					etcPath = DefaultPath.etcPath,
+					btcTestPath = DefaultPath.testPath,
+					bchPath = DefaultPath.bchPath,
+					ltcPath = DefaultPath.ltcPath,
+					eosPath = DefaultPath.eosPath,
+					hint = hint,
+					isUsing = true,
+					// 防止用户跳过助记词, 把使用 `RSA` 加密后的助记词存入数据库
+					encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
+				).insertWatchOnlyWallet { wallet ->
+					generateMyTokenInfo(multiChainAddresses) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {
 							putString(ArgumentKey.mnemonicCode, mnemonic)
 						}
-						// 防止用户跳过助记词, 把使用 `RSA` 加密后的住几次存入数据库
-						saveEncryptMnemonic(mnemonic, multiChainAddresses.ethAddress) {
-							fragment.context?.runOnUiThread {
-								showMnemonicBackupFragment(arguments)
-								callback()
-							}
-						}
+						showMnemonicBackupFragment(arguments)
+						callback(it)
 					}
 					XinGePushReceiver.registerAddressesForPush(wallet)
 				}
-			}
-		}
-	}
-
-	private fun saveEncryptMnemonic(
-		mnemonic: String?,
-		address: String,
-		callback: () -> Unit
-	) {
-		mnemonic?.let {
-			WalletTable.saveEncryptMnemonicIfUserSkip(
-				JavaKeystoreUtil().encryptData(it),
-				address
-			) {
-				callback()
 			}
 		}
 	}
@@ -249,19 +223,15 @@ class CreateWalletPresenter(
 		 */
 		fun generateMyTokenInfo(
 			addresses: ChainAddresses,
-			errorCallback: (Exception) -> Unit,
-			callback: (Boolean) -> Unit
+			@UiThread callback: (RequestError) -> Unit
 		) {
-			// 首先从本地查找数据
-			DefaultTokenTable.getAllTokens { localTokens ->
-				localTokens.isEmpty() isTrue {
-					errorCallback(Exception("empty default token"))
+			doAsync {
+				// 首先从本地查找数据
+				GoldStoneDataBase.database.defaultTokenDao().getAllTokens().apply {
 					// 本地没有数据从服务器获取数据
-					GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
+					if (isEmpty()) GoldStoneAPI.getDefaultTokens(callback) { serverTokens ->
 						serverTokens.completeAddressInfo(addresses, callback)
-					}
-				} otherwise {
-					localTokens.completeAddressInfo(addresses, callback)
+					} else completeAddressInfo(addresses, callback)
 				}
 			}
 		}
@@ -271,76 +241,52 @@ class CreateWalletPresenter(
 			password: String,
 			repeatPassword: String,
 			isAgree: Boolean,
-			context: Context?,
-			failedCallback: () -> Unit,
-			callback: (password: String, walletName: String) -> Unit
+			errorCallback: (GoldStoneError) -> Unit,
+			@UiThread callback: (password: String, walletName: String) -> Unit
 		) {
-			if (password.isEmpty()) {
-				context.alert(CreateWalletText.emptyRepeatPasswordAlert)
-				failedCallback()
-				return
-			}
-
-			isAgree isFalse {
-				context?.alert(CreateWalletText.agreeRemind)
-				failedCallback()
-				return
-			}
-
-			if (password != repeatPassword) {
-				context?.alert(CreateWalletText.passwordRepeatAlert)
-				failedCallback()
-				return
-			}
-			val walletName =
-				if (name.isEmpty()) generateDefaultName()
-				else name
-			val reason = ReasonText().apply {
-				passwordCount = CreateWalletText.passwordCount
-				illegalSymbol = CreateWalletText.illegalSymbol
-				tooMuchSameValue = CreateWalletText.tooMuchSame
-				bothNumberAndLetter = CreateWalletText.bothNumberAndLetter
-				capitalAndLowercase = CreateWalletText.bothNumberAndLetter
-				weak = CreateWalletText.safetyLevelWeak
-				strong = CreateWalletText.safetyLevelStrong
-				normal = CreateWalletText.safetyLevelNoraml
-				high = CreateWalletText.safetyLevelHigh
-			}
-
-			doAsync {
-				password.checkPasswordInRules(reason) { _, reasons ->
-					GoldStoneAPI.context.runOnUiThread {
-						if (reasons == UnsafeReasons.None) {
-							callback(password, walletName)
-						} else {
-							context.alert(reasons.info)
-							failedCallback()
+			if (password.isEmpty()) errorCallback(AccountError.EmptyRepeatPassword)
+			else if (!isAgree) errorCallback(AccountError.AgreeTerms)
+			else if (password != repeatPassword) errorCallback(AccountError.DifferentRepeatPassword)
+			else {
+				val walletName = if (name.isEmpty()) generateDefaultName() else name
+				val reason = ReasonText().apply {
+					passwordCount = CreateWalletText.passwordCount
+					illegalSymbol = CreateWalletText.illegalSymbol
+					tooMuchSameValue = CreateWalletText.tooMuchSame
+					bothNumberAndLetter = CreateWalletText.bothNumberAndLetter
+					capitalAndLowercase = CreateWalletText.bothNumberAndLetter
+					weak = CreateWalletText.safetyLevelWeak
+					strong = CreateWalletText.safetyLevelStrong
+					normal = CreateWalletText.safetyLevelNormal
+					high = CreateWalletText.safetyLevelHigh
+				}
+				doAsync {
+					password.checkPasswordInRules(reason) { _, reasons ->
+						GoldStoneAPI.context.runOnUiThread {
+							if (reasons == UnsafeReasons.None) callback(password, walletName)
+							else errorCallback(AccountError.PasswordFormatted(reasons.info))
 						}
 					}
 				}
 			}
 		}
 
-		private fun ArrayList<DefaultTokenTable>.completeAddressInfo(
+		private fun List<DefaultTokenTable>.completeAddressInfo(
 			currentAddresses: ChainAddresses,
-			callback: (Boolean) -> Unit
+			@UiThread callback: (RequestError) -> Unit
 		) {
+			// 初始的时候显示后台要求标记为 `force show` 的 `Token`
+			// 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
 			filter {
-				// 初始的时候显示后台要求标记为 `force show` 的 `Token`
 				TinyNumberUtils.isTrue(it.forceShow)
-			}.apply {
-				/**
-				 * 新创建的钱包, 没有网络的情况下的导入钱包, 都直接插入账目为 `0.0` 的数据
-				 **/
-				insertNewAccount(currentAddresses) {
-					callback(true)
-				}
+			}.insertNewAccount(currentAddresses) {
+				callback(RequestError.None)
 			}
 		}
 
 		private fun List<DefaultTokenTable>.insertNewAccount(
 			currentAddresses: ChainAddresses,
-			callback: () -> Unit
+			@UiThread callback: () -> Unit
 		) {
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
@@ -364,7 +310,12 @@ class CreateWalletPresenter(
 
 							ChainID.eosMain, ChainID.eosTest -> {
 								if (currentAddresses.eosAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.eosAddress).insert()
+									if (EOSWalletUtils.isValidAddress(currentAddresses.eosAddress))
+										MyTokenTable(defaults, currentAddresses.eosAddress).insert()
+									else if (EOSAccount(currentAddresses.eosAddress).isValid()) {
+										// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
+										MyTokenTable(defaults, currentAddresses.eosAddress, "").insert()
+									}
 								}
 							}
 

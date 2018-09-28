@@ -2,10 +2,11 @@ package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
 import io.goldstone.blockchain.crypto.keystore.getPrivateKey
-import io.goldstone.blockchain.crypto.multichain.CryptoValue.singleChainFilename
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
@@ -26,12 +27,10 @@ fun Context.storeBase58PrivateKey(
 	base58PrivateKey: String,
 	fileName: String,
 	password: String,
-	isTestNet: Boolean,
-	isSingleChainWallet: Boolean
+	isTestNet: Boolean
 ) {
 	val net = if (isTestNet) TestNet3Params.get() else MainNetParams.get()
-	val finalFilename = if (isSingleChainWallet) "$singleChainFilename$fileName" else fileName
-	val keystoreFile by lazy { File(filesDir!!, finalFilename) }
+	val keystoreFile by lazy { File(filesDir!!, fileName) }
 	try {
 		/** Generate Keystore */
 		val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
@@ -46,39 +45,31 @@ fun Context.storeBase58PrivateKey(
 fun Context.exportBase58PrivateKey(
 	walletAddress: String,
 	password: String,
-	isSingleChainWallet: Boolean,
 	isTest: Boolean,
-	@UiThread hold: (String?) -> Unit
+	isCompress: Boolean = true,
+	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	getPrivateKey(
 		walletAddress,
 		password,
-		true,
-		isSingleChainWallet,
-		{
-			hold(null)
-			LogUtil.error("exportBase58PrivateKey", it)
-		}
-	) {
-		val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
-		hold(ECKey.fromPrivate(it.toBigInteger(16)).getPrivateKeyAsWiF(net))
+		true
+	) { privateKey, error ->
+		if (!privateKey.isNull() && error.isNone()) {
+			val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
+			hold(ECKey.fromPrivate(privateKey!!.toBigInteger(16), isCompress).getPrivateKeyAsWiF(net), AccountError.None)
+		} else hold(null, error)
 	}
 }
 
 fun Context.exportBase58KeyStoreFile(
 	walletAddress: String,
 	password: String,
-	isSingleChainWallet: Boolean,
-	hold: (String?) -> Unit
+	hold: (keystoreFile: String?, error: AccountError) -> Unit
 ) {
 	getKeystoreFile(
 		walletAddress,
 		password,
 		true,
-		isSingleChainWallet,
-		{
-			hold(null)
-		},
 		hold
 	)
 }

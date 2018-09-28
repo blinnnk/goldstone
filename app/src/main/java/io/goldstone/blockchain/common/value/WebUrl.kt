@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.value
 
 import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 
 /**
  * @date 2018/5/15 4:44 PM
@@ -16,26 +17,26 @@ object WebUrl {
 	}
 	const val header = "https://www.goldstone.io"
 	@JvmStatic
-	val privacy = "$header/${webLanguage(Config.getCurrentLanguageCode())}/privacy"
+	val privacy = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/privacy"
 	@JvmStatic
-	val terms = "$header/${webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
+	val terms = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/termAndConditions"
 	@JvmStatic
-	val support = "$header/${webLanguage(Config.getCurrentLanguageCode())}/support"
+	val support = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/support"
 	@JvmStatic
-	val helpCenter = "$header/${webLanguage(Config.getCurrentLanguageCode())}/helpCenter"
+	val helpCenter = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/helpCenter"
 	@JvmStatic
-	val aboutUs = "$header/${webLanguage(Config.getCurrentLanguageCode())}/aboutUs"
+	val aboutUs = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/aboutUs"
 	@JvmStatic
-	var whatIsKeystore = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/keystore"
+	var whatIsKeystore = "$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/keystore"
 	@JvmStatic
-	val whatIsMnemonic = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/mnemonics"
+	val whatIsMnemonic = "$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/mnemonics"
 	@JvmStatic
-	val whatIsPrivatekey = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/privateKey"
+	val whatIsPrivatekey = "$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/privateKey"
 	@JvmStatic
 	val whatIsWatchOnly =
-		"$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/watchOnlyWallet"
+		"$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/watchOnlyWallet"
 	@JvmStatic
-	val whatIsGas = "$header/wiki/${webLanguage(Config.getCurrentLanguageCode())}/gas"
+	val whatIsGas = "$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/gas"
 	const
 	val backUpServer = "https://goldstone-api1.naonaola.com"
 	const

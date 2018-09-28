@@ -2,7 +2,6 @@ package io.goldstone.blockchain.kernel.database
 
 import android.arch.persistence.room.*
 import android.content.Context
-import io.goldstone.blockchain.crypto.utils.toDataString
 import io.goldstone.blockchain.kernel.commonmodel.*
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
@@ -21,6 +20,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenDefaultTableDao
 import java.math.BigInteger
 
 /**
@@ -74,6 +74,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun exchangeTableDao(): ExchangeDao
 	abstract fun eosTransactionDao(): EOSTransactionDao
 	abstract fun eosAccountDao(): EOSAccountDao
+	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
 
 	companion object {
 		const val databaseVersion = 6

@@ -11,29 +11,33 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.ValueInputView
-import io.goldstone.blockchain.common.component.WalletEditText
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.edittext.ValueInputView
+import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
-import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.verticalLayout
+import kotlin.apply
 
 /**
  * @date 2018/5/15 10:18 PM
@@ -41,6 +45,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
+	override val pageTitle: String = TokenDetailText.transferDetail
 	val address by lazy {
 		arguments?.getString(ArgumentKey.paymentAddress)
 	}
@@ -83,14 +88,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 				confirmButton.apply {
 					setGrayStyle(20.uiPX())
-					text = CommonText.next.toUpperCase()
-					setMargins<LinearLayout.LayoutParams> {
-						bottomMargin = 30.uiPX()
-					}
-				}.click {
-					it.showLoadingStatus()
+					text = CommonText.next
+				}.click { button ->
+					button.showLoadingStatus()
 					presenter.goToGasEditorFragmentOrTransfer {
-						it.showLoadingStatus(false)
+						if (!it.isNone()) context.alert(it.message)
+						button.showLoadingStatus(false)
 					}
 				}.into(this)
 				// 扫描二维码进入后的样式判断
@@ -191,13 +194,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		getParentContainer()?.apply {
 			val addressInput = WalletEditText(context)
 			DashboardOverlay(context) {
-				textView {
-					text = PrepareTransferText.customChangeAddress
-					textSize = fontSize(16)
-					textColor = GrayScale.black
-					typeface = GoldStoneFont.black(context)
-					gravity = Gravity.CENTER_HORIZONTAL
-				}
 				addressInput.apply {
 					setMargins<LinearLayout.LayoutParams> {
 						width = ScreenSize.widthWithPadding - 40.uiPX()
@@ -210,20 +206,19 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				confirmEvent = Runnable {
 					val customAddress = addressInput.text?.toString().orEmpty()
 					when {
-						TokenContract(presenter.getToken()?.contract).isBTC() ||
-							TokenContract(presenter.getToken()?.contract).isBCH() ->
+						presenter.getToken()?.contract.isBTC() || presenter.getToken()?.contract.isBCH() ->
 							presenter.isValidAddressOrElse(customAddress) isTrue {
 								// 更新默认的自定义找零地址
 								changeAddress = customAddress
 							}
-						TokenContract(presenter.getToken()?.contract).isLTC() ->
+						presenter.getToken()?.contract.isLTC() ->
 							presenter.isValidLTCAddressOrElse(customAddress) isTrue {
 								// 更新默认的自定义找零地址
 								changeAddress = customAddress
 							}
 					}
 				}
-			}.into(this)
+			}.showTitle(PrepareTransferText.customChangeAddress).into(this)
 		}
 	}
 
@@ -269,7 +264,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
-		val isEOSTransfer = TokenContract(rootFragment?.token?.contract).isEOS()
+		val isEOSTransfer = rootFragment?.token?.contract.isEOS()
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {

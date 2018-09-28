@@ -19,6 +19,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.uiThread
 
 /**
  * @date 23/04/2018 2:42 PM
@@ -36,7 +37,7 @@ data class AppConfigTable(
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
-	var isRegisteredAddresses: Boolean = false,
+	var isRegisteredAddresses: Boolean = false, // For Push
 	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",
@@ -44,14 +45,14 @@ data class AppConfigTable(
 	var shareContent: String = ProfileText.shareContent,
 	var terms: String = "",
 	var currentETCTestChainNameID: Int,
-	var currentETHERC20AndETCTestChainNameID: Int,
+	var currentETHSeriesTestChainNameID: Int,
 	var currentBTCTestChainNameID: Int,
 	var currentLTCTestChainNameID: Int,
 	var currentBCHTestChainNameID: Int,
 	var currentEOSTestChainNameID: Int,
 	var currentETCChainNameID: Int,
 	var currentBTCChainNameID: Int,
-	var currentETHERC20AndETCChainNameID: Int,
+	var currentETHSeriesChainNameID: Int,
 	var currentBCHChainNameID: Int,
 	var currentLTCChainNameID: Int,
 	var currentEOSChainNameID: Int,
@@ -226,7 +227,7 @@ data class AppConfigTable(
 		fun updateChainInfo(
 			isMainnet: Boolean,
 			etcChainNameID: Int,
-			ethERC20AndETCChainNameID: Int,
+			ethSeriesID: Int,
 			btcChainNameID: Int,
 			bchChainNameID: Int,
 			ltcChainNameID: Int,
@@ -235,60 +236,29 @@ data class AppConfigTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply {
-							this.isMainnet = isMainnet
-							if (isMainnet) {
-								currentBTCChainNameID = btcChainNameID
-								currentLTCChainNameID = ltcChainNameID
-								currentETCChainNameID = etcChainNameID
-								currentETHERC20AndETCChainNameID = ethERC20AndETCChainNameID
-								currentBCHChainNameID = bchChainNameID
-								currentEOSChainNameID = eosChainNameID
-							} else {
-								currentBTCTestChainNameID = btcChainNameID
-								currentLTCTestChainNameID = ltcChainNameID
-								currentETCTestChainNameID = etcChainNameID
-								currentETHERC20AndETCTestChainNameID = ethERC20AndETCChainNameID
-								currentBCHTestChainNameID = bchChainNameID
-								currentEOSTestChainNameID = eosChainNameID
-							}
-						})
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+					if (isMainnet) updateMainnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
+					else updateTestnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
+					callback()
 				}
 			}
 		}
 
 		fun updateTerms(terms: String) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					update(getAppConfig()[0].apply { this.terms = terms })
-				}
+				GoldStoneDataBase.database.appConfigDao().updateTerms(terms)
 			}
 		}
 
 		fun updateShareContent(shareContent: String) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					update(getAppConfig()[0].apply { this.shareContent = shareContent })
-				}
+				GoldStoneDataBase.database.appConfigDao().updateShareContent(shareContent)
 			}
 		}
 
-		fun updateCurrency(
-			code: String,
-			callback: () -> Unit
-		) {
+		fun updateCurrency(code: String, callback: () -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply { currencyCode = code })
-						GoldStoneAPI.context.runOnUiThread { callback() }
-					}
-				}
+				GoldStoneDataBase.database.appConfigDao().updateCurrency(code)
+				uiThread { callback() }
 			}
 		}
 
@@ -312,10 +282,10 @@ data class AppConfigTable(
 							isMainnet = true,
 							currentBTCChainNameID = ChainNameID.GoldStoneBTCMain.id,
 							currentETCChainNameID = ChainNameID.GasTrackerETCMain.id,
-							currentETHERC20AndETCChainNameID = ChainNameID.InfuraETHMain.id,
+							currentETHSeriesChainNameID = ChainNameID.InfuraETHMain.id,
 							currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
 							currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
-							currentETHERC20AndETCTestChainNameID = ChainNameID.InfuraRopsten.id,
+							currentETHSeriesTestChainNameID = ChainNameID.InfuraRopsten.id,
 							currentLTCTestChainNameID = ChainNameID.GoldStoneLTCTest.id,
 							currentLTCChainNameID = ChainNameID.GoldStoneLTC.id,
 							currentBCHChainNameID = ChainNameID.GoldStoneBCHMain.id,
@@ -353,6 +323,21 @@ interface AppConfigDao {
 
 	@Query("SELECT * FROM appConfig")
 	fun getAppConfig(): List<AppConfigTable>
+
+	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
+	fun updateCurrency(newCurrencyCode: String)
+
+	@Query("UPDATE appConfig SET shareContent = :content WHERE id = 1")
+	fun updateShareContent(content: String)
+
+	@Query("UPDATE appConfig SET terms = :content WHERE id = 1")
+	fun updateTerms(content: String)
+
+	@Query("UPDATE appConfig SET isMainnet = :isMainnet, currentBCHChainNameID = :bchChainNameID, currentLTCChainNameID = :ltcChainNameID, currentEOSChainNameID = :eosChainNameID, currentETHSeriesChainNameID = :ethSeriesChainNameID, currentBTCChainNameID = :btcChainNameID, currentETCChainNameID = :etcChainNameID   WHERE id = 1")
+	fun updateMainnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
+
+	@Query("UPDATE appConfig SET isMainnet = :isMainnet,  currentBCHTestChainNameID = :bchChainNameID, currentLTCTestChainNameID = :ltcChainNameID, currentEOSTestChainNameID = :eosChainNameID, currentETHSeriesTestChainNameID = :ethSeriesChainNameID, currentBTCTestChainNameID = :btcChainNameID, currentETCTestChainNameID = :etcChainNameID   WHERE id = 1")
+	fun updateTestnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
 
 	@Insert
 	fun insert(appConfigTable: AppConfigTable)

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.presente
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.content.ContextCompat.startActivity
 import android.text.format.DateUtils
 import android.view.ViewGroup
@@ -15,9 +16,11 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -110,8 +113,7 @@ class MarketTokenDetailPresenter(
 				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
-					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-						fragment.currencyInfo?.symbol.orEmpty(),
+					DefaultTokenTable.getTokenByContractFromAllChains(
 						fragment.currencyInfo?.contract.orEmpty()
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
@@ -134,16 +136,13 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	fun showWebFragmentWithLink(
-		link: String,
-		title: String,
-		previousTitle: String
-	) {
+	fun showWebFragmentWithLink(link: String, title: String) {
 		marketCenter?.presenter
 			?.showTargetFragment<WebViewFragment, QuotationOverlayFragment>(
-				title,
-				previousTitle,
-				Bundle().apply { putString(ArgumentKey.webViewUrl, link) },
+				Bundle().apply {
+					putString(ArgumentKey.webViewUrl, link)
+					putString(ArgumentKey.webViewName, title)
+				},
 				true
 			)
 	}
@@ -166,7 +165,7 @@ class MarketTokenDetailPresenter(
 			getCurrencyInfoFromDatabase(info) { tokenData, priceData ->
 				if (
 					tokenData.marketCap.isEmpty()
-					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != Config.getCurrentLanguageCode()
+					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != SharedWallet.getCurrentLanguageCode()
 				) {
 					// 本地没有数据的话从服务端拉取 `Coin Information`
 					NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
@@ -224,7 +223,7 @@ class MarketTokenDetailPresenter(
 			}
 		) {
 			// 把数据更新到数据库
-			it.updateCandleChartDataInDatabaseBy(period, pair)
+			it.updateLocalCandleChartData(period, pair)
 			// 更新 `UI` 界面
 			updateCandleChartUI(it, dateType)
 		}
@@ -262,7 +261,7 @@ class MarketTokenDetailPresenter(
 					try {
 						resetData(
 							dateType,
-							data.sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
+							data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
 								CandleEntry(
 									index.toFloat(),
 									entry.high.toFloat(),
@@ -270,7 +269,7 @@ class MarketTokenDetailPresenter(
 									entry.open.toFloat(),
 									entry.close.toFloat(),
 									entry.time)
-							}
+							}.toList()
 						)
 					} catch (error: Exception) {
 						LogUtil.error("updateChartUI", error)
@@ -282,27 +281,18 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	private fun List<CandleChartModel>.updateCandleChartDataInDatabaseBy(
-		period: String,
-		pair: String
-	) {
+	private fun List<CandleChartModel>.updateLocalCandleChartData(period: String, pair: String) {
 		map { JSONObject("{\"open\":\"${it.open}\",\"close\":\"${it.close}\",\"high\":\"${it.high}\",\"low\":\"${it.low}\",\"time\":${it.time}}") }.let {
 			when (period) {
-				MarketTokenDetailChartType.WEEK.info -> {
-					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString())
-				}
+				MarketTokenDetailChartType.WEEK.info ->
+					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.DAY.info ->
+					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.MONTH.info ->
+					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString()) {}
+				MarketTokenDetailChartType.Hour.info ->
+					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString()) {}
 
-				MarketTokenDetailChartType.DAY.info -> {
-					QuotationSelectionTable.updateLineChartDataBy(pair, it.toString())
-				}
-
-				MarketTokenDetailChartType.MONTH.info -> {
-					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString())
-				}
-
-				MarketTokenDetailChartType.Hour.info -> {
-					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString())
-				}
 			}
 		}
 	}
@@ -334,10 +324,7 @@ class MarketTokenDetailPresenter(
 			priceData: PriceHistoryModel
 		) -> Unit
 	) {
-		DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-			info.symbol,
-			info.contract
-		) { default ->
+		DefaultTokenTable.getTokenByContractFromAllChains(info.contract) { default ->
 			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
 				val tokenData =
 					if (default.isNull()) TokenInformationModel()
@@ -348,10 +335,9 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	// Async Function
 	private fun loadCoinInfoFromServer(
 		info: QuotationModel,
-		hold: (DefaultTokenTable) -> Unit
+		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
 		val chainID = TokenContract(info.contract).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(
@@ -362,10 +348,9 @@ class MarketTokenDetailPresenter(
 			}
 		) { coinInfo ->
 			DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
-				DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-					info.symbol,
-					info.contract
-				) { it?.let(hold) }
+				DefaultTokenTable.getTokenByContractFromAllChains(info.contract) {
+					it?.let(hold)
+				}
 			}
 		}
 	}
@@ -390,16 +375,6 @@ class MarketTokenDetailPresenter(
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		currentSocket?.closeSocket()
-
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.resetSocket()
-	}
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		// 从 `WebViewFragment` 返回到这个界面更改 `HeaderTitle`
-		// 因为这个页面的 HeaderTitle 是动态数据所以无法用抽象方法实现.
-		fragment.getParentFragment<QuotationOverlayFragment> {
-			headerTitle = fragment.currencyInfo?.pairDisplay.orEmpty()
-		}
 	}
 }

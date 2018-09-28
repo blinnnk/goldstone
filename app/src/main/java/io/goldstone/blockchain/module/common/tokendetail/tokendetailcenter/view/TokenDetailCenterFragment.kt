@@ -2,15 +2,18 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view
 
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ViewPagerMenu
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -25,18 +28,23 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  */
 class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
-	val token by lazy {
-		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
-	}
-
+	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
+	override val pageTitle: String get() = token?.symbol.orEmpty()
 	private val menuBar by lazy { ViewPagerMenu(context!!) }
 	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
 	private val menuTitles by lazy {
 		val secondMenuTitle =
-			if (token?.contract.equals(TokenContract.eosContract, true)) "Asset" else "Information"
-		arrayListOf("Transaction List", secondMenuTitle)
+			if (token?.contract.isEOS()) TokenDetailText.assets else TokenDetailText.information
+		arrayListOf(TokenDetailText.transactionList, secondMenuTitle)
 	}
 	override val presenter = TokenDetailCenterPresenter(this)
+
+	override fun onResume() {
+		super.onResume()
+		getParentFragment<TokenDetailOverlayFragment> {
+			headerTitle = token?.symbol.orEmpty()
+		}
+	}
 
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {

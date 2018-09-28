@@ -8,17 +8,19 @@ import android.widget.TextView
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.AttentionView
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.component.title.AttentionView
+import io.goldstone.blockchain.common.language.EOSAccountText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.activationmode.presenter.EOSActivationModePresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import org.jetbrains.anko.*
 
 
@@ -28,6 +30,9 @@ import org.jetbrains.anko.*
  */
 
 class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
+
+	override val pageTitle: String
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val activationByFriendButton by lazy {
 		RoundButton(context!!)
 	}
@@ -50,7 +55,7 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 				gravity = Gravity.CENTER_HORIZONTAL
 				attentionView.apply {
 					gravity = Gravity.CENTER_HORIZONTAL
-					text = TokenDetailText.inactivationAccount + "\n${Config.getCurrentEOSAddress()}"
+					text = "${EOSAccountText.inactivationAccount} \n${EOSAccountText.publicKey}: ${SharedAddress.getCurrentEOS()}"
 					textSize = fontSize(14)
 					typeface = GoldStoneFont.black(context)
 					textColor = Spectrum.white
@@ -63,17 +68,21 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 	}
 
 	private fun ViewGroup.showButtons() {
-		activationByFriendButton.into(this)
+		activationByFriendButton.click {
+			presenter.showRegisterByFriendFragment()
+		}.into(this)
 		activationByFriendButton.setBlueStyle()
-		activationByFriendButton.text = "Active By Friends"
-		activationByContractButton.into(this)
+		activationByFriendButton.text = EOSAccountText.activeByFriend
+		activationByContractButton.click {
+			presenter.showRegisterBySmartContractFragment()
+		}.into(this)
 		activationByContractButton.setBlueStyle(10.uiPX())
-		activationByContractButton.text = "Active By Smart Contract"
+		activationByContractButton.text = EOSAccountText.activeByContract
 		copyAddressButton.click {
-			context?.clickToCopy(Config.getCurrentEOSAddress())
+			context?.clickToCopy(SharedAddress.getCurrentEOS())
 		}.into(this)
 		copyAddressButton.setBlueStyle(10.uiPX())
-		copyAddressButton.text = "Copy Address Manual Activation"
+		copyAddressButton.text = EOSAccountText.activeManually
 	}
 
 	private fun ViewGroup.showExplanation() {
@@ -83,7 +92,7 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 			textSize = fontSize(14)
 			typeface = GoldStoneFont.medium(context)
 			textColor = GrayScale.gray
-			text = "By design, a blockchain is resistant to modification of the data. It is an open, distributed ledger that can record transactions between two parties efficiently and in a verifiable and permanent way. For use as a distributed ledger, a blockchain is typically managed by a peer-to-peer network collectively adhering to a protocol for inter-node communication and validating new blocks. Once recorded, the data in any given block cannot be altered retroactively without alteration of all subsequent blocks, which requires consensus of the network majority."
+			text = EOSAccountText.inactivationAccountHint
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		}.into(this)
 	}

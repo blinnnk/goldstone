@@ -13,7 +13,10 @@ enum class EOSWalletType {
 enum class EOSUnit(val value: String) {
 	KB("KB"),
 	MB("MB"),
-	Byte("Byte"),
+	Byte("Byte")
+}
+
+enum class EOSCPUUnit(val value: String) {
 	SEC("SEC"),
 	MS("MS"),
 	MUS("MUS"),
@@ -24,6 +27,8 @@ object EOSValue {
 	const val maxNameLength = 12
 	const val maxSpecialNameLength = 32
 	const val memoMaxCharacterSize = 256
+	const val defaultRegisterAssignRAM = 4096
+	const val defaultRegisterAssignBandWidth = 0.1
 }
 
 enum class EOSTransactionMethod(val value: String) {
@@ -31,7 +36,8 @@ enum class EOSTransactionMethod(val value: String) {
 }
 
 enum class EOSCodeName(val value: String) {
-	EOSIOToken("eosio.token")
+	EOSIOToken("eosio.token"),
+	EOSIO("eosio")
 }
 
 data class EOSTransactionSerialization(

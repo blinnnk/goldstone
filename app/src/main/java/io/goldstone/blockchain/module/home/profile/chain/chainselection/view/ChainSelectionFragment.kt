@@ -6,9 +6,9 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.presenter.ChainSelectionPresenter
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -19,6 +19,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, ChainSelectionModel>() {
 
+	override val pageTitle: String = ProfileText.chain
 	override val presenter = ChainSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(
@@ -38,9 +39,11 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 	}
 
 	private fun checkIsSingleChainWalletOrElse(callback: () -> Unit) {
-		val type = WalletType(Config.getCurrentWalletType())
+		val type = SharedWallet.getCurrentWalletType()
 		when {
 			type.isBTCTest() -> context.alert(AlertText.testnetOnly)
+			type.isEOSJungle() -> context.alert(AlertText.testnetOnly)
+			type.isEOSMainnet() -> context.alert(AlertText.mainnetOnly)
 			type.isBTC() -> context.alert(AlertText.mainnetOnly)
 			type.isLTC() -> context.alert(AlertText.mainnetOnly)
 			type.isBCH() -> context.alert(AlertText.mainnetOnly)

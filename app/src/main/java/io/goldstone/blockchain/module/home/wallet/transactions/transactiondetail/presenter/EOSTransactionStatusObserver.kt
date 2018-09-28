@@ -48,31 +48,18 @@ fun TransactionDetailPresenter.observerEOSTransaction() {
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onEOSTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-	}
+	)
 }
 
 private fun TransactionDetailPresenter.updateBlockNumberInUI(blockNumber: Int) {

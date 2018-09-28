@@ -1,12 +1,17 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter
 
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -26,20 +31,12 @@ class QuotationManagementPresenter(
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
 	}
 
-	private fun updateSelectionsData(callback: () -> Unit = {}) {
+	private fun updateSelectionsData() {
 		QuotationSelectionTable.getMySelections { selections ->
 			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
-				fragment.apply {
-					context?.runOnUiThread {
-						asyncData.isNull() isTrue {
-							asyncData = orderedData
-						} otherwise {
-							diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
-						}
-					}
-				}
+				if (fragment.asyncData.isNull()) fragment.asyncData = orderedData
+				else diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
 			}
-			callback()
 		}
 	}
 
@@ -47,8 +44,23 @@ class QuotationManagementPresenter(
 		fragment.updateSelectionOrderID()
 	}
 
-	private fun getCurrentAsyncData() =
-		fragment.asyncData.orEmptyArray()
+	override fun onFragmentDetach() {
+		super.onFragmentDetach()
+		checkAndUpdateQuotationData()
+	}
+
+	private fun checkAndUpdateQuotationData() {
+		doAsync {
+			fragment.asyncData?.filter { !it.isSelecting }?.let {
+				GoldStoneDataBase.database.quotationSelectionDao().deleteAll(it)
+				GoldStoneAPI.context.runOnUiThread {
+					getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
+				}
+			}
+		}
+	}
+
+	private fun getCurrentAsyncData() = fragment.asyncData.orEmptyArray()
 
 	private fun QuotationManagementFragment.updateSelectionOrderID() {
 		recyclerView.addDragEventAndReordering(getCurrentAsyncData()) { _, toPosition ->
@@ -59,9 +71,7 @@ class QuotationManagementPresenter(
 				data.lastIndex -> data[toPosition - 1].orderID - 0.1
 				else -> (data[toPosition - 1].orderID + data[toPosition + 1].orderID) / 2.0
 			}
-			QuotationSelectionTable.updateSelectionOrderIDBy(
-				data[toPosition].pair, newOrderID
-			) {
+			QuotationSelectionTable.updateSelectionOrderIDBy(data[toPosition].pair, newOrderID) {
 				// 更新完数据库后也需要同时更新一下缓存的数据, 解决用户一次更新多个缓存数据排序的情况
 				fragment.asyncData?.find {
 					it.baseSymbol == data[toPosition].baseSymbol
@@ -70,8 +80,8 @@ class QuotationManagementPresenter(
 		}
 	}
 
+	// 更新数据
 	override fun onFragmentShowFromHidden() {
-		// 更新数据
 		updateSelectionsData()
 	}
 }

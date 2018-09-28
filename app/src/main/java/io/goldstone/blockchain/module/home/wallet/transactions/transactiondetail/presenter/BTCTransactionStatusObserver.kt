@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -28,13 +30,15 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	val currentActivity = fragment.getMainActivity()
 	object : BTCSeriesTransactionStatusObserver() {
-		override val chainName = Config.getBTCCurrentChainName()
+		override val chainName = SharedChain.getBTCCurrentName()
 		override val hash = currentHash
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBTCTransactionSucceed()
-				val address = CoinSymbol.getBTC().getAddress()
-				updateWalletDetailBTCValue(address, currentActivity)
+				val address = CoinSymbol.BTC.getAddress()
+				updateBTCBalanceByTransaction(address, currentActivity) {
+					if (!it.isNone()) fragment.context.alert(it.message)
+				}
 				if (confirmed) {
 					updateConformationBarFinished()
 				}
@@ -50,30 +54,21 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailBTCValue(
+fun updateBTCBalanceByTransaction(
 	address: String,
-	activity: MainActivity?
-) {
-	updateBTCBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
+	activity: MainActivity?,
+	callback: (GoldStoneError) -> Unit
 ) {
 	MyTokenTable.getBalanceByContract(
-		TokenContract.getBTC(),
-		address,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-			LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+		TokenContract.BTC,
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, TokenContract.BTC)
+		} else GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
+			callback(error)
 		}
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, TokenContract.getBTC())
-		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }
 
@@ -81,33 +76,19 @@ private fun TransactionDetailPresenter.updateBTCBalanceByTransaction(
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onBTCTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getBTCTransactionFromChain(false)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-		getBTCTransactionFromChain(false)
-	}
+	)
+	getBTCTransactionFromChain(false)
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
@@ -115,8 +96,8 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 	isPending: Boolean
 ) {
 	val address =
-		if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-		else Config.getCurrentBTCAddress()
+		if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
+		else SharedAddress.getCurrentBTC()
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		address,

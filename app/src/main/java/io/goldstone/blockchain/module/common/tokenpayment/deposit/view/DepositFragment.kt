@@ -5,13 +5,15 @@ import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter.DepositPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -28,6 +30,7 @@ import org.jetbrains.anko.*
  */
 class DepositFragment : BaseFragment<DepositPresenter>() {
 
+	override val pageTitle: String get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = DepositPresenter(this)
@@ -49,7 +52,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 
 			getParentFragment<TokenDetailOverlayFragment> {
 				token?.apply { prepareSymbolPrice(contract) }
-				if (TokenContract(token?.contract).isBCH()) {
+				if (token?.contract.isBCH()) {
 					showConvertAddressButton()
 				}
 			}
@@ -66,7 +69,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 	}
 
 	private var symbolPrice: Double = 0.0
-	private fun prepareSymbolPrice(contract: String) {
+	private fun prepareSymbolPrice(contract: TokenContract) {
 		DefaultTokenTable.getCurrentChainToken(contract) {
 			symbolPrice = it?.price.orElse(0.0)
 		}
@@ -111,20 +114,24 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		WalletTable.getCurrentWallet {
 			getParentFragment<TokenDetailOverlayFragment> {
 				when {
-					TokenContract(token?.contract).isBTC() -> {
-						if (Config.isTestEnvironment())
+					token?.contract.isBTC() -> {
+						if (SharedValue.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentBTCAddress)
 					}
 
-					TokenContract(token?.contract).isLTC() -> {
-						if (Config.isTestEnvironment())
+					token?.contract.isLTC() -> {
+						if (SharedValue.isTestEnvironment())
 							qrView.setAddressText(currentBTCSeriesTestAddress)
 						else qrView.setAddressText(currentLTCAddress)
 					}
 
-					TokenContract(token?.contract).isBCH() -> {
-						if (Config.isTestEnvironment()) {
+					token?.contract.isEOS() -> {
+						qrView.setAddressText(currentEOSAccountName.getCurrent())
+					}
+
+					token?.contract.isBCH() -> {
+						if (SharedValue.isTestEnvironment()) {
 							val bchTestAddress =
 								if (convertBCHAddress) BCHUtil.instance.encodeCashAddressByLegacy(currentBTCSeriesTestAddress)
 								else currentBTCSeriesTestAddress
@@ -139,9 +146,9 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 						}
 					}
 
-					TokenContract(token?.contract).isETC() ->
+					token?.contract.isETC() ->
 						qrView.setAddressText(currentETCAddress)
-					else -> qrView.setAddressText(currentETHAndERCAddress)
+					else -> qrView.setAddressText(currentETHSeriesAddress)
 				}
 			}
 		}

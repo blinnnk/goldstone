@@ -1,14 +1,13 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter
 
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -35,11 +34,10 @@ class WalletListPresenter(
 
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) { it ->
-			if (it.isNull()) return@switchCurrentWallet
-			val walletType = it?.getWalletType()!!
+			val walletType = it.getWalletType()
 			when {
 				walletType.isBTC() -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Mainnet") {
 							NodeSelectionPresenter.setAllMainnet {
 								fragment.activity?.jump<SplashActivity>()
@@ -49,7 +47,7 @@ class WalletListPresenter(
 				}
 
 				walletType.isBTCTest() -> {
-					if (!Config.isTestEnvironment()) {
+					if (!SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Testnet") {
 							NodeSelectionPresenter.setAllTestnet {
 								fragment.activity?.jump<SplashActivity>()
@@ -59,7 +57,7 @@ class WalletListPresenter(
 				}
 
 				walletType.isLTC() -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Litecoin Mainnet") {
 							NodeSelectionPresenter.setAllMainnet {
 								fragment.activity?.jump<SplashActivity>()
@@ -69,8 +67,28 @@ class WalletListPresenter(
 				}
 
 				walletType.isBCH() -> {
-					if (Config.isTestEnvironment()) {
-						showConfirmationAlertView(" Bitcoin Cash Mainnet") {
+					if (SharedValue.isTestEnvironment()) {
+						showConfirmationAlertView("Bitcoin Cash Mainnet") {
+							NodeSelectionPresenter.setAllMainnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isEOSJungle() -> {
+					if (!SharedValue.isTestEnvironment()) {
+						showConfirmationAlertView("EOS Jungle Testnet") {
+							NodeSelectionPresenter.setAllTestnet {
+								fragment.activity?.jump<SplashActivity>()
+							}
+						}
+					} else fragment.activity?.jump<SplashActivity>()
+				}
+
+				walletType.isEOSMainnet() -> {
+					if (SharedValue.isTestEnvironment()) {
+						showConfirmationAlertView("EOS Mainnet Testnet") {
 							NodeSelectionPresenter.setAllMainnet {
 								fragment.activity?.jump<SplashActivity>()
 							}
@@ -79,7 +97,7 @@ class WalletListPresenter(
 				}
 
 				walletType.isBIP44() -> {
-					if (Config.isTestEnvironment()) {
+					if (SharedValue.isTestEnvironment()) {
 						NodeSelectionPresenter.setAllTestnet {
 							fragment.activity?.jump<SplashActivity>()
 						}
@@ -131,7 +149,7 @@ class WalletListPresenter(
 					override fun concurrentJobs() {
 						this@all.forEach { wallet ->
 							// 获取对应的钱包下的全部 `token`
-							MyTokenTable.getMyTokensByAddress(wallet.getCurrentAddresses()) { myTokens ->
+							MyTokenTable.getTokensByAddress(wallet.getCurrentAddresses()) { myTokens ->
 								val targetWalletType = wallet.getWalletType()
 								if (myTokens.isEmpty()) {
 									data.add(WalletListModel(wallet, 0.0, targetWalletType.type!!))

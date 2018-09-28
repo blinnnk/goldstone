@@ -7,9 +7,10 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -115,7 +116,7 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getWebUrlValue() {
 		val terms =
-			"${WebUrl.header}/${WebUrl.webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
+			"${WebUrl.header}/${WebUrl.webLanguage(SharedWallet.getCurrentLanguageCode())}/termAndConditions"
 		LogUtil.debug("getWebUrlValue", terms)
 	}
 
@@ -137,7 +138,7 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getETCTransactions() {
 		GoldStoneAPI.getETCTransactions(
-			"62",
+			ChainID.ETCTest,
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
 			"0",
 			{

@@ -51,13 +51,3 @@ object BTCUtils {
 		}
 	}
 }
-
-enum class AddressType(val value: String, val symbol: String) {
-	ETHERCOrETC("ethERCOrETC", CoinSymbol.eth),
-	BTC("btc", CoinSymbol.pureBTCSymbol),
-	BCH("bch", CoinSymbol.bch),
-	BTCSeriesTest("btcTest", CoinSymbol.pureBTCSymbol),
-	LTC("ltc", CoinSymbol.ltc),
-	EOS("eos", CoinSymbol.eos),
-	EOSAccountName("eosAccountName", CoinSymbol.eos),
-}

@@ -27,11 +27,11 @@ class SupportedChainMenu(context: Context) : LinearLayout(context) {
 	private val title = ImportWalletText.supportedChain
 	private val listOfChainIcon = listOf(
 		Pair(R.drawable.btc_creator_icon, PrivateKeyType.BTC),
-		Pair(R.drawable.eth_creator_icon, PrivateKeyType.ETHERCAndETC),
+		Pair(R.drawable.eth_creator_icon, PrivateKeyType.ETHSeries),
 		Pair(R.drawable.ltc_creator_icon, PrivateKeyType.LTC),
 		Pair(R.drawable.bch_creator_icon, PrivateKeyType.BCH),
-		Pair(R.drawable.etc_creator_icon, PrivateKeyType.ETHERCAndETC),
-		Pair(R.drawable.eos_creater_icon, PrivateKeyType.EOS)
+		Pair(R.drawable.etc_creator_icon, PrivateKeyType.ETHSeries),
+		Pair(R.drawable.eos_creator_icon, PrivateKeyType.EOS)
 	)
 	private val iconSize = 55.uiPX()
 

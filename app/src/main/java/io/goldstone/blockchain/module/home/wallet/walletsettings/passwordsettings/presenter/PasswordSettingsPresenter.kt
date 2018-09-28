@@ -5,11 +5,11 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import com.blinnnk.util.getDeviceBrand
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.isValid
@@ -17,10 +17,11 @@ import io.goldstone.blockchain.crypto.keystore.updatePassword
 import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.WalletType
+import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.toast
@@ -38,19 +39,15 @@ class PasswordSettingsPresenter(
 		newPassword: String,
 		repeatPassword: String,
 		passwordHint: String,
-		callback: () -> Unit
+		@UiThread callback: (GoldStoneError) -> Unit
 	) {
-		if (oldPassword.isEmpty()) {
-			fragment.context.alert(CreateWalletText.emptyRepeatPasswordAlert)
-			return
-		}
-		CreateWalletPresenter.checkInputValue(
+		if (oldPassword.isEmpty()) callback(AccountError.EmptyRepeatPassword)
+		else CreateWalletPresenter.checkInputValue(
 			"",
 			newPassword,
 			repeatPassword,
 			true,
-			fragment.context,
-			callback // error callback
+			callback
 		) { password, _ ->
 			WalletTable.getWalletType { type, wallet ->
 				fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
@@ -60,12 +57,8 @@ class PasswordSettingsPresenter(
 						type,
 						wallet,
 						passwordHint
-					)
-					else {
-						callback()
-						fragment.context?.runOnUiThread {
-							alert(CommonText.wrongPassword)
-						}
+					) else GoldStoneAPI.context.runOnUiThread {
+						callback(AccountError.WrongPassword)
 					}
 				}
 			}
@@ -93,14 +86,14 @@ class PasswordSettingsPresenter(
 							wallet.btcAddresses,
 							wallet.btcSeriesTestAddresses
 						).forEach { addresses ->
-							AddressManagerPresenter.convertToChildAddresses(addresses).forEach {
+							AddressManagerPresenter.convertToChildAddresses(addresses).forEach { pair ->
 								updateKeystorePassword(
-									it.first,
+									pair.first,
 									oldPassword,
 									password,
 									passwordHint,
-									!Address(it.first).isValid(), // 不是合规的 `ETH` 地址就是 `BTC` 系列地址
-									false
+									// 不是合规的 `ETH` 地址就是 `BTC` 系列地址
+									!Address(pair.first).isValid()
 								) {
 									completeMark()
 								}
@@ -129,26 +122,18 @@ class PasswordSettingsPresenter(
 		newPassword: String,
 		passwordHint: String,
 		isBTCSeriesWallet: Boolean,
-		isSingleChainWallet: Boolean,
-		callback: () -> Unit
+		callback: (AccountError) -> Unit
 	) {
 		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 		fragment.context?.updatePassword(
 			address,
 			oldPassword,
 			newPassword,
-			isBTCSeriesWallet,
-			isSingleChainWallet,
-			{
-				// error callback
-				callback()
-			}
-		) {
+			isBTCSeriesWallet
+		) { _, error ->
 			// Update User Password Hint
-			passwordHint.isNotEmpty() isTrue {
-				WalletTable.updateHint(passwordHint)
-			}
-			callback()
+			if (error.isNone()) WalletTable.updateHint(passwordHint)
+			callback(error)
 		}
 	}
 
@@ -157,22 +142,18 @@ class PasswordSettingsPresenter(
 		oldPassword: String,
 		newPassword: String,
 		passwordHint: String,
-		callback: () -> Unit
+		callback: (AccountError) -> Unit
 	) {
 		fragment.context?.updatePasswordByWalletID(
 			walletID,
 			oldPassword,
-			newPassword,
-			{
-				// error callback
-				callback()
-			}
+			newPassword
 		) {
 			// Update User Password Hint
 			passwordHint.isNotEmpty() isTrue {
 				WalletTable.updateHint(passwordHint)
 			}
-			callback()
+			callback(it)
 		}
 	}
 

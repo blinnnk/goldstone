@@ -4,7 +4,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -17,6 +17,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class QuotationManagementFragment :
 	BaseRecyclerFragment<QuotationManagementPresenter, QuotationSelectionTable>() {
 
+	override val pageTitle: String = QuotationText.management
 	private var willDeletePair = listOf<String>()
 	override val presenter = QuotationManagementPresenter(this)
 	override fun setRecyclerViewAdapter(
@@ -25,7 +26,7 @@ class QuotationManagementFragment :
 	) {
 		recyclerView.adapter = QuotationManagementAdapter(asyncData.orEmptyArray()) { cell ->
 			cell.switch.onClick { _ ->
-				cell.searchModel?.apply {
+				cell.quotationSearchModel?.apply {
 					// 更新内存里面的数据防止复用的时候出错
 					asyncData?.find { selection ->
 						selection.pair.equals(pair, true)
@@ -41,19 +42,6 @@ class QuotationManagementFragment :
 		}
 	}
 
-	override fun onDetach() {
-		super.onDetach()
-		asyncData?.filter {
-			!it.isSelecting
-		}?.apply {
-			forEach { pair ->
-				QuotationSelectionTable.removeSelectionBy(pair.pair)
-			}
-			if (isNotEmpty())
-				getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
-		}
-	}
-
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		// 从下一个界面返回的时候更新这个界面的 `UI` 数据
@@ -61,7 +49,7 @@ class QuotationManagementFragment :
 			if (hidden) {
 				overlayView.header.showSearchButton(false)
 			} else overlayView.header.showSearchButton(true) {
-				presenter.showQutationSearchFragment()
+				presenter.showQuotationSearchFragment()
 			}
 		}
 	}

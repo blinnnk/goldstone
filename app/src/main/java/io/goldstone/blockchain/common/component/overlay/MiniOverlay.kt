@@ -81,7 +81,7 @@ class MiniOverlay(
 	
 	fun setTopRight() {
 		if (this::dashBoard.isInitialized) {
-			dashBoard.scale(2)
+			dashBoard.scale(2, false, 60)
 			dashBoard.y = 20.uiPX().toFloat()
 			dashBoard.x -= 20.uiPX()
 			dashBoard.setAlignParentRight()

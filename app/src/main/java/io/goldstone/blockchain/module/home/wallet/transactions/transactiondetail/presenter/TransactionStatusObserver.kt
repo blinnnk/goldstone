@@ -6,10 +6,10 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.TinyNumberUtils
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -47,9 +47,9 @@ abstract class TransactionStatusObserver {
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
 					},
-					{ error, reason ->
+					{
 						removeObserver()
-						LogUtil.error("checkStatus getTransactionByHash $reason", error)
+						LogUtil.error("checkStatus getTransactionByHash", it)
 					}
 				) { data ->
 					transaction = data
@@ -58,8 +58,8 @@ abstract class TransactionStatusObserver {
 				}
 			} else {
 				GoldStoneEthCall.getBlockNumber(
-					{ error, reason ->
-						LogUtil.error("checkStatus getBlockNumber $reason", error)
+					{
+						LogUtil.error("checkStatus getBlockNumber", it)
 					},
 					ChainID(chainID).getChainName()
 				) { blockNumber ->
@@ -94,8 +94,8 @@ abstract class TransactionStatusObserver {
 							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
 							GoldStoneEthCall.getReceiptByHash(
 								transactionHash,
-								{ error, reason ->
-									LogUtil.error("checkStatusByTransaction$reason", error)
+								{
+									LogUtil.error("checkStatusByTransaction", it)
 								},
 								ChainID(chainID).getChainName()
 							) { failed ->
@@ -177,51 +177,35 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 	isFailed: Boolean
 ) {
 	// 交易过程中发生错误
-	if (hasError) {
-		updateDataWhenHasError()
-	}
+	if (hasError) updateDataWhenHasError()
 	// 交易流程全部成功, 但是合约的问题导致失败
-	if (isFailed) {
-		updateDataWhenFailed()
-	}
+	if (isFailed) updateDataWhenFailed()
 
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				TinyNumberUtils.hasTrue(hasError, isFailed)
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getTransactionFromChain()
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				TinyNumberUtils.hasTrue(hasError, isFailed)
-			)
-		)
-		getTransactionFromChain()
+	)
+	getTransactionFromChain {
+		if (!it.isNone()) fragment.context.alert(it.message)
 	}
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-private fun TransactionDetailPresenter.getTransactionFromChain() {
+private fun TransactionDetailPresenter.getTransactionFromChain(
+	errorCallback: (RequestError) -> Unit
+) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		CoinSymbol(getUnitSymbol()).getCurrentChainName(),
-		errorCallback = { error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
-		}
+		errorCallback = errorCallback
 	) {
 		fragment.context?.runOnUiThread {
 			fragment.asyncData?.clear()
@@ -288,35 +272,22 @@ private fun TransactionDetailPresenter.updateWalletDetailValue(
 	address: String,
 	activity: MainActivity?
 ) {
-	updateMyTokenBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateMyTokenBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
-) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
 		CoinSymbol(getUnitSymbol()).getCurrentChainName(),
-		errorCallback = { error, reason ->
-			fragment.context?.alert(reason ?: error.toString())
+		errorCallback = {
+			LogUtil.error("updateWalletDetailValue", it)
 		}
 	) { transaction ->
 		val contract =
 			ChainURL.getContractByTransaction(transaction, CoinSymbol(getUnitSymbol()).getCurrentChainName())
 		MyTokenTable.getBalanceByContract(
 			contract,
-			address,
-			{ error, reason ->
-				fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-				LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-				GoldStoneAPI.context.runOnUiThread { callback() }
-			}
-		) {
-			MyTokenTable.updateBalanceByContract(it, address, contract)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+			address
+		) { balance, error ->
+			if (!balance.isNull() && error.isNone()) {
+				MyTokenTable.updateBalanceByContract(balance!!, address, contract)
+			} else GoldStoneAPI.context.runOnUiThread { activity?.getWalletDetailFragment()?.presenter?.updateData() }
 		}
 	}
 }

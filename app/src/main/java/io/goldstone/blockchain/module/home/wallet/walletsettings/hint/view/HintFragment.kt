@@ -7,11 +7,11 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
@@ -31,7 +31,8 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class HintFragment : BaseFragment<HintPresenter>() {
-	
+
+	override val pageTitle: String = WalletSettingsText.hint
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = HintPresenter(this)
@@ -45,7 +46,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 					topMargin = 30.uiPX()
 				}
 			}.into(this)
-			
+
 			confirmButton.apply {
 				text = CommonText.confirm.toUpperCase()
 				setBlueStyle()
@@ -55,7 +56,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 			}.into(this)
 		}
 	}
-	
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
@@ -70,11 +71,11 @@ class HintFragment : BaseFragment<HintPresenter>() {
 					}
 				}
 			}
-			
+
 			hintInput.hint = this.hint
 		}
 	}
-	
+
 	override fun setBaseBackEvent(
 		activity: MainActivity?,
 		parent: Fragment?

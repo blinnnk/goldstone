@@ -2,20 +2,23 @@
 
 package io.goldstone.blockchain.common.utils
 
+import android.R
 import android.content.Context
+import android.content.res.ColorStateList
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import com.blinnnk.extension.isNull
+import android.widget.RadioButton
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.eos.EOSCPUUnit
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
@@ -59,6 +62,7 @@ fun Context.showAlertView(
 ) {
 	var input: EditText? = null
 	alert(subtitle, title) {
+		isCancelable = false
 		showEditText isTrue {
 			customView {
 				verticalLayout {
@@ -95,30 +99,6 @@ fun String.showAfterColonContent(): String {
 	else this
 }
 
-fun <T> Fragment.getGrandFather(): T? {
-	return try {
-		parentFragment?.parentFragment as? T
-	} catch (error: Exception) {
-		LogUtil.error("getGrandFather", error)
-		null
-	}
-}
-
-fun JSONArray.toList(): List<String> {
-	var result = listOf<String>()
-	(0 until length()).forEach {
-		result += get(it).toString()
-	}
-	return result
-}
-
-// 自己解 `SONObject` 的时候用来可能用 `String` 判断 `Null`
-fun String.isNullValue(): Boolean {
-	return contains("null")
-}
-
-infix fun String.suffix(content: String) = this + " " + content
-
 fun BigInteger.convertToDiskUnit(): String {
 	val convertValue = ("$this".length / 3.0).toInt()
 	val diskUnit = when (convertValue) {
@@ -134,10 +114,10 @@ fun BigInteger.convertToTimeUnit(): String {
 	val convertValue = ("$this".length / 3.0).toInt()
 	val sixtyHexadecimal = if (convertValue > 2) (this.toDouble() / 1000 * 1000 / 60).toInt() else 0
 	val diskUnit = when {
-		convertValue == 0 -> EOSUnit.MUS.value
-		convertValue == 1 -> EOSUnit.MS.value
-		sixtyHexadecimal == 0 -> EOSUnit.SEC.value
-		else -> EOSUnit.MIN.value
+		convertValue == 0 -> EOSCPUUnit.MUS.value
+		convertValue == 1 -> EOSCPUUnit.MS.value
+		sixtyHexadecimal == 0 -> EOSCPUUnit.SEC.value
+		else -> EOSCPUUnit.MIN.value
 	}
 	val value = if (convertValue > 2) this / BigInteger.valueOf(1000) * BigInteger.valueOf(1000) else this
 	val hexadecimal = if (convertValue > 2) 60.0 else 1000.0
@@ -146,32 +126,27 @@ fun BigInteger.convertToTimeUnit(): String {
 	return result suffix diskUnit
 }
 
-@Throws
-fun JSONObject.getTargetChild(vararg keys: String): String {
-	try {
-		var willGetChildObject = this
-		keys.forEachIndexed { index, content ->
-			if (index == keys.lastIndex) return@forEachIndexed
-			willGetChildObject = JSONObject(willGetChildObject.safeGet(content))
-		}
-		return willGetChildObject.safeGet(keys.last())
-	} catch (error: Exception) {
-		throw Exception("goldstone getTargetChild has error")
+fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
+
+class MutablePair<L, R>(var left: L, var right: R)
+
+fun JSONArray.toList(): List<JSONObject> {
+	var result = listOf<JSONObject>()
+	(0 until length()).forEach {
+		result += JSONObject(get(it).toString())
 	}
+	return result
 }
 
-@Throws
-fun JSONObject.getTargetObject(vararg keys: String): JSONObject {
-	try {
-		var willGetChildObject = this
-		keys.forEach {
-			willGetChildObject = JSONObject(willGetChildObject.safeGet(it))
-		}
-		return willGetChildObject
-	} catch (error: Exception) {
-		throw Exception("goldstone getTargetObject has error")
-	}
-}
+infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
 
-fun BigInteger?.orZero() = (if (isNull()) BigInteger.ZERO else this)!!
-fun String.toBigIntegerOrZero() = toBigIntegerOrNull() ?: BigInteger.ZERO
+fun RadioButton.isDefaultStyle() {
+	buttonTintList = ColorStateList(
+		arrayOf(
+			intArrayOf(-R.attr.state_checked), //disabled
+			intArrayOf(R.attr.state_checked) //enabled
+		),
+		// disabled - enabled
+		intArrayOf(GrayScale.midGray, Spectrum.blue)
+	)
+}

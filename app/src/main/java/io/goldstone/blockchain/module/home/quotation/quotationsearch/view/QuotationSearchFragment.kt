@@ -19,6 +19,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.support.v4.onUiThread
 import java.util.*
 
 /**
@@ -40,6 +41,8 @@ class QuotationSearchFragment :
 			visibility = View.GONE
 		}
 	}
+
+	override val pageTitle: String = "Quotation Search"
 	override val presenter = QuotationSearchPresenter(this)
 	
 	override fun onViewCreated(
@@ -55,11 +58,11 @@ class QuotationSearchFragment :
 		asyncData: ArrayList<QuotationSelectionTable>?
 	) {
 		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { cell ->
-			cell.searchModel?.let { model ->
-				cell.switch.onClick {
+			cell.quotationSearchModel?.let { model ->
+				cell.switch.onClick { _ ->
 					getMainActivity()?.showLoadingView()
 					presenter.setQuotationSelfSelection(model, cell.switch.isChecked) {
-						getMainActivity()?.removeLoadingView()
+						onUiThread { getMainActivity()?.removeLoadingView() }
 					}
 				}
 			}

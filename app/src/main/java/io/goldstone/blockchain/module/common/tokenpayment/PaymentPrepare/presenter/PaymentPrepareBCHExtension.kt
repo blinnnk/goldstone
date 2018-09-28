@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
-import io.goldstone.blockchain.crypto.error.TransferError
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
@@ -29,15 +30,13 @@ import org.jetbrains.anko.runOnUiThread
 fun PaymentPreparePresenter.prepareBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	@UiThread callback: (TransferError) -> Unit
+	@UiThread callback: (GoldStoneError) -> Unit
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
 		callback(TransferError.IncorrectDecimal)
-	else generateBCHPaymentModel(count, changeAddress) { error, paymentModel ->
+	else generateBCHPaymentModel(count, changeAddress, callback) { error, paymentModel ->
 		if (!paymentModel.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
-				TokenDetailText.customGas,
-				TokenDetailText.paymentValue,
 				Bundle().apply {
 					putSerializable(ArgumentKey.btcSeriesPrepareModel, paymentModel)
 				})
@@ -50,16 +49,18 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	@UiThread hold: (TransferError, PaymentBTCSeriesModel?) -> Unit
+	errorCallback: (RequestError) -> Unit,
+	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = CoinSymbol(getToken()?.symbol).getAddress()
 	val chainName =
-		if (Config.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
+		if (SharedValue.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
 		3,
-		false
+		false,
+		errorCallback
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
 			hold(TransferError.GetWrongFeeFromChain, null)
@@ -81,9 +82,9 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				fragment.address.orEmpty(),
 				changeAddress,
 				unspents,
-				if (Config.isTestEnvironment()) CryptoValue.signedSecret
+				if (SharedValue.isTestEnvironment()) CryptoValue.signedSecret
 				else CryptoValue.signedBTCMainnetSecret, // 测算 `MessageSize` 的默认无效私钥
-				Config.isTestEnvironment()
+				SharedValue.isTestEnvironment()
 			).messageSize
 			// 返回的是千字节的费用, 除以 `1000` 得出 `1` 字节的燃气费
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
@@ -96,7 +97,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.None, it)
+					hold(GoldStoneError.None, it)
 				}
 			}
 		}

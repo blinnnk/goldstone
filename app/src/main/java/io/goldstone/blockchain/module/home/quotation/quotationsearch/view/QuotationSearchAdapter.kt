@@ -13,12 +13,12 @@ class QuotationSearchAdapter(
 	override val dataSet: ArrayList<QuotationSelectionTable>,
 	private val hold: (QuotationSearchCell) -> Unit
 ) : HoneyBaseAdapter<QuotationSelectionTable, QuotationSearchCell>() {
-	
-	override fun generateCell(context: Context) = QuotationSearchCell(context)
-	
-	override fun QuotationSearchCell.bindCell(data: QuotationSelectionTable, position: Int) {
-		searchModel = data
-		hold(this)
-	}
-	
+
+  override fun generateCell(context: Context) = QuotationSearchCell(context)
+
+  override fun QuotationSearchCell.bindCell(data: QuotationSelectionTable, position: Int) {
+		quotationSearchModel = data
+    hold(this)
+  }
+
 }

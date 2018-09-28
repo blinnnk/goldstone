@@ -5,34 +5,29 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
-import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
-import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.component.AttentionTextView
-import io.goldstone.blockchain.common.component.RoundInput
+import io.goldstone.blockchain.common.component.DescriptionView
+import io.goldstone.blockchain.common.component.KeyValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.CornerSize
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.*
+import org.jetbrains.anko.AnkoContext
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 06/04/2018 1:02 AM
@@ -40,8 +35,8 @@ import org.jetbrains.anko.*
  */
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
-	private val attentionView by lazy { AttentionTextView(context!!) }
-	private val privateKeyTextView by lazy { TextView(context) }
+	override val pageTitle: String = WalletSettingsText.exportPrivateKey
+	private val privateKeyTextView by lazy { KeyValueView(context!!) }
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyExportPresenter(this)
@@ -50,28 +45,12 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			attentionView.apply {
-				isCenter()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-				text = ImportWalletText.exportPrivateKey
-			}.into(this)
+			DescriptionView(context).isExportPrivateKey().into(this)
 			privateKeyTextView.apply {
-				addCorner(CornerSize.default.toInt(), GrayScale.whiteGray)
-				layoutParams = LinearLayout.LayoutParams(
-					ScreenSize.Width - PaddingSize.device * 2, 120.uiPX()
-				).apply {
-					topMargin = 20.uiPX()
-					setPadding(20.uiPX(), 16.uiPX(), 20.uiPX(), 10.uiPX())
-				}
-				gravity = Gravity.CENTER_VERTICAL
-				textSize = fontSize(15)
-				textColor = GrayScale.black
-				typeface = GoldStoneFont.heavy(context)
+				layoutParams.height = 80.uiPX()
 			}.click {
 				// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
-				if (it.text.isNotEmpty()) {
-					context.clickToCopy(privateKeyTextView.text.toString())
-				}
+				if (it.text.isNotEmpty()) context.clickToCopy(privateKeyTextView.text.toString())
 			}.into(this)
 
 			passwordInput.apply {
@@ -87,10 +66,10 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				setBlueStyle(15.uiPX())
 			}.click { it ->
 				it.showLoadingStatus()
-				presenter.getPrivateKey(passwordInput.text.toString()) privateKey@{
-					this@privateKey?.let {
-						privateKeyTextView.text = it
-					}
+				presenter.getPrivateKey(passwordInput.text.toString()) { privateKey, error ->
+					if (!privateKey.isNull() && error.isNone()) {
+						privateKeyTextView.text = privateKey!!
+					} else context.alert(error.message)
 					it.showLoadingStatus(false)
 				}
 			}.into(this)

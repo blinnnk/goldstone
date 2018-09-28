@@ -11,21 +11,25 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.*
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
-import io.goldstone.blockchain.crypto.eos.eosram.EOSRamModel
+import io.goldstone.blockchain.crypto.eos.eosram.EOSBuyRamModel
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
-import io.goldstone.blockchain.crypto.eos.netcpumodel.EOSNetCPUModel
+import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.math.BigInteger
 
 
 /**
@@ -56,9 +60,9 @@ class EOSUnitTest {
 	fun encryptEOSTransactionInfo() {
 		val expectResult = "00a6823403ea30550000000000ea3055400d03000000000004454f5300000000026464"
 		val transactionInfo = EOSTransactionInfo(
-			"eosio.token",
-			"eosio",
-			200000L,
+			EOSAccount("eosio.token"),
+			EOSAccount("eosio"),
+			BigInteger.valueOf(200000L),
 			"dd",
 			CoinSymbol.eos
 		)
@@ -219,9 +223,9 @@ class EOSUnitTest {
 	@Test
 	fun serializedTransaction() {
 		val transactionInfo = EOSTransactionInfo(
-			"kingofdragon",
-			"wuxianyinli2",
-			2,
+			EOSAccount("kingofdragon"),
+			EOSAccount("wuxianyinli2"),
+			BigInteger.valueOf(20000),
 			"test trans",
 			CoinSymbol.eos
 		)
@@ -275,11 +279,11 @@ class EOSUnitTest {
 	fun createBuyRamObject() {
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizations = listOf(authorization)
-		val ramModel = EOSRamModel(
+		val ramModel = EOSBuyRamModel(
 			authorizations,
 			"kingofdragon",
 			"snowsnowsnow",
-			50000
+			BigInteger.valueOf(50000)
 		)
 		LogUtil.debug("$position createBuyRamObject", ramModel.createObject())
 	}
@@ -288,12 +292,13 @@ class EOSUnitTest {
 	fun createCPUNetObject() {
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizations = listOf(authorization)
-		val netCPUModel = EOSNetCPUModel(
+		val netCPUModel = BandWidthModel(
 			authorizations,
 			"kingofdragon",
 			"snowsnowsnow",
-			50000,
-			50000,
+			BigInteger.valueOf(50000),
+			BigInteger.valueOf(50000),
+			StakeType.Delegate,
 			false
 		)
 		LogUtil.debug("$position createCPUNetObject", netCPUModel.createObject())
@@ -329,22 +334,23 @@ class EOSUnitTest {
 			actives,
 			account
 		)
-		val buyRamModel = EOSRamModel(
+		val buyRamModel = EOSBuyRamModel(
 			authorizations,
 			"kingofdragon",
 			"xxrkissleo11",
-			50000
+			BigInteger.valueOf(50000)
 		)
-		val netCPUModel = EOSNetCPUModel(
+		val netCPUModel = BandWidthModel(
 			authorizations,
 			"kingofdragon",
 			"xxrkissleo11",
-			50000,
-			50000,
+			BigInteger.valueOf(50000),
+			BigInteger.valueOf(50000),
+			StakeType.Delegate,
 			false
 		)
-		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(EOSChain.Test, header, accountInfo, buyRamModel, netCPUModel, false)
-		LogUtil.debug("$position serializeRegisterModels", serializedRegister)
+		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(ChainID.EOSTest, header, accountInfo, buyRamModel, netCPUModel)
+		LogUtil.debug("$position serializeRegisterModels", serializedRegister.serialized)
 	}
 
 	@Test

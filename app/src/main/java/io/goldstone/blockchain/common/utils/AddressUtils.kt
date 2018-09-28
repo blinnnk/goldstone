@@ -1,20 +1,21 @@
 package io.goldstone.blockchain.common.utils
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 
 object AddressUtils {
 	fun getCurrentBTCAddress(): String {
-		return if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-		else Config.getCurrentBTCAddress()
+		return if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
+		else SharedAddress.getCurrentBTC()
 	}
 
 	fun getCurrentLTCAddress(): String {
-		return if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-		else Config.getCurrentLTCAddress()
+		return if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
+		else SharedAddress.getCurrentLTC()
 	}
 
 	fun getCurrentBCHAddress(): String {
-		return if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-		else Config.getCurrentBCHAddress()
+		return if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
+		else SharedAddress.getCurrentBCH()
 	}
 }

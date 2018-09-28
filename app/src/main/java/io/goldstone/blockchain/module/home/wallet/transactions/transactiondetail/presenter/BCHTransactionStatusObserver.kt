@@ -1,10 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAfterColonContent
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -28,12 +29,12 @@ fun TransactionDetailPresenter.observerBCHTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	val currentActivity = fragment.getMainActivity()
 	object : BTCSeriesTransactionStatusObserver() {
-		override val chainName = Config.getBCHCurrentChainName()
+		override val chainName = SharedChain.getBCHCurrentName()
 		override val hash = currentHash
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
 				onBCHTransactionSucceed()
-				val address = CoinSymbol.getBCH().getAddress()
+				val address = CoinSymbol.BCH.getAddress()
 				updateWalletDetailBCHValue(address, currentActivity)
 				if (confirmed) {
 					updateConformationBarFinished()
@@ -50,31 +51,20 @@ fun TransactionDetailPresenter.observerBCHTransaction() {
 	}.start()
 }
 
-private fun TransactionDetailPresenter.updateWalletDetailBCHValue(
+private fun updateWalletDetailBCHValue(
 	address: String,
 	activity: MainActivity?
 ) {
-	updateBCHBalanceByTransaction(address) {
-		activity?.getWalletDetailFragment()?.presenter?.updateData()
-	}
-}
-
-private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
-	address: String,
-	callback: () -> Unit
-) {
-	val contract = TokenContract.getBCH()
+	val contract = TokenContract.BCH
 	MyTokenTable.getBalanceByContract(
 		contract,
-		address,
-		{ error, reason ->
-			fragment.context?.alert(reason ?: error.toString().showAfterColonContent())
-			LogUtil.error("updateMyTokenBalanceByTransaction $reason", error)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+		address
+	) { balance, error ->
+		if (!balance.isNull() && error.isNone()) {
+			MyTokenTable.updateBalanceByContract(balance!!, address, contract)
+		} else GoldStoneAPI.context.runOnUiThread {
+			activity?.getWalletDetailFragment()?.presenter?.updateData()
 		}
-	) {
-		MyTokenTable.updateBalanceByContract(it, address, contract)
-		GoldStoneAPI.context.runOnUiThread { callback() }
 	}
 }
 
@@ -82,33 +72,19 @@ private fun TransactionDetailPresenter.updateBCHBalanceByTransaction(
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
 private fun TransactionDetailPresenter.onBCHTransactionSucceed() {
-	data?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				toAddress,
-				token.symbol,
-				false,
-				false,
-				false
-			)
+	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
+	val symbol = getUnitSymbol()
+	updateHeaderValue(
+		TransactionHeaderModel(
+			count,
+			address,
+			symbol,
+			false,
+			false,
+			false
 		)
-		getBCHTransactionFromChain(false)
-	}
-
-	dataFromList?.apply {
-		updateHeaderValue(
-			TransactionHeaderModel(
-				count,
-				addressName,
-				symbol,
-				false,
-				false,
-				false
-			)
-		)
-		getBCHTransactionFromChain(false)
-	}
+	)
+	getBCHTransactionFromChain(false)
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
@@ -116,8 +92,8 @@ private fun TransactionDetailPresenter.getBCHTransactionFromChain(
 	isPending: Boolean
 ) {
 	val address =
-		if (Config.isTestEnvironment()) Config.getCurrentBTCSeriesTestAddress()
-		else Config.getCurrentBCHAddress()
+		if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
+		else SharedAddress.getCurrentBCH()
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		address,

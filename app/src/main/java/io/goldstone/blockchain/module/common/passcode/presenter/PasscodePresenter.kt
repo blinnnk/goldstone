@@ -22,9 +22,7 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
  * @date 23/04/2018 11:04 AM
  * @author KaySaith
  */
-class PasscodePresenter(
-	override val fragment: PasscodeFragment
-) : BasePresenter<PasscodeFragment>() {
+class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter<PasscodeFragment>() {
 
 	private var currentFrozenTime = 0L
 	private val handler = Handler()
@@ -84,7 +82,7 @@ class PasscodePresenter(
 				handler.postDelayed(refreshRunnable, 1000L)
 			} else {
 				resetConfig()
-				fragment.recoveryAfterFrezon()
+				fragment.recoveryAfterFreeze()
 			}
 		}
 	}
@@ -93,35 +91,36 @@ class PasscodePresenter(
 		handler.removeCallbacks(refreshRunnable)
 	}
 
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		fun AppCompatActivity.recoverBackEventAfterPinCode() {
-			supportFragmentManager.fragments.last()?.apply {
-				when (this) {
-					is HomeFragment -> {
-						(childFragmentManager.fragments.last() as? BaseRecyclerFragment<*, *>)?.apply {
-							if (this is WalletDetailFragment) {
-								getMainActivity()?.backEvent = null
-							} else {
-								recoveryBackEvent()
-							}
+	private fun AppCompatActivity.recoverBackEventAfterPinCode() {
+		supportFragmentManager.fragments.last()?.apply {
+			when (this) {
+				is HomeFragment -> {
+					(childFragmentManager.fragments.last() as? BaseRecyclerFragment<*, *>)?.apply {
+						if (this is WalletDetailFragment) {
+							getMainActivity()?.backEvent = null
+						} else {
+							recoveryBackEvent()
 						}
 					}
+				}
 
-					is BaseFragment<*> -> recoveryBackEvent()
-					is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
+				is BaseFragment<*> -> recoveryBackEvent()
+				is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
 
-					is BaseOverlayFragment<*> -> {
-						childFragmentManager.fragments.last()?.apply {
-							when (this) {
-								is BaseFragment<*> -> recoveryBackEvent()
-								is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
-							}
+				is BaseOverlayFragment<*> -> {
+					childFragmentManager.fragments.last()?.apply {
+						when (this) {
+							is BaseFragment<*> -> recoveryBackEvent()
+							is BaseRecyclerFragment<*, *> -> recoveryBackEvent()
 						}
 					}
 				}
 			}
 		}
+	}
+
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
 		fragment.activity?.apply {
 			when (this) {
 				is SplashActivity -> recoverBackEventAfterPinCode()
@@ -156,11 +155,7 @@ class PasscodePresenter(
 		if (passcode.length >= Count.pinCode)
 		// 从数据库获取本机的 `Passcode`
 			AppConfigTable.getAppConfig {
-				if (it?.pincode == passcode.toInt()) {
-					hold(true)
-				} else {
-					hold(false)
-				}
+				hold(it?.pincode == passcode.toInt())
 			}
 	}
 }

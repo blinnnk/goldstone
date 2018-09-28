@@ -2,23 +2,27 @@ package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
+import android.widget.RadioButton
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.component.HoneyRadioButton
 import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.extension.into
 import com.blinnnk.extension.measureTextWidth
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
+
 
 /**
  * @date 22/03/2018 3:52 PM
@@ -29,7 +33,7 @@ import org.jetbrains.anko.*
 class AgreementView(context: Context) : RelativeLayout(context) {
 
 	private val viewHeight = 20.uiPX()
-	val radioButton = HoneyRadioButton(context)
+	lateinit var radioButton: RadioButton
 	val textView = TextView(context)
 	private var isChecked = false
 
@@ -58,15 +62,17 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 			// Layout 防止点击出错
 			isClickable = true
 			layoutParams = LinearLayout.LayoutParams(80.uiPX(), matchParent)
-			radioButton.apply {
+			radioButton = radioButton {
+				isDefaultStyle()
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				scaleX = 0.7f
 				scaleY = 0.7f
 				x -= 15.uiPX()
-				setColorStyle(GrayScale.midGray, Spectrum.green)
-			}.click {
-				setRadioStatus()
-			}.into(this)
+				onClick {
+					setRadioStatus()
+					preventDuplicateClicks()
+				}
+			}
 		}
 	}
 

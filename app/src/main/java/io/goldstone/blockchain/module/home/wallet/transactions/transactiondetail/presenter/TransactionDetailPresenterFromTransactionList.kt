@@ -1,11 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -21,7 +22,9 @@ import java.math.BigInteger
  * @date 2018/6/6 3:59 PM
  * @author KaySaith
  */
-fun TransactionDetailPresenter.updateDataFromTransactionList() {
+fun TransactionDetailPresenter.updateDataFromTransactionList(
+	errorCallback: (RequestError) -> Unit
+) {
 	dataFromList?.apply {
 		val headerData = TransactionHeaderModel(
 			count,
@@ -36,22 +39,20 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
 
 		when {
-			CoinSymbol(symbol).isBTCSeries() -> {
+			contract.isBTCSeries() -> {
 				dataFromList?.let {
 					fragment.asyncData = generateModels(it).toArrayList()
 					updateHeaderValue(headerData)
 					fragment.removeLoadingView()
-					if (isPending) {
-						when {
-							CoinSymbol(symbol).isBTC() -> observerBTCTransaction()
-							CoinSymbol(symbol).isBCH() -> observerBCHTransaction()
-							else -> observerLTCTransaction()
-						}
+					if (isPending) when {
+						contract.isBTC() -> observerBTCTransaction()
+						contract.isBCH() -> observerBCHTransaction()
+						else -> observerLTCTransaction()
 					}
 				}
 			}
 
-			EOSWalletUtils.isValidAccountName(fromAddress, false) -> {
+			EOSAccount(fromAddress).isValid(false) -> {
 				dataFromList?.let {
 					// 本地没有 Miner 信息那么从链上拉取
 					fun updateUI(miner: String) {
@@ -70,8 +71,8 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 				}
 			}
 
-			CoinSymbol(symbol).isETC() -> {
-				getETHERC20OrETCMemo(headerData)
+			contract.isETC() -> {
+				getETHERC20OrETCMemo(headerData, errorCallback)
 				if (isPending) observerTransaction()
 			}
 
@@ -79,7 +80,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 				//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取
 				// 未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
 				checkTokenNameInfoOrUpdate()
-				getETHERC20OrETCMemo(headerData)
+				getETHERC20OrETCMemo(headerData, errorCallback)
 				if (isPending) observerTransaction()
 			}
 		}
@@ -90,24 +91,26 @@ private fun getBandWidthUsageAndUpdateDatabase(
 	txID: String,
 	hold: (cpuUsage: BigInteger, netUsage: BigInteger) -> Unit
 ) {
-	EOSAPI.getCPUAndNETUsageByTxID(
+	EOSAPI.getBandWidthByTxID(
 		txID,
-		{
-			LogUtil.error("getBandWidthUsageAndStatusBy", it)
-		}
+		{ LogUtil.error("getBandWidthByTxID", it) }
 	) { cpuUsage, netUsage, status ->
 		EOSTransactionTable.updateBandWidthAndStatusBy(txID, cpuUsage, netUsage, status)
 		GoldStoneAPI.context.runOnUiThread { hold(cpuUsage, netUsage) }
 	}
 }
 
-private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: TransactionHeaderModel) {
+private fun TransactionDetailPresenter.getETHERC20OrETCMemo(
+	headerData: TransactionHeaderModel,
+	errorCallback: (RequestError) -> Unit
+) {
 	dataFromList?.apply {
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
-			if (CoinSymbol(symbol).isETC()) Config.getETCCurrentChainName()
-			else CoinSymbol(getUnitSymbol()).getCurrentChainName()
+			if (contract.isETC()) SharedChain.getETCCurrentName()
+			else CoinSymbol(getUnitSymbol()).getCurrentChainName(),
+			errorCallback
 		) { memo ->
 			fragment.removeLoadingView()
 			fragment.asyncData = generateModels(this).toArrayList().apply {
@@ -120,14 +123,14 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 
 private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 	DefaultTokenTable.getCurrentChainToken(contract) { defaultToken ->
-		defaultToken?.apply {
-			if (name.isEmpty()) {
+		defaultToken?.let { token ->
+			if (token.name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
-					contract,
-					{ error, reason ->
-						LogUtil.error("getCurrentChainToken $reason", error)
+					token.contract,
+					{
+						LogUtil.error("getCurrentChainToken", it)
 					},
-					CoinSymbol(symbol).getCurrentChainName()
+					contract.getCurrentChainName()
 				) {
 					DefaultTokenTable.updateTokenName(contract, it)
 				}

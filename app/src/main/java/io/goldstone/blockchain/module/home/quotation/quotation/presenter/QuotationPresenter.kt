@@ -3,16 +3,12 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.utils.toJsonArray
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -21,7 +17,6 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFra
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -29,8 +24,6 @@ import org.json.JSONObject
  * @date 26/03/2018 8:56 PM
  * @author KaySaith
  */
-var selectionMD5: String? = null
-var memoryData: ArrayList<QuotationModel>? = null
 
 class QuotationPresenter(
 	override val fragment: QuotationFragment
@@ -41,20 +34,10 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		// 如果内存有数据直接更新内存的数据
-		memoryData?.let {
-			diffAndUpdateAdapterData<QuotationAdapter>(it)
-		}
 		QuotationSelectionTable.getMySelections { selections ->
-			// 比对内存中的源数据 `MD5` 和新的数据是否一样, 如果一样跳出
-			if (selectionMD5 == selections.getObjectMD5HexString()) {
-				return@getMySelections
-			}
-			selectionMD5 = selections.getObjectMD5HexString()
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
-
-			selections.map { selection ->
+			selections.asSequence().map { selection ->
 				var linechart = listOf<ChartPoint>()
 				if (!selection.lineChartDay.isBlank()) {
 					linechart = convertDataToChartData(selection.lineChartDay)
@@ -68,24 +51,14 @@ class QuotationPresenter(
 				)
 			}.sortedByDescending {
 				it.orderID
-			}.toArrayList().let { it ->
-				// 把数据存在内存里面方便下次打开使用
-				memoryData = it
+			}.toList().toArrayList().let { it ->
 				// 更新 `UI`
-				fragment.context?.runOnUiThread {
-					diffAndUpdateAdapterData<QuotationAdapter>(it)
-					// 设定 `Socket` 并执行
-					currentSocket.isNull() isTrue {
-						// 初始化 `Socket`
-						setSocket {
-							hasInitSocket = true
-							currentSocket?.runSocket()
-						}
-					} otherwise {
-						// 更新 `Socket`
-						subscribeSocket()
-					}
-				}
+				diffAndUpdateAdapterData<QuotationAdapter>(it)
+				// 设定 `Socket` 并执行
+				if (currentSocket.isNull()) setSocket {
+					hasInitSocket = true
+					currentSocket?.runSocket()
+				} else subscribeSocket()
 			}
 		}
 	}
@@ -101,10 +74,8 @@ class QuotationPresenter(
 				subscribeSocket()
 			}
 		}
-		if (currentSocket.isNull() && hasInitSocket) {
-			setSocket {
-				currentSocket?.runSocket()
-			}
+		if (currentSocket.isNull() && hasInitSocket) setSocket {
+			currentSocket?.runSocket()
 		}
 	}
 
@@ -119,14 +90,16 @@ class QuotationPresenter(
 		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
 		if (maxDate + 1L < 0.daysAgoInMills()) {
-			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart ->
-				QuotationSelectionTable.updateLineChartDataBy(pair, newChart) {
-					/** 防止服务器数据出错或不足, 可能导致的死循环 */
-					if (updateChartTimes.orZero() > 0) {
-						updateData()
-						updateChartTimes = updateChartTimes.orZero() - 1
+			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
+				if (!newChart.isNull() && error.isNone()) {
+					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {
+						/** 防止服务器数据出错或不足, 可能导致的死循环 */
+						if (updateChartTimes.orZero() > 0) {
+							updateData()
+							updateChartTimes = updateChartTimes.orZero() - 1
+						}
 					}
-				}
+				} else fragment.context.alert(error.message)
 			}
 		}
 	}
@@ -211,6 +184,7 @@ class QuotationPresenter(
 				override fun onOpened() {
 					sendMessage("{\"t\":\"sub_tick\", \"pair_list\":${pairList?.toJsonArray()}}")
 				}
+
 				override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 					hold(CurrencyPriceInfoModel(content), isDisconnected)
 				}

@@ -17,7 +17,7 @@ class TokenManagementListAdapter(
   override fun generateCell(context: Context) = TokenManagementListCell(context)
 
   override fun TokenManagementListCell.bindCell(data: DefaultTokenTable, position: Int) {
-    model = data
+    tokenSearchModel = data
     callback(this)
   }
 

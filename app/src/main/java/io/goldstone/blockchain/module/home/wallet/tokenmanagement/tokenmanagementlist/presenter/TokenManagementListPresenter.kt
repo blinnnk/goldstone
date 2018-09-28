@@ -6,10 +6,12 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.WalletType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -33,7 +35,7 @@ class TokenManagementListPresenter(
 		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
 		fragment.getParentFragment<TokenManagementFragment> {
-			prepareMyDefaultTokens(WalletType(Config.getCurrentWalletType()).isETHSeries())
+			prepareMyDefaultTokens(SharedWallet.getCurrentWalletType().isETHSeries())
 		}
 	}
 
@@ -63,19 +65,13 @@ class TokenManagementListPresenter(
 					val sortedList =
 						defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						if (isETHERCAndETCOnly) {
-							sortedList.filterNot {
-								CoinSymbol(it.symbol).isBTCSeries()
-							}.let {
-								memoryTokenData = it.toArrayList()
-							}
-						} else {
-							memoryTokenData = sortedList
-						}
+						if (isETHERCAndETCOnly) sortedList.filterNot {
+							TokenContract(it.contract).isBTCSeries() || TokenContract(it.contract).isEOS()
+						}.let {
+							memoryTokenData = it.toArrayList()
+						} else memoryTokenData = sortedList
 						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
-					} else {
-						return
-					}
+					} else return
 				}
 			}.start()
 		}
@@ -83,20 +79,17 @@ class TokenManagementListPresenter(
 
 	companion object {
 
-		fun updateMyTokensInfoBy(
-			switch: HoneyBaseSwitch,
-			token: DefaultTokenTable
-		) {
+		fun updateMyTokenInfoBy(switch: HoneyBaseSwitch, token: DefaultTokenTable) {
 			switch.isClickable = false
 			if (switch.isChecked) {
-				// once it is checked then insertOrReplace this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbolAndContract(token.symbol, token.contract) {
+				// once it is checked then insert this symbol into `MyTokenTable` database
+				MyTokenTable.insertBySymbolAndContract(token.symbol, TokenContract(token.contract)) {
 					switch.isClickable = true
 				}
 			} else {
 				// once it is unchecked then delete this symbol from `MyTokenTable` database
 				MyTokenTable.deleteByContract(
-					token.contract,
+					TokenContract(token.contract),
 					CoinSymbol(token.symbol).getAddress()
 				) {
 					switch.isClickable = true
