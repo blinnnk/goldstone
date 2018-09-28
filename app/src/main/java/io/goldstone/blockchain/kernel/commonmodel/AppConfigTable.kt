@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.annotation.SuppressLint
 import android.arch.persistence.room.*
 import android.provider.Settings
+import android.provider.SyncStateContract.Helpers.update
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
@@ -166,38 +167,22 @@ data class AppConfigTable(
 			status: Boolean,
 			callback: () -> Unit
 		) {
-			AppConfigTable.getAppConfig { it ->
-				it?.let {
-					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(it.apply {
-							showPincode = status
-							if (!status) {
-								pincode = null
-							}
-						})
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().updateShowPincode(status)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
-
 
 		fun showFingerprintUnlockStatus(
 			status: Boolean,
 			callback: () -> Unit
 		) {
-			AppConfigTable.getAppConfig { it ->
-				it?.let {
-					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(it.apply {
-							showFingerprintUnlocker = status
-						})
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().updateShowFingerprintUnlocker(status)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
@@ -384,6 +369,12 @@ interface AppConfigDao {
 
 	@Query("SELECT * FROM appConfig")
 	fun getAppConfig(): List<AppConfigTable>
+
+	@Query("UPDATE appConfig SET showPincode = :showPincode")
+	fun updateShowPincode(showPincode: Boolean = false)
+
+	@Query("UPDATE appConfig SET showFingerprintUnlocker = :showFingerprintUnlocker")
+	fun updateShowFingerprintUnlocker(showFingerprintUnlocker: Boolean = false)
 
 	@Insert
 	fun insert(appConfigTable: AppConfigTable)
