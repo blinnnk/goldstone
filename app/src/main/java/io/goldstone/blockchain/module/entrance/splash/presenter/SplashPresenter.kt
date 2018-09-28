@@ -18,7 +18,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.updateEOSAccountName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.currentPublicKeyHasActivated
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.isActivatedWatchOnlyEOSAccount
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.hasActivatedOrWatchOnlyEOSAccount
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -38,7 +38,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		WalletTable.getCurrentWallet {
 			if (
 				!eosAccountNames.currentPublicKeyHasActivated() &&
-				!eosAccountNames.isActivatedWatchOnlyEOSAccount() &&
+				!eosAccountNames.hasActivatedOrWatchOnlyEOSAccount() &&
 				getCurrentAddressesAndChainID().any { it.second.isEOS() }
 			) {
 				checkOrUpdateEOSAccount()

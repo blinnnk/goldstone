@@ -37,7 +37,7 @@ data class AppConfigTable(
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
-	var isRegisteredAddresses: Boolean = false,
+	var isRegisteredAddresses: Boolean = false, // For Push
 	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",

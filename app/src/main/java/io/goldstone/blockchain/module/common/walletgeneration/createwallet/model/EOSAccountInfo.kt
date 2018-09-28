@@ -36,7 +36,7 @@ data class EOSAccountInfo(
 		return ChainID(chainID).isCurrent() && publicKey.equals(SharedAddress.getCurrentEOS(), true)
 	}
 
-	fun isActivatedWatchOnlyEOSAccount(): Boolean {
+	fun isActivatedOrWatchOnlyEOSAccount(): Boolean {
 		return ChainID(chainID).isCurrent() && name.equals(SharedAddress.getCurrentEOSAccount().accountName, true)
 	}
 
@@ -49,8 +49,8 @@ fun List<EOSAccountInfo>.currentPublicKeyHasActivated(): Boolean {
 	return !find { it.hasActivated() }.isNull()
 }
 
-fun List<EOSAccountInfo>.isActivatedWatchOnlyEOSAccount(): Boolean {
-	return !find { it.isActivatedWatchOnlyEOSAccount() }.isNull()
+fun List<EOSAccountInfo>.hasActivatedOrWatchOnlyEOSAccount(): Boolean {
+	return !find { it.isActivatedOrWatchOnlyEOSAccount() }.isNull()
 }
 
 fun List<EOSAccountInfo>.getTargetKeyName(key: String): String? {

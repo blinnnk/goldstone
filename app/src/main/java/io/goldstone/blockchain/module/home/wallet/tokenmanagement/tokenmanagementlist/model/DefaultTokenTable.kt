@@ -213,14 +213,11 @@ data class DefaultTokenTable(
 			}
 		}
 
-		fun getTokenBySymbolAndContractFromAllChains(
-			symbol: String,
-			contract: String,
-			hold: (DefaultTokenTable?) -> Unit
+		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenBySymbolAndContractFromAllChains(symbol, contract)
+					.getTokenByContractFromAllChains(contract)
 			} then { hold(it?.firstOrNull()) }
 		}
 
@@ -241,7 +238,7 @@ data class DefaultTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
-						getTokenBySymbolAndContractFromAllChains(data.symbol, data.contract.contract.orEmpty())?.let { targetTokens ->
+						getTokenByContractFromAllChains(data.contract.contract.orEmpty())?.let { targetTokens ->
 							if (targetTokens.isEmpty()) {
 								insert(DefaultTokenTable(data))
 								callback()
@@ -314,8 +311,8 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chainID LIKE :chainID")
 	fun getTokenByContract(contract: String, chainID: String): DefaultTokenTable?
 
-	@Query("SELECT * FROM defaultTokens WHERE symbol LIKE :symbol AND contract LIKE :contract")
-	fun getTokenBySymbolAndContractFromAllChains(symbol: String, contract: String): List<DefaultTokenTable>?
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
+	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>?
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

@@ -6,7 +6,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -95,6 +94,7 @@ class ChainType(val id: Int) : Serializable {
 	// 与 `WalletTable` 有关联的非纯粹但是便捷的方法
 	fun updateCurrentAddress(
 		newAddress: String,
+		newEOSAccountName: String,
 		@UiThread callback: (isSwitchEOSAddress: Boolean, wallet: WalletTable) -> Unit
 	) {
 		doAsync {
@@ -121,7 +121,7 @@ class ChainType(val id: Int) : Serializable {
 					currentWallet?.currentEOSAddress = newAddress
 					// 切换 `EOS` 的默认地址, 把 `accountName` 的数据值为初始化状态,
 					// 好在其他流程中重新走检查 `Account Name` 的逻辑
-					currentWallet?.currentEOSAccountName = EOSDefaultAllChainName(newAddress, newAddress)
+					currentWallet?.currentEOSAccountName?.updateCurrent(newEOSAccountName)
 					SharedAddress.updateCurrentEOS(newAddress)
 				}
 				ChainType.BTC.id -> if (SharedValue.isTestEnvironment()) {

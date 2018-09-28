@@ -28,8 +28,8 @@ class BitcoinUnitTest {
 	@Test
 	fun getBitcoinBalance() {
 		val address = "mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"
-		BitcoinApi.getBalance(address) {
-			LogUtil.debug("$position getBitcoinBalance", "$it")
+		BitcoinApi.getBalance(address, false) { balance, error ->
+			LogUtil.debug("$position getBitcoinBalance $balance", "$error")
 		}
 	}
 }

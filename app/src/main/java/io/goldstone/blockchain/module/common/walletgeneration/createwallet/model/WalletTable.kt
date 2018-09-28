@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.*
 import android.content.Context
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orFalse
@@ -248,9 +249,7 @@ data class WalletTable(
 	fun insertWatchOnlyWallet(callback: (wallet: WalletTable) -> Unit) {
 		load {
 			GoldStoneDataBase.database.walletDao().apply {
-				findWhichIsUsing(true)?.let {
-					update(it.apply { isUsing = false })
-				}
+				findWhichIsUsing(true)?.let { update(it.apply { isUsing = false }) }
 				insert(this@WalletTable)
 			}.findWhichIsUsing(true)
 		} then {
@@ -622,10 +621,7 @@ data class WalletTable(
 			}
 		}
 
-		fun updateEOSDefaultName(
-			defaultName: String,
-			@UiThread callback: () -> Unit
-		) {
+		fun updateEOSDefaultName(defaultName: String, @UiThread callback: () -> Unit) {
 			doAsync {
 				// 更新钱包数据库的 `Default EOS Address`
 				GoldStoneDataBase.database.walletDao().apply {
@@ -656,7 +652,7 @@ data class WalletTable(
 			}
 		}
 
-		fun deleteCurrentWallet(callback: (WalletTable?) -> Unit) {
+		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					val willDeleteWallet = findWhichIsUsing(true)

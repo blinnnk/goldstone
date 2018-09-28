@@ -93,8 +93,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.click { button ->
 				button.showLoadingStatus()
 				presenter.importWatchOnlyWallet(currentType, addressInput, nameInput) {
-					if (!it.isNone()) context.alert(it.message)
-					else activity?.jump<SplashActivity>()
+					if (!it.isNone()) context.alert(it.message) else activity?.jump<SplashActivity>()
 					button.showLoadingStatus(false)
 				}
 			}.into(this)
