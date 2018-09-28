@@ -16,7 +16,6 @@ object CryptoValue {
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	const val keystoreFilename = "keystore"
-	const val singleChainFilename = "singleChain"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18

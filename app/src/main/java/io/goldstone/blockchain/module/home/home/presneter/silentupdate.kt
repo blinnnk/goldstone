@@ -5,6 +5,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -23,11 +24,13 @@ import org.jetbrains.anko.doAsync
 abstract class SilentUpdater {
 	fun star() {
 		doAsync {
-			updateUnknownDefaultToken()
-			updateRAMUnitPrice()
-			updateMyTokenCurrencyPrice()
-			updateCPUUnitPrice()
-			updateNETUnitPrice()
+			if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+				updateUnknownDefaultToken()
+				updateRAMUnitPrice()
+				updateMyTokenCurrencyPrice()
+				updateCPUUnitPrice()
+				updateNETUnitPrice()
+			}
 		}
 	}
 

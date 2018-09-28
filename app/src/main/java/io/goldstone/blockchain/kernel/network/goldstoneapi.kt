@@ -114,21 +114,20 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTokenInfoBySymbolFromServer(
 		symbolsOrContract: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<TokenSearchModel>) -> Unit
+		hold: (tokens: ArrayList<TokenSearchModel>?, error: RequestError) -> Unit
 	) {
 		requestData<TokenSearchModel>(
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${SharedChain.getCurrentETH().id},${SharedChain.getETCCurrent().id},${SharedChain.getBTCCurrent().id},${SharedChain.getLTCCurrent().id},${SharedChain.getEOSCurrent().id}"
+				"${SharedChain.getCurrentETH().id},${SharedChain.getETCCurrent().id},${SharedChain.getBTCCurrent().id},${SharedChain.getLTCCurrent().id},${SharedChain.getEOSCurrent().id},${SharedChain.getBCHCurrent().id}"
 			),
 			"list",
 			false,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(toArrayList())
+			hold(toArrayList(), RequestError.None)
 		}
 	}
 

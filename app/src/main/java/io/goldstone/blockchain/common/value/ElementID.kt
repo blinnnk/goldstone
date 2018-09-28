@@ -28,7 +28,7 @@ object ElementID {
 	const val scanButton = 2014
 	const val buttonLoading = 2015
 	const val contentScrollview = 2016
-	const val mask = 2017
+	const val customHeader = 2017
 	const val miniOverlay = 2018
 	const val dashboardOverlay = 2019
 	const val baseFragmentContainer = 2020

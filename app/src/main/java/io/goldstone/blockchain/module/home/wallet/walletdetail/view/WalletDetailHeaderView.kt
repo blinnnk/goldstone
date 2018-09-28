@@ -36,12 +36,13 @@ import org.jetbrains.anko.*
  * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
-
 	private val avatarBitmap = UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			if (avatar.isNull())
-				currentAccount.avatar.glideImage(avatarBitmap)
+				currentAccount.avatar.glideImage(
+					avatarBitmap ?: UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
+				)
 			else currentAccount.avatar.glideImage(avatar)
 
 			currentAccount.info.title.text = object : FixTextLength() {

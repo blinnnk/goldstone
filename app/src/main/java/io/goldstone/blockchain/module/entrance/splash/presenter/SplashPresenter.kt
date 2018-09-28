@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orElse
@@ -13,6 +15,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -161,9 +164,10 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
-	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
-		WalletTable.getAll {
-			if (isEmpty()) {
+	fun cleanWhenUpdateDatabaseOrElse(@UiThread callback: (allWallets: List<WalletTable>) -> Unit) {
+		doAsync {
+			val allWallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+			if (allWallets.isEmpty()) {
 				cleanKeyStoreFile(activity.filesDir)
 				unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 			} else {
@@ -173,7 +177,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					unregisterGoldStoneID(SharedWallet.getNeedUnregisterGoldStoneID())
 				}
 			}
-			callback()
+			uiThread { callback(allWallets) }
 		}
 	}
 

@@ -18,7 +18,6 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -141,29 +140,28 @@ class WalletDetailPresenter(
 	}
 
 	fun updateUnreadCount(@UiThread hold: (unreadCount: Int?, error: GoldStoneError) -> Unit) {
+		if (!NetworkUtil.hasNetwork()) return
 		doAsync {
-			AppConfigTable.getAppConfig { config ->
-				NotificationTable.getAllNotifications { notifications ->
-					config?.apply {
-						/**
-						 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
-						 * 如果本地有数据获取最后一条的创建时间作为请求时间
-						 */
-						val time = if (notifications.isEmpty()) goldStoneID.substring(
-							goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
-						).toLong()
-						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
-						GoldStoneAPI.getUnreadCount(
-							goldStoneID,
-							time,
-							{ hold(null, it) }
-						) { unreadCount ->
-							uiThread {
-								hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
-							}
-						}
+			val goldStoneID = SharedWallet.getGoldStoneID()
+			NotificationTable.getAllNotifications { notifications ->
+				/**
+				 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
+				 * 如果本地有数据获取最后一条的创建时间作为请求时间
+				 */
+				val time = if (notifications.isEmpty()) goldStoneID.substring(
+					goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
+				).toLong()
+				else notifications.maxBy { it.createTime }?.createTime.orElse(0)
+				GoldStoneAPI.getUnreadCount(
+					goldStoneID,
+					time,
+					{ hold(null, it) }
+				) { unreadCount ->
+					uiThread {
+						hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
 					}
 				}
+
 			}
 		}
 	}
@@ -267,17 +265,18 @@ class WalletDetailPresenter(
 	}
 
 	private fun generateHeaderModel(hold: (WalletDetailHeaderModel) -> Unit) {
-		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
+		var totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
-		SharedWallet.updateCurrentBalance(totalBalance.orElse(0.0))
+		if (!totalBalance.isNull()) SharedWallet.updateCurrentBalance(totalBalance!!)
+		else totalBalance = SharedWallet.getCurrentBalance()
 		WalletTable.getCurrentWallet {
 			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
 				null,
 				SharedWallet.getCurrentName(),
-				if (subtitle.equals(WalletText.multiChainWallet, true)) {
+				if (subtitle.equals(WalletText.multiChainWallet, true) || subtitle.equals(WalletText.bip44MultiChain, true)) {
 					object : FixTextLength() {
-						override var text = WalletText.multiChainWallet
+						override var text = subtitle
 						override val maxWidth = 90.uiPX().toFloat()
 						override val textSize: Float = 12.uiPX().toFloat()
 					}.getFixString()

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.webview.presenter
 
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -22,6 +23,7 @@ class WebViewPresenter(
 			when (this) {
 				is WalletImportFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
+				is BaseOverlayFragment<*> -> presenter.removeSelfFromActivity()
 			}
 		}
 	}
