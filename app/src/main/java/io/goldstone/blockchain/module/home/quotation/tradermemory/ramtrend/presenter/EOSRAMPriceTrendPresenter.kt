@@ -7,6 +7,7 @@ import com.blinnnk.util.*
 import com.github.mikephil.charting.data.CandleEntry
 import com.google.android.gms.common.util.SharedPreferencesUtils
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
@@ -35,9 +36,13 @@ import java.math.BigDecimal
 class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	: BasePresenter<EOSRAMPriceTrendFragment>(), RefreshReceiver {
 	
-	private val sharedPreferencesKey = "eosRAMInfo"
+	private val ramInformationKey = "eosRAMInfo"
+	
+	private val ramCandleDataKey = "eosRAMCandle"
 	
 	private lateinit var ramInformationModel: RAMInformationModel
+	
+	private var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	
 	private var period: String = EOSRAMChartType.Hour.info
 	private var dateType: Int = DateUtils.FORMAT_SHOW_TIME
@@ -51,10 +56,18 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		super.onFragmentCreate()
 		fragment.context?.apply {
 			ramInformationModel = try {
-				val jsonData = getStringFromSharedPreferences(sharedPreferencesKey)
+				val jsonData = getStringFromSharedPreferences(ramInformationKey)
 				Gson().fromJson(jsonData, RAMInformationModel::class.java)
 			} catch (error: Exception) {
 				RAMInformationModel(null, null, null, null, null, null, null)
+			}
+			
+			candleDataMap = try {
+			  val jsonData = getStringFromSharedPreferences(ramCandleDataKey)
+				val type = object : TypeToken<HashMap<String, ArrayList<CandleChartModel>>>() {}.type
+				Gson().fromJson(jsonData, type)
+			} catch (error: Exception) {
+				hashMapOf()
 			}
 		}
 		RAMTradeRefreshEvent.register(this)
@@ -63,7 +76,8 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	override fun onFragmentDestroy() {
 		RAMTradeRefreshEvent.unRegister(this)
 		fragment.context?.apply {
-			saveDataToSharedPreferences(sharedPreferencesKey, Gson().toJson(ramInformationModel).toString())
+			saveDataToSharedPreferences(ramInformationKey, Gson().toJson(ramInformationModel))
+			saveDataToSharedPreferences(ramCandleDataKey, Gson().toJson(candleDataMap))
 		}
 		super.onFragmentDestroy()
 	}
@@ -90,31 +104,32 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 			{
 				// Show the error exception to user
 				fragment.context.alert(it.toString().showAfterColonContent())
-				fragment.candleChart.updateCandleChartUI(arrayListOf(), dateType)
+				fragment.candleChart.updateCandleChartUI()
 			}
 		) {
 			// 把数据更新到数据库
 			// 更新 `UI` 界面
+			candleDataMap[period] = it
 			GoldStoneAPI.context.runOnUiThread {
-				fragment.candleChart.updateCandleChartUI(it, dateType)
+				fragment.candleChart.updateCandleChartUI()
 			}
 		}
 	}
 	
 	private fun EOSRAMPriceTrendCandleChart.updateCandleChartUI(
-		data: ArrayList<CandleChartModel>,
-		dateType:Int
 	) {
-		resetData(dateType, data.mapIndexed { index, entry ->
-			CandleEntry(
-				index.toFloat(),
-				entry.high.toFloat(),
-				entry.low.toFloat(),
-				entry.open.toFloat(),
-				entry.close.toFloat(),
-				entry.time)
-			}
-		)
+		candleDataMap[period]?.apply {
+			resetData(dateType, this.mapIndexed { index, entry ->
+				CandleEntry(
+					index.toFloat(),
+					entry.high.toFloat(),
+					entry.low.toFloat(),
+					entry.open.toFloat(),
+					entry.close.toFloat(),
+					entry.time)
+			})
+		}
+		
 		
 	}
 	
