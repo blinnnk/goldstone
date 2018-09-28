@@ -32,7 +32,7 @@ class DescriptionView(context: Context) : TextView(context) {
 	}
 
 	fun isNameRule(): DescriptionView {
-		text = "The username must be 12 characters long, and the character content can only contain the letters A~Z or the numbers 1~5."
+		text = EOSAccountText.activateForFriendHint
 		return this
 	}
 
