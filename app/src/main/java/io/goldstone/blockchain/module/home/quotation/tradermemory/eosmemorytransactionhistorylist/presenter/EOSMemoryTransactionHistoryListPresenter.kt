@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorylist.presenter
 
+import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
@@ -44,15 +45,27 @@ class EOSMemoryTransactionHistoryListPresenter(
 	}
 
 	fun showPersonalMemoryTransactionRecord(account: String) {
-		fragment.activity?.addFragmentAndSetArguments<TraderMemoryOverlayFragment>(ContainerID.main) {
-			putString(
-				"内存交易",
-				"个人交易"
-			)
-			putString(
-				"account",
-				account
-			)
+		(fragment.parentFragment?.parentFragment?.parentFragment as? BaseOverlayFragment<*>)?.apply {
+			presenter.showTargetFragment<PersonalMemoryTransactionRecordFragment>(bundle = Bundle().apply {
+				putString(
+					"内存交易",
+					"个人交易"
+				)
+				putString(
+					"account",
+					account
+				) })
 		}
+		
+//		fragment.activity?.addFragmentAndSetArguments<TraderMemoryOverlayFragment>(ContainerID.main) {
+//			putString(
+//				"内存交易",
+//				"个人交易"
+//			)
+//			putString(
+//				"account",
+//				account
+//			)
+//		}
 	}
 }
