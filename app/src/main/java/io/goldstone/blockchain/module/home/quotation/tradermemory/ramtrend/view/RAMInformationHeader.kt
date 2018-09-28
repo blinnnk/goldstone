@@ -7,6 +7,7 @@ import android.widget.*
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 
@@ -44,20 +45,20 @@ class RAMInformationHeader(context: Context) : LinearLayout(context) {
 		linearLayout {
 			verticalLayout {
 				textView {
-					text = "当前价"
+					text = EOSRAMText.currentPrice
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 				}
 				linearLayout {
 					currentPrice = textView {
-						text = "当前价"
+						text = ""
 						textSize = fontSize(18)
 						textColor = Spectrum.darkBlue
 						singleLine = true
 					}
 					trendcyPercent = textView {
 						leftPadding = 10.uiPX()
-						text = "涨幅"
+						text = ""
 						singleLine = true
 					}
 				}
@@ -69,23 +70,27 @@ class RAMInformationHeader(context: Context) : LinearLayout(context) {
 			}.lparams(viewWidth / 5 * 3, wrapContent)
 			
 			verticalLayout {
+				gravity = Gravity.RIGHT
 				startPrice = textView {
-					text = "开盘价"
+					text = EOSRAMText.openPrice("")
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 					singleLine = true
+					gravity = Gravity.RIGHT
 				}
 				highPrice = textView {
-					text = "最高"
+					text = EOSRAMText.highPrice("")
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 					singleLine = true
+					gravity = Gravity.RIGHT
 				}
 				lowPrice = textView {
-					text = "最低"
+					text = EOSRAMText.lowPrice("")
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 					singleLine = true
+					gravity = Gravity.RIGHT
 				}
 			}.lparams(matchParent, wrapContent)
 		}
@@ -94,17 +99,17 @@ class RAMInformationHeader(context: Context) : LinearLayout(context) {
 			topPadding = 10.uiPX()
 			linearLayout {
 				textView {
-					text = "RAM内存占用率"
+					text = EOSRAMText.ramUtilization
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 				}.lparams(viewWidth / 3, wrapContent)
 				ramTotalReserved = textView {
-					text = "占用/GB"
+					text = EOSRAMText.ramAccupyAmount("")
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 				}.lparams(viewWidth / 3, wrapContent)
 				ramMax = textView {
-					text = "总量/GB"
+					text = EOSRAMText.ramTotalAmount("")
 					textSize = fontSize(12)
 					textColor = GrayScale.black
 				}.lparams(viewWidth / 3, wrapContent)

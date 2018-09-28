@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.pres
 import android.annotation.SuppressLint
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.data.CandleEntry
+import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
@@ -72,8 +73,8 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 					maxAmount = maxAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
 					reservedAmount = reservedAmount.divide(BigDecimal(gbDivisior), 2 ,BigDecimal.ROUND_HALF_UP)
 					fragment.ramInformationHeader.apply {
-						ramTotalReserved.text = "占用${reservedAmount}GB"
-						ramMax.text = "总量${maxAmount}GB"
+						ramTotalReserved.text = EOSRAMText.ramAccupyAmount(reservedAmount.toString())
+						ramMax.text = EOSRAMText.ramTotalAmount(maxAmount.toString())
 						ramPercent.text = "${percent.stripTrailingZeros().toPlainString()}%"
 						percentProgressBar.progress = percent.toInt()
 					}
@@ -132,9 +133,9 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.ramInformationHeader.apply {
 					this@EOSRAMPriceTrendPresenter.todayOpenPrice = it.open
-					startPrice.text = "开盘价：" + BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-					highPrice.text = "    最高：" + BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
-					lowPrice.text = "    最低：" + BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
+					startPrice.text = EOSRAMText.openPrice(BigDecimal(it.open).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString())
+					highPrice.text = EOSRAMText.highPrice(BigDecimal(it.high).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString())
+					lowPrice.text = EOSRAMText.lowPrice(BigDecimal(it.low).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString())
 					setTrendPercent()
 				}
 			}
