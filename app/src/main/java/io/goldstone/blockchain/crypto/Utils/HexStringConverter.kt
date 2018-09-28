@@ -22,7 +22,9 @@ fun String.toCryptHexString(): String {
 		stringBuilder.append(hexStringRegular[(it.toInt() and 0x0f) shr 0])
 	}
 	return stringBuilder.toString()
+
 }
+
 
 fun String.toStringFromHex(): String {
 	val hexStringRegular = "0123456789ABCDEF".toCharArray()

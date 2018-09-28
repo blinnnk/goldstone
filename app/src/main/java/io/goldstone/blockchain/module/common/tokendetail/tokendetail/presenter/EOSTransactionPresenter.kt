@@ -15,6 +15,7 @@ import org.jetbrains.anko.runOnUiThread
  * @date  2018/09/13
  */
 
+val current = System.currentTimeMillis()
 fun TokenDetailPresenter.loadEOSDataFromChain(localMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val account = SharedAddress.getCurrentEOSAccount()
