@@ -177,7 +177,8 @@ data class WalletTable(
 			Pair(currentBTCSeriesTestAddress, ChainType.AllTest),
 			Pair(currentETCAddress, ChainType.ETC),
 			Pair(currentETHSeriesAddress, ChainType.ETH),
-			Pair(currentEOSAddress, ChainType.EOS)
+			Pair(currentEOSAddress, ChainType.EOS),
+			Pair(currentEOSAccountName.getCurrent(), ChainType.EOS)
 		).filter { it.first.isNotEmpty() }
 	}
 
@@ -629,7 +630,7 @@ data class WalletTable(
 						it.apply {
 							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
 							// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-							MyTokenTable.updateEOSAccountName(defaultName, currentEOSAddress)
+							MyTokenTable.updateOwnerName(defaultName, currentEOSAddress)
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
 					}

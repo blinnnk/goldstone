@@ -60,16 +60,12 @@ class ChainAddressesPresenter(
 			BCHWalletUtils.isNewCashAddress(address),
 			setDefaultAddressEvent = {
 				fun update(address: String, eosAccountName: String) {
-					coinType.updateCurrentAddress(address, eosAccountName) { isSwitchEOSAddress, _ ->
-						if (isSwitchEOSAddress)
-							AddressManagerFragment.showSwitchEOSAddressAlertAndJump(fragment.context)
-						else {
-							// 更新钱包默认地址, 同时更新首页的数据
-							updateWalletDetail()
-							updateData()
-							AddressManagerFragment.removeDashboard(fragment.context)
-							fragment.toast(CommonText.succeed)
-						}
+					coinType.updateCurrentAddress(address, eosAccountName) { _ ->
+						// 更新钱包默认地址, 同时更新首页的数据
+						updateWalletDetail()
+						updateData()
+						AddressManagerFragment.removeDashboard(fragment.context)
+						fragment.toast(CommonText.succeed)
 					}
 				}
 				// `EOS` 和其他链的切换默认地址的逻辑不同

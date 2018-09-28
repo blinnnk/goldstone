@@ -76,6 +76,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				lparams(matchParent, matchParent)
 				leftPadding = PaddingSize.device
 				rightPadding = PaddingSize.device
+				bottomPadding = PaddingSize.device
 				val nodes = nodeList(fromMainnetSetting.orTrue())
 				nodes.distinctBy { it.first }.forEach { chain ->
 					// Section Header
@@ -113,7 +114,10 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 							pair.first.equals(CryptoName.eos, true) -> 50
 							else -> 0
 						}
-						NodeSelectionCell(context).setData(pair.second, isSelected, id).click { it ->
+						NodeSelectionCell(context).apply {
+							// 这个是画下划线的判断
+							if (index == chainChild.lastIndex) isLast = true
+						}.setData(pair.second, isSelected, id).click { it ->
 							clearAllRadio(chainChild.size, getChainTypeByName(chain.first))
 							it.selectRadio()
 							selectedNode.find {

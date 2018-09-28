@@ -108,6 +108,7 @@ private fun GasSelectionPresenter.getCurrentBTCPrivateKey(
 		walletAddress,
 		password,
 		SharedValue.isTestEnvironment(),
+		true,
 		hold
 	)
 }

@@ -16,6 +16,7 @@ import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 
@@ -36,7 +37,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 
 		updateColorAnimation(GrayScale.Opacity1Black, GrayScale.Opacity5Black)
 
-		val size = (ScreenSize.Width * 0.6).toInt()
+		val size = (ScreenSize.Width * 0.5).toInt()
 
 		relativeLayout {
 
@@ -48,9 +49,10 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 			}
 
 			introView.apply {
-				textSize = fontSize(13)
+				textSize = fontSize(14)
 				textColor = GrayScale.gray
 				gravity = Gravity.CENTER_HORIZONTAL
+				typeface = GoldStoneFont.heavy(context)
 				leftPadding = 30.uiPX()
 				rightPadding = 30.uiPX()
 				lparams {

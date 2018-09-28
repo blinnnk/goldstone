@@ -84,17 +84,16 @@ data class MyTokenTable(
 	}
 
 	companion object {
-		fun updateEOSAccountName(name: String, address: String) {
+		fun updateOwnerName(name: String, address: String) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					val chainID = SharedChain.getEOSCurrent().id
 					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
-					// 如果存在不存在则插入一条新数据
-					val pendingAccountTable =
-						getPendingEOSAccount(address, chainID)
-					if (pendingAccountTable.isNull()) {
+					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
+					if (getPendingEOSAccount(address, chainID).isNull() && getByOwnerName(name, chainID).isNull()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
+							GoldStoneDataBase.database.defaultTokenDao()
+								.getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
 						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
 					} else updateEOSAccountName(name, address, chainID)
 				}
@@ -114,7 +113,8 @@ data class MyTokenTable(
 
 		fun getEOSAccountNamesByAddress(
 			address: String,
-			@UiThread hold: (List<String>) -> Unit) {
+			@UiThread hold: (List<String>) -> Unit
+		) {
 			load {
 				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
 			} then { myTokens ->
@@ -291,6 +291,9 @@ interface MyTokenDao {
 
 	@Query("SELECT * FROM myTokens WHERE ownerName = :address AND ownerAddress = :address  AND chainID = :chainID")
 	fun getPendingEOSAccount(address: String, chainID: String): MyTokenTable?
+
+	@Query("SELECT * FROM myTokens WHERE ownerName = :name AND chainID = :chainID")
+	fun getByOwnerName(name: String, chainID: String): MyTokenTable?
 
 	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
 	fun deleteByContractAndAddress(address: String, contract: String)
