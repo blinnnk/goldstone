@@ -43,7 +43,6 @@ class PersonalMemoryTransactionRecordFragment() :
 	}
 	
 	override fun setBackEvent(mainActivity: MainActivity?) {
-//		super.setBackEvent(mainActivity)
 		getParentFragment<BaseOverlayFragment<*>>()?.apply {
 			presenter.popFragmentFrom<PersonalMemoryTransactionRecordFragment>()
 		}

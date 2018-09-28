@@ -5,7 +5,7 @@ package io.goldstone.blockchain.module.home.quotation.tradermemory
  * @author: yanglihai
  * @description:
  */
-object RAMTradePresenterManager {
+object RAMTradeRefreshEvent {
 	
 	private val receiverList = arrayListOf<RefreshReceiver>()
 	

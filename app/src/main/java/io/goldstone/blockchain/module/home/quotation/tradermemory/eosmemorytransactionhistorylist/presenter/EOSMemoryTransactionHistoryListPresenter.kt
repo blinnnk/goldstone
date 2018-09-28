@@ -57,15 +57,5 @@ class EOSMemoryTransactionHistoryListPresenter(
 				) })
 		}
 		
-//		fragment.activity?.addFragmentAndSetArguments<TraderMemoryOverlayFragment>(ContainerID.main) {
-//			putString(
-//				"内存交易",
-//				"个人交易"
-//			)
-//			putString(
-//				"account",
-//				account
-//			)
-//		}
 	}
 }

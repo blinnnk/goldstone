@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.presenter
 
 import android.annotation.SuppressLint
-import android.os.Handler
 import com.blinnnk.extension.isNull
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -13,7 +12,7 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRAMUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradePresenterManager
+import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendCandleChart
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
@@ -39,12 +38,12 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	override fun onFragmentCreate() {
 		super.onFragmentCreate()
-		RAMTradePresenterManager.register(this)
+		RAMTradeRefreshEvent.register(this)
 	}
 	
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
-		RAMTradePresenterManager.unRegister(this)
+		RAMTradeRefreshEvent.unRegister(this)
 	}
 	
 	@SuppressLint("SetTextI18n")
