@@ -28,6 +28,16 @@ object WalletSettingsText {
 		HoneyLanguage.TraditionalChinese.code -> "(包含測試鏈地址)"
 		else -> ""
 	}
+	@JvmField
+	val testAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Test Address"
+		HoneyLanguage.Chinese.code -> "包含测试链地址"
+		HoneyLanguage.Japanese.code -> "テストチェーンアドレス"
+		HoneyLanguage.Korean.code -> "테스트 체인 주소"
+		HoneyLanguage.Russian.code -> "Адрес тестовой цепи"
+		HoneyLanguage.TraditionalChinese.code -> "測試鏈地址"
+		else -> ""
+	}
 
 	val addressCountSubtitle: (
 		count: Int,
@@ -316,21 +326,21 @@ object WalletSettingsText {
 	@JvmField
 	val ethereumSeriesAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Ethereum Address"
-		HoneyLanguage.Chinese.code -> "以太坊地址"
-		HoneyLanguage.Japanese.code -> "エテリアルアドレス"
-		HoneyLanguage.Korean.code -> "에테르 주소"
-		HoneyLanguage.Russian.code -> "Эфирный адрес"
-		HoneyLanguage.TraditionalChinese.code -> "以太坊地址"
+		HoneyLanguage.Chinese.code -> "Ethereum(以太坊)地址"
+		HoneyLanguage.Japanese.code -> "Ethereum(エテリアル)アドレス"
+		HoneyLanguage.Korean.code -> "Ethereum(에테르) 주소"
+		HoneyLanguage.Russian.code -> "Ethereum(Эфирный) адрес"
+		HoneyLanguage.TraditionalChinese.code -> "Ethereum(以太坊)地址"
 		else -> ""
 	}
 	@JvmField
 	val ethereumClassicAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Ethereum Classic Address"
-		HoneyLanguage.Chinese.code -> "以太坊经典地址"
-		HoneyLanguage.Japanese.code -> "エテリアムクラシック住所"
-		HoneyLanguage.Korean.code -> "에테 리움 클래식 주소"
+		HoneyLanguage.Chinese.code -> "ETC(以太坊经典)地址"
+		HoneyLanguage.Japanese.code -> "ETC(エテリアムクラシック)アドレス"
+		HoneyLanguage.Korean.code -> "ETC(에테 리움 클래식) 주소"
 		HoneyLanguage.Russian.code -> "Ethereum Classic Адрес"
-		HoneyLanguage.TraditionalChinese.code -> "以太坊經典地址"
+		HoneyLanguage.TraditionalChinese.code -> "ETC(以太坊經典)地址"
 		else -> ""
 	}
 	@JvmField
@@ -489,4 +499,27 @@ object WalletSettingsText {
 			else -> ""
 		}
 	}
+
+	@JvmField
+	val unactivatedPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Not registered"
+		HoneyLanguage.Chinese.code -> "该公钥未注册"
+		HoneyLanguage.Japanese.code -> "登録されていません"
+		HoneyLanguage.Korean.code -> "등록되지 않음"
+		HoneyLanguage.Russian.code -> "Открытый ключ не зарегистрирован"
+		HoneyLanguage.TraditionalChinese.code -> "該公鑰未註冊"
+		else -> ""
+	}
+	@JvmField
+	val activatedPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Registered public key"
+		HoneyLanguage.Chinese.code -> "已注册的公钥"
+		HoneyLanguage.Japanese.code -> "登録された公開鍵"
+		HoneyLanguage.Korean.code -> "등록 된 공개 키"
+		HoneyLanguage.Russian.code -> "Зарегистрированный открытый ключ"
+		HoneyLanguage.TraditionalChinese.code -> "已註冊的公鑰"
+		else -> ""
+	}
+
+
 }

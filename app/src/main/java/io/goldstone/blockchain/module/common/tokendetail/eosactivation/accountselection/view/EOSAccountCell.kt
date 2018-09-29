@@ -10,6 +10,9 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.language.EOSAccountText
+import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -53,8 +56,8 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 
 	@SuppressLint("SetTextI18n")
 	fun setAccountInfo(name: String, authorization: String) {
-		info.title.text = "Account Name: $name"
-		val wholeString = "Authorization: $authorization"
+		info.title.text = "${ImportWalletText.eosAccountName}: $name"
+		val wholeString = "${EOSAccountText.authorization}: $authorization"
 		info.subtitle.text = CustomTargetTextStyle(
 			authorization,
 			wholeString,

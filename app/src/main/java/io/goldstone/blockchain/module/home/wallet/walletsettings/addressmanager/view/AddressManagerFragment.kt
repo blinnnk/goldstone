@@ -241,7 +241,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
 		val title = if (SharedValue.isTestEnvironment()) {
-			"${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
+			"${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
 		} else {
 			WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
 		}

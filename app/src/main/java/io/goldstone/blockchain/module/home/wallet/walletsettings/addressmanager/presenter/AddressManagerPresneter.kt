@@ -64,10 +64,10 @@ class AddressManagerPresenter(
 				{ LogUtil.error("showEOSPublickeyDescription", it) }
 			) { chainNames ->
 				WalletTable.updateEOSAccountName(chainNames) {
-					val description = if (it) "available publickey" else "inactivation publickey"
+					val description = if (it) WalletSettingsText.activatedPublicKey else WalletSettingsText.unactivatedPublicKey
 					cell.showDescriptionTitle(description)
 				}
-			} else cell.showDescriptionTitle("available publickey")
+			} else cell.showDescriptionTitle(WalletSettingsText.activatedPublicKey)
 	}
 
 	fun setBackEvent() {

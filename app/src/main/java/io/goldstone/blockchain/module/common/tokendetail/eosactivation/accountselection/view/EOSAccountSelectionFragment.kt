@@ -72,7 +72,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 					isCenter()
 					setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-					text = "Found multiple EOS accounts under this EOS public key, please select an account as your default account."
+					text = EOSAccountText.multipleAccountHint
 				}.into(this)
 				container = verticalLayout {
 					lparams(matchParent, matchParent)
@@ -82,7 +82,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 						lparams(matchParent, 200.uiPX())
 						gravity = Gravity.CENTER
 						LoadingView.addLoadingCircle(this, 60.uiPX())
-						textView("loading account info from chain") {
+						textView(EOSAccountText.loadingAccountInfo) {
 							topPadding = 20.uiPX()
 							layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
 							textSize = fontSize(12)
