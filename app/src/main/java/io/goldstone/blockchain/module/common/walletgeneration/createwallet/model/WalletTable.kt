@@ -4,10 +4,8 @@ import android.arch.persistence.room.*
 import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orFalse
-import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
@@ -17,10 +15,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.utils.toList
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
@@ -202,7 +197,7 @@ data class WalletTable(
 			currentETHSeriesAddress,
 			currentLTCAddress,
 			currentBCHAddress,
-			if (useEOSAccountName) currentEOSAccountName.getCurrent()
+			if (useEOSAccountName) currentEOSAccountName.getCurrent() isEmptyThen currentEOSAddress
 			else listOf(
 				currentEOSAddress,
 				currentEOSAccountName.getCurrent(),
@@ -602,23 +597,23 @@ data class WalletTable(
 			load { GoldStoneDataBase.database.walletDao().updateHasBackUp() } then { callback() }
 		}
 
-		fun updateEOSAccountName(
+		fun initEOSAccountName(
 			accountNames: List<EOSAccountInfo>,
-			@UiThread callback: (hasDefaultAccount: Boolean) -> Unit
+			@UiThread callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					// 增量存储同一公钥下的多 `AccountName`
-					var currentAccountNames =
+					val currentAccountNames =
 						getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
-					currentAccountNames += accountNames
+					currentAccountNames.asSequence().plus(accountNames).distinct().toList()
 					updateCurrentEOSAccountNames(currentAccountNames)
 				}
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
 				if (accountNames.size == 1) {
 					val accountName = accountNames.first().name
-					WalletTable.updateEOSDefaultName(accountName) { callback(true) }
-				} else GoldStoneAPI.context.runOnUiThread { callback(false) }
+					WalletTable.updateEOSDefaultName(accountName) { callback() }
+				} else GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 
@@ -630,7 +625,7 @@ data class WalletTable(
 						it.apply {
 							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
 							// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-							MyTokenTable.updateOwnerName(defaultName, currentEOSAddress)
+							MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
 					}
@@ -659,13 +654,11 @@ data class WalletTable(
 					val willDeleteWallet = findWhichIsUsing(true)
 					willDeleteWallet?.let { delete(it) }
 					getAllWallets().let { wallets ->
-						wallets.isEmpty() isTrue {
-							callback(willDeleteWallet)
-						} otherwise {
+						if (wallets.isNotEmpty()) {
 							update(wallets.first().apply { isUsing = true })
 							SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
-							callback(willDeleteWallet)
 						}
+						callback(willDeleteWallet)
 					}
 				}
 			}

@@ -60,7 +60,7 @@ class KeystoreExportPresenter(
 		hold: (keystoreFile: String?, error: AccountError) -> Unit
 	) {
 		doAsync {
-			if (ChainAddresses.isBTCSeriesAddress(address) || EOSWalletUtils.isValidAddress(address)) {
+			if (ChainAddresses.isBTCSeries(address) || EOSWalletUtils.isValidAddress(address)) {
 				getBTCSeriesKeystoreFile(address, password) { keystoreJSON, error ->
 					uiThread {
 						if (!keystoreJSON.isNull() && error.isNone()) {

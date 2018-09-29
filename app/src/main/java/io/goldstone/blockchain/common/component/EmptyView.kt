@@ -65,8 +65,9 @@ class EmptyView(context: Context) : LinearLayout(context) {
 	fun setStyle(type: EmptyType) {
 		when (type) {
 			EmptyType.TokenDetail -> {
+				val footerHeight = 80.uiPX()
 				x += (ScreenSize.Width * 0.2).toInt()
-				y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - emptyViewHeight) / 2 + TokenDetailSize.headerHeight - 10.uiPX()
+				y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - emptyViewHeight - footerHeight) / 2 + TokenDetailSize.headerHeight + 10.uiPX()
 				icon.imageResource = R.drawable.token_detail_empty_icon
 				introTitles.title.text = EmptyText.tokenDetailTitle
 				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
