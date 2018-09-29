@@ -43,27 +43,27 @@ class WalletImportPresenter(
 			// 不为空的地址进行
 			val currentAddress =
 				arrayListOf(
-					multiChainAddresses.ethAddress,
-					multiChainAddresses.etcAddress,
-					multiChainAddresses.btcAddress,
-					multiChainAddresses.btcSeriesTestAddress,
-					multiChainAddresses.ltcAddress,
-					multiChainAddresses.bchAddress,
-					multiChainAddresses.eosAddress
+					multiChainAddresses.eth,
+					multiChainAddresses.etc,
+					multiChainAddresses.btc,
+					multiChainAddresses.btcSeriesTest,
+					multiChainAddresses.ltc,
+					multiChainAddresses.bch,
+					multiChainAddresses.eos
 				).firstOrNull { it.isNotEmpty() }.orEmpty()
 
 			WalletTable.getWalletByAddress(currentAddress) { it ->
 				if (it.isNull()) WalletTable(
 					0,
 					name,
-					currentETHSeriesAddress = multiChainAddresses.ethAddress,
-					currentETCAddress = multiChainAddresses.etcAddress,
-					currentBTCAddress = multiChainAddresses.btcAddress,
-					currentBTCSeriesTestAddress = multiChainAddresses.btcSeriesTestAddress,
-					currentLTCAddress = multiChainAddresses.ltcAddress,
-					currentBCHAddress = multiChainAddresses.bchAddress,
-					currentEOSAddress = multiChainAddresses.eosAddress,
-					currentEOSAccountName = EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
+					currentETHSeriesAddress = multiChainAddresses.eth,
+					currentETCAddress = multiChainAddresses.etc,
+					currentBTCAddress = multiChainAddresses.btc,
+					currentBTCSeriesTestAddress = multiChainAddresses.btcSeriesTest,
+					currentLTCAddress = multiChainAddresses.ltc,
+					currentBCHAddress = multiChainAddresses.bch,
+					currentEOSAddress = multiChainAddresses.eos,
+					currentEOSAccountName = EOSDefaultAllChainName(multiChainAddresses.eos, multiChainAddresses.eos),
 					isUsing = true,
 					hint = hint,
 					isWatchOnly = false,
@@ -71,31 +71,31 @@ class WalletImportPresenter(
 					encryptMnemonic = encryptMnemonic,
 					hasBackUpMnemonic = true,
 					ethAddresses = childAddressValue(
-						multiChainAddresses.ethAddress,
+						multiChainAddresses.eth,
 						getAddressIndexFromPath(multiChainPath.ethPath)
 					),
 					etcAddresses = childAddressValue(
-						multiChainAddresses.etcAddress,
+						multiChainAddresses.etc,
 						getAddressIndexFromPath(multiChainPath.etcPath)
 					),
 					btcAddresses = childAddressValue(
-						multiChainAddresses.btcAddress,
+						multiChainAddresses.btc,
 						getAddressIndexFromPath(multiChainPath.btcPath)
 					),
 					btcSeriesTestAddresses = childAddressValue(
-						multiChainAddresses.btcSeriesTestAddress,
+						multiChainAddresses.btcSeriesTest,
 						getAddressIndexFromPath(multiChainPath.testPath)
 					),
 					ltcAddresses = childAddressValue(
-						multiChainAddresses.ltcAddress,
+						multiChainAddresses.ltc,
 						getAddressIndexFromPath(multiChainPath.ltcPath)
 					),
 					bchAddresses = childAddressValue(
-						multiChainAddresses.bchAddress,
+						multiChainAddresses.bch,
 						getAddressIndexFromPath(multiChainPath.bchPath)
 					),
 					eosAddresses = childAddressValue(
-						multiChainAddresses.eosAddress,
+						multiChainAddresses.eos,
 						getAddressIndexFromPath(multiChainPath.eosPath)
 					),
 					eosAccountNames = listOf(),

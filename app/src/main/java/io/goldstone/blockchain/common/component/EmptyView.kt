@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize.heightWithOutHeader
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.imageView
 import org.jetbrains.anko.matchParent
@@ -37,52 +38,51 @@ enum class EmptyType {
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
-	
-	private val imageSize = (ScreenSize.Width * 0.5).toInt()
+
+	private val imageSize = (ScreenSize.Width * 0.4).toInt()
 	private val introTitles = TwoLineTitles(context)
 	private var icon: ImageView
-	private val emptyViewHeight = ScreenSize.Width
-	
+	private val emptyViewHeight = imageSize + 50.uiPX()
+
 	init {
 		id = ElementID.emptyView
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
-		
+
 		layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), emptyViewHeight)
-		
+
 		icon = imageView {
 			scaleType = ImageView.ScaleType.FIT_XY
 			layoutParams = LinearLayout.LayoutParams(imageSize, imageSize)
 		}
-		
+
 		introTitles.apply {
 			setGrayTitles()
 			y -= 30.uiPX().toFloat()
 			isCenter = true
 		}.into(this)
 	}
-	
+
 	fun setStyle(type: EmptyType) {
 		when (type) {
 			EmptyType.TokenDetail -> {
 				x += (ScreenSize.Width * 0.2).toInt()
-				y += (context.getRealScreenHeight() - TokenDetailSize.headerHeight - emptyViewHeight) / 2 + TokenDetailSize.headerHeight - 10.uiPX()
+				y += (heightWithOutHeader - TokenDetailSize.headerHeight - emptyViewHeight - 60.uiPX()) / 2 + TokenDetailSize.headerHeight
 				icon.imageResource = R.drawable.token_detail_empty_icon
 				introTitles.title.text = EmptyText.tokenDetailTitle
 				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
 			}
 
-
 			EmptyType.WalletDetail -> {
 				val viewSize = 300.uiPX()
 				val hasEnoughSpace =
 					WalletDetailSize.headerHeight + viewSize +
-					HomeSize.tabBarHeight <
-					context.getRealScreenHeight()
+						HomeSize.tabBarHeight <
+						context.getRealScreenHeight()
 				val topValue: (modulus: Float) -> Float = {
 					(context.getRealScreenHeight() - WalletDetailSize.headerHeight - viewSize * it) / 2f +
-					WalletDetailSize.headerHeight - (context.getRealScreenHeight() - viewSize * it) / 2f +
-					HomeSize.tabBarHeight
+						WalletDetailSize.headerHeight - (context.getRealScreenHeight() - viewSize * it) / 2f +
+						HomeSize.tabBarHeight
 				}
 				val centerY =
 					if (hasEnoughSpace) topValue(1f)
@@ -121,19 +121,19 @@ class EmptyView(context: Context) : LinearLayout(context) {
 				introTitles.title.text = EmptyText.tokenDetailTitle
 				introTitles.subtitle.text = EmptyText.tokenDetailSubtitle
 			}
-			
+
 			EmptyType.Contact -> {
 				icon.imageResource = R.drawable.contract_empty_icon
 				introTitles.title.text = EmptyText.contractTitle
 				introTitles.subtitle.text = EmptyText.contractSubtitle
 			}
-			
+
 			EmptyType.Search -> {
 				icon.imageResource = R.drawable.search_empty_icon
 				introTitles.title.text = EmptyText.searchTitle
 				introTitles.subtitle.text = EmptyText.searchSubtitle
 			}
-			
+
 			EmptyType.QuotationManagement -> {
 				icon.imageResource = R.drawable.pair_selection_empty_icon
 				introTitles.title.text = EmptyText.quotationManagementTitle

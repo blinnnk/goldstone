@@ -176,5 +176,21 @@ class GoldStoneUtilUnitTest {
 		val result = data.getTargetChild("data", "value", "name")
 		Assert.assertTrue("convert to wrong value", expect == result)
 	}
+
+	@Test
+	fun getAllLocalEOSAccount() {
+		doAsync {
+			val localData = GoldStoneDataBase.database.eosAccountDao().getAll()
+			LogUtil.debug("all local eos account tables", localData.toString())
+		}
+	}
+
+	@Test
+	fun getAllLocalWallets() {
+		doAsync {
+			val wallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+			LogUtil.debug("all local wallet tables", wallets.toString())
+		}
+	}
 }
 

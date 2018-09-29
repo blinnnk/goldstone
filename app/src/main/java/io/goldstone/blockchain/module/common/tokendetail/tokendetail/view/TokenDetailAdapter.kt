@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
+import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.uikit.uiPX
@@ -15,17 +16,17 @@ class TokenDetailAdapter(
 	override val dataSet: ArrayList<TransactionListModel>,
 	private val callback: TokenDetailCell.() -> Unit,
 	private val holdHeader: TokenDetailHeaderView.() -> Unit
-) : HoneyBaseAdapterWithHeaderAndFooter<TransactionListModel, TokenDetailHeaderView, TokenDetailCell, LinearLayout>() {
-	
+) : HoneyBaseAdapterWithHeaderAndFooter<TransactionListModel, TokenDetailHeaderView, TokenDetailCell, View>() {
+
 	override fun generateCell(context: Context) = TokenDetailCell(context)
-	
-	override fun generateFooter(context: Context) = LinearLayout(context).apply {
+
+	override fun generateFooter(context: Context) = View(context).apply {
 		// 让出 覆盖在上面的 `Footer` 的高度
 		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 	}
-	
+
 	override fun generateHeader(context: Context) = TokenDetailHeaderView(context).apply(holdHeader)
-	
+
 	override fun TokenDetailCell.bindCell(data: TransactionListModel, position: Int) {
 		model = data
 		callback(this)

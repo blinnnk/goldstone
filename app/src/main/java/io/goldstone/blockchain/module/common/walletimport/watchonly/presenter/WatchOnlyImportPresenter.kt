@@ -74,12 +74,12 @@ class WatchOnlyImportPresenter(
 					return
 				}
 			AddressType.EOS.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid()) {
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
 			AddressType.EOSJungle.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid()) {
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
@@ -107,7 +107,7 @@ class WatchOnlyImportPresenter(
 				currentETCAddress,
 				currentLTCAddress,
 				currentBCHAddress,
-				currentEOSAddress, // 如果导入的是一个 `AccountName` 的钱包, 那么同时把这个 `AccountName` 作为 `CurrentEOSAddress` 录入, 以此来对接大逻辑
+				currentEOSAddress,
 				EOSDefaultAllChainName(eosMainnetAccountName, eosTestnetAccountName),
 				if (eosMainnetAccountName.isEmpty() && eosTestnetAccountName.isEmpty()) listOf()
 				else listOf(

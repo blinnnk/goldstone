@@ -109,7 +109,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		val token = rootFragment?.token
 		getParentFragment<TokenDetailOverlayFragment> {
 			if (status) customHeader = {
-				System.out.println("hello 1")
 				val titles = TwoLineTitles(context).apply {
 					id = ElementID.customHeader
 					isCenter = true
@@ -147,7 +146,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 
 	override fun onDetach() {
 		super.onDetach()
-		System.out.println("hello fuck")
 		setCustomHeaderTitle(false)
 	}
 

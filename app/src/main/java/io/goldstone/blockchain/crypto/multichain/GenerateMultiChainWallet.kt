@@ -51,7 +51,7 @@ object GenerateMultiChainWallet {
 				context.apply {
 					// Ethereum
 					getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
-						addresses.ethAddress = ethAddress
+						addresses.eth = ethAddress
 						completeMark()
 					}
 					// Ethereum Classic
@@ -60,7 +60,7 @@ object GenerateMultiChainWallet {
 						path.etcPath,
 						password
 					) { etcAddress ->
-						addresses.etcAddress = etcAddress
+						addresses.etc = etcAddress
 						completeMark()
 					}
 					// Bitcoin
@@ -75,7 +75,7 @@ object GenerateMultiChainWallet {
 							password,
 							false
 						)
-						addresses.btcAddress = btcAddress
+						addresses.btc = btcAddress
 						completeMark()
 					}
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
@@ -89,7 +89,7 @@ object GenerateMultiChainWallet {
 							password,
 							true
 						)
-						addresses.btcSeriesTestAddress = btcSeriesTestAddress
+						addresses.btcSeriesTest = btcSeriesTestAddress
 						completeMark()
 					}
 					// Litecoin
@@ -102,7 +102,7 @@ object GenerateMultiChainWallet {
 							ltcKeyPair.address,
 							password
 						)
-						addresses.ltcAddress = ltcKeyPair.address
+						addresses.ltc = ltcKeyPair.address
 						completeMark()
 					}
 					// Bitcoin Cash
@@ -116,7 +116,7 @@ object GenerateMultiChainWallet {
 							password,
 							false
 						)
-						addresses.bchAddress = bchKeyPair.address
+						addresses.bch = bchKeyPair.address
 						completeMark()
 					}
 					// Bitcoin Cash
@@ -131,7 +131,7 @@ object GenerateMultiChainWallet {
 							password,
 							false
 						)
-						addresses.eosAddress = eosKeyPair.address
+						addresses.eos = eosKeyPair.address
 						completeMark()
 					}
 				}

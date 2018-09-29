@@ -173,8 +173,8 @@ class GasSelectionPresenter(
 
 	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
+			TransactionText.confirmTransactionTitle.toUpperCase(),
 			TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase(),
 			true
 		) {
 			val password = it?.text.toString()

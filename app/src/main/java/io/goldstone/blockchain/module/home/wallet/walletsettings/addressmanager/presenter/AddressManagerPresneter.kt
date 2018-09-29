@@ -36,11 +36,11 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.getTargetKeyName
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
 /**
@@ -62,11 +62,9 @@ class AddressManagerPresenter(
 			EOSAPI.getAccountNameByPublicKey(
 				key,
 				{ LogUtil.error("showEOSPublickeyDescription", it) }
-			) { chainNames ->
-				WalletTable.updateEOSAccountName(chainNames) {
-					val description = if (it) WalletSettingsText.activatedPublicKey else WalletSettingsText.unactivatedPublicKey
-					cell.showDescriptionTitle(description)
-				}
+			) { accountNames ->
+				val description = if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey else WalletSettingsText.unactivatedPublicKey
+				cell.showDescriptionTitle(description)
 			} else cell.showDescriptionTitle(WalletSettingsText.activatedPublicKey)
 	}
 
