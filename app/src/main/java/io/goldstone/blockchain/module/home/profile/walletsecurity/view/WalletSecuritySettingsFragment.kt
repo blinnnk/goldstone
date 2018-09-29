@@ -72,7 +72,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	}
 
 	private fun ViewGroup.initSwitchCell() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().isHardwareDoesNotSupportFingerprints()) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
 			// 指纹解锁
 			SingleLineSwitch(
 				context,

@@ -42,7 +42,7 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 		fingerprintAvailableStatus: FingerprintAvailableStatus,
 		@UiThread hold: (error: WalletSecurityError) -> Unit
 	) {
-		if (fingerprintAvailableStatus.isUnregisteredFingerprint()) {
+		if (fingerprintAvailableStatus.isUnregistered()) {
 			hold(WalletSecurityError.UnregisteredFingerprint)
 		} else {
 			hold(WalletSecurityError.HardwareDoesNotSupportFingerprints)
@@ -137,14 +137,14 @@ enum class FingerprintAvailableStatus(val status: Int) {
 	HardwareDoesNotSupportFingerprints(-1);
 
 	fun isAvailable(): Boolean {
-		return status == 1
+		return status == Available.status
 	}
 
-	fun isUnregisteredFingerprint(): Boolean {
-		return status == 0
+	fun isUnregistered(): Boolean {
+		return status == NoFingerprintSaveRecord.status
 	}
 
-	fun isHardwareDoesNotSupportFingerprints(): Boolean {
-		return status == -1
+	fun hardwareIsUnsupported(): Boolean {
+		return status == HardwareDoesNotSupportFingerprints.status
 	}
 }
