@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.FingerprintAvailableStatus
 import io.goldstone.blockchain.common.utils.FingerprintHelper
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -39,7 +40,7 @@ import org.jetbrains.anko.*
  * @author wcx
  */
 class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresenter>() {
-	override val pageTitle: String = ""
+	override val pageTitle: String = ProfileText.walletSecurity
 
 	private val changePinCode by lazy { LinearLayout(context) }
 	private var pinCodeSingleLineSwitch: SingleLineSwitch? = null
@@ -78,8 +79,9 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				context,
 				true
 			).apply {
+				setHorizontalPadding()
 				AppConfigTable.getAppConfig { config ->
-					setSwitch(config?.fingerprintUnlockerIsOpened.orFalse())
+					setSwitchStatus(config?.fingerprintUnlockerIsOpened.orFalse())
 				}
 				setOnclick { switch ->
 					if (switch.isChecked) {
@@ -94,7 +96,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 						openFingerprintEvent(switch)
 					}
 				}
-				setContent(FingerprintUnlockText.fingerprintUnlock)
+				setTitle(FingerprintUnlockText.fingerprintUnlock)
 			}.into(this)
 		}
 
@@ -102,8 +104,9 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			context,
 			true
 		).apply {
+			setHorizontalPadding()
 			AppConfigTable.getAppConfig { config ->
-				setSwitch(config?.pincodeIsOpened.orFalse())
+				setSwitchStatus(config?.pincodeIsOpened.orFalse())
 				if (config?.pincodeIsOpened.orFalse()) {
 					changePinCode.visibility = View.VISIBLE
 				} else {
@@ -112,16 +115,16 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			}
 			setOnclick {
 				// 点击后跳转到PinCode编辑界面
-				val switchChecked = pinCodeSingleLineSwitch?.getSwitchChecked()
+				val switchChecked = pinCodeSingleLineSwitch?.getSwitchCheckedStatus()
 				if (switchChecked.orFalse()) {
 					presenter.setPassCodeFragment()
-					pinCodeSingleLineSwitch?.setSwitch(!switchChecked.orFalse())
+					pinCodeSingleLineSwitch?.setSwitchStatus(!switchChecked.orFalse())
 				} else {
 					changePinCode.visibility = View.GONE
 					AppConfigTable.setPinCodeStatus(false) {}
 				}
 			}
-			setContent(PincodeText.show)
+			setTitle(PincodeText.show)
 		}
 		pinCodeSingleLineSwitch?.into(this)
 
@@ -148,21 +151,22 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				context,
 				false
 			).apply {
+				setHorizontalPadding()
 				setOnclick {
 					// 点击后根据更新的数据库情况显示开关状态
 					presenter.setPassCodeFragment()
 				}
 
-				setContent(PincodeText.changePinCode)
+				setTitle(PincodeText.changePinCode)
 			}.into(this)
 		}.into(this)
 	}
 
-	fun setPinCodeSingleLineSwitch(isChecked: Boolean) {
-		pinCodeSingleLineSwitch?.setSwitch(isChecked)
+	private fun setPinCodeSingleLineSwitchStatus(isChecked: Boolean) {
+		pinCodeSingleLineSwitch?.setSwitchStatus(isChecked)
 	}
 
-	fun setChangePinCodeVisibility() {
+	private fun setChangePinCodeVisibility() {
 		changePinCode.visibility = View.VISIBLE
 	}
 
@@ -181,7 +185,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		presenter.setFingerprintStatus(switch.isChecked) {
 			AppConfigTable.getAppConfig {
 				switch.isChecked = it?.fingerprintUnlockerIsOpened.orFalse()
-				if (!pinCodeSingleLineSwitch?.getSwitchChecked().orFalse() && switch.isChecked) {
+				if (!pinCodeSingleLineSwitch?.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
 					setPinCodeTips()
 				}
 			}
@@ -233,7 +237,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				// 设置新密码返回更新状态
 				if (it?.pincodeIsOpened.orFalse()) {
 					setChangePinCodeVisibility()
-					setPinCodeSingleLineSwitch(true)
+					setPinCodeSingleLineSwitchStatus(true)
 				}
 			}
 		}
