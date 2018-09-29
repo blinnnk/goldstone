@@ -19,7 +19,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class RAMRankView(context: Context): LinearLayout(context) {
 	
-	private var rankRecyclerView: BaseRecyclerView
+	var rankRecyclerView: BaseRecyclerView
 	
 	private var title: RoundButton
 	
@@ -44,18 +44,6 @@ class RAMRankView(context: Context): LinearLayout(context) {
 		
 	}
 	
-	fun setData(dataRows: ArrayList<EOSRAMRankModel>) {
-		if (rankRecyclerView.adapter.isNull()) {
-			rankRecyclerView.adapter = RAMRankAdapter(dataRows) { cell, position ->
-				cell.onClick {
-					Toast.makeText(cell.context, "position is $position", Toast.LENGTH_LONG).show()
-				}
-			}
-		} else {
-			rankRecyclerView.adapter?.notifyDataSetChanged()
-		}
-		
-	}
 }
 
 class RAMRankAdapter(
