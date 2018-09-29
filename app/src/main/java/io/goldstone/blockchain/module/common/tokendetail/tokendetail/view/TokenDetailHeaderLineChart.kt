@@ -42,6 +42,9 @@ class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 			axisLeft.axisMaximum = maxValue + distance
 			resetMarkerView()
 		}
+		isScaleXEnabled = false
+		isScaleYEnabled = false
+		mPinchZoomEnabled = false
 		super.resetData(dataRows)
 	}
 }
