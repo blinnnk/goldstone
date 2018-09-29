@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.eos.EOSRAMUtil
+import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
@@ -161,7 +161,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 	
 	@SuppressLint("SetTextI18n")
 	private fun updateCurrentPrice() {
-		EOSRAMUtil.getRAMPrice(EOSUnit.KB) { price, error ->
+		EOSResourceUtil.getRAMPrice(EOSUnit.KB) { price, error ->
 			if (error.isNone()) {
 				val current = BigDecimal(price.toString()).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toString()
 				ramInformationModel.currentPrice = current
