@@ -74,12 +74,12 @@ class WatchOnlyImportPresenter(
 					return
 				}
 			AddressType.EOS.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid()) {
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
 			AddressType.EOSJungle.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid()) {
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}

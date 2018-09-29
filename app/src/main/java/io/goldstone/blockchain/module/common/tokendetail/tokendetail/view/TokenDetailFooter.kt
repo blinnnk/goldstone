@@ -9,8 +9,8 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.matchParent
+import io.goldstone.blockchain.common.value.ScreenSize
+import org.jetbrains.anko.*
 
 /**
  * @date 27/03/2018 3:20 PM
@@ -22,33 +22,26 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
 	val receivedButton = RoundButton(context)
 
 	init {
+		setPadding(PaddingSize.device, 8.uiPX(), 10.uiPX(), 0)
 		isClickable = true
-		layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
 		backgroundColor = Spectrum.white
 		val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
-		val buttonHeight = 40.uiPX()
+		val buttonHeight = 36.uiPX()
 		val marginSize = 15.uiPX()
-		sendButton
-			.apply {
-				setGreenStyle()
-				text = CommonText.send
-				layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight).apply {
-					leftMargin = PaddingSize.device
-					topMargin = marginSize
-				}
-			}
-			.into(this)
+		sendButton.apply {
+			setGreenStyle(marginSize)
+			text = CommonText.send
+			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight)
+		}.into(this)
 
-		receivedButton
-			.apply {
-				text = CommonText.deposit
-				setBlueStyle()
-				layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight).apply {
-					topMargin = marginSize
-					leftMargin = 10.uiPX()
-				}
+		receivedButton.apply {
+			text = CommonText.deposit
+			setBlueStyle(marginSize)
+			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight).apply {
+				leftMargin = 10.uiPX()
 			}
-			.into(this)
+		}.into(this)
 	}
 
 	private val paint = Paint().apply {
