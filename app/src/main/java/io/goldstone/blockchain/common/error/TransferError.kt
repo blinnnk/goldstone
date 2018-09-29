@@ -62,7 +62,7 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val ExistAddress = AccountError(ErrorText.existAddress)
 		@JvmStatic
-		val InvalidPrivateKey = AccountError(ErrorText.)
+		val InvalidPrivateKey = AccountError(ErrorText.invalidPrivateKey)
 		@JvmStatic
 		val PasswordFormatted: (reason: String) -> AccountError = {
 			AccountError("${ErrorText.passwordFormatted} $it")
