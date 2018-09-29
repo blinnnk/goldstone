@@ -8,6 +8,9 @@ object EOSUrl {
 	private val currentURL: () -> String = {
 		if (SharedValue.isTestEnvironment()) currentEOSTestUrl else ChainURL.eosMain
 	}
+	private val currentHistoryURL: () -> String = {
+		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain
+	}
 	val getKeyAccount: () -> String = {
 		"${currentURL()}/v1/history/${EOSMethod.GetKeyAccountName.method}"
 	}
@@ -27,10 +30,10 @@ object EOSUrl {
 		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
 	}
 	val getTransactionHistory: () -> String = {
-		"${currentURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
+		"${currentHistoryURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
 	}
 	val getTransaction: () -> String = {
-		"${currentURL()}/v1/history/${EOSMethod.GetTransaction.method}"
+		"${currentHistoryURL()}/v1/history/${EOSMethod.GetTransaction.method}"
 	}
 	val getInfo: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.GetInfo.method}"

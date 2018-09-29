@@ -604,10 +604,10 @@ data class WalletTable(
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					// 增量存储同一公钥下的多 `AccountName`
-					val currentAccountNames =
+					var currentAccountNames =
 						getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
-					currentAccountNames.asSequence().plus(accountNames).distinct().toList()
-					updateCurrentEOSAccountNames(currentAccountNames)
+					currentAccountNames += accountNames
+					updateCurrentEOSAccountNames(currentAccountNames.distinct())
 				}
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
 				if (accountNames.size == 1) {
