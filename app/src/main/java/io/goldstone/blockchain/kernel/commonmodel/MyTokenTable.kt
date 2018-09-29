@@ -84,18 +84,22 @@ data class MyTokenTable(
 	}
 
 	companion object {
-		fun updateOwnerName(name: String, address: String) {
+		fun updateOrInsertOwnerName(name: String, address: String) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
 					val chainID = SharedChain.getEOSCurrent().id
 					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
 					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
-					if (getPendingEOSAccount(address, chainID).isNull() && getByOwnerName(name, chainID).isNull()) {
+					val pendingAccount = getPendingEOSAccount(address, chainID)
+					val existingAccount = getByOwnerName(name, chainID)
+					if (pendingAccount.isNull() && existingAccount.isNull()) {
 						val defaultToken =
 							GoldStoneDataBase.database.defaultTokenDao()
 								.getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
 						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
-					} else updateEOSAccountName(name, address, chainID)
+					} else if (!pendingAccount.isNull()) {
+						updatePendingAccountName(name, address, chainID)
+					}
 				}
 			}
 		}
@@ -111,10 +115,7 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getEOSAccountNamesByAddress(
-			address: String,
-			@UiThread hold: (List<String>) -> Unit
-		) {
+		fun getEOSAccountNamesByAddress(address: String, @UiThread hold: (List<String>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
 			} then { myTokens ->
@@ -287,7 +288,7 @@ interface MyTokenDao {
 
 	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态
 	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND ownerName = :address AND chainID = :chainID")
-	fun updateEOSAccountName(name: String, address: String, chainID: String)
+	fun updatePendingAccountName(name: String, address: String, chainID: String)
 
 	@Query("SELECT * FROM myTokens WHERE ownerName = :address AND ownerAddress = :address  AND chainID = :chainID")
 	fun getPendingEOSAccount(address: String, chainID: String): MyTokenTable?

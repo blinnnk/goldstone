@@ -9,13 +9,13 @@ import java.io.Serializable
 
 
 data class ChainAddresses(
-	var ethAddress: String,
-	var etcAddress: String,
-	var btcAddress: String,
-	var btcSeriesTestAddress: String,
-	var ltcAddress: String,
-	var bchAddress: String,
-	var eosAddress: String
+	var eth: String,
+	var etc: String,
+	var btc: String,
+	var btcSeriesTest: String,
+	var ltc: String,
+	var bch: String,
+	var eos: String
 ) : Serializable {
 
 	constructor() : this(
@@ -41,7 +41,7 @@ data class ChainAddresses(
 
 	companion object {
 		@JvmStatic
-		val isBTCSeriesAddress: (address: String) -> Boolean = {
+		val isBTCSeries: (address: String) -> Boolean = {
 			CryptoValue.isBitcoinAddressLength(it) || it.contains(":")
 		}
 	}

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
 import android.support.annotation.UiThread
-import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orElse
@@ -19,7 +18,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.updateEOSAccountName
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.initEOSAccountName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.currentPublicKeyHasActivated
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.hasActivatedOrWatchOnlyEOSAccount
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -75,9 +74,11 @@ class SplashPresenter(val activity: SplashActivity) {
 				activity.jump<MainActivity>()
 			}
 		) { accounts ->
-			updateEOSAccountName(accounts) { hasDefaultName ->
+			if (accounts.isEmpty()) cacheDataAndSetNetBy(this) {
+				activity.jump<MainActivity>()
+			} else initEOSAccountName(accounts) {
 				// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
-				cacheDataAndSetNetBy(apply { if (hasDefaultName) currentEOSAccountName.updateCurrent(accounts.first().name) }) {
+				cacheDataAndSetNetBy(apply { currentEOSAccountName.updateCurrent(accounts.first().name) }) {
 					activity.jump<MainActivity>()
 				}
 			}

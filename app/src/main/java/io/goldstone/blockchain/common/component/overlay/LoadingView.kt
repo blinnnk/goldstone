@@ -45,7 +45,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 
 			addLoadingCircle(this) {
 				setCenterInParent()
-				y -= 30.uiPX()
+				y -= 20.uiPX()
 			}
 
 			introView.apply {
@@ -59,7 +59,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 					width = matchParent
 					height = 50.uiPX()
 					centerInParent()
-					y += 50.uiPX()
+					y += 60.uiPX()
 				}
 			}.into(this)
 
