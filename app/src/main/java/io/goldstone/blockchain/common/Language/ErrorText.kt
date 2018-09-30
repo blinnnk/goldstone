@@ -248,4 +248,66 @@ object ErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "Неверный формат пароля"
 		else -> ""
 	}
+
+	@JvmField
+	val postFailed = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Post error"
+		HoneyLanguage.Chinese.code -> "请求出错"
+		HoneyLanguage.Japanese.code -> "リクエストエラー"
+		HoneyLanguage.Korean.code -> "요청 오류"
+		HoneyLanguage.Russian.code -> "Ошибка запроса"
+		HoneyLanguage.TraditionalChinese.code -> "請求出錯"
+		else -> ""
+	}
+	@JvmField
+	val resolveDataError = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Failed to parse the return value correctly"
+		HoneyLanguage.Chinese.code -> "未能正确解析返回值"
+		HoneyLanguage.Japanese.code -> "戻り値を正しく解析できませんでした"
+		HoneyLanguage.Korean.code -> "반환 값을 올바르게 구문 분석하지 못했습니다."
+		HoneyLanguage.Russian.code -> "Не удалось правильно проанализировать возвращаемое значение"
+		HoneyLanguage.TraditionalChinese.code -> "未能正確解析返回值"
+		else -> ""
+	}
+	@JvmField
+	val nullResponse = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Return value is null"
+		HoneyLanguage.Chinese.code -> "未获取有效返回值"
+		HoneyLanguage.Japanese.code -> "有効な戻り値が取得されない"
+		HoneyLanguage.Korean.code -> "반환 값은 null입니다"
+		HoneyLanguage.Russian.code -> "Возвращаемое значение равно нулю"
+		HoneyLanguage.TraditionalChinese.code -> "返回值為空"
+		else -> ""
+	}
+
+	@JvmField
+	val rpcResult = when (currentLanguage) {
+		HoneyLanguage.English.code -> "RPC request error"
+		HoneyLanguage.Chinese.code -> "RPC请求出错"
+		HoneyLanguage.Japanese.code -> "RPC要求エラー"
+		HoneyLanguage.Korean.code -> "RPC 요청 오류"
+		HoneyLanguage.Russian.code -> "Ошибка запроса RPC"
+		HoneyLanguage.TraditionalChinese.code -> "RPC請求出錯"
+		else -> ""
+	}
+	@JvmField
+	val none = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No error."
+		HoneyLanguage.Chinese.code -> "没有错误信息"
+		HoneyLanguage.Japanese.code -> "エラーメッセージなし"
+		HoneyLanguage.Korean.code -> "오류 메시지 없음"
+		HoneyLanguage.Russian.code -> "Нет сообщения об ошибке"
+		HoneyLanguage.TraditionalChinese.code -> "沒有錯誤信息"
+		else -> ""
+	}
+	@JvmField
+	val error = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Error"
+		HoneyLanguage.Chinese.code -> "错误"
+		HoneyLanguage.Japanese.code -> "エラー"
+		HoneyLanguage.Korean.code -> "틀렸어"
+		HoneyLanguage.Russian.code -> "Ошибка"
+		HoneyLanguage.TraditionalChinese.code -> "錯誤"
+		else -> ""
+	}
 }
