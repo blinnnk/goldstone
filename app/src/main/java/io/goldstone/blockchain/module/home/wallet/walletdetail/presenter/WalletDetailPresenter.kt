@@ -161,7 +161,6 @@ class WalletDetailPresenter(
 						hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
 					}
 				}
-
 			}
 		}
 	}

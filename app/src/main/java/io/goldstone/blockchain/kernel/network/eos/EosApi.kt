@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -38,9 +39,8 @@ object EOSAPI {
 
 	fun getAccountInfo(
 		account: EOSAccount,
-		errorCallBack: (GoldStoneError) -> Unit,
 		targetNet: String = "",
-		@WorkerThread hold: (EOSAccountTable) -> Unit
+		@WorkerThread hold: (accountInfo: EOSAccountTable?, error: GoldStoneError) -> Unit
 	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
@@ -52,24 +52,30 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				errorCallBack,
+				{ hold(null, it) },
 				false
 			) { result ->
+				System.out.println("result$result")
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
-				hold(EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent()))
+				if (result.isEmpty()) {
+					hold(null, AccountError.UnavailableAccountName)
+				} else {
+					hold(EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent()), RequestError.None)
+				}
 			}
 		}
 	}
 
 	fun getAvailableRamBytes(
 		accountName: EOSAccount,
-		errorCallBack: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (BigInteger) -> Unit
+		@WorkerThread hold: (ramAvailable: BigInteger?, error: GoldStoneError) -> Unit
 	) {
-		getAccountInfo(accountName, errorCallBack) {
-			val availableRAM = it.ramQuota - it.ramUsed
-			hold(availableRAM)
+		getAccountInfo(accountName) { account, error ->
+			if (!account.isNull() && error.isNone()) {
+				val availableRAM = account!!.ramQuota - account.ramUsed
+				hold(availableRAM, GoldStoneError.None)
+			} else hold(null, error)
 		}
 	}
 

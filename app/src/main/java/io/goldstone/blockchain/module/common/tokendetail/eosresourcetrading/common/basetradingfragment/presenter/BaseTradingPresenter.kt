@@ -13,7 +13,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
@@ -188,16 +188,17 @@ open class BaseTradingPresenter(
 	private fun updateLocalDataAndUI() {
 		val currentAccount = SharedAddress.getCurrentEOSAccount()
 		EOSAPI.getAccountInfo(
-			currentAccount,
-			{ LogUtil.error("updateLocalResourceData", it) }
-		) { newData ->
-			EOSAccountTable.getAccountByName(currentAccount.accountName, false) { localData ->
-				localData?.let { local ->
-					// 新数据标记为老数据的 `主键` 值
-					GoldStoneDataBase.database.eosAccountDao().update(newData.apply { this.id = local.id })
-					GoldStoneAPI.context.runOnUiThread { fragment.setUsageValue() }
+			currentAccount
+		) { newData, error ->
+			if (!newData.isNull() && error.isNone()) {
+				EOSAccountTable.getAccountByName(currentAccount.accountName, false) { localData ->
+					localData?.let { local ->
+						// 新数据标记为老数据的 `主键` 值
+						GoldStoneDataBase.database.eosAccountDao().update(newData!!.apply { this.id = local.id })
+						GoldStoneAPI.context.runOnUiThread { fragment.setUsageValue() }
+					}
 				}
-			}
+			} else fragment.context.alert(error.message)
 		}
 	}
 
@@ -216,14 +217,13 @@ open class BaseTradingPresenter(
 			isValidInputValue(Pair(toAccount, tradingCount), isSellRam) { error ->
 				if (!error.isNone()) hold(null, error) else {
 					// 检查余额
-					if (isSellRam) EOSAPI.getAvailableRamBytes(
-						fromAccount,
-						{ hold(null, error) }
-					) {
+					if (isSellRam) EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
 						// 检查发起账户的 `RAM` 余额是否足够
 						GoldStoneAPI.context.runOnUiThread {
 							when {
-								it < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
+								!ramError.isNone() -> hold(null, ramError)
+								ramAvailable.isNull() -> hold(null, ramError)
+								ramAvailable!! < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
 								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
 								else -> PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
 							}
