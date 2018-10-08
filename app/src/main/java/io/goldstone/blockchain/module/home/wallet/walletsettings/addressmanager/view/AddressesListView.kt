@@ -74,7 +74,7 @@ class AddressesListView(
 					hold(this, data, currentWallet, isDefault)
 					val title = when {
 						isMultiChain -> data.getChainType().getSymbol().symbol
-						data.index == -1 -> data.getChainType().getSymbol().symbol
+						data.index == -1 -> ""
 						else -> "${data.index}"
 					}
 					setTitle(title.orEmpty())

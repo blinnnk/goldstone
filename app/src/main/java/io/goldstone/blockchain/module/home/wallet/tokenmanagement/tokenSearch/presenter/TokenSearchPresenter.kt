@@ -51,7 +51,6 @@ class TokenSearchPresenter(
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
 			fragment.onUiThread {
 				if (!result.isNull() && error.isNone()) {
-					System.out.println("result $result")
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
 						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.filterNot { TokenContract(it.contract).isBTCSeries() }.toArrayList())

@@ -36,6 +36,7 @@ class ChainType(val id: Int) : Serializable {
 			ChainType.ETH.id -> CoinSymbol.ETH
 			ChainType.ETC.id -> CoinSymbol.ETC
 			ChainType.BTC.id -> CoinSymbol.BTC
+			ChainType.AllTest.id -> CoinSymbol.BTC
 			ChainType.LTC.id -> CoinSymbol.LTC
 			ChainType.BCH.id -> CoinSymbol.BCH
 			ChainType.EOS.id -> CoinSymbol.EOS

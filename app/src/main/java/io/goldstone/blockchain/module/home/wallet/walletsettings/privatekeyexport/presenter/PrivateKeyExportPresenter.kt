@@ -112,7 +112,7 @@ class PrivateKeyExportPresenter(
 		) {
 			getBigIntegerPrivateKeyByWalletID(password, walletID) { privateKeyInteger, error ->
 				if (!privateKeyInteger.isNull() && error.isNone()) hold(when {
-					ChainType.isSamePrivateKeyRule(chainType) && SharedValue.isTestEnvironment() -> {
+					ChainType.isSamePrivateKeyRule(chainType) -> {
 						val net =
 							if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
 						ECKey.fromPrivate(privateKeyInteger!!).getPrivateKeyAsWiF(net)
