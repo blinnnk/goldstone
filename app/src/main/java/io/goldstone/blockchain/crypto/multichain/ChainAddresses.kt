@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import java.io.Serializable
 
 /**
@@ -9,34 +10,23 @@ import java.io.Serializable
 
 
 data class ChainAddresses(
-	var eth: String,
-	var etc: String,
-	var btc: String,
-	var btcSeriesTest: String,
-	var ltc: String,
-	var bch: String,
-	var eos: String
+	var eth: Bip44Address,
+	var etc: Bip44Address,
+	var btc: Bip44Address,
+	var btcSeriesTest: Bip44Address,
+	var ltc: Bip44Address,
+	var bch: Bip44Address,
+	var eos: Bip44Address
 ) : Serializable {
 
 	constructor() : this(
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	)
-
-	// Ethereum Series
-	constructor(address: String) : this(
-		address,
-		address,
-		"",
-		"",
-		"",
-		"",
-		""
+		Bip44Address(),
+		Bip44Address(),
+		Bip44Address(),
+		Bip44Address(),
+		Bip44Address(),
+		Bip44Address(),
+		Bip44Address()
 	)
 
 	companion object {

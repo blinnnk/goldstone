@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
@@ -32,6 +31,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.getTargetKeyName
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
@@ -185,9 +185,9 @@ class AddressManagerPresenter(
 		fun createETHSeriesAddress(
 			context: Context,
 			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
+			hold: (List<Bip44Address>) -> Unit
 		) {
-			WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+			WalletTable.getLatestAddressIndexByChainType(ChainType.ETH) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
@@ -210,8 +210,8 @@ class AddressManagerPresenter(
 								wallet.id
 							)
 						)
-						wallet.updateETHSeriesAddresses(address, newAddressIndex) {
-							hold(convertToChildAddresses(it).toArrayList())
+						wallet.updateETHSeriesAddresses(Bip44Address(address, newAddressIndex, ChainType.ETH.id)) {
+							hold(it)
 						}
 					}
 				}
@@ -221,9 +221,9 @@ class AddressManagerPresenter(
 		fun createETCAddress(
 			context: Context,
 			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
+			hold: (List<Bip44Address>) -> Unit
 		) {
-			WalletTable.getETCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+			WalletTable.getLatestAddressIndexByChainType(ChainType.ETC) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
@@ -247,8 +247,8 @@ class AddressManagerPresenter(
 								wallet.id
 							)
 						)
-						wallet.updateETCAddresses(address, newAddressIndex) {
-							hold(convertToChildAddresses(it).toArrayList())
+						wallet.updateETCAddresses(Bip44Address(address, newAddressIndex, ChainType.ETC.id)) {
+							hold(it)
 						}
 					}
 				}
@@ -258,7 +258,7 @@ class AddressManagerPresenter(
 		fun createEOSAddress(
 			context: Context,
 			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
+			hold: (List<Bip44Address>) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
@@ -266,7 +266,7 @@ class AddressManagerPresenter(
 				true
 			) { isCorrect ->
 				if (!isCorrect) context.alert(CommonText.wrongPassword)
-				else WalletTable.getEOSWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				else WalletTable.getLatestAddressIndexByChainType(ChainType.EOS) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -295,8 +295,8 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateEOSAddresses(eosKeyPair.address, newAddressIndex) {
-								hold(convertToChildAddresses(it).toArrayList())
+							wallet.updateEOSAddresses(Bip44Address(eosKeyPair.address, newAddressIndex, ChainType.EOS.id)) {
+								hold(it)
 							}
 						}
 					}
@@ -307,14 +307,14 @@ class AddressManagerPresenter(
 		fun createBTCAddress(
 			context: Context,
 			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
+			hold: (List<Bip44Address>) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBTC(),
 				true
 			) { isCorrect ->
-				if (isCorrect) WalletTable.getBTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				if (isCorrect) WalletTable.getLatestAddressIndexByChainType(ChainType.BTC) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -345,8 +345,8 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateBTCAddresses(address, newAddressIndex) {
-								hold(convertToChildAddresses(it).toArrayList())
+							wallet.updateBTCAddresses(Bip44Address(address, newAddressIndex, ChainType.BTC.id)) {
+								hold(it)
 							}
 						}
 					}
@@ -355,18 +355,14 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun createBTCTestAddress(
-			context: Context,
-			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
-		) {
+		fun createBTCTestAddress(context: Context, password: String, hold: (List<Bip44Address>) -> Unit) {
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBTCSeriesTest(),
 				true
 			) { isCorrect ->
 				if (!isCorrect) context.alert(CommonText.wrongPassword)
-				else WalletTable.getBTCTestWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				else WalletTable.getLatestAddressIndexByChainType(ChainType.AllTest) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -406,8 +402,8 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateBTCSeriesTestAddresses(address, newAddressIndex) {
-								hold(convertToChildAddresses(it).toArrayList())
+							wallet.updateBTCSeriesTestAddresses(Bip44Address(address, newAddressIndex, ChainType.AllTest.id)) {
+								hold(it)
 							}
 						}
 					}
@@ -418,7 +414,7 @@ class AddressManagerPresenter(
 		fun createBCHAddress(
 			context: Context,
 			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
+			hold: (List<Bip44Address>) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
@@ -426,7 +422,7 @@ class AddressManagerPresenter(
 				true
 			) { isCorrect ->
 				if (!isCorrect) context.alert(CommonText.wrongPassword)
-				else WalletTable.getBCHWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				else WalletTable.getLatestAddressIndexByChainType(ChainType.BCH) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -453,8 +449,8 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateBCHAddresses(bchKeyPair.address, newAddressIndex) {
-								hold(convertToChildAddresses(it).toArrayList())
+							wallet.updateBCHAddresses(Bip44Address(bchKeyPair.address, newAddressIndex, ChainType.BCH.id)) {
+								hold(it)
 							}
 						}
 					}
@@ -465,7 +461,7 @@ class AddressManagerPresenter(
 		fun createLTCAddress(
 			context: Context,
 			password: String,
-			hold: (ArrayList<Pair<String, String>>) -> Unit
+			hold: (List<Bip44Address>) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
@@ -473,7 +469,7 @@ class AddressManagerPresenter(
 				true
 			) { isCorrect ->
 				if (!isCorrect) context.alert(CommonText.wrongPassword)
-				else WalletTable.getLTCWalletLatestChildAddressIndex { wallet, childAddressIndex ->
+				else WalletTable.getLatestAddressIndexByChainType(ChainType.LTC) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -502,8 +498,8 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateLTCAddresses(ltcKeyPair.address, newAddressIndex) {
-								hold(convertToChildAddresses(it).toArrayList())
+							wallet.updateLTCAddresses(Bip44Address(ltcKeyPair.address, newAddressIndex, ChainType.LTC.id)) {
+								hold(it)
 							}
 						}
 					}
@@ -529,29 +525,7 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun convertToChildAddresses(seriesAddress: String): List<Pair<String, String>> {
-			return when {
-				seriesAddress.contains(",") -> seriesAddress.split(",").map {
-					Pair(
-						it.substringBeforeLast("|"),
-						it.substringAfterLast("|")
-					)
-				}
-				seriesAddress.contains("|") -> listOf(
-					Pair(
-						seriesAddress.substringBeforeLast("|"),
-						seriesAddress.substringAfterLast("|")
-					)
-				)
-				else -> listOf(Pair(seriesAddress, ""))
-			}
-		}
-
-		private fun insertNewAddressToMyToken(
-			contract: String,
-			address: String,
-			chainID: String
-		) {
+		private fun insertNewAddressToMyToken(contract: String, address: String, chainID: String) {
 			DefaultTokenTable.getTokenByContractFromAllChains(contract) { it ->
 				it?.let {
 					MyTokenTable(it.apply { this.chainID = chainID }, address).insert()

@@ -4,9 +4,8 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.network.ChainURL
 
 object EOSUrl {
-	private var currentEOSTestUrl = ChainURL.eosTest // 网络出问题后会在 `Error` 中更改这个值
 	private val currentURL: () -> String = {
-		if (SharedValue.isTestEnvironment()) currentEOSTestUrl else ChainURL.eosMain
+		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain
 	}
 	private val currentHistoryURL: () -> String = {
 		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain

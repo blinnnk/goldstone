@@ -8,6 +8,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
 
@@ -17,9 +18,9 @@ import org.jetbrains.anko.wrapContent
  */
 class ChainAddressesCell(context: Context) : LinearLayout(context) {
 
-	var model: Pair<String, String> by observing(Pair("", "")) {
-		cell.setTitle("${model.second}.")
-		cell.setSubtitle(CryptoUtils.scaleMiddleAddress(model.first))
+	var model: Bip44Address? by observing(null) {
+		cell.setTitle("${model?.index}.")
+		cell.setSubtitle(CryptoUtils.scaleMiddleAddress(model?.address.orEmpty()))
 	}
 	val cell = GraySquareCellWithButtons(context)
 

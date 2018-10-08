@@ -166,9 +166,7 @@ class WalletDetailPresenter(
 		}
 	}
 
-	private fun List<WalletDetailCellModel>.getChainModels(
-		hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit
-	) {
+	private fun List<WalletDetailCellModel>.getChainModels(hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)

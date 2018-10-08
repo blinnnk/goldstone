@@ -13,6 +13,7 @@ import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
@@ -36,14 +37,15 @@ object MultiChainUtils {
 		val ltcAddress = ECKey.fromPrivate(rootKey).toAddress(LitecoinNetParams()).toBase58()
 		val bchAddress = BCHWalletUtils.getAddressByPrivateKey(rootKey)
 		val eosAddress = EOSWalletUtils.generateKeyPairByPrivateKey(rootKey).address
+		// 根私钥创建的钱包不是 `Bip44` 所以不用传递 `Address Index`
 		return ChainAddresses(
-			ethAddress,
-			ethAddress,
-			btcMainnetAddress,
-			allBtcSeriesTestAddress,
-			ltcAddress,
-			bchAddress,
-			eosAddress
+			Bip44Address(ethAddress, ChainType.ETH.id),
+			Bip44Address(ethAddress, ChainType.ETC.id),
+			Bip44Address(btcMainnetAddress, ChainType.BTC.id),
+			Bip44Address(allBtcSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(ltcAddress, ChainType.LTC.id),
+			Bip44Address(bchAddress, ChainType.BCH.id),
+			Bip44Address(eosAddress, ChainType.EOS.id)
 		)
 	}
 

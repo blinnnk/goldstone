@@ -34,22 +34,15 @@ class TokenManagementListFragment :
 		supportTokenManagementOrHide()
 	}
 
-	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<DefaultTokenTable>?
-	) {
-		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
+	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?) {
+		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) { default, switch ->
 			switch.onClick {
-				tokenSearchModel?.let { model ->
-					// 更新内存数据防止上下滑动导致的复用问题
-					asyncData?.find { defaultToken ->
-						defaultToken.contract.equals(model.contract, true)
-					}?.apply {
-						isUsed = switch.isChecked
-					}
-					// 更新数据库
-					TokenManagementListPresenter.updateMyTokenInfoBy(switch, model)
-				}
+				switch.isClickable = false
+				// 更新内存数据防止上下滑动导致的复用问题
+				asyncData?.find { data -> data.contract.equals(default.contract, true) }?.isUsed = switch.isChecked
+				// 更新数据库
+				TokenManagementListPresenter.insertOrDeleteMyToken(switch.isChecked, default)
+				switch.isClickable = true
 			}
 		}
 	}

@@ -151,43 +151,24 @@ data class MyTokenTable(
 			}
 		}
 
-		fun deleteByContract(
-			contract: TokenContract,
-			address: String,
-			callback: () -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(address, contract.contract.orEmpty())
-			} then { callback() }
-		}
-
-		fun insertBySymbolAndContract(
-			symbol: String,
-			contract: TokenContract,
-			@UiThread callback: () -> Unit
-		) {
-			doAsync {
-				val currentAddress = CoinSymbol(symbol).getAddress()
-				// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-				if (
-					GoldStoneDataBase.database.myTokenDao()
-						.getTokenByContractAndAddress(currentAddress, currentAddress, contract.getMainnetChainID()).isNull()
-				) {
-					MyTokenTable(
-						0,
-						currentAddress,
-						currentAddress,
-						symbol,
-						0.0,
-						contract.contract.orEmpty(),
-						contract.getCurrentChainID().id
-					).insert()
-					// 没有网络不用检查间隔直接插入数据库
-					GoldStoneAPI.context.runOnUiThread {
-						callback()
-					}
-				}
+		@WorkerThread
+		fun insertBySymbolAndContract(symbol: String, contract: TokenContract) {
+			val currentAddress = contract.getAddress()
+			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
+			if (GoldStoneDataBase.database.myTokenDao().getTokenByContractAndAddress(
+					contract.contract.orEmpty(),
+					currentAddress,
+					contract.getCurrentChainID().id
+				).isNull()) {
+				MyTokenTable(
+					0,
+					currentAddress,
+					currentAddress,
+					symbol,
+					0.0,
+					contract.contract.orEmpty(),
+					contract.getCurrentChainID().id
+				).insert()
 			}
 		}
 
@@ -230,9 +211,9 @@ data class MyTokenTable(
 						hold(balance, error)
 					}
 
+				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
+				// 网络请求在这额外校验一次.
 				contract.isEOS() -> {
-					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
-					// 网络请求在这额外校验一次.
 					if (SharedAddress.getCurrentEOSAccount().isValid()) {
 						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), { hold(null, it) }) {
 							hold(it, RequestError.None)
@@ -265,7 +246,7 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :ownerName AND chainID Like :chainID ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, ownerName: String, chainID: String): MyTokenTable?
 
 	@Query("SELECT * FROM myTokens WHERE (ownerName IN (:addresses) OR ownerAddress IN (:addresses))  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
@@ -297,7 +278,7 @@ interface MyTokenDao {
 	fun getByOwnerName(name: String, chainID: String): MyTokenTable?
 
 	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
-	fun deleteByContractAndAddress(address: String, contract: String)
+	fun deleteByContractAndAddress(contract: String, address: String)
 
 	@Insert
 	fun insert(token: MyTokenTable)

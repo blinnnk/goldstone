@@ -41,7 +41,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			if (
 				!eosAccountNames.currentPublicKeyHasActivated() &&
 				!eosAccountNames.hasActivatedOrWatchOnlyEOSAccount() &&
-				getCurrentAddressesAndChainID().any { it.second.isEOS() }
+				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				checkOrUpdateEOSAccount()
 			} else cacheDataAndSetNetBy(this) { activity.jump<MainActivity>() }
