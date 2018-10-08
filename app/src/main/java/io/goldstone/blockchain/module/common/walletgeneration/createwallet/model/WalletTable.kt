@@ -123,6 +123,28 @@ data class WalletTable(
 		).filter { it.address.isNotEmpty() }
 	}
 
+	fun getCurrentMainnetBip44Addresses(): List<Bip44Address> {
+		return listOf(
+			Bip44Address(currentBTCAddress, ChainType.BTC.id),
+			Bip44Address(currentLTCAddress, ChainType.LTC.id),
+			Bip44Address(currentBCHAddress, ChainType.BCH.id),
+			Bip44Address(currentETCAddress, ChainType.ETC.id),
+			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
+		).filter { it.address.isNotEmpty() }
+	}
+
+	fun getCurrentTestnetBip44Addresses(): List<Bip44Address> {
+		return listOf(
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.LTC.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.BCH.id),
+			Bip44Address(currentETCAddress, ChainType.ETC.id),
+			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
+		).filter { it.address.isNotEmpty() }
+	}
+
 	fun getCurrentBip44Address(chainType: ChainType): Bip44Address {
 		return when {
 			chainType.isETH() -> {
@@ -432,7 +454,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getWatchOnlyWallet(hold:Bip44Address.() -> Unit) {
+		fun getWatchOnlyWallet(hold: Bip44Address.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				if (isWatchOnly) getCurrentBip44Addresses().firstOrNull()?.let(hold)
 			}

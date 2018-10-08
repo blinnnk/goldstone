@@ -104,7 +104,8 @@ class WatchOnlyImportPresenter(
 				currentETCAddress,
 				currentLTCAddress,
 				currentBCHAddress,
-				currentEOSAddress,
+				// 如果用户只导入 `AccountName` 那么会把名字存成 `Address` 以对接切换钱包的逻辑
+				currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName,
 				EOSDefaultAllChainName(eosMainnetAccountName, eosTestnetAccountName),
 				if (eosMainnetAccountName.isEmpty() && eosTestnetAccountName.isEmpty()) listOf()
 				else listOf(

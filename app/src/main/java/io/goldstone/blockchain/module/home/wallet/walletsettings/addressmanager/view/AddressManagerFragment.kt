@@ -209,7 +209,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	private fun setMultiChainAddresses(wallet: WalletTable) {
 		currentMultiChainAddressesView.setTitle(WalletSettingsText.currentMultiChainAddresses)
 		currentMultiChainAddressesView.currentWallet = wallet
-		currentMultiChainAddressesView.model = wallet.getCurrentBip44Addresses()
+		currentMultiChainAddressesView.model =
+			if (SharedValue.isTestEnvironment()) wallet.getCurrentTestnetBip44Addresses()
+			else wallet.getCurrentMainnetBip44Addresses()
 	}
 
 	fun setEthereumAddressesModel(wallet: WalletTable) {

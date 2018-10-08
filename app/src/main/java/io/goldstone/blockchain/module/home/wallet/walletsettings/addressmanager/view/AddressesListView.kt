@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.C
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -49,7 +48,6 @@ class AddressesListView(
 		cellLayout.removeAllViewsInLayout()
 		model?.apply {
 			val currentAddresses by lazy { currentWallet?.getCurrentAddresses() }
-			// 如果是当前使用的多链那么 `data.second` 会是对应的链的缩写用此判断做缩进
 			if (isNotEmpty() && firstOrNull()?.index == -1) hideButton()
 			else updateButtonTitle("${CommonText.checkAll} (${model?.size})")
 			// 计算最大显示个数
@@ -74,7 +72,11 @@ class AddressesListView(
 						copyButton.preventDuplicateClicks()
 					}
 					hold(this, data, currentWallet, isDefault)
-					val title = if (isMultiChain) ChainType(data.chainType).getSymbol().symbol else "${data.index}"
+					val title = when {
+						isMultiChain -> data.getChainType().getSymbol().symbol
+						data.index == -1 -> ""
+						else -> "${data.index}"
+					}
 					setTitle(title.orEmpty())
 					setSubtitle(CryptoUtils.scaleMiddleAddress(data.address, 12))
 				}.into(cellLayout)
