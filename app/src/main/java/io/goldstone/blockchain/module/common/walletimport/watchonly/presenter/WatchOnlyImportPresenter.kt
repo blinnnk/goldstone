@@ -21,7 +21,6 @@ import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -136,7 +135,7 @@ class WatchOnlyImportPresenter(
 			Pair(currentBTCAddress, ChainType.BTC),
 			Pair(currentLTCAddress, ChainType.LTC),
 			Pair(currentBCHAddress, ChainType.BCH),
-			Pair(currentBTCTestAddress.toAddressCode(), ChainType.AllTest),
+			Pair(currentBTCTestAddress, ChainType.AllTest),
 			Pair(currentETCAddress, ChainType.ETC),
 			Pair(currentETHSeriesAddress, ChainType.ETH),
 			Pair(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS)
@@ -169,7 +168,7 @@ class WatchOnlyImportPresenter(
 			}
 			AddressType.EOS.value -> {
 				if (EOSWalletUtils.isValidAddress(address)) currentEOSAddress = address
-				else if (EOSAccount(address).isValid()) {
+				else if (EOSAccount(address).isValid(false)) {
 					eosMainnetAccountName = address
 					SharedAddress.updateCurrentEOSName(address)
 					SharedChain.updateEOSCurrent(ChainID.eosMain)
@@ -178,7 +177,7 @@ class WatchOnlyImportPresenter(
 			}
 			AddressType.EOSJungle.value -> {
 				if (EOSWalletUtils.isValidAddress(address)) currentEOSAddress = address
-				else if (EOSAccount(address).isValid()) {
+				else if (EOSAccount(address).isValid(false)) {
 					eosTestnetAccountName = address
 					SharedAddress.updateCurrentEOSName(address)
 					SharedChain.updateEOSCurrent(ChainID.eosTest)

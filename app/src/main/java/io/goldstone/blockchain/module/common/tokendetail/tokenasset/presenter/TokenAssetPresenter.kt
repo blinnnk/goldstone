@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
@@ -108,18 +109,15 @@ class TokenAssetPresenter(
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
 			if (onlyUpdateLocalData) return@getAccountByName
-			EOSAPI.getAccountInfo(
-				account,
-				{
-					LogUtil.error("getAccountInfo", it)
-				}
-			) { eosAccount ->
-				val newData =
-					if (localData.isNull()) eosAccount else eosAccount.apply { this.id = localData!!.id }
-				GoldStoneDataBase.database.eosAccountDao().insert(newData)
-				GoldStoneAPI.context.runOnUiThread {
-					eosAccount.updateUIValue()
-				}
+			EOSAPI.getAccountInfo(account) { eosAccount, error ->
+				if (!eosAccount.isNull() && error.isNone()) {
+					val newData =
+						if (localData.isNull()) eosAccount else eosAccount!!.apply { this.id = localData!!.id }
+					GoldStoneDataBase.database.eosAccountDao().insert(newData!!)
+					GoldStoneAPI.context.runOnUiThread {
+						eosAccount!!.updateUIValue()
+					}
+				} else fragment.context.alert(error.message)
 			}
 		}
 	}

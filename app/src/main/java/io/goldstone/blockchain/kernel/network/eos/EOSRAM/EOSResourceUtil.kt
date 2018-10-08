@@ -83,12 +83,13 @@ object EOSResourceUtil {
 		hold: (priceInEOS: Double?, error: GoldStoneError) -> Unit
 	) {
 		EOSAPI.getAccountInfo(
-			account,
-			{ hold(null, it) }
-		) { accountInfo ->
-			val priceInEOS =
-				getCPUPriceByTime(accountInfo.cpuWeight, accountInfo.cpuLimit.max, unit)
-			hold(priceInEOS, GoldStoneError.None)
+			account
+		) { accountInfo, error ->
+			if (!accountInfo.isNull() && error.isNone()) {
+				val priceInEOS =
+					getCPUPriceByTime(accountInfo!!.cpuWeight, accountInfo.cpuLimit.max, unit)
+				hold(priceInEOS, GoldStoneError.None)
+			} else hold(null, error)
 		}
 	}
 
@@ -98,12 +99,13 @@ object EOSResourceUtil {
 		hold: (priceInEOS: Double?, error: GoldStoneError) -> Unit
 	) {
 		EOSAPI.getAccountInfo(
-			account,
-			{ hold(null, it) }
-		) { accountInfo ->
-			val priceInEOS =
-				getNETPriceByTime(accountInfo.netWeight, accountInfo.netLimit.max, unit)
-			hold(priceInEOS, GoldStoneError.None)
+			account
+		) { accountInfo, error ->
+			if (!accountInfo.isNull() && error.isNone()) {
+				val priceInEOS =
+					getNETPriceByTime(accountInfo!!.netWeight, accountInfo.netLimit.max, unit)
+				hold(priceInEOS, GoldStoneError.None)
+			} else hold(null, error)
 		}
 	}
 

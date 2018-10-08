@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
@@ -53,10 +52,7 @@ class TokenDetailPresenter(
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		updateEmptyCharData(fragment.token?.symbol.orEmpty())
-		// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
-		AnimationDuration.Default timeUpThen {
-			prepareTokenDetailData()
-		}
+		prepareTokenDetailData()
 	}
 
 	fun showOnlyReceiveData() {
@@ -110,23 +106,23 @@ class TokenDetailPresenter(
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
 		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData, localEOSSeriesData ->
-			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
-				// `ETHERC20OrETC` 需要使用到 `localData`
-				when {
-					token?.contract.isBTCSeries() -> {
-						// This localDataMaxIndex is BTCSeries Transactions Only
-						val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
-						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
-					}
-					token?.contract.isEOS() -> {
-						// This localDataMaxIndex is EOSSeries Transactions Only
-						val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
-						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
-					}
-					!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
-						fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
-					}
+			// 检查是否有网络
+			if (!NetworkUtil.hasNetworkWithAlert(fragment.context)) return@loadDataFromDatabaseOrElse
+			// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
+			// `ETHERC20OrETC` 需要使用到 `localData`
+			when {
+				token?.contract.isBTCSeries() -> {
+					// This localDataMaxIndex is BTCSeries Transactions Only
+					val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
+					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
+				}
+				token?.contract.isEOS() -> {
+					// This localDataMaxIndex is EOSSeries Transactions Only
+					val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
+					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
+				}
+				!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
+					fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
 				}
 			}
 		}
@@ -293,12 +289,8 @@ class TokenDetailPresenter(
 		checkAddressNameInContacts(data) {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
-			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				data.prepareTokenHistoryBalance(token?.contract!!, ownerName) {
-					it.updateChartAndHeaderData()
-				}
-			} otherwise {
-				updateEmptyCharData(token?.symbol.orEmpty())
+			data.prepareTokenHistoryBalance(token?.contract!!, ownerName) {
+				it.updateChartAndHeaderData()
 			}
 		}
 	}

@@ -35,7 +35,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
-import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -292,7 +291,7 @@ class CreateWalletPresenter(
 								if (currentAddresses.eos.isNotEmpty()) {
 									if (EOSWalletUtils.isValidAddress(currentAddresses.eos.address)) {
 										MyTokenTable(defaults, currentAddresses.eos.address).insert()
-									} else if (EOSAccount(currentAddresses.eos.address).isValid()) {
+									} else if (EOSAccount(currentAddresses.eos.address).isValid(false)) {
 										// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
 										MyTokenTable(defaults, currentAddresses.eos.address, "").insert()
 									}

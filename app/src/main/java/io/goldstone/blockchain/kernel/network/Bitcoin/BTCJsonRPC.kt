@@ -28,7 +28,7 @@ object BTCSeriesJsonRPC {
 		blocks: Int,
 		isSmartFee: Boolean,
 		errorCallback: (RequestError) -> Unit,
-		hold: (Double?) -> Unit
+		@WorkerThread hold: (Double?) -> Unit
 	) {
 		val method =
 			if (isSmartFee) BitcoinMethod.EstimatesmartFee.method
