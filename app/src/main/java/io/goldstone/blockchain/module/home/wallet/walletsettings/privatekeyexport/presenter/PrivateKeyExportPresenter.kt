@@ -55,9 +55,9 @@ class PrivateKeyExportPresenter(
 			if (password.isEmpty())
 				hold(null, AccountError.WrongPassword)
 			else WalletTable.getWalletType { walletType, wallet ->
-				if (walletType.isMultiChain())
+				if (walletType.isMultiChain()) {
 					context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
-				else context.getPrivateKeyByAddress(address, chainType, password, hold)
+				} else context.getPrivateKeyByAddress(address, chainType, password, hold)
 			}
 			(context as? Activity)?.apply { SoftKeyboard.hide(this) }
 		}
@@ -110,10 +110,7 @@ class PrivateKeyExportPresenter(
 			chainType: ChainType,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			getBigIntegerPrivateKeyByWalletID(
-				password,
-				walletID
-			) { privateKeyInteger, error ->
+			getBigIntegerPrivateKeyByWalletID(password, walletID) { privateKeyInteger, error ->
 				if (!privateKeyInteger.isNull() && error.isNone()) hold(when {
 					ChainType.isSamePrivateKeyRule(chainType) && SharedValue.isTestEnvironment() -> {
 						val net =

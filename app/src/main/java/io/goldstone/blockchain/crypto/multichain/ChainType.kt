@@ -156,22 +156,14 @@ class ChainType(val id: Int) : Serializable {
 		val ETH = ChainType(60)
 		@JvmStatic
 		val ETC = ChainType(61)
-		@JvmStatic
-		val ERC = ChainType(100)
 
 		// 比特的 `Bip44` 的比特币测试地址的  `CoinType` 为 `1`
 		val isBTCTest: (chainType: Int) -> Boolean = {
 			it == ChainType.AllTest.id
 		}
 
-		private fun getAllBTCSeriesType(): List<ChainType> =
-			listOf(ChainType.LTC, ChainType.AllTest, ChainType.BTC, ChainType.BCH)
-
-		fun isBTCSeriesChainType(type: ChainType): Boolean =
-			getAllBTCSeriesType().any { it == type }
-
-		fun isSamePrivateKeyRule(id: ChainType): Boolean =
-			listOf(ChainType.BCH, ChainType.BTC, ChainType.AllTest).any { it == id }
+		fun isSamePrivateKeyRule(type: ChainType): Boolean =
+			listOf(ChainType.BCH, ChainType.BTC, ChainType.AllTest).any { it.id == type.id }
 
 		fun getChainTypeBySymbol(symbol: String?): ChainType = when (symbol) {
 			CoinSymbol.btc() -> ChainType.BTC

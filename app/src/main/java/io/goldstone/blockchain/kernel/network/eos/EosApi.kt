@@ -55,7 +55,6 @@ object EOSAPI {
 				{ hold(null, it) },
 				false
 			) { result ->
-				System.out.println("result$result")
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
 				if (result.isEmpty()) {
