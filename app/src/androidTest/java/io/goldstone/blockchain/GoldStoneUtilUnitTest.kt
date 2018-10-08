@@ -108,13 +108,6 @@ class GoldStoneUtilUnitTest {
 	}
 
 	@Test
-	fun getLatestEthereumChildAddressIndex() {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
-			LogUtil.debug("getLatestEthereumChildAddressIndex + $position", "$ethereumChildAddressIndex")
-		}
-	}
-
-	@Test
 	fun cryptoMnemonic() {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
@@ -139,23 +132,6 @@ class GoldStoneUtilUnitTest {
 			}
 		) {
 			LogUtil.debug("getCoinInfo", "$it")
-		}
-	}
-
-	@Test
-	fun newEthereumChildAddress() {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
-			wallet.encryptMnemonic?.let {
-				val mnemonic = JavaKeystoreUtil().decryptData(it)
-				val index = ethereumChildAddressIndex + 1
-				val childPath = wallet.ethPath.substringBeforeLast("/") + "/" + index
-				val masterKey = Mnemonic.mnemonicToKey(mnemonic, childPath)
-				val current = masterKey.keyPair.getAddress().prepend0xPrefix()
-				Assert.assertTrue(
-					"wrong address value", current.equals
-				("0x6e3df901a984d50b68355eede503cbfc1ead8f13", true)
-				)
-			}
 		}
 	}
 

@@ -34,14 +34,6 @@ data class PermissionsInfo(
 			}
 			return permissions
 		}
-
-		fun generateByJSON(data: JSONObject): PermissionsInfo {
-			return PermissionsInfo(
-				data.safeGet("parent"),
-				data.safeGet("perm_name"),
-				RequiredAuthorization(JSONObject(data.safeGet("required_auth")))
-			)
-		}
 	}
 }
 
@@ -52,7 +44,7 @@ class PermissionsInfoConverter {
 		var permissions = listOf<PermissionsInfo>()
 		(0 until data.length()).forEach {
 			val permission = JSONObject(data.get(it).toString())
-			permissions += PermissionsInfo.generateByJSON(permission)
+			permissions += PermissionsInfo(permission)
 		}
 		return permissions
 	}

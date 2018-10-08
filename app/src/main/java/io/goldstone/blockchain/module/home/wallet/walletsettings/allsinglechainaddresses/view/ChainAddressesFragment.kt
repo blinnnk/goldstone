@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter.ChainAddressesPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -20,23 +21,18 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author KaySaith
  */
 class ChainAddressesFragment
-	: BaseRecyclerFragment<ChainAddressesPresenter, Pair<String, String>>() {
+	: BaseRecyclerFragment<ChainAddressesPresenter, Bip44Address>() {
 
 	val coinType by lazy { arguments?.getInt(ArgumentKey.coinType)?.let { ChainType(it) } }
 	override val pageTitle: String get() = coinType?.getSymbol()?.symbol.orEmpty()
 	override val presenter = ChainAddressesPresenter(this)
-	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<Pair<String, String>>?
-	) {
+	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<Bip44Address>?) {
 		recyclerView.adapter = ChainAddressesAdapter(asyncData.orEmptyArray()) {
 			cell.copyButton.onClick {
-				cell.context.clickToCopy(model.first)
+				cell.context.clickToCopy(model?.address.orEmpty())
 			}
 			cell.moreButton.onClick {
-				coinType?.apply {
-					presenter.showMoreDashboard(cell, model.first, this)
-				}
+				presenter.showMoreDashboard(cell, model ?: Bip44Address())
 			}
 		}
 	}

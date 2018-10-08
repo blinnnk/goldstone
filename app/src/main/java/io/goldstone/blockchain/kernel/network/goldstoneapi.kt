@@ -114,7 +114,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTokenInfoBySymbolFromServer(
 		symbolsOrContract: String,
-		hold: (tokens: ArrayList<TokenSearchModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (tokens: ArrayList<TokenSearchModel>?, error: RequestError) -> Unit
 	) {
 		requestData<TokenSearchModel>(
 			APIPath.getTokenInfo(

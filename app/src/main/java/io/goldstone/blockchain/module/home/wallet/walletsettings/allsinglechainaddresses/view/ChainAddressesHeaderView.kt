@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -55,15 +56,14 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 	}
 
 	fun setDefaultAddress(
-		index: String,
-		address: String,
-		chainType: ChainType,
+		bip44Address: Bip44Address,
 		showDashboardEvent: GraySquareCellWithButtons.() -> Unit
 	) {
-		setClickEvent(address, showDashboardEvent)
-		currentAddress.setTitle(index)
+		setClickEvent(bip44Address.address, showDashboardEvent)
+		currentAddress.setTitle("${bip44Address.index}")
+		val chainType = bip44Address.getChainType()
 		val halfSize = if (chainType.isBTC()) 12 else 14
-		currentAddress.setSubtitle(CryptoUtils.scaleMiddleAddress(address, halfSize))
+		currentAddress.setSubtitle(CryptoUtils.scaleMiddleAddress(bip44Address.address, halfSize))
 		when {
 			chainType.isETH() -> allAddressTitle.text = WalletSettingsText.allETHSeriesAddresses
 			chainType.isETC() -> allAddressTitle.text = WalletSettingsText.allETCAddresses

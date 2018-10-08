@@ -21,11 +21,9 @@ import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -117,13 +115,13 @@ class WatchOnlyImportPresenter(
 			).insertWatchOnlyWallet { thisWallet ->
 				CreateWalletPresenter.generateMyTokenInfo(
 					ChainAddresses(
-						currentETHSeriesAddress,
-						currentETCAddress,
-						currentBTCAddress,
-						currentBTCTestAddress,
-						currentLTCAddress,
-						currentBCHAddress,
-						currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName
+						Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+						Bip44Address(currentETCAddress, ChainType.ETC.id),
+						Bip44Address(currentBTCAddress, ChainType.BTC.id),
+						Bip44Address(currentBTCTestAddress, ChainType.AllTest.id),
+						Bip44Address(currentLTCAddress, ChainType.LTC.id),
+						Bip44Address(currentBCHAddress, ChainType.BCH.id),
+						Bip44Address(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS.id)
 					)
 				) { error ->
 					if (error.isNone()) thisWallet.registerPushByAddress(callback)
@@ -138,7 +136,7 @@ class WatchOnlyImportPresenter(
 			Pair(currentBTCAddress, ChainType.BTC),
 			Pair(currentLTCAddress, ChainType.LTC),
 			Pair(currentBCHAddress, ChainType.BCH),
-			Pair(currentBTCTestAddress, ChainType.AllTest),
+			Pair(currentBTCTestAddress.toAddressCode(), ChainType.AllTest),
 			Pair(currentETCAddress, ChainType.ETC),
 			Pair(currentETHSeriesAddress, ChainType.ETH),
 			Pair(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS)

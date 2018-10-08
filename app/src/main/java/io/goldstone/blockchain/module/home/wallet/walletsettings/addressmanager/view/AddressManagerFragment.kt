@@ -28,11 +28,11 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.view.AddressesListView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
@@ -48,15 +48,15 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	override val pageTitle: String = WalletSettingsText.viewAddresses
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 7) { cell, data, wallet, isDefault ->
-			val chainType = ChainType.getChainTypeBySymbol(data.second)
+			val chainType = data.getChainType()
 			// EOS 需要在默认地址中显示激活状态
-			if (CoinSymbol(data.second).isEOS()) {
-				presenter.showEOSPublickeyDescription(cell, data.first, wallet)
+			if (chainType.isEOS()) {
+				presenter.showEOSPublickeyDescription(cell, data.address, wallet)
 			}
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					chainType,
 					!isDefault
 				)
@@ -76,7 +76,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					ChainType.ETH,
 					!isDefault
 				)
@@ -89,7 +89,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					ChainType.ETC,
 					!isDefault
 				)
@@ -102,7 +102,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					ChainType.BTC,
 					!isDefault
 				)
@@ -115,7 +115,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					ChainType.LTC,
 					!isDefault
 				)
@@ -126,11 +126,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private val eosAddressesView by lazy {
 		AddressesListView(context!!, 3) { cell, data, wallet, isDefault ->
-			presenter.showEOSPublickeyDescription(cell, data.first, wallet)
+			presenter.showEOSPublickeyDescription(cell, data.address, wallet)
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					ChainType.EOS,
 					!isDefault
 				)
@@ -144,7 +144,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
-					data.first,
+					data,
 					ChainType.BCH,
 					!isDefault
 				)
@@ -209,7 +209,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	private fun setMultiChainAddresses(wallet: WalletTable) {
 		currentMultiChainAddressesView.setTitle(WalletSettingsText.currentMultiChainAddresses)
 		currentMultiChainAddressesView.currentWallet = wallet
-		currentMultiChainAddressesView.model = wallet.getCurrentAddressAndSymbol()
+		currentMultiChainAddressesView.model = wallet.getCurrentBip44Addresses()
 	}
 
 	fun setEthereumAddressesModel(wallet: WalletTable) {
@@ -217,7 +217,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
 		ethSeriesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
 		ethSeriesView.currentWallet = wallet
-		ethSeriesView.model = AddressManagerPresenter.convertToChildAddresses(wallet.ethAddresses)
+		ethSeriesView.model = wallet.ethAddresses
 	}
 
 	fun setBitcoinCashAddressesModel(wallet: WalletTable) {
@@ -227,7 +227,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashAddress)
 		bchAddressesView.currentWallet = wallet
-		bchAddressesView.model = AddressManagerPresenter.convertToChildAddresses(address)
+		bchAddressesView.model = address
 	}
 
 	fun setEthereumClassicAddressesModel(wallet: WalletTable) {
@@ -235,7 +235,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
 		etcAddressesView.currentWallet = wallet
-		etcAddressesView.model = AddressManagerPresenter.convertToChildAddresses(wallet.etcAddresses)
+		etcAddressesView.model = wallet.etcAddresses
 	}
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
@@ -251,7 +251,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
-		btcAddressesView.model = AddressManagerPresenter.convertToChildAddresses(addresses)
+		btcAddressesView.model = addresses
 	}
 
 	fun setLitecoinAddressesModel(wallet: WalletTable) {
@@ -261,7 +261,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.currentWallet = wallet
-		ltcAddressesView.model = AddressManagerPresenter.convertToChildAddresses(address)
+		ltcAddressesView.model = address
 	}
 
 	fun setEOSAddressesModel(wallet: WalletTable) {
@@ -269,7 +269,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 		eosAddressesView.setTitle(WalletSettingsText.eosAddress)
 		eosAddressesView.currentWallet = wallet
-		eosAddressesView.model = AddressManagerPresenter.convertToChildAddresses(wallet.eosAddresses)
+		eosAddressesView.model = wallet.eosAddresses
 	}
 
 	fun showCreatorDashboard() {
@@ -344,7 +344,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private fun showCellMoreDashboard(
 		top: Float,
-		address: String,
+		address: Bip44Address,
 		coinType: ChainType,
 		hasDefaultCell: Boolean
 	) {
@@ -352,10 +352,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			getParentContainer(),
 			top,
 			hasDefaultCell,
-			BCHWalletUtils.isNewCashAddress(address),
+			BCHWalletUtils.isNewCashAddress(address.address),
 			setDefaultAddressEvent = {
 				// 因为在下面多种判断下调用同一套逻辑, 这是一个方法内的复用函数
-				fun update(address: String, eosAccountName: String) {
+				fun update(address: Bip44Address, eosAccountName: String) {
 					coinType.updateCurrentAddress(address, eosAccountName) { wallet ->
 						updateWalletDetail()
 						when {
@@ -370,29 +370,29 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					}
 				}
 				// `EOS` 和其他链的切换默认地址的逻辑不同
-				if (coinType.isEOS()) switchEOSDefaultAddress(context, address) { accountName ->
+				if (coinType.isEOS()) switchEOSDefaultAddress(context, address.address) { accountName ->
 					update(address, accountName)
-				} else update(address, address)
+				} else update(address, address.address)
 			},
 			qrCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
 					// `BCH` 需要在二维码页面下转换 `CashAddress` 和 `Legacy` 所以需要标记 `BCH Symbol`
 					val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
-					AddressManagerPresenter.showQRCodeFragment(ContactModel(address, symbol), this)
+					AddressManagerPresenter.showQRCodeFragment(ContactModel(address.address, symbol), this)
 				}
 			},
 			exportPrivateKey = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresenter.showPrivateKeyExportFragment(address, coinType, this)
+					AddressManagerPresenter.showPrivateKeyExportFragment(address.address, coinType, this)
 				}
 			},
 			keystoreCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresenter.showKeystoreExportFragment(address, this)
+					AddressManagerPresenter.showKeystoreExportFragment(address.address, this)
 				}
 			},
 			convertBCHAddressToLegacy = {
-				val legacyAddress = BCHWalletUtils.formattedToLegacy(address, MainNetParams.get())
+				val legacyAddress = BCHWalletUtils.formattedToLegacy(address.address, MainNetParams.get())
 				context.alert(legacyAddress)
 				context?.clickToCopy(legacyAddress)
 				removeDashboard(context)
@@ -427,7 +427,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		 *    对应的资产 `AccountName`
 		 * 4. 如果有多个 `AccountName` 那么就展示明细让用户选择默认地址对应的默认 `AccountName` 是哪个
 		 */
-		fun switchEOSDefaultAddress(context: Context?, newDefaultAddress: String, hold: (String) -> Unit) {
+		fun switchEOSDefaultAddress(
+			context: Context?,
+			newDefaultAddress: String,
+			hold: (String) -> Unit
+		) {
 			MyTokenTable.getEOSAccountNamesByAddress(newDefaultAddress) { namesInMyTokenTable ->
 				when {
 					namesInMyTokenTable.size == 1 -> hold(namesInMyTokenTable.first())
