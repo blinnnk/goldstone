@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -21,6 +22,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view.RankFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
@@ -40,6 +42,14 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 
 	@SuppressLint("ResourceType", "CommitTransaction")
 	override fun AnkoContext<Fragment>.initView() {
+		AppConfigTable.getAppConfig {
+			it?.apply {
+				if (!isMainnet) {
+					context?.toast("您当前在使用Jungle测试网络\n" +
+						"目前内存行情仅支持EOS主网，当前显示的是主网数据")
+				}
+			}
+		}
 		relativeLayout {
 			scrollView {
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
@@ -75,7 +85,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						id = ElementID.pieChart
 					}
 					addFragmentAndSetArgument<RAMTradePercentFragment>(ElementID.pieChart) {}
-					
+
 				}
 			}
 
@@ -90,7 +100,6 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 						AppConfigTable.getAppConfig {
 							it?.apply {
 								if (!isMainnet) {
-									getContext().toast("目前不支持测试网络买卖")
 									switchTheMainNetworkPopupWindow()
 								} else {
 									presenter.merchandiseRAM()
@@ -110,8 +119,8 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 		context?.let {
 			GoldStoneDialog.show(it) {
 				showButtons("切换到主网") {
+					switchToTheMainNetwork()
 					GoldStoneDialog.remove(context)
-
 				}
 				setImage(R.drawable.network_browken_banner)
 				setContent(
@@ -133,37 +142,25 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 	)
 	private val selectedNode = arrayListOf<Pair<String, String>>()
 
-	fun test() {
-//		val nodes = mainnetNodeList
-//		nodes.distinctBy { it.first }.forEach { chain ->
-//			// Nodes of Main or Test Chain
-//			val chainChild = nodes.filter {
-//				it.first.equals(chain.first, true)
-//			}
-//			// Generate cell with chain and node data
-//			chainChild.forEachIndexed { index, pair ->
-//				var isSelected = false
-//				if (pair.second == presenter.getCurrentChainName(
-//						true,
-//						getChainTypeByName(chain.first)
-//					)
-//				) {
-//					selectedNode += pair
-//					isSelected = true
-//				}
-//				/**
-//				 * `ID` 用 `10` 为波段进行区分, ETH 0～10 ， ETC 10~20
-//				 */
-//				val id = index + when {
-//					pair.first.equals(CryptoName.etc, true) -> 10
-//					pair.first.equals(CryptoName.btc, true) -> 20
-//					pair.first.equals(CryptoName.ltc, true) -> 30
-//					pair.first.equals(CryptoName.bch, true) -> 40
-//					pair.first.equals(CryptoName.eos, true) -> 50
-//					else -> 0
-//				}
-//			}
-//		}
+	fun switchToTheMainNetwork() {
+		val nodes = mainnetNodeList
+		nodes.distinctBy { it.first }.forEach { chain ->
+			// Nodes of Main or Test Chain
+			val chainChild = nodes.filter {
+				it.first.equals(chain.first, true)
+			}
+			// Generate cell with chain and node data
+			chainChild.forEachIndexed { _, pair ->
+				if (pair.second == presenter.getCurrentChainName(
+						true,
+						getChainTypeByName(chain.first)
+					)
+				) {
+					selectedNode += pair
+				}
+
+			}
+		}
 
 		true.let { fromMainnet ->
 			// 更新是否是测试环境的参数
@@ -231,10 +228,10 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 			else -> ChainType.ETC
 		}
 	}
-	
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		presenter.onHiddenChanged(hidden)
 	}
-	
+
 }

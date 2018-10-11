@@ -21,8 +21,7 @@ import io.goldstone.blockchain.module.home.quotation.tradermemory.tradermemoryde
 @SuppressLint("ValidFragment")
 class PersonalMemoryTransactionRecordFragment() :
 	BaseRecyclerFragment<PersonalMemoryTransactionRecordPresenter, PersonalMemoryTransactionRecordTable>() {
-	override val pageTitle: String
-		get() = "个人交易"
+	override val pageTitle: String = "个人交易"
 	private val account by lazy { arguments?.getString("account") }
 	private val isSalesRecord by lazy { arguments?.getBoolean("isSalesRecord") }
 	override val presenter: PersonalMemoryTransactionRecordPresenter = PersonalMemoryTransactionRecordPresenter(
@@ -41,7 +40,7 @@ class PersonalMemoryTransactionRecordFragment() :
 	fun getAccountName(): String {
 		return account ?: ""
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<BaseOverlayFragment<*>>()?.apply {
 			presenter.popFragmentFrom<PersonalMemoryTransactionRecordFragment>()
