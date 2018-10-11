@@ -162,7 +162,7 @@ class ChainAddressesPresenter(
 					chainType.isBCH() -> setBitcoinCashAddressesModel(this)
 					chainType.isLTC() -> setLitecoinAddressesModel(this)
 					chainType.isEOS() -> setEOSAddressesModel(this)
-					chainType.isAllTest() -> setBitcoinAddressesModel(this)
+					chainType.isAllTest() -> setBTCSeriesTestAddressesModel(this)
 				}
 			}
 		}

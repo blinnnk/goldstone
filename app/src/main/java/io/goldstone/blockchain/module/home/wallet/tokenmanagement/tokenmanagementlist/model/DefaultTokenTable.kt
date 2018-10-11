@@ -98,7 +98,7 @@ data class DefaultTokenTable(
 		"",
 		isDefault,
 		data.weight,
-		SharedChain.getCurrentETH().id
+		data.chainID
 	)
 
 	constructor(

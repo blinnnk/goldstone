@@ -120,9 +120,7 @@ class SplashActivity : AppCompatActivity() {
 						}
 						// Check network to get default toke list
 						initDefaultTokenByNetWork {
-							prepareYingYongBaoInReviewStatus {
-								hasAccountThenLogin()
-							}
+							prepareYingYongBaoInReviewStatus { hasAccountThenLogin() }
 						}
 					}
 				}

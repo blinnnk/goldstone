@@ -10,7 +10,10 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -71,10 +74,7 @@ class TokenSearchPresenter(
 			) {
 				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, localToken)
 				callback()
-			} else searchToken.apply {
-				isDefault = isChecked
-				chainID = TokenContract(contract).getCurrentChainID().id
-			} insertThen {
+			} else searchToken.apply { isDefault = isChecked } insertThen {
 				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, searchToken)
 				callback()
 			}

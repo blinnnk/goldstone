@@ -96,7 +96,9 @@ class AddressSelectionPresenter(
 			}
 		}
 		// 检查地址是否合规
-		when (MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
+		val addressType =
+			MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())
+		when (addressType) {
 			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
 			AddressType.ETHSeries -> when {
 				token?.contract.isBTCSeries() || token?.contract.isEOS() -> fragment.context.alert("this is not a valid bitcoin address")

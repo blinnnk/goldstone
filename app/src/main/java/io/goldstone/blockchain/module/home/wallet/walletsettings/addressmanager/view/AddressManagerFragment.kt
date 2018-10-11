@@ -189,7 +189,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							ltcAddressesView.into(this@parent)
 							setLitecoinAddressesModel(this)
 						} else {
-							setBitcoinAddressesModel(this)
+							setBTCSeriesTestAddressesModel(this)
 							setBitcoinCashAddressesModel(this)
 							setLitecoinAddressesModel(this)
 						}
@@ -242,15 +242,20 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
-		val title = if (SharedValue.isTestEnvironment()) {
-			"${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
-		} else {
-			WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
-		}
-		val addresses = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
-		else wallet.btcAddresses
+		val title = WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
+		val addresses = wallet.btcAddresses
 		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
+		btcAddressesView.setTitle(title)
+		btcAddressesView.currentWallet = wallet
+		btcAddressesView.model = addresses
+	}
+
+	fun setBTCSeriesTestAddressesModel(wallet: WalletTable) {
+		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
+		val addresses = wallet.btcSeriesTestAddresses
+		setMultiChainAddresses(wallet)
+		btcAddressesView.checkAllEvent = presenter.showAllBTCSeriesTestAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
 		btcAddressesView.model = addresses

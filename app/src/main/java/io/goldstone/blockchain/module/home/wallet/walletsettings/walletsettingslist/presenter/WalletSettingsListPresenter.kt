@@ -89,9 +89,8 @@ class WalletSettingsListPresenter(
 			WalletSettingsText.deleteInfoSubtitle,
 			!SharedWallet.isWatchOnlyWallet()
 		) { passwordInput ->
-			if (SharedWallet.isWatchOnlyWallet()) WalletTable.getWatchOnlyWallet {
-				deleteWatchOnlyWallet(address, getChainType())
-			} else {
+			if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
+			else {
 				val password = passwordInput?.text.toString()
 				WalletTable.getCurrentWallet(false) {
 					val type = getWalletType()
@@ -191,9 +190,10 @@ class WalletSettingsListPresenter(
 		GoldStoneDataBase.database.tokenBalanceDao().deleteTokenBalanceByAddress(address)
 	}
 
-	private fun deleteWatchOnlyWallet(address: String, chainType: ChainType) {
+	private fun deleteWatchOnlyWallet() {
 		WalletTable.deleteCurrentWallet { wallet ->
-			deleteAllLocalDataByAddress(address, chainType)
+			val bip44Address = wallet!!.getCurrentBip44Addresses().firstOrNull() ?: Bip44Address()
+			deleteAllLocalDataByAddress(bip44Address.address, bip44Address.getChainType())
 			// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 			XinGePushReceiver.registerAddressesForPush(wallet, true)
 			GoldStoneAPI.context.runOnUiThread {
