@@ -42,7 +42,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
 	private val imageSize = (ScreenSize.Width * 0.4).toInt()
 	private val introTitles = TwoLineTitles(context)
 	private var icon: ImageView
-	private val emptyViewHeight = imageSize + 50.uiPX()
+	private val emptyViewHeight = imageSize + 60.uiPX()
 
 	init {
 		id = ElementID.emptyView

@@ -6,6 +6,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -35,6 +36,8 @@ class WalletListPresenter(
 	fun switchWallet(address: String) {
 		WalletTable.switchCurrentWallet(address) { it ->
 			val walletType = it.getWalletType()
+			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly).let {
+			}
 			when {
 				walletType.isBTC() -> {
 					if (SharedValue.isTestEnvironment()) {

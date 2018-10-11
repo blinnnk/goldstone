@@ -293,7 +293,7 @@ class CreateWalletPresenter(
 										MyTokenTable(defaults, currentAddresses.eos.address).insert()
 									} else if (EOSAccount(currentAddresses.eos.address).isValid(false)) {
 										// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
-										MyTokenTable(defaults, currentAddresses.eos.address, "").insert()
+										MyTokenTable(defaults, currentAddresses.eos.address, currentAddresses.eos.address).insert()
 									}
 								}
 							}

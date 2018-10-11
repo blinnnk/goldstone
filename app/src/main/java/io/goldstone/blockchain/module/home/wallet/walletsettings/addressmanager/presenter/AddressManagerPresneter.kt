@@ -122,6 +122,14 @@ class AddressManagerPresenter(
 		}
 	}
 
+	fun showAllBTCSeriesTestAddresses(): Runnable {
+		return Runnable {
+			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(
+				Bundle().apply { putInt(ArgumentKey.coinType, ChainType.AllTest.id) }
+			)
+		}
+	}
+
 	fun showAllLTCAddresses(): Runnable {
 		return Runnable {
 			showTargetFragment<ChainAddressesFragment, WalletSettingsFragment>(

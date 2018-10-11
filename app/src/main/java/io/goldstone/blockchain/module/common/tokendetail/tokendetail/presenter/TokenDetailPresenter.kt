@@ -287,6 +287,8 @@ class TokenDetailPresenter(
 	) {
 		allData = data
 		checkAddressNameInContacts(data) {
+			// 防止用户在加载数据过程中切换到别的 `Tab` 这里复位一下
+			setAllSelectedStatus()
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
 			data.prepareTokenHistoryBalance(token?.contract!!, ownerName) {

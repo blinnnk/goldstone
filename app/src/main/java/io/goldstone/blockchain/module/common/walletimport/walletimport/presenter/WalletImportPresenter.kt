@@ -27,7 +27,7 @@ class WalletImportPresenter(
 			encryptMnemonic: String,
 			multiChainPath: ChainPath,
 			hint: String?,
-			callback: (GoldStoneError) -> Unit
+			callback: (walletID: Int?, error: GoldStoneError) -> Unit
 		) {
 			// 不为空的地址进行
 			val currentAddress =
@@ -76,10 +76,12 @@ class WalletImportPresenter(
 					eosPath = multiChainPath.eosPath
 				).insertWatchOnlyWallet { wallet ->
 					// 创建钱包并获取默认的 `token` 信息
-					CreateWalletPresenter.generateMyTokenInfo(multiChainAddresses, callback)
+					CreateWalletPresenter.generateMyTokenInfo(multiChainAddresses) {
+						callback(wallet.id, GoldStoneError.None)
+					}
 					// 注册钱包地址用于发送 `Push`
 					XinGePushReceiver.registerAddressesForPush(wallet)
-				} else callback(AccountError.ExistAddress)
+				} else callback(null, AccountError.ExistAddress)
 			}
 		}
 	}

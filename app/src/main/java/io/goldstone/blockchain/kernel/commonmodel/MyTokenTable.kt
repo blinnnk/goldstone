@@ -214,8 +214,11 @@ data class MyTokenTable(
 				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 				// 网络请求在这额外校验一次.
 				contract.isEOS() -> {
-					if (SharedAddress.getCurrentEOSAccount().isValid()) {
-						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), { hold(null, it) }) {
+					if (SharedAddress.getCurrentEOSAccount().isValid(false)) {
+						EOSAPI.getAccountEOSBalance(
+							SharedAddress.getCurrentEOSAccount(),
+							{ hold(null, it) }
+						) {
 							hold(it, RequestError.None)
 						}
 					} else hold(null, RequestError.None)

@@ -25,6 +25,7 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 	override val pageTitle: String get() = token?.symbol.orEmpty()
 	private val footer by lazy { TokenDetailFooter(context!!) }
 	override val presenter = TokenDetailPresenter(this)
+	private var headerView: TokenDetailHeaderView? = null
 
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
@@ -38,6 +39,7 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 				}
 			}
 		}) {
+			headerView = this
 			menu.getButton { button ->
 				button.onClick {
 					when (button.text) {
@@ -73,5 +75,10 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		super.setBackEvent(mainActivity)
 		mainActivity?.backEvent = null
+	}
+
+	// 异步加载数据后, 防止用户切换到别的 `TAB` 用来自动复位的方法
+	fun setAllSelectedStatus() {
+		headerView?.menu?.selected(0)
 	}
 }

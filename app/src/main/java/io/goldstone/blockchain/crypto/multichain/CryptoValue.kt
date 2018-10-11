@@ -10,6 +10,7 @@ import com.blinnnk.util.TinyNumberUtils
 
 object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
+	const val bchNewAddressMinLengh = 41
 	private const val bitcoinAddressLength = 34
 	const val bitcoinAddressClassicLength = 33
 	const val eosAddressLength = 53

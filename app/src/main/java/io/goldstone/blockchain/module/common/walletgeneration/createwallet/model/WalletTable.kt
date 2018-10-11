@@ -454,7 +454,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getWatchOnlyWallet(hold: Bip44Address.() -> Unit) {
+		fun getWatchOnlyWallet(hold:Bip44Address.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				if (isWatchOnly) getCurrentBip44Addresses().firstOrNull()?.let(hold)
 			}
