@@ -66,7 +66,7 @@ data class TransactionListModel(
 		data.txID,
 		data.transactionData.memo,
 		if (data.cupUsage * data.netUsage == BigInteger.ZERO) "" else generateEOSMinerContent(data.cupUsage, data.netUsage),
-		generateTransactionURL(data.txID, CoinSymbol.eos),
+		generateTransactionURL(data.txID, CoinSymbol.eos, true),
 		data.isPending,
 		data.time.toString(),
 		data.transactionData.quantity.substringBeforeLast(" "),
@@ -90,7 +90,7 @@ data class TransactionListModel(
 		data.hash,
 		data.memo,
 		data.minerFee + getUnitSymbol(data.symbol), // 计算燃气费使用情况
-		generateTransactionURL(data.hash, data.symbol), // Api 地址拼接
+		generateTransactionURL(data.hash, data.symbol, false), // Api 地址拼接
 		data.isPending,
 		data.timeStamp,
 		data.value,
@@ -121,7 +121,7 @@ data class TransactionListModel(
 		data.hash,
 		"",
 		"${data.fee.toDouble().toBigDecimal()} ${data.symbol}",
-		generateTransactionURL(data.hash, data.symbol),
+		generateTransactionURL(data.hash, data.symbol, false),
 		data.isPending,
 		data.timeStamp,
 		data.value.toDouble().toString(),
@@ -183,7 +183,7 @@ data class TransactionListModel(
 			}
 		}
 
-		fun generateTransactionURL(taxHash: String, symbol: String?): String {
+		fun generateTransactionURL(taxHash: String, symbol: String?, isEOSSeries: Boolean): String {
 			return when {
 				CoinSymbol(symbol).isETC() ->
 					EtherScanApi.gasTrackerHeader(taxHash)
@@ -193,7 +193,7 @@ data class TransactionListModel(
 					litecoinTransactionDetail(taxHash)
 				CoinSymbol(symbol).isBCH() ->
 					bitcoinCashTransactionDetail(taxHash)
-				CoinSymbol(symbol).isEOS() -> {
+				CoinSymbol(symbol).isEOS() || isEOSSeries -> {
 					eosTransactionDetail(taxHash)
 				}
 				else -> EtherScanApi.transactionDetail(taxHash)

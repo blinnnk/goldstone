@@ -109,7 +109,7 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 					else it.bchAddress
 			}
 		}
-		contract.isEOS() -> map {
+		contract.isEOS() || contract.isEOSToken() -> map {
 			it.apply {
 				defaultAddress =
 					if (SharedValue.isTestEnvironment()) it.eosJungle

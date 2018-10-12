@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -126,6 +127,8 @@ class TransactionDetailPresenter(
 
 	fun showTransactionWebFragment() {
 		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
+		val fromAddress = dataFromList?.fromAddress ?: data?.fromAddress
+		?: notificationData?.fromAddress.orEmpty()
 		fragment.parentFragment.apply {
 			val webTitle =
 				when {
@@ -137,7 +140,11 @@ class TransactionDetailPresenter(
 			val argument = Bundle().apply {
 				putString(
 					ArgumentKey.webViewUrl,
-					TransactionListModel.generateTransactionURL(currentHash, symbol)
+					TransactionListModel.generateTransactionURL(
+						currentHash,
+						symbol,
+						EOSAccount(fromAddress).isValid(false)
+					)
 				)
 				putString(ArgumentKey.webViewName, webTitle)
 			}
@@ -192,7 +199,7 @@ class TransactionDetailPresenter(
 					currentHash,
 					receipt.blockNumber,
 					date,
-					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol, false)
 				)
 			}
 
@@ -205,7 +212,7 @@ class TransactionDetailPresenter(
 					currentHash,
 					receipt.blockNumber,
 					TimeUtils.formatDate(receipt.timeStamp.toMillisecond()),
-					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol, false)
 				)
 			}
 
@@ -218,7 +225,11 @@ class TransactionDetailPresenter(
 					currentHash,
 					TransactionText.pendingBlockConfirmation,
 					date,
-					TransactionListModel.generateTransactionURL(currentHash, symbol)
+					TransactionListModel.generateTransactionURL(
+						currentHash,
+						symbol,
+						EOSAccount(fromAddress.orEmpty()).isValid(false)
+					)
 				)
 			}
 		}

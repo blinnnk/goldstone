@@ -12,7 +12,24 @@ import java.io.Serializable
  * @author KaySaith
  * @date  2018/09/14
  */
-class TokenContract(val contract: String?) : Serializable {
+class TokenContract(val contract: String?, val symbol: String = "") : Serializable {
+	constructor(contract: String?) : this(
+		contract,
+		when {
+			contract.equals(TokenContract.etcContract, true) -> CoinSymbol.etc
+			contract.equals(TokenContract.btcContract, true) -> CoinSymbol.pureBTCSymbol
+			contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.ltc
+			contract.equals(TokenContract.bchContract, true) -> CoinSymbol. bch
+			contract.equals(TokenContract.eosContract, true) -> CoinSymbol.eos
+			contract.equals(TokenContract.ethContract, true) -> CoinSymbol.eth
+			/** 以下两个通常用作燃气费的基础手续费的显示 `Symbol` */
+			// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
+			contract?.length == CryptoValue.contractAddressLength -> CoinSymbol.eth
+			// `EOS` 的 `Contract` 是 对应的 `CodeName` 例如 `eosio.token`
+			else -> CoinSymbol.eos
+		}
+	)
+
 	companion object {
 		val ETH = TokenContract(TokenContract.ethContract)
 		val ETC = TokenContract(TokenContract.etcContract)
@@ -38,6 +55,10 @@ fun TokenContract?.orEmpty() = if (isNull()) TokenContract("") else this!!
 
 fun TokenContract?.isEOS(): Boolean {
 	return this?.contract.equals(TokenContract.eosContract, true)
+}
+
+fun TokenContract?.isEOSSeries(): Boolean {
+	return isEOS() || isEOSToken()
 }
 
 fun TokenContract?.isEOSCode(): Boolean {
@@ -66,11 +87,11 @@ fun TokenContract?.isETC(): Boolean {
 
 // 在 `Ethereum` 或 `Ethereum Classic` 的链下使用
 fun TokenContract?.isERC20Token(): Boolean {
-	return (!isETH() && !isETC() && !isBTC() && !isBCH() && isLTC())
+	return (!isETH() && !isETC() && !isBTC() && !isBCH() && !isLTC() && !isEOSToken())
 }
 
 fun TokenContract?.isEOSToken(): Boolean {
-	return (!isEOS() && !isETC() && !isBCH() && !isLTC() && isETH() && isBTC() && this?.contract?.length != CryptoValue.contractAddressLength)
+	return (!isEOS() && !isETC() && !isBCH() && !isLTC() && !isETH() && !isBTC() && this?.contract?.length != CryptoValue.contractAddressLength)
 }
 
 fun TokenContract?.isBTCSeries(): Boolean {
@@ -117,7 +138,7 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 			AddressUtils.getCurrentBCHAddress()
 		TokenContract(this?.contract).isETC() ->
 			SharedAddress.getCurrentETC()
-		TokenContract(this?.contract).isEOS() ->
+		TokenContract(this?.contract).isEOS() || TokenContract(this?.contract).isEOSToken() ->
 			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
 			else SharedAddress.getCurrentEOS()
 		TokenContract(this?.contract).isETH() -> SharedAddress.getCurrentEthereum()

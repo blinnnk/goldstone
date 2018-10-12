@@ -291,15 +291,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 
 	private fun setFromAddress() {
-		from.setSubtitle(
-			CryptoUtils.scaleMiddleAddress(
-				CoinSymbol(presenter.getToken()?.symbol).getAddress()
-			)
-		)
+		from.setSubtitle(CryptoUtils.scaleMiddleAddress(presenter.getToken()?.contract.getAddress()))
 	}
 
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
-		val isEOSTransfer = rootFragment?.token?.contract.isEOS()
+		val isEOSTransfer = rootFragment?.token?.contract.isEOSSeries()
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {

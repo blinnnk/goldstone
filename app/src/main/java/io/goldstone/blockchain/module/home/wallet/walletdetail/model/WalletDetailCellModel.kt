@@ -38,7 +38,7 @@ data class WalletDetailCellModel(
 		data.count,
 		data.price,
 		data.currency,
-		TokenContract(data.contract),
+		TokenContract(data.contract, data.symbol),
 		data.weight,
 		data.chainID,
 		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None

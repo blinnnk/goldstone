@@ -58,7 +58,6 @@ class NodeSelectionPresenter(
 	fun getCurrentChainName(isMainnet: Boolean, type: ChainType): String {
 		return if (isMainnet) ChainType(type.id).getMainnetChainName()
 		else ChainType(type.id).getTestnetChainName()
-
 	}
 
 	private fun checkIsEncryptERCNode(nodeName: String): Boolean {

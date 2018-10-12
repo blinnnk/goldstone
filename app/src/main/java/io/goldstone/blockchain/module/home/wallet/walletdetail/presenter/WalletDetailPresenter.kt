@@ -177,10 +177,7 @@ class WalletDetailPresenter(
 					forEach { model ->
 						// 链上查余额
 						val ownerName = model.contract.getAddress(true)
-						MyTokenTable.getBalanceByContract(
-							model.contract,
-							ownerName
-						) { balance, error ->
+						MyTokenTable.getBalanceByContract(model.contract, ownerName) { balance, error ->
 							// 更新数据的余额信息
 							if (!balance.isNull() && error.isNone()) {
 								MyTokenTable.updateBalanceByContract(

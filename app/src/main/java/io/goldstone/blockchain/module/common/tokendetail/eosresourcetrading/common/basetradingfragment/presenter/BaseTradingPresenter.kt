@@ -231,12 +231,13 @@ open class BaseTradingPresenter(
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
 						symbol,
-						EOSCodeName.EOSIOToken,
-						{ hold(null, it) }
-					) { balance ->
-						// 检查发起账户的余额是否足够
-						if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
-						else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+						EOSCodeName.EOSIOToken.value
+					) { balance, balanceError ->
+						if (!balance.isNull() && balanceError.isNone()) {
+							// 检查发起账户的余额是否足够
+							if (balance!! < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
+							else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+						} else hold(null, balanceError)
 					}
 				}
 			}
