@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -116,7 +117,7 @@ class TokenDetailPresenter(
 					val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
 				}
-				token?.contract.isEOS() -> {
+				token?.contract.isEOS() || token?.contract.isEOSToken() -> {
 					// This localDataMaxIndex is EOSSeries Transactions Only
 					val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
@@ -194,7 +195,17 @@ class TokenDetailPresenter(
 						}
 					}
 
-					token?.contract.isEOS() -> getEOSSeriesData {
+					token?.contract.isEOS() -> getEOSSeriesData(
+						CoinSymbol.EOS.symbol!!,
+						EOSCodeName.EOSIOToken
+					) {
+						callback(null, null, it)
+					}
+
+					token?.contract.isEOSToken() -> getEOSSeriesData(
+						token?.symbol.orEmpty(),
+						EOSCodeName(token?.contract?.contract.orEmpty())
+					) {
 						callback(null, null, it)
 					}
 
@@ -209,7 +220,17 @@ class TokenDetailPresenter(
 					callback(null, it, null)
 				}
 
-			token?.contract.isEOS() -> getEOSSeriesData {
+			token?.contract.isEOS() -> getEOSSeriesData(
+				CoinSymbol.EOS.symbol!!,
+				EOSCodeName.EOSIOToken
+			) {
+				callback(null, null, it)
+			}
+
+			token?.contract.isEOSToken() -> getEOSSeriesData(
+				token?.symbol.orEmpty(),
+				EOSCodeName(token?.contract?.contract.orEmpty())
+			) {
 				callback(null, null, it)
 			}
 
@@ -236,10 +257,16 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun getEOSSeriesData(callback: (List<EOSTransactionTable>) -> Unit) {
+	private fun getEOSSeriesData(
+		symbol: String,
+		codeName: EOSCodeName,
+		callback: (List<EOSTransactionTable>) -> Unit
+	) {
 		val account = SharedAddress.getCurrentEOSAccount()
-		EOSTransactionTable.getTransactionByAccountName(
+		EOSTransactionTable.getTransaction(
 			account.accountName,
+			symbol,
+			codeName.value,
 			SharedChain.getEOSCurrent()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {

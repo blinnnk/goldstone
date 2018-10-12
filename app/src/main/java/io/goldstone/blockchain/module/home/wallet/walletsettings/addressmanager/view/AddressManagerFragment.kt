@@ -370,7 +370,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
 							coinType.isEOS() -> setEOSAddressesModel(wallet)
 							coinType.isLTC() -> setLitecoinAddressesModel(wallet)
-							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
+							coinType.isBTC() ->
+								if (SharedValue.isTestEnvironment()) setBTCSeriesTestAddressesModel(wallet)
+								else setBitcoinAddressesModel(wallet)
 						}
 						toast(CommonText.succeed)
 						removeDashboard(context)

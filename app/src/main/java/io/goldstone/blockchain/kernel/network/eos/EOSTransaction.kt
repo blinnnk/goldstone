@@ -27,7 +27,8 @@ class EOSTransaction(
 	private val amount: BigInteger,
 	private val memo: String,
 	private val expirationType: ExpirationType,
-	private val symbol: String = CoinSymbol.eos
+	private val symbol: String,
+	private val codeName: EOSCodeName
 ) : Serializable, EOSTransactionInterface() {
 
 	override fun serialized(
@@ -39,7 +40,8 @@ class EOSTransaction(
 			EOSAccount(toAccountName),
 			amount,
 			memo,
-			symbol
+			symbol,
+			codeName
 		)
 		val transactionInfoCode = transactionInfo.serialize()
 		EOSAPI.getTransactionHeaderFromChain(expirationType, errorCallback) { header ->
@@ -47,7 +49,7 @@ class EOSTransaction(
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
 			val action = EOSAction(
-				EOSCodeName.EOSIOToken,
+				codeName,
 				transactionInfoCode,
 				EOSTransactionMethod.Transfer,
 				authorizationObjects

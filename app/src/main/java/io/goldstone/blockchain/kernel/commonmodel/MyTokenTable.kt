@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Current
@@ -152,22 +153,24 @@ data class MyTokenTable(
 		}
 
 		@WorkerThread
-		fun insertBySymbolAndContract(symbol: String, contract: TokenContract) {
-			val currentAddress = contract.getAddress()
+		fun addNew(symbol: String, contract: TokenContract, chainID: String) {
+			val currentAddress = contract.getAddress(false)
+			val accountName =
+				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
 			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
 			if (GoldStoneDataBase.database.myTokenDao().getTokenByContractAndAddress(
 					contract.contract.orEmpty(),
 					currentAddress,
-					contract.getCurrentChainID().id
+					chainID
 				).isNull()) {
 				MyTokenTable(
 					0,
-					currentAddress,
+					accountName,
 					currentAddress,
 					symbol,
 					0.0,
 					contract.contract.orEmpty(),
-					contract.getCurrentChainID().id
+					chainID
 				).insert()
 			}
 		}
@@ -215,14 +218,16 @@ data class MyTokenTable(
 				// 网络请求在这额外校验一次.
 				contract.isEOS() -> {
 					if (SharedAddress.getCurrentEOSAccount().isValid(false)) {
-						EOSAPI.getAccountEOSBalance(
-							SharedAddress.getCurrentEOSAccount(),
-							{ hold(null, it) }
-						) {
-							hold(it, RequestError.None)
-						}
+						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), hold)
 					} else hold(null, RequestError.None)
 				}
+
+				contract.isEOSToken() -> EOSAPI.getAccountBalanceBySymbol(
+					SharedAddress.getCurrentEOSAccount(),
+					CoinSymbol(contract.symbol),
+					contract.contract.orEmpty(),
+					hold
+				)
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(

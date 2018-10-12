@@ -11,9 +11,9 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -125,24 +125,19 @@ class TokenAssetPresenter(
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
 		val account = SharedAddress.getCurrentEOSAccount()
-		EOSTransactionTable.getTransactionByAccountName(
+		EOSTransactionTable.getTransaction(
 			account.accountName,
+			CoinSymbol.EOS.symbol!!,
+			EOSCodeName.EOSIOToken.value,
 			SharedChain.getEOSCurrent()
 		) { localData ->
-			if (localData.isEmpty()) {
-				EOSAPI.getTransactionsLastIndex(
-					account,
-					{
-						fragment.setTransactionCount(CommonText.calculating)
-						LogUtil.error("getTransactionsLastIndex", it)
-					}
-				) {
-					val count = if (it.isNull()) 0 else it!! + 1
+			if (localData.isEmpty()) EOSAPI.getTransactionsLastIndex(account
+			) { latestCount, error ->
+				if (error.isNone()) {
+					val count = if (latestCount.isNull()) 0 else latestCount!! + 1
 					fragment.setTransactionCount(count.toString())
 				}
-			} else {
-				fragment.setTransactionCount(localData.size.toString())
-			}
+			} else fragment.setTransactionCount(localData.size.toString())
 		}
 	}
 

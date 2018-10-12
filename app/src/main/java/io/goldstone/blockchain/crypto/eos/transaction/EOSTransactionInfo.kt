@@ -3,6 +3,7 @@ package io.goldstone.blockchain.crypto.eos.transaction
 import android.content.Context
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -30,6 +31,7 @@ data class EOSTransactionInfo(
 	val toAccount: EOSAccount,
 	val amount: BigInteger, // 这里是把精度包含进去的最小单位的值, 签名的时候会对这个值直接转换
 	val symbol: String,
+	val codeName: EOSCodeName,
 	val decimal: Int,
 	val memo: String,
 	// 账单的模型和买内存的复用, 唯一不同的是, 是否包含 `Memo`. 这个 `Boolean` 主要的用处是
@@ -46,7 +48,8 @@ data class EOSTransactionInfo(
 		fromAccount,
 		toAccount,
 		amount,
-		CoinSymbol.eos,
+		CoinSymbol.EOS.symbol!!,
+		EOSCodeName.EOSIOToken,
 		CryptoValue.eosDecimal,
 		"",
 		false
@@ -57,12 +60,14 @@ data class EOSTransactionInfo(
 		toAccount: EOSAccount,
 		amount: BigInteger,
 		memo: String,
-		symbol: String
+		symbol: String,
+		codeName: EOSCodeName
 	) : this(
 		fromAccount,
 		toAccount,
 		amount,
 		symbol,
+		codeName,
 		CryptoValue.eosDecimal,
 		memo,
 		true
@@ -108,7 +113,8 @@ data class EOSTransactionInfo(
 			memo,
 			// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
 			ExpirationType.FiveMinutes,
-			symbol
+			symbol,
+			codeName
 		).send(privateKey, errorCallback, hold)
 	}
 
@@ -128,10 +134,10 @@ data class EOSTransactionInfo(
 		val amountCode = EOSUtils.convertAmountToCode(amount)
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(decimal)
 		val symbolCode = symbol.toByteArray().toNoPrefixHexString()
-		val completeZero = "00000000"
+		// `EOS Token` 的 `Memo` 不用补位
+		val completeZero = if (symbol == CoinSymbol.EOS.symbol) "00000000" else "00"
 		val memoCode = if (isTransaction) EOSUtils.convertMemoToCode(memo) else ""
 		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + completeZero + memoCode
-
 	}
 
 	companion object {

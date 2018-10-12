@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -129,16 +128,15 @@ class ChainAddressesPresenter(
 								}
 
 							fragment.coinType.isBTC() -> {
-								if (SharedValue.isTestEnvironment()) {
-									AddressManagerPresenter.createBTCTestAddress(this, password) {
-										updateAddressManagerDataBy(ChainType.AllTest)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
-									}
-								} else {
-									AddressManagerPresenter.createBTCAddress(this, password) {
-										updateAddressManagerDataBy(ChainType.BTC)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
-									}
+								AddressManagerPresenter.createBTCAddress(this, password) {
+									updateAddressManagerDataBy(ChainType.BTC)
+									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								}
+							}
+							fragment.coinType.isAllTest() -> {
+								AddressManagerPresenter.createBTCTestAddress(this, password) {
+									updateAddressManagerDataBy(ChainType.AllTest)
+									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
 								}
 							}
 						}
@@ -178,6 +176,7 @@ class ChainAddressesPresenter(
 					fragment.coinType.isBCH() -> setBitcoinCashAddressesModel(this)
 					fragment.coinType.isEOS() -> setEOSAddressesModel(this)
 					fragment.coinType.isBTC() -> setBitcoinAddressesModel(this)
+					fragment.coinType.isAllTest() -> setBTCSeriesTestAddressesModel(this)
 				}
 			}
 		}
