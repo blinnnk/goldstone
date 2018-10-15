@@ -12,10 +12,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.progressBar
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
+import org.jetbrains.anko.*
 
 
 /**
@@ -26,10 +23,12 @@ class BottomLoadingView(context: Context) : LinearLayout(context) {
 
 	private var description: TextView
 	private var loading: ProgressBar
+
 	init {
 		orientation = LinearLayout.VERTICAL
 		id = ElementID.bottomLoading
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 40.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+		minimumHeight = 40.uiPX()
 		gravity = Gravity.CENTER_HORIZONTAL
 		loading = progressBar {
 			layoutParams = RelativeLayout.LayoutParams(25.uiPX(), matchParent)
