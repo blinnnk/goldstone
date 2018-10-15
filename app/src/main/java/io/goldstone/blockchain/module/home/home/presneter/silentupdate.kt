@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -22,9 +24,13 @@ import org.jetbrains.anko.doAsync
 abstract class SilentUpdater {
 	fun star() {
 		doAsync {
-			updateUnknownDefaultToken()
-			updateRAMUnitPrice()
-			updateMyTokenCurrencyPrice()
+			if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+				updateUnknownDefaultToken()
+				updateRAMUnitPrice()
+				updateMyTokenCurrencyPrice()
+				updateCPUUnitPrice()
+				updateNETUnitPrice()
+			}
 		}
 	}
 
@@ -40,8 +46,28 @@ abstract class SilentUpdater {
 	private fun updateRAMUnitPrice() {
 		EOSResourceUtil.getRAMPrice(EOSUnit.KB, false) { priceInEOS, error ->
 			if (!priceInEOS.isNull() && error.isNone()) {
-				Config.updateRAMUnitPrice(priceInEOS!!)
+				SharedValue.updateRAMUnitPrice(priceInEOS!!)
 			} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+		}
+	}
+
+	private fun updateCPUUnitPrice() {
+		if (SharedAddress.getCurrentEOSAccount().isValid()) {
+			EOSResourceUtil.getCPUPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
+				if (!priceInEOS.isNull() && error.isNone()) {
+					SharedValue.updateCPUUnitPrice(priceInEOS!!)
+				} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+			}
+		}
+	}
+
+	private fun updateNETUnitPrice() {
+		if (SharedAddress.getCurrentEOSAccount().isValid()) {
+			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
+				if (!priceInEOS.isNull() && error.isNone()) {
+					SharedValue.updateNETUnitPrice(priceInEOS!!)
+				} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+			}
 		}
 	}
 

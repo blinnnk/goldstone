@@ -6,13 +6,13 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -30,13 +30,17 @@ import java.math.BigInteger
  */
 open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
-	override val pageTitle: String = "Trading Resource"
 	open val tradingType: TradingType = TradingType.CPU
+	override val pageTitle get() = when (tradingType) {
+		TradingType.CPU -> TokenDetailText.tradingCPU
+		TradingType.NET -> TokenDetailText.tradingNET
+		TradingType.RAM -> TokenDetailText.tradingRAM
+	}
 	private val delegateTitle by lazy {
 		val title = when (tradingType) {
 			TradingType.CPU -> TokenDetailText.delegateTitle suffix TokenDetailText.cpu
 			TradingType.NET -> TokenDetailText.delegateTitle suffix TokenDetailText.net
-			TradingType.RAM -> "BUY" + TokenDetailText.ram
+			TradingType.RAM -> TokenDetailText.buyRam
 		}
 		SessionTitleView(context!!).setTitle(title)
 	}
@@ -44,14 +48,14 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		val title = when (tradingType) {
 			TradingType.CPU -> TokenDetailText.refundTitle suffix TokenDetailText.cpu
 			TradingType.NET -> TokenDetailText.refundTitle suffix TokenDetailText.net
-			TradingType.RAM -> "SELL" + TokenDetailText.ram
+			TradingType.RAM -> TokenDetailText.sellRam
 		}
 		SessionTitleView(context!!).setTitle(title)
 	}
 
 	private val incomeTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(Config.getCurrentEOSAccount().accountName)
+			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.gainConfirmEvent {
@@ -69,7 +73,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val expendTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(Config.getCurrentEOSAccount().accountName)
+			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
 			if (tradingType.isRAM()) setSellingRAMStyle()
 			setConfirmClickEvent {
 				showLoading(true)
@@ -97,10 +101,10 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				topPadding = 10.uiPX()
 				bottomPadding = 10.uiPX()
 				delegateTitle.into(this)
-				delegateTitle.setSubtitle(CommonText.calculating, "Current Price: ${CommonText.calculating} EOS/MS/Day", Spectrum.blue)
+				delegateTitle.setSubtitle(CommonText.calculating, "${QuotationText.currentPrice}: ${CommonText.calculating} EOS/MS/Day", Spectrum.blue)
 				incomeTradingCard.into(this)
 				refundTitle.into(this)
-				refundTitle.setSubtitle(CommonText.calculating, "Current Price: ${CommonText.calculating} EOS/Byte/Day", Spectrum.blue)
+				refundTitle.setSubtitle(CommonText.calculating, "${QuotationText.currentPrice}: ${CommonText.calculating} EOS/Byte/Day", Spectrum.blue)
 				expendTradingCard.into(this)
 			}
 			// 某些行为不需要设置 `租赁或转出` 的选项
@@ -122,15 +126,15 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		val unitDescription = when (tradingType) {
 			TradingType.CPU -> "EOS/MS/Day"
 			TradingType.NET -> "EOS/Bytes/Day"
-			TradingType.RAM -> "KB/PER EOS"
+			TradingType.RAM -> "KB/EOS"
 		}
 		val isTime = when (tradingType) {
 			TradingType.CPU -> true
 			else -> false
 		}
 		val formattedPriceEOS = "≈ " + priceEOS.formatCount(4)
-		delegateTitle.setSubtitle(formattedPriceEOS, "Current Price: $formattedPriceEOS $unitDescription", Spectrum.blue)
-		refundTitle.setSubtitle(formattedPriceEOS, "Current Price: $formattedPriceEOS $$unitDescription", Spectrum.blue)
+		delegateTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
+		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $$unitDescription", Spectrum.blue)
 		incomeTradingCard.setProcessValue(title, weight, available, total, isTime)
 		expendTradingCard.setProcessValue(title, weight, available, total, isTime)
 	}

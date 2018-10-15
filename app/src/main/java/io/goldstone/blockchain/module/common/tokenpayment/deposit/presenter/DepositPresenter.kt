@@ -3,7 +3,9 @@ package io.goldstone.blockchain.module.common.tokenpayment.deposit.presenter
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -33,59 +35,59 @@ class DepositPresenter(
 			val content = when {
 				token?.contract.isETC() -> {
 					QRCode.generateETHOrETCCode(
-						Config.getCurrentETCAddress(),
+						SharedAddress.getCurrentETC(),
 						amount,
-						Config.getETCCurrentChain().id
+						SharedChain.getETCCurrent().id
 					)
 				}
 
 				token?.contract.isETH() -> {
 					QRCode.generateETHOrETCCode(
-						Config.getCurrentEthereumAddress(),
+						SharedAddress.getCurrentEthereum(),
 						amount,
-						Config.getCurrentChain().id
+						SharedChain.getCurrentETH().id
 					)
 				}
 
 				token?.contract.isBTC() -> {
-					val address = if (Config.isTestEnvironment())
-						Config.getCurrentBTCSeriesTestAddress()
-					else Config.getCurrentBTCAddress()
+					val address = if (SharedValue.isTestEnvironment())
+						SharedAddress.getCurrentBTCSeriesTest()
+					else SharedAddress.getCurrentBTC()
 					QRCode.generateBitcoinCode(address, amount)
 				}
 
 				token?.contract.isLTC() -> {
-					val address = if (Config.isTestEnvironment())
-						Config.getCurrentBTCSeriesTestAddress()
-					else Config.getCurrentLTCAddress()
+					val address = if (SharedValue.isTestEnvironment())
+						SharedAddress.getCurrentBTCSeriesTest()
+					else SharedAddress.getCurrentLTC()
 					QRCode.generateLitecoinCode(address, amount)
 				}
 
 				token?.contract.isBCH() -> {
-					val address = if (Config.isTestEnvironment())
-						Config.getCurrentBTCSeriesTestAddress()
-					else Config.getCurrentBCHAddress()
+					val address = if (SharedValue.isTestEnvironment())
+						SharedAddress.getCurrentBTCSeriesTest()
+					else SharedAddress.getCurrentBCH()
 					QRCode.generateBitcoinCashCode(address, amount)
 				}
 
-				token?.contract.isEOS() -> {
-					val accountName = Config.getCurrentEOSAccount().accountName
+				token?.contract.isEOSSeries() -> {
+					val accountName = SharedAddress.getCurrentEOSAccount().accountName
 					QRCode.generateEOSCode(
 						accountName,
 						EOSCodeName.EOSIO.value, // `EOS` 的 `Token` 要支持传递对应的 `Token Code`
 						amount,
 						token?.decimal.orZero(),
-						Config.getEOSCurrentChain().id
+						SharedChain.getEOSCurrent().id
 					)
 				}
 
 				else -> {
 					QRCode.generateERC20Code(
-						Config.getCurrentEthereumAddress(),
+						SharedAddress.getCurrentEthereum(),
 						token?.contract?.contract.orEmpty(),
 						amount,
 						token?.decimal.orZero(),
-						Config.getCurrentChain().id
+						SharedChain.getCurrentETH().id
 					)
 				}
 			}

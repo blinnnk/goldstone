@@ -15,7 +15,6 @@ import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
@@ -24,11 +23,11 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
-import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -93,8 +92,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.click { button ->
 				button.showLoadingStatus()
 				presenter.importWatchOnlyWallet(currentType, addressInput, nameInput) {
-					if (!it.isNone()) context.alert(it.message)
-					else activity?.jump<SplashActivity>()
+					if (!it.isNone()) context.alert(it.message) else activity?.jump<SplashActivity>()
 					button.showLoadingStatus(false)
 				}
 			}.into(this)
@@ -102,15 +100,13 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			ExplanationTitle(context).apply {
 				text = QAText.whatIsWatchOnlyWallet.setUnderline()
 			}.click {
-				getParentFragment<WalletImportFragment> {
-					NetworkUtil.hasNetworkWithAlert(context) isTrue {
-						presenter.showTargetFragment<WebViewFragment>(
-							Bundle().apply {
-								putString(ArgumentKey.webViewUrl, WebUrl.whatIsWatchOnly)
-								putString(ArgumentKey.webViewName, WalletText.watchOnly)
-							}
-						)
-					}
+				getParentFragment<ProfileOverlayFragment> {
+					presenter.showTargetFragment<WebViewFragment>(
+						Bundle().apply {
+							putString(ArgumentKey.webViewUrl, WebUrl.whatIsWatchOnly)
+							putString(ArgumentKey.webViewName, WalletText.watchOnly)
+						}
+					)
 				}
 			}.into(this)
 		}

@@ -2,8 +2,8 @@ package io.goldstone.blockchain.crypto.utils
 
 import android.text.format.DateUtils
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -179,7 +179,7 @@ fun Double.toGWeiValue(): String {
 }
 
 fun Double.formatCurrency(): String {
-	val rate = Config.getCurrentRate()
+	val rate = SharedWallet.getCurrentRate()
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 3
 	val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同

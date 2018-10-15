@@ -108,13 +108,6 @@ class GoldStoneUtilUnitTest {
 	}
 
 	@Test
-	fun getLatestEthereumChildAddressIndex() {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
-			LogUtil.debug("getLatestEthereumChildAddressIndex + $position", "$ethereumChildAddressIndex")
-		}
-	}
-
-	@Test
 	fun cryptoMnemonic() {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
@@ -142,23 +135,6 @@ class GoldStoneUtilUnitTest {
 		}
 	}
 
-	@Test
-	fun newEthereumChildAddress() {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
-			wallet.encryptMnemonic?.let {
-				val mnemonic = JavaKeystoreUtil().decryptData(it)
-				val index = ethereumChildAddressIndex + 1
-				val childPath = wallet.ethPath.substringBeforeLast("/") + "/" + index
-				val masterKey = Mnemonic.mnemonicToKey(mnemonic, childPath)
-				val current = masterKey.keyPair.getAddress().prepend0xPrefix()
-				Assert.assertTrue(
-					"wrong address value", current.equals
-				("0x6e3df901a984d50b68355eede503cbfc1ead8f13", true)
-				)
-			}
-		}
-	}
-
 	data class PricePairModel(val pair: String, val price: String)
 	data class PriceAlarmClockTable(
 		val pair: String,
@@ -175,6 +151,22 @@ class GoldStoneUtilUnitTest {
 		LogUtil.debug(position, data.getTargetChild("data", "value", "name"))
 		val result = data.getTargetChild("data", "value", "name")
 		Assert.assertTrue("convert to wrong value", expect == result)
+	}
+
+	@Test
+	fun getAllLocalEOSAccount() {
+		doAsync {
+			val localData = GoldStoneDataBase.database.eosAccountDao().getAll()
+			LogUtil.debug("all local eos account tables", localData.toString())
+		}
+	}
+
+	@Test
+	fun getAllLocalWallets() {
+		doAsync {
+			val wallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+			LogUtil.debug("all local wallet tables", wallets.toString())
+		}
 	}
 }
 

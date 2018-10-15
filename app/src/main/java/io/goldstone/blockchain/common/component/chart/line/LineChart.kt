@@ -71,7 +71,6 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 
 		val gridLineColor = GrayScale.lightGray
 		val labelColor = GrayScale.midGray
-
 		isScaleXEnabled = false
 		isScaleYEnabled = false
 		mPinchZoomEnabled = true

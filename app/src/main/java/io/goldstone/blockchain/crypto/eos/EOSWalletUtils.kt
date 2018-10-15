@@ -29,9 +29,8 @@ object EOSWalletUtils {
 	}
 
 	fun generateKeyPairByPrivateKey(privateKey: BigInteger): BaseKeyPair {
-		val eckey = ECKey.fromPrivate(privateKey, true)
-		val compressPublicKey = eckey.publicKeyAsHex
-		val wifPrivateKey = eckey.getPrivateKeyAsWiF(MainNetParams.get())
+		val compressPublicKey = ECKey.fromPrivate(privateKey, true).publicKeyAsHex
+		val wifPrivateKey = ECKey.fromPrivate(privateKey, false).getPrivateKeyAsWiF(MainNetParams.get())
 		val publicKeyWithRipemd160 = RIPEMD160.Digest().digest(Hex.decode(compressPublicKey))
 		val checkSum = publicKeyWithRipemd160.toNoPrefixHexString().substring(0, 8)
 		val base58PublicKey = Base58.encode(Hex.decode(compressPublicKey + checkSum))

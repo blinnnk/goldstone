@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -17,12 +18,14 @@ import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.component.edittext.ValueInputView
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.*
@@ -32,11 +35,8 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.present
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.verticalLayout
 import kotlin.apply
 
 /**
@@ -105,13 +105,48 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 
+	private fun setCustomHeaderTitle(status: Boolean) {
+		val token = rootFragment?.token
+		getParentFragment<TokenDetailOverlayFragment> {
+			if (status) customHeader = {
+				val titles = TwoLineTitles(context).apply {
+					id = ElementID.customHeader
+					isCenter = true
+					layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
+					this.title.text = token?.symbol.orEmpty()
+					this.subtitle.text = "${token?.count}" suffix token?.contract.getSymbol().symbol.orEmpty()
+					setBoldTitles()
+				}
+				titles.into(this)
+				titles.setCenterInParent()
+			} else {
+				overlayView.header.apply {
+					removeView(findViewById<TwoLineTitles>(ElementID.customHeader))
+				}
+				recoveryOverlayHeader()
+			}
+
+		}
+	}
+
 	override fun onViewCreated(
 		view: View,
 		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(view, savedInstanceState)
+		setCustomHeaderTitle(true)
 		updateValueTotalPrice()
 		resetBackButtonEvent()
+	}
+
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		setCustomHeaderTitle(!hidden)
+	}
+
+	override fun onDetach() {
+		super.onDetach()
+		setCustomHeaderTitle(false)
 	}
 
 	override fun onResume() {
@@ -256,15 +291,11 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	}
 
 	private fun setFromAddress() {
-		from.setSubtitle(
-			CryptoUtils.scaleMiddleAddress(
-				CoinSymbol(presenter.getToken()?.symbol).getAddress()
-			)
-		)
+		from.setSubtitle(CryptoUtils.scaleMiddleAddress(presenter.getToken()?.contract.getAddress()))
 	}
 
 	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
-		val isEOSTransfer = rootFragment?.token?.contract.isEOS()
+		val isEOSTransfer = rootFragment?.token?.contract.isEOSSeries()
 		if (memoInputView.isNull()) {
 			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {

@@ -1,23 +1,21 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter
 
-import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.Config
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
+import org.jetbrains.anko.doAsync
 
 /**
  * @date 25/03/2018 5:11 PM
@@ -35,7 +33,7 @@ class TokenManagementListPresenter(
 		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
 		fragment.getParentFragment<TokenManagementFragment> {
-			prepareMyDefaultTokens(Config.getCurrentWalletType().isETHSeries())
+			prepareMyDefaultTokens(SharedWallet.getCurrentWalletType().isETHSeries())
 		}
 	}
 
@@ -44,12 +42,11 @@ class TokenManagementListPresenter(
 		updateData()
 	}
 
+	// 在异步线程更新数据
 	private fun prepareMyDefaultTokens(isETHERCAndETCOnly: Boolean) {
-		// 在异步线程更新数据
 		DefaultTokenTable.getDefaultTokens { defaultTokens ->
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = defaultTokens.size
-
 				override fun concurrentJobs() {
 					defaultTokens.forEach { default ->
 						MyTokenTable.getMyTokens { myTokens ->
@@ -62,11 +59,12 @@ class TokenManagementListPresenter(
 				}
 
 				override fun mergeCallBack() {
-					val sortedList =
-						defaultTokens.sortedByDescending { it.weight }.toArrayList()
+					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						if (isETHERCAndETCOnly) sortedList.filterNot {
-							TokenContract(it.contract).isBTCSeries() || TokenContract(it.contract).isEOS()
+						if (isETHERCAndETCOnly) sortedList.filter {
+							TokenContract(it.contract).isETH() ||
+								TokenContract(it.contract).isERC20Token() ||
+								TokenContract(it.contract).isETC()
 						}.let {
 							memoryTokenData = it.toArrayList()
 						} else memoryTokenData = sortedList
@@ -78,22 +76,12 @@ class TokenManagementListPresenter(
 	}
 
 	companion object {
-
-		fun updateMyTokenInfoBy(switch: HoneyBaseSwitch, token: DefaultTokenTable) {
-			switch.isClickable = false
-			if (switch.isChecked) {
+		fun insertOrDeleteMyToken(isChecked: Boolean, token: DefaultTokenTable) {
+			doAsync {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				MyTokenTable.insertBySymbolAndContract(token.symbol, TokenContract(token.contract)) {
-					switch.isClickable = true
-				}
-			} else {
-				// once it is unchecked then delete this symbol from `MyTokenTable` database
-				MyTokenTable.deleteByContract(
-					TokenContract(token.contract),
-					CoinSymbol(token.symbol).getAddress()
-				) {
-					switch.isClickable = true
-				}
+				if (isChecked) MyTokenTable.addNew(token.symbol, TokenContract(token.contract), token.chainID)
+				else GoldStoneDataBase.database.myTokenDao()
+					.deleteByContractAndAddress(token.contract, TokenContract(token.contract).getAddress())
 			}
 		}
 	}

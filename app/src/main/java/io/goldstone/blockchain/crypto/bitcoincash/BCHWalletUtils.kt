@@ -51,11 +51,9 @@ object BCHWalletUtils {
 		return when {
 			address.length < CryptoValue.bitcoinAddressClassicLength -> false
 			address.contentEquals(":") &&
-				!address.substringAfter(":")
-					.substring(0, 1).equals("q", true) -> false
+				!address.substringAfter(":").substring(0, 1).equals("q", true) -> false
 			address.substring(0, 1).equals("q", true) &&
-				address.length < CryptoValue.bip39AddressLength -> false
-			// TODO 暂时私钥导入的 BCH 不支持测试网, 这里还没考虑好这种级别的架构.
+				address.length < CryptoValue.bchNewAddressMinLengh -> false
 			CryptoValue.isBitcoinAddressLength(address) &&
 				address.substring(0, 1).equals("m", true) -> false
 			CryptoValue.isBitcoinAddressLength(address) &&

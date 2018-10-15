@@ -61,10 +61,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 		}
 	}
 
-	inline fun <reified T : Fragment> showTargetFragment(
-		bundle: Bundle = Bundle(),
-		viewPagerSize: Int = 0
-	) {
+	inline fun <reified T : Fragment> showTargetFragment(bundle: Bundle = Bundle(), viewPagerSize: Int = 0) {
 		fragment.apply {
 			if (viewPagerSize > 0) {
 				childFragmentManager.fragments.apply {

@@ -3,9 +3,10 @@ package io.goldstone.blockchain.kernel.commonmodel.eos
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -22,6 +23,8 @@ data class EOSTransactionTable(
 	var id: Int,
 	var dataIndex: Int,
 	var txID: String,
+	var symbol: String,
+	var codeName: String,
 	var cupUsage: BigInteger,
 	var netUsage: BigInteger,
 	var transactionData: EOSTransactionData,
@@ -41,6 +44,8 @@ data class EOSTransactionTable(
 		0,
 		dataIndex,
 		response.transactionID,
+		info.symbol,
+		info.codeName.value,
 		response.cupUsageByte,
 		response.netUsageByte,
 		EOSTransactionData(info),
@@ -49,15 +54,19 @@ data class EOSTransactionTable(
 		response.executedStatus,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
 		info.fromAccount.accountName,
-		Config.getCurrentEOSAddress(),
-		Config.getEOSCurrentChain().id,
+		SharedAddress.getCurrentEOS(),
+		SharedChain.getEOSCurrent().id,
 		true
 	)
 
+	// act part json
+	// {"account":"eosio.token","name":"transfer","authorization":[{"actor":"huaxingziben","permission":"active"}],"data":{"from":"huaxingziben","to":"googletumblr","quantity":"2.0000 EOS","memo":""},"hex_data":"30d5719f4dd78d6e70e3913aabc82865204e00000000000004454f530000000000"}
 	constructor(data: JSONObject, recordAccountName: String) : this(
 		0,
 		dataIndex = data.safeGet("account_action_seq").toIntOrZero(),
 		txID = data.getTargetChild("action_trace", "trx_id"),
+		symbol = EOSTransactionData(data.getTargetObject("action_trace", "act", "data")).quantity.substringAfter(" "),
+		codeName = data.getTargetObject("action_trace", "act").safeGet("account"),
 		cupUsage = BigInteger.ZERO,
 		netUsage = BigInteger.ZERO,
 		transactionData = EOSTransactionData(data.getTargetObject("action_trace", "act", "data")),
@@ -65,8 +74,8 @@ data class EOSTransactionTable(
 		time = EOSUtils.getUTCTimeStamp(data.safeGet("block_time")),
 		status = true,
 		recordAccountName = recordAccountName,
-		recordPublicKey = Config.getCurrentEOSAddress(),
-		chainID = Config.getEOSCurrentChain().id,
+		recordPublicKey = SharedAddress.getCurrentEOS(),
+		chainID = SharedChain.getEOSCurrent().id,
 		isPending = false
 	)
 
@@ -92,13 +101,20 @@ data class EOSTransactionTable(
 			}
 		}
 
-		fun getTransactionByAccountName(
+		fun getTransaction(
 			name: String,
+			symbol: String,
+			codeName: String,
 			chainID: ChainID,
 			@UiThread hold: (List<EOSTransactionTable>) -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(name, chainID.id)
+				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(
+					name,
+					symbol,
+					codeName,
+					chainID.id
+				)
 			} then (hold)
 		}
 	}
@@ -125,8 +141,8 @@ interface EOSTransactionDao {
 	@Query("DELETE FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")
 	fun deleteDataByRecordAddress(recordAddress: String)
 
-	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID")
-	fun getDataByRecordAccount(recordAccountName: String, chainID: String): List<EOSTransactionTable>
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND chainID LIKE :chainID AND symbol LIKE :symbol AND codeName LIKE :codeName")
+	fun getDataByRecordAccount(recordAccountName: String, symbol: String, codeName: String, chainID: String): List<EOSTransactionTable>
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND txID LIKE :txID")
 	fun getDataByTxIDAndRecordName(txID: String, recordAccountName: String): EOSTransactionTable?

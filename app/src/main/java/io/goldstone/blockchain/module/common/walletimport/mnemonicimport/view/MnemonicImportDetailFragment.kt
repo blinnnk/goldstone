@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.alert
@@ -178,11 +179,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		Pair(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader),
 		Pair(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader),
 		Pair(
-			ImportWalletText.customBitcoinPath(Config.getYingYongBaoInReviewStatus()),
+			ImportWalletText.customBitcoinPath(SharedWallet.getYingYongBaoInReviewStatus()),
 			DefaultPath.btcPathHeader
 		),
 		Pair(
-			ImportWalletText.customBTCTestPath(Config.getYingYongBaoInReviewStatus()),
+			ImportWalletText.customBTCTestPath(SharedWallet.getYingYongBaoInReviewStatus()),
 			DefaultPath.testPathHeader
 		),
 		Pair(ImportWalletText.customLitecoinPath, DefaultPath.ltcPathHeader),

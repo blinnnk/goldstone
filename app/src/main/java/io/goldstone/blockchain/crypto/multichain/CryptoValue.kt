@@ -10,13 +10,13 @@ import com.blinnnk.util.TinyNumberUtils
 
 object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
+	const val bchNewAddressMinLengh = 41
 	private const val bitcoinAddressLength = 34
 	const val bitcoinAddressClassicLength = 33
 	const val eosAddressLength = 53
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	const val keystoreFilename = "keystore"
-	const val singleChainFilename = "singleChain"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18
@@ -29,9 +29,6 @@ object CryptoValue {
 	const val signedBTCMainnetSecret = "KxJQeWFnRuTv7HtECL85ytaxQAyFxspzWs9RuY1Fa1oqXFGh6gJC"
 	const val ltcMainnetSignedSecret = "T99eF7JUK83YfnCBqcdsUP7pBPeLqYLmAW477PHdRX67g82MgQLk"
 
-	val singleChainFile: (btcAddress: String) -> String = {
-		singleChainFilename + it
-	}
 	val isBitcoinAddressLength: (address: String) -> Boolean = {
 		TinyNumberUtils.hasTrue(
 			it.length == bitcoinAddressLength,
@@ -40,12 +37,10 @@ object CryptoValue {
 	}
 	val filename: (
 		walletAddress: String,
-		isBTCSeriesWallet: Boolean,
-		isSingleChainWallet: Boolean
-	) -> String = { walletAddress, isBTCSeriesWallet, isSingleChainWallet ->
+		isBTCSeriesWallet: Boolean
+	) -> String = { walletAddress, isBTCSeriesWallet ->
 		when {
-			isBTCSeriesWallet && !isSingleChainWallet -> walletAddress
-			isSingleChainWallet -> singleChainFile(walletAddress)
+			isBTCSeriesWallet -> walletAddress
 			else -> keystoreFilename
 		}
 	}

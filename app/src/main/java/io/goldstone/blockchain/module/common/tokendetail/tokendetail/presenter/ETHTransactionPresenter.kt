@@ -5,9 +5,10 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
@@ -75,7 +76,7 @@ fun getTokenTransactions(
 ) {
 	getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
 		if (hasData) TransactionTable.getTokenTransactions(
-			Config.getCurrentEthereumAddress()
+			SharedAddress.getCurrentEthereum()
 		) { transactions ->
 			checkAddressNameInContacts(transactions) {
 				hold(transactions)
@@ -115,7 +116,7 @@ private fun mergeETHAndERC20Incoming(
 			doAsync {
 				GoldStoneAPI.getTransactionListByAddress(
 					startBlock,
-					Config.getCurrentEthereumAddress(),
+					SharedAddress.getCurrentEthereum(),
 					{
 						// 只弹出一次错误信息
 						if (!hasError) {
@@ -140,7 +141,7 @@ private fun mergeETHAndERC20Incoming(
 						}
 						completeMark()
 					},
-					Config.getCurrentEthereumAddress()
+					SharedAddress.getCurrentEthereum()
 				) { erc20Data ->
 					// 把请求回来的数据转换成 `TransactionTable` 格式
 					logData = erc20Data.map {
@@ -170,8 +171,8 @@ private fun diffNewDataAndUpdateLocalData(
 ) {
 	GoldStoneDataBase.database.transactionDao().apply {
 		getTransactionsByAddress(
-			Config.getCurrentEthereumAddress(),
-			Config.getCurrentChain().id
+			SharedAddress.getCurrentEthereum(),
+			SharedChain.getCurrentETH().id
 		).let { localData ->
 			newData.filterNot { new ->
 				localData.any {
@@ -213,7 +214,7 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 								completeMark()
 								LogUtil.error("getUnknownTokenInfo ", it)
 							},
-							Config.getCurrentChainName()
+							SharedChain.getCurrentETHName()
 						) { symbol, decimal ->
 							unknownData.add(DefaultTokenTable(transaction.contractAddress, symbol, decimal))
 							completeMark()

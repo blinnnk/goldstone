@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 import android.arch.persistence.room.*
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
@@ -91,28 +91,28 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 		contract.isBTC() -> map {
 			it.apply {
 				defaultAddress =
-					if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+					if (SharedValue.isTestEnvironment()) it.btcSeriesTestnetAddress
 					else it.btcMainnetAddress
 			}
 		}
 		contract.isLTC() -> map {
 			it.apply {
 				defaultAddress =
-					if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+					if (SharedValue.isTestEnvironment()) it.btcSeriesTestnetAddress
 					else it.ltcAddress
 			}
 		}
 		contract.isBCH() -> map {
 			it.apply {
 				defaultAddress =
-					if (Config.isTestEnvironment()) it.btcSeriesTestnetAddress
+					if (SharedValue.isTestEnvironment()) it.btcSeriesTestnetAddress
 					else it.bchAddress
 			}
 		}
-		contract.isEOS() -> map {
+		contract.isEOS() || contract.isEOSToken() -> map {
 			it.apply {
 				defaultAddress =
-					if (Config.isTestEnvironment()) it.eosJungle
+					if (SharedValue.isTestEnvironment()) it.eosJungle
 					else it.eosAddress
 			}
 		}

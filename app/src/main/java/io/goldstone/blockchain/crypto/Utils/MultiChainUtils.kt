@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.utils
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -13,6 +13,7 @@ import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
@@ -36,14 +37,15 @@ object MultiChainUtils {
 		val ltcAddress = ECKey.fromPrivate(rootKey).toAddress(LitecoinNetParams()).toBase58()
 		val bchAddress = BCHWalletUtils.getAddressByPrivateKey(rootKey)
 		val eosAddress = EOSWalletUtils.generateKeyPairByPrivateKey(rootKey).address
+		// 根私钥创建的钱包不是 `Bip44` 所以不用传递 `Address Index`
 		return ChainAddresses(
-			ethAddress,
-			ethAddress,
-			btcMainnetAddress,
-			allBtcSeriesTestAddress,
-			ltcAddress,
-			bchAddress,
-			eosAddress
+			Bip44Address(ethAddress, ChainType.ETH.id),
+			Bip44Address(ethAddress, ChainType.ETC.id),
+			Bip44Address(btcMainnetAddress, ChainType.BTC.id),
+			Bip44Address(allBtcSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(ltcAddress, ChainType.LTC.id),
+			Bip44Address(bchAddress, ChainType.BCH.id),
+			Bip44Address(eosAddress, ChainType.EOS.id)
 		)
 	}
 
@@ -77,11 +79,11 @@ object MultiChainUtils {
 			BTCUtils.isValidTestnetAddress(address) -> {
 				when {
 					CoinSymbol(symbol).isBCH() -> {
-						if (Config.isTestEnvironment()) AddressType.BCH
+						if (SharedValue.isTestEnvironment()) AddressType.BCH
 						else null
 					}
 					CoinSymbol(symbol).isLTC() -> {
-						if (Config.isTestEnvironment()) AddressType.LTC
+						if (SharedValue.isTestEnvironment()) AddressType.LTC
 						else null
 					}
 					else -> AddressType.BTCSeriesTest

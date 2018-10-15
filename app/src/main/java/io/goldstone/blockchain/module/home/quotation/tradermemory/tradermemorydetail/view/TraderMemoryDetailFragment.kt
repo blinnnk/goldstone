@@ -13,8 +13,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.ChainNameID
@@ -22,7 +21,6 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
 import io.goldstone.blockchain.module.home.quotation.tradermemory.eosmemorytransactionhistorygeneralview.view.EOSMemoryTransactionHistoryFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.view.RankFragment
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.EOSRAMPriceTrendFragment
@@ -164,7 +162,7 @@ class TraderMemoryDetailFragment : BaseFragment<TraderMemoryDetailPresenter>() {
 
 		true.let { fromMainnet ->
 			// 更新是否是测试环境的参数
-			Config.updateIsTestEnvironment(fromMainnet == false)
+			SharedValue.updateIsTestEnvironment(!fromMainnet)
 			selectedNode.forEach { pair ->
 				when {
 					pair.first.equals(CryptoName.eth, true) ->

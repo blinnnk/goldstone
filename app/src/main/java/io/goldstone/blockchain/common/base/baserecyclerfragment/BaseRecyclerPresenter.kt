@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.base.baserecyclerfragment
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 
 /**
@@ -13,12 +14,8 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 
 	abstract val fragment: T
 
-	open fun updateData() {
-		// Do Something
-	}
-
-	open fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {
-	}
+	open fun updateData() {}
+	open fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {}
 
 	/**
 	 * @description
@@ -26,40 +23,41 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	 * @param
 	 * [fragment] 这个就是依赖的 `Fragment` 实体
 	 * */
-	open fun onFragmentAttach() {
-		// Do Something
-	}
+	open fun onFragmentAttach() {}
 
-	open fun onFragmentCreate() {
-		// Do Something
-	}
+	open fun onFragmentCreate() {}
+	open fun onFragmentCreateView() {}
+	open fun onFragmentDetach() {}
+	open fun onFragmentDestroy() {}
 
-	open fun onFragmentCreateView() {
-		// Do Something
-	}
-
-	open fun onFragmentDetach() {
-	}
-
-	open fun onFragmentDestroy() {
-		// Do Something
-	}
-
+	private var isLoadingData = false
 	open fun onFragmentViewCreated() {
 		updateData()
+		fragment.addRecyclerLoadMoreListener {
+			if (!isLoadingData) loadMore()
+			isLoadingData = true
+		}
 	}
 
-	open fun onFragmentStart() {
-		// 当 `ViewCreated`后执行更新数据函数
-	}
-
-	open fun onFragmentShowFromHidden() {
-		// Do Something
-	}
-
+	open fun onFragmentStart() {}
+	open fun onFragmentShowFromHidden() {}
 	open fun onFragmentResume() {}
-
 	open fun onFragmentHiddenChanged(isHidden: Boolean) {}
+
+	fun showBottomLoading(status: Boolean) {
+		fragment.recyclerView.apply {
+			val bottomIndex = adapter?.itemCount.orZero() - 1
+			getItemAtAdapterPosition<BottomLoadingView>(bottomIndex) {
+				if (status) it.show() else it.hide()
+			}
+		}
+		isLoadingData = false
+	}
+
+	open fun loadMore() {
+		// 显示底部的 `LoadingView`
+		showBottomLoading(true)
+	}
 
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
 	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(

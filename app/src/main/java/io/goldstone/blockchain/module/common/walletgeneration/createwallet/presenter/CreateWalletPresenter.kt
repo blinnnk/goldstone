@@ -35,7 +35,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
-import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -126,42 +125,22 @@ class CreateWalletPresenter(
 				WalletTable(
 					0,
 					name,
-					multiChainAddresses.ethAddress,
-					multiChainAddresses.etcAddress,
-					multiChainAddresses.btcAddress,
-					multiChainAddresses.btcSeriesTestAddress,
-					multiChainAddresses.ltcAddress,
-					multiChainAddresses.bchAddress,
-					multiChainAddresses.eosAddress,
-					EOSDefaultAllChainName(multiChainAddresses.eosAddress, multiChainAddresses.eosAddress),
-					ethAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.ethAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+					multiChainAddresses.eth.address,
+					multiChainAddresses.etc.address,
+					multiChainAddresses.btc.address,
+					multiChainAddresses.btcSeriesTest.address,
+					multiChainAddresses.ltc.address,
+					multiChainAddresses.bch.address,
+					multiChainAddresses.eos.address,
+					EOSDefaultAllChainName(multiChainAddresses.eos.address, multiChainAddresses.eos.address),
+					ethAddresses = listOf(multiChainAddresses.eth),
+					etcAddresses = listOf(multiChainAddresses.etc),
+					btcAddresses = listOf(multiChainAddresses.btc),
+					btcSeriesTestAddresses = listOf(multiChainAddresses.btcSeriesTest
 					),
-					etcAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.etcAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-					),
-					btcAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.btcAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-					),
-					btcSeriesTestAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.btcSeriesTestAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-					),
-					ltcAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.ltcAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
-					),
-					bchAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.bchAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
-					),
-					eosAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.eosAddress,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.eosPath)
-					),
+					ltcAddresses = listOf(multiChainAddresses.ltc),
+					bchAddresses = listOf(multiChainAddresses.bch),
+					eosAddresses = listOf(multiChainAddresses.eos),
 					eosAccountNames = listOf(),
 					ethPath = DefaultPath.ethPath,
 					btcPath = DefaultPath.btcPath,
@@ -297,48 +276,48 @@ class CreateWalletPresenter(
 							ChainID.ropsten,
 							ChainID.kovan,
 							ChainID.rinkeby -> {
-								if (currentAddresses.ethAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.ethAddress).insert()
+								if (currentAddresses.eth.isNotEmpty()) {
+									MyTokenTable(defaults, currentAddresses.eth.address).insert()
 								}
 							}
 
 							ChainID.etcMain, ChainID.etcTest -> {
-								if (currentAddresses.etcAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.etcAddress).insert()
+								if (currentAddresses.etc.isNotEmpty()) {
+									MyTokenTable(defaults, currentAddresses.etc.address).insert()
 								}
 							}
 
 							ChainID.eosMain, ChainID.eosTest -> {
-								if (currentAddresses.eosAddress.isNotEmpty()) {
-									if (EOSWalletUtils.isValidAddress(currentAddresses.eosAddress))
-										MyTokenTable(defaults, currentAddresses.eosAddress).insert()
-									else if (EOSAccount(currentAddresses.eosAddress).isValid()) {
+								if (currentAddresses.eos.isNotEmpty()) {
+									if (EOSWalletUtils.isValidAddress(currentAddresses.eos.address)) {
+										MyTokenTable(defaults, currentAddresses.eos.address).insert()
+									} else if (EOSAccount(currentAddresses.eos.address).isValid(false)) {
 										// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
-										MyTokenTable(defaults, currentAddresses.eosAddress, "").insert()
+										MyTokenTable(defaults, currentAddresses.eos.address, currentAddresses.eos.address).insert()
 									}
 								}
 							}
 
 							ChainID.btcMain -> {
-								if (currentAddresses.btcAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.btcAddress).insert()
+								if (currentAddresses.btc.isNotEmpty()) {
+									MyTokenTable(defaults, currentAddresses.btc.address).insert()
 								}
 							}
 
 							ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
-								if (currentAddresses.btcSeriesTestAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.btcSeriesTestAddress).insert()
+								if (currentAddresses.btcSeriesTest.isNotEmpty()) {
+									MyTokenTable(defaults, currentAddresses.btcSeriesTest.address).insert()
 								}
 							}
 							ChainID.ltcMain -> {
-								if (currentAddresses.ltcAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.ltcAddress).insert()
+								if (currentAddresses.ltc.isNotEmpty()) {
+									MyTokenTable(defaults, currentAddresses.ltc.address).insert()
 								}
 							}
 
 							ChainID.bchMain -> {
-								if (currentAddresses.bchAddress.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.bchAddress).insert()
+								if (currentAddresses.bch.isNotEmpty()) {
+									MyTokenTable(defaults, currentAddresses.bch.address).insert()
 								}
 							}
 						}

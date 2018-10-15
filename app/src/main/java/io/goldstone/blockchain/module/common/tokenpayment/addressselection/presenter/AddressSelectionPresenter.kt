@@ -8,9 +8,10 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
@@ -95,17 +96,21 @@ class AddressSelectionPresenter(
 			}
 		}
 		// 检查地址是否合规
-		when (MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
+		val addressType =
+			MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())
+		when (addressType) {
 			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
 			AddressType.ETHSeries -> when {
-				token?.contract.isBTCSeries() || token?.contract.isEOS() -> fragment.context.alert("this is not a valid bitcoin address")
+				token?.contract.isBTCSeries() || token?.contract.isEOS() ->
+					fragment.context.alert("this is not a valid bitcoin address")
 				else -> WalletTable.getAllETHAndERCAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
 			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
-				!token?.contract.isEOS() -> fragment.context.alert("this is not a valid eos account name")
+				!token?.contract.isEOS() && !token?.contract.isEOSToken() ->
+					fragment.context.alert("this is not a valid eos account name")
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {
 					showAlertIfLocalExistThisAddress(this)
@@ -131,7 +136,7 @@ class AddressSelectionPresenter(
 			}
 
 			AddressType.BTC -> when {
-				Config.isTestEnvironment() -> fragment.context.alert(
+				SharedValue.isTestEnvironment() -> fragment.context.alert(
 					"this is a mainnet address, please switch your local net setting in settings first"
 				)
 				!token?.contract.isBTC() -> fragment.context.alert(
@@ -143,7 +148,7 @@ class AddressSelectionPresenter(
 			}
 
 			AddressType.BTCSeriesTest -> when {
-				!Config.isTestEnvironment() -> fragment.context.alert(
+				!SharedValue.isTestEnvironment() -> fragment.context.alert(
 					"this is a testnet address, please switch your local net setting in settings first"
 				)
 				!token?.contract.isBTCSeries() -> fragment.context.alert(
@@ -161,7 +166,7 @@ class AddressSelectionPresenter(
 			token?.contract.isETC() -> when {
 				!TokenContract(qrModel.contractAddress).isETC() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(Config.getETCCurrentChain().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getETCCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -169,7 +174,7 @@ class AddressSelectionPresenter(
 			token?.contract.isEOS() -> when {
 				!TokenContract(qrModel.contractAddress).isEOSCode() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(Config.getEOSCurrentChain().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getEOSCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -177,7 +182,7 @@ class AddressSelectionPresenter(
 			token?.contract.isBTC() -> when {
 				!TokenContract(qrModel.contractAddress).isBTC() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(Config.getBTCCurrentChain().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getBTCCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -185,7 +190,7 @@ class AddressSelectionPresenter(
 			token?.contract.isLTC() -> when {
 				!TokenContract(qrModel.contractAddress).isLTC() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(Config.getLTCCurrentChain().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getLTCCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -193,7 +198,7 @@ class AddressSelectionPresenter(
 			token?.contract.isBCH() -> when {
 				!TokenContract(qrModel.contractAddress).isBCH() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(Config.getBCHCurrentChain().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getBCHCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -201,7 +206,7 @@ class AddressSelectionPresenter(
 			else -> when {
 				!qrModel.contractAddress.equals(token?.contract?.contract, true) ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(Config.getCurrentChain().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getCurrentETH().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}

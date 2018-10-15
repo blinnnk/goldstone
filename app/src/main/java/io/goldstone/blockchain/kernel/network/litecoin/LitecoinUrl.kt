@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.WebUrl
 
 /**
@@ -10,14 +10,14 @@ import io.goldstone.blockchain.common.value.WebUrl
 
 object LitecoinUrl {
 	var currentUrl: () -> String = {
-		if (Config.isTestEnvironment()) WebUrl.ltcTest else WebUrl.ltcMain
+		if (SharedValue.isTestEnvironment()) WebUrl.ltcTest else WebUrl.ltcMain
 	}
 	val getBalance: (address: String) -> String = { address ->
 		"${currentUrl()}/api/addr/$address/balance"
 	}
 
 	val getBalanceFromChainSo: (address: String) -> String = { address ->
-		val param = if (Config.isTestEnvironment()) "LTCTest" else "LTC"
+		val param = if (SharedValue.isTestEnvironment()) "LTCTest" else "LTC"
 		"https://chain.so/api/v2/get_address_balance/$param/$address"
 	}
 

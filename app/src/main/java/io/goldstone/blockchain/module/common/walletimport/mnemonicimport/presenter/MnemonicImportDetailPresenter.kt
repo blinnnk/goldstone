@@ -113,9 +113,10 @@ class MnemonicImportDetailPresenter(
 						name,
 						encryptMnemonic,
 						multiChainPath,
-						hint,
-						callback
-					)
+						hint
+					) { _, error ->
+						callback(error)
+					}
 				}
 			}
 		}

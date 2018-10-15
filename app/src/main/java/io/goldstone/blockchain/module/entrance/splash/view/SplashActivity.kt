@@ -9,7 +9,9 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
+import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
@@ -50,20 +52,16 @@ class SplashActivity : AppCompatActivity() {
 				gradientView.into(this)
 				initWaveView()
 			})
-		}
-	}
-
-	override fun onStart() {
-		super.onStart()
-		presenter.cleanWhenUpdateDatabaseOrElse {
-			runOnUiThread { prepareData() }
+			presenter.cleanWhenUpdateDatabaseOrElse {
+				prepareData(it)
+			}
 		}
 	}
 
 	private fun prepareYingYongBaoInReviewStatus(callback: () -> Unit) {
 		// 如果不是 `YingYongBao` 渠道跳过
 		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {
-			Config.updateYingYongBaoInReviewStatus(false)
+			SharedWallet.updateYingYongBaoInReviewStatus(false)
 			callback()
 			return
 		}
@@ -83,23 +81,21 @@ class SplashActivity : AppCompatActivity() {
 				it.name.equals("inReview", true)
 			}?.switch?.toIntOrNull() == 1
 			if (isInReview) {
-				Config.updateYingYongBaoInReviewStatus(true)
+				SharedWallet.updateYingYongBaoInReviewStatus(true)
 			} else {
-				Config.updateYingYongBaoInReviewStatus(false)
+				SharedWallet.updateYingYongBaoInReviewStatus(false)
 			}
 			callback()
 		}
 	}
 
-	private fun prepareData() {
+	private fun prepareData(allWallet: List<WalletTable>) {
 		prepareAppConfig config@{
 			// 如果本地的钱包数量不为空那么才开始注册设备
-			WalletTable.getAll {
-				if (isNotEmpty()) {
-					registerDeviceForPush()
-					// 把 `GoldStoneID` 存储到 `SharePreference` 里面
-					Config.updateGoldStoneID(goldStoneID)
-				}
+			if (allWallet.isNotEmpty()) {
+				registerDeviceForPush()
+				// 把 `GoldStoneID` 存储到 `SharePreference` 里面
+				SharedWallet.updateGoldStoneID(goldStoneID)
 			}
 			initLaunchLanguage(language)
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
@@ -124,9 +120,7 @@ class SplashActivity : AppCompatActivity() {
 						}
 						// Check network to get default toke list
 						initDefaultTokenByNetWork {
-							prepareYingYongBaoInReviewStatus {
-								hasAccountThenLogin()
-							}
+							prepareYingYongBaoInReviewStatus { hasAccountThenLogin() }
 						}
 					}
 				}
@@ -160,13 +154,9 @@ class SplashActivity : AppCompatActivity() {
 	private fun prepareAppConfig(callback: AppConfigTable.() -> Unit) {
 		AppConfigTable.getAppConfig { config ->
 			config.isNull() isTrue {
-				AppConfigTable.insertAppConfig {
-					AppConfigTable.getAppConfig {
-						it?.apply {
-							callback(this)
-						}
-					}
-				}
+				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
+				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+				AppConfigTable.insertAppConfig(callback)
 			} otherwise {
 				config?.isRegisteredAddresses?.isFalse {
 					/**
@@ -188,7 +178,7 @@ class SplashActivity : AppCompatActivity() {
 	 */
 	private fun initLaunchLanguage(code: Int) {
 		currentLanguage = code
-		Config.updateCurrentLanguageCode(code)
+		SharedWallet.updateCurrentLanguageCode(code)
 	}
 
 	private fun ViewGroup.initWaveView() {

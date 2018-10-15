@@ -14,9 +14,9 @@ import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.*
@@ -180,14 +180,14 @@ class GasSelectionPresenter(
 			val password = it?.text.toString()
 			when {
 				getToken()?.contract.isBTC() -> prepareBTCSeriesModel?.apply {
-						transferBTC(this, password, callback)
-					}
+					transferBTC(this, password, callback)
+				}
 				getToken()?.contract.isLTC() -> prepareBTCSeriesModel?.apply {
-						transferLTC(this, password, callback)
-					}
+					transferLTC(this, password, callback)
+				}
 				getToken()?.contract.isBCH() -> prepareBTCSeriesModel?.apply {
-						transferBCH(this, password, callback)
-					}
+					transferBCH(this, password, callback)
+				}
 				else -> transfer(password, callback)
 			}
 		}
@@ -276,7 +276,7 @@ class GasSelectionPresenter(
 			}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(
-				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + Config.getCurrencyCode()
+				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + SharedWallet.getCurrencyCode()
 			)
 		}
 	}

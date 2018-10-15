@@ -14,8 +14,8 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
@@ -119,21 +119,20 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTokenInfoBySymbolFromServer(
 		symbolsOrContract: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<TokenSearchModel>) -> Unit
+		@WorkerThread hold: (tokens: ArrayList<TokenSearchModel>?, error: RequestError) -> Unit
 	) {
 		requestData<TokenSearchModel>(
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${Config.getCurrentChain().id},${Config.getETCCurrentChain().id},${Config.getBTCCurrentChain().id},${Config.getLTCCurrentChain().id},${Config.getEOSCurrentChain().id}"
+				"${SharedChain.getCurrentETH().id},${SharedChain.getETCCurrent().id},${SharedChain.getBTCCurrent().id},${SharedChain.getLTCCurrent().id},${SharedChain.getEOSCurrent().id},${SharedChain.getBCHCurrent().id}"
 			),
 			"list",
 			false,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(toArrayList())
+			hold(toArrayList(), RequestError.None)
 		}
 	}
 

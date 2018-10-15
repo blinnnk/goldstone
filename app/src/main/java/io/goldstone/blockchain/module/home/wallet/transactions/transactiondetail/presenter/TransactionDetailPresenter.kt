@@ -15,10 +15,8 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.getChainSymbol
-import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.crypto.multichain.isETC
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -99,7 +97,11 @@ class TransactionDetailPresenter(
 
 	fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
+		return when {
+			ChainID(notificationData?.chainID.orEmpty()).isEOS() -> CoinSymbol.EOS.symbol.orEmpty()
+			data?.token?.contract.isEOSToken() -> CoinSymbol.EOS.symbol.orEmpty()
+			else -> CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
+		}
 	}
 
 	fun showAddContactsButton(cell: TransactionInfoCell) {
@@ -129,17 +131,24 @@ class TransactionDetailPresenter(
 
 	fun showTransactionWebFragment() {
 		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
+		val fromAddress = dataFromList?.fromAddress ?: data?.fromAddress
+		?: notificationData?.fromAddress.orEmpty()
 		fragment.parentFragment.apply {
 			val webTitle =
 				when {
 					CoinSymbol(symbol).isETC() -> TransactionText.gasTracker
-					CoinSymbol(symbol).isBTCSeries() -> TransactionText.transactionWeb
+					CoinSymbol(symbol).isBTCSeries() || CoinSymbol(symbol).isEOS() ->
+						TransactionText.transactionWeb
 					else -> TransactionText.etherScanTransaction
 				}
 			val argument = Bundle().apply {
 				putString(
 					ArgumentKey.webViewUrl,
-					TransactionListModel.generateTransactionURL(currentHash, symbol)
+					TransactionListModel.generateTransactionURL(
+						currentHash,
+						symbol,
+						EOSAccount(fromAddress).isValid(false)
+					)
 				)
 				putString(ArgumentKey.webViewName, webTitle)
 			}
@@ -194,7 +203,7 @@ class TransactionDetailPresenter(
 					currentHash,
 					receipt.blockNumber,
 					date,
-					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol, false)
 				)
 			}
 
@@ -207,7 +216,7 @@ class TransactionDetailPresenter(
 					currentHash,
 					receipt.blockNumber,
 					TimeUtils.formatDate(receipt.timeStamp.toMillisecond()),
-					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol)
+					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol, false)
 				)
 			}
 
@@ -220,7 +229,11 @@ class TransactionDetailPresenter(
 					currentHash,
 					TransactionText.pendingBlockConfirmation,
 					date,
-					TransactionListModel.generateTransactionURL(currentHash, symbol)
+					TransactionListModel.generateTransactionURL(
+						currentHash,
+						symbol,
+						EOSAccount(fromAddress.orEmpty()).isValid(false)
+					)
 				)
 			}
 		}

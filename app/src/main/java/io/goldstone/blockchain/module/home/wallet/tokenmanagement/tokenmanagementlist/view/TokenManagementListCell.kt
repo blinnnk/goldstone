@@ -12,8 +12,8 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.button.SquareIcon
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -40,7 +40,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				contract.isEOS() -> icon.image.imageResource = R.drawable.eos_icon
 				contract.isBTC() ->
 					icon.image.imageResource =
-						if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token
+						if (SharedWallet.getYingYongBaoInReviewStatus()) R.drawable.default_token
 						else R.drawable.btc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}
@@ -68,7 +68,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				TokenContract(contract).isEOS() -> icon.image.imageResource = R.drawable.eos_icon
 				TokenContract(contract).isBTC() ->
 					icon.image.imageResource =
-						if (Config.getYingYongBaoInReviewStatus()) R.drawable.default_token
+						if (SharedWallet.getYingYongBaoInReviewStatus()) R.drawable.default_token
 						else R.drawable.btc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}

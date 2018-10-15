@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.crypto.eos
 
+import java.io.Serializable
+
 
 /**
  * @author KaySaith
@@ -13,7 +15,10 @@ enum class EOSWalletType {
 enum class EOSUnit(val value: String) {
 	KB("KB"),
 	MB("MB"),
-	Byte("Byte"),
+	Byte("Byte")
+}
+
+enum class EOSCPUUnit(val value: String) {
 	SEC("SEC"),
 	MS("MS"),
 	MUS("MUS"),
@@ -32,12 +37,14 @@ enum class EOSTransactionMethod(val value: String) {
 	Transfer("transfer")
 }
 
-enum class EOSCodeName(val value: String) {
-	EOSIOToken("eosio.token"),
-	EOSIO("eosio")
-}
-
 data class EOSTransactionSerialization(
 	val packedTX: String,
 	val serialized: String
 )
+
+data class EOSCodeName(val value: String) : Serializable {
+	companion object {
+		val EOSIOToken = EOSCodeName("eosio.token")
+		val EOSIO = EOSCodeName("eosio")
+	}
+}

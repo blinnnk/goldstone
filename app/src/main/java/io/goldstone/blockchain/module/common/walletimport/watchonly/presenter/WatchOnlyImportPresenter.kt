@@ -6,7 +6,10 @@ import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -19,10 +22,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -71,12 +71,12 @@ class WatchOnlyImportPresenter(
 					return
 				}
 			AddressType.EOS.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid()) {
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
 			AddressType.EOSJungle.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid()) {
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
@@ -104,9 +104,10 @@ class WatchOnlyImportPresenter(
 				currentETCAddress,
 				currentLTCAddress,
 				currentBCHAddress,
-				getUnEmptyEOSAccountValue(), // 如果导入的是一个 `AccountName` 的钱包, 那么同时把这个 `AccountName` 作为 `CurrentEOSAddress` 录入, 以此来对接大逻辑
+				// 如果用户只导入 `AccountName` 那么会把名字存成 `Address` 以对接切换钱包的逻辑
+				currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName,
 				EOSDefaultAllChainName(eosMainnetAccountName, eosTestnetAccountName),
-				if (getUnEmptyEOSAccountValue().isEmpty()) listOf()
+				if (eosMainnetAccountName.isEmpty() && eosTestnetAccountName.isEmpty()) listOf()
 				else listOf(
 					EOSAccountInfo(eosMainnetAccountName, ChainID.EOS.id),
 					EOSAccountInfo(eosTestnetAccountName, ChainID.EOSTest.id)
@@ -114,13 +115,13 @@ class WatchOnlyImportPresenter(
 			).insertWatchOnlyWallet { thisWallet ->
 				CreateWalletPresenter.generateMyTokenInfo(
 					ChainAddresses(
-						currentETHSeriesAddress,
-						currentETCAddress,
-						currentBTCAddress,
-						currentBTCTestAddress,
-						currentLTCAddress,
-						currentBCHAddress,
-						getUnEmptyEOSAccountValue()
+						Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+						Bip44Address(currentETCAddress, ChainType.ETC.id),
+						Bip44Address(currentBTCAddress, ChainType.BTC.id),
+						Bip44Address(currentBTCTestAddress, ChainType.AllTest.id),
+						Bip44Address(currentLTCAddress, ChainType.LTC.id),
+						Bip44Address(currentBCHAddress, ChainType.BCH.id),
+						Bip44Address(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS.id)
 					)
 				) { error ->
 					if (error.isNone()) thisWallet.registerPushByAddress(callback)
@@ -138,7 +139,7 @@ class WatchOnlyImportPresenter(
 			Pair(currentBTCTestAddress, ChainType.AllTest),
 			Pair(currentETCAddress, ChainType.ETC),
 			Pair(currentETHSeriesAddress, ChainType.ETH),
-			Pair(getUnEmptyEOSAccountValue(), ChainType.EOS)
+			Pair(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS)
 		).first {
 			it.first.isNotEmpty()
 		}.apply {
@@ -146,14 +147,6 @@ class WatchOnlyImportPresenter(
 				AddressCommissionModel(first, second.id, 1, id))
 			callback(AccountError.None)
 		}
-	}
-
-	private fun getUnEmptyEOSAccountValue(): String {
-		return listOf(
-			currentEOSAddress,
-			eosTestnetAccountName,
-			eosMainnetAccountName
-		).firstOrNull { it.isNotEmpty() } ?: ""
 	}
 
 	private fun setAddressByChainType(address: String, addressType: String) {
@@ -164,35 +157,36 @@ class WatchOnlyImportPresenter(
 			}
 			AddressType.BTC.value -> {
 				currentBTCAddress = address
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.LTC.value -> {
 				currentLTCAddress = address
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.BCH.value -> {
 				currentBCHAddress = address
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.EOS.value -> {
 				if (EOSWalletUtils.isValidAddress(address)) currentEOSAddress = address
-				else if (EOSAccount(address).isValid()) {
+				else if (EOSAccount(address).isValid(false)) {
 					eosMainnetAccountName = address
-					Config.updateCurrentEOSName(address)
+					SharedAddress.updateCurrentEOSName(address)
+					SharedChain.updateEOSCurrent(ChainID.eosMain)
 				}
-				Config.updateIsTestEnvironment(false)
+				SharedValue.updateIsTestEnvironment(false)
 			}
 			AddressType.EOSJungle.value -> {
 				if (EOSWalletUtils.isValidAddress(address)) currentEOSAddress = address
-				else if (EOSAccount(address).isValid()) {
+				else if (EOSAccount(address).isValid(false)) {
 					eosTestnetAccountName = address
-					Config.updateCurrentEOSName(address)
-					Config.updateEOSCurrentChain(ChainID.eosTest)
+					SharedAddress.updateCurrentEOSName(address)
+					SharedChain.updateEOSCurrent(ChainID.eosTest)
 				}
-				Config.updateIsTestEnvironment(true)
+				SharedValue.updateIsTestEnvironment(true)
 			}
 			else -> {
-				Config.updateIsTestEnvironment(true)
+				SharedValue.updateIsTestEnvironment(true)
 				currentBTCTestAddress = address
 			}
 		}

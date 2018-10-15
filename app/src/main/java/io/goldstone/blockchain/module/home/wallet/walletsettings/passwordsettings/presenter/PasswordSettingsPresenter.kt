@@ -21,7 +21,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletaddressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.toast
@@ -86,14 +85,14 @@ class PasswordSettingsPresenter(
 							wallet.btcAddresses,
 							wallet.btcSeriesTestAddresses
 						).forEach { addresses ->
-							AddressManagerPresenter.convertToChildAddresses(addresses).forEach {
+							addresses.forEach { pair ->
 								updateKeystorePassword(
-									it.first,
+									pair.address,
 									oldPassword,
 									password,
 									passwordHint,
-									!Address(it.first).isValid(), // 不是合规的 `ETH` 地址就是 `BTC` 系列地址
-									false
+									// 不是合规的 `ETH` 地址就是 `BTC` 系列地址
+									!Address(pair.address).isValid()
 								) {
 									completeMark()
 								}
@@ -122,7 +121,6 @@ class PasswordSettingsPresenter(
 		newPassword: String,
 		passwordHint: String,
 		isBTCSeriesWallet: Boolean,
-		isSingleChainWallet: Boolean,
 		callback: (AccountError) -> Unit
 	) {
 		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
@@ -130,8 +128,7 @@ class PasswordSettingsPresenter(
 			address,
 			oldPassword,
 			newPassword,
-			isBTCSeriesWallet,
-			isSingleChainWallet
+			isBTCSeriesWallet
 		) { _, error ->
 			// Update User Password Hint
 			if (error.isNone()) WalletTable.updateHint(passwordHint)
@@ -144,22 +141,18 @@ class PasswordSettingsPresenter(
 		oldPassword: String,
 		newPassword: String,
 		passwordHint: String,
-		callback: () -> Unit
+		callback: (AccountError) -> Unit
 	) {
 		fragment.context?.updatePasswordByWalletID(
 			walletID,
 			oldPassword,
-			newPassword,
-			{
-				// error callback
-				callback()
-			}
+			newPassword
 		) {
 			// Update User Password Hint
 			passwordHint.isNotEmpty() isTrue {
 				WalletTable.updateHint(passwordHint)
 			}
-			callback()
+			callback(it)
 		}
 	}
 

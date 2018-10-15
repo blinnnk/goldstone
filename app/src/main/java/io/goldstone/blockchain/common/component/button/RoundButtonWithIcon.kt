@@ -14,8 +14,8 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.ArrowIconView
 import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.backgroundColor
@@ -27,11 +27,11 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
-	
+
 	private val titleView by lazy { TextView(context) }
 	private val viewHeight = 30.uiPX()
 	private val arrowIcon by lazy { ArrowIconView(context) }
-	
+
 	init {
 		titleView.apply {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
@@ -40,31 +40,31 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 			typeface = GoldStoneFont.heavy(context)
 			textSize = fontSize(12)
 		}.into(this)
-		
+
 		layoutParams = RelativeLayout.LayoutParams(0, viewHeight)
 		backgroundColor = Color.WHITE
 		addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square, viewHeight / 2f)
 		elevation = 4.uiPX().toFloat()
-		
+
 		arrowIcon
 			.apply { setWhiteSytle() }
 			.into(this)
 		arrowIcon.setAlignParentRight()
 		arrowIcon.setCenterInVertical()
 	}
-	
+
 	fun setTitle(text: String) {
 		titleView.text = text
-		layoutParams.width = text.measureTextWidth(16.uiPX().toFloat()).toInt()  + retWidthDependsOnLanguage()
+		layoutParams.width = text.measureTextWidth(16.uiPX().toFloat()).toInt() + retWidthDependsOnLanguage()
 	}
-	
+
 	fun removeIcon() {
 		layoutParams.width -= 5.uiPX()
 		removeView(arrowIcon)
 	}
-	
+
 	private fun retWidthDependsOnLanguage(): Int {
-		return when(Config.getCurrentLanguageCode()) {
+		return when (SharedWallet.getCurrentLanguageCode()) {
 			HoneyLanguage.Chinese.code -> 30.uiPX()
 			HoneyLanguage.Korean.code -> 30.uiPX()
 			HoneyLanguage.TraditionalChinese.code -> 30.uiPX()

@@ -8,9 +8,12 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -72,7 +75,7 @@ class TokenAssetPresenter(
 		fragment.getGrandFather<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<EOSAccountSelectionFragment>(
 			Bundle().apply {
-				putString(ArgumentKey.defaultEOSAccountName, Config.getCurrentEOSAccount().accountName)
+				putString(ArgumentKey.defaultEOSAccountName, SharedAddress.getCurrentEOSAccount().accountName)
 			},
 			2
 		)
@@ -92,7 +95,7 @@ class TokenAssetPresenter(
 					Bundle(),
 					2
 				)
-			TokenDetailText.tradeRAM -> tokenDetailOverlayPresenter
+			TokenDetailText.buySellRAM -> tokenDetailOverlayPresenter
 				?.showTargetFragment<RAMTradingFragment>(
 					Bundle(),
 					2
@@ -101,48 +104,40 @@ class TokenAssetPresenter(
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val account = Config.getCurrentEOSAccount()
+		val account = SharedAddress.getCurrentEOSAccount()
 		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
 			if (onlyUpdateLocalData) return@getAccountByName
-			EOSAPI.getAccountInfo(
-				account,
-				{
-					LogUtil.error("getAccountInfo", it)
-				}
-			) { eosAccount ->
-				val newData =
-					if (localData.isNull()) eosAccount else eosAccount.apply { this.id = localData!!.id }
-				GoldStoneDataBase.database.eosAccountDao().insert(newData)
-				GoldStoneAPI.context.runOnUiThread {
-					eosAccount.updateUIValue()
-				}
+			EOSAPI.getAccountInfo(account) { eosAccount, error ->
+				if (!eosAccount.isNull() && error.isNone()) {
+					val newData =
+						if (localData.isNull()) eosAccount else eosAccount!!.apply { this.id = localData!!.id }
+					GoldStoneDataBase.database.eosAccountDao().insert(newData!!)
+					GoldStoneAPI.context.runOnUiThread {
+						eosAccount!!.updateUIValue()
+					}
+				} else fragment.context.alert(error.message)
 			}
 		}
 	}
 
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val account = Config.getCurrentEOSAccount()
-		EOSTransactionTable.getTransactionByAccountName(
+		val account = SharedAddress.getCurrentEOSAccount()
+		EOSTransactionTable.getTransaction(
 			account.accountName,
-			Config.getEOSCurrentChain()
+			CoinSymbol.EOS.symbol!!,
+			EOSCodeName.EOSIOToken.value,
+			SharedChain.getEOSCurrent()
 		) { localData ->
-			if (localData.isEmpty()) {
-				EOSAPI.getTransactionsLastIndex(
-					account,
-					{
-						fragment.setTransactionCount(CommonText.calculating)
-						LogUtil.error("getTransactionsLastIndex", it)
-					}
-				) {
-					val count = if (it.isNull()) 0 else it!! + 1
+			if (localData.isEmpty()) EOSAPI.getTransactionsLastIndex(account
+			) { latestCount, error ->
+				if (error.isNone()) {
+					val count = if (latestCount.isNull()) 0 else latestCount!! + 1
 					fragment.setTransactionCount(count.toString())
 				}
-			} else {
-				fragment.setTransactionCount(localData.size.toString())
-			}
+			} else fragment.setTransactionCount(localData.size.toString())
 		}
 	}
 
@@ -156,7 +151,7 @@ class TokenAssetPresenter(
 		val availableNet = netLimit.max - netLimit.used
 		val netEOSValue = "${netWeight.toEOSCount()}" suffix CoinSymbol.eos
 		val ramEOSCount =
-			"≈ " + (availableRAM.toDouble() * Config.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
+			"≈ " + (availableRAM.toDouble() * SharedValue.getRAMUnitPrice() / 1024).formatCount(4) suffix CoinSymbol.eos
 		fragment.setResourcesValue(
 			availableRAM,
 			ramQuota,

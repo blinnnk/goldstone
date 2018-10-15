@@ -11,8 +11,8 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.EthereumRPCError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -478,9 +478,9 @@ object GoldStoneEthCall {
 	@JvmStatic
 	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
 		return when (type) {
-			ChainType.ETC -> Config.isEncryptETCNodeRequest()
-			ChainType.ETH -> Config.isEncryptERCNodeRequest()
-			else -> Config.isEncryptERCNodeRequest()
+			ChainType.ETC -> SharedValue.isEncryptETCNodeRequest()
+			ChainType.ETH -> SharedValue.isEncryptERCNodeRequest()
+			else -> SharedValue.isEncryptERCNodeRequest()
 		}
 	}
 }

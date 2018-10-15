@@ -5,9 +5,9 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -45,10 +46,10 @@ class EOSAccountSelectionPresenter(
 			// 获取本地数据库里面的此公钥地址对应的用户名字
 			val currentChainNames =
 				eosAccountNames.filter {
-					it.chainID.equals(Config.getEOSCurrentChain().id, true)
+					it.chainID.equals(SharedChain.getEOSCurrent().id, true)
 				}
 			EOSAPI.getAccountNameByPublicKey(
-				Config.getCurrentEOSAddress(),
+				SharedAddress.getCurrentEOS(),
 				{
 					errorCallback(it)
 					// 如果请求出错的话, 仍要保持不阻碍用户的模式, 那么暂时通过只显示
@@ -64,37 +65,54 @@ class EOSAccountSelectionPresenter(
 		fragment.showLoadingView(true)
 		// 从链上重新拉取一次该公钥的对应的 AccountNames,
 		getNewAccountNameFromChain(errorCallback) { allAccountNames ->
-			val actors = arrayListOf<AccountActor>()
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = allAccountNames.size
-				override fun concurrentJobs() {
-					allAccountNames.forEach { account ->
-						EOSAccountTable.getAccountByName(account.name, false) { localAccount ->
+			EOSAccountTable.getAccountsByNames(
+				allAccountNames.map { it.name },
+				false
+			) { localAccounts ->
+				val actors = arrayListOf<AccountActor>()
+				// 本地现存的数据整理到 `Actors``
+				actors.addAll(
+					localAccounts.map { localAccount ->
+						getAccountActorByPublicKey(localAccount, localAccount.name)
+					}.flatten()
+				)
+				// 删选出本地不存在的链上 `AccountName`
+				val notInLocalAccount =
+					allAccountNames.filterNot { chainAccount ->
+						localAccounts.any {
+							it.name.equals(chainAccount.name, true) &&
+								it.chainID.equals(chainAccount.chainID, true)
+						}
+					}
+				if (notInLocalAccount.isEmpty()) {
+					fragment.context?.runOnUiThread {
+						fragment.setAccountNameList(actors)
+						fragment.showLoadingView(false)
+					}
+				} else object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = notInLocalAccount.size
+					override fun concurrentJobs() {
+						notInLocalAccount.forEach { account ->
 							// 本地为空的话从网络获取数据
-							if (localAccount.isNull()) EOSAPI.getAccountInfo(
-								EOSAccount(account.name),
-								{
-									completeMark()
-									LogUtil.error("getAccountInfo", it)
+							EOSAPI.getAccountInfo(
+								EOSAccount(account.name)
+							) { eosAccount, error ->
+								if (!eosAccount.isNull() && error.isNone()) {
+									actors.addAll(getAccountActorByPublicKey(eosAccount!!, account.name))
+									// 插入数据库
+									EOSAccountTable.preventDuplicateInsert(eosAccount)
 								}
-							) { eosAccount ->
-								actors.addAll(getAccountActorByPublicKey(eosAccount, account.name))
-								// 插入数据库
-								EOSAccountTable.preventDuplicateInsert(eosAccount)
-								completeMark()
-							} else {
-								actors.addAll(getAccountActorByPublicKey(localAccount!!, account.name))
 								completeMark()
 							}
 						}
 					}
-				}
 
-				override fun mergeCallBack() {
-					fragment.setAccountNameList(actors)
-					fragment.showLoadingView(false)
-				}
-			}.start()
+					override fun mergeCallBack() {
+						fragment.setAccountNameList(actors)
+						fragment.showLoadingView(false)
+					}
+				}.start()
+			}
 		}
 	}
 
@@ -104,7 +122,7 @@ class EOSAccountSelectionPresenter(
 	): List<AccountActor> {
 		return account.permissions.asSequence().map { permission ->
 			permission.requiredAuthorization.getKeys().asSequence().filter {
-				it.publicKey == Config.getCurrentEOSAddress()
+				it.publicKey == SharedAddress.getCurrentEOS()
 			}.map {
 				AccountActor(name, EOSActor.getActorByValue(permission.permissionName)!!, it.weight)
 			}.toList()

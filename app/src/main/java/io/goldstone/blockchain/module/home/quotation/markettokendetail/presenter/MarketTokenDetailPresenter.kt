@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -112,8 +113,7 @@ class MarketTokenDetailPresenter(
 				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
-					DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-						fragment.currencyInfo?.symbol.orEmpty(),
+					DefaultTokenTable.getTokenByContractFromAllChains(
 						fragment.currencyInfo?.contract.orEmpty()
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
@@ -165,7 +165,7 @@ class MarketTokenDetailPresenter(
 			getCurrencyInfoFromDatabase(info) { tokenData, priceData ->
 				if (
 					tokenData.marketCap.isEmpty()
-					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != Config.getCurrentLanguageCode()
+					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != SharedWallet.getCurrentLanguageCode()
 				) {
 					// 本地没有数据的话从服务端拉取 `Coin Information`
 					NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
@@ -324,10 +324,7 @@ class MarketTokenDetailPresenter(
 			priceData: PriceHistoryModel
 		) -> Unit
 	) {
-		DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-			info.symbol,
-			info.contract
-		) { default ->
+		DefaultTokenTable.getTokenByContractFromAllChains(info.contract) { default ->
 			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
 				val tokenData =
 					if (default.isNull()) TokenInformationModel()
@@ -351,10 +348,9 @@ class MarketTokenDetailPresenter(
 			}
 		) { coinInfo ->
 			DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
-				DefaultTokenTable.getTokenBySymbolAndContractFromAllChains(
-					info.symbol,
-					info.contract
-				) { it?.let(hold) }
+				DefaultTokenTable.getTokenByContractFromAllChains(info.contract) {
+					it?.let(hold)
+				}
 			}
 		}
 	}

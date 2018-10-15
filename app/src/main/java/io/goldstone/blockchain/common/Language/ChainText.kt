@@ -39,11 +39,11 @@ object ChainText {
 	@JvmField
 	val mainnetDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The formal production environment \nwhere the assets are of real value"
-		HoneyLanguage.Chinese.code -> "正式环境资产具有真正价值"
+		HoneyLanguage.Chinese.code -> "正式环境，资产具有真正价值"
 		HoneyLanguage.Japanese.code -> "正式な環境\n資産は本当の価値がある"
 		HoneyLanguage.Korean.code -> "공식 생산 환경 \n자산이 실제 가치를 지닌 곳"
 		HoneyLanguage.Russian.code -> "Формальная среда \nактивы имеют реальную ценность"
-		HoneyLanguage.TraditionalChinese.code -> "正式生產環境資產具有真正價值"
+		HoneyLanguage.TraditionalChinese.code -> "正式環境，資產具有真正價值"
 		else -> ""
 	}
 	@JvmField

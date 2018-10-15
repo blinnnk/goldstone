@@ -2,16 +2,18 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -51,10 +53,7 @@ class TokenDetailPresenter(
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		updateEmptyCharData(fragment.token?.symbol.orEmpty())
-		// 错开动画和数据读取的时间, 避免 `UI` 可能的卡顿
-		AnimationDuration.Default timeUpThen {
-			prepareTokenDetailData()
-		}
+		prepareTokenDetailData()
 	}
 
 	fun showOnlyReceiveData() {
@@ -108,23 +107,23 @@ class TokenDetailPresenter(
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
 		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData, localEOSSeriesData ->
-			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-				// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
-				// `ETHERC20OrETC` 需要使用到 `localData`
-				when {
-					token?.contract.isBTCSeries() -> {
-						// This localDataMaxIndex is BTCSeries Transactions Only
-						val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
-						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
-					}
-					token?.contract.isEOS() -> {
-						// This localDataMaxIndex is EOSSeries Transactions Only
-						val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
-						fragment.loadDataFromChain(listOf(), localDataMaxIndex)
-					}
-					!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
-						fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
-					}
+			// 检查是否有网络
+			if (!NetworkUtil.hasNetworkWithAlert(fragment.context)) return@loadDataFromDatabaseOrElse
+			// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
+			// `ETHERC20OrETC` 需要使用到 `localData`
+			when {
+				token?.contract.isBTCSeries() -> {
+					// This localDataMaxIndex is BTCSeries Transactions Only
+					val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
+					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
+				}
+				token?.contract.isEOS() || token?.contract.isEOSToken() -> {
+					// This localDataMaxIndex is EOSSeries Transactions Only
+					val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
+					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
+				}
+				!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
+					fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
 				}
 			}
 		}
@@ -181,7 +180,7 @@ class TokenDetailPresenter(
 			localEOSSeriesData: List<EOSTransactionTable>?
 		) -> Unit = { _, _, _ -> }
 	) {
-		val walletType = Config.getCurrentWalletType()
+		val walletType = SharedWallet.getCurrentWalletType()
 		when {
 			walletType.isBIP44() || walletType.isMultiChain() -> {
 				when {
@@ -196,7 +195,17 @@ class TokenDetailPresenter(
 						}
 					}
 
-					token?.contract.isEOS() -> getEOSSeriesData {
+					token?.contract.isEOS() -> getEOSSeriesData(
+						CoinSymbol.EOS.symbol!!,
+						EOSCodeName.EOSIOToken
+					) {
+						callback(null, null, it)
+					}
+
+					token?.contract.isEOSToken() -> getEOSSeriesData(
+						token?.symbol.orEmpty(),
+						EOSCodeName(token?.contract?.contract.orEmpty())
+					) {
 						callback(null, null, it)
 					}
 
@@ -211,12 +220,22 @@ class TokenDetailPresenter(
 					callback(null, it, null)
 				}
 
-			token?.contract.isEOS() -> getEOSSeriesData {
+			token?.contract.isEOS() -> getEOSSeriesData(
+				CoinSymbol.EOS.symbol!!,
+				EOSCodeName.EOSIOToken
+			) {
+				callback(null, null, it)
+			}
+
+			token?.contract.isEOSToken() -> getEOSSeriesData(
+				token?.symbol.orEmpty(),
+				EOSCodeName(token?.contract?.contract.orEmpty())
+			) {
 				callback(null, null, it)
 			}
 
 			walletType.isETHSeries() ->
-				getETHSeriesData(Config.getCurrentEthereumAddress()) {
+				getETHSeriesData(SharedAddress.getCurrentEthereum()) {
 					callback(it, null, null)
 				}
 		}
@@ -238,11 +257,17 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun getEOSSeriesData(callback: (List<EOSTransactionTable>) -> Unit) {
-		val account = Config.getCurrentEOSAccount()
-		EOSTransactionTable.getTransactionByAccountName(
+	private fun getEOSSeriesData(
+		symbol: String,
+		codeName: EOSCodeName,
+		callback: (List<EOSTransactionTable>) -> Unit
+	) {
+		val account = SharedAddress.getCurrentEOSAccount()
+		EOSTransactionTable.getTransaction(
 			account.accountName,
-			Config.getEOSCurrentChain()
+			symbol,
+			codeName.value,
+			SharedChain.getEOSCurrent()
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(
@@ -289,14 +314,12 @@ class TokenDetailPresenter(
 	) {
 		allData = data
 		checkAddressNameInContacts(data) {
+			// 防止用户在加载数据过程中切换到别的 `Tab` 这里复位一下
+			setAllSelectedStatus()
 			diffAndUpdateAdapterData<TokenDetailAdapter>(data.toArrayList())
 			// 显示内存的数据后异步更新数据
-			NetworkUtil.hasNetworkWithAlert(context) isTrue {
-				data.prepareTokenHistoryBalance(token?.contract!!, ownerName) {
-					it.updateChartAndHeaderData()
-				}
-			} otherwise {
-				updateEmptyCharData(token?.symbol.orEmpty())
+			data.prepareTokenHistoryBalance(token?.contract!!, ownerName) {
+				it.updateChartAndHeaderData()
 			}
 		}
 	}

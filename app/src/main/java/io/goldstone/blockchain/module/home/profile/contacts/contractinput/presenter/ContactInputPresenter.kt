@@ -13,8 +13,8 @@ import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ContactText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -66,7 +66,7 @@ class ContactInputPresenter(
 					}
 
 					AddressType.EOSJungle, AddressType.EOS, AddressType.EOSAccountName -> {
-						if (!Config.isTestEnvironment()) {
+						if (!SharedValue.isTestEnvironment()) {
 							eosInput.setText(it.address)
 							eosAccountNameText = it.address
 						} else {
@@ -126,13 +126,13 @@ class ContactInputPresenter(
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!EOSAccount(eosAccountNameText).isValid() && eosAccountNameText.isNotEmpty()) {
+		if (!EOSAccount(eosAccountNameText).isValid(false) && eosAccountNameText.isNotEmpty()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!EOSAccount(eosJungleAccountNameText).isValid() && eosJungleAccountNameText.isNotEmpty()) {
+		if (!EOSAccount(eosJungleAccountNameText).isValid(false) && eosJungleAccountNameText.isNotEmpty()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
 			return
 		}

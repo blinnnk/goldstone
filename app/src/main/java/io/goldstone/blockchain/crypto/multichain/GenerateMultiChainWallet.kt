@@ -10,6 +10,7 @@ import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 
 /**
  * @date 2018/7/14 12:20 PM
@@ -51,7 +52,7 @@ object GenerateMultiChainWallet {
 				context.apply {
 					// Ethereum
 					getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
-						addresses.ethAddress = ethAddress
+						addresses.eth = Bip44Address(ethAddress, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
 						completeMark()
 					}
 					// Ethereum Classic
@@ -60,7 +61,7 @@ object GenerateMultiChainWallet {
 						path.etcPath,
 						password
 					) { etcAddress ->
-						addresses.etcAddress = etcAddress
+						addresses.etc = Bip44Address(etcAddress, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
 						completeMark()
 					}
 					// Bitcoin
@@ -73,10 +74,9 @@ object GenerateMultiChainWallet {
 							base58Privatekey,
 							btcAddress,
 							password,
-							false,
 							false
 						)
-						addresses.btcAddress = btcAddress
+						addresses.btc = Bip44Address(btcAddress, getAddressIndexFromPath(path.btcPath), ChainType.BTC.id)
 						completeMark()
 					}
 					BTCWalletUtils.getBitcoinWalletByMnemonic(
@@ -88,10 +88,9 @@ object GenerateMultiChainWallet {
 							btcTestBase58Privatekey,
 							btcSeriesTestAddress,
 							password,
-							true,
-							false
+							true
 						)
-						addresses.btcSeriesTestAddress = btcSeriesTestAddress
+						addresses.btcSeriesTest = Bip44Address(btcSeriesTestAddress, getAddressIndexFromPath(path.testPath), ChainType.AllTest.id)
 						completeMark()
 					}
 					// Litecoin
@@ -102,10 +101,9 @@ object GenerateMultiChainWallet {
 						context.storeLTCBase58PrivateKey(
 							ltcKeyPair.privateKey,
 							ltcKeyPair.address,
-							password,
-							false
+							password
 						)
-						addresses.ltcAddress = ltcKeyPair.address
+						addresses.ltc = Bip44Address(ltcKeyPair.address, getAddressIndexFromPath(path.ltcPath), ChainType.LTC.id)
 						completeMark()
 					}
 					// Bitcoin Cash
@@ -117,10 +115,9 @@ object GenerateMultiChainWallet {
 							bchKeyPair.privateKey,
 							bchKeyPair.address,
 							password,
-							false,
 							false
 						)
-						addresses.bchAddress = bchKeyPair.address
+						addresses.bch = Bip44Address(bchKeyPair.address, getAddressIndexFromPath(path.bchPath), ChainType.BCH.id)
 						completeMark()
 					}
 					// Bitcoin Cash
@@ -133,10 +130,9 @@ object GenerateMultiChainWallet {
 							eosKeyPair.privateKey,
 							eosKeyPair.address,
 							password,
-							false,
 							false
 						)
-						addresses.eosAddress = eosKeyPair.address
+						addresses.eos = Bip44Address(eosKeyPair.address, getAddressIndexFromPath(path.eosPath), ChainType.EOS.id)
 						completeMark()
 					}
 				}
@@ -144,5 +140,10 @@ object GenerateMultiChainWallet {
 
 			override fun mergeCallBack() = hold(addresses)
 		}.start()
+	}
+
+	private fun getAddressIndexFromPath(path: String): Int {
+		return if (path.isEmpty()) -1
+		else path.substringAfterLast("/").toInt()
 	}
 }

@@ -3,20 +3,21 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.*
 import android.content.Context
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orEmpty
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orFalse
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.utils.toList
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
@@ -25,7 +26,6 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.json.JSONArray
 import java.io.Serializable
 
 /**
@@ -46,13 +46,13 @@ data class WalletTable(
 	var currentBCHAddress: String,
 	var currentEOSAddress: String,
 	var currentEOSAccountName: EOSDefaultAllChainName,
-	var ethAddresses: String, // format - "address|index,0x288832ds23...|0"
-	var btcAddresses: String,
-	var btcSeriesTestAddresses: String,
-	var etcAddresses: String,
-	var ltcAddresses: String,
-	var bchAddresses: String,
-	var eosAddresses: String,
+	var ethAddresses: List<Bip44Address>,
+	var btcAddresses: List<Bip44Address>,
+	var btcSeriesTestAddresses: List<Bip44Address>,
+	var etcAddresses: List<Bip44Address>,
+	var ltcAddresses: List<Bip44Address>,
+	var bchAddresses: List<Bip44Address>,
+	var eosAddresses: List<Bip44Address>,
 	var eosAccountNames: List<EOSAccountInfo>,
 	var ethPath: String,
 	var etcPath: String,
@@ -101,92 +101,94 @@ data class WalletTable(
 		btcTestPath = "",
 		ltcPath = "",
 		eosPath = "",
-		ethAddresses = "",
-		etcAddresses = "",
-		btcAddresses = "",
-		bchAddresses = "",
-		btcSeriesTestAddresses = "",
-		ltcAddresses = "",
-		eosAddresses = "",
+		ethAddresses = listOf(),
+		etcAddresses = listOf(),
+		btcAddresses = listOf(),
+		bchAddresses = listOf(),
+		btcSeriesTestAddresses = listOf(),
+		ltcAddresses = listOf(),
+		eosAddresses = listOf(),
 		eosAccountNames = eosAccountNames
 	)
 
-	fun getAddressIndexByChainType(chainType: ChainType, hold: (String) -> Unit) {
-		fun getTargetAddressIndex(address: String, targetAddress: String): String {
-			return if (address.contains(",")) {
-				address.split(",").find {
-					it.contains(targetAddress)
-				}?.substringAfterLast("|").orEmpty()
-			} else address.substringAfterLast("|")
-		}
-		when {
-			chainType.isETH() -> hold(getTargetAddressIndex(ethAddresses, currentETHSeriesAddress))
-			chainType.isETC() -> hold(getTargetAddressIndex(etcAddresses, currentETCAddress))
-			chainType.isLTC() -> hold(getTargetAddressIndex(ltcAddresses, currentLTCAddress))
-			chainType.isBCH() -> hold(getTargetAddressIndex(bchAddresses, currentBCHAddress))
-			chainType.isEOS() -> hold(getTargetAddressIndex(eosAddresses, currentEOSAddress))
-			chainType.isBTC() ->
-				if (Config.isTestEnvironment())
-					hold(getTargetAddressIndex(btcSeriesTestAddresses, currentBTCSeriesTestAddress))
-				else hold(getTargetAddressIndex(btcAddresses, currentBTCAddress))
-		}
-	}
-
-	fun getCurrentAddressAndSymbol(): List<Pair<String, String>> {
-		return arrayListOf<Pair<String, String>>().apply {
-			// 如果是测试环境展示 `BTCSeriesTest Address`. Bip44 规则, 目前多数 `比特币` 系列的测试网是公用的
-			if (currentBTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-				add(Pair(currentBTCAddress, CoinSymbol.btc()))
-			} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.btc()))
-			}
-			// Litecoin Mainnet and Testnet Addresses
-			if (currentLTCAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-				add(Pair(currentLTCAddress, CoinSymbol.ltc))
-			} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.ltc))
-			}
-			// Bitcoin Cash Mainnet and Testnet Addresses
-			if (currentBCHAddress.isNotEmpty() && !Config.isTestEnvironment()) {
-				add(Pair(currentBCHAddress, CoinSymbol.bch))
-			} else if (currentBTCSeriesTestAddress.isNotEmpty() && Config.isTestEnvironment()) {
-				add(Pair(currentBTCSeriesTestAddress, CoinSymbol.bch))
-			}
-			// Ethereum & Ethereum Classic Mainnet and Testnet Addresses
-			if (currentETHSeriesAddress.isNotEmpty()) {
-				add(Pair(currentETHSeriesAddress, CoinSymbol.erc))
-				add(Pair(currentETHSeriesAddress, CoinSymbol.eth))
-				add(Pair(currentETCAddress, CoinSymbol.etc))
-			}
-			// EOS.io Mainnet and Testnet Addresses
-			if (currentEOSAddress.isNotEmpty()) {
-				add(Pair(currentEOSAddress, CoinSymbol.eos))
-			}
-		}
-	}
-
-	fun getCurrentAddressesAndChainID(): List<Pair<String, ChainType>> {
+	fun getCurrentBip44Addresses(): List<Bip44Address> {
 		return listOf(
-			Pair(currentBTCAddress, ChainType.BTC),
-			Pair(currentLTCAddress, ChainType.LTC),
-			Pair(currentBCHAddress, ChainType.BCH),
-			Pair(currentBTCSeriesTestAddress, ChainType.AllTest),
-			Pair(currentETCAddress, ChainType.ETC),
-			Pair(currentETHSeriesAddress, ChainType.ETH),
-			Pair(currentEOSAddress, ChainType.EOS)
-		).filter { it.first.isNotEmpty() }
+			Bip44Address(currentBTCAddress, ChainType.BTC.id),
+			Bip44Address(currentLTCAddress, ChainType.LTC.id),
+			Bip44Address(currentBCHAddress, ChainType.BCH.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(currentETCAddress, ChainType.ETC.id),
+			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
+		).filter { it.address.isNotEmpty() }
 	}
 
-	fun getCurrentAllAddressAndChainID(): List<Pair<String, ChainType>> {
+	fun getCurrentMainnetBip44Addresses(): List<Bip44Address> {
 		return listOf(
-			Pair(btcAddresses, ChainType.BTC),
-			Pair(ltcAddresses, ChainType.LTC),
-			Pair(bchAddresses, ChainType.BCH),
-			Pair(btcSeriesTestAddresses, ChainType.AllTest),
-			Pair(etcAddresses, ChainType.ETC),
-			Pair(ethAddresses, ChainType.ETH),
-			Pair(eosAddresses, ChainType.EOS)
-		).filter { it.first.isNotEmpty() }
+			Bip44Address(currentBTCAddress, ChainType.BTC.id),
+			Bip44Address(currentLTCAddress, ChainType.LTC.id),
+			Bip44Address(currentBCHAddress, ChainType.BCH.id),
+			Bip44Address(currentETCAddress, ChainType.ETC.id),
+			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
+		).filter { it.address.isNotEmpty() }
+	}
+
+	fun getCurrentTestnetBip44Addresses(): List<Bip44Address> {
+		return listOf(
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.LTC.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.BCH.id),
+			Bip44Address(currentETCAddress, ChainType.ETC.id),
+			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
+		).filter { it.address.isNotEmpty() }
+	}
+
+	fun getCurrentBip44Address(chainType: ChainType): Bip44Address {
+		return when {
+			chainType.isETH() -> {
+				val index = ethAddresses.find { it.address.equals(currentETHSeriesAddress, true) }?.index.orZero()
+				Bip44Address(currentETHSeriesAddress, index, ChainType.ETH.id)
+			}
+			chainType.isETC() -> {
+				val index = etcAddresses.find { it.address.equals(currentETCAddress, true) }?.index.orZero()
+				Bip44Address(currentETCAddress, index, ChainType.ETC.id)
+			}
+			chainType.isBTC() -> {
+				val index = btcAddresses.find { it.address.equals(currentBTCAddress, true) }?.index.orZero()
+				Bip44Address(currentBTCAddress, index, ChainType.BTC.id)
+			}
+			chainType.isAllTest() -> {
+				val index = btcSeriesTestAddresses.find { it.address.equals(currentBTCSeriesTestAddress, true) }?.index.orZero()
+				Bip44Address(currentBTCSeriesTestAddress, index, ChainType.AllTest.id)
+			}
+			chainType.isLTC() -> {
+				val index = ltcAddresses.find { it.address.equals(currentLTCAddress, true) }?.index.orZero()
+				Bip44Address(currentLTCAddress, index, ChainType.LTC.id)
+			}
+			chainType.isBCH() -> {
+				val index = bchAddresses.find { it.address.equals(currentBCHAddress, true) }?.index.orZero()
+				Bip44Address(currentBCHAddress, index, ChainType.BCH.id)
+			}
+			chainType.isEOS() -> {
+				val index = eosAddresses.find { it.address.equals(currentEOSAddress, true) }?.index.orZero()
+				Bip44Address(currentEOSAddress, index, ChainType.EOS.id)
+			}
+			else -> Bip44Address()
+		}
+	}
+
+	fun getCurrentAllBip44Address(): List<Bip44Address> {
+		return listOf(
+			btcAddresses,
+			ltcAddresses,
+			bchAddresses,
+			btcSeriesTestAddresses,
+			etcAddresses,
+			ethAddresses,
+			eosAddresses
+		).flatten()
 	}
 
 	fun getCurrentAddresses(useEOSAccountName: Boolean = false): List<String> {
@@ -197,7 +199,7 @@ data class WalletTable(
 			currentETHSeriesAddress,
 			currentLTCAddress,
 			currentBCHAddress,
-			if (useEOSAccountName) currentEOSAccountName.getCurrent()
+			if (useEOSAccountName) currentEOSAccountName.getCurrent() isEmptyThen currentEOSAddress
 			else listOf(
 				currentEOSAddress,
 				currentEOSAccountName.getCurrent(),
@@ -245,42 +247,130 @@ data class WalletTable(
 	fun insertWatchOnlyWallet(callback: (wallet: WalletTable) -> Unit) {
 		load {
 			GoldStoneDataBase.database.walletDao().apply {
-				findWhichIsUsing(true)?.let {
-					update(it.apply { isUsing = false })
-				}
+				findWhichIsUsing(true)?.let { update(it.apply { isUsing = false }) }
 				insert(this@WalletTable)
 			}.findWhichIsUsing(true)
 		} then {
-			Config.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
+			SharedWallet.updateCurrentIsWatchOnlyOrNot(it?.isWatchOnly.orFalse())
 			it?.apply(callback)
 		}
 	}
 
 	fun getEOSWalletType(): EOSWalletType {
 		return when {
-			EOSAccount(currentEOSAccountName.getCurrent()).isValid() -> EOSWalletType.Available
+			EOSAccount(currentEOSAccountName.getCurrent()).isValid(false) -> EOSWalletType.Available
 			// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 			eosAccountNames.filter {
-				it.chainID.equals(Config.getEOSCurrentChain().id, true) &&
-					it.publicKey.equals(Config.getCurrentEOSAddress(), true)
+				it.chainID.equals(SharedChain.getEOSCurrent().id, true) &&
+					it.publicKey.equals(SharedAddress.getCurrentEOS(), true)
 			}.size > 1 -> EOSWalletType.NoDefault
 			else -> EOSWalletType.Inactivated
+		}
+	}
+
+	// Update New Child Address
+	fun updateETHSeriesAddresses(
+		newAddress: Bip44Address,
+		callback: (ethSeriesAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			ethAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateETHAddress(ethAddresses)
+			GoldStoneAPI.context.runOnUiThread { callback(ethAddresses) }
+		}
+	}
+
+	fun updateETCAddresses(
+		newAddress: Bip44Address,
+		callback: (etcAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			etcAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateETCAddress(etcAddresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(etcAddresses)
+			}
+		}
+	}
+
+	fun updateBTCAddresses(
+		newAddress: Bip44Address,
+		callback: (bitcoinAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			btcAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateBTCAddress(btcAddresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(btcAddresses)
+			}
+		}
+	}
+
+	fun updateBCHAddresses(
+		newAddress: Bip44Address,
+		callback: (bitcoinCashAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			bchAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateBCHAddress(bchAddresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(bchAddresses)
+			}
+		}
+	}
+
+	fun updateBTCSeriesTestAddresses(
+		newAddress: Bip44Address,
+		callback: (bitcoinAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			btcSeriesTestAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateBTCSeriesTestAddress(btcSeriesTestAddresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(btcSeriesTestAddresses)
+			}
+		}
+	}
+
+	fun updateLTCAddresses(
+		newAddress: Bip44Address,
+		callback: (litecoinAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			ltcAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateLTCAddress(ltcAddresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(ltcAddresses)
+			}
+		}
+	}
+
+	fun updateEOSAddresses(
+		newAddress: Bip44Address,
+		callback: (eosAddresses: List<Bip44Address>) -> Unit
+	) {
+		doAsync {
+			eosAddresses += newAddress
+			GoldStoneDataBase.database.walletDao().updateEOSAddress(eosAddresses)
+			GoldStoneAPI.context.runOnUiThread {
+				callback(eosAddresses)
+			}
 		}
 	}
 
 	companion object {
 		fun getWalletAddressCount(hold: (Int) -> Unit) {
 			WalletTable.getCurrentWallet {
-				val currentType = Config.getCurrentWalletType()
+				val currentType = SharedWallet.getCurrentWalletType()
 				when {
 					currentType.isBIP44() -> {
-						val ethAddressCount = ethAddresses.split(",").size
-						val etcAddressCount = etcAddresses.split(",").size
-						val btcAddressCount = btcAddresses.split(",").size
-						val btcTestAddressCount = btcSeriesTestAddresses.split(",").size
-						val ltcAddressCount = ltcAddresses.split(",").size
-						val bchAddressCount = bchAddresses.split(",").size
-						val eosAddressCount = eosAddresses.split(",").size
+						val ethAddressCount = ethAddresses.size
+						val etcAddressCount = etcAddresses.size
+						val btcAddressCount = btcAddresses.size
+						val btcTestAddressCount = btcSeriesTestAddresses.size
+						val ltcAddressCount = ltcAddresses.size
+						val bchAddressCount = bchAddresses.size
+						val eosAddressCount = eosAddresses.size
 						hold(
 							ethAddressCount +
 								etcAddressCount +
@@ -357,16 +447,16 @@ data class WalletTable(
 		fun getCurrentWallet(isMainThread: Boolean = true, hold: WalletTable.() -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-					balance = Config.getCurrentBalance()
+					balance = SharedWallet.getCurrentBalance()
 					if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
 					else hold(this)
 				}
 			}
 		}
 
-		fun getWatchOnlyWallet(hold: Pair<String, ChainType>.() -> Unit) {
+		fun getWatchOnlyWallet(hold:Bip44Address.() -> Unit) {
 			WalletTable.getCurrentWallet {
-				if (isWatchOnly) getCurrentAddressesAndChainID().firstOrNull()?.let(hold)
+				if (isWatchOnly) getCurrentBip44Addresses().firstOrNull()?.let(hold)
 			}
 		}
 
@@ -376,115 +466,24 @@ data class WalletTable(
 			}
 		}
 
-		fun getETHAndERCWalletLatestChildAddressIndex(
-			hold: (wallet: WalletTable, ethChildAddressIndex: Int) -> Unit
+		fun getLatestAddressIndexByChainType(
+			chainType: ChainType,
+			hold: (wallet: WalletTable, ethAddressIndex: Int) -> Unit
 		) {
 			WalletTable.getCurrentWallet {
 				// 清理数据格式
-				val pureAddresses = if (ethAddresses.contains(",")) {
-					ethAddresses.replace(",", "")
-				} else ethAddresses
+				val latestIndex = when {
+					chainType.isETH() -> ethAddresses.maxBy { it.index }?.index
+					chainType.isETC() -> etcAddresses.maxBy { it.index }?.index
+					chainType.isBTC() -> btcAddresses.maxBy { it.index }?.index
+					chainType.isAllTest() -> btcSeriesTestAddresses.maxBy { it.index }?.index
+					chainType.isLTC() -> ltcAddresses.maxBy { it.index }?.index
+					chainType.isBCH() -> bchAddresses.maxBy { it.index }?.index
+					chainType.isEOS() -> eosAddresses.maxBy { it.index }?.index
+					else -> null
+				}
 				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getETCWalletLatestChildAddressIndex(
-			hold: (wallet: WalletTable, etcChildAddressIndex: Int) -> Unit
-		) {
-			WalletTable.getCurrentWallet {
-				// 清理数据格式
-				val pureAddresses = if (etcAddresses.contains(",")) {
-					etcAddresses.replace(",", "")
-				} else etcAddresses
-				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getBTCWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				btcChildAddressIndex: Int
-			) -> Unit
-		) {
-			WalletTable.getCurrentWallet {
-				// 清理数据格式
-				val pureAddresses = if (btcAddresses.contains(",")) {
-					btcAddresses.replace(",", "")
-				} else btcAddresses
-				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getBTCTestWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				btcSeriesTestChildAddressIndex: Int
-			) -> Unit
-		) {
-			WalletTable.getCurrentWallet {
-				// 清理数据格式
-				val pureAddresses = if (btcSeriesTestAddresses.contains(",")) {
-					btcSeriesTestAddresses.replace(",", "")
-				} else btcSeriesTestAddresses
-				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getLTCWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				ltcChildAddressIndex: Int
-			) -> Unit
-		) {
-			WalletTable.getCurrentWallet {
-				// 清理数据格式
-				val pureAddresses = if (ltcAddresses.contains(",")) {
-					ltcAddresses.replace(",", "")
-				} else ltcAddresses
-				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getBCHWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				bchChildAddressIndex: Int
-			) -> Unit
-		) {
-			WalletTable.getCurrentWallet {
-				// 清理数据格式
-				val pureAddresses = if (bchAddresses.contains(",")) {
-					bchAddresses.replace(",", "")
-				} else bchAddresses
-				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getEOSWalletLatestChildAddressIndex(
-			hold: (
-				wallet: WalletTable,
-				eosChildAddressIndex: Int
-			) -> Unit
-		) {
-			WalletTable.getCurrentWallet {
-				// 清理数据格式
-				val pureAddresses = if (eosAddresses.contains(",")) {
-					eosAddresses.replace(",", "")
-				} else eosAddresses
-				// 获取最近的 `Address Index` 数值
-				hold(this, pureAddresses.substringAfterLast("|").toInt())
-			}
-		}
-
-		fun getAllEOSAccounts(hold: List<EOSAccountInfo>.() -> Unit) {
-			load { GoldStoneDataBase.database.walletDao().getEOSAccountNames() } then { it ->
-				hold(it.map { JSONArray(it).toList() }.flatten().map { EOSAccountInfo(it) })
+				hold(this, latestIndex.orZero())
 			}
 		}
 
@@ -500,184 +499,27 @@ data class WalletTable(
 			load { GoldStoneDataBase.database.walletDao().updateHasBackUp() } then { callback() }
 		}
 
-		fun updateETHAndERCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (ethereumSeriesAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.ethAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								ethAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateETCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (ethereumClassicAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.etcAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								etcAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateBTCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (bitcoinAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.btcAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								btcAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateBCHAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (bitcoinCashAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.bchAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								bchAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateBTCTestAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (bitcoinAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.btcSeriesTestAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								btcSeriesTestAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateLTCAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (litecoinAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.ltcAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								ltcAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateEOSAddresses(
-			newAddress: String,
-			newAddressIndex: Int,
-			callback: (eosAddresses: String) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							val addresses = this.eosAddresses + "," + newAddress + "|$newAddressIndex"
-							update(this.apply {
-								eosAddresses = addresses
-							})
-							GoldStoneAPI.context.runOnUiThread {
-								callback(addresses)
-							}
-						}
-					}
-				}
-			}
-		}
-
-		fun updateEOSAccountName(
+		fun initEOSAccountName(
 			accountNames: List<EOSAccountInfo>,
-			@UiThread callback: (hasDefaultAccount: Boolean) -> Unit
+			@UiThread callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					// 增量存储同一公钥下的多 `AccountName`
 					var currentAccountNames =
-						getWalletByAddress(Config.getCurrentEOSAddress())?.eosAccountNames ?: listOf()
+						getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
 					currentAccountNames += accountNames
-					updateCurrentEOSAccountNames(currentAccountNames)
+					updateCurrentEOSAccountNames(currentAccountNames.distinct())
 				}
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
 				if (accountNames.size == 1) {
 					val accountName = accountNames.first().name
-					WalletTable.updateEOSDefaultName(accountName) { callback(true) }
-				} else GoldStoneAPI.context.runOnUiThread { callback(false) }
+					WalletTable.updateEOSDefaultName(accountName) { callback() }
+				} else GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 
-		fun updateEOSDefaultName(
-			defaultName: String,
-			@UiThread callback: () -> Unit
-		) {
+		fun updateEOSDefaultName(defaultName: String, @UiThread callback: () -> Unit) {
 			doAsync {
 				// 更新钱包数据库的 `Default EOS Address`
 				GoldStoneDataBase.database.walletDao().apply {
@@ -685,7 +527,7 @@ data class WalletTable(
 						it.apply {
 							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
 							// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-							MyTokenTable.updateEOSAccountName(defaultName, currentEOSAddress)
+							MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
 							GoldStoneAPI.context.runOnUiThread { callback() }
 						}
 					}
@@ -708,19 +550,17 @@ data class WalletTable(
 			}
 		}
 
-		fun deleteCurrentWallet(callback: (WalletTable?) -> Unit) {
+		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable?) -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					val willDeleteWallet = findWhichIsUsing(true)
 					willDeleteWallet?.let { delete(it) }
 					getAllWallets().let { wallets ->
-						wallets.isEmpty() isTrue {
-							callback(willDeleteWallet)
-						} otherwise {
+						if (wallets.isNotEmpty()) {
 							update(wallets.first().apply { isUsing = true })
-							Config.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
-							callback(willDeleteWallet)
+							SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
 						}
+						callback(willDeleteWallet)
 					}
 				}
 			}
@@ -735,7 +575,7 @@ data class WalletTable(
 			confirmEvent: () -> Unit,
 			callback: () -> Unit
 		) {
-			if (Config.isWatchOnlyWallet()) context.alert(AlertText.watchOnly)
+			if (SharedWallet.isWatchOnlyWallet()) context.alert(AlertText.watchOnly)
 			else WalletTable.getCurrentWallet {
 				if (!hasBackUpMnemonic) GoldStoneDialog.show(context) {
 					showButtons(DialogText.goToBackUp) {
@@ -791,4 +631,25 @@ interface WalletDao {
 
 	@Query("UPDATE wallet SET eosAccountNames = :accounts  WHERE isUsing = :status")
 	fun updateCurrentEOSAccountNames(accounts: List<EOSAccountInfo>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET ethAddresses = :ethAddresses  WHERE isUsing = :status")
+	fun updateETHAddress(ethAddresses: List<Bip44Address>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET etcAddresses = :etcAddresses  WHERE isUsing = :status")
+	fun updateETCAddress(etcAddresses: List<Bip44Address>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET btcAddresses = :btcAddresses  WHERE isUsing = :status")
+	fun updateBTCAddress(btcAddresses: List<Bip44Address>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET btcSeriesTestAddresses = :btcSeriesTestAddresses  WHERE isUsing = :status")
+	fun updateBTCSeriesTestAddress(btcSeriesTestAddresses: List<Bip44Address>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET ltcAddresses = :ltcAddresses  WHERE isUsing = :status")
+	fun updateLTCAddress(ltcAddresses: List<Bip44Address>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET bchAddresses = :bchAddresses  WHERE isUsing = :status")
+	fun updateBCHAddress(bchAddresses: List<Bip44Address>, status: Boolean = true)
+
+	@Query("UPDATE wallet SET eosAddresses = :eosAddresses  WHERE isUsing = :status")
+	fun updateEOSAddress(eosAddresses: List<Bip44Address>, status: Boolean = true)
 }

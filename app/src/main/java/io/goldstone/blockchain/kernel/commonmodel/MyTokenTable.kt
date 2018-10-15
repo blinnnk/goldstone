@@ -8,10 +8,13 @@ import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Current
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
@@ -82,9 +85,23 @@ data class MyTokenTable(
 	}
 
 	companion object {
-		fun updateEOSAccountName(name: String, address: String) {
+		fun updateOrInsertOwnerName(name: String, address: String) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateEOSAccountName(name, address, Config.getEOSCurrentChain().id)
+				GoldStoneDataBase.database.myTokenDao().apply {
+					val chainID = SharedChain.getEOSCurrent().id
+					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
+					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
+					val pendingAccount = getPendingEOSAccount(address, chainID)
+					val existingAccount = getByOwnerName(name, chainID)
+					if (pendingAccount.isNull() && existingAccount.isNull()) {
+						val defaultToken =
+							GoldStoneDataBase.database.defaultTokenDao()
+								.getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
+						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
+					} else if (!pendingAccount.isNull()) {
+						updatePendingAccountName(name, address, chainID)
+					}
+				}
 			}
 		}
 
@@ -96,6 +113,20 @@ data class MyTokenTable(
 						else hold(this)
 					}
 				}
+			}
+		}
+
+		fun getEOSAccountNamesByAddress(address: String, @UiThread hold: (List<String>) -> Unit) {
+			load {
+				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
+			} then { myTokens ->
+				hold(
+					myTokens.asSequence().filter {
+						EOSAccount(it.ownerName).isValid()
+					}.map {
+						it.ownerName
+					}.toList()
+				)
 			}
 		}
 
@@ -121,58 +152,26 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getMyTokenByContractAndWalletAddress(
-			contract: TokenContract,
-			walletAddress: String,
-			callback: (MyTokenTable?) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(
-						contract.contract.orEmpty(),
-						walletAddress,
-						contract.getCurrentChainID().id
-					)
-			} then (callback)
-		}
-
-		fun deleteByContract(
-			contract: TokenContract,
-			address: String,
-			callback: () -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(address, contract.contract.orEmpty())
-			} then { callback() }
-		}
-
-		fun insertBySymbolAndContract(
-			symbol: String,
-			contract: TokenContract,
-			@UiThread callback: () -> Unit
-		) {
-			doAsync {
-				val currentAddress = CoinSymbol(symbol).getAddress()
-				// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-				if (
-					GoldStoneDataBase.database.myTokenDao()
-						.getTokenByContractAndAddress(currentAddress, currentAddress, contract.getMainnetChainID()).isNull()
-				) {
-					MyTokenTable(
-						0,
-						currentAddress,
-						currentAddress,
-						symbol,
-						0.0,
-						contract.contract.orEmpty(),
-						contract.getCurrentChainID().id
-					).insert()
-					// 没有网络不用检查间隔直接插入数据库
-					GoldStoneAPI.context.runOnUiThread {
-						callback()
-					}
-				}
+		@WorkerThread
+		fun addNew(symbol: String, contract: TokenContract, chainID: String) {
+			val currentAddress = contract.getAddress(false)
+			val accountName =
+				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
+			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
+			if (GoldStoneDataBase.database.myTokenDao().getTokenByContractAndAddress(
+					contract.contract.orEmpty(),
+					currentAddress,
+					chainID
+				).isNull()) {
+				MyTokenTable(
+					0,
+					accountName,
+					currentAddress,
+					symbol,
+					0.0,
+					contract.contract.orEmpty(),
+					chainID
+				).insert()
 			}
 		}
 
@@ -215,15 +214,20 @@ data class MyTokenTable(
 						hold(balance, error)
 					}
 
+				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
+				// 网络请求在这额外校验一次.
 				contract.isEOS() -> {
-					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
-					// 网络请求在这额外校验一次.
-					if (Config.getCurrentEOSAccount().isValid()) {
-						EOSAPI.getAccountEOSBalance(Config.getCurrentEOSAccount(), { hold(null, it) }) {
-							hold(it, RequestError.None)
-						}
+					if (SharedAddress.getCurrentEOSAccount().isValid(false)) {
+						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), hold)
 					} else hold(null, RequestError.None)
 				}
+
+				contract.isEOSToken() -> EOSAPI.getAccountBalanceBySymbol(
+					SharedAddress.getCurrentEOSAccount(),
+					CoinSymbol(contract.symbol),
+					contract.contract.orEmpty(),
+					hold
+				)
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
@@ -250,7 +254,7 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :ownerName AND chainID Like :chainID ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, ownerName: String, chainID: String): MyTokenTable?
 
 	@Query("SELECT * FROM myTokens WHERE (ownerName IN (:addresses) OR ownerAddress IN (:addresses))  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
@@ -259,7 +263,10 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
-	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress")
+	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID LIKE :chainID")
+	fun getByAddressAndChainID(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
+
+	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress OR ownerName LIKE :walletAddress")
 	fun deleteAllByAddress(walletAddress: String)
 
 	@Query("SELECT * FROM myTokens")
@@ -268,11 +275,18 @@ interface MyTokenDao {
 	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
 	fun updateBalanceByContract(balance: Double, contract: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
-	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND chainID = :chainID")
-	fun updateEOSAccountName(name: String, address: String, chainID: String)
+	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态
+	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND ownerName = :address AND chainID = :chainID")
+	fun updatePendingAccountName(name: String, address: String, chainID: String)
+
+	@Query("SELECT * FROM myTokens WHERE ownerName = :address AND ownerAddress = :address  AND chainID = :chainID")
+	fun getPendingEOSAccount(address: String, chainID: String): MyTokenTable?
+
+	@Query("SELECT * FROM myTokens WHERE ownerName = :name AND chainID = :chainID")
+	fun getByOwnerName(name: String, chainID: String): MyTokenTable?
 
 	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
-	fun deleteByContractAndAddress(address: String, contract: String)
+	fun deleteByContractAndAddress(contract: String, address: String)
 
 	@Insert
 	fun insert(token: MyTokenTable)

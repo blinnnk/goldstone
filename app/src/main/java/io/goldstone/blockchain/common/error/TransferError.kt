@@ -11,11 +11,11 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val BalanceIsNotEnough = TransferError("this account doesn't have enough balance")
 		@JvmStatic
+		val SellRAMTooLess = TransferError("the value you decide sell about RAM much greater than 1 byte")
+		@JvmStatic
 		val IncorrectDecimal = TransferError("this input count's decimal is wrong with its own decimal value")
 		@JvmStatic
 		val GetWrongFeeFromChain = TransferError("there is error when get fee from chain")
-		@JvmStatic
-		val GetChainInfoError = TransferError("get chain info error, please check your net environment")
 		@JvmStatic
 		val TradingInputIsEmpty = TransferError("please enter the count that you will trading")
 		@JvmStatic
@@ -37,6 +37,8 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		val DecryptKeyStoreError = AccountError("decrypt your keystore by password found error")
 		@JvmStatic
 		val InvalidAccountName = AccountError("invalid eos account name")
+		@JvmStatic
+		val UnavailableAccountName = AccountError("Unavailable Account Name")
 		@JvmStatic
 		val EmptyName = AccountError("please enter the account name which you decide to register")
 		@JvmStatic

@@ -10,8 +10,8 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -34,22 +34,15 @@ class TokenManagementListFragment :
 		supportTokenManagementOrHide()
 	}
 
-	override fun setRecyclerViewAdapter(
-		recyclerView: BaseRecyclerView,
-		asyncData: ArrayList<DefaultTokenTable>?
-	) {
-		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) {
+	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?) {
+		recyclerView.adapter = TokenManagementListAdapter(asyncData.orEmptyArray()) { default, switch ->
 			switch.onClick {
-				tokenSearchModel?.let { model ->
-					// 更新内存数据防止上下滑动导致的复用问题
-					asyncData?.find { defaultToken ->
-						defaultToken.contract.equals(model.contract, true)
-					}?.apply {
-						isUsed = switch.isChecked
-					}
-					// 更新数据库
-					TokenManagementListPresenter.updateMyTokenInfoBy(switch, model)
-				}
+				switch.isClickable = false
+				// 更新内存数据防止上下滑动导致的复用问题
+				asyncData?.find { data -> data.contract.equals(default.contract, true) }?.isUsed = switch.isChecked
+				// 更新数据库
+				TokenManagementListPresenter.insertOrDeleteMyToken(switch.isChecked, default)
+				switch.isClickable = true
 			}
 		}
 	}
@@ -65,7 +58,7 @@ class TokenManagementListFragment :
 	}
 
 	private fun supportTokenManagementOrHide() {
-		if (Config.getCurrentWalletType().isBTCSeries() || Config.getCurrentWalletType().isEOSSeries()) {
+		if (SharedWallet.getCurrentWalletType().isBTCSeries() || SharedWallet.getCurrentWalletType().isEOSSeries()) {
 			showAttentionView()
 			getParentFragment<TokenManagementFragment> {
 				overlayView.header.showSearchButton(false)

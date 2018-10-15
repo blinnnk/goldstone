@@ -23,9 +23,9 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.Config
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -40,19 +40,19 @@ import org.jetbrains.anko.verticalLayout
  */
 @SuppressLint("SetTextI18n")
 open class ValueInputView(context: Context) : RelativeLayout(context) {
-	
+
 	protected val gradientView by lazy { GradientView(context) }
 	protected val description by lazy { TextView(context) }
 	protected val valueInput by lazy { EditText(context) }
 	private val priceInfo by lazy { TextView(context) }
 	protected val gradientViewHeight = 170.uiPX()
-	
+
 	init {
 		this.addView(gradientView.apply {
 			layoutParams = LinearLayout.LayoutParams(matchParent, gradientViewHeight)
 			setStyle(GradientType.DarkGreenYellow, gradientViewHeight)
 		})
-		
+
 		verticalLayout {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, gradientViewHeight)
 			gravity = Gravity.CENTER
@@ -65,7 +65,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				typeface = GoldStoneFont.medium(context)
 				gravity = Gravity.CENTER
 			}.into(this)
-			
+
 			valueInput.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 				hint = "0.0"
@@ -78,12 +78,12 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				y -= 3.uiPX()
 			}.into(this)
-			
+
 			priceInfo.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX()).apply {
 					topMargin = -(18.uiPX())
 				}
-				text = "≈ 0.0 (${Config.getCurrencyCode()})"
+				text = "≈ 0.0 (${SharedWallet.getCurrencyCode()})"
 				textColor = Spectrum.opacity5White
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
@@ -91,7 +91,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 			}.into(this)
 		}
 	}
-	
+
 	fun updateCurrencyValue(value: Double) {
 		if (valueInput.text?.toString()?.toDoubleOrNull().isNull() && valueInput.text.isNotEmpty()) {
 			context?.alert(AlertText.transferUnvalidInputFormat)
@@ -100,13 +100,13 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 		}
 		val count = if (valueInput.text.isEmpty()) 0.0 else valueInput.text.toString().toDouble()
 		priceInfo.text =
-			"≈ ${(value * count).orElse(0.0).formatCurrency()} (${Config.getCurrencyCode()})"
+			"≈ ${(value * count).orElse(0.0).formatCurrency()} (${SharedWallet.getCurrencyCode()})"
 	}
-	
+
 	fun setInputValue(count: Double) {
 		valueInput.setText(count.toString())
 	}
-	
+
 	fun inputTextListener(hold: (String) -> Unit) {
 		valueInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
@@ -118,7 +118,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				}
 				text.apply { hold(toString()) }
 			}
-			
+
 			override fun beforeTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -126,7 +126,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 				after: Int
 			) {
 			}
-			
+
 			override fun onTextChanged(
 				s: CharSequence?,
 				start: Int,
@@ -136,7 +136,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 			}
 		})
 	}
-	
+
 	fun setHeaderSymbol(symbol: String, isDeposit: Boolean = false) {
 		val prefix =
 			if (isDeposit) CommonText.deposit.toLowerCase().toUpperCaseFirstLetter()
@@ -144,11 +144,11 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 		description.text =
 			"$prefix $symbol ${PrepareTransferText.sendAmountSuffix}"
 	}
-	
+
 	fun getValue(): String {
 		return valueInput.text.toString()
 	}
-	
+
 	fun setFoucs() {
 		valueInput.requestFocus()
 		(context as? Activity)?.apply { SoftKeyboard.show(this, valueInput) }
