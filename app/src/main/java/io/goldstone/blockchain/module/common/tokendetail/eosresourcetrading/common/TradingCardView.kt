@@ -68,6 +68,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 	}
 
 	fun setSellingRAMStyle() {
+		accountNameEditText.visibility = View.GONE
 		amountEditText.setTitle(TokenDetailText.tradeRamByBytesTitle)
 		amountEditText.setHint(TokenDetailText.tradeRamByBytesPlaceholder)
 	}

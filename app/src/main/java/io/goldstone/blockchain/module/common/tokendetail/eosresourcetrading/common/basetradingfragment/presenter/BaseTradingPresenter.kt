@@ -112,6 +112,7 @@ open class BaseTradingPresenter(
 			toAccount,
 			tradingCount,
 			CoinSymbol.EOS,
+			EOSCodeName.EOSIOToken,
 			stakeType.isSellRam()
 		) { privateKey, error ->
 			/** `Buy Ram` 是可以按照 `EOS Count` 来进行购买的, 但是 `Sell` 只能按照 `Byte` 进行销售 */
@@ -160,7 +161,8 @@ open class BaseTradingPresenter(
 			fromAccount,
 			toAccount,
 			transferCount,
-			CoinSymbol.EOS
+			CoinSymbol.EOS,
+			EOSCodeName.EOSIOToken
 		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
@@ -210,6 +212,7 @@ open class BaseTradingPresenter(
 			toAccount: EOSAccount,
 			tradingCount: Double,
 			symbol: CoinSymbol,
+			contract: EOSCodeName,
 			isSellRam: Boolean = false,
 			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
@@ -231,7 +234,7 @@ open class BaseTradingPresenter(
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
 						symbol,
-						EOSCodeName.EOSIOToken.value
+						contract.value
 					) { balance, balanceError ->
 						if (!balance.isNull() && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够

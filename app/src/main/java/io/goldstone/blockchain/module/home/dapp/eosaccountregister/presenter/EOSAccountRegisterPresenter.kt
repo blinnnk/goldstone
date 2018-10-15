@@ -76,6 +76,7 @@ class EOSAccountRegisterPresenter(
 						validAccount!!,
 						totalSpent,
 						CoinSymbol.EOS,
+						EOSCodeName.EOSIOToken,
 						false
 					) { privateKey, privateKeyError ->
 						if (error.isNone() && !privateKey.isNull()) {

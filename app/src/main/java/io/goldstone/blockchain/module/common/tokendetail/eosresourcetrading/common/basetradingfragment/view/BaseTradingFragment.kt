@@ -134,7 +134,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		}
 		val formattedPriceEOS = "≈ " + priceEOS.formatCount(4)
 		delegateTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
-		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $$unitDescription", Spectrum.blue)
+		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
 		incomeTradingCard.setProcessValue(title, weight, available, total, isTime)
 		expendTradingCard.setProcessValue(title, weight, available, total, isTime)
 	}

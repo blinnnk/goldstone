@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.account
 
 import io.goldstone.blockchain.crypto.eos.EOSValue
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import java.io.Serializable
 
 /**
@@ -10,7 +11,7 @@ import java.io.Serializable
 
 class EOSAccount(private val value: String) : Serializable {
 
-	val accountName = value.toLowerCase()
+	val accountName = if (EOSWalletUtils.isValidAddress(value)) value else value.toLowerCase()
 
 	/**
 	 * EOS Account Name 没有找到特别清晰的官方文档进行校验

@@ -125,7 +125,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 						else qrView.setAddressText(currentLTCAddress)
 					}
 
-					token?.contract.isEOS() -> {
+					token?.contract.isEOSSeries() -> {
 						qrView.setAddressText(currentEOSAccountName.getCurrent())
 					}
 

@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -117,6 +118,12 @@ data class EOSTransactionTable(
 				)
 			} then (hold)
 		}
+
+		fun getMaxDataIndex(accountName: EOSAccount, hold: (Int?) -> Unit) {
+			load {
+				GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(accountName.accountName)
+			} then { hold(it?.dataIndex) }
+		}
 	}
 }
 
@@ -131,6 +138,9 @@ interface EOSTransactionDao {
 
 	@Query("UPDATE eosTransactions SET isPending = :pendingStatus WHERE txID LIKE :txID")
 	fun updatePendingStatusByTxID(txID: String, pendingStatus: Boolean = false)
+
+	@Query("SELECT * FROM eosTransactions WHERE id = (SELECT MAX(id) FROM eosTransactions) AND recordAccountName LIKE :accountName")
+	fun getMaxDataIndex(accountName: String): EOSTransactionTable?
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName")
 	fun getDataByRecordAccount(recordAccountName: String): List<EOSTransactionTable>

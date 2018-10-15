@@ -45,33 +45,34 @@ class TokenManagementListPresenter(
 	// 在异步线程更新数据
 	private fun prepareMyDefaultTokens(isETHERCAndETCOnly: Boolean) {
 		DefaultTokenTable.getDefaultTokens { defaultTokens ->
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = defaultTokens.size
-				override fun concurrentJobs() {
-					defaultTokens.forEach { default ->
-						MyTokenTable.getMyTokens { myTokens ->
+			MyTokenTable.getMyTokens { myTokens ->
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = defaultTokens.size
+					override fun concurrentJobs() {
+						defaultTokens.forEach { default ->
 							default.isUsed = !myTokens.find {
 								default.contract.equals(it.contract, true)
 							}.isNull()
 							completeMark()
+
 						}
 					}
-				}
 
-				override fun mergeCallBack() {
-					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
-					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						if (isETHERCAndETCOnly) sortedList.filter {
-							TokenContract(it.contract).isETH() ||
-								TokenContract(it.contract).isERC20Token() ||
-								TokenContract(it.contract).isETC()
-						}.let {
-							memoryTokenData = it.toArrayList()
-						} else memoryTokenData = sortedList
-						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
-					} else return
-				}
-			}.start()
+					override fun mergeCallBack() {
+						val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
+						if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
+							if (isETHERCAndETCOnly) sortedList.filter {
+								TokenContract(it.contract).isETH() ||
+									TokenContract(it.contract).isERC20Token() ||
+									TokenContract(it.contract).isETC()
+							}.let {
+								memoryTokenData = it.toArrayList()
+							} else memoryTokenData = sortedList
+							diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
+						} else return
+					}
+				}.start()
+			}
 		}
 	}
 
