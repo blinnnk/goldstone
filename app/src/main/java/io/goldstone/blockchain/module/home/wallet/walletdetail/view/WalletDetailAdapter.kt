@@ -31,7 +31,6 @@ class WalletDetailAdapter(
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context): BottomLoadingView {
 		return BottomLoadingView(context).apply {
-			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			// 加载更多显示的底部 `LoadingView`
 			hide()
 			addView(
