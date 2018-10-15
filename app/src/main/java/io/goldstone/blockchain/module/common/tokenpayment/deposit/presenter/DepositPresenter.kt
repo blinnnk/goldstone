@@ -70,7 +70,7 @@ class DepositPresenter(
 					QRCode.generateBitcoinCashCode(address, amount)
 				}
 
-				token?.contract.isEOS() -> {
+				token?.contract.isEOSSeries() -> {
 					val accountName = SharedAddress.getCurrentEOSAccount().accountName
 					QRCode.generateEOSCode(
 						accountName,

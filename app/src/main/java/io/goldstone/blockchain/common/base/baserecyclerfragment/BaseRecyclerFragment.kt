@@ -3,7 +3,10 @@ package io.goldstone.blockchain.common.base.baserecyclerfragment
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -222,6 +225,28 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		getMainActivity()?.backEvent = Runnable {
 			setBackEvent(getMainActivity())
 		}
+	}
+
+	fun addRecyclerLoadMoreListener(callback: () -> Unit) {
+		recyclerView.addOnScrollListener(
+			object : RecyclerView.OnScrollListener() {
+				override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+					recyclerView.layoutManager?.apply {
+						var lastPosition = 0
+						when (this) {
+							is LinearLayoutManager -> lastPosition = findLastVisibleItemPosition()
+							is GridLayoutManager -> lastPosition = findLastVisibleItemPosition()
+							is StaggeredGridLayoutManager -> {
+								val arrays = IntArray(spanCount)
+								findLastVisibleItemPositions(arrays)
+								lastPosition = arrays.max()!!
+							}
+						}
+						if (lastPosition >= itemCount - 1) callback()
+					}
+				}
+			}
+		)
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {
