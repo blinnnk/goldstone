@@ -97,7 +97,11 @@ class TransactionDetailPresenter(
 
 	fun getUnitSymbol(): String {
 		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
+		return when {
+			ChainID(notificationData?.chainID.orEmpty()).isEOS() -> CoinSymbol.EOS.symbol.orEmpty()
+			data?.token?.contract.isEOSToken() -> CoinSymbol.EOS.symbol.orEmpty()
+			else -> CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
+		}
 	}
 
 	fun showAddContactsButton(cell: TransactionInfoCell) {

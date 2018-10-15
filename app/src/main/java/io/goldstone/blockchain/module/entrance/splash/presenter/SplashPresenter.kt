@@ -119,14 +119,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					cacheWalletData(wallet, callback)
 				}
 			}
-			type.isBIP44() -> {
-				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-					cacheWalletData(wallet, callback)
-				} else NodeSelectionPresenter.setAllMainnet {
-					cacheWalletData(wallet, callback)
-				}
-			}
-			type.isMultiChain() -> {
+			type.isBIP44() || type.isMultiChain() -> {
 				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {

@@ -7,10 +7,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.multichain.getAddress
-import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -64,8 +61,10 @@ class TokenManagementListPresenter(
 				override fun mergeCallBack() {
 					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						if (isETHERCAndETCOnly) sortedList.filterNot {
-							TokenContract(it.contract).isBTCSeries() || TokenContract(it.contract).isEOS()
+						if (isETHERCAndETCOnly) sortedList.filter {
+							TokenContract(it.contract).isETH() ||
+								TokenContract(it.contract).isERC20Token() ||
+								TokenContract(it.contract).isETC()
 						}.let {
 							memoryTokenData = it.toArrayList()
 						} else memoryTokenData = sortedList

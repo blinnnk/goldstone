@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -28,6 +29,7 @@ import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -36,6 +38,10 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.uiThread
@@ -75,6 +81,30 @@ class WalletDetailPresenter(
 					if (!error.isNone()) fragment.context.alert(error.message)
 				}
 			} else fragment.removeMiniLoadingView()
+		}
+	}
+
+	override fun loadMore() {
+		super.loadMore()
+		// 例子之后需要删除掉
+		/**
+		 * 1. 异步获取新数据
+		 * 2. 获取到的数据更新 adapter 的数据以及 asyncData 的数据
+		 * 		 2.1  asyncData.addAll(newData)
+		 *		 2.2 getAdapter<Type>().dataSet = asyncData
+		 * 3. recycler adapter notifyItemRangeChanged 增量更新
+		 */
+		launch(CommonPool) {
+			val testData = listOf(WalletDetailCellModel(DefaultTokenTable(), 2.0, EOSWalletType.None))
+			delay(2000L)
+			fragment.asyncData?.addAll(testData)
+			fragment.getAdapter<WalletDetailAdapter>()?.dataSet = fragment.asyncData.orEmptyArray()
+			launch(UI) {
+				fragment.recyclerView.adapter?.notifyItemRangeChanged(
+					fragment.asyncData?.count().orZero() - testData.size, fragment.asyncData?.count().orZero()
+				)
+				showBottomLoading(false)
+			}
 		}
 	}
 
