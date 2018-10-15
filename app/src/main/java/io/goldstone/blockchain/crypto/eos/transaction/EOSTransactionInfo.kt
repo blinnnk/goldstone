@@ -12,6 +12,7 @@ import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toCount
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
@@ -96,6 +97,7 @@ data class EOSTransactionInfo(
 			toAccount,
 			amount.toCount(decimal),
 			CoinSymbol(symbol),
+			codeName,
 			false,
 			hold
 		)
@@ -135,7 +137,7 @@ data class EOSTransactionInfo(
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(decimal)
 		val symbolCode = symbol.toByteArray().toNoPrefixHexString()
 		// `EOS Token` 的 `Memo` 不用补位
-		val completeZero = if (symbol == CoinSymbol.EOS.symbol) "00000000" else "00"
+		val completeZero = if (CoinSymbol(symbol).isEOS()) "00000000" else "0000"
 		val memoCode = if (isTransaction) EOSUtils.convertMemoToCode(memo) else ""
 		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + completeZero + memoCode
 	}

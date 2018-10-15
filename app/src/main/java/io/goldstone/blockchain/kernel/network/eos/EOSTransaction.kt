@@ -7,7 +7,6 @@ import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.transaction.*
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
 import java.io.Serializable
 import java.math.BigInteger
@@ -60,7 +59,9 @@ class EOSTransaction(
 				listOf(action),
 				listOf(authorization),
 				transactionInfoCode
-			).let(hold)
+			).let {
+				hold(it)
+			}
 		}
 	}
 }

@@ -26,6 +26,11 @@ class QuotationManagementPresenter(
 		updateSelectionsData()
 	}
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()

@@ -19,7 +19,9 @@ import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -199,8 +201,9 @@ data class WalletTable(
 			currentETHSeriesAddress,
 			currentLTCAddress,
 			currentBCHAddress,
-			if (useEOSAccountName) currentEOSAccountName.getCurrent() isEmptyThen currentEOSAddress
-			else listOf(
+			if (useEOSAccountName) {
+				currentEOSAccountName.getCurrent() isEmptyThen currentEOSAddress
+			} else listOf(
 				currentEOSAddress,
 				currentEOSAccountName.getCurrent(),
 				currentEOSAccountName.getUnEmptyValue()
@@ -234,7 +237,9 @@ data class WalletTable(
 			Pair(WalletType.eosOnly, currentEOSAddress),
 			Pair(WalletType.eosMainnetOnly, currentEOSAccountName.main),
 			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle)
-		).filter { it.second.isNotEmpty() }
+		).filter {
+			it.second.isNotEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
+		}
 		return when {
 			// 减 `2` 是去除掉 `EOS` 的两个网络状态的计数, 此计数并不影响判断是否是全链钱包
 			// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
@@ -454,7 +459,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getWatchOnlyWallet(hold:Bip44Address.() -> Unit) {
+		fun getWatchOnlyWallet(hold: Bip44Address.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				if (isWatchOnly) getCurrentBip44Addresses().firstOrNull()?.let(hold)
 			}

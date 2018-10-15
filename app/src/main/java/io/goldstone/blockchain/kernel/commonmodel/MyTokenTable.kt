@@ -222,12 +222,14 @@ data class MyTokenTable(
 					} else hold(null, RequestError.None)
 				}
 
-				contract.isEOSToken() -> EOSAPI.getAccountBalanceBySymbol(
-					SharedAddress.getCurrentEOSAccount(),
-					CoinSymbol(contract.symbol),
-					contract.contract.orEmpty(),
-					hold
-				)
+				contract.isEOSToken() -> {
+					EOSAPI.getAccountBalanceBySymbol(
+						SharedAddress.getCurrentEOSAccount(),
+						CoinSymbol(contract.symbol),
+						contract.contract.orEmpty(),
+						hold
+					)
+				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					GoldStoneEthCall.getTokenBalanceWithContract(
@@ -257,7 +259,7 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, ownerName: String, chainID: String): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE (ownerName IN (:addresses) OR ownerAddress IN (:addresses))  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
+	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
 	fun getTokensByAddress(addresses: List<String>, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
@@ -285,7 +287,7 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerName = :name AND chainID = :chainID")
 	fun getByOwnerName(name: String, chainID: String): MyTokenTable?
 
-	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
+	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract")
 	fun deleteByContractAndAddress(contract: String, address: String)
 
 	@Insert

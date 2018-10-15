@@ -54,6 +54,13 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		isLoadingData = false
 	}
 
+	/**
+	 * 1. 异步获取新数据
+	 * 2. 获取到的数据更新 adapter 的数据以及 asyncData 的数据
+	 * 		 2.1  asyncData.addAll(newData)
+	 *		 2.2 getAdapter<Type>().dataSet = asyncData
+	 * 3. recycler adapter notifyItemRangeChanged 增量更新
+	 */
 	open fun loadMore() {
 		// 显示底部的 `LoadingView`
 		showBottomLoading(true)

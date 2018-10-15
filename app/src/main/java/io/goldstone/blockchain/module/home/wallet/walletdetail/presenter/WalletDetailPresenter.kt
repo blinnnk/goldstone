@@ -58,6 +58,11 @@ class WalletDetailPresenter(
 	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
 	private var detailModels: List<WalletDetailCellModel>? = null
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -73,8 +78,10 @@ class WalletDetailPresenter(
 			// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
 			if (!lockGettingChainModelsThread) {
 				// 再检查链上的最新价格和数量
-				fragment.removeMiniLoadingView()
+				lockGettingChainModelsThread = true
 				models.getChainModels { chainModels, error ->
+					fragment.removeMiniLoadingView()
+					lockGettingChainModelsThread = false
 					// 更新内存的数据
 					detailModels = chainModels
 					updateUIByData(chainModels)
@@ -84,16 +91,16 @@ class WalletDetailPresenter(
 		}
 	}
 
+	/**
+	 * 1. 异步获取新数据
+	 * 2. 获取到的数据更新 adapter 的数据以及 asyncData 的数据
+	 * 		 2.1  asyncData.addAll(newData)
+	 *		 2.2 getAdapter<Type>().dataSet = asyncData
+	 * 3. recycler adapter notifyItemRangeChanged 增量更新
+	 */
 	override fun loadMore() {
 		super.loadMore()
 		// 例子之后需要删除掉
-		/**
-		 * 1. 异步获取新数据
-		 * 2. 获取到的数据更新 adapter 的数据以及 asyncData 的数据
-		 * 		 2.1  asyncData.addAll(newData)
-		 *		 2.2 getAdapter<Type>().dataSet = asyncData
-		 * 3. recycler adapter notifyItemRangeChanged 增量更新
-		 */
 		launch(CommonPool) {
 			val testData = listOf(WalletDetailCellModel(DefaultTokenTable(), 2.0, EOSWalletType.None))
 			delay(2000L)
@@ -200,7 +207,6 @@ class WalletDetailPresenter(
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
 		else {
-			lockGettingChainModelsThread = true
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
