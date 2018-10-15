@@ -619,11 +619,18 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getPersonalMemoryTransactionRecord(
 		account: String,
+		id: String,
 		errorCallback: (RequestError) -> Unit = {},
 		hold: (PersonalMemoryTransactionRecordModel?) -> Unit
 	) {
+		var apiUrl = if (id.isEmpty()) {
+			APIPath.getPersonalMemoryTransactionRecord(APIPath.currentUrl) + account
+		} else {
+			APIPath.getPersonalMemoryTransactionRecord(APIPath.currentUrl) + account + "&id=$id"
+		}
+		apiUrl += "&size=20"
 		requestData<String>(
-			APIPath.getPersonalMemoryTransactionRecord(APIPath.currentUrl) + account,
+			apiUrl,
 			"",
 			true,
 			errorCallback,
