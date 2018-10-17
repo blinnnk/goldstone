@@ -453,7 +453,7 @@ object TokenDetailText {
 		HoneyLanguage.English.code -> "EOS Amount"
 		HoneyLanguage.Chinese.code -> "EOS 数量"
 		HoneyLanguage.Japanese.code -> "EOSの数"
-		HoneyLanguage.Korean.code -> "EOS의 수"
+		HoneyLanguage.Korean.code -> "EOS 의 수"
 		HoneyLanguage.Russian.code -> "Количество EOS"
 		HoneyLanguage.TraditionalChinese.code -> "EOS 數量"
 		else -> ""

@@ -2,8 +2,11 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getChildFragment
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
 import org.jetbrains.anko.runOnUiThread
@@ -27,8 +30,12 @@ fun TransactionDetailPresenter.observerEOSTransaction() {
 		) {
 			// Update Database BlockNumber
 			GoldStoneDataBase.database.eosTransactionDao().updateBlockNumberByTxID(currentHash, blockNumber)
-			if (confirmed)
-				GoldStoneDataBase.database.eosTransactionDao().updatePendingStatusByTxID(currentHash)
+			if (confirmed) {
+				// 根据服务器计算 `ServerID` 的规则更新本地数 `PendingData` 数据
+				EOSAPI.getTransactionServerID(blockNumber, currentHash, SharedAddress.getCurrentEOSAccount()) {
+					if (!it.isNull()) GoldStoneDataBase.database.eosTransactionDao().updatePendingDataByTxID(currentHash, it!!)
+				}
+			}
 			GoldStoneAPI.context.runOnUiThread {
 				if (confirmed) {
 					onEOSTransactionSucceed()

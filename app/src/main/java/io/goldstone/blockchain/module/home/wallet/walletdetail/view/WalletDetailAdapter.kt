@@ -8,11 +8,9 @@ import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.keyboardHeightListener
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.wrapContent
 
 /**
  * @date 23/03/2018 4:16 PM
@@ -23,24 +21,19 @@ class WalletDetailAdapter(
 	private val holdCell: WalletDetailCell.() -> Unit,
 	private val holdHeader: WalletDetailHeaderView.() -> Unit
 ) :
-	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, BottomLoadingView>() {
+	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
 
 	override fun generateCell(context: Context) =
 		WalletDetailCell(context)
 
 	private var hasHiddenSoftNavigationBar = false
-	override fun generateFooter(context: Context): BottomLoadingView {
-		return BottomLoadingView(context).apply {
-			// 加载更多显示的底部 `LoadingView`
-			addView(
-				View(context).apply {
-					val barHeight =
-						if ((!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) || SharedWallet.isNotchScreen()) {
-							60.uiPX()
-						} else 10.uiPX()
-					layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
-				}
-			)
+	override fun generateFooter(context: Context): View {
+		return View(context).apply {
+			val barHeight =
+				if ((!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) || SharedWallet.isNotchScreen()) {
+					60.uiPX()
+				} else 10.uiPX()
+			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
 	}
 

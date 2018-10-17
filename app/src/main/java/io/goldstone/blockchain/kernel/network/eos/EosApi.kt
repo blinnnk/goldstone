@@ -10,8 +10,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.utils.toList
-import io.goldstone.blockchain.common.value.DataValue
-import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
@@ -35,6 +33,56 @@ import org.json.JSONObject
 import java.math.BigInteger
 
 object EOSAPI {
+
+	/**
+	 * 本地转账临时插入的 Pending Data 需要填充, 服务器自定义的 ServerID 格式
+	 * unique_id = block_num * 1000000 + tx_index * 1000 + action_index
+	 */
+	fun getTransactionServerID(blockNumber: Int, txID: String, fromAccount: EOSAccount, hold: (Long?) -> Unit) {
+		getBlockByNumber(blockNumber) { jsonString, error ->
+			if (!jsonString.isNull() && error.isNone()) {
+				val json = JSONObject(jsonString)
+				val blockTransactions = JSONArray(json.safeGet("transactions")).toList()
+				var txIndex: Int? = null
+				blockTransactions.forEachIndexed { index, jsonObject ->
+					if (jsonObject.getTargetChild("trx", "id").equals(txID, true)) txIndex = index
+				}
+				System.out.println("txIndex $txIndex")
+				val actions = JSONArray(blockTransactions[txIndex!!].getTargetChild("trx", "transaction", "actions")).toList()
+				var actionIndex: Int? = null
+				actions.forEachIndexed { index, jsonObject ->
+					if (
+						jsonObject.safeGet("name").equals("transfer", true) &&
+						jsonObject.getTargetChild("data", "from").equals(fromAccount.accountName, true)
+					) {
+						actionIndex = index
+					}
+				}
+				if (!txIndex.isNull() && !actionIndex.isNull()) {
+					val uniqueID = blockNumber * 1000000L + txIndex!! * 1000L + actionIndex!!
+					hold(uniqueID)
+				}
+			}
+		}
+	}
+
+	fun getBlockByNumber(blockNumber: Int, @WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber))
+		).let { requestBody ->
+			val api = EOSUrl.getBlock()
+			RequisitionUtil.postRequest(
+				requestBody,
+				api,
+				{ hold(null, it) },
+				false
+			) { result ->
+				if (result.isEmpty()) hold(null, RequestError.ResolveDataError(Throwable("Empty Result")))
+				else hold(result, RequestError.None)
+			}
+		}
+	}
 
 	fun getAccountInfo(
 		account: EOSAccount,

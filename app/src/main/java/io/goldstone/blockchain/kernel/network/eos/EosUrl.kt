@@ -19,6 +19,10 @@ object EOSUrl {
 	val getAccountInfo: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.GetAccount.method}"
 	}
+
+	val getBlock: () -> String = {
+		"${currentURL()}/v1/chain/${EOSMethod.GetBlock.method}"
+	}
 	val getAccountInfoInTargetNet: (targetNet: String) -> String = {
 		"$it/v1/chain/${EOSMethod.GetAccount.method}"
 	}
