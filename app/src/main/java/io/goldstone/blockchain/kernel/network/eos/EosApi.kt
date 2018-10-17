@@ -25,6 +25,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.TotalResources
+import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
@@ -47,7 +48,6 @@ object EOSAPI {
 				blockTransactions.forEachIndexed { index, jsonObject ->
 					if (jsonObject.getTargetChild("trx", "id").equals(txID, true)) txIndex = index
 				}
-				System.out.println("txIndex $txIndex")
 				val actions = JSONArray(blockTransactions[txIndex!!].getTargetChild("trx", "transaction", "actions")).toList()
 				var actionIndex: Int? = null
 				actions.forEachIndexed { index, jsonObject ->
@@ -66,7 +66,7 @@ object EOSAPI {
 		}
 	}
 
-	fun getBlockByNumber(blockNumber: Int, @WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit) {
+	private fun getBlockByNumber(blockNumber: Int, @WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber))
@@ -342,6 +342,58 @@ object EOSAPI {
 				},
 				RequestError.None
 			) else hold(null, RequestError.NullResponse("Empty or Null Result"))
+		}
+	}
+
+	fun getEOSCountInfo(
+		chainid: ChainID,
+		account: EOSAccount,
+		codeName: String,
+		symbol: String,
+		hold: (info: EOSTokenCountInfo?, error: RequestError) -> Unit
+	) {
+		getEOSTokenCountInfo(chainid, account, codeName, symbol) { data, error ->
+			if (!data.isNullOrEmpty() && error.isNone()) {
+				getTransactionCount(chainid, account, codeName, symbol) { count, totalCountError ->
+					if (!count.isNull() && totalCountError.isNone()) {
+						hold(
+							EOSTokenCountInfo(
+								JSONObject(data).safeGet("total_send").toIntOrNull().orZero(),
+								JSONObject(data).safeGet("total_receive").toIntOrNull().orZero(),
+								count.orZero()
+							),
+							RequestError.None
+						)
+					} else hold(null, totalCountError)
+				}
+			} else hold(null, error)
+		}
+	}
+
+	@JvmStatic
+	fun getEOSTokenCountInfo(
+		chainid: ChainID,
+		account: EOSAccount,
+		codeName: String,
+		symbol: String,
+		@WorkerThread hold: (info: String?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<String>(
+			APIPath.getEOSTokenCountInfo(
+				APIPath.currentUrl,
+				chainid.id,
+				account.accountName,
+				codeName,
+				symbol
+			),
+			"",
+			true,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			val data = firstOrNull()
+			if (data.isNullOrEmpty()) hold(null, RequestError.NullResponse("Empty Result"))
+			else hold(data, RequestError.None)
 		}
 	}
 

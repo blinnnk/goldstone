@@ -1,10 +1,10 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
-import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -21,8 +21,6 @@ import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -34,7 +32,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -45,7 +42,7 @@ class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
-	private var allData: List<TransactionListModel>? = null
+	var allData: List<TransactionListModel>? = null
 	val token by lazy {
 		fragment.getParentFragment<TokenDetailCenterFragment>()?.token
 	}
@@ -62,147 +59,64 @@ class TokenDetailPresenter(
 		prepareTokenDetailData()
 	}
 
-	fun showOnlyReceiveData() {
-		allData?.filter {
-			it.isReceived
-		}?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
-		}
-	}
-
-	private var totalCount: Int? = null
-	private var currentMaxCount: Int? = null
-	private val pageCount = 10
+	var totalCount: Int? = null
+	var currentMaxCount: Int? = null
 
 	override fun loadMore() {
-		super.loadMore()
-		// 是否有合法的数据
-		if (totalCount == null || currentMaxCount == null) {
-			showBottomLoading(false)
-			return
-		} else if (currentMaxCount!! <= 0 || fragment.asyncData?.size == totalCount) {
-			// 数据是否有效
-			showBottomLoading(false)
-			return
-		} else when {
-			token?.contract.isEOSSeries() -> {
-				val account = SharedAddress.getCurrentEOSAccount()
-				val codeName =
-					if (token?.contract.isEOS()) EOSCodeName.EOSIOToken.value
-					else token?.contract?.contract.orEmpty()
-				doAsync {
-					EOSTransactionTable.getRangeData(
-						account,
-						currentMaxCount!! - pageCount,
-						currentMaxCount!!,
-						token?.symbol.orEmpty(),
-						codeName,
-						false
-					) { localData ->
-						// 显示内存的数据后异步更新数据
-						if (!fragment.asyncData.isNull() && fragment.asyncData!!.isEmpty()) localData.map {
-							TransactionListModel(it)
-						}.prepareTokenHistoryBalance(token?.contract!!, account.accountName) {
-							it.updateChartAndHeaderData()
-						}
-						var endID = 0L
-						var pageSize = pageCount
-						fun loadTargetRangeData() {
-							// 拉取指定范围和数量的账单
-							EOSAPI.getEOSTransactions(
-								SharedChain.getEOSCurrent(),
-								account,
-								pageSize,
-								0L,
-								endID,
-								codeName,
-								token?.symbol.orEmpty()
-							) { data, error ->
-								if (!data.isNull() && error.isNone()) {
-									// 排序后插入数据库
-									data!!.asSequence().sortedByDescending { it.serverID }.forEachIndexed { index, eosTransactionTable ->
-										EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - index })
-									}
-									updateFlipPageData(data.plus(localData))
-									currentMaxCount = currentMaxCount!! - pageSize
-								}
-							}
-						}
-
-						when {
-							// 本地指定范围的数据是空的条件判断
-							localData.isEmpty() -> {
-								// 准备 `MongoDB` 格式的 `EndID`
-								endID =
-									if (currentMaxCount == totalCount) 0L // 本地无数据初次加载
-									// 分页数据本地不存在此范围片段, 向上获取指定 ID
-									else GoldStoneDataBase.database.eosTransactionDao()
-										.getDataByDataIndex(
-											account.accountName,
-											currentMaxCount!! + 1,
-											token?.symbol.orEmpty(),
-											codeName
-										)?.serverID ?: 0L
-								loadTargetRangeData()
-							}
-							localData.size < pageCount -> {
-								// 本地片段存在不足的情况
-								endID = if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
-									localData.minBy { it.dataIndex }?.serverID ?: 0L
-								else GoldStoneDataBase.database.eosTransactionDao().getDataByDataIndex(
-									account.accountName,
-									currentMaxCount!! + 1,
-									token?.symbol.orEmpty(),
-									codeName
-								)?.serverID ?: 0L
-								pageSize = pageCount - localData.size
-								loadTargetRangeData()
-							}
-							// 本地有数据
-							else -> {
-								updateFlipPageData(localData)
-								currentMaxCount = localData.minBy { it.dataIndex }?.dataIndex.orZero() - 1
-							}
-						}
-					}
-				}
-			}
+		// 目前的翻页逻辑比较复杂, 暂时不支持分类 `Sort` 后的分页, 只在总类目下支持分页
+		if (fragment.currentMenu.isNull() || fragment.currentMenu == CommonText.all) {
+			super.loadMore()
+			flipEOSPageData()
 		}
 	}
 
-
-	@UiThread
-	private fun updateFlipPageData(data: List<EOSTransactionTable>) {
-		fragment.asyncData?.addAll(data.map { TransactionListModel(it) })
-		fragment.getAdapter<TokenDetailAdapter>()?.dataSet = fragment.asyncData!!
-		val totalCount = fragment.asyncData?.size.orZero()
-		fragment.context?.runOnUiThread {
-			fragment.removeEmptyView()
-			fragment.recyclerView.adapter?.notifyItemRangeChanged(totalCount - data.size.orZero() + 1, totalCount)
-			showBottomLoading(false)
+	fun showOnlyReceiveData() {
+		fun sortData() {
+			allData?.filter { it.isReceived }?.let {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+				if (it.isEmpty()) showBottomLoading(false)
+			}
 		}
+		if (token?.contract.isEOSSeries()) {
+			currentMaxCount = totalCount
+			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+			flipEOSPageData { sortData() }
+		} else sortData()
 	}
 
 	fun showOnlyFailedData() {
-		allData?.filter {
-			it.isFailed || it.hasError
-		}?.let {
+		allData?.filter { it.isFailed || it.hasError }?.let {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+			if (it.isEmpty()) showBottomLoading(false)
 		}
 	}
 
 	fun showOnlySendData() {
-		allData?.filter {
-			!it.isReceived && !it.isFee
-		}?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		fun sortData() {
+			allData?.filter { !it.isReceived && !it.isFee }?.let {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+				if (it.isEmpty()) showBottomLoading(false)
+			}
 		}
+		if (token?.contract.isEOSSeries()) {
+			currentMaxCount = totalCount
+			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+			flipEOSPageData { sortData() }
+		} else sortData()
 	}
 
 	fun showAllData() {
-		allData?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		fun sortData() {
+			allData?.let {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+				if (it.isEmpty()) showBottomLoading(false)
+			}
 		}
+		if (token?.contract.isEOSSeries()) {
+			currentMaxCount = totalCount
+			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+			flipEOSPageData { sortData() }
+		} else sortData()
 	}
 
 	fun showAddressSelectionFragment() {
@@ -407,7 +321,7 @@ class TokenDetailPresenter(
 		emptyData.updateChartAndHeaderData()
 	}
 
-	private fun List<TokenBalanceTable>.updateChartAndHeaderData() {
+	fun List<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 7
 			val chartArray = arrayListOf<ChartPoint>()
@@ -426,7 +340,7 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun List<TransactionListModel>.prepareTokenHistoryBalance(
+	fun List<TransactionListModel>.prepareTokenHistoryBalance(
 		contract: TokenContract,
 		ownerName: String,
 		callback: (List<TokenBalanceTable>) -> Unit

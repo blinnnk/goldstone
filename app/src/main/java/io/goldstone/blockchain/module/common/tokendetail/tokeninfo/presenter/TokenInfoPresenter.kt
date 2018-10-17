@@ -10,17 +10,17 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
@@ -151,6 +151,19 @@ class TokenInfoPresenter(
 			}
 
 			tokenInfo?.contract.isEOSToken() -> {
+				EOSAPI.getEOSCountInfo(
+					SharedChain.getEOSCurrent(),
+					SharedAddress.getCurrentEOSAccount(),
+					tokenInfo?.contract?.contract.orEmpty(),
+					tokenInfo?.symbol.orEmpty()
+				) { info, error ->
+					GoldStoneAPI.context.runOnUiThread {
+						if (!info.isNull() && error.isNone()) {
+							fragment.showTransactionCount(info!!.totalCount)
+							fragment.showTotalValue("${info.totalReceived}", "${info.totalSent}")
+						} else fragment.context.alert(error.message)
+					}
+				}
 			}
 
 			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->

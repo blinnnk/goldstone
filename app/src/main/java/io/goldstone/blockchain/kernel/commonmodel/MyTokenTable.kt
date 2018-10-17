@@ -223,12 +223,14 @@ data class MyTokenTable(
 				}
 
 				contract.isEOSToken() -> {
-					EOSAPI.getAccountBalanceBySymbol(
-						SharedAddress.getCurrentEOSAccount(),
-						CoinSymbol(contract.symbol),
-						contract.contract.orEmpty(),
-						hold
-					)
+					if (SharedAddress.getCurrentEOSAccount().isValid(false))
+						EOSAPI.getAccountBalanceBySymbol(
+							SharedAddress.getCurrentEOSAccount(),
+							CoinSymbol(contract.symbol),
+							contract.contract.orEmpty(),
+							hold
+						)
+					else hold(null, RequestError.None)
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
