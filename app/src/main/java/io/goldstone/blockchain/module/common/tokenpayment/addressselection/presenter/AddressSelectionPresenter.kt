@@ -96,17 +96,21 @@ class AddressSelectionPresenter(
 			}
 		}
 		// 检查地址是否合规
-		when (MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())) {
+		val addressType =
+			MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())
+		when (addressType) {
 			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
 			AddressType.ETHSeries -> when {
-				token?.contract.isBTCSeries() || token?.contract.isEOS() -> fragment.context.alert("this is not a valid bitcoin address")
+				token?.contract.isBTCSeries() || token?.contract.isEOS() ->
+					fragment.context.alert("this is not a valid bitcoin address")
 				else -> WalletTable.getAllETHAndERCAddresses {
 					showAlertIfLocalExistThisAddress(this)
 				}
 			}
 
 			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
-				!token?.contract.isEOS() -> fragment.context.alert("this is not a valid eos account name")
+				!token?.contract.isEOS() && !token?.contract.isEOSToken() ->
+					fragment.context.alert("this is not a valid eos account name")
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {
 					showAlertIfLocalExistThisAddress(this)

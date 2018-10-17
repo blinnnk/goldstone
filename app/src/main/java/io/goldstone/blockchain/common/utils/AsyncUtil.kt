@@ -17,13 +17,11 @@ abstract class SequentialTask {
 		first()
 		second()
 		third()
-		println("start sequential task")
 	}
 
 	private suspend fun first() {
 		launch(CommonPool) {
 			firstJob()
-			println("start job1")
 		}.join()
 	}
 
@@ -32,7 +30,6 @@ abstract class SequentialTask {
 	private suspend fun second() {
 		launch(CommonPool) {
 			secondJob()
-			println("start job2")
 		}.join()
 	}
 
@@ -41,7 +38,6 @@ abstract class SequentialTask {
 	private suspend fun third() {
 		launch(CommonPool) {
 			thirdJob()
-			println("start job3")
 		}.join()
 	}
 
@@ -71,6 +67,10 @@ abstract class ConcurrentAsyncCombine {
 
 	fun start() {
 		doAsync { concurrentJobs() }
+		if (asyncCount == 0) {
+			if (getResultInMainThread()) GoldStoneAPI.context.runOnUiThread { mergeCallBack() }
+			else doAsync { mergeCallBack() }
+		}
 	}
 
 	abstract fun mergeCallBack()

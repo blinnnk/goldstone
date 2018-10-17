@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
@@ -49,6 +48,7 @@ private fun GasSelectionPresenter.getCurrentLTCPrivateKey(
 	if (SharedValue.isTestEnvironment()) fragment.context?.exportBase58PrivateKey(
 		walletAddress,
 		password,
+		true,
 		true,
 		hold
 	) else fragment.context?.exportLTCBase58PrivateKey(

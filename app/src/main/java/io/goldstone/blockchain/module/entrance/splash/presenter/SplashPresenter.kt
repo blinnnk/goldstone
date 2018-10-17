@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.jump
 import com.blinnnk.extension.orElse
@@ -13,10 +14,11 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.updateEOSAccountName
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.initEOSAccountName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.currentPublicKeyHasActivated
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.hasActivatedOrWatchOnlyEOSAccount
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -39,7 +41,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			if (
 				!eosAccountNames.currentPublicKeyHasActivated() &&
 				!eosAccountNames.hasActivatedOrWatchOnlyEOSAccount() &&
-				getCurrentAddressesAndChainID().any { it.second.isEOS() }
+				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				checkOrUpdateEOSAccount()
 			} else cacheDataAndSetNetBy(this) { activity.jump<MainActivity>() }
@@ -72,9 +74,11 @@ class SplashPresenter(val activity: SplashActivity) {
 				activity.jump<MainActivity>()
 			}
 		) { accounts ->
-			updateEOSAccountName(accounts) { hasDefaultName ->
+			if (accounts.isEmpty()) cacheDataAndSetNetBy(this) {
+				activity.jump<MainActivity>()
+			} else initEOSAccountName(accounts) {
 				// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
-				cacheDataAndSetNetBy(apply { if (hasDefaultName) currentEOSAccountName.updateCurrent(accounts.first().name) }) {
+				cacheDataAndSetNetBy(apply { currentEOSAccountName.updateCurrent(accounts.first().name) }) {
 					activity.jump<MainActivity>()
 				}
 			}
@@ -115,14 +119,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					cacheWalletData(wallet, callback)
 				}
 			}
-			type.isBIP44() -> {
-				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-					cacheWalletData(wallet, callback)
-				} else NodeSelectionPresenter.setAllMainnet {
-					cacheWalletData(wallet, callback)
-				}
-			}
-			type.isMultiChain() -> {
+			type.isBIP44() || type.isMultiChain() -> {
 				if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				} else NodeSelectionPresenter.setAllMainnet {
@@ -161,9 +158,10 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
-	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
-		WalletTable.getAll {
-			if (isEmpty()) {
+	fun cleanWhenUpdateDatabaseOrElse(@UiThread callback: (allWallets: List<WalletTable>) -> Unit) {
+		doAsync {
+			val allWallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+			if (allWallets.isEmpty()) {
 				cleanKeyStoreFile(activity.filesDir)
 				unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 			} else {
@@ -173,7 +171,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					unregisterGoldStoneID(SharedWallet.getNeedUnregisterGoldStoneID())
 				}
 			}
-			callback()
+			uiThread { callback(allWallets) }
 		}
 	}
 

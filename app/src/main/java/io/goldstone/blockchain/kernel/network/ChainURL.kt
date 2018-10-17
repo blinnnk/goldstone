@@ -96,8 +96,8 @@ object ChainURL {
 	private const val bchTest = "https://btc-node-testnet.goldstone.io/bch"
 	/** EOS Chain Address */
 	const val eosMain = "https://api1.eosasia.one"
-	const val eosTest = "https://junglehistory.cryptolions.io"
-	const val eosTestBackUp = "https://api.jungle.alohaeos.com"
+	const val eosTest = "https://api.jungle.alohaeos.com"
+	const val eosJungleHistory = "https://junglehistory.cryptolions.io"
 	/** ETC Chain Address */
 	private const val etcMain = "https://web3.gastracker.io"
 	private const val etcMordenTest = "https://web3.gastracker.io/morden"
@@ -109,7 +109,7 @@ object ChainURL {
 	private val infuraKovan = "https://kovan.infura.io/${infuraKey()}"
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
 
-	/** Transaction Html View */
+	/** Transaction Third-Party Html View */
 	// BCH
 	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC"
 	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC"
@@ -133,8 +133,6 @@ object ChainURL {
 	// EOS
 	private const val eosMainnetWeb = "https://bloks.io"
 	private const val eosJungleWeb = "https://jungle.bloks.io"
-	// TODO 这里还没找到第三方的测试查账
-	private const val eosTestnetWeb = "https://eosmonitor.io/txn/"
 
 	/** Address Detail URL*/
 	val btcAddressDetail: (address: String) -> String = {

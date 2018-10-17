@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
-import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
@@ -44,18 +43,13 @@ class HomePresenter(
 		object : SilentUpdater() {}.star()
 	}
 
-	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(
-		fragmentTag: String,
-		setArgument: Bundle.() -> Unit = {}
-	) {
+	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(fragmentTag: String) {
 		// 隐藏可见的 `Fragment`
 		childFragmentManager.fragments.forEach { hideChildFragment(it) }
 		// 加载目标 `Fragment`
 		childFragmentManager.findFragmentByTag(fragmentTag).let { it ->
 			it.isNull() isTrue {
-				addFragmentAndSetArgument<T>(ContainerID.home, fragmentTag) {
-					setArgument(this)
-				}
+				addFragmentAndSetArgument<T>(ContainerID.home, fragmentTag)
 			} otherwise {
 				it?.let { showChildFragment(it) }
 			}

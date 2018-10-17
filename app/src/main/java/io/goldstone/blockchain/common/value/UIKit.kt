@@ -164,7 +164,7 @@ object AvatarSize {
 
 object TokenDetailSize {
 	@JvmField
-	val headerHeight = 300.uiPX()
+	val headerHeight = 280.uiPX()
 }
 
 object WalletDetailSize {

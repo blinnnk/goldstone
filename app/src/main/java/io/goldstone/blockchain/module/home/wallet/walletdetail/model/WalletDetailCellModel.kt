@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.isEOSSeries
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
@@ -38,10 +39,10 @@ data class WalletDetailCellModel(
 		data.count,
 		data.price,
 		data.currency,
-		TokenContract(data.contract),
+		TokenContract(data.contract, data.symbol),
 		data.weight,
 		data.chainID,
-		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None
+		if (TokenContract(data.contract).isEOSSeries()) eosWalletType else EOSWalletType.None
 	)
 
 	constructor(

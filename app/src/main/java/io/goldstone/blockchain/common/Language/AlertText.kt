@@ -7,22 +7,22 @@ package io.goldstone.blockchain.common.language
 object AlertText {
 	@JvmField
 	val testnetOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This is a Bitcoin testnet only account, you can't switch to mainnet"
-		HoneyLanguage.Chinese.code -> "这是一个仅限比特币测试网络，你不能切换到主网"
-		HoneyLanguage.Japanese.code -> "これは、ビットコムのテストネットに限定されたアカウントです。メインネットワークに切り替えることはできません。"
-		HoneyLanguage.Korean.code -> "이 계정은 Bitcoin testnet 으로 제한되며 주 네트워크로 전환 할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Это учетная запись, ограниченная тестовой сетью bitcoin, вы не можете переключиться на основную сеть."
-		HoneyLanguage.TraditionalChinese.code -> "這是一個僅限比特幣測試網絡的帳號，你不能切換到主網"
+		HoneyLanguage.English.code -> "This is a testnet only account, you can't switch to mainnet"
+		HoneyLanguage.Chinese.code -> "This is a testnet only account, you can't switch to mainnet"
+		HoneyLanguage.Japanese.code -> "This is a testnet only account, you can't switch to mainnet"
+		HoneyLanguage.Korean.code -> "This is a testnet only account, you can't switch to mainnet"
+		HoneyLanguage.Russian.code -> "This is a testnet only account, you can't switch to mainnet"
+		HoneyLanguage.TraditionalChinese.code -> "This is a testnet only account, you can't switch to mainnet"
 		else -> ""
 	}
 	@JvmField
 	val mainnetOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This is a Bitcoin mainnet only account, you can't switch to testnet"
-		HoneyLanguage.Chinese.code -> "这是一个仅限比特币主网的帐号，你不能将链网切换到测试网"
-		HoneyLanguage.Japanese.code -> "これはビットコム専用のアカウントです。チェーンをテストネットワークに切り替えることはできません。"
-		HoneyLanguage.Korean.code -> "이것은 비트 동전 전용 계정이므로 체인을 테스트 네트워크로 전환 할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Это учетная запись только для биткойнов, вы не можете переключить цепочку на тестовую сеть."
-		HoneyLanguage.TraditionalChinese.code -> "這是一個僅限比特幣主網的帳號，你不能將鍊網切換到測試網"
+		HoneyLanguage.English.code -> "This is a mainnet only account, you can't switch to testnet"
+		HoneyLanguage.Chinese.code -> "This is a mainnet only account, you can't switch to testnet"
+		HoneyLanguage.Japanese.code -> "This is a mainnet only account, you can't switch to testnet"
+		HoneyLanguage.Korean.code -> "This is a mainnet only account, you can't switch to testnet"
+		HoneyLanguage.Russian.code -> "This is a mainnet only account, you can't switch to testnet"
+		HoneyLanguage.TraditionalChinese.code -> "This is a mainnet only account, you can't switch to testnet"
 		else -> ""
 	}
 	@JvmField

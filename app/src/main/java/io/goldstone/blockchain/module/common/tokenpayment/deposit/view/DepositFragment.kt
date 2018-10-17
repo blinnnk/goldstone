@@ -9,7 +9,6 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -126,7 +125,7 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 						else qrView.setAddressText(currentLTCAddress)
 					}
 
-					token?.contract.isEOS() -> {
+					token?.contract.isEOSSeries() -> {
 						qrView.setAddressText(currentEOSAccountName.getCurrent())
 					}
 

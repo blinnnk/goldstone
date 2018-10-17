@@ -16,9 +16,11 @@ import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
 import io.goldstone.blockchain.common.component.title.RadioWithTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.language.TokenManagementText
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.utils.formatCount
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
@@ -56,6 +58,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		}
 	}
 
+	var amountEditTextChanged: Runnable? = null
 	private val amountEditText by lazy {
 		RoundTitleInput(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX()).apply {
@@ -64,12 +67,24 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			setNumberPadKeyboard()
 			setTitle(TokenDetailText.eosAmountTitle)
 			setHint(TokenDetailText.eosAmountPlaceholder)
+			onTextChanged = Runnable {
+				amountEditTextChanged?.run()
+			}
 		}
 	}
 
 	fun setSellingRAMStyle() {
+		accountNameEditText.visibility = View.GONE
 		amountEditText.setTitle(TokenDetailText.tradeRamByBytesTitle)
 		amountEditText.setHint(TokenDetailText.tradeRamByBytesPlaceholder)
+	}
+
+	fun showRAMEOSCount(eosCount: Double) {
+		amountEditText.setTitle(TokenDetailText.tradeRamByBytesTitle + " ≈ ${eosCount.formatCount(4)} ${CoinSymbol.EOS.symbol}")
+	}
+
+	fun showRAMAmount(amount: Double) {
+		amountEditText.setTitle(TokenDetailText.eosAmountTitle + " ≈ ${amount.formatCount(2)} ${EOSUnit.KB.value}")
 	}
 
 	private val radioCellWidth = 100.uiPX()

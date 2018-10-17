@@ -18,7 +18,6 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -53,6 +52,11 @@ class WalletDetailPresenter(
 	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
 	private var detailModels: List<WalletDetailCellModel>? = null
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -68,8 +72,10 @@ class WalletDetailPresenter(
 			// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
 			if (!lockGettingChainModelsThread) {
 				// 再检查链上的最新价格和数量
-				fragment.removeMiniLoadingView()
+				lockGettingChainModelsThread = true
 				models.getChainModels { chainModels, error ->
+					fragment.removeMiniLoadingView()
+					lockGettingChainModelsThread = false
 					// 更新内存的数据
 					detailModels = chainModels
 					updateUIByData(chainModels)
@@ -141,51 +147,43 @@ class WalletDetailPresenter(
 	}
 
 	fun updateUnreadCount(@UiThread hold: (unreadCount: Int?, error: GoldStoneError) -> Unit) {
+		if (!NetworkUtil.hasNetwork()) return
 		doAsync {
-			AppConfigTable.getAppConfig { config ->
-				NotificationTable.getAllNotifications { notifications ->
-					config?.apply {
-						/**
-						 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
-						 * 如果本地有数据获取最后一条的创建时间作为请求时间
-						 */
-						val time = if (notifications.isEmpty()) goldStoneID.substring(
-							goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
-						).toLong()
-						else notifications.maxBy { it.createTime }?.createTime.orElse(0)
-						GoldStoneAPI.getUnreadCount(
-							goldStoneID,
-							time,
-							{ hold(null, it) }
-						) { unreadCount ->
-							uiThread {
-								hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
-							}
-						}
+			val goldStoneID = SharedWallet.getGoldStoneID()
+			NotificationTable.getAllNotifications { notifications ->
+				/**
+				 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
+				 * 如果本地有数据获取最后一条的创建时间作为请求时间
+				 */
+				val time = if (notifications.isEmpty()) goldStoneID.substring(
+					goldStoneID.length - System.currentTimeMillis().toString().length, goldStoneID.length
+				).toLong()
+				else notifications.maxBy { it.createTime }?.createTime.orElse(0)
+				GoldStoneAPI.getUnreadCount(
+					goldStoneID,
+					time,
+					{ hold(null, it) }
+				) { unreadCount ->
+					uiThread {
+						hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
 					}
 				}
 			}
 		}
 	}
 
-	private fun List<WalletDetailCellModel>.getChainModels(
-		hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit
-	) {
+	private fun List<WalletDetailCellModel>.getChainModels(hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
 		else {
-			lockGettingChainModelsThread = true
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach { model ->
 						// 链上查余额
 						val ownerName = model.contract.getAddress(true)
-						MyTokenTable.getBalanceByContract(
-							model.contract,
-							ownerName
-						) { balance, error ->
+						MyTokenTable.getBalanceByContract(model.contract, ownerName) { balance, error ->
 							// 更新数据的余额信息
 							if (!balance.isNull() && error.isNone()) {
 								MyTokenTable.updateBalanceByContract(
@@ -267,17 +265,18 @@ class WalletDetailPresenter(
 	}
 
 	private fun generateHeaderModel(hold: (WalletDetailHeaderModel) -> Unit) {
-		val totalBalance = fragment.asyncData?.sumByDouble { it.currency }
+		var totalBalance = fragment.asyncData?.sumByDouble { it.currency }
 		// Once the calculation is finished then update `WalletTable`
-		SharedWallet.updateCurrentBalance(totalBalance.orElse(0.0))
+		if (!totalBalance.isNull()) SharedWallet.updateCurrentBalance(totalBalance!!)
+		else totalBalance = SharedWallet.getCurrentBalance()
 		WalletTable.getCurrentWallet {
 			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
 				null,
 				SharedWallet.getCurrentName(),
-				if (subtitle.equals(WalletText.multiChainWallet, true)) {
+				if (subtitle.equals(WalletText.multiChainWallet, true) || subtitle.equals(WalletText.bip44MultiChain, true)) {
 					object : FixTextLength() {
-						override var text = WalletText.multiChainWallet
+						override var text = subtitle
 						override val maxWidth = 90.uiPX().toFloat()
 						override val textSize: Float = 12.uiPX().toFloat()
 					}.getFixString()

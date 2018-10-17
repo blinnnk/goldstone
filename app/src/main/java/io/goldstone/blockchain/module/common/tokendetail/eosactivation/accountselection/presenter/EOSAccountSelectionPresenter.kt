@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -18,6 +17,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -65,37 +65,63 @@ class EOSAccountSelectionPresenter(
 		fragment.showLoadingView(true)
 		// 从链上重新拉取一次该公钥的对应的 AccountNames,
 		getNewAccountNameFromChain(errorCallback) { allAccountNames ->
-			val actors = arrayListOf<AccountActor>()
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = allAccountNames.size
-				override fun concurrentJobs() {
-					allAccountNames.forEach { account ->
-						EOSAccountTable.getAccountByName(account.name, false) { localAccount ->
+			EOSAccountTable.getAccountsByNames(
+				allAccountNames.map { it.name },
+				false
+			) { localAccounts ->
+				val actors = arrayListOf<AccountActor>()
+				// 本地现存的数据整理到 `Actors``
+				actors.addAll(
+					localAccounts.map { localAccount ->
+						getAccountActorByPublicKey(localAccount, localAccount.name)
+					}.flatten()
+				)
+				// 删选出本地不存在的链上 `AccountName`
+				val notInLocalAccount =
+					allAccountNames.filterNot { chainAccount ->
+						localAccounts.any {
+							it.name.equals(chainAccount.name, true) &&
+								it.chainID.equals(chainAccount.chainID, true)
+						}
+					}
+				if (notInLocalAccount.isEmpty()) {
+					fragment.context?.runOnUiThread {
+						val willRemoveData = actors - actors.distinctBy { it.name }
+						val finalData = actors.filterNot { data ->
+							willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
+						}
+						fragment.setAccountNameList(finalData)
+						fragment.showLoadingView(false)
+					}
+				} else object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = notInLocalAccount.size
+					override fun concurrentJobs() {
+						notInLocalAccount.forEach { account ->
 							// 本地为空的话从网络获取数据
-							if (localAccount.isNull()) EOSAPI.getAccountInfo(
-								EOSAccount(account.name),
-								{
-									completeMark()
-									LogUtil.error("getAccountInfo", it)
+							EOSAPI.getAccountInfo(
+								EOSAccount(account.name)
+							) { eosAccount, error ->
+								if (!eosAccount.isNull() && error.isNone()) {
+									actors.addAll(getAccountActorByPublicKey(eosAccount!!, account.name))
+									// 插入数据库
+									EOSAccountTable.preventDuplicateInsert(eosAccount)
 								}
-							) { eosAccount ->
-								actors.addAll(getAccountActorByPublicKey(eosAccount, account.name))
-								// 插入数据库
-								EOSAccountTable.preventDuplicateInsert(eosAccount)
-								completeMark()
-							} else {
-								actors.addAll(getAccountActorByPublicKey(localAccount!!, account.name))
 								completeMark()
 							}
 						}
 					}
-				}
 
-				override fun mergeCallBack() {
-					fragment.setAccountNameList(actors)
-					fragment.showLoadingView(false)
-				}
-			}.start()
+					override fun mergeCallBack() {
+						// `Owner` 和 `Active` 同时存在的时候界面做去重显示
+						val willRemoveData = actors - actors.distinctBy { it.name }
+						val finalData = actors.filterNot { data ->
+							willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
+						}
+						fragment.setAccountNameList(finalData)
+						fragment.showLoadingView(false)
+					}
+				}.start()
+			}
 		}
 	}
 

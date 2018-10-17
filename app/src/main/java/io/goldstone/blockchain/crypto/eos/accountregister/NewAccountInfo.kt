@@ -125,6 +125,7 @@ data class AccountActor(
 	val permission: EOSActor,
 	val weight: Int
 ) : Serializable, EOSModel {
+
 	override fun createObject(): String {
 		return "{\"permission\":{\"actor\":\"$name\",\"permission\":\"$permission\"},\"weight\":$weight}"
 	}
@@ -137,6 +138,13 @@ data class AccountActor(
 enum class EOSActor(val value: String) {
 	Owner("owner"),
 	Active("active");
+
+	fun isActive(): Boolean {
+		return value.equals(Active.value, true)
+	}
+	fun isOwner(): Boolean {
+		return value.equals(Owner.value, true)
+	}
 
 	companion object {
 		fun getActorByValue(value: String): EOSActor? {

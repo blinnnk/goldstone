@@ -126,13 +126,13 @@ class ContactInputPresenter(
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!EOSAccount(eosAccountNameText).isValid() && eosAccountNameText.isNotEmpty()) {
+		if (!EOSAccount(eosAccountNameText).isValid(false) && eosAccountNameText.isNotEmpty()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!EOSAccount(eosJungleAccountNameText).isValid() && eosJungleAccountNameText.isNotEmpty()) {
+		if (!EOSAccount(eosJungleAccountNameText).isValid(false) && eosJungleAccountNameText.isNotEmpty()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
 			return
 		}

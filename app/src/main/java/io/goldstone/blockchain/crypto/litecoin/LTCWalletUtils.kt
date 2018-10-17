@@ -117,12 +117,16 @@ object LTCWalletUtils {
 	}
 
 	fun isValidPrivateKey(privateKey: String): Boolean {
-		val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
-		val key = dpk.key
-		// checking our key object
-		val ltcTest = LitecoinNetParams()
-		val check = key.getPrivateKeyAsWiF(ltcTest)
-		return privateKey == check
+		return try {
+			val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
+			val key = dpk.key
+			// checking our key object
+			val ltcTest = LitecoinNetParams()
+			val check = key.getPrivateKeyAsWiF(ltcTest)
+			privateKey == check
+		} catch (error: Exception) {
+			false
+		}
 	}
 
 	/**

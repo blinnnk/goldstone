@@ -17,8 +17,6 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val GetWrongFeeFromChain = TransferError("there is error when get fee from chain")
 		@JvmStatic
-		val GetChainInfoError = TransferError("get chain info error, please check your net environment")
-		@JvmStatic
 		val TradingInputIsEmpty = TransferError("please enter the count that you will trading")
 		@JvmStatic
 		val wrongRAMInputValue = TransferError("you must enter only Integer because of the unit of selling ram is byte")
@@ -39,6 +37,8 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		val DecryptKeyStoreError = AccountError("decrypt your keystore by password found error")
 		@JvmStatic
 		val InvalidAccountName = AccountError("invalid eos account name")
+		@JvmStatic
+		val UnavailableAccountName = AccountError("Unavailable Account Name")
 		@JvmStatic
 		val EmptyName = AccountError("please enter the account name which you decide to register")
 		@JvmStatic

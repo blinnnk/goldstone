@@ -1,20 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinUrl
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -27,18 +23,17 @@ private var hasBlockNumber = false
 /** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
 fun TransactionDetailPresenter.observerLTCTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
-	val currentActivity = fragment.getMainActivity()
 	object : BTCSeriesTransactionStatusObserver() {
 		override val chainName = SharedChain.getLTCCurrentName()
 		override val hash = currentHash
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
-				onLTCTransactionSucceed()
-				val address = CoinSymbol.LTC.getAddress()
-				updateWalletDetailLTCValue(address, currentActivity)
-				if (confirmed) {
-					updateConformationBarFinished()
+				doAsync {
+					GoldStoneDataBase.database.btcSeriesTransactionDao().updatePendingStatus(hash)
 				}
+				onLTCTransactionSucceed()
+				updateConformationBarFinished()
+				updateTokenDetailPendingStatus()
 			} else {
 				if (!hasBlockNumber) {
 					// 更新 `BlockNumber` 及时间信息, 并未完全完成 `Pending` 状态
@@ -50,23 +45,6 @@ fun TransactionDetailPresenter.observerLTCTransaction() {
 		}
 	}.start()
 }
-
-private fun updateWalletDetailLTCValue(
-	address: String,
-	activity: MainActivity?
-) {
-	MyTokenTable.getBalanceByContract(
-		TokenContract.LTC,
-		address
-	) { balance, error ->
-		if (!balance.isNull() && error.isNone()) {
-			MyTokenTable.updateBalanceByContract(balance!!, address, TokenContract.LTC)
-		} else GoldStoneAPI.context.runOnUiThread {
-			activity?.getWalletDetailFragment()?.presenter?.updateData()
-		}
-	}
-}
-
 
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
