@@ -172,7 +172,7 @@ fun Context.getPrivateKey(
 	password: String,
 	isBTCSeriesWallet: Boolean,
 	isMainThreadResult: Boolean = true,
-	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
+	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	doAsync {
 		getKeystoreFile(
@@ -180,14 +180,15 @@ fun Context.getPrivateKey(
 			password,
 			isBTCSeriesWallet
 		) { keyStoreFile, error ->
-			if (!keyStoreFile.isNull() && error.isNone()) WalletUtil.getKeyPairFromWalletFile(
-				keyStoreFile!!,
-				password
-			) { hold(null, it) }?.let {
-				if (isMainThreadResult) runOnUiThread {
-					hold(it.privateKey.toString(16), AccountError.None)
-				} else hold(it.privateKey.toString(16), AccountError.None)
-			} else hold(null, error)
+			if (!keyStoreFile.isNull() && error.isNone()) {
+				val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile!!, password)
+				if (keyPair.isNull()) hold(null, AccountError.WrongPassword)
+				else {
+					if (isMainThreadResult) runOnUiThread {
+						hold(keyPair!!.privateKey.toString(16), AccountError.None)
+					} else hold(keyPair!!.privateKey.toString(16), AccountError.None)
+				}
+			} else runOnUiThread { hold(null, error) }
 		}
 	}
 }
@@ -203,14 +204,9 @@ fun Context.getBigIntegerPrivateKeyByWalletID(
 	) { keyStoreFile, error ->
 		// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
 		if (!keyStoreFile.isNull() && error.isNone()) {
-			WalletUtil.getKeyPairFromWalletFile(
-				keyStoreFile!!,
-				password
-			) {
-				hold(null, it)
-			}?.let {
-				GoldStoneAPI.context.runOnUiThread { hold(it.privateKey, AccountError.None) }
-			}
+			val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile!!, password)
+			if (keyPair.isNull()) hold(null, AccountError.WrongPassword)
+			else GoldStoneAPI.context.runOnUiThread { hold(keyPair!!.privateKey, AccountError.None) }
 		} else hold(null, error)
 	}
 }

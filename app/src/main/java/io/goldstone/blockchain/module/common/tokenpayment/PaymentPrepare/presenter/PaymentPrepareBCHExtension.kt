@@ -58,12 +58,14 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		chainName,
-		3,
+		4,
 		false,
 		errorCallback
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
-			hold(TransferError.GetWrongFeeFromChain, null)
+			GoldStoneAPI.context.runOnUiThread {
+				hold(TransferError.GetWrongFeeFromChain, null)
+			}
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`

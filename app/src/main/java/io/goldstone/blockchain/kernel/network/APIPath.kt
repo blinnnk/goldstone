@@ -44,6 +44,27 @@ object APIPath {
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
+	val getEOSTokenCountInfo: (
+		header: String,
+		chainID: String,
+		account: String,
+		code: String,
+		symbol: String
+	) -> String = { header, chainID, account, codeName, symbol ->
+		"$header/eos/txCountInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
+	}
+	val getEOSTransactions: (
+		header: String,
+		chainID: String,
+		account: String,
+		pageSize: Int,
+		startID: Long,
+		endID: Long,
+		codeName: String,
+		symbol: String
+	) -> String = { header, chainID, account, pageSize, startID, endID, codeName, symbol ->
+		"$header/eos/actionList?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
+	}
 	val defaultTokenList: (
 		header: String,
 		md5: String
@@ -108,6 +129,8 @@ object EtherScanApi {
 			else -> ropstenLogHeader
 		}
 	}
+
+	// `Html` 页面用的 `URL` 网址
 	private val transactionDetailHeader: (currentChain: ChainID) -> String = {
 		when {
 			it.isETHMain() -> "https://etherscan.io/tx/"

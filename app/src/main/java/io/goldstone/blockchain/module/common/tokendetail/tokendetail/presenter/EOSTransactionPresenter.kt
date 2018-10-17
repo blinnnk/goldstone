@@ -1,80 +1,135 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import android.support.annotation.WorkerThread
+import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.isEOSSeries
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 
 /**
  * @author KaySaith
- * @date  2018/09/13
+ * @date  2018/10/17
  */
+private const val pageCount = 10
 
-val current = System.currentTimeMillis()
-fun TokenDetailPresenter.loadEOSDataFromChain(localMaxIndex: Int) {
-	fragment.showLoadingView(LoadingText.transactionData)
-	val account = SharedAddress.getCurrentEOSAccount()
-	EOSAPI.getTransactionsLastIndex(
-		account,
-		{ LogUtil.error("loadEOSChainData", it) }
-	) { transactionCount ->
-		loadTransactionsFromChain(
-			account.accountName,
-			localMaxIndex,
-			transactionCount.orZero(),
-			{
-				LogUtil.error("EOS loadTransactionsFromChain", it)
+fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
+	// 是否有合法的数据
+	if (totalCount == null || currentMaxCount == null) {
+		showBottomLoading(false)
+		return
+	} else if (currentMaxCount!! <= 0 || fragment.asyncData?.size == totalCount) {
+		// 数据是否有效
+		showBottomLoading(false)
+		return
+	} else when {
+		token?.contract.isEOSSeries() -> {
+			val account = SharedAddress.getCurrentEOSAccount()
+			val codeName =
+				if (token?.contract.isEOS()) EOSCodeName.EOSIOToken.value
+				else token?.contract?.contract.orEmpty()
+			doAsync {
+				EOSTransactionTable.getRangeData(
+					account,
+					currentMaxCount!! - pageCount,
+					currentMaxCount!!,
+					token?.symbol.orEmpty(),
+					codeName,
+					false
+				) { localData ->
+					// 显示内存的数据后异步更新数据
+					if (!fragment.asyncData.isNull() && fragment.asyncData!!.isEmpty()) localData.map {
+						TransactionListModel(it)
+					}.prepareTokenHistoryBalance(token?.contract!!, account.accountName) {
+						it.updateChartAndHeaderData()
+					}
+					var endID = 0L
+					var pageSize = pageCount
+					fun loadTargetRangeData() {
+						// 拉取指定范围和数量的账单
+						EOSAPI.getEOSTransactions(
+							SharedChain.getEOSCurrent(),
+							account,
+							pageSize,
+							0L,
+							endID,
+							codeName,
+							token?.symbol.orEmpty()
+						) { data, error ->
+							if (!data.isNull() && error.isNone()) {
+								// 排序后插入数据库
+								data!!.asSequence().sortedByDescending { it.serverID }.forEachIndexed { index, eosTransactionTable ->
+									EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - index })
+								}
+								flipPage(data.plus(localData), callback)
+								currentMaxCount = currentMaxCount!! - pageSize
+							}
+						}
+					}
+
+					when {
+						// 本地指定范围的数据是空的条件判断
+						localData.isEmpty() -> {
+							// 准备 `MongoDB` 格式的 `EndID`
+							endID =
+								if (currentMaxCount == totalCount) 0L // 本地无数据初次加载
+								// 分页数据本地不存在此范围片段, 向上获取指定 ID
+								else GoldStoneDataBase.database.eosTransactionDao()
+									.getDataByDataIndex(
+										account.accountName,
+										currentMaxCount!! + 1,
+										token?.symbol.orEmpty(),
+										codeName
+									)?.serverID ?: 0L
+							loadTargetRangeData()
+						}
+						localData.size < pageCount -> {
+							// 本地片段存在不足的情况
+							endID = if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
+								localData.minBy { it.dataIndex }?.serverID ?: 0L
+							else GoldStoneDataBase.database.eosTransactionDao().getDataByDataIndex(
+								account.accountName,
+								currentMaxCount!! + 1,
+								token?.symbol.orEmpty(),
+								codeName
+							)?.serverID ?: 0L
+							pageSize = pageCount - localData.size
+							loadTargetRangeData()
+						}
+						// 本地有数据
+						else -> {
+							flipPage(localData, callback)
+							currentMaxCount = localData.minBy { it.dataIndex }?.dataIndex.orZero() - 1
+						}
+					}
+				}
 			}
-		) {
-			fragment.context?.runOnUiThread {
-				fragment.removeLoadingView()
-			}
-			loadDataFromDatabaseOrElse()
 		}
+		else -> showBottomLoading(false)
 	}
 }
 
-private fun loadTransactionsFromChain(
-	accountName: String,
-	localDataMaxIndex: Int,
-	transactionCount: Int,
-	errorCallback: (Throwable) -> Unit,
-	@WorkerThread successCallback: (hasData: Boolean) -> Unit
-) {
-	val pageInfo = EOSAPI.getPageInfo(localDataMaxIndex, transactionCount)
-	// 意味着网络没有更新的数据直接返回
-	if (pageInfo.to == 0) {
-		successCallback(false)
-		return
-	}
-	EOSAPI.getAccountTransactionHistory(
-		accountName,
-		pageInfo.from,
-		pageInfo.to,
-		errorCallback
-	) { transactionList ->
-		/**
-		 * @Important
-		 * 通过 `EOS History Chain` 获取的转账历史数据会出现重复的情况, 具体原因还不详
-		 * 这里先在本地做去重复处理, 但是问题依旧, 并且拉取重复的数据很消耗流量.
-		 * 需要时刻跟进随时更改这里的实现.
-		 * */
-		// Calculate All Inputs to get transfer value
-		val newData = transactionList.asSequence().filterNot {
-			// 某些非交易类的行为会在多条重复的 Action 中夹杂 From 和 To 的值为空的数据跳步
-			// 在去重复处理的时候有的时候会被保留, 这里首先移除这种情况的数据
-			it.transactionData.fromName.isEmpty() || it.transactionData.toName.isEmpty()
-		}.distinctBy {
-			it.txID
-		}.map {
-			// 插入转账数据到数据库
-			EOSTransactionTable.preventDuplicateInsert(accountName, it)
-		}.toList()
-		successCallback(newData.isNotEmpty())
+@UiThread
+private fun TokenDetailPresenter.flipPage(data: List<EOSTransactionTable>, callback: () -> Unit) {
+	fragment.asyncData?.addAll(data.map { TransactionListModel(it) })
+	fragment.getAdapter<TokenDetailAdapter>()?.dataSet = fragment.asyncData!!
+	val totalCount = fragment.asyncData?.size.orZero()
+	fragment.context?.runOnUiThread {
+		allData = fragment.asyncData
+		fragment.removeEmptyView()
+		fragment.recyclerView.adapter?.notifyItemRangeChanged(totalCount - data.size.orZero() + 1, totalCount)
+		showBottomLoading(false)
+		callback()
 	}
 }

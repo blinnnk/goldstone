@@ -99,7 +99,9 @@ object GoldStoneEthCall {
 					hash
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetInputCode(it)) },
+			{
+				errorCallback(EthereumRPCError.GetInputCode(it))
+			},
 			chainName
 		) {
 			holdValue(JSONObject(it).safeGet("input"))

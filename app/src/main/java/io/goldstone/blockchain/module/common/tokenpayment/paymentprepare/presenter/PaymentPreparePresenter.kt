@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -55,21 +56,28 @@ class PaymentPreparePresenter(
 
 	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
 		val count = fragment.getTransferCount()
-		if (!getToken()?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
+		val token = getToken()
+		if (!token?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
 		if (count == 0.0) callback(TransferError.TradingInputIsEmpty)
 		else when {
 			/** 准备 BTC 转账需要的参数 */
-			getToken()?.contract.isBTC() ->
+			token?.contract.isBTC() ->
 				prepareBTCPaymentModel(count, fragment.getChangeAddress(), callback)
 			/** 准备 LTC 转账需要的参数 */
-			getToken()?.contract.isLTC() ->
+			token?.contract.isLTC() ->
 				prepareLTCPaymentModel(count, fragment.getChangeAddress(), callback)
 			/** 准备 BCH 转账需要的参数 */
-			getToken()?.contract.isBCH() ->
+			token?.contract.isBCH() ->
 				prepareBCHPaymentModel(count, fragment.getChangeAddress(), callback)
 			/** 准备 EOS 转账需要的参数 */
-			getToken()?.contract.isEOS() ->
-				transferEOS(count, CoinSymbol(getToken()?.symbol), callback)
+			token?.contract.isEOSSeries() ->
+				transferEOS(
+					count,
+					CoinSymbol(getToken()?.symbol),
+					if (token?.contract.isEOS()) EOSCodeName.EOSIOToken
+					else EOSCodeName(token?.contract?.contract.orEmpty()),
+					callback
+				)
 			else -> prepareETHSeriesPaymentModel(count, callback)
 		}
 	}

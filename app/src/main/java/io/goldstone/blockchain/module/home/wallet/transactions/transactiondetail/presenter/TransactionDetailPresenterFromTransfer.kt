@@ -27,7 +27,7 @@ fun TransactionDetailPresenter.updateDataFromTransfer() {
 			token.contract.isBTC() -> observerBTCTransaction()
 			token.contract.isLTC() -> observerLTCTransaction()
 			token.contract.isBCH() -> observerBCHTransaction()
-			token.contract.isEOS() -> observerEOSTransaction()
+			token.contract.isEOSSeries() -> observerEOSTransaction()
 			else -> observerTransaction()
 		}
 	}

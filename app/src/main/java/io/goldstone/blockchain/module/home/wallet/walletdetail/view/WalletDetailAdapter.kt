@@ -17,28 +17,26 @@ import org.jetbrains.anko.matchParent
  * @author KaySaith
  */
 class WalletDetailAdapter(
-	override val dataSet: ArrayList<WalletDetailCellModel>,
+	override var dataSet: ArrayList<WalletDetailCellModel>,
 	private val holdCell: WalletDetailCell.() -> Unit,
 	private val holdHeader: WalletDetailHeaderView.() -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
-	
+
 	override fun generateCell(context: Context) =
 		WalletDetailCell(context)
-	
+
 	private var hasHiddenSoftNavigationBar = false
-	override fun generateFooter(context: Context) =
-		View(context).apply {
+	override fun generateFooter(context: Context): View {
+		return View(context).apply {
 			val barHeight =
-				if (
-					(!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK))
-					|| SharedWallet.isNotchScreen()
-				) {
+				if ((!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) || SharedWallet.isNotchScreen()) {
 					60.uiPX()
 				} else 10.uiPX()
 			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
 		}
-	
+	}
+
 	override fun generateHeader(context: Context) =
 		WalletDetailHeaderView(context).apply {
 			/**
@@ -52,7 +50,7 @@ class WalletDetailAdapter(
 			}
 			holdHeader(this)
 		}
-	
+
 	override fun WalletDetailCell.bindCell(
 		data: WalletDetailCellModel,
 		position: Int

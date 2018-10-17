@@ -3,7 +3,10 @@ package io.goldstone.blockchain.common.base.baserecyclerfragment
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +16,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -223,6 +227,28 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		}
 	}
 
+	fun addRecyclerLoadMoreListener(callback: () -> Unit) {
+		recyclerView.addOnScrollListener(
+			object : RecyclerView.OnScrollListener() {
+				override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+					recyclerView.layoutManager?.apply {
+						var lastPosition = 0
+						when (this) {
+							is LinearLayoutManager -> lastPosition = findLastVisibleItemPosition()
+							is GridLayoutManager -> lastPosition = findLastVisibleItemPosition()
+							is StaggeredGridLayoutManager -> {
+								val arrays = IntArray(spanCount)
+								findLastVisibleItemPositions(arrays)
+								lastPosition = arrays.max()!!
+							}
+						}
+						if (lastPosition >= itemCount - 1) callback()
+					}
+				}
+			}
+		)
+	}
+
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		presenter.onFragmentHiddenChanged(hidden)
@@ -274,6 +300,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	}
 	
 	fun getLoadingView(): View = loadingView
+
+	fun getOverlayHeader(): OverlayHeaderLayout? {
+		val parent = parentFragment
+		return (parent as? BaseOverlayFragment<*>)?.overlayView?.header
+	}
 
 	open fun showEmptyView() {
 		// 如果已经存在 `emptyLayout` 跳出

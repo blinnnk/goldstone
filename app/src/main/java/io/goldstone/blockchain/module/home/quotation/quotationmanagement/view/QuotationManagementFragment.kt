@@ -44,6 +44,7 @@ class QuotationManagementFragment :
 
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
+		presenter.checkAndUpdateQuotationData()
 		// 从下一个界面返回的时候更新这个界面的 `UI` 数据
 		getParentFragment<QuotationOverlayFragment> {
 			if (hidden) {

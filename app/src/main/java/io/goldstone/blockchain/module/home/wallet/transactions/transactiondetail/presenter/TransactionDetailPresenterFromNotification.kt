@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -271,19 +272,21 @@ private fun TransactionDetailPresenter.updateHeaderFromNotification(info: Notifi
 
 private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
-		(gas.toBigDecimal() * gasPrice.toBigDecimal())
-			.toDouble()
-			.toUnitValue(
-				if (TokenContract(contractAddress).isETC()) CoinSymbol.etc
-				else CoinSymbol.eth
-			),
+		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toUnitValue(
+			if (TokenContract(contractAddress).isETC()) CoinSymbol.etc
+			else CoinSymbol.eth
+		),
 		if (memo.isEmpty()) TransactionText.noMemo else memo,
 		fromAddress,
 		to,
 		hash,
 		blockNumber,
 		TimeUtils.formatDate(timeStamp),
-		TransactionListModel.generateTransactionURL(hash, symbol)
+		TransactionListModel.generateTransactionURL(
+			hash,
+			symbol,
+			EOSAccount(fromAddress).isValid(false)
+		)
 	)
 	arrayListOf(
 		TransactionText.minerFee,
@@ -309,7 +312,7 @@ private fun BTCSeriesTransactionTable.toAsyncData(): ArrayList<TransactionDetail
 		hash,
 		blockNumber,
 		TimeUtils.formatDate(timeStamp),
-		TransactionListModel.generateTransactionURL(hash, symbol)
+		TransactionListModel.generateTransactionURL(hash, symbol, false)
 	)
 	arrayListOf(
 		TransactionText.minerFee,

@@ -4,9 +4,11 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.network.ChainURL
 
 object EOSUrl {
-	private var currentEOSTestUrl = ChainURL.eosTest // 网络出问题后会在 `Error` 中更改这个值
 	private val currentURL: () -> String = {
-		if (SharedValue.isTestEnvironment()) currentEOSTestUrl else ChainURL.eosMain
+		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain
+	}
+	private val currentHistoryURL: () -> String = {
+		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain
 	}
 	val getKeyAccount: () -> String = {
 		"${currentURL()}/v1/history/${EOSMethod.GetKeyAccountName.method}"
@@ -16,6 +18,10 @@ object EOSUrl {
 	}
 	val getAccountInfo: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.GetAccount.method}"
+	}
+
+	val getBlock: () -> String = {
+		"${currentURL()}/v1/chain/${EOSMethod.GetBlock.method}"
 	}
 	val getAccountInfoInTargetNet: (targetNet: String) -> String = {
 		"$it/v1/chain/${EOSMethod.GetAccount.method}"
@@ -27,10 +33,10 @@ object EOSUrl {
 		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
 	}
 	val getTransactionHistory: () -> String = {
-		"${currentURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
+		"${currentHistoryURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
 	}
 	val getTransaction: () -> String = {
-		"${currentURL()}/v1/history/${EOSMethod.GetTransaction.method}"
+		"${currentHistoryURL()}/v1/history/${EOSMethod.GetTransaction.method}"
 	}
 	val getInfo: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.GetInfo.method}"

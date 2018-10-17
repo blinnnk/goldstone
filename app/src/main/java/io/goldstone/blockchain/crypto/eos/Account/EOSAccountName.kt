@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.account
 
 import io.goldstone.blockchain.crypto.eos.EOSValue
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import java.io.Serializable
 
 /**
@@ -10,7 +11,7 @@ import java.io.Serializable
 
 class EOSAccount(private val value: String) : Serializable {
 
-	val accountName = value.toLowerCase()
+	val accountName = if (EOSWalletUtils.isValidAddress(value)) value else value.toLowerCase()
 
 	/**
 	 * EOS Account Name 没有找到特别清晰的官方文档进行校验
@@ -45,7 +46,7 @@ class EOSAccount(private val value: String) : Serializable {
 				if (value.length > EOSValue.maxNameLength)
 					value.substring(0, 11).none { !it.toString().matches(legalCharsIn12) } &&
 						value.substring(12).none { !it.toString().matches(legalCharsAt13th) }
-				else value.none { !it.toString().matches(legalCharsIn12) }
+				else value.replace(".", "").none { !it.toString().matches(legalCharsIn12) }
 			}
 		return if (!isLegalCharacter) {
 			if (value.matches(Regex(".*[6-9].*")) || value.contains("0")) {
@@ -61,10 +62,6 @@ class EOSAccount(private val value: String) : Serializable {
 	}
 
 	fun isValid(onlyNormalName: Boolean = true): Boolean = checker(onlyNormalName).isValid()
-
-	companion object {
-		private const val charNotAllowed = '.'
-	}
 }
 
 enum class EOSAccountNameChecker(val content: String, val shortDescription: String) {

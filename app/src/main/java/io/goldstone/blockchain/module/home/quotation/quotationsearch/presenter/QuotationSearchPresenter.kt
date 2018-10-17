@@ -13,9 +13,7 @@ import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.showAfterColonContent
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
@@ -149,8 +147,9 @@ class QuotationSearchPresenter(
 				})
 				callback(error)
 			} else callback(error)
-		} else {
+		} else load {
 			GoldStoneDataBase.database.quotationSelectionDao().deleteByPairs(model.pair)
+		} then {
 			callback(RequestError.None)
 		}
 	}

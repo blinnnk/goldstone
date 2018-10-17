@@ -263,40 +263,40 @@ data class AppConfigTable(
 		}
 
 		@SuppressLint("HardwareIds")
-		fun insertAppConfig(callback: () -> Unit) {
+		fun insertAppConfig(callback: (AppConfigTable) -> Unit) {
 			doAsync {
 				val goldStoneID =
 					Settings.Secure.getString(
 						GoldStoneAPI.context.contentResolver,
 						Settings.Secure.ANDROID_ID
 					) + System.currentTimeMillis()
+
+				val config = AppConfigTable(
+					0,
+					goldStoneID = goldStoneID,
+					language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+					terms = getLocalTerms(),
+					isMainnet = true,
+					currentBTCChainNameID = ChainNameID.GoldStoneBTCMain.id,
+					currentETCChainNameID = ChainNameID.GasTrackerETCMain.id,
+					currentETHSeriesChainNameID = ChainNameID.InfuraETHMain.id,
+					currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
+					currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
+					currentETHSeriesTestChainNameID = ChainNameID.InfuraRopsten.id,
+					currentLTCTestChainNameID = ChainNameID.GoldStoneLTCTest.id,
+					currentLTCChainNameID = ChainNameID.GoldStoneLTC.id,
+					currentBCHChainNameID = ChainNameID.GoldStoneBCHMain.id,
+					currentBCHTestChainNameID = ChainNameID.GoldStoneBCHTest.id,
+					currentEOSChainNameID = ChainNameID.GoldStoneEOSMain.id,
+					currentEOSTestChainNameID = ChainNameID.GoldStoneEOSTest.id,
+					defaultCoinListMD5 = "",
+					exchangeListMD5 = ""
+				)
 				GoldStoneDataBase
 					.database
 					.appConfigDao()
-					.insert(
-						AppConfigTable(
-							0,
-							goldStoneID = goldStoneID,
-							language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
-							terms = getLocalTerms(),
-							isMainnet = true,
-							currentBTCChainNameID = ChainNameID.GoldStoneBTCMain.id,
-							currentETCChainNameID = ChainNameID.GasTrackerETCMain.id,
-							currentETHSeriesChainNameID = ChainNameID.InfuraETHMain.id,
-							currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
-							currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
-							currentETHSeriesTestChainNameID = ChainNameID.InfuraRopsten.id,
-							currentLTCTestChainNameID = ChainNameID.GoldStoneLTCTest.id,
-							currentLTCChainNameID = ChainNameID.GoldStoneLTC.id,
-							currentBCHChainNameID = ChainNameID.GoldStoneBCHMain.id,
-							currentBCHTestChainNameID = ChainNameID.GoldStoneBCHTest.id,
-							currentEOSChainNameID = ChainNameID.GoldStoneEOSMain.id,
-							currentEOSTestChainNameID = ChainNameID.GoldStoneEOSTest.id,
-							defaultCoinListMD5 = "",
-							exchangeListMD5 = ""
-						)
-					)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+					.insert(config)
+				GoldStoneAPI.context.runOnUiThread { callback(config) }
 			}
 		}
 

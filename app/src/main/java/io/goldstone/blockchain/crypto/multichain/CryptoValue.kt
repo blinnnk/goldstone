@@ -10,13 +10,13 @@ import com.blinnnk.util.TinyNumberUtils
 
 object CryptoValue {
 	const val bip39AddressLength = 42 // 包含 `0x`
+	const val bchNewAddressMinLengh = 41
 	private const val bitcoinAddressLength = 34
 	const val bitcoinAddressClassicLength = 33
 	const val eosAddressLength = 53
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
 	const val keystoreFilename = "keystore"
-	const val singleChainFilename = "singleChain"
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18

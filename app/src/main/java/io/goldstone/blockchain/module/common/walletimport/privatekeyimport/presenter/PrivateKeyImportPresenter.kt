@@ -2,6 +2,8 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 
 import android.content.Context
 import android.widget.EditText
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -10,6 +12,7 @@ import io.goldstone.blockchain.crypto.keystore.storeRootKeyByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -40,6 +43,10 @@ class PrivateKeyImportPresenter(
 			isAgree,
 			callback
 		) { passwordValue, walletName ->
+			if (MultiChainUtils.detectPrivateKeyType(privateKeyInput.text.toString()).isNull()) {
+				callback(AccountError.InvalidPrivateKey)
+				return@checkInputValue
+			}
 			val rootPrivateKey =
 				MultiChainUtils.getRootPrivateKey(privateKeyInput.text.toString())
 			fragment.context?.let {
@@ -58,6 +65,12 @@ class PrivateKeyImportPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
+		// 深度回退站恢复
+		fragment.getParentFragment<WalletImportFragment> {
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<PrivateKeyImportFragment>()
+			}
+		}
 	}
 
 	companion object {
@@ -73,19 +86,19 @@ class PrivateKeyImportPresenter(
 			val multiChainAddresses =
 				MultiChainUtils.getMultiChainAddressesByRootKey(rootPrivateKey)
 			context.apply {
-				// 即将创建的钱包 `ID` 的值是当前最大钱包 `ID + 1`
-				val thisWalletID = SharedWallet.getMaxWalletID() + 1
-				// 如果成功存储 私钥 到 KeyStore
-				if (storeRootKeyByWalletID(thisWalletID, rootPrivateKey, password)) {
-					// 那么就存储可读信息到数据库
-					WalletImportPresenter.insertWalletToDatabase(
-						multiChainAddresses,
-						walletName,
-						"",
-						ChainPath(),
-						hint,
-						callback
-					)
+				// 存储可读信息到数据库
+				WalletImportPresenter.insertWalletToDatabase(
+					multiChainAddresses,
+					walletName,
+					"",
+					ChainPath(),
+					hint
+				) { walletID, error ->
+					if (!walletID.isNull() && error.isNone()) {
+						// 如果成功存储 私钥 到 KeyStore
+						storeRootKeyByWalletID(walletID!!, rootPrivateKey, password)
+						callback(error)
+					} else callback(error)
 				}
 			}
 		}

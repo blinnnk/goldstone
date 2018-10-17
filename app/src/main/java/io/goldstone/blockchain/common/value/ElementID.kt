@@ -25,16 +25,18 @@ object ElementID {
 	const val loadingView = 2011
 	const val emptyView = 2012
 	const val dialog = 2013
-	const val scanButton = 20014
-	const val buttonLoading = 20015
-	const val contentScrollview = 20016
-	const val mask = 20017
-	const val miniOverlay = 20018
-	const val dashboardOverlay = 20019
-	const val overlayContainer = 20020
-	const val checkBox = 20021
+	const val scanButton = 2014
+	const val buttonLoading = 2015
+	const val contentScrollview = 2016
+	const val mask = 2017
+	const val miniOverlay = 2018
+	const val dashboardOverlay = 2019
+	const val overlayContainer = 2020
+	const val checkBox = 2021
 	const val recycleriew = 20022
 	const val baseFragmentContainer = 2023
+	const val customHeader = 2024
+	const val bottomLoading = 2025
 }
 
 object ViewPagerID {
