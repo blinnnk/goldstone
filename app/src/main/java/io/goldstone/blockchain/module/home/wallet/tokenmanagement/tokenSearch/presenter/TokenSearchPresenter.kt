@@ -21,7 +21,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.vi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
-import org.jetbrains.anko.support.v4.onUiThread
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 27/03/2018 11:23 AM
@@ -52,7 +52,7 @@ class TokenSearchPresenter(
 
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
-			fragment.onUiThread {
+			GoldStoneAPI.context.runOnUiThread {
 				if (!result.isNull() && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin

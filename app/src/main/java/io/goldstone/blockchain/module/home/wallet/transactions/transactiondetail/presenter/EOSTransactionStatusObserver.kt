@@ -26,8 +26,7 @@ fun TransactionDetailPresenter.observerEOSTransaction() {
 			totalCount: Int
 		) {
 			// Update Database BlockNumber
-			GoldStoneDataBase.database.eosTransactionDao()
-				.updateBlockNumberByTxID(currentHash, blockNumber)
+			GoldStoneDataBase.database.eosTransactionDao().updateBlockNumberByTxID(currentHash, blockNumber)
 			if (confirmed)
 				GoldStoneDataBase.database.eosTransactionDao().updatePendingStatusByTxID(currentHash)
 			GoldStoneAPI.context.runOnUiThread {
@@ -72,8 +71,7 @@ private fun TransactionDetailPresenter.updateBlockNumberInUI(blockNumber: Int) {
 	fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
 }
 
-private fun TransactionDetailPresenter.updateTokenDetailPendingStatus() {
-	fragment.parentFragment
-		?.getChildFragment<TokenDetailCenterFragment>()
+fun TransactionDetailPresenter.updateTokenDetailPendingStatus() {
+	fragment.parentFragment?.getChildFragment<TokenDetailCenterFragment>()
 		?.presenter?.refreshTransactionListFromDatabase()
 }

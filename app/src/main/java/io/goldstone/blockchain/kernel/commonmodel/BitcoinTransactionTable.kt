@@ -270,6 +270,9 @@ interface BTCSeriesTransactionDao {
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND recordAddress LIKE :recordAddress AND isFee LIKE :isFee")
 	fun getTransactionByHash(hash: String, isFee: Boolean, recordAddress: String): BTCSeriesTransactionTable?
 
+	@Query("UPDATE bitcoinTransactionList SET isPending = :isPending WHERE hash LIKE :hash")
+	fun updatePendingStatus(hash: String, isPending: Boolean = false)
+
 	@Insert
 	fun insert(table: BTCSeriesTransactionTable)
 

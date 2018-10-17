@@ -61,7 +61,7 @@ object MultiChainUtils {
 		}
 	}
 
-	private fun detectPrivateKeyType(privateKey: String): PrivateKeyType? {
+	fun detectPrivateKeyType(privateKey: String): PrivateKeyType? {
 		return when {
 			WalletUtil.isValidPrivateKey(privateKey) -> PrivateKeyType.ETHSeries
 			BTCUtils.isValidMainnetPrivateKey(privateKey) -> PrivateKeyType.BTCEOSAndBCH

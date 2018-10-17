@@ -779,14 +779,16 @@ object EOSAccountText {
 		else -> ""
 	}
 	@JvmField
-	val activeByContractMethod = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Transfer at least 2.0 EOS to the contract account (goldstonenew) from your exchange/ wallet, with memo."
-		HoneyLanguage.Chinese.code -> "通过交易所提币并备注/从钱包转账并备注的方式向合约账号(goldstonenew)转入至少2.0 EOS"
-		HoneyLanguage.Japanese.code -> "取引所のコインとノート/送金とウォレットからのメモを使用して、少なくとも2.0 EOSを契約口座に転送する（goldstonenew）"
-		HoneyLanguage.Korean.code -> "거래소의 동전과 노트 / 송금 및 지갑에서 노트를 통해 계약 계정 (goldstonenew)으로 최소한 2.0 EOS를 이체하십시오."
-		HoneyLanguage.Russian.code -> "Передайте по крайней мере 2,0 EOS на контрактную учетную запись (goldstonenew) с помощью монеты обмена и банкноты / банкноты и записку из кошелька"
-		HoneyLanguage.TraditionalChinese.code -> "通過交易所提幣並備註/從錢包轉賬並備註的方式向合約賬號(goldstonenew)轉入至少2.0 EOS"
-		else -> ""
+	val activeByContractMethod: (contract: String) -> String = { contract ->
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "Transfer at least 2.0 EOS to the contract account ($contract) from your exchange/ wallet, with memo."
+			HoneyLanguage.Chinese.code -> "通过交易所提币并备注/从钱包转账并备注的方式向合约账号($contract)转入至少2.0 EOS"
+			HoneyLanguage.Japanese.code -> "取引所のコインとノート/送金とウォレットからのメモを使用して、少なくとも2.0 EOSを契約口座に転送する（$contract）"
+			HoneyLanguage.Korean.code -> "거래소의 동전과 노트 / 송금 및 지갑에서 노트를 통해 계약 계정 ($contract)으로 최소한 2.0 EOS를 이체하십시오."
+			HoneyLanguage.Russian.code -> "Передайте по крайней мере 2,0 EOS на контрактную учетную запись ($contract) с помощью монеты обмена и банкноты / банкноты и записку из кошелька"
+			HoneyLanguage.TraditionalChinese.code -> "通過交易所提幣並備註/從錢包轉賬並備註的方式向合約賬號($contract)轉入至少2.0 EOS"
+			else -> ""
+		}
 	}
 	@JvmField
 	val smartContract = when (currentLanguage) {

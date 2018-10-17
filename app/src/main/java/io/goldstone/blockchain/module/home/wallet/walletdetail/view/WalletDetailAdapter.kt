@@ -32,7 +32,6 @@ class WalletDetailAdapter(
 	override fun generateFooter(context: Context): BottomLoadingView {
 		return BottomLoadingView(context).apply {
 			// 加载更多显示的底部 `LoadingView`
-			hide()
 			addView(
 				View(context).apply {
 					val barHeight =
