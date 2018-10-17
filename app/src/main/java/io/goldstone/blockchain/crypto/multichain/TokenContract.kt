@@ -138,7 +138,7 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 			AddressUtils.getCurrentBCHAddress()
 		TokenContract(this?.contract).isETC() ->
 			SharedAddress.getCurrentETC()
-		TokenContract(this?.contract).isEOS() || TokenContract(this?.contract).isEOSToken() ->
+		TokenContract(this?.contract).isEOSSeries() ->
 			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
 			else SharedAddress.getCurrentEOS()
 		TokenContract(this?.contract).isETH() -> SharedAddress.getCurrentEthereum()

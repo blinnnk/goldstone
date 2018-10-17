@@ -536,7 +536,7 @@ class AddressManagerPresenter(
 		private fun insertNewAddressToMyToken(contract: String, address: String, chainID: String) {
 			DefaultTokenTable.getTokenByContractFromAllChains(contract) { it ->
 				it?.let {
-					MyTokenTable(it.apply { this.chainID = chainID }, address).insert()
+					MyTokenTable(it.apply { this.chainID = chainID }, address).preventDuplicateInsert()
 				}
 			}
 		}
