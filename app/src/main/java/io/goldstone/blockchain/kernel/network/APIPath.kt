@@ -35,6 +35,15 @@ object APIPath {
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
+	val getEOSTokenCountInfo: (
+		header: String,
+		chainID: String,
+		account: String,
+		code: String,
+		symbol: String
+	) -> String = { header, chainID, account, codeName, symbol ->
+		"$header/eos/txCountInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
+	}
 	val getEOSTransactions: (
 		header: String,
 		chainID: String,
