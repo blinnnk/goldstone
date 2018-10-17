@@ -5,6 +5,7 @@ import android.content.Context
 import io.goldstone.blockchain.kernel.commonmodel.*
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionIDDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceDao
@@ -74,6 +75,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun eosTransactionDao(): EOSTransactionDao
 	abstract fun eosAccountDao(): EOSAccountDao
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
+	abstract fun eosTransactionIDDao(): EOSTransactionIDDao
 
 	companion object {
 		const val databaseVersion = 6

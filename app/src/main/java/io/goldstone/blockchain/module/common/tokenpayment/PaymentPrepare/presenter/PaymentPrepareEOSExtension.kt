@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
@@ -61,7 +62,7 @@ private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 	doAsync {
 		GoldStoneDataBase.database.eosTransactionDao().apply {
 			val dataIndex =
-				getDataByRecordAccount(info.fromAccount.accountName).maxBy { it.dataIndex }?.dataIndex ?: 0
+				getMaxDataIndex(info.fromAccount.accountName)?.dataIndex.orZero()
 			val transaction = EOSTransactionTable(info, response, dataIndex)
 			insert(transaction)
 		}

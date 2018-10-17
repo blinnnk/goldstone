@@ -151,13 +151,6 @@ class TokenInfoPresenter(
 			}
 
 			tokenInfo?.contract.isEOSToken() -> {
-				val account = EOSAccount(currentAddress)
-				EOSTransactionTable.getMaxDataIndex(account) {
-					if (it.isNull()) EOSAPI.getTransactionsLastIndex(account) { count, error ->
-						if (!count.isNull() && error.isNone()) fragment.showTransactionCount(it)
-						else fragment.context.alert(error.message)
-					} else fragment.showTransactionCount(it)
-				}
 			}
 
 			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->

@@ -41,6 +41,10 @@ class PrivateKeyImportPresenter(
 			isAgree,
 			callback
 		) { passwordValue, walletName ->
+			if (MultiChainUtils.detectPrivateKeyType(privateKeyInput.text.toString()).isNull()) {
+				callback(AccountError.InvalidPrivateKey)
+				return@checkInputValue
+			}
 			val rootPrivateKey =
 				MultiChainUtils.getRootPrivateKey(privateKeyInput.text.toString())
 			fragment.context?.let {

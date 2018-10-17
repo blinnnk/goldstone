@@ -48,6 +48,7 @@ data class TransactionListModel(
 	val hasError: Boolean,
 	var contract: TokenContract,
 	var isFailed: Boolean,
+	var pageID: Long,
 	var isFee: Boolean = false
 ) : Serializable {
 
@@ -73,6 +74,7 @@ data class TransactionListModel(
 		false,
 		TokenContract(""),
 		false,
+		data.serverID,
 		false
 	)
 
@@ -97,6 +99,7 @@ data class TransactionListModel(
 		data.hasError == "1",
 		TokenContract(data.contractAddress),
 		data.isFailed,
+		0L, // TODO
 		data.isFee
 	)
 
@@ -128,6 +131,7 @@ data class TransactionListModel(
 		false,
 		CoinSymbol(data.symbol).getContract().orEmpty(),
 		false,
+		data.dataIndex.toLong(), // TODO
 		data.isFee
 	)
 

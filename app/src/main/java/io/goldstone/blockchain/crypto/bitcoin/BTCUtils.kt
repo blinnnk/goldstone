@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.DumpedPrivateKey
 import org.bitcoinj.params.MainNetParams
@@ -14,21 +13,29 @@ import org.bitcoinj.params.TestNet3Params
 object BTCUtils {
 
 	fun isValidTestnetPrivateKey(privateKey: String): Boolean {
-		val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
-		val key = dpk.key
-		// checking our key object
-		val testnet3 = TestNet3Params.get()
-		val check = key.getPrivateKeyAsWiF(testnet3)
-		return privateKey == check
+		return try {
+			val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
+			val key = dpk.key
+			// checking our key object
+			val testnet3 = TestNet3Params.get()
+			val check = key.getPrivateKeyAsWiF(testnet3)
+			privateKey == check
+		} catch (error: Exception) {
+			false
+		}
 	}
 
 	fun isValidMainnetPrivateKey(privateKey: String): Boolean {
-		val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
-		val key = dpk.key
-		// checking our key object
-		val main = MainNetParams.get()
-		val check = key.getPrivateKeyAsWiF(main)
-		return privateKey == check
+		return try {
+			val dpk = DumpedPrivateKey.fromBase58(null, privateKey)
+			val key = dpk.key
+			// checking our key object
+			val main = MainNetParams.get()
+			val check = key.getPrivateKeyAsWiF(main)
+			privateKey == check
+		} catch (error: Exception) {
+			false
+		}
 	}
 
 	fun isValidMainnetAddress(address: String): Boolean {

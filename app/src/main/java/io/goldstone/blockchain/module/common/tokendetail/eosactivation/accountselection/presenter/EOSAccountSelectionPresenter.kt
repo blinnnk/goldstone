@@ -86,7 +86,11 @@ class EOSAccountSelectionPresenter(
 					}
 				if (notInLocalAccount.isEmpty()) {
 					fragment.context?.runOnUiThread {
-						fragment.setAccountNameList(actors)
+						val willRemoveData = actors - actors.distinctBy { it.name }
+						val finalData = actors.filterNot { data ->
+							willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
+						}
+						fragment.setAccountNameList(finalData)
 						fragment.showLoadingView(false)
 					}
 				} else object : ConcurrentAsyncCombine() {
@@ -108,7 +112,12 @@ class EOSAccountSelectionPresenter(
 					}
 
 					override fun mergeCallBack() {
-						fragment.setAccountNameList(actors)
+						// `Owner` 和 `Active` 同时存在的时候界面做去重显示
+						val willRemoveData = actors - actors.distinctBy { it.name }
+						val finalData = actors.filterNot { data ->
+							willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
+						}
+						fragment.setAccountNameList(finalData)
 						fragment.showLoadingView(false)
 					}
 				}.start()

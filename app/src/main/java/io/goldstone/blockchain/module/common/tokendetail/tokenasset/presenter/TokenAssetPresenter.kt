@@ -131,7 +131,11 @@ class TokenAssetPresenter(
 			EOSCodeName.EOSIOToken.value,
 			SharedChain.getEOSCurrent()
 		) { localData ->
-			if (localData.isEmpty()) EOSAPI.getTransactionsLastIndex(account
+			if (localData.isEmpty()) EOSAPI.getTransactionCount(
+				SharedChain.getEOSCurrent(),
+				account,
+				"", // TODO
+				""
 			) { latestCount, error ->
 				if (error.isNone()) {
 					val count = if (latestCount.isNull()) 0 else latestCount!! + 1
