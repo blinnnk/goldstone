@@ -217,7 +217,7 @@ object WalletText {
 		HoneyLanguage.Chinese.code -> "观察钱包"
 		HoneyLanguage.Japanese.code -> "観察ウォレット"
 		HoneyLanguage.Korean.code -> "관측 지갑"
-		HoneyLanguage.Russian.code -> "Наблюдательный кошелек"
+		HoneyLanguage.Russian.code -> "Наблюдать"
 		HoneyLanguage.TraditionalChinese.code -> "觀察錢包"
 		else -> ""
 	}

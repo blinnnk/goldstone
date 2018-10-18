@@ -227,23 +227,23 @@ object ContactText {
 
 	@JvmField
 	val eosHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Chinese.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Japanese.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Korean.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Russian.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.TraditionalChinese.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.English.code -> "Enter EOS Mainnet account name that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的EOS主网账户名"
+		HoneyLanguage.Japanese.code -> "保存したいEOSアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장하려는 EOS 기본 네트워크 계정 이름을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите имя главной сетевой учетной записи EOS, которое вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的EOS主網賬戶名"
 		else -> ""
 	}
 
 	@JvmField
 	val eosJungleHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Chinese.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Japanese.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Korean.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Russian.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.TraditionalChinese.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "輸入您要存儲的EOS主網賬戶名"
+		HoneyLanguage.Japanese.code -> "保存したいEOS Jungleテストネットワークアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장하려는 EOS Jungle 테스트 네트워크 계정 이름 입력"
+		HoneyLanguage.Russian.code -> "Введите имя учетной записи тестовой сети EOS Jungle, которую вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的EOS Jungle測試網網賬戶名"
 		else -> ""
 	}
 

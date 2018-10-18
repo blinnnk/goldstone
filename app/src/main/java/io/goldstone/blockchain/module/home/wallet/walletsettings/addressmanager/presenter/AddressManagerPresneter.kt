@@ -63,9 +63,9 @@ class AddressManagerPresenter(
 				key,
 				{ LogUtil.error("showEOSPublickeyDescription", it) }
 			) { accountNames ->
-				val description = if (accountNames.isNotEmpty()) "available publickey" else "inactivation publickey"
+				val description = if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey else WalletSettingsText.unactivatedPublicKey
 				cell.showDescriptionTitle(description)
-			} else cell.showDescriptionTitle("available publickey")
+			} else cell.showDescriptionTitle(WalletSettingsText.activatedPublicKey)
 	}
 
 	fun setBackEvent() {
