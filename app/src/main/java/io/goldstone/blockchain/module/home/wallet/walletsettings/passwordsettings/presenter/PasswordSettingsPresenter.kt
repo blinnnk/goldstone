@@ -83,7 +83,8 @@ class PasswordSettingsPresenter(
 							wallet.bchAddresses,
 							wallet.ltcAddresses,
 							wallet.btcAddresses,
-							wallet.btcSeriesTestAddresses
+							wallet.btcSeriesTestAddresses,
+							wallet.eosAddresses
 						).forEach { addresses ->
 							addresses.forEach { pair ->
 								updateKeystorePassword(
