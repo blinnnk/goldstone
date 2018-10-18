@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
@@ -367,6 +368,27 @@ object EOSAPI {
 					} else hold(null, totalCountError)
 				}
 			} else hold(null, error)
+		}
+	}
+
+	@JvmStatic
+	fun getEOSTokenList(
+		chainid: ChainID,
+		account: EOSAccount,
+		@WorkerThread hold: (info: List<TokenContract>?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<TokenContract>(
+			APIPath.getEOSTokenList(
+				APIPath.currentUrl,
+				chainid.id,
+				account.accountName
+			),
+			"token_list",
+			false,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			hold(this, RequestError.None)
 		}
 	}
 

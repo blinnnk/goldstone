@@ -452,7 +452,7 @@ object GoldStoneAPI {
 	}
 
 	fun getPriceByContractAddress(
-		addressList: JsonArray,
+		addressList: List<String>,
 		errorCallback: (RequestError) -> Unit,
 		@UiThread hold: (List<TokenPriceModel>) -> Unit
 	) {

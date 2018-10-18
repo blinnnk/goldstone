@@ -38,6 +38,9 @@ class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 			axisLeft.axisMinimum = minValue - distance
 			axisLeft.axisMaximum = maxValue + distance
 		}
+		isScaleXEnabled = false
+		isScaleYEnabled = false
+		mPinchZoomEnabled = false
 		super.resetData(dataRows)
 	}
 }

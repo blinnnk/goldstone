@@ -156,11 +156,11 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				val option = if (isRemove) 0 else 1
 				if (getWalletType().isBIP44()) {
 					val all = getCurrentAllBip44Address()
-					all.asSequence().map {
+					val convertedData = all.asSequence().map {
 						prepareAddressData(AddressCommissionModel(it.address, it.getChainType().id, option, id))
 					}.toList()
 					GoldStoneAPI.registerWalletAddresses(
-						AesCrypto.encrypt("$all").orEmpty(),
+						AesCrypto.encrypt("$convertedData").orEmpty(),
 						{ LogUtil.error("registerAddressesAfterGenerateWallet", it) }
 					) {
 						if (!isRemove) updateRegisterAddressesStatus(it)

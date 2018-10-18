@@ -42,7 +42,7 @@ class EOSAccountRegisterPresenter(
 		@UiThread hold: (currency: Double?, ramPrice: Double?, error: RequestError) -> Unit
 	) {
 		GoldStoneAPI.getPriceByContractAddress(
-			listOf(TokenContract.eosContract).toJsonArray(),
+			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
 			// 网络获取价格出错后从本地数据库获取价格
 			{ hold(null, null, it) }
 		) {

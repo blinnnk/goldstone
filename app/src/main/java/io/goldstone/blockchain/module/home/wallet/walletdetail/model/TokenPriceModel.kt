@@ -10,11 +10,14 @@ import com.google.gson.annotations.SerializedName
 data class TokenPriceModel(
 	@SerializedName("address")
 	val contract: String,
+	@SerializedName("symbol")
+	val symbol: String,
 	@SerializedName("price")
 	val price: Double
 ) {
 	// 这个没设定构造函数会导致 Gson 解析失败
 	constructor() : this(
+		"",
 		"",
 		0.0
 	)

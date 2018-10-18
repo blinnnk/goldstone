@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import com.blinnnk.extension.isNull
+import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
@@ -12,14 +13,19 @@ import java.io.Serializable
  * @author KaySaith
  * @date  2018/09/14
  */
-class TokenContract(val contract: String?, val symbol: String = "") : Serializable {
+data class TokenContract(
+	@SerializedName("code")
+	val contract: String?,
+	@SerializedName("symbol")
+	val symbol: String = ""
+) : Serializable {
 	constructor(contract: String?) : this(
 		contract,
 		when {
 			contract.equals(TokenContract.etcContract, true) -> CoinSymbol.etc
 			contract.equals(TokenContract.btcContract, true) -> CoinSymbol.pureBTCSymbol
 			contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.ltc
-			contract.equals(TokenContract.bchContract, true) -> CoinSymbol. bch
+			contract.equals(TokenContract.bchContract, true) -> CoinSymbol.bch
 			contract.equals(TokenContract.eosContract, true) -> CoinSymbol.eos
 			contract.equals(TokenContract.ethContract, true) -> CoinSymbol.eth
 			/** 以下两个通常用作燃气费的基础手续费的显示 `Symbol` */
@@ -31,19 +37,19 @@ class TokenContract(val contract: String?, val symbol: String = "") : Serializab
 	)
 
 	companion object {
-		val ETH = TokenContract(TokenContract.ethContract)
-		val ETC = TokenContract(TokenContract.etcContract)
-		val BTC = TokenContract(TokenContract.btcContract)
-		val LTC = TokenContract(TokenContract.ltcContract)
-		val BCH = TokenContract(TokenContract.bchContract)
-		val EOS = TokenContract(TokenContract.eosContract)
+		val ETH = TokenContract(TokenContract.ethContract, CoinSymbol.ETH.symbol!!)
+		val ETC = TokenContract(TokenContract.etcContract, CoinSymbol.ETC.symbol!!)
+		val BTC = TokenContract(TokenContract.btcContract, CoinSymbol.BTC.symbol!!)
+		val LTC = TokenContract(TokenContract.ltcContract, CoinSymbol.LTC.symbol!!)
+		val BCH = TokenContract(TokenContract.bchContract, CoinSymbol.BCH.symbol!!)
+		val EOS = TokenContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!)
 		// GoldStone 业务约定的值
 		const val ethContract = "0x60"
 		const val etcContract = "0x61"
 		const val btcContract = "0x0"
 		const val ltcContract = "0x2"
 		const val bchContract = "0x145"
-		const val eosContract = "0x194"
+		const val eosContract = "eosio.token"
 		@JvmStatic
 		val isBTCSeries: (contract: String?) -> Boolean = { contract ->
 			listOf(btcContract, ltcContract, bchContract).any { it.equals(contract, true) }
@@ -54,7 +60,7 @@ class TokenContract(val contract: String?, val symbol: String = "") : Serializab
 fun TokenContract?.orEmpty() = if (isNull()) TokenContract("") else this!!
 
 fun TokenContract?.isEOS(): Boolean {
-	return this?.contract.equals(TokenContract.eosContract, true)
+	return this?.contract.equals(TokenContract.eosContract, true) && this?.symbol.equals(CoinSymbol.EOS.symbol, true)
 }
 
 fun TokenContract?.isEOSSeries(): Boolean {

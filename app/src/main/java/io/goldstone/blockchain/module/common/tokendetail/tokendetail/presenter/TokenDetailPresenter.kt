@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -217,31 +216,7 @@ class TokenDetailPresenter(
 							callback(null, it)
 						}
 					}
-					token?.contract.isEOSSeries() -> {
-						// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
-						val codeName =
-							if (token?.contract.isEOS()) EOSCodeName.EOSIOToken.value
-							else token?.contract?.contract.orEmpty()
-						EOSAPI.getTransactionCount(
-							SharedChain.getEOSCurrent(),
-							SharedAddress.getCurrentEOSAccount(),
-							codeName,
-							token?.symbol.orEmpty()
-						) { count, error ->
-							if (!count.isNull() && error.isNone()) {
-								totalCount = count
-								currentMaxCount = count
-								// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
-								// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
-								fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
-								// 初始化
-								loadMore()
-								GoldStoneAPI.context.runOnUiThread {
-									fragment.removeLoadingView()
-								}
-							}
-						}
-					}
+					token?.contract.isEOSSeries() -> getEOSSeriesData()
 					else -> getETHSeriesData(token?.contract.getAddress()) {
 						callback(it, null)
 					}
@@ -252,8 +227,34 @@ class TokenDetailPresenter(
 				callback(null, it)
 			}
 
+			token?.contract.isEOSSeries() -> getEOSSeriesData()
+
 			walletType.isETHSeries() -> getETHSeriesData(SharedAddress.getCurrentEthereum()) {
 				callback(it, null)
+			}
+		}
+	}
+
+	private fun getEOSSeriesData() {
+		// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
+		val codeName = token?.contract?.contract.orEmpty()
+		EOSAPI.getTransactionCount(
+			SharedChain.getEOSCurrent(),
+			SharedAddress.getCurrentEOSAccount(),
+			codeName,
+			token?.symbol.orEmpty()
+		) { count, error ->
+			if (!count.isNull() && error.isNone()) {
+				totalCount = count
+				currentMaxCount = count
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				// 初始化
+				loadMore()
+				GoldStoneAPI.context.runOnUiThread {
+					fragment.removeLoadingView()
+				}
 			}
 		}
 	}
