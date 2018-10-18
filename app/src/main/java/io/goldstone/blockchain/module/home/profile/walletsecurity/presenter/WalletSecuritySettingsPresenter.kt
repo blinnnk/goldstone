@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Count
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -55,6 +56,6 @@ class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySett
 		fragment.getParentFragment<ProfileOverlayFragment> {
 			hideChildFragment(fragment)
 		}
-		fragment.activity?.addFragmentAndSetArguments<PassCodeFragment>(ContainerID.main) { }
+		fragment.activity?.addFragmentAndSetArguments<PassCodeFragment>(ContainerID.main,FragmentTag.pinCode) { }
 	}
 }

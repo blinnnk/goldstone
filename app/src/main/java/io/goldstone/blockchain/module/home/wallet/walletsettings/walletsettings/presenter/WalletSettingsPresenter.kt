@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
@@ -94,7 +95,10 @@ class WalletSettingsPresenter(override val fragment : WalletSettingsFragment) : 
 					it?.apply {
 						// 如果有私密验证首先要通过 `Pin Code`
 						pincodeIsOpened.isTrue {
-							activity?.addFragmentAndSetArguments<PassCodeFragment>(ContainerID.main)
+							activity?.addFragmentAndSetArguments<PassCodeFragment>(
+								ContainerID.main,
+								FragmentTag.pinCode
+							)
 						}
 						// 加载 `Hint` 编辑界面
 						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)

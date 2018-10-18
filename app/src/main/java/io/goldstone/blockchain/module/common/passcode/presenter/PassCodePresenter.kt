@@ -42,7 +42,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		if(passCode.length >= Count.pinCode) {
 			AppConfigTable.getAppConfig { it ->
 				val retryTimes = it?.retryTimes.orZero()
-				if(fragment.isVerifyIdentity) {
+				if(fragment.getIsVerifyIdentity()) {
 					// 是否再一次输入新密码
 					IsEnterYourNewPasswordAgain(passCode)
 				} else {
@@ -65,15 +65,15 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		var retryTimes = retryTime
 		it isTrue {
 			if(retryTimes < Count.retry) resetConfig()
-			if(fragment.isSetPinCode.orFalse()) {
-				fragment.isVerifyIdentity = true
+			if(fragment.getIsSetPinCode().orFalse()) {
+				fragment.setIsVerifyIdentity(true)
 				fragment.setPasswordInputTitles(
 					PincodeText.setFourDigitPassword,
 					""
 				)
 				fragment.resetHeaderStyle()
 			} else {
-				fragment.isVerifyIdentity = true
+				fragment.setIsVerifyIdentity(true)
 				fragment.removePassCodeFragment()
 			}
 		} otherwise {
@@ -96,7 +96,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 	}
 
 	private fun IsEnterYourNewPasswordAgain(passCode : String) {
-		if(fragment.isEnterYourNewPasswordAgain) {
+		if(fragment.getIsEnterYourNewPasswordAgain()) {
 			checkNewPassword(passCode)
 		} else {
 			this.passCode = passCode
@@ -105,7 +105,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 				PincodeText.resetTheFour_digitPassword,
 				PincodeText.ifThePasswordInputIsInconsistentPleaseRe_enter
 			)
-			fragment.isEnterYourNewPasswordAgain = true
+			fragment.setIsEnterYourNewPasswordAgain(true)
 		}
 	}
 
@@ -174,7 +174,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 					is BaseRecyclerFragment<*,*> -> recoveryBackEvent()
 
 					is BaseOverlayFragment<*> -> {
-						if(!fragment.isSetPinCode.orFalse() && !fragment.isVerifyIdentity) {
+						if(!fragment.getIsSetPinCode().orFalse() && !fragment.getIsVerifyIdentity()) {
 							this.presenter.removeSelfFromActivity()
 						} else {
 							childFragmentManager.fragments.last()?.apply {

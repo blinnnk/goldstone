@@ -28,12 +28,12 @@ import org.jetbrains.anko.relativeLayout
 
 class MainActivity : AppCompatActivity() {
 
-	var backEvent: Runnable? = null
-	private var loadingView: LoadingView? = null
-	private var netWorkReceiver: ConnectionChangeReceiver? = null
-	private var tracker: Tracker? = null
+	var backEvent : Runnable? = null
+	private var loadingView : LoadingView? = null
+	private var netWorkReceiver : ConnectionChangeReceiver? = null
+	private var tracker : Tracker? = null
 
-	override fun onCreate(savedInstanceState: Bundle?) {
+	override fun onCreate(savedInstanceState : Bundle?) {
 		super.onCreate(savedInstanceState)
 		val application = application as GoldStoneApp
 		// 初始化 `Google Analytics` 追踪器
@@ -45,14 +45,14 @@ class MainActivity : AppCompatActivity() {
 			id = ContainerID.main
 			savedInstanceState.isNull {
 				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-				addFragment<HomeFragment>(this.id, FragmentTag.home)
+				addFragment<HomeFragment>(this.id,FragmentTag.home)
 			}
 		})
 		registerReceiver()
 	}
 
-	private var currentIntent: Intent? = null
-	override fun onNewIntent(intent: Intent?) {
+	private var currentIntent : Intent? = null
+	override fun onNewIntent(intent : Intent?) {
 		super.onNewIntent(intent)
 		// App 存在的时候记录 `Intent`
 		currentIntent = intent
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 		showNotificationFragmentByIntent(currentIntent ?: intent)
 	}
 
-	fun sendAnalyticsData(className: String) {
+	fun sendAnalyticsData(className : String) {
 		tracker?.setScreenName(className)
 		tracker?.send(
 			HitBuilders.ScreenViewBuilder().setCustomDimension(
@@ -96,28 +96,28 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onBackPressed() {
 		recoveryBackEventFromOtherApp()
-		if (backEvent.isNull()) {
+		if(backEvent.isNull()) {
 			super.onBackPressed()
 		} else {
 			backEvent?.run()
 		}
 	}
 
-	fun getHomeFragment(): HomeFragment? {
+	fun getHomeFragment() : HomeFragment? {
 		supportFragmentManager.findFragmentByTag(FragmentTag.home).let {
-			return if (it.isNull()) null
+			return if(it.isNull()) null
 			else it as? HomeFragment
 		}
 	}
 
-	fun getMainContainer(): RelativeLayout? {
+	fun getMainContainer() : RelativeLayout? {
 		return findViewById(ContainerID.main)
 	}
 
 	// 防止重绘的专用方法
 	fun hideHomeFragment() {
 		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let { fragment ->
-			if (fragment is HomeFragment) {
+			if(fragment is HomeFragment) {
 				supportFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss()
 			}
 		}
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
 	// 防止重绘的专用方法
 	fun showHomeFragment() {
 		getHomeFragment()?.let {
-			if (it.isHidden) {
+			if(it.isHidden) {
 				supportFragmentManager
 					?.beginTransaction()
 					?.show(it)
@@ -135,21 +135,21 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
-	fun getWalletDetailFragment(): WalletDetailFragment? {
+	fun getWalletDetailFragment() : WalletDetailFragment? {
 		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.walletDetail)
 	}
 
-	fun getQuotationFragment(): QuotationFragment? {
+	fun getQuotationFragment() : QuotationFragment? {
 		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.quotation)
 	}
 
 	private fun recoveryBackEventFromOtherApp() {
 		supportFragmentManager.fragments.last()?.let {
-			if (it is BaseOverlayFragment<*>) {
+			if(it is BaseOverlayFragment<*>) {
 				val child = it.childFragmentManager.fragments.last()
-				if (child is BaseFragment<*>) {
+				if(child is BaseFragment<*>) {
 					child.recoveryBackEvent()
-				} else if (child is BaseRecyclerFragment<*, *>) {
+				} else if(child is BaseRecyclerFragment<*,*>) {
 					child.recoveryBackEvent()
 				}
 			}
@@ -159,9 +159,9 @@ class MainActivity : AppCompatActivity() {
 	/**
 	 * 接受到 `Push` 跳转到 `NotificationFragment`
 	 */
-	private fun showNotificationFragmentByIntent(intent: Intent?) {
+	private fun showNotificationFragmentByIntent(intent : Intent?) {
 		val hash = intent?.getStringExtra(IntentKey.hashFromNotify)
-		if (hash.isNull()) return
+		if(hash.isNull()) return
 		getWalletDetailFragment()?.apply {
 			// 如果有正在打开的悬浮层, 直接关闭
 			supportFragmentManager.fragments.find {
@@ -179,15 +179,15 @@ class MainActivity : AppCompatActivity() {
 		netWorkReceiver = ConnectionChangeReceiver()
 		val intentFilter = IntentFilter()
 		intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
-		registerReceiver(netWorkReceiver, intentFilter)
+		registerReceiver(netWorkReceiver,intentFilter)
 	}
 
-	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, data)
-		this.saveDataToSharedPreferences(SharesPreference.activityIsResult, TinyNumber.True.value)
+	override fun onActivityResult(requestCode : Int,resultCode : Int,data : Intent?) {
+		super.onActivityResult(requestCode,resultCode,data)
+		this.saveDataToSharedPreferences(SharesPreference.activityIsResult,TinyNumber.True.value)
 	}
 }
 
-fun FragmentActivity?.findIsItExist(fragmentTag: String): Boolean {
+fun FragmentActivity?.findIsItExist(fragmentTag : String) : Boolean {
 	return !this?.supportFragmentManager?.findFragmentByTag(fragmentTag).isNull()
 }

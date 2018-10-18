@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -32,14 +33,14 @@ import org.jetbrains.anko.verticalLayout
  */
 class HintFragment : BaseFragment<HintPresenter>() {
 
-	override val pageTitle: String = WalletSettingsText.hint
+	override val pageTitle : String = WalletSettingsText.hint
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = HintPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
-			lparams(matchParent, matchParent)
+			lparams(matchParent,matchParent)
 			hintInput.apply {
 				title = CreateWalletText.hint
 				setMargins<LinearLayout.LayoutParams> {
@@ -58,16 +59,19 @@ class HintFragment : BaseFragment<HintPresenter>() {
 	}
 
 	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
+		view : View,
+		savedInstanceState : Bundle?
 	) {
-		super.onViewCreated(view, savedInstanceState)
+		super.onViewCreated(view,savedInstanceState)
 		WalletTable.getCurrentWallet {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
 			AppConfigTable.getAppConfig {
-				it?.pincodeIsOpened?.isTrue {
+				if(it?.pincodeIsOpened.orFalse() || it?.fingerprintUnlockerIsOpened.orFalse()) {
 					getParentFragment<ProfileOverlayFragment> {
-						activity?.addFragmentAndSetArguments<PassCodeFragment>(ContainerID.main)
+						activity?.addFragmentAndSetArguments<PassCodeFragment>(
+							ContainerID.main,
+							FragmentTag.pinCode
+						)
 					}
 				}
 			}
@@ -77,8 +81,8 @@ class HintFragment : BaseFragment<HintPresenter>() {
 	}
 
 	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
+		activity : MainActivity?,
+		parent : Fragment?
 	) {
 		getParentFragment<WalletSettingsFragment> {
 			headerTitle = WalletSettingsText.walletSettings

@@ -150,12 +150,12 @@ object PincodeText {
 	}
 	@JvmField
 	val resetTheFour_digitPassword = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Reset the four-digit password"
-		HoneyLanguage.Chinese.code -> "Reset the four-digit password"
-		HoneyLanguage.Japanese.code -> "Reset the four-digit password"
-		HoneyLanguage.Korean.code -> "Reset the four-digit password"
-		HoneyLanguage.Russian.code -> "Reset the four-digit password"
-		HoneyLanguage.TraditionalChinese.code -> "Reset the four-digit password"
+		HoneyLanguage.English.code -> "Reset four-digit password"
+		HoneyLanguage.Chinese.code -> "Reset four-digit password"
+		HoneyLanguage.Japanese.code -> "Reset four-digit password"
+		HoneyLanguage.Korean.code -> "Reset four-digit password"
+		HoneyLanguage.Russian.code -> "Reset four-digit password"
+		HoneyLanguage.TraditionalChinese.code -> "Reset four-digit password"
 		else -> ""
 	}
 	@JvmField
@@ -179,8 +179,8 @@ object PincodeText {
 		else -> ""
 	}
 	@JvmField
-	val failedAttention: (retryTimes: Int) -> String = {
-		when (currentLanguage) {
+	val failedAttention : (retryTimes : Int) -> String = {
+		when(currentLanguage) {
 			HoneyLanguage.English.code -> "incorrect passcode $it retry times left"
 			HoneyLanguage.Chinese.code -> "incorrect passcode $it retry times left"
 			HoneyLanguage.Japanese.code -> "incorrect passcode $it retry times left"
@@ -191,8 +191,8 @@ object PincodeText {
 		}
 	}
 	@JvmField
-	val remainingFrozenTime: (currentFrozenTime: Long) -> String = {
-		when (currentLanguage) {
+	val remainingFrozenTime : (currentFrozenTime : Long) -> String = {
+		when(currentLanguage) {
 			HoneyLanguage.English.code -> "you have to wait ${it / 1000} seconds"
 			HoneyLanguage.Chinese.code -> "you have to wait ${it / 1000} seconds"
 			HoneyLanguage.Japanese.code -> "you have to wait ${it / 1000} seconds"

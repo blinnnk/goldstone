@@ -35,38 +35,38 @@ import org.jetbrains.anko.uiThread
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
 	@PrimaryKey(autoGenerate = true)
-	var id: Int,
-	var pincode: Int? = null,
-	var pincodeIsOpened: Boolean = false,
-	var fingerprintUnlockerIsOpened: Boolean = false,
-	var frozenTime: Long? = null,
-	var retryTimes: Int = 5,
-	var goldStoneID: String = "",
-	var isRegisteredAddresses: Boolean = false, // For Push
-	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
-	var currencyCode: String = CountryCode.currentCurrency,
-	var pushToken: String = "",
-	var isMainnet: Boolean = true,
-	var shareContent: String = ProfileText.shareContent,
-	var terms: String = "",
-	var currentETCTestChainNameID: Int,
-	var currentETHSeriesTestChainNameID: Int,
-	var currentBTCTestChainNameID: Int,
-	var currentLTCTestChainNameID: Int,
-	var currentBCHTestChainNameID: Int,
-	var currentEOSTestChainNameID: Int,
-	var currentETCChainNameID: Int,
-	var currentBTCChainNameID: Int,
-	var currentETHSeriesChainNameID: Int,
-	var currentBCHChainNameID: Int,
-	var currentLTCChainNameID: Int,
-	var currentEOSChainNameID: Int,
-	var defaultCoinListMD5: String,
-	var exchangeListMD5: String
+	var id : Int,
+	var pincode : Int? = null,
+	var pincodeIsOpened : Boolean = false,
+	var fingerprintUnlockerIsOpened : Boolean = false,
+	var frozenTime : Long? = null,
+	var retryTimes : Int = 5,
+	var goldStoneID : String = "",
+	var isRegisteredAddresses : Boolean = false, // For Push
+	var language : Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+	var currencyCode : String = CountryCode.currentCurrency,
+	var pushToken : String = "",
+	var isMainnet : Boolean = true,
+	var shareContent : String = ProfileText.shareContent,
+	var terms : String = "",
+	var currentETCTestChainNameID : Int,
+	var currentETHSeriesTestChainNameID : Int,
+	var currentBTCTestChainNameID : Int,
+	var currentLTCTestChainNameID : Int,
+	var currentBCHTestChainNameID : Int,
+	var currentEOSTestChainNameID : Int,
+	var currentETCChainNameID : Int,
+	var currentBTCChainNameID : Int,
+	var currentETHSeriesChainNameID : Int,
+	var currentBCHChainNameID : Int,
+	var currentLTCChainNameID : Int,
+	var currentEOSChainNameID : Int,
+	var defaultCoinListMD5 : String,
+	var exchangeListMD5 : String
 ) {
 
 	companion object {
-		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
+		fun getAppConfig(hold : (AppConfigTable?) -> Unit) {
 			load {
 				GoldStoneDataBase.database.appConfigDao().getAppConfig()
 			} then {
@@ -79,8 +79,8 @@ data class AppConfigTable(
 		}
 
 		fun updatePinCode(
-			newPinCode: Int,
-			callback: () -> Unit
+			newPinCode : Int,
+			callback : () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -96,7 +96,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updatePushToken(token: String) {
+		fun updatePushToken(token : String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
@@ -108,7 +108,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateDefaultTokenMD5(md5: String) {
+		fun updateDefaultTokenMD5(md5 : String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
@@ -120,7 +120,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
+		fun updateRegisterAddressesStatus(isRegistered : Boolean,callback : () -> Unit = {}) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
@@ -135,7 +135,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateRetryTimes(times: Int) {
+		fun updateRetryTimes(times : Int) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
@@ -148,8 +148,8 @@ data class AppConfigTable(
 		}
 
 		fun setFrozenTime(
-			frozenTime: Long?,
-			callback: () -> Unit = {}
+			frozenTime : Long?,
+			callback : () -> Unit = {}
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -164,11 +164,14 @@ data class AppConfigTable(
 		}
 
 		fun setPinCodeStatus(
-			status: Boolean,
-			callback: () -> Unit
+			status : Boolean,
+			callback : () -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.appConfigDao().updatePincodeIsOpened(status)
+				if(!status) {
+					GoldStoneDataBase.database.appConfigDao().updatePincode(null)
+				}
 				SharedWallet.updatePincodeIsOpened(status)
 			} then {
 				callback()
@@ -176,8 +179,8 @@ data class AppConfigTable(
 		}
 
 		fun setFingerprintUnlockStatus(
-			status: Boolean,
-			callback: () -> Unit
+			status : Boolean,
+			callback : () -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.appConfigDao().updateFingerprintUnlockerIsOpened(status)
@@ -188,8 +191,8 @@ data class AppConfigTable(
 		}
 
 		fun updateLanguage(
-			code: Int,
-			callback: () -> Unit
+			code : Int,
+			callback : () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -204,8 +207,8 @@ data class AppConfigTable(
 		}
 
 		fun updateChainStatus(
-			isMainnet: Boolean,
-			callback: () -> Unit
+			isMainnet : Boolean,
+			callback : () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
@@ -222,37 +225,37 @@ data class AppConfigTable(
 		}
 
 		fun updateChainInfo(
-			isMainnet: Boolean,
-			etcChainNameID: Int,
-			ethSeriesID: Int,
-			btcChainNameID: Int,
-			bchChainNameID: Int,
-			ltcChainNameID: Int,
-			eosChainNameID: Int,
-			callback: () -> Unit
+			isMainnet : Boolean,
+			etcChainNameID : Int,
+			ethSeriesID : Int,
+			btcChainNameID : Int,
+			bchChainNameID : Int,
+			ltcChainNameID : Int,
+			eosChainNameID : Int,
+			callback : () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
-					if (isMainnet) updateMainnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
-					else updateTestnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
+					if(isMainnet) updateMainnetChainName(isMainnet,bchChainNameID,ltcChainNameID,eosChainNameID,ethSeriesID,btcChainNameID,etcChainNameID)
+					else updateTestnetChainName(isMainnet,bchChainNameID,ltcChainNameID,eosChainNameID,ethSeriesID,btcChainNameID,etcChainNameID)
 					callback()
 				}
 			}
 		}
 
-		fun updateTerms(terms: String) {
+		fun updateTerms(terms : String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateTerms(terms)
 			}
 		}
 
-		fun updateShareContent(shareContent: String) {
+		fun updateShareContent(shareContent : String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateShareContent(shareContent)
 			}
 		}
 
-		fun updateCurrency(code: String, callback: () -> Unit) {
+		fun updateCurrency(code : String,callback : () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateCurrency(code)
 				uiThread { callback() }
@@ -260,7 +263,7 @@ data class AppConfigTable(
 		}
 
 		@SuppressLint("HardwareIds")
-		fun insertAppConfig(callback: (AppConfigTable) -> Unit) {
+		fun insertAppConfig(callback : (AppConfigTable) -> Unit) {
 			doAsync {
 				val goldStoneID =
 					Settings.Secure.getString(
@@ -297,14 +300,14 @@ data class AppConfigTable(
 			}
 		}
 
-		private fun getLocalTerms(): String {
+		private fun getLocalTerms() : String {
 			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(terms).let { localTerms ->
 				localTerms.find {
-					it.safeGet("language").equals(CountryCode.currentLanguageSymbol, true)
+					it.safeGet("language").equals(CountryCode.currentLanguageSymbol,true)
 				}.let { it ->
-					return if (it.isNull()) {
+					return if(it.isNull()) {
 						localTerms.find {
-							it.safeGet("language").equals(HoneyLanguage.English.symbol, true)
+							it.safeGet("language").equals(HoneyLanguage.English.symbol,true)
 						}?.safeGet("terms").orEmpty()
 					} else {
 						return it!!.safeGet("terms")
@@ -319,35 +322,38 @@ data class AppConfigTable(
 interface AppConfigDao {
 
 	@Query("SELECT * FROM appConfig")
-	fun getAppConfig(): List<AppConfigTable>
+	fun getAppConfig() : List<AppConfigTable>
+
+	@Query("UPDATE appConfig SET pincode = :pincode")
+	fun updatePincode(pincode : Int? = null)
 
 	@Query("UPDATE appConfig SET pincodeIsOpened = :pincodeIsOpened")
-	fun updatePincodeIsOpened(pincodeIsOpened: Boolean = false)
+	fun updatePincodeIsOpened(pincodeIsOpened : Boolean = false)
 
 	@Query("UPDATE appConfig SET fingerprintUnlockerIsOpened = :fingerprintUnlockerIsOpened")
-	fun updateFingerprintUnlockerIsOpened(fingerprintUnlockerIsOpened: Boolean = false)
+	fun updateFingerprintUnlockerIsOpened(fingerprintUnlockerIsOpened : Boolean = false)
 
 	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
-	fun updateCurrency(newCurrencyCode: String)
+	fun updateCurrency(newCurrencyCode : String)
 
 	@Query("UPDATE appConfig SET shareContent = :content WHERE id = 1")
-	fun updateShareContent(content: String)
+	fun updateShareContent(content : String)
 
 	@Query("UPDATE appConfig SET terms = :content WHERE id = 1")
-	fun updateTerms(content: String)
+	fun updateTerms(content : String)
 
 	@Query("UPDATE appConfig SET isMainnet = :isMainnet, currentBCHChainNameID = :bchChainNameID, currentLTCChainNameID = :ltcChainNameID, currentEOSChainNameID = :eosChainNameID, currentETHSeriesChainNameID = :ethSeriesChainNameID, currentBTCChainNameID = :btcChainNameID, currentETCChainNameID = :etcChainNameID   WHERE id = 1")
-	fun updateMainnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
+	fun updateMainnetChainName(isMainnet : Boolean,bchChainNameID : Int,ltcChainNameID : Int,eosChainNameID : Int,ethSeriesChainNameID : Int,btcChainNameID : Int,etcChainNameID : Int)
 
 	@Query("UPDATE appConfig SET isMainnet = :isMainnet,  currentBCHTestChainNameID = :bchChainNameID, currentLTCTestChainNameID = :ltcChainNameID, currentEOSTestChainNameID = :eosChainNameID, currentETHSeriesTestChainNameID = :ethSeriesChainNameID, currentBTCTestChainNameID = :btcChainNameID, currentETCTestChainNameID = :etcChainNameID   WHERE id = 1")
-	fun updateTestnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
+	fun updateTestnetChainName(isMainnet : Boolean,bchChainNameID : Int,ltcChainNameID : Int,eosChainNameID : Int,ethSeriesChainNameID : Int,btcChainNameID : Int,etcChainNameID : Int)
 
 	@Insert
-	fun insert(appConfigTable: AppConfigTable)
+	fun insert(appConfigTable : AppConfigTable)
 
 	@Update
-	fun update(appConfigTable: AppConfigTable)
+	fun update(appConfigTable : AppConfigTable)
 
 	@Delete
-	fun delete(appConfigTable: AppConfigTable)
+	fun delete(appConfigTable : AppConfigTable)
 }
