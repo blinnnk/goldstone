@@ -77,8 +77,6 @@ class ScanCaptureActivity: FragmentActivity() {
 			})
 		}
 		
-		
-		
 	}
 	
 	
