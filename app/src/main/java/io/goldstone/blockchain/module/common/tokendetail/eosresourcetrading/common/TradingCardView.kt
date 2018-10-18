@@ -18,8 +18,8 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSUnit
-import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.linearLayout
@@ -77,6 +77,10 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		accountNameEditText.visibility = View.GONE
 		amountEditText.setTitle(TokenDetailText.tradeRamByBytesTitle)
 		amountEditText.setHint(TokenDetailText.tradeRamByBytesPlaceholder)
+	}
+
+	fun showRAMEOSCount(eosCount: Double) {
+		amountEditText.setTitle(TokenDetailText.tradeRamByBytesTitle + " ≈ ${eosCount.formatCount(4)} ${CoinSymbol.EOS.symbol}")
 	}
 
 	fun showRAMAmount(amount: Double) {

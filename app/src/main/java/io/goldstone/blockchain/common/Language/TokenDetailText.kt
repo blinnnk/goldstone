@@ -480,12 +480,12 @@ object TokenDetailText {
 	}
 	@JvmField
 	val tradeRamByBytesPlaceholder = when (currentLanguage) {
-		HoneyLanguage.English.code -> "How much bytes you want"
-		HoneyLanguage.Chinese.code -> "想要卖出的RAM数量(Byte)"
-		HoneyLanguage.Japanese.code -> "購入したい番号（バイト）"
-		HoneyLanguage.Korean.code -> "구매하려는 번호 (바이트)"
-		HoneyLanguage.Russian.code -> "Номер, который вы хотите купить (байт)"
-		HoneyLanguage.TraditionalChinese.code -> "想要買的數量(Byte)"
+		HoneyLanguage.English.code -> "Sell bytes"
+		HoneyLanguage.Chinese.code -> "卖出的RAM数量"
+		HoneyLanguage.Japanese.code -> "購入したい番号"
+		HoneyLanguage.Korean.code -> "구매하려는 번호"
+		HoneyLanguage.Russian.code -> "Номер, который вы хотите купить"
+		HoneyLanguage.TraditionalChinese.code -> "想要買的數量"
 		else -> ""
 	}
 

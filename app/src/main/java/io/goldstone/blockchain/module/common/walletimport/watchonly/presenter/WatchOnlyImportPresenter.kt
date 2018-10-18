@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.walletimport.watchonly.presenter
 
 import android.support.annotation.UiThread
 import android.widget.EditText
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -26,8 +27,10 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 
 /**
  * @date 23/03/2018 2:16 AM
@@ -219,6 +222,12 @@ class WatchOnlyImportPresenter(
 
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
-		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
+		setRootChildFragmentBackEvent<ProfileOverlayFragment>(fragment)
+		// 深度回退站恢复
+		fragment.getParentFragment<ProfileOverlayFragment> {
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<WatchOnlyImportFragment>()
+			}
+		}
 	}
 }
