@@ -40,21 +40,18 @@ import org.jetbrains.anko.*
  * @author wcx
  */
 class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresenter>() {
-	override val pageTitle: String = ProfileText.walletSecurity
+	override val pageTitle : String = ProfileText.walletSecurity
 
 	private val changePinCode by lazy { LinearLayout(context) }
-	private var pinCodeSingleLineSwitch: SingleLineSwitch? = null
+	private var pinCodeSingleLineSwitch : SingleLineSwitch? = null
 	override val presenter = WalletSecuritySettingsPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
-			lparams(
-				matchParent,
-				matchParent
-			)
+			lparams(matchParent,matchParent)
 			AppConfigTable.getAppConfig {
-				if (it?.pincodeIsOpened.orFalse() || it?.fingerprintUnlockerIsOpened.orFalse()) {
+				if(it?.pincodeIsOpened.orFalse() || it?.fingerprintUnlockerIsOpened.orFalse()) {
 					presenter.showPassCodeFragment()
 				}
 
@@ -73,19 +70,16 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	}
 
 	private fun ViewGroup.initSwitchCell() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
 			// 指纹解锁
-			SingleLineSwitch(
-				context,
-				true
-			).apply {
+			SingleLineSwitch(context,true).apply {
 				setHorizontalPadding()
 				AppConfigTable.getAppConfig { config ->
 					setSwitchStatus(config?.fingerprintUnlockerIsOpened.orFalse())
 				}
 				setOnclick { switch ->
-					if (switch.isChecked) {
-						if (checkIfTheSystemFingerprintExists().isAvailable()) {
+					if(switch.isChecked) {
+						if(checkIfTheSystemFingerprintExists().isAvailable()) {
 							// 系统已设置指纹
 							openFingerprintEvent(switch)
 						} else {
@@ -100,14 +94,11 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			}.into(this)
 		}
 
-		pinCodeSingleLineSwitch = SingleLineSwitch(
-			context,
-			true
-		).apply {
+		pinCodeSingleLineSwitch = SingleLineSwitch(context,true).apply {
 			setHorizontalPadding()
 			AppConfigTable.getAppConfig { config ->
 				setSwitchStatus(config?.pincodeIsOpened.orFalse())
-				if (config?.pincodeIsOpened.orFalse()) {
+				if(config?.pincodeIsOpened.orFalse()) {
 					changePinCode.visibility = View.VISIBLE
 				} else {
 					changePinCode.visibility = View.GONE
@@ -116,7 +107,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			setOnclick {
 				// 点击后跳转到PinCode编辑界面
 				val switchChecked = pinCodeSingleLineSwitch?.getSwitchCheckedStatus()
-				if (switchChecked.orFalse()) {
+				if(switchChecked.orFalse()) {
 					presenter.setPassCodeFragment()
 					pinCodeSingleLineSwitch?.setSwitchStatus(!switchChecked.orFalse())
 				} else {
@@ -129,28 +120,19 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		pinCodeSingleLineSwitch?.into(this)
 
 		changePinCode.apply {
-			layoutParams = ViewGroup.LayoutParams(
-				ScreenSize.widthWithPadding,
-				wrapContent
-			)
+			layoutParams = ViewGroup.LayoutParams(ScreenSize.widthWithPadding,wrapContent)
 			orientation = LinearLayout.VERTICAL
 			textView {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.black(context)
 				textColor = GrayScale.gray
 				text = PincodeText.setPinCode
-				layoutParams = LinearLayout.LayoutParams(
-					wrapContent,
-					wrapContent
-				).apply {
+				layoutParams = LinearLayout.LayoutParams(wrapContent,wrapContent).apply {
 					topMargin = 8.uiPX()
 				}
 			}
 
-			SingleLineSwitch(
-				context,
-				false
-			).apply {
+			SingleLineSwitch(context,false).apply {
 				setHorizontalPadding()
 				setOnclick {
 					// 点击后根据更新的数据库情况显示开关状态
@@ -162,7 +144,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		}.into(this)
 	}
 
-	private fun setPinCodeSingleLineSwitchStatus(isChecked: Boolean) {
+	private fun setPinCodeSingleLineSwitchStatus(isChecked : Boolean) {
 		pinCodeSingleLineSwitch?.setSwitchStatus(isChecked)
 	}
 
@@ -170,8 +152,8 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		changePinCode.visibility = View.VISIBLE
 	}
 
-	private fun checkIfTheSystemFingerprintExists(): FingerprintAvailableStatus {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+	private fun checkIfTheSystemFingerprintExists() : FingerprintAvailableStatus {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			context?.let {
 				val fingerprintHelper = FingerprintHelper(it)
 				return fingerprintHelper.checkIfTheFingerprintIsAvailable()
@@ -181,11 +163,11 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	}
 
 	// 点击后根据更新的数据库情况显示指紋解锁开关状态
-	private fun openFingerprintEvent(switch: HoneyBaseSwitch) {
+	private fun openFingerprintEvent(switch : HoneyBaseSwitch) {
 		presenter.setFingerprintStatus(switch.isChecked) {
 			AppConfigTable.getAppConfig {
 				switch.isChecked = it?.fingerprintUnlockerIsOpened.orFalse()
-				if (!pinCodeSingleLineSwitch?.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
+				if(!pinCodeSingleLineSwitch?.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
 					setPinCodeTips()
 				}
 			}
@@ -201,10 +183,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					GoldStoneDialog.remove(context)
 				}
 				setImage(R.drawable.network_browken_banner)
-				setContent(
-					FingerprintUnlockText.fingerprintIsOn,
-					FingerprintUnlockText.fingerprintOpeningPrompt
-				)
+				setContent(FingerprintUnlockText.fingerprintIsOn,FingerprintUnlockText.fingerprintOpeningPrompt)
 			}
 		}
 	}
@@ -218,24 +197,21 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 					try {
 						context.startActivity(intent)
-					} catch (e: Exception) {
+					} catch(e : Exception) {
 					}
 					GoldStoneDialog.remove(context)
 				}
 				setImage(R.drawable.network_browken_banner)
-				setContent(
-					FingerprintUnlockText.yourDeviceHasNotSetAFingerprintYet,
-					FingerprintUnlockText.fingerprintNotSetPrompt
-				)
+				setContent(FingerprintUnlockText.yourDeviceHasNotSetAFingerprintYet,FingerprintUnlockText.fingerprintNotSetPrompt)
 			}
 		}
 	}
 
-	override fun onHiddenChanged(hidden: Boolean) {
-		if (!hidden) {
+	override fun onHiddenChanged(hidden : Boolean) {
+		if(!hidden) {
 			AppConfigTable.getAppConfig {
 				// 设置新密码返回更新状态
-				if (it?.pincodeIsOpened.orFalse()) {
+				if(it?.pincodeIsOpened.orFalse()) {
 					setChangePinCodeVisibility()
 					setPinCodeSingleLineSwitchStatus(true)
 				}
@@ -243,10 +219,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity : MainActivity?,parent : Fragment?) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()
 		}

@@ -40,20 +40,20 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 
 	init {
 
-		layoutParams = LinearLayout.LayoutParams(matchParent, 200.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 
 		titles.apply {
 			layoutParams = RelativeLayout.LayoutParams((ScreenSize.Width * 0.8f).toInt(), 200.uiPX())
 			setBigWhiteStyle()
-			titles.title.text = PincodeText.enterPincode
-			titles.subtitle.text = PincodeText.enterPincodeDescription
+			titles.title.text = PincodeText.needToVerifyYourIdentity
+			titles.subtitle.text = PincodeText.pleaseEnterYourCurrentNumericPassword
 			isCenter = true
 		}.into(this)
 		titles.setCenterInHorizontal()
 
 		inputLayout = linearLayout {
 			layoutParams = LinearLayout.LayoutParams(codeWidth, wrapContent)
-			y += 100.uiPX()
+			y += ScreenSize.Height * 0.112f
 			x = centerLeft
 			(0 until Count.pinCode).forEach {
 				View(context).apply {
@@ -94,6 +94,27 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 				setValueAnimatorOfFloat(FloatAnimationObject.X, leftValue, rightValue, 100L) {
 					setValueAnimatorOfFloat(FloatAnimationObject.X, rightValue, centerLeft, 100L)
 				}
+			}
+		}
+	}
+
+	fun setTitles(
+		title: String,
+		subtitle: String,
+		isPinCode: Boolean
+	) {
+		titles.apply {
+			this.title.text = title
+			if (subtitle.isBlank()) {
+				this.subtitle.visibility = View.GONE
+			} else {
+				this.subtitle.visibility = View.VISIBLE
+				this.subtitle.text = subtitle
+			}
+			if (isPinCode) {
+				inputLayout.visibility = View.VISIBLE
+			} else {
+				inputLayout.visibility = View.GONE
 			}
 		}
 	}

@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
+import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
@@ -146,7 +146,7 @@ class WalletDetailFragment :
 		if (activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull())
 			AppConfigTable.getAppConfig {
 				it?.pincodeIsOpened?.isTrue {
-					activity?.addFragmentAndSetArguments<PasscodeFragment>(
+					activity?.addFragmentAndSetArguments<PassCodeFragment>(
 						ContainerID.main,
 						FragmentTag.pinCode
 					)

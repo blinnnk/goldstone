@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.annotation.SuppressLint
 import android.arch.persistence.room.*
 import android.provider.Settings
-import android.provider.SyncStateContract.Helpers.update
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise

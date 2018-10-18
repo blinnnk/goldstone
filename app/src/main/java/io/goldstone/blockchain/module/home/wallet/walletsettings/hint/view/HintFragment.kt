@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
+import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -67,7 +67,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 			AppConfigTable.getAppConfig {
 				it?.pincodeIsOpened?.isTrue {
 					getParentFragment<ProfileOverlayFragment> {
-						activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
+						activity?.addFragmentAndSetArguments<PassCodeFragment>(ContainerID.main)
 					}
 				}
 			}
