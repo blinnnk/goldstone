@@ -9,8 +9,7 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.KeyEvent
 import android.widget.*
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.google.zxing.MultiFormatReader
 import com.google.zxing.ResultPoint
@@ -75,13 +74,14 @@ class DecoratedQRCodeView : RelativeLayout {
 		}
 		
 		statusView = TextView(context).apply {
-			setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+			setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
 			textColor = Color.WHITE
 			typeface = GoldStoneFont.light(context)
 			gravity = Gravity.CENTER_HORIZONTAL
 			layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent).apply {
 				alignParentBottom()
 			}
+			bottomPadding = 10.uiPX()
 		}
 		
 		addView(barcodeView)
