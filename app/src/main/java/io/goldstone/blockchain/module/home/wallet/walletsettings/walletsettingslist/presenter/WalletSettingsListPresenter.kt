@@ -24,9 +24,9 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
@@ -89,9 +89,8 @@ class WalletSettingsListPresenter(
 			WalletSettingsText.deleteInfoSubtitle,
 			!SharedWallet.isWatchOnlyWallet()
 		) { passwordInput ->
-			if (SharedWallet.isWatchOnlyWallet()) WalletTable.getWatchOnlyWallet {
-				deleteWatchOnlyWallet(first, second)
-			} else {
+			if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
+			else {
 				val password = passwordInput?.text.toString()
 				WalletTable.getCurrentWallet(false) {
 					val type = getWalletType()
@@ -99,8 +98,8 @@ class WalletSettingsListPresenter(
 						if (isCorrect) {
 							runOnUiThread { getMainActivity()?.showLoadingView() }
 							if (type.isBIP44())
-								deleteWalletData(getCurrentAllAddressAndChainID(), password)
-							else deleteRootKeyWallet(id, getCurrentAddressesAndChainID(), password)
+								deleteWalletData(getCurrentAllBip44Address(), password)
+							else deleteRootKeyWallet(id, getCurrentBip44Addresses(), password)
 						} else runOnUiThread {
 							alert(CommonText.wrongPassword)
 						}
@@ -110,15 +109,13 @@ class WalletSettingsListPresenter(
 		}
 	}
 
-	private fun Context.deleteWalletData(addresses: List<Pair<String, ChainType>>, password: String) {
+	private fun Context.deleteWalletData(addresses: List<Bip44Address>, password: String) {
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount = addresses.size
 			override fun concurrentJobs() {
-				addresses.forEach { account ->
-					AddressManagerPresenter.convertToChildAddresses(account.first).forEach { pair ->
-						deleteRoutineWallet(pair.first, password, account.second) {
-							completeMark()
-						}
+				addresses.forEach { pair ->
+					deleteRoutineWallet(pair.address, password, pair.getChainType()) {
+						completeMark()
 					}
 				}
 			}
@@ -135,14 +132,14 @@ class WalletSettingsListPresenter(
 
 	private fun Context.deleteRootKeyWallet(
 		walletID: Int,
-		addresses: List<Pair<String, ChainType>>,
+		addresses: List<Bip44Address>,
 		password: String
 	) {
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount = addresses.size
 			override fun concurrentJobs() {
 				addresses.forEach { account ->
-					deleteAllLocalDataByAddress(account.first, account.second)
+					deleteAllLocalDataByAddress(account.address, account.getChainType())
 					completeMark()
 				}
 			}
@@ -193,9 +190,10 @@ class WalletSettingsListPresenter(
 		GoldStoneDataBase.database.tokenBalanceDao().deleteTokenBalanceByAddress(address)
 	}
 
-	private fun deleteWatchOnlyWallet(address: String, chainType: ChainType) {
+	private fun deleteWatchOnlyWallet() {
 		WalletTable.deleteCurrentWallet { wallet ->
-			deleteAllLocalDataByAddress(address, chainType)
+			val bip44Address = wallet!!.getCurrentBip44Addresses().firstOrNull() ?: Bip44Address()
+			deleteAllLocalDataByAddress(bip44Address.address, bip44Address.getChainType())
 			// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 			XinGePushReceiver.registerAddressesForPush(wallet, true)
 			GoldStoneAPI.context.runOnUiThread {

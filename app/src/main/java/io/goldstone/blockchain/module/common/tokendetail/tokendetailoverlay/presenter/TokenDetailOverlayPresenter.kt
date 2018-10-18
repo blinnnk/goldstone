@@ -49,7 +49,6 @@ class TokenDetailOverlayPresenter(
 
 	fun showEOSAccountSelectionFragment(token: WalletDetailCellModel?) {
 		fragment.apply {
-			headerTitle = EOSAccountText.accountNameSelection
 			addFragmentAndSetArgument<EOSAccountSelectionFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.tokenDetail, token)
 			}

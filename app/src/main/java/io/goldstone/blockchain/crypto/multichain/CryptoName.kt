@@ -35,6 +35,17 @@ object CryptoName {
 		}
 	}
 
+	fun getChainNameByContract(contract: TokenContract?): String {
+		return when  {
+			contract.isEOSSeries() -> eos
+			contract.isLTC() -> ltc
+			contract.isETC() -> etc
+			contract.isBCH() -> bch
+			contract.isBTC() -> btc
+			else -> eth
+		}
+	}
+
 	fun getBTCSeriesChainIDByName(name: String): ChainID? {
 		return listOf(
 			Pair(ltc, SharedChain.getLTCCurrent()),

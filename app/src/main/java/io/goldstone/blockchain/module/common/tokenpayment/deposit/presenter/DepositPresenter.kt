@@ -70,11 +70,11 @@ class DepositPresenter(
 					QRCode.generateBitcoinCashCode(address, amount)
 				}
 
-				token?.contract.isEOS() -> {
+				token?.contract.isEOSSeries() -> {
 					val accountName = SharedAddress.getCurrentEOSAccount().accountName
 					QRCode.generateEOSCode(
 						accountName,
-						EOSCodeName.EOSIO.value, // `EOS` 的 `Token` 要支持传递对应的 `Token Code`
+						if (token?.contract.isEOSToken()) token?.contract?.contract.orEmpty() else EOSCodeName.EOSIO.value,
 						amount,
 						token?.decimal.orZero(),
 						SharedChain.getEOSCurrent().id

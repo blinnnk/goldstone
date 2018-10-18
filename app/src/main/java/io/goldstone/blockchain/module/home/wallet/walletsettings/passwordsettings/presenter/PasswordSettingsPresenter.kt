@@ -21,7 +21,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.toast
@@ -86,14 +85,14 @@ class PasswordSettingsPresenter(
 							wallet.btcAddresses,
 							wallet.btcSeriesTestAddresses
 						).forEach { addresses ->
-							AddressManagerPresenter.convertToChildAddresses(addresses).forEach { pair ->
+							addresses.forEach { pair ->
 								updateKeystorePassword(
-									pair.first,
+									pair.address,
 									oldPassword,
 									password,
 									passwordHint,
 									// 不是合规的 `ETH` 地址就是 `BTC` 系列地址
-									!Address(pair.first).isValid()
+									!Address(pair.address).isValid()
 								) {
 									completeMark()
 								}

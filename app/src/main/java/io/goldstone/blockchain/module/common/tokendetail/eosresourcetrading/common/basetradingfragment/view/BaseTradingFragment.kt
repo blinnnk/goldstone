@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -56,6 +57,11 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 	private val incomeTradingCard by lazy {
 		TradingCardView(context!!).apply {
 			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
+			if (tradingType.isRAM()) {
+				amountEditTextChanged = Runnable {
+					showRAMAmount(getInputValue().second / SharedValue.getRAMUnitPrice())
+				}
+			}
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.gainConfirmEvent {
@@ -134,7 +140,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		}
 		val formattedPriceEOS = "≈ " + priceEOS.formatCount(4)
 		delegateTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
-		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $$unitDescription", Spectrum.blue)
+		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
 		incomeTradingCard.setProcessValue(title, weight, available, total, isTime)
 		expendTradingCard.setProcessValue(title, weight, available, total, isTime)
 	}

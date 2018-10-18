@@ -23,7 +23,9 @@ data class TokenSearchModel(
 	@SerializedName("type")
 	var type: Int = 0,
 	@SerializedName("weight")
-	var weight: Int = 0
+	var weight: Int = 0,
+	@SerializedName("chainid")
+	var chainID: String = ""
 ) {
 	constructor() : this(
 		"",

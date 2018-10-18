@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.radioButton
 
@@ -57,9 +58,12 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 	@SuppressLint("SetTextI18n")
 	fun setAccountInfo(name: String, authorization: String) {
 		info.title.text = "${ImportWalletText.eosAccountName}: $name"
-		val wholeString = "${EOSAccountText.authorization}: $authorization"
+		val permission =
+			if (authorization.equals(EOSActor.Owner.value, true)) EOSActor.Owner.value + "/" + EOSActor.Active.value
+			else authorization
+		val wholeString = "${EOSAccountText.authorization}: $permission"
 		info.subtitle.text = CustomTargetTextStyle(
-			authorization,
+			permission,
 			wholeString,
 			GrayScale.gray,
 			12.uiPX(),

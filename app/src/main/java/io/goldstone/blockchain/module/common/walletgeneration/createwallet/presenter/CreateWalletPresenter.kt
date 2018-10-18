@@ -35,7 +35,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.view.CreateWalletFragment
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
-import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -126,42 +125,22 @@ class CreateWalletPresenter(
 				WalletTable(
 					0,
 					name,
-					multiChainAddresses.eth,
-					multiChainAddresses.etc,
-					multiChainAddresses.btc,
-					multiChainAddresses.btcSeriesTest,
-					multiChainAddresses.ltc,
-					multiChainAddresses.bch,
-					multiChainAddresses.eos,
-					EOSDefaultAllChainName(multiChainAddresses.eos, multiChainAddresses.eos),
-					ethAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.eth,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
+					multiChainAddresses.eth.address,
+					multiChainAddresses.etc.address,
+					multiChainAddresses.btc.address,
+					multiChainAddresses.btcSeriesTest.address,
+					multiChainAddresses.ltc.address,
+					multiChainAddresses.bch.address,
+					multiChainAddresses.eos.address,
+					EOSDefaultAllChainName(multiChainAddresses.eos.address, multiChainAddresses.eos.address),
+					ethAddresses = listOf(multiChainAddresses.eth),
+					etcAddresses = listOf(multiChainAddresses.etc),
+					btcAddresses = listOf(multiChainAddresses.btc),
+					btcSeriesTestAddresses = listOf(multiChainAddresses.btcSeriesTest
 					),
-					etcAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.etc,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-					),
-					btcAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.btc,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-					),
-					btcSeriesTestAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.btcSeriesTest,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ethPath)
-					),
-					ltcAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.ltc,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.ltcPath)
-					),
-					bchAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.bch,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.bchPath)
-					),
-					eosAddresses = WalletImportPresenter.childAddressValue(
-						multiChainAddresses.eos,
-						WalletImportPresenter.getAddressIndexFromPath(DefaultPath.eosPath)
-					),
+					ltcAddresses = listOf(multiChainAddresses.ltc),
+					bchAddresses = listOf(multiChainAddresses.bch),
+					eosAddresses = listOf(multiChainAddresses.eos),
 					eosAccountNames = listOf(),
 					ethPath = DefaultPath.ethPath,
 					btcPath = DefaultPath.btcPath,
@@ -298,47 +277,47 @@ class CreateWalletPresenter(
 							ChainID.kovan,
 							ChainID.rinkeby -> {
 								if (currentAddresses.eth.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.eth).insert()
+									MyTokenTable(defaults, currentAddresses.eth.address).insert()
 								}
 							}
 
 							ChainID.etcMain, ChainID.etcTest -> {
 								if (currentAddresses.etc.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.etc).insert()
+									MyTokenTable(defaults, currentAddresses.etc.address).insert()
 								}
 							}
 
 							ChainID.eosMain, ChainID.eosTest -> {
 								if (currentAddresses.eos.isNotEmpty()) {
-									if (EOSWalletUtils.isValidAddress(currentAddresses.eos)) {
-										MyTokenTable(defaults, currentAddresses.eos).insert()
-									} else if (EOSAccount(currentAddresses.eos).isValid()) {
+									if (EOSWalletUtils.isValidAddress(currentAddresses.eos.address)) {
+										MyTokenTable(defaults, currentAddresses.eos.address).insert()
+									} else if (EOSAccount(currentAddresses.eos.address).isValid(false)) {
 										// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
-										MyTokenTable(defaults, currentAddresses.eos, "").insert()
+										MyTokenTable(defaults, currentAddresses.eos.address, currentAddresses.eos.address).insert()
 									}
 								}
 							}
 
 							ChainID.btcMain -> {
 								if (currentAddresses.btc.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.btc).insert()
+									MyTokenTable(defaults, currentAddresses.btc.address).insert()
 								}
 							}
 
 							ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
 								if (currentAddresses.btcSeriesTest.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.btcSeriesTest).insert()
+									MyTokenTable(defaults, currentAddresses.btcSeriesTest.address).insert()
 								}
 							}
 							ChainID.ltcMain -> {
 								if (currentAddresses.ltc.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.ltc).insert()
+									MyTokenTable(defaults, currentAddresses.ltc.address).insert()
 								}
 							}
 
 							ChainID.bchMain -> {
 								if (currentAddresses.bch.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.bch).insert()
+									MyTokenTable(defaults, currentAddresses.bch.address).insert()
 								}
 							}
 						}

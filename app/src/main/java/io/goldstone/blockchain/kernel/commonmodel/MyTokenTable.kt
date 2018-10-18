@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Current
@@ -151,43 +152,26 @@ data class MyTokenTable(
 			}
 		}
 
-		fun deleteByContract(
-			contract: TokenContract,
-			address: String,
-			callback: () -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(address, contract.contract.orEmpty())
-			} then { callback() }
-		}
-
-		fun insertBySymbolAndContract(
-			symbol: String,
-			contract: TokenContract,
-			@UiThread callback: () -> Unit
-		) {
-			doAsync {
-				val currentAddress = CoinSymbol(symbol).getAddress()
-				// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-				if (
-					GoldStoneDataBase.database.myTokenDao()
-						.getTokenByContractAndAddress(currentAddress, currentAddress, contract.getMainnetChainID()).isNull()
-				) {
-					MyTokenTable(
-						0,
-						currentAddress,
-						currentAddress,
-						symbol,
-						0.0,
-						contract.contract.orEmpty(),
-						contract.getCurrentChainID().id
-					).insert()
-					// 没有网络不用检查间隔直接插入数据库
-					GoldStoneAPI.context.runOnUiThread {
-						callback()
-					}
-				}
+		@WorkerThread
+		fun addNew(symbol: String, contract: TokenContract, chainID: String) {
+			val currentAddress = contract.getAddress(false)
+			val accountName =
+				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
+			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
+			if (GoldStoneDataBase.database.myTokenDao().getTokenByContractAndAddress(
+					contract.contract.orEmpty(),
+					currentAddress,
+					chainID
+				).isNull()) {
+				MyTokenTable(
+					0,
+					accountName,
+					currentAddress,
+					symbol,
+					0.0,
+					contract.contract.orEmpty(),
+					chainID
+				).insert()
 			}
 		}
 
@@ -230,14 +214,21 @@ data class MyTokenTable(
 						hold(balance, error)
 					}
 
+				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
+				// 网络请求在这额外校验一次.
 				contract.isEOS() -> {
-					// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
-					// 网络请求在这额外校验一次.
-					if (SharedAddress.getCurrentEOSAccount().isValid()) {
-						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), { hold(null, it) }) {
-							hold(it, RequestError.None)
-						}
+					if (SharedAddress.getCurrentEOSAccount().isValid(false)) {
+						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), hold)
 					} else hold(null, RequestError.None)
+				}
+
+				contract.isEOSToken() -> {
+					EOSAPI.getAccountBalanceBySymbol(
+						SharedAddress.getCurrentEOSAccount(),
+						CoinSymbol(contract.symbol),
+						contract.contract.orEmpty(),
+						hold
+					)
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
@@ -265,10 +256,10 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND ownerName LIKE :ownerName AND chainID Like :chainID ")
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, ownerName: String, chainID: String): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE (ownerName IN (:addresses) OR ownerAddress IN (:addresses))  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
+	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
 	fun getTokensByAddress(addresses: List<String>, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
@@ -296,8 +287,8 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerName = :name AND chainID = :chainID")
 	fun getByOwnerName(name: String, chainID: String): MyTokenTable?
 
-	@Query("DELETE FROM myTokens  WHERE ownerAddress LIKE :address AND contract LIKE :contract")
-	fun deleteByContractAndAddress(address: String, contract: String)
+	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract")
+	fun deleteByContractAndAddress(contract: String, address: String)
 
 	@Insert
 	fun insert(token: MyTokenTable)

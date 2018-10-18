@@ -5,7 +5,6 @@ import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.TokenManagementText
-import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -20,15 +19,20 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 
 	override val pageTitle: String = "Token Search"
 	override val presenter = TokenSearchPresenter(this)
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView, asyncData: ArrayList<DefaultTokenTable>?
 	) {
-		recyclerView.adapter = TokenSearchAdapter(asyncData.orEmptyArray()) { cell ->
-			cell.switch.onClick { presenter.setMyTokenStatus(cell) }
+		recyclerView.adapter = TokenSearchAdapter(asyncData.orEmptyArray()) { default, switch ->
+			switch.onClick {
+				switch.isClickable = false
+				presenter.setMyTokenStatus(default, switch.isChecked) {
+					switch.isClickable = true
+				}
+			}
 		}
 	}
-	
+
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenManagementFragment> {
 			headerTitle = TokenManagementText.addToken

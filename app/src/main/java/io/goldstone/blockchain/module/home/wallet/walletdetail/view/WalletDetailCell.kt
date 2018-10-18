@@ -18,8 +18,11 @@ import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.crypto.multichain.isEOSSeries
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -51,10 +54,13 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 				}
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(tokenName)
-			if (symbol.equals(CoinSymbol.eos, true) && eosWalletType != EOSWalletType.Available) {
-				if (eosWalletType == EOSWalletType.Inactivated) showStatusButton(BasicRadiusButton.Companion.Style.Pending)
-				else if (eosWalletType == EOSWalletType.NoDefault) showStatusButton(BasicRadiusButton.Companion.Style.ToBeSet)
+			// 部分 `Token` 没有 `Name` 这里就直接显示 `Symbol`
+			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(tokenName isEmptyThen symbol)
+			if (contract.isEOSSeries() && eosWalletType != EOSWalletType.Available) {
+				if (eosWalletType == EOSWalletType.Inactivated)
+					showStatusButton(BasicRadiusButton.Companion.Style.Pending)
+				else if (eosWalletType == EOSWalletType.NoDefault)
+					showStatusButton(BasicRadiusButton.Companion.Style.ToBeSet)
 			} else {
 				clearStatusButton()
 				valueInfo.title.text = count.formatCount()

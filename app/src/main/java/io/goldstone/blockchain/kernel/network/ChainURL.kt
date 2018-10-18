@@ -109,7 +109,7 @@ object ChainURL {
 	private val infuraKovan = "https://kovan.infura.io/${infuraKey()}"
 	private val infuraRinkeby = "https://rinkeby.infura.io/${infuraKey()}"
 
-	/** Transaction Html View */
+	/** Transaction Third-Party Html View */
 	// BCH
 	private const val bchMainnetWeb = "https://www.blocktrail.com/BCC"
 	private const val bchTestnetWeb = "https://www.blocktrail.com/tBCC"

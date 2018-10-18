@@ -31,7 +31,7 @@ object WalletSettingsText {
 	@JvmField
 	val testAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Test Address"
-		HoneyLanguage.Chinese.code -> "包含测试链地址"
+		HoneyLanguage.Chinese.code -> "测试链地址"
 		HoneyLanguage.Japanese.code -> "テストチェーンアドレス"
 		HoneyLanguage.Korean.code -> "테스트 체인 주소"
 		HoneyLanguage.Russian.code -> "Адрес тестовой цепи"

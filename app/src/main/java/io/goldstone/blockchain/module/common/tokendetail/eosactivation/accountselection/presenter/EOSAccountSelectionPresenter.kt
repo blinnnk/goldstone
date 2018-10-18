@@ -1,13 +1,13 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.presenter
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -86,7 +86,11 @@ class EOSAccountSelectionPresenter(
 					}
 				if (notInLocalAccount.isEmpty()) {
 					fragment.context?.runOnUiThread {
-						fragment.setAccountNameList(actors)
+						val willRemoveData = actors - actors.distinctBy { it.name }
+						val finalData = actors.filterNot { data ->
+							willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
+						}
+						fragment.setAccountNameList(finalData)
 						fragment.showLoadingView(false)
 					}
 				} else object : ConcurrentAsyncCombine() {
@@ -95,22 +99,25 @@ class EOSAccountSelectionPresenter(
 						notInLocalAccount.forEach { account ->
 							// 本地为空的话从网络获取数据
 							EOSAPI.getAccountInfo(
-								EOSAccount(account.name),
-								{
-									completeMark()
-									LogUtil.error("getAccountInfo", it)
+								EOSAccount(account.name)
+							) { eosAccount, error ->
+								if (!eosAccount.isNull() && error.isNone()) {
+									actors.addAll(getAccountActorByPublicKey(eosAccount!!, account.name))
+									// 插入数据库
+									EOSAccountTable.preventDuplicateInsert(eosAccount)
 								}
-							) { eosAccount ->
-								actors.addAll(getAccountActorByPublicKey(eosAccount, account.name))
-								// 插入数据库
-								EOSAccountTable.preventDuplicateInsert(eosAccount)
 								completeMark()
 							}
 						}
 					}
 
 					override fun mergeCallBack() {
-						fragment.setAccountNameList(actors)
+						// `Owner` 和 `Active` 同时存在的时候界面做去重显示
+						val willRemoveData = actors - actors.distinctBy { it.name }
+						val finalData = actors.filterNot { data ->
+							willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
+						}
+						fragment.setAccountNameList(finalData)
 						fragment.showLoadingView(false)
 					}
 				}.start()

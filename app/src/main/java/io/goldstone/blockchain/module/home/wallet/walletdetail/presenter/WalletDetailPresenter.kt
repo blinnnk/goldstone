@@ -52,6 +52,11 @@ class WalletDetailPresenter(
 	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
 	private var detailModels: List<WalletDetailCellModel>? = null
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -67,8 +72,10 @@ class WalletDetailPresenter(
 			// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
 			if (!lockGettingChainModelsThread) {
 				// 再检查链上的最新价格和数量
-				fragment.removeMiniLoadingView()
+				lockGettingChainModelsThread = true
 				models.getChainModels { chainModels, error ->
+					fragment.removeMiniLoadingView()
+					lockGettingChainModelsThread = false
 					// 更新内存的数据
 					detailModels = chainModels
 					updateUIByData(chainModels)
@@ -161,29 +168,22 @@ class WalletDetailPresenter(
 						hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
 					}
 				}
-
 			}
 		}
 	}
 
-	private fun List<WalletDetailCellModel>.getChainModels(
-		hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit
-	) {
+	private fun List<WalletDetailCellModel>.getChainModels(hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
 		else {
-			lockGettingChainModelsThread = true
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {
 					forEach { model ->
 						// 链上查余额
 						val ownerName = model.contract.getAddress(true)
-						MyTokenTable.getBalanceByContract(
-							model.contract,
-							ownerName
-						) { balance, error ->
+						MyTokenTable.getBalanceByContract(model.contract, ownerName) { balance, error ->
 							// 更新数据的余额信息
 							if (!balance.isNull() && error.isNone()) {
 								MyTokenTable.updateBalanceByContract(

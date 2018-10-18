@@ -26,6 +26,7 @@ class ChainID(val id: String) : Serializable {
 	fun isLTCTest(): Boolean = ltcTest.equals(id, true)
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
+	fun isEOS(): Boolean = isEOSMain() || isEOSTest()
 
 	fun isCurrent(): Boolean {
 		return when (id) {

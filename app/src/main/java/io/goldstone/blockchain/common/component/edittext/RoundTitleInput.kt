@@ -2,7 +2,9 @@ package io.goldstone.blockchain.common.component.edittext
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.widget.EditText
@@ -28,6 +30,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @date  2018/09/19
  */
 class RoundTitleInput(context: Context) : RelativeLayout(context) {
+
+	var onTextChanged: Runnable? = null
+
 	private val editText = EditText(context)
 	private val titleView = TextView(context)
 	private val viewHeight = 46.uiPX()
@@ -74,6 +79,14 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 		button.into(this)
 		button.setAlignParentRight()
 		button.setCenterInVertical()
+		editText.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(s: Editable?) {
+				onTextChanged?.run()
+			}
+			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+		})
 	}
 
 	fun setTitle(text: String) {

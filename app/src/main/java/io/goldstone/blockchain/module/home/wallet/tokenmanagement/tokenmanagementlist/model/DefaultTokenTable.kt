@@ -98,7 +98,7 @@ data class DefaultTokenTable(
 		"",
 		isDefault,
 		data.weight,
-		SharedChain.getCurrentETH().id
+		data.chainID
 	)
 
 	constructor(
@@ -176,6 +176,22 @@ data class DefaultTokenTable(
 			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
 			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
+	}
+
+	fun updateDefaultStatus(
+		contract: TokenContract,
+		isDefault: Boolean,
+		name: String,
+		callback: () -> Unit
+	) {
+		load {
+			GoldStoneDataBase.database.defaultTokenDao().update(apply {
+				this.isDefault = isDefault
+				this.name = name
+				this.contract = contract.contract.orEmpty()
+				this.chainID = contract.getCurrentChainID().id
+			})
+		} then { callback() }
 	}
 
 	fun updateTokenNameFromChain() {
@@ -277,13 +293,6 @@ data class DefaultTokenTable(
 					.updateTokenName(name, contract.contract.orEmpty(), contract.getCurrentChainID().id)
 			}
 		}
-
-		fun updateTokenDefaultStatus(contract: TokenContract, isDefault: Boolean, name: String, callback: () -> Unit) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenDefaultStatusAndName(isDefault, name, contract.contract.orEmpty(), contract.getCurrentChainID().id)
-			} then { callback() }
-		}
 	}
 }
 
@@ -298,9 +307,6 @@ interface DefaultTokenDao {
 
 	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID")
 	fun updateTokenName(newName: String, contract: String, chainID: String)
-
-	@Query("UPDATE defaultTokens SET name = :newName, isDefault = :isDefault WHERE contract LIKE :contract AND chainID LIKE :chainID")
-	fun updateTokenDefaultStatusAndName(isDefault: Boolean, newName: String, contract: String, chainID: String)
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID IN (:currentChainIDs)")
 	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chainIDs()): List<DefaultTokenTable>

@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -35,6 +36,7 @@ class ChainType(val id: Int) : Serializable {
 			ChainType.ETH.id -> CoinSymbol.ETH
 			ChainType.ETC.id -> CoinSymbol.ETC
 			ChainType.BTC.id -> CoinSymbol.BTC
+			ChainType.AllTest.id -> CoinSymbol.BTC
 			ChainType.LTC.id -> CoinSymbol.LTC
 			ChainType.BCH.id -> CoinSymbol.BCH
 			ChainType.EOS.id -> CoinSymbol.EOS
@@ -93,7 +95,7 @@ class ChainType(val id: Int) : Serializable {
 
 	// 与 `WalletTable` 有关联的非纯粹但是便捷的方法
 	fun updateCurrentAddress(
-		newAddress: String,
+		newAddress: Bip44Address,
 		newEOSAccountName: String,
 		@UiThread callback: (wallet: WalletTable) -> Unit
 	) {
@@ -102,33 +104,33 @@ class ChainType(val id: Int) : Serializable {
 			val currentWallet = walletDao.findWhichIsUsing(true)
 			when (id) {
 				ChainType.ETH.id -> {
-					SharedAddress.updateCurrentEthereum(newAddress)
-					currentWallet?.currentETHSeriesAddress = newAddress
+					SharedAddress.updateCurrentEthereum(newAddress.address)
+					currentWallet?.currentETHSeriesAddress = newAddress.address
 				}
 				ChainType.ETC.id -> {
-					currentWallet?.currentETCAddress = newAddress
-					SharedAddress.updateCurrentETC(newAddress)
+					currentWallet?.currentETCAddress = newAddress.address
+					SharedAddress.updateCurrentETC(newAddress.address)
 				}
 				ChainType.LTC.id -> {
-					currentWallet?.currentLTCAddress = newAddress
-					SharedAddress.updateCurrentLTC(newAddress)
+					currentWallet?.currentLTCAddress = newAddress.address
+					SharedAddress.updateCurrentLTC(newAddress.address)
 				}
 				ChainType.BCH.id -> {
-					currentWallet?.currentBCHAddress = newAddress
-					SharedAddress.updateCurrentBCH(newAddress)
+					currentWallet?.currentBCHAddress = newAddress.address
+					SharedAddress.updateCurrentBCH(newAddress.address)
 				}
 				ChainType.EOS.id -> {
-					currentWallet?.currentEOSAddress = newAddress
+					currentWallet?.currentEOSAddress = newAddress.address
 					currentWallet?.currentEOSAccountName?.updateCurrent(newEOSAccountName)
-					SharedAddress.updateCurrentEOS(newAddress)
+					SharedAddress.updateCurrentEOS(newAddress.address)
 					SharedAddress.updateCurrentEOSName(newEOSAccountName)
 				}
 				ChainType.BTC.id -> if (SharedValue.isTestEnvironment()) {
-					currentWallet?.currentBTCSeriesTestAddress = newAddress
-					SharedAddress.updateCurrentBTCSeriesTest(newAddress)
+					currentWallet?.currentBTCSeriesTestAddress = newAddress.address
+					SharedAddress.updateCurrentBTCSeriesTest(newAddress.address)
 				} else {
-					currentWallet?.currentBTCAddress = newAddress
-					SharedAddress.updateCurrentBTC(newAddress)
+					currentWallet?.currentBTCAddress = newAddress.address
+					SharedAddress.updateCurrentBTC(newAddress.address)
 				}
 			}
 			currentWallet?.apply {
@@ -155,22 +157,14 @@ class ChainType(val id: Int) : Serializable {
 		val ETH = ChainType(60)
 		@JvmStatic
 		val ETC = ChainType(61)
-		@JvmStatic
-		val ERC = ChainType(100)
 
 		// 比特的 `Bip44` 的比特币测试地址的  `CoinType` 为 `1`
 		val isBTCTest: (chainType: Int) -> Boolean = {
 			it == ChainType.AllTest.id
 		}
 
-		private fun getAllBTCSeriesType(): List<ChainType> =
-			listOf(ChainType.LTC, ChainType.AllTest, ChainType.BTC, ChainType.BCH)
-
-		fun isBTCSeriesChainType(type: ChainType): Boolean =
-			getAllBTCSeriesType().any { it == type }
-
-		fun isSamePrivateKeyRule(id: ChainType): Boolean =
-			listOf(ChainType.BCH, ChainType.BTC, ChainType.AllTest).any { it == id }
+		fun isSamePrivateKeyRule(type: ChainType): Boolean =
+			listOf(ChainType.BCH, ChainType.BTC, ChainType.AllTest).any { it.id == type.id }
 
 		fun getChainTypeBySymbol(symbol: String?): ChainType = when (symbol) {
 			CoinSymbol.btc() -> ChainType.BTC

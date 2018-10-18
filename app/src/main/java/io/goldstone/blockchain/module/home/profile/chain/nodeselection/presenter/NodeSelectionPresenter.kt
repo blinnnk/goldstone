@@ -58,7 +58,6 @@ class NodeSelectionPresenter(
 	fun getCurrentChainName(isMainnet: Boolean, type: ChainType): String {
 		return if (isMainnet) ChainType(type.id).getMainnetChainName()
 		else ChainType(type.id).getTestnetChainName()
-
 	}
 
 	private fun checkIsEncryptERCNode(nodeName: String): Boolean {
@@ -85,9 +84,7 @@ class NodeSelectionPresenter(
 						SharedChain.updateETCCurrent(ChainID.etcTest)
 						SharedChain.updateEOSCurrent(ChainID.eosTest)
 						SharedChain.updateCurrentETH(
-							ChainID.getChainIDByName(
-								ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID)
-							)
+							ChainID.getChainIDByName(ChainNameID.getChainNameByID(currentETHSeriesTestChainNameID))
 						)
 						SharedChain.updateETCCurrentName(
 							ChainNameID.getChainNameByID(currentETCTestChainNameID)

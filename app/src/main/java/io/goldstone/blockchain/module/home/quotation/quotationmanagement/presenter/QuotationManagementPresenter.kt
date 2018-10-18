@@ -26,6 +26,11 @@ class QuotationManagementPresenter(
 		updateSelectionsData()
 	}
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
@@ -49,7 +54,7 @@ class QuotationManagementPresenter(
 		checkAndUpdateQuotationData()
 	}
 
-	private fun checkAndUpdateQuotationData() {
+	fun checkAndUpdateQuotationData() {
 		doAsync {
 			fragment.asyncData?.filter { !it.isSelecting }?.let {
 				GoldStoneDataBase.database.quotationSelectionDao().deleteAll(it)
@@ -78,10 +83,5 @@ class QuotationManagementPresenter(
 				}?.orderID = newOrderID
 			}
 		}
-	}
-
-	// 更新数据
-	override fun onFragmentShowFromHidden() {
-		updateSelectionsData()
 	}
 }

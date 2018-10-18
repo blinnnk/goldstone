@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoViewInterface
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
@@ -93,7 +94,7 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInter
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		presenter.showTransactionInfo {
+		if (NetworkUtil.hasNetwork(context)) presenter.showTransactionInfo {
 			if (!it.isNone()) context.alert(it.message)
 		}
 		showBalance()

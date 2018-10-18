@@ -75,8 +75,10 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						onClick { _ ->
 							showLoadingStatus()
 							presenter.confirmTransfer {
-								if (it is AccountError) setCanUseStyle(false)
-								else if (!it.isNone()) this@GasSelectionFragment.context.alert(it.message)
+								if (!it.isNone()) {
+									if (it is AccountError) setCanUseStyle(false)
+									this@GasSelectionFragment.context.alert(it.message)
+								}
 								resetMinerType()
 								showLoadingStatus(false, Spectrum.white, CommonText.next)
 							}

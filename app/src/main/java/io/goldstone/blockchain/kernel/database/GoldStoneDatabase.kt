@@ -5,14 +5,12 @@ import android.content.Context
 import io.goldstone.blockchain.kernel.commonmodel.*
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionIDDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceDao
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfoConverter
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainNameConverter
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletDao
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
@@ -59,7 +57,8 @@ import java.math.BigInteger
 	EOSAccountInfoConverter::class,
 	EOSDefaultAllChainNameConverter::class,
 	EOSTransactionDataConverter::class,
-	BigintegerConverter::class
+	BigintegerConverter::class,
+	ListBip44AddressConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao
@@ -76,6 +75,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun eosTransactionDao(): EOSTransactionDao
 	abstract fun eosAccountDao(): EOSAccountDao
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
+	abstract fun eosTransactionIDDao(): EOSTransactionIDDao
 
 	companion object {
 		const val databaseVersion = 6

@@ -110,7 +110,7 @@ object ErrorText {
 	val invalidAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid eos account name"
 		HoneyLanguage.Chinese.code -> "无效的eos帐户名称"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "無効なeosアカウント名"
 		HoneyLanguage.Korean.code -> "잘못된 eos 계정 이름"
 		HoneyLanguage.Russian.code -> "Недопустимое имя учетной записи eos"
 		HoneyLanguage.TraditionalChinese.code -> "無效的eos帳戶名稱"
@@ -121,7 +121,7 @@ object ErrorText {
 	val emptyName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter the account name which you decide to register"
 		HoneyLanguage.Chinese.code -> "请输入您决定注册的帐户名称"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "登録することを決めたアカウントの名前を入力してください"
 		HoneyLanguage.Korean.code -> "등록하기로 결정한 계정 이름을 입력하십시오."
 		HoneyLanguage.Russian.code -> "Введите имя учетной записи, которую вы решили зарегистрировать"
 		HoneyLanguage.TraditionalChinese.code -> "請輸入您決定註冊的帳戶名稱"
@@ -132,7 +132,7 @@ object ErrorText {
 	val emptyRepeatPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Repeat Password Is Empty Now"
 		HoneyLanguage.Chinese.code -> "请填写重复密码"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "重複したパスワードを入力してください"
 		HoneyLanguage.Korean.code -> "반복 암호가 비어 있습니다."
 		HoneyLanguage.Russian.code -> "Повторить пароль сейчас пуст"
 		HoneyLanguage.TraditionalChinese.code -> "請填寫重複密碼"
@@ -143,7 +143,7 @@ object ErrorText {
 	val differentRepeatPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The password entered twice is inconsistent"
 		HoneyLanguage.Chinese.code -> "输入两次的密码不一致"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "矛盾したパスワードを2度入力してください"
 		HoneyLanguage.Korean.code -> "두 번 입력 한 암호가 일치하지 않습니다."
 		HoneyLanguage.Russian.code -> "Пароль, введенный дважды, является непоследовательным"
 		HoneyLanguage.TraditionalChinese.code -> "輸入兩次的密碼不一致"
@@ -154,7 +154,7 @@ object ErrorText {
 	val agreeTerms = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please read and agree to the terms"
 		HoneyLanguage.Chinese.code -> "请阅读并同意这些条款"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "ユーザー規約を読み、同意してください"
 		HoneyLanguage.Korean.code -> "약관을 읽고 동의하십시오."
 		HoneyLanguage.Russian.code -> "Прочтите и согласитесь с условиями"
 		HoneyLanguage.TraditionalChinese.code -> "請閱讀並同意這些條款"
@@ -165,7 +165,7 @@ object ErrorText {
 	val invalidMnemonic = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect mnemonic format"
 		HoneyLanguage.Chinese.code -> "助记符格式不正确"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "ニーモニック形式が正しくありません"
 		HoneyLanguage.Korean.code -> "잘못된 니모닉 형식"
 		HoneyLanguage.Russian.code -> "Недействительный мнемонический формат"
 		HoneyLanguage.TraditionalChinese.code -> "助記符格式不正確"
@@ -176,7 +176,7 @@ object ErrorText {
 	val invalidBip44Path = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect Bip44 Path"
 		HoneyLanguage.Chinese.code -> "Bip44路径不正确"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "Bip44のパスが正しくありません"
 		HoneyLanguage.Korean.code -> "잘못된 Bip44 경로"
 		HoneyLanguage.Russian.code -> "Неправильный путь Bip43"
 		HoneyLanguage.TraditionalChinese.code -> "Bip44路徑不正確"
@@ -187,7 +187,7 @@ object ErrorText {
 	val emptyPublicKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter the public key which you decide to bind the account name"
 		HoneyLanguage.Chinese.code -> "请输入您决定绑定帐户名称的公钥"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "アカウント名をバインドすることを決定した公開鍵を入力してください。"
 		HoneyLanguage.Korean.code -> "계정 이름을 바인드하기로 결정한 공개 키를 입력하십시오."
 		HoneyLanguage.Russian.code -> "Введите открытый ключ, который вы решите связать имя учетной записи"
 		HoneyLanguage.TraditionalChinese.code -> "請輸入您決定綁定帳戶名稱的公鑰"
@@ -198,7 +198,7 @@ object ErrorText {
 	val wrongPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wrong Password"
 		HoneyLanguage.Chinese.code -> "密码错误"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "間違ったパスワード"
 		HoneyLanguage.Korean.code -> "잘못된 비밀번호"
 		HoneyLanguage.Russian.code -> "Неправильный пароль"
 		HoneyLanguage.TraditionalChinese.code -> "密碼錯誤"
@@ -209,7 +209,7 @@ object ErrorText {
 	val invalidAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Address Formatted is Invalid"
 		HoneyLanguage.Chinese.code -> "地址格式无效"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "無効なアドレス形式"
 		HoneyLanguage.Korean.code -> "서식이 지정된 주소가 잘못되었습니다."
 		HoneyLanguage.Russian.code -> "Неверный формат адреса"
 		HoneyLanguage.TraditionalChinese.code -> "地址格式無效"
@@ -220,7 +220,7 @@ object ErrorText {
 	val existAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This Address Has Existed In Your Wallet"
 		HoneyLanguage.Chinese.code -> "此地址已存在于您的钱包中"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "このアドレスは既にあなたのウォレットにあります"
 		HoneyLanguage.Korean.code -> "이 주소는 월렛에 존재합니다."
 		HoneyLanguage.Russian.code -> "Этот адрес существует в вашем кошельке"
 		HoneyLanguage.TraditionalChinese.code -> "此地址已存在於您的錢包中"
@@ -231,7 +231,7 @@ object ErrorText {
 	val invalidPrivateKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid Private Key"
 		HoneyLanguage.Chinese.code -> "私钥无效"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "秘密鍵が無効です"
 		HoneyLanguage.Korean.code -> "잘못된 개인 키"
 		HoneyLanguage.Russian.code -> "Недопустимый закрытый ключ"
 		HoneyLanguage.TraditionalChinese.code -> "私鑰無效"
@@ -242,7 +242,7 @@ object ErrorText {
 	val passwordFormatted = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Password Formatted is Wrong "
 		HoneyLanguage.Chinese.code -> "密码格式错误"
-		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Japanese.code -> "間違ったパスワード形式"
 		HoneyLanguage.Korean.code -> "암호가 잘못되었습니다."
 		HoneyLanguage.Russian.code -> "Неверный формат пароля"
 		HoneyLanguage.TraditionalChinese.code -> "Неверный формат пароля"
@@ -308,6 +308,17 @@ object ErrorText {
 		HoneyLanguage.Korean.code -> "틀렸어"
 		HoneyLanguage.Russian.code -> "Ошибка"
 		HoneyLanguage.TraditionalChinese.code -> "錯誤"
+		else -> ""
+	}
+
+	@JvmField
+	val eosNameResultUnavailable = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The account name has already been registered by someone else"
+		HoneyLanguage.Chinese.code -> "该用户名已经被别人注册"
+		HoneyLanguage.Japanese.code -> "ユーザー名は既に他のユーザーによって登録されています"
+		HoneyLanguage.Korean.code -> "이미 다른 사용자가 사용자 이름을 등록했습니다."
+		HoneyLanguage.Russian.code -> "Имя пользователя уже зарегистрировано кем-то другим."
+		HoneyLanguage.TraditionalChinese.code -> "該用戶名已經被別人註冊`"
 		else -> ""
 	}
 }
