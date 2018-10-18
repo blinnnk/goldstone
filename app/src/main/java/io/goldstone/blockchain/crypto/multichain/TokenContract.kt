@@ -1,11 +1,11 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import java.io.Serializable
 
 
@@ -67,10 +67,6 @@ fun TokenContract?.isEOSSeries(): Boolean {
 	return isEOS() || isEOSToken()
 }
 
-fun TokenContract?.isEOSCode(): Boolean {
-	return this?.contract.equals(EOSCodeName.EOSIO.value, true)
-}
-
 fun TokenContract?.isETH(): Boolean {
 	return this?.contract.equals(TokenContract.ethContract, true)
 }
@@ -97,7 +93,7 @@ fun TokenContract?.isERC20Token(): Boolean {
 }
 
 fun TokenContract?.isEOSToken(): Boolean {
-	return (!isEOS() && !isETC() && !isBCH() && !isLTC() && !isETH() && !isBTC() && this?.contract?.length != CryptoValue.contractAddressLength)
+	return !isEOS() && !isETC() && !isBCH() && !isLTC() && !isETH() && !isBTC() && this?.contract?.length != CryptoValue.contractAddressLength && this?.contract?.length.orZero() > 0
 }
 
 fun TokenContract?.isBTCSeries(): Boolean {
