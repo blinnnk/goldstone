@@ -73,11 +73,11 @@ data class MyTokenTable(
 		data.chainID
 	)
 
-	fun insert() {
+	fun preventDuplicateInsert() {
 		doAsync {
 			// 防止重复添加
 			GoldStoneDataBase.database.myTokenDao().apply {
-				if (getTokenByContractAndAddress(contract, ownerAddress, chainID).isNull()) {
+				if (getTokenByContractAndAddress(contract, ownerName, chainID).isNull()) {
 					insert(this@MyTokenTable)
 				}
 			}
@@ -158,21 +158,15 @@ data class MyTokenTable(
 			val accountName =
 				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
 			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-			if (GoldStoneDataBase.database.myTokenDao().getTokenByContractAndAddress(
-					contract.contract.orEmpty(),
-					currentAddress,
-					chainID
-				).isNull()) {
-				MyTokenTable(
-					0,
-					accountName,
-					currentAddress,
-					symbol,
-					0.0,
-					contract.contract.orEmpty(),
-					chainID
-				).insert()
-			}
+			MyTokenTable(
+				0,
+				accountName,
+				currentAddress,
+				symbol,
+				0.0,
+				contract.contract.orEmpty(),
+				chainID
+			).preventDuplicateInsert()
 		}
 
 		fun getBalanceByContract(

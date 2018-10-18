@@ -261,7 +261,7 @@ class MarketTokenDetailPresenter(
 					try {
 						resetData(
 							dateType,
-							data.asSequence().sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
+							data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
 								CandleEntry(
 									index.toFloat(),
 									entry.high.toFloat(),
