@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.error.PasswordError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.showAlertView
@@ -111,8 +112,8 @@ class PaymentPreparePresenter(
 			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			context?.showAlertView(
-				"Transfer EOS Token",
-				"prepare to transfer eos token, now you should enter your password",
+				TransactionText.confirmTransactionTitle.toUpperCase(),
+				TransactionText.confirmTransaction,
 				true,
 				{
 					// User click cancel button

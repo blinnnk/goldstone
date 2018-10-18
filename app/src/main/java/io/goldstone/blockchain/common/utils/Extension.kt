@@ -16,6 +16,7 @@ import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSCPUUnit

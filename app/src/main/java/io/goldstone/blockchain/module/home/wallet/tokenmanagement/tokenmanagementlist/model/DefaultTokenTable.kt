@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toArrayList
-import com.blinnnk.extension.toIntOrZero
+import android.support.annotation.WorkerThread
+import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -154,7 +152,9 @@ data class DefaultTokenTable(
 	constructor(
 		contract: String,
 		symbol: String,
-		decimals: Int
+		decimals: Int,
+		chainID: ChainID,
+		isDefault: Boolean = true
 	) : this(
 		0,
 		"",
@@ -166,15 +166,24 @@ data class DefaultTokenTable(
 		"",
 		decimals,
 		"",
-		false,
+		isDefault,
 		0,
-		TokenContract(contract).getCurrentChainID().id
+		chainID.id
 	)
 
 	infix fun insertThen(callback: () -> Unit) {
 		doAsync {
 			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
 			GoldStoneAPI.context.runOnUiThread { callback() }
+		}
+	}
+
+	@WorkerThread
+	fun preventDuplicateInsert() {
+		GoldStoneDataBase.database.defaultTokenDao().apply {
+			if (getTargetEOSToken(contract, symbol, chainID).isNull()) {
+				insert(this@DefaultTokenTable)
+			}
 		}
 	}
 
@@ -234,7 +243,7 @@ data class DefaultTokenTable(
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.getTokenByContractFromAllChains(contract)
-			} then { hold(it?.firstOrNull()) }
+			} then { hold(it.firstOrNull()) }
 		}
 
 		fun getCurrentChainToken(
@@ -254,7 +263,7 @@ data class DefaultTokenTable(
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
 					.apply {
-						getTokenByContractFromAllChains(data.contract.contract.orEmpty())?.let { targetTokens ->
+						getTokenByContractFromAllChains(data.contract.contract.orEmpty()).let { targetTokens ->
 							if (targetTokens.isEmpty()) {
 								insert(DefaultTokenTable(data))
 								callback()
@@ -283,7 +292,7 @@ data class DefaultTokenTable(
 		fun updateTokenPrice(contract: TokenContract, newPrice: Double, callback: () -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenPrice(newPrice, contract.contract.orEmpty(), contract.getCurrentChainID().id)
+					.updateTokenPrice(newPrice, contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			} then { callback() }
 		}
 
@@ -302,8 +311,8 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
 
-	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND chainID LIKE :chainID")
-	fun updateTokenPrice(newPrice: Double, contract: String, chainID: String)
+	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
+	fun updateTokenPrice(newPrice: Double, contract: String, symbol: String, chainID: String)
 
 	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID")
 	fun updateTokenName(newName: String, contract: String, chainID: String)
@@ -318,7 +327,10 @@ interface DefaultTokenDao {
 	fun getTokenByContract(contract: String, chainID: String): DefaultTokenTable?
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
-	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>?
+	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>
+
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
+	fun getTargetEOSToken(contract: String, symbol: String, chainID: String): DefaultTokenTable?
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

@@ -127,10 +127,7 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun QuotationFragment.updateAdapterDataSet(
-		data: CurrencyPriceInfoModel,
-		isDisconnected: Boolean
-	) {
+	private fun QuotationFragment.updateAdapterDataSet(data: CurrencyPriceInfoModel, isDisconnected: Boolean) {
 		load {
 			asyncData?.find {
 				it.pair.equals(data.pair, true)

@@ -129,16 +129,6 @@ object PincodeText {
 		else -> ""
 	}
 	@JvmField
-	val countAlert = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Please Enter four bit ciphers"
-		HoneyLanguage.Chinese.code -> "请输入四位数字"
-		HoneyLanguage.Japanese.code -> "4桁の数字を入力して下さい"
-		HoneyLanguage.Korean.code -> "4 비트 암호를 입력하십시오."
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите 4-значное число"
-		HoneyLanguage.TraditionalChinese.code -> "請輸入四位數字"
-		else -> ""
-	}
-	@JvmField
 	val setFourDigitPassword = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Set a four-digit password"
 		HoneyLanguage.Chinese.code -> "Set a four-digit password"
@@ -168,16 +158,7 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "If the password input is inconsistent, please re-enter"
 		else -> ""
 	}
-	@JvmField
-	val verifyAlert = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Please repeat the same PIN"
-		HoneyLanguage.Chinese.code -> "请再次输入一遍PIN码进行确认"
-		HoneyLanguage.Japanese.code -> "再度繰り返しPINコードを入力し確認して下さい"
-		HoneyLanguage.Korean.code -> "같은 PIN을 중복하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите PIN-код еще раз для подтверждения"
-		HoneyLanguage.TraditionalChinese.code -> "請再次輸入PIN碼確認"
-		else -> ""
-	}
+
 	@JvmField
 	val failedAttention : (retryTimes : Int) -> String = {
 		when(currentLanguage) {
@@ -202,16 +183,7 @@ object PincodeText {
 			else -> ""
 		}
 	}
-	@JvmField
-	val turnOnAttention = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Please set a PIN"
-		HoneyLanguage.Chinese.code -> "请先设置PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードを先に設定して下さい"
-		HoneyLanguage.Korean.code -> "PIN을 설정하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, установите PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "請先設置PIN碼"
-		else -> ""
-	}
+
 	@JvmField
 	val show = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Show PIN"
@@ -220,16 +192,6 @@ object PincodeText {
 		HoneyLanguage.Korean.code -> "PIN 코드 표시"
 		HoneyLanguage.Russian.code -> "Показать PIN-код"
 		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
-		else -> ""
-	}
-	@JvmField
-	val enterPincode = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Enter PIN"
-		HoneyLanguage.Chinese.code -> "输入PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードを入力します"
-		HoneyLanguage.Korean.code -> "Enter Passcode"
-		HoneyLanguage.Russian.code -> "Введите PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "輸入PIN碼"
 		else -> ""
 	}
 	val setPinCode = when(currentLanguage) {
@@ -266,16 +228,6 @@ object PincodeText {
 		HoneyLanguage.Korean.code -> "To set a numeric password"
 		HoneyLanguage.Russian.code -> "To set a numeric password"
 		HoneyLanguage.TraditionalChinese.code -> "To set a numeric password"
-		else -> ""
-	}
-	@JvmField
-	val enterPincodeDescription = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Set the PIN to protect privacy. Once you open GoldStone, you need to enter PIN to see your wallet "
-		HoneyLanguage.Chinese.code -> "设置锁屏密码保护隐私，一旦开启锁屏密码，每次打开 GoldStone 时需要输入锁屏密码才能查看钱包"
-		HoneyLanguage.Japanese.code -> "ロック画面のパスワードを設定するとプライバシーを保護します。ロック画面のパスワードを設定すると、GoldStoneの画面を開くたびにロック画面のパスワードを入力することで、ウォレットを確認することができます"
-		HoneyLanguage.Korean.code -> "잠금 화면 암호를 설정하여 개인 정보를 보호하십시오. 화면 잠금 암호가 켜지면 GoldStone을 열 때마다 지갑 화면을 보려면 잠금 화면 암호를 입력해야합니다."
-		HoneyLanguage.Russian.code -> "Установите защиту паролем экрана блокировки для защиты конфиденциальности. Как только Вы запустите пароль экрана блокировки, Вам нужно ввести пароль экрана блокировки, чтобы просмотреть свой кошелек"
-		HoneyLanguage.TraditionalChinese.code -> "設置鎖屏密碼保護隱私，一旦開啟鎖屏密碼，每次打開GoldStone時需要輸入鎖屏密碼才能查看錢包"
 		else -> ""
 	}
 }
@@ -438,23 +390,23 @@ object ContactText {
 
 	@JvmField
 	val eosHint = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Chinese.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Japanese.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Korean.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.Russian.code -> "Enter EOS Account name that you want to store"
-		HoneyLanguage.TraditionalChinese.code -> "Enter EOS Account name that you want to store"
+		HoneyLanguage.English.code -> "Enter EOS Mainnet account name that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的EOS主网账户名"
+		HoneyLanguage.Japanese.code -> "保存したいEOSアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장하려는 EOS 기본 네트워크 계정 이름을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите имя главной сетевой учетной записи EOS, которое вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的EOS主網賬戶名"
 		else -> ""
 	}
 
 	@JvmField
 	val eosJungleHint = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Chinese.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Japanese.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Korean.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.Russian.code -> "Enter EOS JUNGLE Account name that you want to store"
-		HoneyLanguage.TraditionalChinese.code -> "Enter EOS JUNGLE Account name that you want to store"
+		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "輸入您要存儲的EOS主網賬戶名"
+		HoneyLanguage.Japanese.code -> "保存したいEOS Jungleテストネットワークアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장하려는 EOS Jungle 테스트 네트워크 계정 이름 입력"
+		HoneyLanguage.Russian.code -> "Введите имя учетной записи тестовой сети EOS Jungle, которую вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的EOS Jungle測試網網賬戶名"
 		else -> ""
 	}
 
@@ -509,7 +461,7 @@ object QRText {
 		HoneyLanguage.English.code -> "QR code has been saved to album"
 		HoneyLanguage.Chinese.code -> "二维码已保存至相册"
 		HoneyLanguage.Japanese.code -> "QRコードをアルバムに保存しました"
-		HoneyLanguage.Korean.code -> "QR코드를 앨범에 저장 완료"
+		HoneyLanguage.Korean.code -> "QR 코드를 앨범에 저장 완료"
 		HoneyLanguage.Russian.code -> "QR-код был сохранен в альбом"
 		HoneyLanguage.TraditionalChinese.code -> "二維碼已保存至手機相冊"
 		else -> ""
@@ -519,7 +471,7 @@ object QRText {
 		HoneyLanguage.English.code -> "SHARE QR IMAGE"
 		HoneyLanguage.Chinese.code -> "分享二维码"
 		HoneyLanguage.Japanese.code -> "QRコードをシェアする"
-		HoneyLanguage.Korean.code -> "QR코드 공유"
+		HoneyLanguage.Korean.code -> "QR 코드 공유"
 		HoneyLanguage.Russian.code -> "Поделиться QR-кодом"
 		HoneyLanguage.TraditionalChinese.code -> "分享二維碼"
 		else -> ""
@@ -539,7 +491,7 @@ object QRText {
 		HoneyLanguage.English.code -> "Invalid QR code"
 		HoneyLanguage.Chinese.code -> "未识别到有效的二维码图片"
 		HoneyLanguage.Japanese.code -> "有効的なQRコード画像を識別できません"
-		HoneyLanguage.Korean.code -> "미식별 유효 QR코드 이미지"
+		HoneyLanguage.Korean.code -> "미식별 유효 QR 코드 이미지"
 		HoneyLanguage.Russian.code -> "Неверный QR-код"
 		HoneyLanguage.TraditionalChinese.code -> "未識別到有效的二維碼圖片"
 		else -> ""
@@ -549,9 +501,20 @@ object QRText {
 		HoneyLanguage.English.code -> "Inconsistent currency. The QR code scanned is not that of the current token, please change the transfer token, or change the scanned QR code."
 		HoneyLanguage.Chinese.code -> "货币不一致。您所扫描的不是当前Token的二维码，请您更换token进行转账，或者更换扫描的二维码。"
 		HoneyLanguage.Japanese.code -> "貨幣が一致していません。現在のTokenのQRコードがスキャンされていません。Tokenを変更して振込するか、スキャンするQRコードを変更して下さい。"
-		HoneyLanguage.Korean.code -> "화폐가 불일치합니다. 귀하께서 스캐스 한 것은 현재 Token의 QR코드가 아닙니다, 귀하께서 token을 교체하여 이체하거나, 스캐너용 QR코드를 교체하십시오. "
+		HoneyLanguage.Korean.code -> "화폐가 불일치합니다. 귀하께서 스캐스 한 것은 현재 Token 의 QR 코드가 아닙니다, 귀하께서 token 을 교체하여 이체하거나, 스캐너용 QR 코드를 교체하십시오. "
 		HoneyLanguage.Russian.code -> "Несоответствующая валюта. Отсканированное содержание не является QR-кодом текущего токена, пожалуйста, поменяйте токен для перевода или измените отсканированный QR-код."
 		HoneyLanguage.TraditionalChinese.code -> "貨幣不一致。您所掃描的不是當前Token的二維碼，請您更換token進行轉賬，或者更換掃描的二維碼。"
+		else -> ""
+	}
+
+	@JvmField
+	val selectQRCodeFromAlbum = when(currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "从相册选择二维码"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> " "
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
 }
@@ -582,7 +545,7 @@ object QAText {
 		HoneyLanguage.English.code -> "What is a keystore?"
 		HoneyLanguage.Chinese.code -> "什么是 keystore?"
 		HoneyLanguage.Japanese.code -> "Keystoreとはなんですか？"
-		HoneyLanguage.Korean.code -> "keystore란？"
+		HoneyLanguage.Korean.code -> "keystore 란？"
 		HoneyLanguage.Russian.code -> "Что такое keystore?"
 		HoneyLanguage.TraditionalChinese.code -> "什麼是 keystore?"
 		else -> ""

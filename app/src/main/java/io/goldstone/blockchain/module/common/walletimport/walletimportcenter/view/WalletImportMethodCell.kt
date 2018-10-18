@@ -8,6 +8,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.ImportMethodText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -71,7 +72,7 @@ class WalletImportMethodCell(context: Context) : RelativeLayout(context) {
 	fun setMnemonicType() {
 		titles.apply {
 			title.text = ImportMethodText.mnemonic
-			subtitle.text = "a type of password consisting of 12 words"
+			subtitle.text = ImportWalletText.importMnemonicsHint
 			setCenterInVertical()
 		}
 		typeIcon.imageResource = R.drawable.mnemonic_icon
@@ -80,7 +81,7 @@ class WalletImportMethodCell(context: Context) : RelativeLayout(context) {
 	fun setPrivateKeyType() {
 		titles.apply {
 			title.text = ImportMethodText.privateKey
-			subtitle.text = "the private key of any supported chain type"
+			subtitle.text = ImportWalletText.importPrivateKeyHint
 			setCenterInVertical()
 		}
 		typeIcon.imageResource = R.drawable.private_key_import_icon
@@ -90,7 +91,7 @@ class WalletImportMethodCell(context: Context) : RelativeLayout(context) {
 	fun setKeystoreType() {
 		titles.apply {
 			title.text = ImportMethodText.keystore
-			subtitle.text = "a string of characters in a format file"
+			subtitle.text = ImportWalletText.importKeystoreHint
 			setCenterInVertical()
 		}
 		typeIcon.imageResource = R.drawable.keystore_import_icon

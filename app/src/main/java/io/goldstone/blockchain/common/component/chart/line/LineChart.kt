@@ -73,12 +73,10 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		val labelColor = GrayScale.midGray
 		isScaleXEnabled = false
 		isScaleYEnabled = false
-		mPinchZoomEnabled = true
+		mPinchZoomEnabled = false
 		isDragEnabled = dragEnable
 		legend.isEnabled = false // 标签是否显示
 		description.isEnabled = false // 描述信息展示
-
-
 		marker = object : LineMarkerView(context) {
 			override fun getChartWidth(): Int {
 				return this@LineChart.width

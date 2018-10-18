@@ -2,8 +2,6 @@ package io.goldstone.blockchain.module.common.passcode.view
 
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Message
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.view.Gravity
@@ -25,6 +23,7 @@ import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.utils.FingerprintHelper
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.ShowBackToHomeConfirmationDialog
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -33,7 +32,6 @@ import io.goldstone.blockchain.module.common.passcode.presenter.PassCodePresente
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @date 23/04/2018 11:04 AM
@@ -54,7 +52,6 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 	private var isTwoVerificationMethods = false
 	private var isVerifyIdentity = false
 	private var isEnterYourNewPasswordAgain = false
-	private var isConfirmExit = false
 
 	private val fingerprintHelper by lazy {
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -249,7 +246,7 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 				}
 			})
 			fingerprintHelper?.startFingerprintUnlock() {
-				if(!(it.content == WalletSecurityError.None.content)) {
+				if(it.content != WalletSecurityError.None.content) {
 					context?.toast(it.content)
 				}
 			}
@@ -361,35 +358,30 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 		return isEnterYourNewPasswordAgain
 	}
 
+	private fun backEvent() {
+		if(!disableTheBackButtonToExit.orFalse()) {
+			removePassCodeFragment()
+		} else {
+			ShowBackToHomeConfirmationDialog(this).showBackToHomeConfirmationDialog()
+		}
+	}
+
 	override fun setBaseBackEvent(
 		activity : MainActivity?,
 		parent : Fragment?
 	) {
-		if(!isConfirmExit) {
-			isConfirmExit = true
-			context?.toast("请输入密码")
-		} else {
-			if(isSetPinCode.orFalse() || isPinCode) {
-				val enteredCode = keyboard.getEnteredCode()
-				if(enteredCode.isNotEmpty()) {
-					keyboard.setEnteredCode(enteredCode.substring(
-						0,
-						enteredCode.lastIndex
-					))
-				} else {
-					if(!disableTheBackButtonToExit.orFalse()) {
-						removePassCodeFragment()
-					} else {
-						activity?.finish()
-					}
-				}
+		if(isSetPinCode.orFalse() || isPinCode) {
+			val enteredCode = keyboard.getEnteredCode()
+			if(enteredCode.isNotEmpty()) {
+				keyboard.setEnteredCode(enteredCode.substring(
+					0,
+					enteredCode.lastIndex
+				))
 			} else {
-				if(!disableTheBackButtonToExit.orFalse()) {
-					removePassCodeFragment()
-				} else {
-					activity?.finish()
-				}
+				backEvent()
 			}
+		} else {
+			backEvent()
 		}
 	}
 }

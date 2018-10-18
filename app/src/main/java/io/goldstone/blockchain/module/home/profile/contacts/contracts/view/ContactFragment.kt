@@ -52,8 +52,8 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX()) { position, cell ->
 				alert {
 					isCancelable = false
-					title = "DELETE CONTACT"
-					message = "are you sure that you want to delete this contact?"
+					title = ProfileText.deletContactAlertTitle
+					message = ProfileText.deleteContactAlertDescription
 					yesButton { cell?.apply { presenter.deleteContact(model.id) } }
 					cancelButton {
 						recyclerView.adapter?.notifyItemChanged(position)

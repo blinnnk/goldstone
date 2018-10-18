@@ -242,6 +242,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
+
 		val title = WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
 		val addresses = wallet.btcAddresses
 		setMultiChainAddresses(wallet)
@@ -252,7 +253,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setBTCSeriesTestAddressesModel(wallet: WalletTable) {
-		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
+		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
 		val addresses = wallet.btcSeriesTestAddresses
 		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCSeriesTestAddresses()
