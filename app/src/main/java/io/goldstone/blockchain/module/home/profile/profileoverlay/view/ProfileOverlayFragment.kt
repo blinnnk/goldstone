@@ -21,7 +21,14 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
 	override val presenter = ProfileOverlayPresenter(this)
 	
 	override fun ViewGroup.initView() {
+		when (title) {
+			ArgumentKey.setTheDigitalLock -> {
+				presenter.setPassCodeFragment()
+			}
+			else -> {
+				presenter.showTargetFragmentByTitle(title.orEmpty())
+			}
+		}
 		headerTitle = title.orEmpty()
-		presenter.showTargetFragmentByTitle(title.orEmpty())
 	}
 }

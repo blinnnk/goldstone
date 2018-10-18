@@ -110,12 +110,12 @@ object PincodeText {
 	}
 	@JvmField
 	val needToVerifyYourIdentity = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Need to verify your identity"
-		HoneyLanguage.Chinese.code -> "Need to verify your identity"
-		HoneyLanguage.Japanese.code -> "Need to verify your identity"
-		HoneyLanguage.Korean.code -> "Need to verify your identity"
-		HoneyLanguage.Russian.code -> "Need to verify your identity"
-		HoneyLanguage.TraditionalChinese.code -> "Need to verify your identity"
+		HoneyLanguage.English.code -> "Verify your identity"
+		HoneyLanguage.Chinese.code -> "Verify your identity"
+		HoneyLanguage.Japanese.code -> "Verify your identity"
+		HoneyLanguage.Korean.code -> "Verify your identity"
+		HoneyLanguage.Russian.code -> "Verify your identity"
+		HoneyLanguage.TraditionalChinese.code -> "Verify your identity"
 		else -> ""
 	}
 	@JvmField

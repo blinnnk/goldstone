@@ -94,7 +94,7 @@ class SingleLineSwitch(
 	fun setOnclick(callback: (HoneyBaseSwitch) -> Unit) {
 		if (isSwitchIconType) {
 			arrowIcon.visibility = View.GONE
-			onClick {
+			switch.onClick {
 				callback(switch)
 			}
 		} else {

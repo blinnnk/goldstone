@@ -24,7 +24,10 @@ import io.goldstone.blockchain.module.home.profile.walletsecurity.view.WalletSec
  */
 class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySettingsFragment) : BasePresenter<WalletSecuritySettingsFragment>() {
 
-	fun setFingerprintStatus(status : Boolean,callback : () -> Unit = {}) {
+	fun setFingerprintStatus(
+		status : Boolean,
+		callback : () -> Unit = {}
+	) {
 		AppConfigTable.setFingerprintUnlockStatus(status) {
 			callback()
 		}
@@ -36,8 +39,14 @@ class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySett
 			hideChildFragment(fragment)
 		}
 		fragment.activity?.addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-			putString(ArgumentKey.profileTitle,PincodeText.setTheDigitalLock)
-			putBoolean(ArgumentKey.setPinCode,true)
+			putString(
+				ArgumentKey.profileTitle,
+				ArgumentKey.setTheDigitalLock
+			)
+			putBoolean(
+				ArgumentKey.setPinCode,
+				true
+			)
 		}
 	}
 

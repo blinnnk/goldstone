@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -165,7 +166,11 @@ class ProfileOverlayPresenter(
 	private fun showWalletSecurityFragment() {
 		fragment.addFragmentAndSetArgument<WalletSecuritySettingsFragment>(ContainerID.content)
 	}
-
+	fun setPassCodeFragment() {
+		fragment.addFragmentAndSetArgument<PassCodeFragment>(ContainerID.content) {
+			putBoolean(ArgumentKey.setPinCode, true)
+		}
+	}
 	private fun showContactsFragment() {
 		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content)
 	}

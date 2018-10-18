@@ -41,6 +41,7 @@ object ArgumentKey {
 	const val eosAccountRegister = "eosAccountRegister"
 	const val setPinCode = "setPinCode"
 	const val disableTheBackButtonToExit = "disableTheBackButtonToExit"
+	const val setTheDigitalLock = "setTheDigitalLock"
 }
 
 object IntentKey {

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.profile.walletsecurity.view
 import android.content.Intent
 import android.os.Build
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +34,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.profile.walletsecurity.presenter.WalletSecuritySettingsPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 
 /**
@@ -78,6 +80,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					setSwitchStatus(config?.fingerprintUnlockerIsOpened.orFalse())
 				}
 				setOnclick { switch ->
+					Log.e("setOnclick","setOnclick")
 					if(switch.isChecked) {
 						if(checkIfTheSystemFingerprintExists().isAvailable()) {
 							// 系统已设置指纹
@@ -105,6 +108,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				}
 			}
 			setOnclick {
+				Log.e("setOnclick1","setOnclick1")
 				// 点击后跳转到PinCode编辑界面
 				val switchChecked = pinCodeSingleLineSwitch?.getSwitchCheckedStatus()
 				if(switchChecked.orFalse()) {
