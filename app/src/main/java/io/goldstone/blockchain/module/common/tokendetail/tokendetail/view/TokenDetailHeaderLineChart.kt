@@ -21,26 +21,27 @@ class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 
 		var maxValue = dataRows[0].y
 		var minValue = dataRows[0].y
-		if (maxValue == minValue) maxValue = minValue * 1.5f
 		dataRows.forEach {
 			if (it.y > maxValue) maxValue = it.y
 			if (it.y < minValue) minValue = it.y
 		}
-		if (maxValue * minValue == 0f) {
+		if (maxValue == 0f && minValue == 0f) {
 			//空数据给的默认格式
 			axisLeft.axisMinimum = 0f
 			axisLeft.axisMaximum = 5f
 			dataRows.forEach {
-				it.y = 0.3f
+				it.y = 0.1f
 			}
+			marker = null
 		} else {
-			val distance = (maxValue - minValue) / 2f
+			var distance = (maxValue - minValue) / 2f
+			if (distance == 0f) {
+				distance = maxValue * 0.2f
+			}
 			axisLeft.axisMinimum = minValue - distance
 			axisLeft.axisMaximum = maxValue + distance
+			resetMarkerView()
 		}
-		isScaleXEnabled = false
-		isScaleYEnabled = false
-		mPinchZoomEnabled = false
 		super.resetData(dataRows)
 	}
 }

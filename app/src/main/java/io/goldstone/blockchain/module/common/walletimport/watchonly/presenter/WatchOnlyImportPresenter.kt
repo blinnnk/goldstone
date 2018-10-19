@@ -27,8 +27,6 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
-import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
-import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 
@@ -184,6 +182,7 @@ class WatchOnlyImportPresenter(
 				if (EOSWalletUtils.isValidAddress(address)) {
 					currentEOSAddress = address
 					SharedValue.updateIsTestEnvironment(false)
+					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
 					EOSAPI.getAccountInfo(EOSAccount(address), ChainURL.eosMain) { info, error ->
 						if (!info.isNull() || error.isNone()) {
@@ -192,7 +191,7 @@ class WatchOnlyImportPresenter(
 							SharedChain.updateEOSCurrent(ChainID.eosMain)
 							SharedValue.updateIsTestEnvironment(false)
 							callback(error)
-						} else callback(AccountError.UnavailableAccountName)
+						} else callback(AccountError.InvalidAccountName)
 					}
 				}
 			}
@@ -200,6 +199,7 @@ class WatchOnlyImportPresenter(
 				if (EOSWalletUtils.isValidAddress(address)) {
 					currentEOSAddress = address
 					SharedValue.updateIsTestEnvironment(true)
+					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
 					EOSAPI.getAccountInfo(EOSAccount(address), ChainURL.eosJungleHistory) { info, error ->
 						if (!info.isNull() || error.isNone()) {
@@ -208,7 +208,7 @@ class WatchOnlyImportPresenter(
 							SharedChain.updateEOSCurrent(ChainID.eosTest)
 							SharedValue.updateIsTestEnvironment(true)
 							callback(error)
-						} else callback(AccountError.UnavailableAccountName)
+						} else callback(AccountError.InvalidAccountName)
 					}
 				}
 			}
