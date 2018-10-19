@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
@@ -14,7 +13,6 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -26,17 +24,17 @@ import java.util.*
  * @date 23/03/2018 3:44 PM
  * @author KaySaith
  */
-class WalletDetailFragment :
+class WalletDetailFragment:
 	BaseRecyclerFragment<WalletDetailPresenter,WalletDetailCellModel>() {
 
-	override val pageTitle : String = "Wallet Detail"
+	override val pageTitle: String = "Wallet Detail"
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
-	private var headerView : WalletDetailHeaderView? = null
+	private var headerView: WalletDetailHeaderView? = null
 	override val presenter = WalletDetailPresenter(this)
 
 	override fun setRecyclerViewAdapter(
-		recyclerView : BaseRecyclerView,
-		asyncData : ArrayList<WalletDetailCellModel>?
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<WalletDetailCellModel>?
 	) {
 		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(),{
 			onClick {
@@ -60,7 +58,7 @@ class WalletDetailFragment :
 		headerView?.showLoadingView(false)
 	}
 
-	override fun onViewCreated(view : View,savedInstanceState : Bundle?) {
+	override fun onViewCreated(view: View,savedInstanceState: Bundle?) {
 		super.onViewCreated(view,savedInstanceState)
 		wrapper.addView(slideHeader)
 		/**
@@ -77,8 +75,8 @@ class WalletDetailFragment :
 	private var totalRange = 0
 
 	override fun observingRecyclerViewVerticalOffset(
-		offset : Int,
-		range : Int
+		offset: Int,
+		range: Int
 	) {
 		if(offset == 0) totalRange = 0
 		if(totalRange == 0) totalRange = range
@@ -103,11 +101,11 @@ class WalletDetailFragment :
 			presenter.updateData()
 		}
 		// 检查是否需要显示 `PIN Code` 界面
-		showPinCodeFragment()
+		showVerifyPinCodeFragment()
 
 	}
 
-	override fun onHiddenChanged(hidden : Boolean) {
+	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if(!hidden) {
 			// 恢复显示的时候检查更新数据
@@ -132,7 +130,7 @@ class WalletDetailFragment :
 		}
 	}
 
-	override fun setBackEvent(mainActivity : MainActivity?) {
+	override fun setBackEvent(mainActivity: MainActivity?) {
 		val overlay = mainActivity
 			?.getMainContainer()
 			?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
@@ -144,7 +142,7 @@ class WalletDetailFragment :
 		}
 	}
 
-	private fun showPinCodeFragment() {
+	private fun showVerifyPinCodeFragment() {
 		if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
 			if(activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull()) {
 				activity?.addFragmentAndSetArguments<PassCodeFragment>(

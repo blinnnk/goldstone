@@ -4,6 +4,7 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.hideChildFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -16,11 +17,11 @@ import io.goldstone.blockchain.module.home.profile.walletsecurity.view.WalletSec
  * @date 11/09/2018 3:45 PM
  * @author wcx
  */
-class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySettingsFragment) : BasePresenter<WalletSecuritySettingsFragment>() {
+class WalletSecuritySettingsPresenter(override val fragment: WalletSecuritySettingsFragment): BasePresenter<WalletSecuritySettingsFragment>() {
 
 	fun setFingerprintStatus(
-		status : Boolean,
-		callback : () -> Unit = {}
+		status: Boolean,
+		callback: () -> Unit = {}
 	) {
 		AppConfigTable.setFingerprintUnlockStatus(status) {
 			callback()
@@ -35,7 +36,7 @@ class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySett
 		fragment.activity?.addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
 			putString(
 				ArgumentKey.profileTitle,
-				ArgumentKey.setTheDigitalLock
+				PincodeText.setTheDigitalLock
 			)
 			putBoolean(
 				ArgumentKey.setPinCode,
@@ -45,7 +46,7 @@ class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySett
 	}
 
 	// 跳转至钱包锁校验身份界面
-	fun showPassCodeFragment() {
+	fun showVerifyPinCodeFragment() {
 		fragment.getParentFragment<ProfileOverlayFragment> {
 			hideChildFragment(fragment)
 		}

@@ -29,15 +29,15 @@ import org.jetbrains.anko.support.v4.toast
  * @reWriter wcx
  * @description 添加指纹解锁相关逻辑和界面
  */
-class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresenter<PassCodeFragment>() {
+class PassCodePresenter(override val fragment: PassCodeFragment): BasePresenter<PassCodeFragment>() {
 
 	private var currentFrozenTime = 0L
 	private val handler = Handler()
 	private var passCode = ""
 
 	fun unlockOrAlert(
-		passCode : String,
-		action : () -> Unit
+		passCode: String,
+		action: () -> Unit
 	) {
 		if(passCode.length >= Count.pinCode) {
 			AppConfigTable.getAppConfig { it ->
@@ -59,13 +59,13 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 	}
 
 	private fun checkPassCodeEvent(
-		it : Boolean,
-		retryTime : Int
+		it: Boolean,
+		retryTime: Int
 	) {
 		var retryTimes = retryTime
 		it isTrue {
 			if(retryTimes < Count.retry) resetConfig()
-			if(fragment.getIsSetPinCode().orFalse()) {
+			if(fragment.getIsPinCodeSetting().orFalse()) {
 				fragment.setIsVerifyIdentity(true)
 				fragment.setPasswordInputTitles(
 					PincodeText.setFourDigitPassword,
@@ -95,7 +95,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		}
 	}
 
-	private fun isEnterYourNewPasswordAgain(passCode : String) {
+	private fun isEnterYourNewPasswordAgain(passCode: String) {
 		if(fragment.getIsEnterYourNewPasswordAgain()) {
 			checkNewPassword(passCode)
 		} else {
@@ -109,7 +109,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		}
 	}
 
-	private fun checkNewPassword(passCode : String) {
+	private fun checkNewPassword(passCode: String) {
 		if(this.passCode == passCode) {
 			AppConfigTable.updatePinCode(passCode.toInt()) {
 				fragment.context?.alert(CommonText.succeed)
@@ -123,7 +123,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		}
 	}
 
-	fun isFrozenStatus(callback : (Boolean) -> Unit = {}) {
+	fun isFrozenStatus(callback: (Boolean) -> Unit = {}) {
 		AppConfigTable.getAppConfig {
 			it?.frozenTime.isNull() isFalse {
 				currentFrozenTime = it?.frozenTime.orElse(0L) - System.currentTimeMillis()
@@ -141,7 +141,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		}
 	}
 
-	private val refreshRunnable : Runnable by lazy {
+	private val refreshRunnable: Runnable by lazy {
 		Runnable {
 			currentFrozenTime -= 1000L
 			fragment.showFailedAttention(setRemainingFrozenTime(currentFrozenTime))
@@ -174,7 +174,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 					is BaseRecyclerFragment<*,*> -> recoveryBackEvent()
 
 					is BaseOverlayFragment<*> -> {
-						if(!fragment.getIsSetPinCode().orFalse() && !fragment.getIsVerifyIdentity()) {
+						if(!fragment.getIsPinCodeSetting().orFalse() && !fragment.getIsVerifyIdentity()) {
 							this.presenter.removeSelfFromActivity()
 						} else {
 							childFragmentManager.fragments.last()?.apply {
@@ -208,13 +208,13 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 	}
 
 	@SuppressLint("SetTextI18n")
-	private fun setRemainingFrozenTime(currentFrozenTime : Long) : String {
+	private fun setRemainingFrozenTime(currentFrozenTime: Long): String {
 		return PincodeText.remainingFrozenTime(currentFrozenTime)
 	}
 
 	private fun checkPassCode(
-		passCode : String,
-		hold : (Boolean) -> Unit
+		passCode: String,
+		hold: (Boolean) -> Unit
 	) {
 		if(passCode.length >= Count.pinCode)
 		// 从数据库获取本机的 `Passcode`

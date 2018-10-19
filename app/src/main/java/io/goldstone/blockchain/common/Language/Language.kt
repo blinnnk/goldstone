@@ -130,7 +130,7 @@ object PincodeText {
 	}
 
 	@JvmField
-	val failedAttention : (retryTimes : Int) -> String = {
+	val failedAttention: (retryTimes: Int) -> String = {
 		when(currentLanguage) {
 			HoneyLanguage.English.code -> "incorrect passcode $it retry times left"
 			HoneyLanguage.Chinese.code -> "incorrect passcode $it retry times left"
@@ -142,7 +142,7 @@ object PincodeText {
 		}
 	}
 	@JvmField
-	val remainingFrozenTime : (currentFrozenTime : Long) -> String = {
+	val remainingFrozenTime: (currentFrozenTime: Long) -> String = {
 		when(currentLanguage) {
 			HoneyLanguage.English.code -> "you have to wait ${it / 1000} seconds"
 			HoneyLanguage.Chinese.code -> "you have to wait ${it / 1000} seconds"
@@ -326,7 +326,7 @@ object ContactText {
 		else -> ""
 	}
 	@JvmField
-	val wrongAddressFormat : (symbol : String) -> String = {
+	val wrongAddressFormat: (symbol: String) -> String = {
 		when(currentLanguage) {
 			HoneyLanguage.English.code -> "Incorrect $it wallet address format"
 			HoneyLanguage.Chinese.code -> "$it 钱包地址格式错误"
@@ -479,12 +479,12 @@ object QRText {
 
 	@JvmField
 	val selectQRCodeFromAlbum = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "从相册选择二维码"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> " "
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
+		HoneyLanguage.English.code -> "Select QR code from the album"
+		HoneyLanguage.Chinese.code -> "Select QR code from the album"
+		HoneyLanguage.Japanese.code -> "Select QR code from the album"
+		HoneyLanguage.Korean.code -> "Select QR code from the album"
+		HoneyLanguage.Russian.code -> "Select QR code from the album"
+		HoneyLanguage.TraditionalChinese.code -> "Select QR code from the album"
 		else -> ""
 	}
 }

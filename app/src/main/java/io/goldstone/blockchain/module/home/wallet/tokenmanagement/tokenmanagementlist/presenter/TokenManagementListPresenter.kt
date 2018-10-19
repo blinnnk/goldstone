@@ -51,10 +51,10 @@ class TokenManagementListPresenter(
 					override fun concurrentJobs() {
 						defaultTokens.forEach { default ->
 							default.isUsed = !myTokens.find {
-								default.contract.equals(it.contract, true)
+								default.contract.equals(it.contract, true) &&
+									default.symbol.equals(it.symbol, true)
 							}.isNull()
 							completeMark()
-
 						}
 					}
 
@@ -82,7 +82,7 @@ class TokenManagementListPresenter(
 				// once it is checked then insert this symbol into `MyTokenTable` database
 				if (isChecked) MyTokenTable.addNew(token.symbol, TokenContract(token.contract), token.chainID)
 				else GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(token.contract, TokenContract(token.contract).getAddress())
+					.deleteByContractAndAddress(token.contract, token.symbol, TokenContract(token.contract).getAddress())
 			}
 		}
 	}

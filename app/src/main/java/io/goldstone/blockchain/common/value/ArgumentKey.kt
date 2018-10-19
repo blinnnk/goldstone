@@ -41,7 +41,6 @@ object ArgumentKey {
 	const val eosAccountRegister = "eosAccountRegister"
 	const val setPinCode = "setPinCode"
 	const val disableTheBackButtonToExit = "disableTheBackButtonToExit"
-	const val setTheDigitalLock = "setTheDigitalLock"
 }
 
 object IntentKey {
@@ -72,7 +71,7 @@ object SharesPreference {
 	const val unregisterGoldStoneID = "unregisterGoldStoneID"
 	const val activityIsResult = "activityIsResult"
 	const val currentEthereumAddress = "currentEthereumAddress"
-	const val currentEOSName= "currentEOSName"
+	const val currentEOSName = "currentEOSName"
 	const val currentETCAddress = "currentETCAddress"
 	const val currentEOSAddress = "currentEOSAddress"
 	const val currentLTCAddress = "currentLTCAddress"

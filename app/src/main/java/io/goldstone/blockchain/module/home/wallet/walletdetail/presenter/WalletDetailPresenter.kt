@@ -80,6 +80,7 @@ class WalletDetailPresenter(
 					detailModels = chainModels
 					updateUIByData(chainModels)
 					if(!error.isNone()) fragment.context.alert(error.message)
+					if (!error.isNone()) ErrorDisplayManager(fragment.context, error)
 				}
 			} else fragment.removeMiniLoadingView()
 		}

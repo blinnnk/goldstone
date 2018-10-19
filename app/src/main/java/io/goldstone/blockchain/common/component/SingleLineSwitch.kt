@@ -28,7 +28,7 @@ import org.jetbrains.anko.*
 class SingleLineSwitch(
 	context: Context,
 	private val isSwitchIconType: Boolean
-) : RelativeLayout(context) {
+): RelativeLayout(context) {
 	private val switch by lazy { HoneyBaseSwitch(context) }
 	private val arrowIcon by lazy { ImageView(context) }
 	private val title by lazy { TextView(context) }
@@ -92,7 +92,7 @@ class SingleLineSwitch(
 	}
 
 	fun setOnclick(callback: (HoneyBaseSwitch) -> Unit) {
-		if (isSwitchIconType) {
+		if(isSwitchIconType) {
 			arrowIcon.visibility = View.GONE
 			switch.onClick {
 				callback(switch)

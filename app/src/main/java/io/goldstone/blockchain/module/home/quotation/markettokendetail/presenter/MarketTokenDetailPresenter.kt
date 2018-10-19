@@ -91,7 +91,7 @@ class MarketTokenDetailPresenter(
 					val candleData = CandleChartModel.convertData(data!!)
 					val databaseTime = candleData.maxBy { it.time }?.time?.toLongOrNull().orElse(0)
 					// 校验数据库的数据时间是否有效，是否需要更新
-					checkDatabaseTimeIsValidBy(period, databaseTime) {
+					if (NetworkUtil.hasNetwork(fragment.context)) checkDatabaseTimeIsValidBy(period, databaseTime) {
 						isTrue {
 							// 合规就更新本地数据库的数据
 							chartView.updateCandleChartUI(candleData, dateType)
@@ -99,6 +99,9 @@ class MarketTokenDetailPresenter(
 							// 不合规就更新网络数据
 							chartView.updateCandleChartDataBy(pair, period, dateType)
 						}
+					} else {
+						// 没有网络就越过检查数据过期的方法直接显示数据库数据
+						chartView.updateCandleChartUI(candleData, dateType)
 					}
 				}
 			}
@@ -218,7 +221,6 @@ class MarketTokenDetailPresenter(
 			size,
 			{
 				// Show the error exception to user
-				fragment.context.alert(it.toString().showAfterColonContent())
 				updateCandleChartUI(arrayListOf(), dateType)
 			}
 		) {

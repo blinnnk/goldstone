@@ -38,7 +38,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
  * @reWriter wcx
  * @description 修改获取头像方法 UnlimitedAvatar
  */
-class WalletSettingsPresenter(override val fragment : WalletSettingsFragment) : BaseOverlayPresenter<WalletSettingsFragment>() {
+class WalletSettingsPresenter(override val fragment: WalletSettingsFragment): BaseOverlayPresenter<WalletSettingsFragment>() {
 
 	override fun onFragmentViewCreated() {
 		showCurrentWalletInfo()
@@ -50,7 +50,7 @@ class WalletSettingsPresenter(override val fragment : WalletSettingsFragment) : 
 		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
 	}
 
-	fun showTargetFragmentByTitle(title : String) {
+	fun showTargetFragmentByTitle(title: String) {
 		when(title) {
 			WalletSettingsText.passwordSettings -> showPasswordSettingsFragment()
 			WalletSettingsText.walletName -> showWalletNameEditorFragment()

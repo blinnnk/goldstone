@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.passcode.view
 
+import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -24,7 +25,7 @@ import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.FingerprintHelper
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.ShowBackToHomeConfirmationDialog
+import io.goldstone.blockchain.common.utils.showBackToHomeConfirmationDialog
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -41,30 +42,24 @@ import org.jetbrains.anko.*
  * @reWriter wcx
  * @description 添加指纹解锁相关逻辑和界面
  */
-class PassCodeFragment : BaseFragment<PassCodePresenter>() {
-	override val pageTitle : String = PincodeText.setTheDigitalLock
-	private val isSetPinCode by lazy { arguments?.getBoolean(ArgumentKey.setPinCode) }
+class PassCodeFragment: BaseFragment<PassCodePresenter>() {
+	override val pageTitle: String = PincodeText.setTheDigitalLock
+	private val isPinCodeSetting by lazy { arguments?.getBoolean(ArgumentKey.setPinCode) }
 	private val disableTheBackButtonToExit by lazy { arguments?.getBoolean(ArgumentKey.disableTheBackButtonToExit) }
-	private lateinit var container : RelativeLayout
+	private lateinit var container: RelativeLayout
 	private val keyboard by lazy { NumberKeyboard(context!!) }
 	private val passwordInput by lazy { PassCodeInput(context!!) }
-	private var failedAttention : TextView? = null
+	private var failedAttention: TextView? = null
 	private var isPinCode = false
 	private var isTwoVerificationMethods = false
 	private var isVerifyIdentity = false
 	private var isEnterYourNewPasswordAgain = false
 
-	private val fingerprintHelper by lazy {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			FingerprintHelper(context!!)
-		} else {
-			null
-		}
-	}
+	private val fingerprintHelper by lazy { FingerprintHelper(context!!) }
 	override val presenter = PassCodePresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		if(isSetPinCode.orFalse()) {
+		if(isPinCodeSetting.orFalse()) {
 			getParentFragment<ProfileOverlayFragment> {
 				overlayView.header.showCloseButton(false)
 				overlayView.header.showBackButton(true) {
@@ -87,7 +82,7 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 				matchParent
 			)
 			GradientView(context).apply {
-				if(isSetPinCode.orFalse()) {
+				if(isPinCodeSetting.orFalse()) {
 					setStyle(GradientType.BlueGreen)
 				} else {
 					setStyle(GradientType.Blue)
@@ -99,7 +94,7 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 			}.into(this)
 
 			passwordInput.apply {
-				if(isSetPinCode.orFalse()) {
+				if(isPinCodeSetting.orFalse()) {
 					y += ScreenSize.Height * 0.07f
 					AppConfigTable.getAppConfig { it ->
 						if(it?.pincode.isNull()) {
@@ -126,10 +121,10 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 				}
 			}.into(this)
 
-			if(!isSetPinCode.orFalse()) {
+			if(!isPinCodeSetting.orFalse()) {
 				determineTheInterfaceMode {
 					initializePasswordInput()
-					if(isTwoVerificationMethods || !isPinCode) {
+					if(isTwoVerificationMethods) {
 						val switchVerificationMethodLinearLayout = LinearLayout(context)
 						switchVerificationMethodLinearLayout.into(this)
 						switchVerificationMethodLinearLayout.apply {
@@ -155,6 +150,8 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 								alpha = 0.3f
 							}
 						}
+					} else if(!isPinCode) {
+						loadFingerprintImage(this)
 					}
 				}
 			}
@@ -167,10 +164,48 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 				setKeyboardClickEventByFrozenStatus()
 			}
 		}
-
 	}
 
-	private fun determineTheInterfaceMode(callback : () -> Unit) {
+	private fun loadFingerprintImage(container: @AnkoViewDslMarker _RelativeLayout) {
+		val switchVerificationMethodLinearLayout = LinearLayout(context)
+		switchVerificationMethodLinearLayout.into(container)
+		switchVerificationMethodLinearLayout.apply {
+			orientation = LinearLayout.VERTICAL
+			layoutParams = RelativeLayout.LayoutParams(
+				wrapContent,
+				wrapContent
+			)
+			y += ScreenSize.Height * 0.27f
+			setCenterInHorizontal()
+			gravity = Gravity.CENTER_HORIZONTAL
+
+			imageView {
+				if(isTwoVerificationMethods) {
+					layoutParams = LinearLayout.LayoutParams(
+						42.uiPX(),
+						42.uiPX()
+					)
+					setColorFilter(Spectrum.white)
+					alpha = 0.3f
+				} else if(!isPinCode) {
+					layoutParams = LinearLayout.LayoutParams(
+						140.uiPX(),
+						140.uiPX()
+					)
+					setColorFilter(Spectrum.white)
+					alpha = 0.3f
+				}
+				setImageDrawable(ContextCompat.getDrawable(
+					context,
+					R.drawable.fingerprint_recognition
+				))
+				setColorFilter(Spectrum.white)
+				alpha = 0.3f
+			}
+		}
+	}
+
+	private fun determineTheInterfaceMode(callback: () -> Unit) {
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 			SharedWallet.isPincodeOpened().orFalse().isTrue {
 				SharedWallet.isFingerprintUnlockerOpened().orFalse().isTrue {
@@ -203,9 +238,7 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 				)
 				startFingerprintUnlock()
 			} else {
-				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					fingerprintHelper?.stopAuthenticate()
-				}
+				fingerprintHelper.stopAuthenticate()
 				recoveryAfterFrezon()
 				isPinCode = true
 				keyboard.visibility = View.VISIBLE
@@ -218,43 +251,41 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 	}
 
 	private fun startFingerprintUnlock() {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			fingerprintHelper?.stopAuthenticate()
-			fingerprintHelper?.setAuthenticationCallback(object : FingerprintHelper.AuthenticationCallback {
-				override fun onAuthenticationSucceeded(value : String) {
-					isVerifyIdentity = true
-					recoveryAfterFrezon()
-					removePassCodeFragment()
-				}
+		fingerprintHelper.stopAuthenticate()
+		fingerprintHelper.setAuthenticationCallback(object: FingerprintHelper.AuthenticationCallback {
+			override fun onAuthenticationSucceeded(value: String) {
+				isVerifyIdentity = true
+				recoveryAfterFrezon()
+				removePassCodeFragment()
+			}
 
-				override fun onAuthenticationFail(
-					errorCode : Int,
-					errString : CharSequence
-				) {
-				}
+			override fun onAuthenticationFail(
+				errorCode: Int,
+				errString: CharSequence
+			) {
+			}
 
-				override fun onAuthenticationFailed() {
-					showFailedAttention(FingerprintUnlockText.tryAgain)
-					startFingerprintUnlock()
-				}
+			override fun onAuthenticationFailed() {
+				showFailedAttention(FingerprintUnlockText.tryAgain)
+				startFingerprintUnlock()
+			}
 
-				override fun onAuthenticationHelp(
-					helpCode : Int,
-					helpString : CharSequence
-				) {
-				}
-			})
-			fingerprintHelper?.startFingerprintUnlock() {
-				if(it.content != WalletSecurityError.None.content) {
-					context?.toast(it.content)
-				}
+			override fun onAuthenticationHelp(
+				helpCode: Int,
+				helpString: CharSequence
+			) {
+			}
+		})
+		fingerprintHelper.startFingerprintUnlock() {
+			if(it.content != WalletSecurityError.None.content) {
+				context?.toast(it.content)
 			}
 		}
 	}
 
 	override fun onViewCreated(
-		view : View,
-		savedInstanceState : Bundle?
+		view: View,
+		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(
 			view,
@@ -268,7 +299,7 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 		passwordInput.swipe()
 	}
 
-	fun showFailedAttention(content : String) {
+	fun showFailedAttention(content: String) {
 		failedAttention.isNull() isFalse {
 			failedAttention?.text = content
 		} otherwise {
@@ -311,10 +342,10 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 		}
 	}
 
-	fun removePassCodeFragment(callback : () -> Unit = {}) {
+	fun removePassCodeFragment(callback: () -> Unit = {}) {
 		activity?.let {
 			container.updateAlphaAnimation(0f) {
-				if(isSetPinCode.orFalse()) {
+				if(isPinCodeSetting.orFalse()) {
 					this.getParentFragment<ProfileOverlayFragment> {
 						this.presenter.removeSelfFromActivity()
 					}
@@ -322,16 +353,14 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 					it.supportFragmentManager.beginTransaction().remove(this).commitAllowingStateLoss()
 				}
 				callback()
-				if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-					fingerprintHelper?.stopAuthenticate()
-				}
+				fingerprintHelper.stopAuthenticate()
 			}
 		}
 	}
 
 	fun setPasswordInputTitles(
-		title : String,
-		subtitle : String
+		title: String,
+		subtitle: String
 	) {
 		passwordInput.setTitles(
 			title,
@@ -340,23 +369,23 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 		)
 	}
 
-	fun getIsSetPinCode() : Boolean? {
-		return isSetPinCode
+	fun getIsPinCodeSetting(): Boolean? {
+		return isPinCodeSetting
 	}
 
-	fun setIsVerifyIdentity(isVerifyIdentity : Boolean) {
+	fun setIsVerifyIdentity(isVerifyIdentity: Boolean) {
 		this.isVerifyIdentity = isVerifyIdentity
 	}
 
-	fun getIsVerifyIdentity() : Boolean {
+	fun getIsVerifyIdentity(): Boolean {
 		return isVerifyIdentity
 	}
 
-	fun setIsEnterYourNewPasswordAgain(isEnterYourNewPasswordAgain : Boolean) {
+	fun setIsEnterYourNewPasswordAgain(isEnterYourNewPasswordAgain: Boolean) {
 		this.isEnterYourNewPasswordAgain = isEnterYourNewPasswordAgain
 	}
 
-	fun getIsEnterYourNewPasswordAgain() : Boolean {
+	fun getIsEnterYourNewPasswordAgain(): Boolean {
 		return isEnterYourNewPasswordAgain
 	}
 
@@ -364,15 +393,15 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 		if(!disableTheBackButtonToExit.orFalse()) {
 			removePassCodeFragment()
 		} else {
-			ShowBackToHomeConfirmationDialog(this).showBackToHomeConfirmationDialog()
+			showBackToHomeConfirmationDialog(this)
 		}
 	}
 
 	override fun setBaseBackEvent(
-		activity : MainActivity?,
-		parent : Fragment?
+		activity: MainActivity?,
+		parent: Fragment?
 	) {
-		if(isSetPinCode.orFalse() || isPinCode) {
+		if(isPinCodeSetting.orFalse() || isPinCode) {
 			val enteredCode = keyboard.getEnteredCode()
 			if(enteredCode.isNotEmpty()) {
 				keyboard.setEnteredCode(enteredCode.substring(

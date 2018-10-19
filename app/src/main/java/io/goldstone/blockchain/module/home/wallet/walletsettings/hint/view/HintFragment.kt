@@ -8,8 +8,8 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
@@ -17,7 +17,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -32,9 +31,9 @@ import org.jetbrains.anko.verticalLayout
  * @date 24/04/2018 10:54 AM
  * @author KaySaith
  */
-class HintFragment : BaseFragment<HintPresenter>() {
+class HintFragment: BaseFragment<HintPresenter>() {
 
-	override val pageTitle : String = WalletSettingsText.hint
+	override val pageTitle: String = WalletSettingsText.hint
 	private val hintInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = HintPresenter(this)
@@ -60,8 +59,8 @@ class HintFragment : BaseFragment<HintPresenter>() {
 	}
 
 	override fun onViewCreated(
-		view : View,
-		savedInstanceState : Bundle?
+		view: View,
+		savedInstanceState: Bundle?
 	) {
 		super.onViewCreated(
 			view,
@@ -82,8 +81,8 @@ class HintFragment : BaseFragment<HintPresenter>() {
 	}
 
 	override fun setBaseBackEvent(
-		activity : MainActivity?,
-		parent : Fragment?
+		activity: MainActivity?,
+		parent: Fragment?
 	) {
 		getParentFragment<WalletSettingsFragment> {
 			headerTitle = WalletSettingsText.walletSettings

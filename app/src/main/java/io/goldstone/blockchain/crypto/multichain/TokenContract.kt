@@ -1,11 +1,11 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import java.io.Serializable
 
 
@@ -17,9 +17,9 @@ data class TokenContract(
 	@SerializedName("code")
 	val contract: String?,
 	@SerializedName("symbol")
-	val symbol: String = ""
+	val symbol: String
 ) : Serializable {
-	constructor(contract: String?) : this(
+	constructor(contract: String) : this(
 		contract,
 		when {
 			contract.equals(TokenContract.etcContract, true) -> CoinSymbol.etc
@@ -30,7 +30,7 @@ data class TokenContract(
 			contract.equals(TokenContract.ethContract, true) -> CoinSymbol.eth
 			/** 以下两个通常用作燃气费的基础手续费的显示 `Symbol` */
 			// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-			contract?.length == CryptoValue.contractAddressLength -> CoinSymbol.eth
+			contract.length == CryptoValue.contractAddressLength -> CoinSymbol.eth
 			// `EOS` 的 `Contract` 是 对应的 `CodeName` 例如 `eosio.token`
 			else -> CoinSymbol.eos
 		}
@@ -67,10 +67,6 @@ fun TokenContract?.isEOSSeries(): Boolean {
 	return isEOS() || isEOSToken()
 }
 
-fun TokenContract?.isEOSCode(): Boolean {
-	return this?.contract.equals(EOSCodeName.EOSIO.value, true)
-}
-
 fun TokenContract?.isETH(): Boolean {
 	return this?.contract.equals(TokenContract.ethContract, true)
 }
@@ -97,7 +93,7 @@ fun TokenContract?.isERC20Token(): Boolean {
 }
 
 fun TokenContract?.isEOSToken(): Boolean {
-	return (!isEOS() && !isETC() && !isBCH() && !isLTC() && !isETH() && !isBTC() && this?.contract?.length != CryptoValue.contractAddressLength)
+	return !isEOS() && !isETC() && !isBCH() && !isLTC() && !isETH() && !isBTC() && this?.contract?.length != CryptoValue.contractAddressLength && this?.contract?.length.orZero() > 0
 }
 
 fun TokenContract?.isBTCSeries(): Boolean {
@@ -110,7 +106,7 @@ fun TokenContract?.getChainType(): ChainType {
 		this?.contract.equals(TokenContract.btcContract, true) -> ChainType.BTC
 		this?.contract.equals(TokenContract.ltcContract, true) -> ChainType.LTC
 		this?.contract.equals(TokenContract.bchContract, true) -> ChainType.BCH
-		this?.contract.equals(TokenContract.eosContract, true) -> ChainType.EOS
+		this.isEOSSeries() -> ChainType.EOS
 		this?.contract.equals(TokenContract.ethContract, true) -> ChainType.ETH
 		// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 		this?.contract?.length == CryptoValue.contractAddressLength -> ChainType.ETH
@@ -118,13 +114,14 @@ fun TokenContract?.getChainType(): ChainType {
 	}
 }
 
+// 这个方法是用来获取链 `Symbol` 用的, 所以 `Token` 的 `Symbol` 都对应到链的核心 `Symbol`
 fun TokenContract?.getSymbol(): CoinSymbol {
 	return when {
 		this?.contract.equals(TokenContract.etcContract, true) -> CoinSymbol.ETC
 		this?.contract.equals(TokenContract.btcContract, true) -> CoinSymbol.BTC
 		this?.contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.LTC
 		this?.contract.equals(TokenContract.bchContract, true) -> CoinSymbol.BCH
-		this?.contract.equals(TokenContract.eosContract, true) -> CoinSymbol.EOS
+		this.isEOSSeries() -> CoinSymbol.EOS
 		this?.contract.equals(TokenContract.ethContract, true) -> CoinSymbol.ETH
 		/** 以下两个通常用作燃气费的基础手续费的显示 `Symbol` */
 		// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
@@ -136,18 +133,18 @@ fun TokenContract?.getSymbol(): CoinSymbol {
 
 fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 	return when {
-		TokenContract(this?.contract).isBTC() ->
+		TokenContract(this?.contract.orEmpty()).isBTC() ->
 			AddressUtils.getCurrentBTCAddress()
-		TokenContract(this?.contract).isLTC() ->
+		TokenContract(this?.contract.orEmpty()).isLTC() ->
 			AddressUtils.getCurrentLTCAddress()
-		TokenContract(this?.contract).isBCH() ->
+		TokenContract(this?.contract.orEmpty()).isBCH() ->
 			AddressUtils.getCurrentBCHAddress()
-		TokenContract(this?.contract).isETC() ->
+		TokenContract(this?.contract.orEmpty()).isETC() ->
 			SharedAddress.getCurrentETC()
-		TokenContract(this?.contract).isEOSSeries() ->
+		TokenContract(this?.contract.orEmpty()).isEOSSeries() ->
 			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
 			else SharedAddress.getCurrentEOS()
-		TokenContract(this?.contract).isETH() -> SharedAddress.getCurrentEthereum()
+		TokenContract(this?.contract.orEmpty()).isETH() -> SharedAddress.getCurrentEthereum()
 		this?.contract?.length == CryptoValue.contractAddressLength -> SharedAddress.getCurrentEthereum()
 		else -> {
 			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
@@ -162,7 +159,7 @@ fun TokenContract?.getCurrentChainID(): ChainID {
 		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrent()
 		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrent()
 		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrent()
-		this?.contract.equals(TokenContract.eosContract, true) -> SharedChain.getEOSCurrent()
+		this.isEOSSeries() -> SharedChain.getEOSCurrent()
 		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETH()
 		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETH()
 		else -> SharedChain.getEOSCurrent() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
@@ -175,7 +172,7 @@ fun TokenContract?.getCurrentChainName(): String {
 		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrentName()
 		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrentName()
 		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrentName()
-		this?.contract.equals(TokenContract.eosContract, true) -> SharedChain.getEOSCurrentName()
+		this.isEOSSeries() -> SharedChain.getEOSCurrentName()
 		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETHName()
 		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETHName()
 		else -> SharedChain.getEOSCurrentName()
@@ -188,20 +185,8 @@ fun TokenContract?.getMainnetChainID(): String {
 		this?.contract.equals(TokenContract.btcContract, true) -> ChainID.btcMain
 		this?.contract.equals(TokenContract.ltcContract, true) -> ChainID.ltcMain
 		this?.contract.equals(TokenContract.bchContract, true) -> ChainID.bchMain
-		this?.contract.equals(TokenContract.eosContract, true) -> ChainID.eosMain
+		this.isEOSSeries() -> ChainID.eosMain
 		this?.contract?.length == CryptoValue.contractAddressLength -> ChainID.ethMain
 		else -> ChainID.eosMain
-	}
-}
-
-fun TokenContract?.getDecimal(): Int? {
-	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> CryptoValue.etcDecimal
-		this?.contract.equals(TokenContract.btcContract, true) -> CryptoValue.btcSeriesDecimal
-		this?.contract.equals(TokenContract.ltcContract, true) -> CryptoValue.btcSeriesDecimal
-		this?.contract.equals(TokenContract.bchContract, true) -> CryptoValue.btcSeriesDecimal
-		this?.contract.equals(TokenContract.eosContract, true) -> CryptoValue.eosDecimal
-		this?.contract.equals(TokenContract.ethContract, true) -> CryptoValue.ethDecimal
-		else -> null // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }

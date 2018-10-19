@@ -64,8 +64,8 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		calculateHandler.postDelayed(disCalculateRunnable, 2000)
 		// data重新赋值后，最高值最低值需要动态计算，不然会导致蜡烛显示在错误，所以要释放最大值最小值的强制设置
 		mAxisLeft.resetAxisMaximum()
-		notifyData(dateType, dataRows)
 		moveViewToX(dataRows.size.toFloat())
+		notifyData(dateType, dataRows)
 	}
 
 	private fun notifyData(dateType: Int, dataRows: List<CandleEntry>) {

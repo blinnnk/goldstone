@@ -15,9 +15,9 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 object SharedChain {
 	/** Chain Config */
 	fun getCurrentETH(): ChainID =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.currentChain)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainID(ChainID.ethMain)
 		} else {
@@ -25,23 +25,23 @@ object SharedChain {
 		}
 
 	fun getCurrentETHName(): String =
-		if (GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName).equals("Default", true)) {
+		if(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName).equals("Default",true)) {
 			ChainText.infuraMain
 		} else {
 			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName)
 		}
 
 	fun updateCurrentETH(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChain, chainID)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChain,chainID)
 
 	fun updateCurrentETHName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChainName, chainName)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChainName,chainName)
 
 	/** LTC ChainID And Chain Name in Shared Preference*/
 	fun getLTCCurrent(): ChainID =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainID.LTC
 		} else {
@@ -49,9 +49,9 @@ object SharedChain {
 		}
 
 	fun getLTCCurrentName(): String =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainText.ltcMain
 		} else {
@@ -59,7 +59,7 @@ object SharedChain {
 		}
 
 	fun updateLTCCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain, chainID)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain,chainID)
 
 	fun updateLTCCurrentName(chainName: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
@@ -69,9 +69,9 @@ object SharedChain {
 
 	/** BCH ChainID And Chain Name in Shared Preference */
 	fun getBCHCurrent(): ChainID =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainID.BCH
 		} else {
@@ -79,9 +79,9 @@ object SharedChain {
 		}
 
 	fun getBCHCurrentName(): String =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainText.bchMain
 		} else {
@@ -89,7 +89,7 @@ object SharedChain {
 		}
 
 	fun updateBCHCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.bchCurrentChain, chainID)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.bchCurrentChain,chainID)
 
 	fun updateBCHCurrentName(chainName: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
@@ -99,9 +99,9 @@ object SharedChain {
 
 	/** EOS ChainID And ChainName In Shared Preference*/
 	fun getEOSCurrent(): ChainID =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainID.EOS
 		} else {
@@ -109,9 +109,9 @@ object SharedChain {
 		}
 
 	fun getEOSCurrentName(): String =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.eosCurrentChainName)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainText.eosMain
 		} else {
@@ -119,7 +119,7 @@ object SharedChain {
 		}
 
 	fun updateEOSCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosCurrentChain, chainID)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosCurrentChain,chainID)
 
 	fun updateEOSCurrentName(chainName: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
@@ -129,9 +129,9 @@ object SharedChain {
 
 	/** ETC ChainID And Chain Name in Shared Preference*/
 	fun getETCCurrent(): ChainID =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainID.ETC
 		} else {
@@ -139,9 +139,9 @@ object SharedChain {
 		}
 
 	fun getETCCurrentName(): String =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainText.etcMainGasTracker
 		} else {
@@ -149,7 +149,7 @@ object SharedChain {
 		}
 
 	fun updateETCCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainID)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain,chainID)
 
 	fun updateETCCurrentName(chainName: String) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(
@@ -158,9 +158,9 @@ object SharedChain {
 		)
 
 	fun getBTCCurrent(): ChainID =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainID.BTC
 		} else {
@@ -168,12 +168,12 @@ object SharedChain {
 		}
 
 	fun updateBTCCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainID)
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain,chainID)
 
 	fun getBTCCurrentName(): String =
-		if (GoldStoneAPI.context
+		if(GoldStoneAPI.context
 				.getStringFromSharedPreferences(SharesPreference.btcCurrentChainName)
-				.equals("Default", true)
+				.equals("Default",true)
 		) {
 			ChainText.btcMain
 		} else {

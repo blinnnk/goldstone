@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
@@ -107,7 +108,8 @@ class TokenAssetPresenter(
 		EOSAccountTable.getAccountByName(account.accountName) { localData ->
 			// 首先显示数据库的数据在界面上
 			localData?.updateUIValue()
-			if (onlyUpdateLocalData) return@getAccountByName
+			if (onlyUpdateLocalData || !NetworkUtil.hasNetwork(fragment.context))
+				return@getAccountByName
 			EOSAPI.getAccountInfo(account) { eosAccount, error ->
 				if (!eosAccount.isNull() && error.isNone()) {
 					val newData =
@@ -124,7 +126,7 @@ class TokenAssetPresenter(
 	private fun getAccountTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
 		val account = SharedAddress.getCurrentEOSAccount()
-		EOSAPI.getTransactionCount(
+		if (NetworkUtil.hasNetwork(fragment.context)) EOSAPI.getTransactionCount(
 			SharedChain.getEOSCurrent(),
 			account,
 			EOSCodeName.EOSIOToken.value,

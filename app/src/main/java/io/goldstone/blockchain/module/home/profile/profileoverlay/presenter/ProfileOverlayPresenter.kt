@@ -41,7 +41,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class ProfileOverlayPresenter(
 	override val fragment: ProfileOverlayFragment
-) : BaseOverlayPresenter<ProfileOverlayFragment>() {
+): BaseOverlayPresenter<ProfileOverlayFragment>() {
 
 	override fun removeSelfFromActivity() {
 		super.removeSelfFromActivity()
@@ -55,7 +55,7 @@ class ProfileOverlayPresenter(
 	}
 
 	fun showTargetFragmentByTitle(title: String) {
-		when (title) {
+		when(title) {
 			ProfileText.contacts -> showContactsFragment()
 			ProfileText.contactsInput -> showContactInput()
 			ProfileText.currency -> showCurrencyFragment()
@@ -75,7 +75,7 @@ class ProfileOverlayPresenter(
 	private fun showWalletListFragment() {
 		fragment.apply {
 			headerTitle = WalletText.wallet
-			showAddButton(true, true) {
+			showAddButton(true,true) {
 				showWalletAddingMethodDashboard()
 			}
 			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)
@@ -84,15 +84,15 @@ class ProfileOverlayPresenter(
 
 	fun showWalletAddingMethodDashboard() {
 		val menuData = listOf(
-			Pair(R.drawable.create_wallet_icon, CreateWalletText.create),
-			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet),
-			Pair(R.drawable.watch_only_icon, ImportWalletText.importWatchWallet)
+			Pair(R.drawable.create_wallet_icon,CreateWalletText.create),
+			Pair(R.drawable.import_wallet_icon,ImportWalletText.importWallet),
+			Pair(R.drawable.watch_only_icon,ImportWalletText.importWatchWallet)
 		)
 		var mini: MiniOverlay? = null
 		fragment.overlayView.apply {
-			mini = MiniOverlay(context) { cell, title ->
+			mini = MiniOverlay(context) { cell,title ->
 				cell.onClick {
-					when (title) {
+					when(title) {
 						CreateWalletText.create -> showCreateWalletFragment()
 						ImportWalletText.importWallet -> showImportWalletFragment()
 						else -> showWatchWalletImportFragment()
@@ -114,8 +114,8 @@ class ProfileOverlayPresenter(
 
 	private fun showAboutFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
-			putString(ArgumentKey.webViewName, ProfileText.aboutUs)
+			putString(ArgumentKey.webViewUrl,WebUrl.aboutUs)
+			putString(ArgumentKey.webViewName,ProfileText.aboutUs)
 		}
 	}
 
@@ -133,29 +133,29 @@ class ProfileOverlayPresenter(
 
 	private fun showPrivacyFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
-			putString(ArgumentKey.webViewName, ProfileText.privacy)
+			putString(ArgumentKey.webViewUrl,WebUrl.privacy)
+			putString(ArgumentKey.webViewName,ProfileText.privacy)
 		}
 	}
 
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.terms)
-			putString(ArgumentKey.webViewName, ProfileText.terms)
+			putString(ArgumentKey.webViewUrl,WebUrl.terms)
+			putString(ArgumentKey.webViewName,ProfileText.terms)
 		}
 	}
 
 	private fun showSupportFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.support)
-			putString(ArgumentKey.webViewName, ProfileText.support)
+			putString(ArgumentKey.webViewUrl,WebUrl.support)
+			putString(ArgumentKey.webViewName,ProfileText.support)
 		}
 	}
 
 	private fun showHelpCenterFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.helpCenter)
-			putString(ArgumentKey.webViewName, ProfileText.helpCenter)
+			putString(ArgumentKey.webViewUrl,WebUrl.helpCenter)
+			putString(ArgumentKey.webViewName,ProfileText.helpCenter)
 		}
 	}
 
@@ -166,7 +166,8 @@ class ProfileOverlayPresenter(
 	private fun showWalletSecurityFragment() {
 		fragment.addFragmentAndSetArgument<WalletSecuritySettingsFragment>(ContainerID.content)
 	}
-	fun setPassCodeFragment() {
+
+	fun showPassCodeSettingFragment() {
 		fragment.addFragmentAndSetArgument<PassCodeFragment>(ContainerID.content) {
 			putBoolean(
 				ArgumentKey.setPinCode,
@@ -174,6 +175,7 @@ class ProfileOverlayPresenter(
 			)
 		}
 	}
+
 	private fun showContactsFragment() {
 		fragment.addFragmentAndSetArgument<ContactFragment>(ContainerID.content)
 	}

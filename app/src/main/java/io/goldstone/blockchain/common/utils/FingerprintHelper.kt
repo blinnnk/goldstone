@@ -6,18 +6,22 @@ import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
 import android.os.CancellationSignal
-import android.support.annotation.RequiresApi
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.error.WalletSecurityError
 
 /**
  * @date 04/09/2018 3:32 PM
  * @author wcx
  */
-@RequiresApi(Build.VERSION_CODES.M)
-class FingerprintHelper(private val context: Context) : FingerprintManager.AuthenticationCallback() {
-	private var fingerprintManager: FingerprintManager = context.getSystemService(FingerprintManager::class.java)
+class FingerprintHelper(private val context: Context) {
+	private var fingerprintManager: FingerprintManager? = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+		context.getSystemService(FingerprintManager::class.java)
+	} else {
+		null
+	}
+	private var systemAuthenticationCallback = implementationSystemAuthenticationCallback()
 	private var authenticationCallback: AuthenticationCallback? = null
 	private var cancellationSignal: CancellationSignal? = null
 
@@ -27,7 +31,7 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 
 	fun startFingerprintUnlock(@UiThread hold: (error: WalletSecurityError) -> Unit) {
 		val fingerprintAvailableStatus = checkIfTheFingerprintIsAvailable()
-		if (fingerprintAvailableStatus.isAvailable()) {
+		if(fingerprintAvailableStatus.isAvailable()) {
 			// 可以指纹检测
 			authenticate()
 			hold(WalletSecurityError.None)
@@ -42,7 +46,7 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 		fingerprintAvailableStatus: FingerprintAvailableStatus,
 		@UiThread hold: (error: WalletSecurityError) -> Unit
 	) {
-		if (fingerprintAvailableStatus.isUnregistered()) {
+		if(fingerprintAvailableStatus.isUnregistered()) {
 			hold(WalletSecurityError.UnregisteredFingerprint)
 		} else {
 			hold(WalletSecurityError.HardwareDoesNotSupportFingerprints)
@@ -50,67 +54,115 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
 	}
 
 	private fun authenticate() {
-		if (cancellationSignal == null) {
+		if(cancellationSignal == null) {
 			cancellationSignal = CancellationSignal()
 		}
-		fingerprintManager.authenticate(
-			null,
-			cancellationSignal,
-			0,
-			this,
-			null
-		)
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			fingerprintManager?.authenticate(
+				null,
+				cancellationSignal,
+				0,
+				object: FingerprintManager.AuthenticationCallback() {
+					override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult) {
+						if(authenticationCallback == null) {
+							return
+						}
+						authenticationCallback?.onAuthenticationSucceeded(result.toString())
+					}
+
+					override fun onAuthenticationError(
+						errorCode: Int,
+						errString: CharSequence
+					) {
+						if(authenticationCallback != null) {
+							authenticationCallback?.onAuthenticationFail(
+								errorCode,
+								errString
+							)
+						}
+					}
+
+					override fun onAuthenticationHelp(
+						helpCode: Int,
+						helpString: CharSequence
+					) {
+						authenticationCallback?.onAuthenticationHelp(
+							helpCode,
+							helpString
+						)
+					}
+
+					override fun onAuthenticationFailed() {
+						authenticationCallback?.onAuthenticationFailed()
+					}
+				},
+				null
+			)
+		}
+	}
+
+	private fun implementationSystemAuthenticationCallback(): FingerprintManager.AuthenticationCallback? {
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			return object: FingerprintManager.AuthenticationCallback() {
+				override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult) {
+					if(authenticationCallback == null) {
+						return
+					}
+					authenticationCallback?.onAuthenticationSucceeded(result.toString())
+				}
+
+				override fun onAuthenticationError(
+					errorCode: Int,
+					errString: CharSequence
+				) {
+					if(authenticationCallback != null) {
+						authenticationCallback?.onAuthenticationFail(
+							errorCode,
+							errString
+						)
+					}
+				}
+
+				override fun onAuthenticationHelp(
+					helpCode: Int,
+					helpString: CharSequence
+				) {
+					authenticationCallback?.onAuthenticationHelp(
+						helpCode,
+						helpString
+					)
+				}
+
+				override fun onAuthenticationFailed() {
+					authenticationCallback?.onAuthenticationFailed()
+				}
+			}
+		} else {
+			return null
+		}
 	}
 
 	fun checkIfTheFingerprintIsAvailable(): FingerprintAvailableStatus {
-		if (fingerprintManager.isNull()) {
-			fingerprintManager = context.getSystemService(FingerprintManager::class.java)
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			if(fingerprintManager.isNull()) {
+				fingerprintManager = context.getSystemService(FingerprintManager::class.java)
+			}
+			if(!fingerprintManager?.isHardwareDetected.orFalse()) {
+				return FingerprintAvailableStatus.HardwareDidNotSupport
+			} else if(!fingerprintManager?.hasEnrolledFingerprints().orFalse()) {
+				return FingerprintAvailableStatus.NoFingerprintSavedRecord
+			}
+			return FingerprintAvailableStatus.Available
+		} else {
+			return FingerprintAvailableStatus.HardwareDidNotSupport
 		}
-		if (!fingerprintManager.isHardwareDetected) {
-			return FingerprintAvailableStatus.HardwareDoesNotSupportFingerprints
-		} else if (!fingerprintManager.hasEnrolledFingerprints()) {
-			return FingerprintAvailableStatus.NoFingerprintSaveRecord
-		}
-		return FingerprintAvailableStatus.Available
 	}
 
 	fun stopAuthenticate() {
 		cancellationSignal?.cancel()
 		cancellationSignal = null
 		authenticationCallback = null
-	}
-
-	override fun onAuthenticationSucceeded(result: FingerprintManager.AuthenticationResult) {
-		if (authenticationCallback == null) {
-			return
-		}
-		authenticationCallback?.onAuthenticationSucceeded(result.toString())
-	}
-
-	override fun onAuthenticationError(
-		errorCode: Int,
-		errString: CharSequence
-	) {
-		if (authenticationCallback != null) {
-			authenticationCallback?.onAuthenticationFail(
-				errorCode,
-				errString
-			)
-		}
-	}
-
-	override fun onAuthenticationHelp(
-		helpCode: Int,
-		helpString: CharSequence
-	) {
-		authenticationCallback?.onAuthenticationHelp(
-			helpCode,
-			helpString
-		)
-	}
-
-	override fun onAuthenticationFailed() {
-		authenticationCallback?.onAuthenticationFailed()
+		systemAuthenticationCallback = null
 	}
 
 	interface AuthenticationCallback {
@@ -133,18 +185,18 @@ class FingerprintHelper(private val context: Context) : FingerprintManager.Authe
  */
 enum class FingerprintAvailableStatus(val status: Int) {
 	Available(1),
-	NoFingerprintSaveRecord(0),
-	HardwareDoesNotSupportFingerprints(-1);
+	NoFingerprintSavedRecord(0),
+	HardwareDidNotSupport(-1);
 
 	fun isAvailable(): Boolean {
 		return status == Available.status
 	}
 
 	fun isUnregistered(): Boolean {
-		return status == NoFingerprintSaveRecord.status
+		return status == NoFingerprintSavedRecord.status
 	}
 
 	fun hardwareIsUnsupported(): Boolean {
-		return status == HardwareDoesNotSupportFingerprints.status
+		return status == HardwareDidNotSupport.status
 	}
 }

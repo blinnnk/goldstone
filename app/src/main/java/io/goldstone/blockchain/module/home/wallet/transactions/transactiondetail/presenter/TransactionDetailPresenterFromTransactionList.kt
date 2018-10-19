@@ -31,28 +31,23 @@ fun TransactionDetailPresenter.updateDataFromTransactionList(
 		headerModel = headerData
 		currentHash = transactionHash
 		fragment.showLoadingView(LoadingText.loadingDataFromChain)
-
 		when {
-			contract.isBTCSeries() -> {
-				dataFromList?.let {
-					fragment.asyncData = generateModels(it).toArrayList()
-					updateHeaderValue(headerData)
-					fragment.removeLoadingView()
-					if (isPending) when {
-						contract.isBTC() -> observerBTCTransaction()
-						contract.isBCH() -> observerBCHTransaction()
-						else -> observerLTCTransaction()
-					}
+			contract.isBTCSeries() -> dataFromList?.let {
+				fragment.asyncData = generateModels(it).toArrayList()
+				updateHeaderValue(headerData)
+				fragment.removeLoadingView()
+				if (isPending) when {
+					contract.isBTC() -> observerBTCTransaction()
+					contract.isBCH() -> observerBCHTransaction()
+					else -> observerLTCTransaction()
 				}
 			}
 
-			contract.isEOSSeries() -> {
-				dataFromList?.let {
-					fragment.asyncData = generateModels(it).toArrayList()
-					updateHeaderValue(headerData)
-					fragment.removeLoadingView()
-					if (isPending) observerEOSTransaction()
-				}
+			contract.isEOSSeries() -> dataFromList?.let {
+				fragment.asyncData = generateModels(it).toArrayList()
+				updateHeaderValue(headerData)
+				fragment.removeLoadingView()
+				if (isPending) observerEOSTransaction()
 			}
 
 			contract.isETC() -> {

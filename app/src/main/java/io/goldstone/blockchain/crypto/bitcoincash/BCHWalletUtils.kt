@@ -53,7 +53,7 @@ object BCHWalletUtils {
 			address.contentEquals(":") &&
 				!address.substringAfter(":").substring(0, 1).equals("q", true) -> false
 			address.substring(0, 1).equals("q", true) &&
-				address.length < CryptoValue.bchNewAddressMinLengh -> false
+				address.length < CryptoValue.bchNewAddressMinLength -> false
 			CryptoValue.isBitcoinAddressLength(address) &&
 				address.substring(0, 1).equals("m", true) -> false
 			CryptoValue.isBitcoinAddressLength(address) &&

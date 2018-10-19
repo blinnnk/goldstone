@@ -89,7 +89,7 @@ class QuotationPresenter(
 		if (isEmpty()) return
 		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
-		if (maxDate + 1L < 0.daysAgoInMills()) {
+		if (maxDate + 1L < 1.daysAgoInMills()) {
 			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
 				if (!newChart.isNull() && error.isNone()) {
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {

@@ -39,11 +39,11 @@ import org.jetbrains.anko.*
  * @date 11/09/2018 3:45 PM
  * @author wcx
  */
-class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresenter>() {
-	override val pageTitle : String = ProfileText.walletSecurity
+class WalletSecuritySettingsFragment: BaseFragment<WalletSecuritySettingsPresenter>() {
+	override val pageTitle: String = ProfileText.walletSecurity
 
 	private val changePinCode by lazy { LinearLayout(context) }
-	private var pinCodeSingleLineSwitch : SingleLineSwitch? = null
+	private var pinCodeSingleLineSwitch: SingleLineSwitch? = null
 	override val presenter = WalletSecuritySettingsPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -51,7 +51,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent,matchParent)
 			if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
-				presenter.showPassCodeFragment()
+				presenter.showVerifyPinCodeFragment()
 			}
 
 			AttentionView(context).apply {
@@ -68,7 +68,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	}
 
 	private fun ViewGroup.initSwitchCell() {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
+		if(!checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
 			// 指纹解锁
 			SingleLineSwitch(
 				context,
@@ -153,7 +153,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		}.into(this)
 	}
 
-	private fun setPinCodeSingleLineSwitchStatus(isChecked : Boolean) {
+	private fun setPinCodeSingleLineSwitchStatus(isChecked: Boolean) {
 		pinCodeSingleLineSwitch?.setSwitchStatus(isChecked)
 	}
 
@@ -161,18 +161,16 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		changePinCode.visibility = View.VISIBLE
 	}
 
-	private fun checkIfTheSystemFingerprintExists() : FingerprintAvailableStatus {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			context?.let {
-				val fingerprintHelper = FingerprintHelper(it)
-				return fingerprintHelper.checkIfTheFingerprintIsAvailable()
-			}
+	private fun checkIfTheSystemFingerprintExists(): FingerprintAvailableStatus {
+		context?.let {
+			val fingerprintHelper = FingerprintHelper(it)
+			return fingerprintHelper.checkIfTheFingerprintIsAvailable()
 		}
-		return FingerprintAvailableStatus.HardwareDoesNotSupportFingerprints
+		return FingerprintAvailableStatus.HardwareDidNotSupport
 	}
 
 	// 点击后根据更新的数据库情况显示指紋解锁开关状态
-	private fun openFingerprintEvent(switch : HoneyBaseSwitch) {
+	private fun openFingerprintEvent(switch: HoneyBaseSwitch) {
 		presenter.setFingerprintStatus(switch.isChecked) {
 			switch.isChecked = SharedWallet.isFingerprintUnlockerOpened().orFalse()
 			if(!pinCodeSingleLineSwitch?.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
@@ -207,7 +205,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 					try {
 						context.startActivity(intent)
-					} catch(e : Exception) {
+					} catch(e: Exception) {
 					}
 					GoldStoneDialog.remove(context)
 				}
@@ -220,7 +218,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		}
 	}
 
-	override fun onHiddenChanged(hidden : Boolean) {
+	override fun onHiddenChanged(hidden: Boolean) {
 		if(!hidden) {
 			// 设置新密码返回更新状态
 			if(SharedWallet.isPincodeOpened().orFalse()) {
@@ -231,8 +229,8 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	}
 
 	override fun setBaseBackEvent(
-		activity : MainActivity?,
-		parent : Fragment?
+		activity: MainActivity?,
+		parent: Fragment?
 	) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()
