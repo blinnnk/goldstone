@@ -59,22 +59,7 @@ class PassCodeFragment: BaseFragment<PassCodePresenter>() {
 	override val presenter = PassCodePresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		if(isPinCodeSetting.orFalse()) {
-			getParentFragment<ProfileOverlayFragment> {
-				overlayView.header.showCloseButton(false)
-				overlayView.header.showBackButton(true) {
-					if(isEnterYourNewPasswordAgain) {
-						isEnterYourNewPasswordAgain = false
-						setPasswordInputTitles(
-							PincodeText.setFourDigitPassword,
-							""
-						)
-					} else {
-						presenter.removeSelfFromActivity()
-					}
-				}
-			}
-		}
+		setParentBackButton()
 		container = relativeLayout {
 			isClickable = true
 			lparams(
@@ -162,6 +147,25 @@ class PassCodeFragment: BaseFragment<PassCodePresenter>() {
 				setAlignParentBottom()
 				y -= ScreenSize.Height * 0.113f
 				setKeyboardClickEventByFrozenStatus()
+			}
+		}
+	}
+
+	private fun setParentBackButton() {
+		if(isPinCodeSetting.orFalse()) {
+			getParentFragment<ProfileOverlayFragment> {
+				overlayView.header.showCloseButton(false)
+				overlayView.header.showBackButton(true) {
+					if(isEnterYourNewPasswordAgain) {
+						isEnterYourNewPasswordAgain = false
+						setPasswordInputTitles(
+							PincodeText.setFourDigitPassword,
+							""
+						)
+					} else {
+						presenter.removeSelfFromActivity()
+					}
+				}
 			}
 		}
 	}
