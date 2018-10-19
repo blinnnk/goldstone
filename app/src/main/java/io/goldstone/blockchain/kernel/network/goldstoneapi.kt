@@ -13,15 +13,12 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestData
 import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoData
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
@@ -66,9 +63,9 @@ object GoldStoneAPI {
 		@WorkerThread hold: (List<DefaultTokenTable>) -> Unit
 	) {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
-		AppConfigTable.getAppConfig { it ->
+		AppConfigTable.getAppConfig { config ->
 			requestData<String>(
-				APIPath.defaultTokenList(APIPath.currentUrl, it?.defaultCoinListMD5.orEmpty()),
+				APIPath.defaultTokenList(APIPath.currentUrl, config?.defaultCoinListMD5.orEmpty()),
 				"",
 				true,
 				errorCallback,
@@ -107,8 +104,9 @@ object GoldStoneAPI {
 					}
 
 					override fun getResultInMainThread(): Boolean = false
-					override fun mergeCallBack() = hold(allDefaultTokens)
-
+					override fun mergeCallBack() {
+						hold(allDefaultTokens)
+					}
 				}.start()
 			}
 		}

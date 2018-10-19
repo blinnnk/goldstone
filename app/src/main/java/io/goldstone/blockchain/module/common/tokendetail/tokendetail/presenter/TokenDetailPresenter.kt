@@ -80,7 +80,7 @@ class TokenDetailPresenter(
 		if (token?.contract.isEOSSeries()) {
 			if (allData.isNull() || allData!!.isEmpty()) {
 				currentMaxCount = totalCount
-				fragment.asyncData?.clear()
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
 				flipEOSPageData { sortData() }
 			} else sortData()
 		} else sortData()
@@ -103,7 +103,7 @@ class TokenDetailPresenter(
 		if (token?.contract.isEOSSeries()) {
 			if (allData.isNull() || allData!!.isEmpty()) {
 				currentMaxCount = totalCount
-				fragment.asyncData?.clear()
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
 				flipEOSPageData { sortData() }
 			} else sortData()
 		} else sortData()
@@ -118,7 +118,7 @@ class TokenDetailPresenter(
 		}
 		if (token?.contract.isEOSSeries()) {
 			currentMaxCount = totalCount
-			fragment.asyncData?.clear()
+			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
 			flipEOSPageData { sortData() }
 		} else sortData()
 	}

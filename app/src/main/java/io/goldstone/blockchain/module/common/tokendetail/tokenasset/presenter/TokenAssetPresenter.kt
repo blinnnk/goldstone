@@ -133,7 +133,7 @@ class TokenAssetPresenter(
 			CoinSymbol.EOS.symbol!!
 		) { latestCount, error ->
 			if (error.isNone()) {
-				val count = if (latestCount.isNull()) 0 else latestCount!! + 1
+				val count = if (latestCount.isNull()) 0 else latestCount!!
 				fragment.setTransactionCount(count.toString())
 			}
 		}

@@ -216,11 +216,11 @@ data class DefaultTokenTable(
 
 	companion object {
 
-		fun getAllTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
-			} then {
-				hold(it.toArrayList())
+		fun getAllTokens(isMainThread: Boolean = true, hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+			doAsync {
+				val data = GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(data.toArrayList()) }
+				else hold(data.toArrayList())
 			}
 		}
 
@@ -252,7 +252,7 @@ data class DefaultTokenTable(
 		) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenByContract(contract.contract.orEmpty(), contract.getCurrentChainID().id)
+					.getTokenByContract(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			} then (hold)
 		}
 
@@ -323,8 +323,8 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chainID IN (:currentChainIDs)")
 	fun getDefaultTokens(currentChainIDs: List<String> = Current.chainIDs(), isDefault: Boolean = true): List<DefaultTokenTable>
 
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract  AND chainID LIKE :chainID")
-	fun getTokenByContract(contract: String, chainID: String): DefaultTokenTable?
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
+	fun getTokenByContract(contract: String, symbol: String, chainID: String): DefaultTokenTable?
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>

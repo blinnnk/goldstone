@@ -98,7 +98,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 									)?.serverID ?: 0L
 							loadTargetRangeData()
 						}
-						localData.size < pageCount -> {
+						localData.size < pageCount && localData.size < totalCount.orZero() -> {
 							// 本地片段存在不足的情况
 							endID = if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
 								localData.minBy { it.dataIndex }?.serverID ?: 0L
