@@ -108,7 +108,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
 					// 没有网络数据直接返回
 					if (serverTokens.isEmpty()) return@getDefaultTokens
-					DefaultTokenTable.getAllTokens { localTokens ->
+					DefaultTokenTable.getAllTokens(false) { localTokens ->
 						// 开一个线程更新图片
 						serverTokens.updateLocalTokenIcon(localTokens)
 						// 移除掉一样的数据
@@ -144,7 +144,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					if (isEmpty()) return@doAsync
 					forEach { server ->
 						GoldStoneDataBase.database.defaultTokenDao().apply {
-							getTokenByContract(server.contract, server.chainID)?.let {
+							getTokenByContract(server.contract, server.symbol, server.chainID)?.let {
 								update(it.apply {
 									iconUrl = server.iconUrl
 									isDefault = server.isDefault

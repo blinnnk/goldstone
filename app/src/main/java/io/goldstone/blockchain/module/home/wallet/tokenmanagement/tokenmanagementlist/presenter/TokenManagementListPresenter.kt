@@ -80,7 +80,7 @@ class TokenManagementListPresenter(
 		fun insertOrDeleteMyToken(isChecked: Boolean, token: DefaultTokenTable) {
 			doAsync {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				if (isChecked) MyTokenTable.addNew(token.symbol, TokenContract(token.contract), token.chainID)
+				if (isChecked) MyTokenTable.addNew(TokenContract(token.contract, token.symbol), token.chainID)
 				else GoldStoneDataBase.database.myTokenDao()
 					.deleteByContractAndAddress(token.contract, token.symbol, TokenContract(token.contract).getAddress())
 			}

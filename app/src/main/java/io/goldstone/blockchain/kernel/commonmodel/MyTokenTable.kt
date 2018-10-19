@@ -95,8 +95,7 @@ data class MyTokenTable(
 					val existingAccount = getByOwnerName(name, chainID)
 					if (pendingAccount.isNull() && existingAccount.isNull()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao()
-								.getTokenByContract(TokenContract.eosContract, SharedChain.getEOSCurrent().id)
+							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!, SharedChain.getEOSCurrent().id)
 						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
 					} else if (!pendingAccount.isNull()) {
 						updatePendingAccountName(name, address, chainID)
@@ -153,7 +152,7 @@ data class MyTokenTable(
 		}
 
 		@WorkerThread
-		fun addNew(symbol: String, contract: TokenContract, chainID: String) {
+		fun addNew(contract: TokenContract, chainID: String) {
 			val currentAddress = contract.getAddress(false)
 			val accountName =
 				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
@@ -162,7 +161,7 @@ data class MyTokenTable(
 				0,
 				accountName,
 				currentAddress,
-				symbol,
+				contract.symbol,
 				0.0,
 				contract.contract.orEmpty(),
 				chainID
