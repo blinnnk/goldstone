@@ -168,7 +168,10 @@ class ProfileOverlayPresenter(
 	}
 	fun setPassCodeFragment() {
 		fragment.addFragmentAndSetArgument<PassCodeFragment>(ContainerID.content) {
-			putBoolean(ArgumentKey.setPinCode, true)
+			putBoolean(
+				ArgumentKey.setPinCode,
+				true
+			)
 		}
 	}
 	private fun showContactsFragment() {

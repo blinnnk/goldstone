@@ -1,18 +1,11 @@
 package io.goldstone.blockchain.module.home.profile.walletsecurity.presenter
 
-import android.widget.EditText
-import com.blinnnk.component.HoneyBaseSwitch
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.hideChildFragment
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.PincodeText
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
@@ -56,6 +49,9 @@ class WalletSecuritySettingsPresenter(override val fragment : WalletSecuritySett
 		fragment.getParentFragment<ProfileOverlayFragment> {
 			hideChildFragment(fragment)
 		}
-		fragment.activity?.addFragmentAndSetArguments<PassCodeFragment>(ContainerID.main,FragmentTag.pinCode) { }
+		fragment.activity?.addFragmentAndSetArguments<PassCodeFragment>(
+			ContainerID.main,
+			FragmentTag.pinCode
+		) { }
 	}
 }

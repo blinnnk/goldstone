@@ -63,10 +63,12 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		view : View,
 		savedInstanceState : Bundle?
 	) {
-		super.onViewCreated(view,savedInstanceState)
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 		WalletTable.getCurrentWallet {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
-
 			if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
 				getParentFragment<ProfileOverlayFragment> {
 					activity?.addFragmentAndSetArguments<PassCodeFragment>(
@@ -75,7 +77,6 @@ class HintFragment : BaseFragment<HintPresenter>() {
 					)
 				}
 			}
-
 			hintInput.hint = this.hint
 		}
 	}

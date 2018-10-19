@@ -47,7 +47,7 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 	private val disableTheBackButtonToExit by lazy { arguments?.getBoolean(ArgumentKey.disableTheBackButtonToExit) }
 	private lateinit var container : RelativeLayout
 	private val keyboard by lazy { NumberKeyboard(context!!) }
-	private val passwordInput by lazy { PasscodeInput(context!!) }
+	private val passwordInput by lazy { PassCodeInput(context!!) }
 	private var failedAttention : TextView? = null
 	private var isPinCode = false
 	private var isTwoVerificationMethods = false
@@ -256,7 +256,10 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 		view : View,
 		savedInstanceState : Bundle?
 	) {
-		super.onViewCreated(view,savedInstanceState)
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 		activity?.apply { SoftKeyboard.hide(this) }
 	}
 

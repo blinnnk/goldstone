@@ -79,36 +79,6 @@ object Alert {
 
 object PincodeText {
 	@JvmField
-	val pincode = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Pin Code"
-		HoneyLanguage.Chinese.code -> "PIN码"
-		HoneyLanguage.Japanese.code -> "PINコード"
-		HoneyLanguage.Korean.code -> "PIN 코드"
-		HoneyLanguage.Russian.code -> "PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
-		else -> ""
-	}
-	@JvmField
-	val repeat = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Repeat PIN"
-		HoneyLanguage.Chinese.code -> "重复PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードが重複しています"
-		HoneyLanguage.Korean.code -> "중복PIN코드"
-		HoneyLanguage.Russian.code -> "Повторите PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "重複PIN碼"
-		else -> ""
-	}
-	@JvmField
-	val description = when(currentLanguage) {
-		HoneyLanguage.English.code -> "Please set a 4-digit PIN"
-		HoneyLanguage.Chinese.code -> "输入四位密码"
-		HoneyLanguage.Japanese.code -> "4桁のパスワードを入力します"
-		HoneyLanguage.Korean.code -> "4자리 비밀번호 입력"
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите 4-значный пароль"
-		HoneyLanguage.TraditionalChinese.code -> "輸入四位密碼密碼"
-		else -> ""
-	}
-	@JvmField
 	val needToVerifyYourIdentity = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Verify your identity"
 		HoneyLanguage.Chinese.code -> "Verify your identity"

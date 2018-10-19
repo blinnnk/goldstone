@@ -44,7 +44,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 				val retryTimes = it?.retryTimes.orZero()
 				if(fragment.getIsVerifyIdentity()) {
 					// 是否再一次输入新密码
-					IsEnterYourNewPasswordAgain(passCode)
+					isEnterYourNewPasswordAgain(passCode)
 				} else {
 					checkPassCode(passCode) {
 						checkPassCodeEvent(
@@ -95,7 +95,7 @@ class PassCodePresenter(override val fragment : PassCodeFragment) : BasePresente
 		}
 	}
 
-	private fun IsEnterYourNewPasswordAgain(passCode : String) {
+	private fun isEnterYourNewPasswordAgain(passCode : String) {
 		if(fragment.getIsEnterYourNewPasswordAgain()) {
 			checkNewPassword(passCode)
 		} else {

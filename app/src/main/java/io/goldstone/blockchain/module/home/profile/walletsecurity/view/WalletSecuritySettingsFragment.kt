@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.profile.walletsecurity.view
 import android.content.Intent
 import android.os.Build
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -35,8 +34,6 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.profile.walletsecurity.presenter.WalletSecuritySettingsPresenter
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
-
 
 /**
  * @date 11/09/2018 3:45 PM
@@ -73,11 +70,13 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	private fun ViewGroup.initSwitchCell() {
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
 			// 指纹解锁
-			SingleLineSwitch(context,true).apply {
+			SingleLineSwitch(
+				context,
+				true
+			).apply {
 				setHorizontalPadding()
 				setSwitchStatus(SharedWallet.isFingerprintUnlockerOpened().orFalse())
 				setOnclick { switch ->
-					Log.e("setOnclick","setOnclick")
 					if(switch.isChecked) {
 						if(checkIfTheSystemFingerprintExists().isAvailable()) {
 							// 系统已设置指纹
@@ -94,7 +93,10 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			}.into(this)
 		}
 
-		pinCodeSingleLineSwitch = SingleLineSwitch(context,true).apply {
+		pinCodeSingleLineSwitch = SingleLineSwitch(
+			context,
+			true
+		).apply {
 			setHorizontalPadding()
 			setSwitchStatus(SharedWallet.isPincodeOpened().orFalse())
 			if(SharedWallet.isPincodeOpened().orFalse()) {
@@ -103,7 +105,6 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 				changePinCode.visibility = View.GONE
 			}
 			setOnclick {
-				Log.e("setOnclick1","setOnclick1")
 				// 点击后跳转到PinCode编辑界面
 				val switchChecked = pinCodeSingleLineSwitch?.getSwitchCheckedStatus()
 				if(switchChecked.orFalse()) {
@@ -119,19 +120,28 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		pinCodeSingleLineSwitch?.into(this)
 
 		changePinCode.apply {
-			layoutParams = ViewGroup.LayoutParams(ScreenSize.widthWithPadding,wrapContent)
+			layoutParams = ViewGroup.LayoutParams(
+				ScreenSize.widthWithPadding,
+				wrapContent
+			)
 			orientation = LinearLayout.VERTICAL
 			textView {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.black(context)
 				textColor = GrayScale.gray
 				text = PincodeText.setPinCode
-				layoutParams = LinearLayout.LayoutParams(wrapContent,wrapContent).apply {
+				layoutParams = LinearLayout.LayoutParams(
+					wrapContent,
+					wrapContent
+				).apply {
 					topMargin = 8.uiPX()
 				}
 			}
 
-			SingleLineSwitch(context,false).apply {
+			SingleLineSwitch(
+				context,
+				false
+			).apply {
 				setHorizontalPadding()
 				setOnclick {
 					// 点击后根据更新的数据库情况显示开关状态
@@ -180,7 +190,10 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					GoldStoneDialog.remove(context)
 				}
 				setImage(R.drawable.network_browken_banner)
-				setContent(FingerprintUnlockText.fingerprintIsOn,FingerprintUnlockText.fingerprintOpeningPrompt)
+				setContent(
+					FingerprintUnlockText.fingerprintIsOn,
+					FingerprintUnlockText.fingerprintOpeningPrompt
+				)
 			}
 		}
 	}
@@ -199,7 +212,10 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 					GoldStoneDialog.remove(context)
 				}
 				setImage(R.drawable.network_browken_banner)
-				setContent(FingerprintUnlockText.yourDeviceHasNotSetAFingerprintYet,FingerprintUnlockText.fingerprintNotSetPrompt)
+				setContent(
+					FingerprintUnlockText.yourDeviceHasNotSetAFingerprintYet,
+					FingerprintUnlockText.fingerprintNotSetPrompt
+				)
 			}
 		}
 	}
@@ -214,7 +230,10 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		}
 	}
 
-	override fun setBaseBackEvent(activity : MainActivity?,parent : Fragment?) {
+	override fun setBaseBackEvent(
+		activity : MainActivity?,
+		parent : Fragment?
+	) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()
 		}
