@@ -250,7 +250,6 @@ class TokenDetailPresenter(
 				SharedChain.getEOSCurrent(),
 				true
 			) {
-				System.out.println("hello $totalCount")
 				totalCount = it?.dataIndex
 				currentMaxCount = it?.dataIndex
 				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
@@ -266,7 +265,6 @@ class TokenDetailPresenter(
 			codeName,
 			token?.symbol.orEmpty()
 		) { count, error ->
-			System.out.println("hello fuck $count")
 			if (!count.isNull() && error.isNone()) {
 				totalCount = count
 				currentMaxCount = count

@@ -34,7 +34,7 @@ android {
       XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
-      abiFilters "armeabi", "armeabi-v7a", "x86" // PC 调试的时候恢复 `x86`
+      abiFilters "armeabi", "armeabi-v7a"//, "x86" // PC 调试的时候恢复 `x86`
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     // Leave only the supported languages

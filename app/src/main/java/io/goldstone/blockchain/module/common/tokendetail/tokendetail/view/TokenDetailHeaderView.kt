@@ -52,8 +52,7 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 		lineChart.resetDataWithTargetLabelCount(
 			data.mapIndexed { index, chartPoint ->
 				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
-			},
-			true
+			}
 		)
 	}
 }

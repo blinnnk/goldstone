@@ -283,8 +283,8 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE ownerName = :name AND chainID = :chainID")
 	fun getByOwnerName(name: String, chainID: String): List<MyTokenTable>
 
-	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract")
-	fun deleteByContractAndAddress(contract: String, address: String)
+	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract AND symbol = :symbol")
+	fun deleteByContractAndAddress(contract: String, symbol: String, address: String)
 
 	@Insert
 	fun insert(token: MyTokenTable)
