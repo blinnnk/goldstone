@@ -1,10 +1,12 @@
 package com.zxing.demo
 
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.provider.MediaStore
 import com.google.zxing.*
 import com.google.zxing.common.GlobalHistogramBinarizer
+import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.QRCodeReader
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import java.io.FileInputStream
@@ -49,15 +51,22 @@ object QRCodeUtil {
 		val binaryBitmap = BinaryBitmap(GlobalHistogramBinarizer(rgbLuminanceSource))
 		var result: String? = null
 		try {
-			QRCodeReader().decode(binaryBitmap)?.apply {
+			QRCodeReader().decode(
+				binaryBitmap,
+				HashMap<DecodeHintType, Boolean>().apply {
+					put(DecodeHintType.PURE_BARCODE, true)
+			})?.apply {
 				result = text
 			}
 		} catch (e: NotFoundException) {
 			e.printStackTrace()
+			result = e.toString()
 		} catch (e: ChecksumException) {
 			e.printStackTrace()
+			result = e.toString()
 		} catch (e: FormatException) {
 			e.printStackTrace()
+			result = e.toString()
 		}
 		
 		return result

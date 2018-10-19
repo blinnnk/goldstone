@@ -32,7 +32,7 @@ object EmptyText {
 		HoneyLanguage.Chinese.code -> "还没有任何交易记录"
 		HoneyLanguage.Japanese.code -> "何の取引記録もありません"
 		HoneyLanguage.Korean.code -> "임의의 거래기록이 없습니다"
-		HoneyLanguage.Russian.code -> "Отсутствует какая-либо история операций"
+		HoneyLanguage.Russian.code -> "Нет истории транзакций"
 		HoneyLanguage.TraditionalChinese.code -> "還沒有任何交易記錄"
 		else -> ""
 	}

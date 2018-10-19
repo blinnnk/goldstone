@@ -53,7 +53,7 @@ class BottomLoadingView(context: Context) : LinearLayout(context) {
 
 	fun hide() {
 		loading.visibility = View.GONE
-		description.visibility = View.VISIBLE
+		description.visibility = View.GONE
 	}
 
 	fun setGrayDescription() {

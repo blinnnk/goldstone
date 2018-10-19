@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.common.error
 
+import io.goldstone.blockchain.common.Language.ErrorText
+
 
 /**
  * @author KaySaith
@@ -10,6 +12,6 @@ open class GoldStoneError(override val message: String, val tag: String = "GoldS
 
 	companion object {
 		@JvmStatic
-		val None = GoldStoneError("No errors")
+		val None = GoldStoneError(ErrorText.none)
 	}
 }

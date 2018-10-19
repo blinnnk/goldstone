@@ -51,10 +51,10 @@ class TokenManagementListPresenter(
 					override fun concurrentJobs() {
 						defaultTokens.forEach { default ->
 							default.isUsed = !myTokens.find {
-								default.contract.equals(it.contract, true)
+								default.contract.equals(it.contract, true) &&
+									default.symbol.equals(it.symbol, true)
 							}.isNull()
 							completeMark()
-
 						}
 					}
 

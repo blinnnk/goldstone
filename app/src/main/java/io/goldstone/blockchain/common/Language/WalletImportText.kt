@@ -360,4 +360,34 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "地址格式不正確"
 		else -> ""
 	}
+	@JvmField
+	val importPrivateKeyHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Clear text private key of any of the above chains"
+		HoneyLanguage.Chinese.code -> "以上任一链的明文私钥"
+		HoneyLanguage.Japanese.code -> "上記のチェーンのいずれかのクリアテキストの秘密鍵"
+		HoneyLanguage.Korean.code -> "위 체인 중 하나의 일반 텍스트 개인 키"
+		HoneyLanguage.Russian.code -> "Открытый текстовый закрытый ключ любой из вышеперечисленных цепочек"
+		HoneyLanguage.TraditionalChinese.code -> "以上任一鏈的明文私鑰"
+		else -> ""
+	}
+	@JvmField
+	val importMnemonicsHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "A set of clear text keys consisting of 12 words"
+		HoneyLanguage.Chinese.code -> "一组由12个单词组成的明文秘钥"
+		HoneyLanguage.Japanese.code -> "12語からなる平文キーのセット"
+		HoneyLanguage.Korean.code -> "12 단어로 구성된 평문 키 세트"
+		HoneyLanguage.Russian.code -> "набор ключей открытого текста, состоящий из 12 слов"
+		HoneyLanguage.TraditionalChinese.code -> "一組由12個單詞組成的明文秘鑰"
+		else -> ""
+	}
+	@JvmField
+	val importKeystoreHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "A string encrypted with a user password"
+		HoneyLanguage.Chinese.code -> "一种使用用户密码加密的字符串秘钥"
+		HoneyLanguage.Japanese.code -> "ユーザーパスワードで暗号化された文字列キー"
+		HoneyLanguage.Korean.code -> "사용자 암호로 암호화 된 문자열 키"
+		HoneyLanguage.Russian.code -> "Строковый ключ, зашифрованный паролем пользователя"
+		HoneyLanguage.TraditionalChinese.code -> "一種使用用戶密碼加密的字符串秘鑰"
+		else -> ""
+	}
 }

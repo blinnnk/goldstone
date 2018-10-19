@@ -73,11 +73,11 @@ data class MyTokenTable(
 		data.chainID
 	)
 
-	fun insert() {
+	fun preventDuplicateInsert() {
 		doAsync {
 			// 防止重复添加
 			GoldStoneDataBase.database.myTokenDao().apply {
-				if (getTokenByContractAndAddress(contract, ownerAddress, chainID).isNull()) {
+				if (getTokenByContractAndAddress(contract, symbol, ownerName, chainID).isNull()) {
 					insert(this@MyTokenTable)
 				}
 			}
@@ -146,7 +146,7 @@ data class MyTokenTable(
 		) {
 			load {
 				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(contract.contract.orEmpty(), ownerName, contract.getCurrentChainID().id)
+					.getTokenByContractAndAddress(contract.contract.orEmpty(), contract.symbol, ownerName, contract.getCurrentChainID().id)
 			} then { token ->
 				if (token.isNull()) callback(null) else callback(token?.balance.orZero())
 			}
@@ -158,21 +158,15 @@ data class MyTokenTable(
 			val accountName =
 				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
 			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-			if (GoldStoneDataBase.database.myTokenDao().getTokenByContractAndAddress(
-					contract.contract.orEmpty(),
-					currentAddress,
-					chainID
-				).isNull()) {
-				MyTokenTable(
-					0,
-					accountName,
-					currentAddress,
-					symbol,
-					0.0,
-					contract.contract.orEmpty(),
-					chainID
-				).insert()
-			}
+			MyTokenTable(
+				0,
+				accountName,
+				currentAddress,
+				symbol,
+				0.0,
+				contract.contract.orEmpty(),
+				chainID
+			).preventDuplicateInsert()
 		}
 
 		fun getBalanceByContract(
@@ -249,7 +243,7 @@ data class MyTokenTable(
 
 		fun updateBalanceByContract(balance: Double, address: String, contract: TokenContract) {
 			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateBalanceByContract(balance, contract.contract!!, address)
+				GoldStoneDataBase.database.myTokenDao().updateBalanceByContract(balance, contract.contract!!, contract.symbol, address)
 			}
 		}
 	}
@@ -258,8 +252,8 @@ data class MyTokenTable(
 @Dao
 interface MyTokenDao {
 
-	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
-	fun getTokenByContractAndAddress(contract: String, ownerName: String, chainID: String): MyTokenTable?
+	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND symbol LIKE :symbol AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
+	fun getTokenByContractAndAddress(contract: String, symbol: String, ownerName: String, chainID: String): MyTokenTable?
 
 	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
 	fun getTokensByAddress(addresses: List<String>, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
@@ -276,8 +270,8 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>
 
-	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
-	fun updateBalanceByContract(balance: Double, contract: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
+	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND symbol = :symbol AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
+	fun updateBalanceByContract(balance: Double, contract: String, symbol: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
 	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态
 	@Query("UPDATE myTokens SET ownerName = :name  WHERE ownerAddress = :address AND ownerName = :address AND chainID = :chainID")
@@ -287,7 +281,7 @@ interface MyTokenDao {
 	fun getPendingEOSAccount(address: String, chainID: String): MyTokenTable?
 
 	@Query("SELECT * FROM myTokens WHERE ownerName = :name AND chainID = :chainID")
-	fun getByOwnerName(name: String, chainID: String): MyTokenTable?
+	fun getByOwnerName(name: String, chainID: String): List<MyTokenTable>
 
 	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract")
 	fun deleteByContractAndAddress(contract: String, address: String)

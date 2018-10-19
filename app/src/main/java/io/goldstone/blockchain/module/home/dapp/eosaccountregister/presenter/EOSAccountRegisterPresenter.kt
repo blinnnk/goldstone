@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -42,13 +43,13 @@ class EOSAccountRegisterPresenter(
 		@UiThread hold: (currency: Double?, ramPrice: Double?, error: RequestError) -> Unit
 	) {
 		GoldStoneAPI.getPriceByContractAddress(
-			listOf(TokenContract.eosContract).toJsonArray(),
+			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
 			// 网络获取价格出错后从本地数据库获取价格
 			{ hold(null, null, it) }
 		) {
 			EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, error ->
 				if (!price.isNull() && error.isNone()) {
-					hold(it.first().price, price!!, error)
+					hold(it.firstOrNull()?.price.orZero(), price!!, error)
 				} else hold(null, null, error)
 			}
 		}

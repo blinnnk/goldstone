@@ -63,7 +63,7 @@ class DescriptionView(context: Context) : TextView(context) {
 	}
 
 	fun isAvailableAccountName(): DescriptionView {
-		text = "Congratulations, this name has not yet been registered by others. If you have friends using GoldStone Wallet, you can go to the settings interface, register the EOS account module, and register with the following information."
+		text = EOSAccountText.checkNameResultAvailable
 		return this
 	}
 

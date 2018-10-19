@@ -69,9 +69,9 @@ object LoadingText {
 	@JvmField
 	val tokenData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Loading token data..."
-		HoneyLanguage.Chinese.code -> "正在加载token信息..."
-		HoneyLanguage.Japanese.code -> "現在Token情報の読み込み中..."
-		HoneyLanguage.Korean.code -> "Token정보 로드중..."
+		HoneyLanguage.Chinese.code -> "正在加载 token 信息..."
+		HoneyLanguage.Japanese.code -> "現在 Token 情報の読み込み中..."
+		HoneyLanguage.Korean.code -> "Token 정보 로드중..."
 		HoneyLanguage.Russian.code -> "Загрузка информации о токене..."
 		HoneyLanguage.TraditionalChinese.code -> "正在加載token信息..."
 		else -> ""

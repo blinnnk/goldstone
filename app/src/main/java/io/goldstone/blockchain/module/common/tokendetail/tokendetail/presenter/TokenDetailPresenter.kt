@@ -14,13 +14,13 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -78,9 +78,11 @@ class TokenDetailPresenter(
 			}
 		}
 		if (token?.contract.isEOSSeries()) {
-			currentMaxCount = totalCount
-			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
-			flipEOSPageData { sortData() }
+			if (allData.isNull() || allData!!.isEmpty()) {
+				currentMaxCount = totalCount
+				fragment.asyncData?.clear()
+				flipEOSPageData { sortData() }
+			} else sortData()
 		} else sortData()
 	}
 
@@ -99,9 +101,11 @@ class TokenDetailPresenter(
 			}
 		}
 		if (token?.contract.isEOSSeries()) {
-			currentMaxCount = totalCount
-			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
-			flipEOSPageData { sortData() }
+			if (allData.isNull() || allData!!.isEmpty()) {
+				currentMaxCount = totalCount
+				fragment.asyncData?.clear()
+				flipEOSPageData { sortData() }
+			} else sortData()
 		} else sortData()
 	}
 
@@ -114,7 +118,7 @@ class TokenDetailPresenter(
 		}
 		if (token?.contract.isEOSSeries()) {
 			currentMaxCount = totalCount
-			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+			fragment.asyncData?.clear()
 			flipEOSPageData { sortData() }
 		} else sortData()
 	}
@@ -141,7 +145,7 @@ class TokenDetailPresenter(
 		fragment.showLoadingView(LoadingText.tokenData)
 		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData ->
 			// 检查是否有网络
-			if (!NetworkUtil.hasNetworkWithAlert(fragment.context)) return@loadDataFromDatabaseOrElse
+			if (!NetworkUtil.hasNetwork(fragment.context)) return@loadDataFromDatabaseOrElse
 			// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
 			// `ETHERC20OrETC` 需要使用到 `localData`
 			when {
@@ -217,31 +221,7 @@ class TokenDetailPresenter(
 							callback(null, it)
 						}
 					}
-					token?.contract.isEOSSeries() -> {
-						// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
-						val codeName =
-							if (token?.contract.isEOS()) EOSCodeName.EOSIOToken.value
-							else token?.contract?.contract.orEmpty()
-						EOSAPI.getTransactionCount(
-							SharedChain.getEOSCurrent(),
-							SharedAddress.getCurrentEOSAccount(),
-							codeName,
-							token?.symbol.orEmpty()
-						) { count, error ->
-							if (!count.isNull() && error.isNone()) {
-								totalCount = count
-								currentMaxCount = count
-								// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
-								// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
-								fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
-								// 初始化
-								loadMore()
-								GoldStoneAPI.context.runOnUiThread {
-									fragment.removeLoadingView()
-								}
-							}
-						}
-					}
+					token?.contract.isEOSSeries() -> getEOSSeriesData()
 					else -> getETHSeriesData(token?.contract.getAddress()) {
 						callback(it, null)
 					}
@@ -252,8 +232,52 @@ class TokenDetailPresenter(
 				callback(null, it)
 			}
 
+			token?.contract.isEOSSeries() -> getEOSSeriesData()
+
 			walletType.isETHSeries() -> getETHSeriesData(SharedAddress.getCurrentEthereum()) {
 				callback(it, null)
+			}
+		}
+	}
+
+	private fun getEOSSeriesData() {
+		// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
+		val codeName = token?.contract?.contract.orEmpty()
+		if (!NetworkUtil.hasNetwork(fragment.context)) {
+			EOSTransactionTable.getMaxDataIndexTable(
+				SharedAddress.getCurrentEOSAccount(),
+				token?.contract.orEmpty(),
+				SharedChain.getEOSCurrent(),
+				true
+			) {
+				System.out.println("hello $totalCount")
+				totalCount = it?.dataIndex
+				currentMaxCount = it?.dataIndex
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				// 初始化
+				loadMore()
+				fragment.removeLoadingView()
+			}
+		} else EOSAPI.getTransactionCount(
+			SharedChain.getEOSCurrent(),
+			SharedAddress.getCurrentEOSAccount(),
+			codeName,
+			token?.symbol.orEmpty()
+		) { count, error ->
+			System.out.println("hello fuck $count")
+			if (!count.isNull() && error.isNone()) {
+				totalCount = count
+				currentMaxCount = count
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				// 初始化
+				loadMore()
+				GoldStoneAPI.context.runOnUiThread {
+					fragment.removeLoadingView()
+				}
 			}
 		}
 	}

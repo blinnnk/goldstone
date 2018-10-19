@@ -72,7 +72,7 @@ data class TransactionListModel(
 		data.time.toString(),
 		data.transactionData.quantity.substringBeforeLast(" "),
 		false,
-		TokenContract(""),
+		TokenContract(data.codeName, data.symbol),
 		false,
 		data.serverID,
 		false
@@ -97,7 +97,7 @@ data class TransactionListModel(
 		data.timeStamp,
 		data.value,
 		data.hasError == "1",
-		TokenContract(data.contractAddress),
+		TokenContract(data.contractAddress, data.symbol),
 		data.isFailed,
 		0L, // TODO
 		data.isFee

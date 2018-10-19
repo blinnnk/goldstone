@@ -216,7 +216,14 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 							},
 							SharedChain.getCurrentETHName()
 						) { symbol, decimal ->
-							unknownData.add(DefaultTokenTable(transaction.contractAddress, symbol, decimal))
+							unknownData.add(
+								DefaultTokenTable(
+									transaction.contractAddress,
+									symbol,
+									decimal,
+									SharedChain.getCurrentETH()
+								)
+							)
 							completeMark()
 						}
 					}
