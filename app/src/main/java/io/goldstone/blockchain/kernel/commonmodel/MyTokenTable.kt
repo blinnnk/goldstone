@@ -121,7 +121,7 @@ data class MyTokenTable(
 				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
 			} then { myTokens ->
 				hold(
-					myTokens.asSequence().filter {
+					myTokens.asSequence().distinctBy { it.ownerName }.filter {
 						EOSAccount(it.ownerName).isValid()
 					}.map {
 						it.ownerName

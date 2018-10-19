@@ -50,7 +50,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 					false
 				) { localData ->
 					// 显示内存的数据后异步更新数据
-					if (!fragment.asyncData.isNull() && !fragment.asyncData!!.isEmpty()) localData.map {
+					if (!fragment.asyncData.isNull() && fragment.asyncData!!.isEmpty()) localData.map {
 						TransactionListModel(it)
 					}.prepareTokenHistoryBalance(token?.contract!!, account.accountName) {
 						it.updateChartAndHeaderData()

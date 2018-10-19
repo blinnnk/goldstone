@@ -82,7 +82,7 @@ class TokenManagementListPresenter(
 				// once it is checked then insert this symbol into `MyTokenTable` database
 				if (isChecked) MyTokenTable.addNew(token.symbol, TokenContract(token.contract), token.chainID)
 				else GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(token.contract, TokenContract(token.contract).getAddress(), token.symbol)
+					.deleteByContractAndAddress(token.contract, token.symbol, TokenContract(token.contract).getAddress())
 			}
 		}
 	}
