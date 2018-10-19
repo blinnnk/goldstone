@@ -3,6 +3,9 @@ package io.goldstone.blockchain.common.language
 /**
  * @date 2018/8/8 2:15 AM
  * @author KaySaith
+ *  @rewriteDate 14/09/2018 11:35 PM
+ * @reWriter wcx
+ * @description pinCode文案修改为walletLock
  */
 
 object ProfileText {
@@ -146,14 +149,13 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "分享GoldStone"
 		else -> ""
 	}
-	@JvmField
-	val pinCode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "PIN"
-		HoneyLanguage.Chinese.code -> "PIN码"
-		HoneyLanguage.Japanese.code -> "PINコード"
-		HoneyLanguage.Korean.code -> "PIN"
-		HoneyLanguage.Russian.code -> "PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
+	val walletSecurity = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Set wallet lock"
+		HoneyLanguage.Chinese.code -> "Set wallet lock"
+		HoneyLanguage.Japanese.code -> "Set wallet lock"
+		HoneyLanguage.Korean.code -> "Set wallet lock"
+		HoneyLanguage.Russian.code -> "Set wallet lock"
+		HoneyLanguage.TraditionalChinese.code -> "Set wallet lock"
 		else -> ""
 	}
 	@JvmField

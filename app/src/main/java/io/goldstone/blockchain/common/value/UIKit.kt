@@ -11,6 +11,9 @@ import org.jetbrains.anko.px2sp
  * @author KaySaith
  * @description
  * Common interface parameters, including color, original size, etc.
+ * @rewriteDate 10/09/2018 7:54 PM
+ * @reWriter wcx
+ * @description 添加密码解锁handler标识PasswordRetrievalHandlerMark
  */
 object GrayScale {
 	@JvmField

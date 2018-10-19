@@ -3,9 +3,11 @@ package io.goldstone.blockchain.common.value
 /**
  * @date 26/03/2018 1:03 AM
  * @author KaySaith
+ * @rewriteDate 28/09/2018 18:42 PM
+ * @reWriter wcx
+ * @description 添加PincodeIsOpened和FingerprintUnlockerIsOpened标记
  */
 object ArgumentKey {
-	
 	const val walletSettingsTitle = "walletSettingsTitle"
 	const val profileTitle = "profileTitle"
 	const val mnemonicCode = "mnemonicCode"
@@ -37,6 +39,8 @@ object ArgumentKey {
 	const val defaultEOSAccountName = "defaultEOSAccountName"
 	const val contact = "contact"
 	const val eosAccountRegister = "eosAccountRegister"
+	const val setPinCode = "setPinCode"
+	const val disableTheBackButtonToExit = "disableTheBackButtonToExit"
 }
 
 object IntentKey {
@@ -67,7 +71,7 @@ object SharesPreference {
 	const val unregisterGoldStoneID = "unregisterGoldStoneID"
 	const val activityIsResult = "activityIsResult"
 	const val currentEthereumAddress = "currentEthereumAddress"
-	const val currentEOSName= "currentEOSName"
+	const val currentEOSName = "currentEOSName"
 	const val currentETCAddress = "currentETCAddress"
 	const val currentEOSAddress = "currentEOSAddress"
 	const val currentLTCAddress = "currentLTCAddress"
@@ -83,6 +87,8 @@ object SharesPreference {
 	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"
+	const val pincodeIsOpened = "pincodeIsOpened"
+	const val fingerprintUnlockerIsOpened = "fingerprintUnlockerIsOpened"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

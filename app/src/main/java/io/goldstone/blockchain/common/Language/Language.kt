@@ -10,15 +10,14 @@ import io.goldstone.blockchain.common.value.CountryCode
  * @author KaySaith
  */
 var currentLanguage = when {
-	SharedWallet.getCurrentLanguageCode() == 100 ->
-		HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+	SharedWallet.getCurrentLanguageCode() == 100 -> HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 	HoneyLanguage.currentLanguageIsSupported() -> SharedWallet.getCurrentLanguageCode()
 	else -> HoneyLanguage.English.code
 }
 
 object WatchOnlyText {
 	@JvmField
-	val enterDescription = when (currentLanguage) {
+	val enterDescription = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter the address of the wallet to be observed"
 		HoneyLanguage.Chinese.code -> "请输入想观察的钱包地址"
 		HoneyLanguage.Japanese.code -> "確認したいウォレットのアドレスを入力して下さい"
@@ -28,7 +27,7 @@ object WatchOnlyText {
 		else -> ""
 	}
 	@JvmField
-	val intro = when (currentLanguage) {
+	val intro = when(currentLanguage) {
 		HoneyLanguage.English.code -> "You are convinced your brain is working at peak efficiency today, yet you wonder why you continue to run into obstacles that you"
 		HoneyLanguage.Chinese.code -> "使用观察钱包, 您无需导入私钥，只需要输入钱包地址, 就能查看该地址下所有余额与转账信息。"
 		HoneyLanguage.Japanese.code -> "ウォレットの確認を使用する際、プライベートキーのインポートをする必要はありません。ウォレットのアドレスを入力するだけで、当該アドレスの全ての残高と振込情報が確認できます。"
@@ -41,7 +40,7 @@ object WatchOnlyText {
 
 object NotificationText {
 	@JvmField
-	val notification = when (currentLanguage) {
+	val notification = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Notifications"
 		HoneyLanguage.Chinese.code -> "通知中心"
 		HoneyLanguage.Japanese.code -> "メッセージセンター"
@@ -54,7 +53,7 @@ object NotificationText {
 
 object TokenManagementText {
 	@JvmField
-	val addToken = when (currentLanguage) {
+	val addToken = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Add Token"
 		HoneyLanguage.Chinese.code -> "添加其他币种"
 		HoneyLanguage.Japanese.code -> "他の貨幣を追加する"
@@ -67,7 +66,7 @@ object TokenManagementText {
 
 object Alert {
 	@JvmField
-	val selectCurrency = when (currentLanguage) {
+	val selectCurrency = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Once you've selected this, you'll need to wait a moment while we restart the app. Are you sure you'd like to switch currency settings?"
 		HoneyLanguage.Chinese.code -> "一旦你选择切换货币，应用程序将被重新启动，并等待几秒钟。 你确定要切换货币设置吗？"
 		HoneyLanguage.Japanese.code -> "貨幣の切り替えを選択すると、アプリケーションが再起動され、数秒待つことになります貨幣設定の切り替えをしますか？"
@@ -80,67 +79,83 @@ object Alert {
 
 object PincodeText {
 	@JvmField
-	val pincode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Pin Code"
-		HoneyLanguage.Chinese.code -> "PIN码"
-		HoneyLanguage.Japanese.code -> "PINコード"
-		HoneyLanguage.Korean.code -> "PIN 코드"
-		HoneyLanguage.Russian.code -> "PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "PIN碼"
+	val needToVerifyYourIdentity = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Verify your identity"
+		HoneyLanguage.Chinese.code -> "Verify your identity"
+		HoneyLanguage.Japanese.code -> "Verify your identity"
+		HoneyLanguage.Korean.code -> "Verify your identity"
+		HoneyLanguage.Russian.code -> "Verify your identity"
+		HoneyLanguage.TraditionalChinese.code -> "Verify your identity"
 		else -> ""
 	}
 	@JvmField
-	val repeat = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Repeat PIN"
-		HoneyLanguage.Chinese.code -> "重复PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードが重複しています"
-		HoneyLanguage.Korean.code -> "중복PIN코드"
-		HoneyLanguage.Russian.code -> "Повторите PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "重複PIN碼"
+	val pleaseEnterYourCurrentNumericPassword = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter your current numeric password"
+		HoneyLanguage.Chinese.code -> "Please enter your current numeric password"
+		HoneyLanguage.Japanese.code -> "Please enter your current numeric password"
+		HoneyLanguage.Korean.code -> "Please enter your current numeric password"
+		HoneyLanguage.Russian.code -> "Please enter your current numeric password"
+		HoneyLanguage.TraditionalChinese.code -> "Please enter your current numeric password"
 		else -> ""
 	}
 	@JvmField
-	val description = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please set a 4-digit PIN"
-		HoneyLanguage.Chinese.code -> "输入四位密码"
-		HoneyLanguage.Japanese.code -> "4桁のパスワードを入力します"
-		HoneyLanguage.Korean.code -> "4자리 비밀번호 입력"
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите 4-значный пароль"
-		HoneyLanguage.TraditionalChinese.code -> "輸入四位密碼密碼"
+	val setFourDigitPassword = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Set a four-digit password"
+		HoneyLanguage.Chinese.code -> "Set a four-digit password"
+		HoneyLanguage.Japanese.code -> "Set a four-digit password"
+		HoneyLanguage.Korean.code -> "Set a four-digit password"
+		HoneyLanguage.Russian.code -> "Set a four-digit password"
+		HoneyLanguage.TraditionalChinese.code -> "Set a four-digit password"
 		else -> ""
 	}
 	@JvmField
-	val countAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please Enter four bit ciphers"
-		HoneyLanguage.Chinese.code -> "请输入四位数字"
-		HoneyLanguage.Japanese.code -> "4桁の数字を入力して下さい"
-		HoneyLanguage.Korean.code -> "4 비트 암호를 입력하십시오."
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите 4-значное число"
-		HoneyLanguage.TraditionalChinese.code -> "請輸入四位數字"
+	val resetTheFour_digitPassword = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Reset four-digit password"
+		HoneyLanguage.Chinese.code -> "Reset four-digit password"
+		HoneyLanguage.Japanese.code -> "Reset four-digit password"
+		HoneyLanguage.Korean.code -> "Reset four-digit password"
+		HoneyLanguage.Russian.code -> "Reset four-digit password"
+		HoneyLanguage.TraditionalChinese.code -> "Reset four-digit password"
 		else -> ""
 	}
 	@JvmField
-	val verifyAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please repeat the same PIN"
-		HoneyLanguage.Chinese.code -> "请再次输入一遍PIN码进行确认"
-		HoneyLanguage.Japanese.code -> "再度繰り返しPINコードを入力し確認して下さい"
-		HoneyLanguage.Korean.code -> "같은 PIN 을 중복하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите PIN-код еще раз для подтверждения"
-		HoneyLanguage.TraditionalChinese.code -> "請再次輸入PIN碼確認"
+	val ifThePasswordInputIsInconsistentPleaseRe_enter = when(currentLanguage) {
+		HoneyLanguage.English.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Chinese.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Japanese.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Korean.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Russian.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.TraditionalChinese.code -> "If the password input is inconsistent, please re-enter"
 		else -> ""
 	}
+
 	@JvmField
-	val turnOnAttention = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please set a PIN"
-		HoneyLanguage.Chinese.code -> "请先设置PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードを先に設定して下さい"
-		HoneyLanguage.Korean.code -> "PIN 을 설정하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, установите PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "請先設置PIN碼"
-		else -> ""
+	val failedAttention: (retryTimes: Int) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Chinese.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Japanese.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Korean.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Russian.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.TraditionalChinese.code -> "incorrect passcode $it retry times left"
+			else -> ""
+		}
 	}
 	@JvmField
-	val show = when (currentLanguage) {
+	val remainingFrozenTime: (currentFrozenTime: Long) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Chinese.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Japanese.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Korean.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Russian.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.TraditionalChinese.code -> "you have to wait ${it / 1000} seconds"
+			else -> ""
+		}
+	}
+
+	@JvmField
+	val show = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Show PIN"
 		HoneyLanguage.Chinese.code -> "显示PIN码"
 		HoneyLanguage.Japanese.code -> "PINコードを表示します"
@@ -149,31 +164,149 @@ object PincodeText {
 		HoneyLanguage.TraditionalChinese.code -> "顯示PIN碼"
 		else -> ""
 	}
-	@JvmField
-	val enterPincode = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter PIN"
-		HoneyLanguage.Chinese.code -> "输入PIN码"
-		HoneyLanguage.Japanese.code -> "PINコードを入力します"
-		HoneyLanguage.Korean.code -> "Enter Passcode"
-		HoneyLanguage.Russian.code -> "Введите PIN-код"
-		HoneyLanguage.TraditionalChinese.code -> "輸入PIN碼"
+	val setPinCode = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Digital password PIN setting"
+		HoneyLanguage.Chinese.code -> "Digital password PIN setting"
+		HoneyLanguage.Japanese.code -> "Digital password PIN setting"
+		HoneyLanguage.Korean.code -> "Digital password PIN setting"
+		HoneyLanguage.Russian.code -> "Digital password PIN setting"
+		HoneyLanguage.TraditionalChinese.code -> "Digital password PIN setting"
 		else -> ""
 	}
-	@JvmField
-	val enterPincodeDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Set the PIN to protect privacy. Once you open GoldStone, you need to enter PIN to see your wallet "
-		HoneyLanguage.Chinese.code -> "设置锁屏密码保护隐私，一旦开启锁屏密码，每次打开 GoldStone 时需要输入锁屏密码才能查看钱包"
-		HoneyLanguage.Japanese.code -> "ロック画面のパスワードを設定するとプライバシーを保護します。ロック画面のパスワードを設定すると、GoldStoneの画面を開くたびにロック画面のパスワードを入力することで、ウォレットを確認することができます"
-		HoneyLanguage.Korean.code -> "잠금 화면 암호를 설정하여 개인 정보를 보호하십시오. 화면 잠금 암호가 켜지면 GoldStone을 열 때마다 지갑 화면을 보려면 잠금 화면 암호를 입력해야합니다."
-		HoneyLanguage.Russian.code -> "Установите защиту паролем экрана блокировки для защиты конфиденциальности. Как только Вы запустите пароль экрана блокировки, Вам нужно ввести пароль экрана блокировки, чтобы просмотреть свой кошелек"
-		HoneyLanguage.TraditionalChinese.code -> "設置鎖屏密碼保護隱私，一旦開啟鎖屏密碼，每次打開GoldStone時需要輸入鎖屏密碼才能查看錢包"
+	val changePinCode = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Change the numeric PIN code"
+		HoneyLanguage.Chinese.code -> "Change the numeric PIN code"
+		HoneyLanguage.Japanese.code -> "Change the numeric PIN code"
+		HoneyLanguage.Korean.code -> "Change the numeric PIN code"
+		HoneyLanguage.Russian.code -> "Change the numeric PIN code"
+		HoneyLanguage.TraditionalChinese.code -> "Change the numeric PIN code"
+		else -> ""
+	}
+	val setTheDigitalLock = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Set the digital lock"
+		HoneyLanguage.Chinese.code -> "Set the digital lock"
+		HoneyLanguage.Japanese.code -> "Set the digital lock"
+		HoneyLanguage.Korean.code -> "Set the digital lock"
+		HoneyLanguage.Russian.code -> "Set the digital lock"
+		HoneyLanguage.TraditionalChinese.code -> "Set the digital lock"
+		else -> ""
+	}
+	val goToSetPinCode = when(currentLanguage) {
+		HoneyLanguage.English.code -> "To set a numeric password"
+		HoneyLanguage.Chinese.code -> "To set a numeric password"
+		HoneyLanguage.Japanese.code -> "To set a numeric password"
+		HoneyLanguage.Korean.code -> "To set a numeric password"
+		HoneyLanguage.Russian.code -> "To set a numeric password"
+		HoneyLanguage.TraditionalChinese.code -> "To set a numeric password"
+		else -> ""
+	}
+}
+
+object FingerprintUnlockText {
+	val fingerprintUnlock = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Fingerprint unlock"
+		HoneyLanguage.Chinese.code -> "Fingerprint unlock"
+		HoneyLanguage.Japanese.code -> "Fingerprint unlock"
+		HoneyLanguage.Korean.code -> "Fingerprint unlock"
+		HoneyLanguage.Russian.code -> "Fingerprint unlock"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint unlock"
+		else -> ""
+	}
+	val attention = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Chinese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Japanese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Korean.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Russian.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.TraditionalChinese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		else -> ""
+	}
+	val fingerprintIsOn = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Fingerprint is on"
+		HoneyLanguage.Chinese.code -> "Fingerprint is on"
+		HoneyLanguage.Japanese.code -> "Fingerprint is on"
+		HoneyLanguage.Korean.code -> "Fingerprint is on"
+		HoneyLanguage.Russian.code -> "Fingerprint is on"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint is on"
+		else -> ""
+	}
+	val checkFingerprint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Check fingerprint"
+		HoneyLanguage.Chinese.code -> "Check fingerprint"
+		HoneyLanguage.Japanese.code -> "Check fingerprint"
+		HoneyLanguage.Korean.code -> "Check fingerprint"
+		HoneyLanguage.Russian.code -> "Check fingerprint"
+		HoneyLanguage.TraditionalChinese.code -> "Check fingerprint"
+		else -> ""
+	}
+	val tryAgain = when(currentLanguage) {
+		HoneyLanguage.English.code -> "try again"
+		HoneyLanguage.Chinese.code -> "try again"
+		HoneyLanguage.Japanese.code -> "try again"
+		HoneyLanguage.Korean.code -> "try again"
+		HoneyLanguage.Russian.code -> "try again"
+		HoneyLanguage.TraditionalChinese.code -> "try again"
+		else -> ""
+	}
+	val fingerprintOpeningPrompt = when(currentLanguage) {
+		HoneyLanguage.English.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Chinese.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Japanese.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Korean.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Russian.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.TraditionalChinese.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		else -> ""
+	}
+	val goToSetFingerprint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Go to set the fingerprint"
+		HoneyLanguage.Chinese.code -> "Go to set the fingerprint"
+		HoneyLanguage.Japanese.code -> "Go to set the fingerprint"
+		HoneyLanguage.Korean.code -> "Go to set the fingerprint"
+		HoneyLanguage.Russian.code -> "Go to set the fingerprint"
+		HoneyLanguage.TraditionalChinese.code -> "Go to set the fingerprint"
+		else -> ""
+	}
+	val yourDeviceHasNotSetAFingerprintYet = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Chinese.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Japanese.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Korean.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Russian.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.TraditionalChinese.code -> "Your device has not set a fingerprint yet"
+		else -> ""
+	}
+	val fingerprintNotSetPrompt = when(currentLanguage) {
+		HoneyLanguage.English.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Chinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Japanese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Korean.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Russian.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.TraditionalChinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		else -> ""
+	}
+	val unregisteredFingerprint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Chinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Japanese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Korean.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Russian.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.TraditionalChinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		else -> ""
+	}
+	val hardwareDoesNotSupportFingerprints = when(currentLanguage) {
+		HoneyLanguage.English.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Chinese.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Japanese.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Korean.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Russian.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.TraditionalChinese.code -> "The device has not detected the fingerprint hardware"
 		else -> ""
 	}
 }
 
 object ContactText {
 	@JvmField
-	val emptyNameAlert = when (currentLanguage) {
+	val emptyNameAlert = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter a contact name"
 		HoneyLanguage.Chinese.code -> "请填写联系人名称"
 		HoneyLanguage.Japanese.code -> "連絡先の名称を記入して下さい"
@@ -183,7 +316,7 @@ object ContactText {
 		else -> ""
 	}
 	@JvmField
-	val emptyAddressAlert = when (currentLanguage) {
+	val emptyAddressAlert = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter a wallet address"
 		HoneyLanguage.Chinese.code -> "请填写联系人钱包地址"
 		HoneyLanguage.Japanese.code -> "連絡先のウォレットアドレスを記入して下さい"
@@ -194,7 +327,7 @@ object ContactText {
 	}
 	@JvmField
 	val wrongAddressFormat: (symbol: String) -> String = {
-		when (currentLanguage) {
+		when(currentLanguage) {
 			HoneyLanguage.English.code -> "Incorrect $it wallet address format"
 			HoneyLanguage.Chinese.code -> "$it 钱包地址格式错误"
 			HoneyLanguage.Japanese.code -> "$it ウォレットアドレス形式が間違っています"
@@ -205,7 +338,7 @@ object ContactText {
 		}
 	}
 	@JvmField
-	val contactName = when (currentLanguage) {
+	val contactName = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Contact Name"
 		HoneyLanguage.Chinese.code -> "联系人名称"
 		HoneyLanguage.Japanese.code -> "連絡先名称"
@@ -215,7 +348,7 @@ object ContactText {
 		else -> ""
 	}
 	@JvmField
-	val ethERCAndETHint = when (currentLanguage) {
+	val ethERCAndETHint = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的以太坊，ERC20或以太坊经典地址"
 		HoneyLanguage.Japanese.code -> "保存したいEthereum、ERC20またはEthereumクラシックアドレスを入力してください"
@@ -226,7 +359,7 @@ object ContactText {
 	}
 
 	@JvmField
-	val eosHint = when (currentLanguage) {
+	val eosHint = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter EOS Mainnet account name that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的EOS主网账户名"
 		HoneyLanguage.Japanese.code -> "保存したいEOSアカウント名を入力してください"
@@ -237,7 +370,7 @@ object ContactText {
 	}
 
 	@JvmField
-	val eosJungleHint = when (currentLanguage) {
+	val eosJungleHint = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "輸入您要存儲的EOS主網賬戶名"
 		HoneyLanguage.Japanese.code -> "保存したいEOS Jungleテストネットワークアカウント名を入力してください"
@@ -248,7 +381,7 @@ object ContactText {
 	}
 
 	@JvmField
-	val btcMainnetAddress = when (currentLanguage) {
+	val btcMainnetAddress = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的比特币主网地址"
 		HoneyLanguage.Japanese.code -> "保存するビットコムホームネットワークアドレスを入力してください"
@@ -259,7 +392,7 @@ object ContactText {
 	}
 
 	@JvmField
-	val bchAddress = when (currentLanguage) {
+	val bchAddress = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
 		HoneyLanguage.Japanese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
@@ -270,7 +403,7 @@ object ContactText {
 	}
 
 	@JvmField
-	val ltcAddress = when (currentLanguage) {
+	val ltcAddress = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Litecoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的莱特币主网地址"
 		HoneyLanguage.Japanese.code -> "Enter Litecoin Mainnet address that you want to store"
@@ -281,7 +414,7 @@ object ContactText {
 	}
 
 	@JvmField
-	val btcTestnetAddress = when (currentLanguage) {
+	val btcTestnetAddress = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Testnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入要存储的比特币Testnet地址"
 		HoneyLanguage.Japanese.code -> "保存するBitcoin Testnetアドレスを入力してください"
@@ -294,7 +427,7 @@ object ContactText {
 
 object QRText {
 	@JvmField
-	val savedAttention = when (currentLanguage) {
+	val savedAttention = when(currentLanguage) {
 		HoneyLanguage.English.code -> "QR code has been saved to album"
 		HoneyLanguage.Chinese.code -> "二维码已保存至相册"
 		HoneyLanguage.Japanese.code -> "QRコードをアルバムに保存しました"
@@ -304,7 +437,7 @@ object QRText {
 		else -> ""
 	}
 	@JvmField
-	val shareQRTitle = when (currentLanguage) {
+	val shareQRTitle = when(currentLanguage) {
 		HoneyLanguage.English.code -> "SHARE QR IMAGE"
 		HoneyLanguage.Chinese.code -> "分享二维码"
 		HoneyLanguage.Japanese.code -> "QRコードをシェアする"
@@ -314,7 +447,7 @@ object QRText {
 		else -> ""
 	}
 	@JvmField
-	val screenText = when (currentLanguage) {
+	val screenText = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Scan GoldStone QR Code"
 		HoneyLanguage.Chinese.code -> "扫描GoldStone的二维码"
 		HoneyLanguage.Japanese.code -> "GoldStoneのQRコードをスキャンします"
@@ -324,7 +457,7 @@ object QRText {
 		else -> ""
 	}
 	@JvmField
-	val invalidQRCodeAlert = when (currentLanguage) {
+	val invalidQRCodeAlert = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid QR code"
 		HoneyLanguage.Chinese.code -> "未识别到有效的二维码图片"
 		HoneyLanguage.Japanese.code -> "有効的なQRコード画像を識別できません"
@@ -334,7 +467,7 @@ object QRText {
 		else -> ""
 	}
 	@JvmField
-	val invalidContract = when (currentLanguage) {
+	val invalidContract = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Inconsistent currency. The QR code scanned is not that of the current token, please change the transfer token, or change the scanned QR code."
 		HoneyLanguage.Chinese.code -> "货币不一致。您所扫描的不是当前Token的二维码，请您更换token进行转账，或者更换扫描的二维码。"
 		HoneyLanguage.Japanese.code -> "貨幣が一致していません。現在のTokenのQRコードがスキャンされていません。Tokenを変更して振込するか、スキャンするQRコードを変更して下さい。"
@@ -345,7 +478,7 @@ object QRText {
 	}
 
 	@JvmField
-	val selectQRCodeFromAlbum = when (currentLanguage) {
+	val selectQRCodeFromAlbum = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Select QR code from the album"
 		HoneyLanguage.Chinese.code -> "Select QR code from the album"
 		HoneyLanguage.Japanese.code -> "Select QR code from the album"
@@ -358,7 +491,7 @@ object QRText {
 
 object QAText {
 	@JvmField
-	val whatIsMnemonic = when (currentLanguage) {
+	val whatIsMnemonic = when(currentLanguage) {
 		HoneyLanguage.English.code -> "What are mnemonics?"
 		HoneyLanguage.Chinese.code -> "什么是助记词？"
 		HoneyLanguage.Japanese.code -> "ニーモニックとはなんですか？"
@@ -368,7 +501,7 @@ object QAText {
 		else -> ""
 	}
 	@JvmField
-	val whatIsGas = when (currentLanguage) {
+	val whatIsGas = when(currentLanguage) {
 		HoneyLanguage.English.code -> "What is gas?"
 		HoneyLanguage.Chinese.code -> "什么是GAS？"
 		HoneyLanguage.Japanese.code -> "GASとはなんですか？"
@@ -378,7 +511,7 @@ object QAText {
 		else -> ""
 	}
 	@JvmField
-	val whatIsKeystore = when (currentLanguage) {
+	val whatIsKeystore = when(currentLanguage) {
 		HoneyLanguage.English.code -> "What is a keystore?"
 		HoneyLanguage.Chinese.code -> "什么是 keystore?"
 		HoneyLanguage.Japanese.code -> "Keystoreとはなんですか？"
@@ -388,7 +521,7 @@ object QAText {
 		else -> ""
 	}
 	@JvmField
-	val whatIsWatchOnlyWallet = when (currentLanguage) {
+	val whatIsWatchOnlyWallet = when(currentLanguage) {
 		HoneyLanguage.English.code -> "What is a watch-only wallet?"
 		HoneyLanguage.Chinese.code -> "什么是观察钱包？"
 		HoneyLanguage.Japanese.code -> "観察ウォレットとはなんですか？"
@@ -398,7 +531,7 @@ object QAText {
 		else -> ""
 	}
 	@JvmField
-	val whatIsPrivateKey = when (currentLanguage) {
+	val whatIsPrivateKey = when(currentLanguage) {
 		HoneyLanguage.English.code -> "What is a private key?"
 		HoneyLanguage.Chinese.code -> "什么是私钥？"
 		HoneyLanguage.Japanese.code -> "プライベートキーとはなんですか？"
@@ -411,7 +544,7 @@ object QAText {
 
 object ImportMethodText {
 	@JvmField
-	val mnemonic = when (currentLanguage) {
+	val mnemonic = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Mnemonic"
 		HoneyLanguage.Chinese.code -> "助记词"
 		HoneyLanguage.Japanese.code -> "ニーモニック"
@@ -421,7 +554,7 @@ object ImportMethodText {
 		else -> ""
 	}
 	@JvmField
-	val keystore = when (currentLanguage) {
+	val keystore = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Keystore"
 		HoneyLanguage.Chinese.code -> "Keystore"
 		HoneyLanguage.Japanese.code -> "Keystore"
@@ -431,7 +564,7 @@ object ImportMethodText {
 		else -> ""
 	}
 	@JvmField
-	val privateKey = when (currentLanguage) {
+	val privateKey = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Private Key"
 		HoneyLanguage.Chinese.code -> "私钥"
 		HoneyLanguage.Japanese.code -> "プライベートキー"
@@ -441,7 +574,7 @@ object ImportMethodText {
 		else -> ""
 	}
 	@JvmField
-	val watchOnly = when (currentLanguage) {
+	val watchOnly = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Watch-Only Wallet"
 		HoneyLanguage.Chinese.code -> "观察钱包"
 		HoneyLanguage.Japanese.code -> "観察ウォレット"
@@ -454,7 +587,7 @@ object ImportMethodText {
 
 object SplashText {
 	@JvmField
-	val slogan = when (currentLanguage) {
+	val slogan = when(currentLanguage) {
 		HoneyLanguage.English.code -> "The safest, most useful wallet in the world"
 		HoneyLanguage.Chinese.code -> "好用又安全的区块链钱包"
 		HoneyLanguage.Japanese.code -> "使いやすくセキュリティのしっかりしたブロックチェーンウォレット"
@@ -464,7 +597,7 @@ object SplashText {
 		else -> ""
 	}
 	@JvmField
-	val goldStone = when (currentLanguage) {
+	val goldStone = when(currentLanguage) {
 		HoneyLanguage.English.code -> "GOLD STONE"
 		HoneyLanguage.Chinese.code -> "GOLD STONE"
 		HoneyLanguage.Japanese.code -> "GOLD STONE"

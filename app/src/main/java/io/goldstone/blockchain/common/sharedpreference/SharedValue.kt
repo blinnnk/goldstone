@@ -19,23 +19,23 @@ object SharedValue {
 		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.ramUnitPrice)
 
 	fun updateRAMUnitPrice(unitPrice: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ramUnitPrice, unitPrice.toFloat())
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ramUnitPrice,unitPrice.toFloat())
 
 	fun getCPUUnitPrice(): Double =
 		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.cpuUnitPrice)
 
 	fun updateCPUUnitPrice(unitPrice: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.cpuUnitPrice, unitPrice.toFloat())
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.cpuUnitPrice,unitPrice.toFloat())
 
 	fun getNETUnitPrice(): Double =
 		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.netUnitPrice)
 
 	fun updateNETUnitPrice(unitPrice: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.netUnitPrice, unitPrice.toFloat())
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.netUnitPrice,unitPrice.toFloat())
 
 
 	fun isEncryptERCNodeRequest(): Boolean =
-		if (SharedChain.getCurrentETHName().equals(ChainText.goldStoneMain, true)) {
+		if(SharedChain.getCurrentETHName().equals(ChainText.goldStoneMain,true)) {
 			// 初始化 App 的时候默认节点是 `GoldStone Main` 这里判断一下
 			updateEncryptERCNodeRequest(true)
 			true

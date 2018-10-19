@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -28,9 +29,9 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
-import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.profile.walletsecurity.view.WalletSecuritySettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -40,7 +41,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  */
 class ProfileOverlayPresenter(
 	override val fragment: ProfileOverlayFragment
-) : BaseOverlayPresenter<ProfileOverlayFragment>() {
+): BaseOverlayPresenter<ProfileOverlayFragment>() {
 
 	override fun removeSelfFromActivity() {
 		super.removeSelfFromActivity()
@@ -54,13 +55,13 @@ class ProfileOverlayPresenter(
 	}
 
 	fun showTargetFragmentByTitle(title: String) {
-		when (title) {
+		when(title) {
 			ProfileText.contacts -> showContactsFragment()
 			ProfileText.contactsInput -> showContactInput()
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
 			ProfileText.eosAccountRegister -> showEOSAccountRegisterFragment()
-			ProfileText.pinCode -> showPinCodeEditorFragment()
+			ProfileText.walletSecurity -> showWalletSecurityFragment()
 			ProfileText.walletManager -> showWalletListFragment()
 			ProfileText.chain -> showChainSelectionFragment()
 			ProfileText.privacy -> showPrivacyFragment()
@@ -74,7 +75,7 @@ class ProfileOverlayPresenter(
 	private fun showWalletListFragment() {
 		fragment.apply {
 			headerTitle = WalletText.wallet
-			showAddButton(true, true) {
+			showAddButton(true,true) {
 				showWalletAddingMethodDashboard()
 			}
 			replaceFragmentAndSetArgument<WalletListFragment>(ContainerID.content)
@@ -83,15 +84,15 @@ class ProfileOverlayPresenter(
 
 	fun showWalletAddingMethodDashboard() {
 		val menuData = listOf(
-			Pair(R.drawable.create_wallet_icon, CreateWalletText.create),
-			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet),
-			Pair(R.drawable.watch_only_icon, ImportWalletText.importWatchWallet)
+			Pair(R.drawable.create_wallet_icon,CreateWalletText.create),
+			Pair(R.drawable.import_wallet_icon,ImportWalletText.importWallet),
+			Pair(R.drawable.watch_only_icon,ImportWalletText.importWatchWallet)
 		)
 		var mini: MiniOverlay? = null
 		fragment.overlayView.apply {
-			mini = MiniOverlay(context) { cell, title ->
+			mini = MiniOverlay(context) { cell,title ->
 				cell.onClick {
-					when (title) {
+					when(title) {
 						CreateWalletText.create -> showCreateWalletFragment()
 						ImportWalletText.importWallet -> showImportWalletFragment()
 						else -> showWatchWalletImportFragment()
@@ -113,8 +114,8 @@ class ProfileOverlayPresenter(
 
 	private fun showAboutFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.aboutUs)
-			putString(ArgumentKey.webViewName, ProfileText.aboutUs)
+			putString(ArgumentKey.webViewUrl,WebUrl.aboutUs)
+			putString(ArgumentKey.webViewName,ProfileText.aboutUs)
 		}
 	}
 
@@ -132,29 +133,29 @@ class ProfileOverlayPresenter(
 
 	private fun showPrivacyFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.privacy)
-			putString(ArgumentKey.webViewName, ProfileText.privacy)
+			putString(ArgumentKey.webViewUrl,WebUrl.privacy)
+			putString(ArgumentKey.webViewName,ProfileText.privacy)
 		}
 	}
 
 	private fun showTermsFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.terms)
-			putString(ArgumentKey.webViewName, ProfileText.terms)
+			putString(ArgumentKey.webViewUrl,WebUrl.terms)
+			putString(ArgumentKey.webViewName,ProfileText.terms)
 		}
 	}
 
 	private fun showSupportFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.support)
-			putString(ArgumentKey.webViewName, ProfileText.support)
+			putString(ArgumentKey.webViewUrl,WebUrl.support)
+			putString(ArgumentKey.webViewName,ProfileText.support)
 		}
 	}
 
 	private fun showHelpCenterFragment() {
 		fragment.addFragmentAndSetArgument<WebViewFragment>(ContainerID.content) {
-			putString(ArgumentKey.webViewUrl, WebUrl.helpCenter)
-			putString(ArgumentKey.webViewName, ProfileText.helpCenter)
+			putString(ArgumentKey.webViewUrl,WebUrl.helpCenter)
+			putString(ArgumentKey.webViewName,ProfileText.helpCenter)
 		}
 	}
 
@@ -162,8 +163,17 @@ class ProfileOverlayPresenter(
 		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content)
 	}
 
-	private fun showPinCodeEditorFragment() {
-		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content)
+	private fun showWalletSecurityFragment() {
+		fragment.addFragmentAndSetArgument<WalletSecuritySettingsFragment>(ContainerID.content)
+	}
+
+	fun showPassCodeSettingFragment() {
+		fragment.addFragmentAndSetArgument<PassCodeFragment>(ContainerID.content) {
+			putBoolean(
+				ArgumentKey.setPinCode,
+				true
+			)
+		}
 	}
 
 	private fun showContactsFragment() {

@@ -8,15 +8,16 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
+import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -30,7 +31,7 @@ import org.jetbrains.anko.verticalLayout
  * @date 24/04/2018 10:54 AM
  * @author KaySaith
  */
-class HintFragment : BaseFragment<HintPresenter>() {
+class HintFragment: BaseFragment<HintPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.hint
 	private val hintInput by lazy { RoundInput(context!!) }
@@ -39,7 +40,7 @@ class HintFragment : BaseFragment<HintPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
-			lparams(matchParent, matchParent)
+			lparams(matchParent,matchParent)
 			hintInput.apply {
 				title = CreateWalletText.hint
 				setMargins<LinearLayout.LayoutParams> {
@@ -61,17 +62,20 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		view: View,
 		savedInstanceState: Bundle?
 	) {
-		super.onViewCreated(view, savedInstanceState)
+		super.onViewCreated(
+			view,
+			savedInstanceState
+		)
 		WalletTable.getCurrentWallet {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					getParentFragment<ProfileOverlayFragment> {
-						activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
-					}
+			if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
+				getParentFragment<ProfileOverlayFragment> {
+					activity?.addFragmentAndSetArguments<PassCodeFragment>(
+						ContainerID.main,
+						FragmentTag.pinCode
+					)
 				}
 			}
-
 			hintInput.hint = this.hint
 		}
 	}

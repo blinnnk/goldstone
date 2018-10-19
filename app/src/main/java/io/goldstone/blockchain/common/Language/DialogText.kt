@@ -6,7 +6,7 @@ package io.goldstone.blockchain.common.language
  */
 object DialogText {
 	@JvmField
-	val backUpMnemonicSucceed = when (currentLanguage) {
+	val backUpMnemonicSucceed = when(currentLanguage) {
 		HoneyLanguage.English.code -> "You have backed up your Mnemonics backed up!"
 		HoneyLanguage.Chinese.code -> "助记词备份成功！"
 		HoneyLanguage.Japanese.code -> "ニーモニックのバックアップに成功しました。"
@@ -16,7 +16,7 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val backUpMnemonic = when (currentLanguage) {
+	val backUpMnemonic = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Back Up Mnemonic"
 		HoneyLanguage.Chinese.code -> "备份助记词"
 		HoneyLanguage.Japanese.code -> "ニーモニックのバックアップ"
@@ -26,7 +26,7 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val backUpMnemonicDescription = when (currentLanguage) {
+	val backUpMnemonicDescription = when(currentLanguage) {
 		HoneyLanguage.English.code -> "You have not backed up your mnemonic yet. It is extremely important that take care of your mnemonic. If you lose it, you will lose your digital assets."
 		HoneyLanguage.Chinese.code -> "你还没有备份您的钱包。GoldStone不会为您保存任何形式的私钥/助记词/keystore，一旦您忘记就无法找回。请您一定确保钱包妥善备份后再用这个钱包接收转账。"
 		HoneyLanguage.Japanese.code -> "まだお客様のウォレットがバックアップされていません。GoldStoneどのような形式であれプライペートキー/ニーモニック/Keystoreは保存されません。忘れてしまった場合は探し出すことは出来ません。必ずウォレットが適切にバックアップされていることを確認してから、このウォレットを使用して振込を受け付けて下さい。"
@@ -36,7 +36,7 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val networkTitle = when (currentLanguage) {
+	val networkTitle = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Network unavailable"
 		HoneyLanguage.Chinese.code -> "未检测到网络"
 		HoneyLanguage.Japanese.code -> "ネットワークが検出できません"
@@ -46,7 +46,7 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val networkDescription = when (currentLanguage) {
+	val networkDescription = when(currentLanguage) {
 		HoneyLanguage.English.code -> "The current state of the network is not good. Please check. You can try turning on and off airplane mode to try to recover."
 		HoneyLanguage.Chinese.code -> "现在的网络状态不好，请检查。您可以尝试开启再关闭飞行模式来尝试恢复。"
 		HoneyLanguage.Japanese.code -> "現在のネットワーク状態がよくありませんので、チェックするようにして下さい。飛行モードをオンにした後オフにして回復を試みて下さい。"
@@ -56,7 +56,7 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val goToBackUp = when (currentLanguage) {
+	val goToBackUp = when(currentLanguage) {
 		HoneyLanguage.English.code -> "BACK UP"
 		HoneyLanguage.Chinese.code -> "立即备份"
 		HoneyLanguage.Japanese.code -> "すぐにバックアップする"
@@ -66,7 +66,27 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val serverBusyTitle = when (currentLanguage) {
+	val title = when(currentLanguage) {
+		HoneyLanguage.English.code -> "title"
+		HoneyLanguage.Chinese.code -> "title"
+		HoneyLanguage.Japanese.code -> "title"
+		HoneyLanguage.Korean.code -> "title"
+		HoneyLanguage.Russian.code -> "title"
+		HoneyLanguage.TraditionalChinese.code -> "title"
+		else -> ""
+	}
+	@JvmField
+	val subtitle = when(currentLanguage) {
+		HoneyLanguage.English.code -> "subtitle"
+		HoneyLanguage.Chinese.code -> "subtitle"
+		HoneyLanguage.Japanese.code -> "subtitle"
+		HoneyLanguage.Korean.code -> "subtitle"
+		HoneyLanguage.Russian.code -> "subtitle"
+		HoneyLanguage.TraditionalChinese.code -> "subtitle"
+		else -> ""
+	}
+	@JvmField
+	val serverBusyTitle = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Network Busy"
 		HoneyLanguage.Chinese.code -> "网络繁忙，无法连接"
 		HoneyLanguage.Japanese.code -> "ネットワークビジーで接続できません"
@@ -76,7 +96,7 @@ object DialogText {
 		else -> ""
 	}
 	@JvmField
-	val serverBusyDescription = when (currentLanguage) {
+	val serverBusyDescription = when(currentLanguage) {
 		HoneyLanguage.English.code -> "Can't connect with service right now, sorry, please try again later."
 		HoneyLanguage.Chinese.code -> "现在无法和服务连接，抱歉呀，请稍后再试。"
 		HoneyLanguage.Japanese.code -> "現在サーバーと接続できません。大変申し訳ありませんが、しばらくしてから再度試して下さい。"

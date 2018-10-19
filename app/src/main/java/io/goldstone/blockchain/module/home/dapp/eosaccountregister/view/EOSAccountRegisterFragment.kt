@@ -42,7 +42,7 @@ import java.math.BigInteger
  * @author KaySaith
  * @date  2018/09/21
  */
-class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
+class EOSAccountRegisterFragment() : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	override val pageTitle: String = ProfileText.eosAccountRegister
 	private val confirmButton by lazy { RoundButton(context!!) }
@@ -55,6 +55,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 		listOf(MutablePair("RAM (Bytes)", "4096"), MutablePair("CPU (EOS)", "0.1"), MutablePair("NET (EOS)", "0.1"))
 
 	override val presenter = EOSAccountRegisterPresenter(this)
+
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			lparams(matchParent, matchParent)

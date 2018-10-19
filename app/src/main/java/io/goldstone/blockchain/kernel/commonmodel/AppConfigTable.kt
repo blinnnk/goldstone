@@ -11,6 +11,7 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
@@ -27,13 +28,17 @@ import org.jetbrains.anko.uiThread
  * @important
  * [goldStoneID] 这个 ID 是自身业务服务器和客户端用来做
  * 唯一校验的值, 不是常规意义的 `Device ID`
+ * @rewriteDate 10/09/2018 7:54 PM
+ * @reWriter wcx
+ * @description 添加showFingerprintUnlock指纹解锁判断属性和更新数据库方法setShowFingerprintUnlockStatus
  */
 @Entity(tableName = "appConfig")
 data class AppConfigTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	var pincode: Int? = null,
-	var showPincode: Boolean = false,
+	var pincodeIsOpened: Boolean = false,
+	var fingerprintUnlockerIsOpened: Boolean = false,
 	var frozenTime: Long? = null,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
@@ -115,7 +120,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
+		fun updateRegisterAddressesStatus(isRegistered: Boolean,callback: () -> Unit = {}) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig().let {
@@ -158,24 +163,30 @@ data class AppConfigTable(
 			}
 		}
 
-		fun setShowPinCodeStatus(
+		fun setPinCodeStatus(
 			status: Boolean,
 			callback: () -> Unit
 		) {
-			AppConfigTable.getAppConfig { it ->
-				it?.let {
-					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(it.apply {
-							showPincode = status
-							if (!status) {
-								pincode = null
-							}
-						})
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+			load {
+				GoldStoneDataBase.database.appConfigDao().updatePincodeIsOpened(status)
+				if(!status) {
+					GoldStoneDataBase.database.appConfigDao().updatePincode(null)
 				}
+				SharedWallet.updatePincodeIsOpened(status)
+			} then {
+				callback()
+			}
+		}
+
+		fun setFingerprintUnlockStatus(
+			status: Boolean,
+			callback: () -> Unit
+		) {
+			load {
+				GoldStoneDataBase.database.appConfigDao().updateFingerprintUnlockerIsOpened(status)
+				SharedWallet.updateFingerprintUnlockerIsOpened(status)
+			} then {
+				callback()
 			}
 		}
 
@@ -225,8 +236,8 @@ data class AppConfigTable(
 		) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
-					if (isMainnet) updateMainnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
-					else updateTestnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
+					if(isMainnet) updateMainnetChainName(isMainnet,bchChainNameID,ltcChainNameID,eosChainNameID,ethSeriesID,btcChainNameID,etcChainNameID)
+					else updateTestnetChainName(isMainnet,bchChainNameID,ltcChainNameID,eosChainNameID,ethSeriesID,btcChainNameID,etcChainNameID)
 					callback()
 				}
 			}
@@ -244,7 +255,7 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateCurrency(code: String, callback: () -> Unit) {
+		fun updateCurrency(code: String,callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateCurrency(code)
 				uiThread { callback() }
@@ -292,11 +303,11 @@ data class AppConfigTable(
 		private fun getLocalTerms(): String {
 			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(terms).let { localTerms ->
 				localTerms.find {
-					it.safeGet("language").equals(CountryCode.currentLanguageSymbol, true)
+					it.safeGet("language").equals(CountryCode.currentLanguageSymbol,true)
 				}.let { it ->
-					return if (it.isNull()) {
+					return if(it.isNull()) {
 						localTerms.find {
-							it.safeGet("language").equals(HoneyLanguage.English.symbol, true)
+							it.safeGet("language").equals(HoneyLanguage.English.symbol,true)
 						}?.safeGet("terms").orEmpty()
 					} else {
 						return it!!.safeGet("terms")
@@ -313,6 +324,15 @@ interface AppConfigDao {
 	@Query("SELECT * FROM appConfig")
 	fun getAppConfig(): List<AppConfigTable>
 
+	@Query("UPDATE appConfig SET pincode = :pincode")
+	fun updatePincode(pincode: Int? = null)
+
+	@Query("UPDATE appConfig SET pincodeIsOpened = :pincodeIsOpened")
+	fun updatePincodeIsOpened(pincodeIsOpened: Boolean = false)
+
+	@Query("UPDATE appConfig SET fingerprintUnlockerIsOpened = :fingerprintUnlockerIsOpened")
+	fun updateFingerprintUnlockerIsOpened(fingerprintUnlockerIsOpened: Boolean = false)
+
 	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
 	fun updateCurrency(newCurrencyCode: String)
 
@@ -323,10 +343,10 @@ interface AppConfigDao {
 	fun updateTerms(content: String)
 
 	@Query("UPDATE appConfig SET isMainnet = :isMainnet, currentBCHChainNameID = :bchChainNameID, currentLTCChainNameID = :ltcChainNameID, currentEOSChainNameID = :eosChainNameID, currentETHSeriesChainNameID = :ethSeriesChainNameID, currentBTCChainNameID = :btcChainNameID, currentETCChainNameID = :etcChainNameID   WHERE id = 1")
-	fun updateMainnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
+	fun updateMainnetChainName(isMainnet: Boolean,bchChainNameID: Int,ltcChainNameID: Int,eosChainNameID: Int,ethSeriesChainNameID: Int,btcChainNameID: Int,etcChainNameID: Int)
 
 	@Query("UPDATE appConfig SET isMainnet = :isMainnet,  currentBCHTestChainNameID = :bchChainNameID, currentLTCTestChainNameID = :ltcChainNameID, currentEOSTestChainNameID = :eosChainNameID, currentETHSeriesTestChainNameID = :ethSeriesChainNameID, currentBTCTestChainNameID = :btcChainNameID, currentETCTestChainNameID = :etcChainNameID   WHERE id = 1")
-	fun updateTestnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
+	fun updateTestnetChainName(isMainnet: Boolean,bchChainNameID: Int,ltcChainNameID: Int,eosChainNameID: Int,ethSeriesChainNameID: Int,btcChainNameID: Int,etcChainNameID: Int)
 
 	@Insert
 	fun insert(appConfigTable: AppConfigTable)

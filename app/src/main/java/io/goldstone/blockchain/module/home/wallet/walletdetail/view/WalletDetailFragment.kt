@@ -6,13 +6,14 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
+import io.goldstone.blockchain.module.common.passcode.view.PassCodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
@@ -23,8 +24,8 @@ import java.util.*
  * @date 23/03/2018 3:44 PM
  * @author KaySaith
  */
-class WalletDetailFragment :
-	BaseRecyclerFragment<WalletDetailPresenter, WalletDetailCellModel>() {
+class WalletDetailFragment:
+	BaseRecyclerFragment<WalletDetailPresenter,WalletDetailCellModel>() {
 
 	override val pageTitle: String = "Wallet Detail"
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
@@ -35,7 +36,7 @@ class WalletDetailFragment :
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<WalletDetailCellModel>?
 	) {
-		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(), {
+		recyclerView.adapter = WalletDetailAdapter(asyncData.orEmptyArray(),{
 			onClick {
 				model?.apply { presenter.showMyTokenDetailFragment(this) }
 				preventDuplicateClicks()
@@ -57,8 +58,8 @@ class WalletDetailFragment :
 		headerView?.showLoadingView(false)
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
+	override fun onViewCreated(view: View,savedInstanceState: Bundle?) {
+		super.onViewCreated(view,savedInstanceState)
 		wrapper.addView(slideHeader)
 		/**
 		 * this `slideHeader` will show or hide depends on the distance that user sliding the
@@ -77,14 +78,14 @@ class WalletDetailFragment :
 		offset: Int,
 		range: Int
 	) {
-		if (offset == 0) totalRange = 0
-		if (totalRange == 0) totalRange = range
+		if(offset == 0) totalRange = 0
+		if(totalRange == 0) totalRange = range
 
-		if (offset >= headerHeight && !isShow) {
+		if(offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true
 		}
-		if (range > totalRange - headerHeight && isShow) {
+		if(range > totalRange - headerHeight && isShow) {
 			slideHeader.onHeaderHidesStyle()
 			isShow = false
 		}
@@ -96,18 +97,17 @@ class WalletDetailFragment :
 		// 检查更新未读消息数字
 		updateUnreadCount()
 		// 检查是否需要更新数据
-		if (!asyncData.isNullOrEmpty()) {
+		if(!asyncData.isNullOrEmpty()) {
 			presenter.updateData()
 		}
 		// 检查是否需要显示 `PIN Code` 界面
-		showPinCodeFragment()
-		// 恢复回退站
-		getMainActivity()?.backEvent = null
+		showVerifyPinCodeFragment()
+
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
-		if (!hidden) {
+		if(!hidden) {
 			// 恢复显示的时候检查更新数据
 			presenter.updateData()
 			// 检查更新未读消息数字
@@ -119,9 +119,9 @@ class WalletDetailFragment :
 	}
 
 	fun updateUnreadCount() {
-		presenter.updateUnreadCount { unreadCount, error ->
-			if (error.isNone() && !unreadCount.isNull()) {
-				if (unreadCount!! > 0) {
+		presenter.updateUnreadCount { unreadCount,error ->
+			if(error.isNone() && !unreadCount.isNull()) {
+				if(unreadCount!! > 0) {
 					slideHeader.notifyButton.setRedDotStyle(unreadCount)
 				} else {
 					slideHeader.notifyButton.removeRedDot()
@@ -142,15 +142,22 @@ class WalletDetailFragment :
 		}
 	}
 
-	private fun showPinCodeFragment() {
-		if (activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull())
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main,
-						FragmentTag.pinCode
+	private fun showVerifyPinCodeFragment() {
+		if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
+			if(activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull()) {
+				activity?.addFragmentAndSetArguments<PassCodeFragment>(
+					ContainerID.main,
+					FragmentTag.pinCode
+				) {
+					putBoolean(
+						ArgumentKey.disableTheBackButtonToExit,
+						true
 					)
 				}
 			}
+		} else {
+			// 恢复回退站
+			getMainActivity()?.backEvent = null
+		}
 	}
 }
