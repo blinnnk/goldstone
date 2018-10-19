@@ -49,7 +49,7 @@ class AddressSelectionPresenter(
 	fun showPaymentPrepareFragmentByQRCode(qrCode: QRCode) {
 		if (qrCode.isValid()) {
 			if (qrCode.content.contains("transfer")) {
-				if (token?.contract.isEOS()) qrCode.convertEOSQRCode().let {
+				if (token?.contract.isEOSSeries()) qrCode.convertEOSQRCode().let {
 					isCorrectCoinOrChainID(it) { showPaymentPrepareFragment(it.walletAddress, it.amount) }
 				} else qrCode.convertERC20QRCode().let {
 					isCorrectCoinOrChainID(it) { showPaymentPrepareFragment(it.walletAddress, it.amount) }
@@ -60,6 +60,14 @@ class AddressSelectionPresenter(
 					if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
 					else isCorrectCoinOrChainID(qrModel!!) {
 						showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
+					}
+				}
+
+				token?.contract.isEOSSeries() -> {
+					qrCode.convertEOSQRCode().let {
+						isCorrectCoinOrChainID(it) {
+							showPaymentPrepareFragment(it.walletAddress, it.amount)
+						}
 					}
 				}
 
@@ -101,7 +109,7 @@ class AddressSelectionPresenter(
 		when (addressType) {
 			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
 			AddressType.ETHSeries -> when {
-				token?.contract.isBTCSeries() || token?.contract.isEOS() ->
+				token?.contract.isBTCSeries() || token?.contract.isEOSSeries() ->
 					fragment.context.alert("this is not a valid bitcoin address")
 				else -> WalletTable.getAllETHAndERCAddresses {
 					showAlertIfLocalExistThisAddress(this)
@@ -109,7 +117,7 @@ class AddressSelectionPresenter(
 			}
 
 			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
-				!token?.contract.isEOS() && !token?.contract.isEOSToken() ->
+				!token?.contract.isEOSSeries() ->
 					fragment.context.alert("this is not a valid eos account name")
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {
@@ -170,9 +178,8 @@ class AddressSelectionPresenter(
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
-
-			token?.contract.isEOS() -> when {
-				!TokenContract(qrModel.contractAddress).isEOSCode() ->
+			token?.contract.isEOSSeries() -> when {
+				!TokenContract(qrModel.contractAddress).isEOSSeries() ->
 					fragment.context.alert(QRText.invalidContract)
 				!qrModel.chainID.equals(SharedChain.getEOSCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)

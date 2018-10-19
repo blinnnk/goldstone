@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.isEOSSeries
+import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -48,8 +49,9 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 					codeName,
 					false
 				) { localData ->
+					System.out.println("fuck you $localData")
 					// 显示内存的数据后异步更新数据
-					if (!fragment.asyncData.isNull() && fragment.asyncData!!.isEmpty()) localData.map {
+					if (!fragment.asyncData.isNull() && !fragment.asyncData!!.isEmpty()) localData.map {
 						TransactionListModel(it)
 					}.prepareTokenHistoryBalance(token?.contract!!, account.accountName) {
 						it.updateChartAndHeaderData()
@@ -64,12 +66,15 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 							pageSize,
 							0L,
 							endID,
-							codeName,
-							token?.symbol.orEmpty()
+							token?.contract.orEmpty()
 						) { data, error ->
 							if (!data.isNull() && error.isNone()) {
+								if (data!!.isEmpty()) {
+									fragment.context?.runOnUiThread { showBottomLoading(false) }
+									return@getEOSTransactions
+								}
 								// 排序后插入数据库
-								data!!.asSequence().sortedByDescending { it.serverID }.forEachIndexed { index, eosTransactionTable ->
+								data.asSequence().sortedByDescending { it.serverID }.forEachIndexed { index, eosTransactionTable ->
 									EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - index })
 								}
 								flipPage(data.plus(localData), callback)
@@ -128,7 +133,14 @@ private fun TokenDetailPresenter.flipPage(data: List<EOSTransactionTable>, callb
 	fragment.context?.runOnUiThread {
 		allData = fragment.asyncData
 		fragment.removeEmptyView()
-		fragment.recyclerView.adapter?.notifyItemRangeChanged(totalCount - data.size.orZero() + 1, totalCount)
+		fragment.recyclerView.adapter?.apply {
+			try {
+				val startPosition = totalCount - data.size.orZero() + 1
+				notifyItemRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
+			} catch (error: Exception) {
+				notifyDataSetChanged()
+			}
+		}
 		showBottomLoading(false)
 		callback()
 	}

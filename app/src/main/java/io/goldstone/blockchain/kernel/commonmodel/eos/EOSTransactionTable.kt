@@ -16,6 +16,7 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -90,13 +91,6 @@ data class EOSTransactionTable(
 
 	companion object {
 
-		fun updateBandWidthAndStatusBy(txID: String, cpuUsage: BigInteger, netUsage: BigInteger) {
-			doAsync {
-				GoldStoneDataBase.database.eosTransactionDao()
-					.updateBandWidthAndStatusByTxID(txID, cpuUsage, netUsage)
-			}
-		}
-
 		fun preventDuplicateInsert(account: EOSAccount, table: EOSTransactionTable) {
 			doAsync {
 				GoldStoneDataBase.database.eosTransactionDao().apply {
@@ -124,33 +118,18 @@ data class EOSTransactionTable(
 
 		fun getMaxDataIndexTable(
 			account: EOSAccount,
+			contract: TokenContract,
+			chainID: ChainID,
 			isMainThread: Boolean = true,
 			hold: (EOSTransactionTable?) -> Unit
 		) {
 			doAsync {
-				val data = GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(account.accountName)
-				if (isMainThread) uiThread {
-					hold(data)
-				} else hold(data)
-			}
-		}
-
-		fun getDataByIndex(
-			account: EOSAccount,
-			dataIndex: Int,
-			symbol: String,
-			codeName: String,
-			isMainThread: Boolean = true,
-			hold: (EOSTransactionTable?) -> Unit
-		) {
-			doAsync {
-				val data =
-					GoldStoneDataBase.database.eosTransactionDao().getDataByDataIndex(
-						account.accountName,
-						dataIndex,
-						symbol,
-						codeName
-					)
+				val data = GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(
+					account.accountName,
+					contract.contract.orEmpty(),
+					contract.symbol,
+					chainID.id
+				)
 				if (isMainThread) uiThread {
 					hold(data)
 				} else hold(data)
@@ -195,8 +174,8 @@ interface EOSTransactionDao {
 	@Query("UPDATE eosTransactions SET isPending = :pendingStatus, serverID = :serverID WHERE txID LIKE :txID")
 	fun updatePendingDataByTxID(txID: String, serverID: Long, pendingStatus: Boolean = false)
 
-	@Query("SELECT * FROM eosTransactions WHERE id = (SELECT MAX(id) FROM eosTransactions) AND recordAccountName LIKE :accountName")
-	fun getMaxDataIndex(accountName: String): EOSTransactionTable?
+	@Query("SELECT * FROM eosTransactions WHERE dataIndex = (SELECT MAX(dataIndex) FROM eosTransactions) AND recordAccountName LIKE :accountName AND codeName = :codeName AND symbol = :symbol AND chainID = :chainID")
+	fun getMaxDataIndex(accountName: String, codeName: String, symbol: String, chainID: String): EOSTransactionTable?
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName")
 	fun getDataByRecordAccount(recordAccountName: String): List<EOSTransactionTable>
