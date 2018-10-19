@@ -4,7 +4,6 @@ import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -125,12 +124,13 @@ class ChainType(val id: Int) : Serializable {
 					SharedAddress.updateCurrentEOS(newAddress.address)
 					SharedAddress.updateCurrentEOSName(newEOSAccountName)
 				}
-				ChainType.BTC.id -> if (SharedValue.isTestEnvironment()) {
-					currentWallet?.currentBTCSeriesTestAddress = newAddress.address
-					SharedAddress.updateCurrentBTCSeriesTest(newAddress.address)
-				} else {
+				ChainType.BTC.id -> {
 					currentWallet?.currentBTCAddress = newAddress.address
 					SharedAddress.updateCurrentBTC(newAddress.address)
+				}
+				ChainType.AllTest.id -> {
+					currentWallet?.currentBTCSeriesTestAddress = newAddress.address
+					SharedAddress.updateCurrentBTCSeriesTest(newAddress.address)
 				}
 			}
 			currentWallet?.apply {

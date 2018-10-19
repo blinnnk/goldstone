@@ -2,14 +2,15 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -60,11 +61,15 @@ private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 	)
 	// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
 	doAsync {
-		GoldStoneDataBase.database.eosTransactionDao().apply {
-			val dataIndex =
-				getMaxDataIndex(info.fromAccount.accountName)?.dataIndex.orZero()
+		EOSTransactionTable.getMaxDataIndexTable(
+			info.fromAccount,
+			getToken()?.contract.orEmpty(),
+			SharedChain.getEOSCurrent(),
+			false
+		) {
+			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
 			val transaction = EOSTransactionTable(info, response, dataIndex)
-			insert(transaction)
+			GoldStoneDataBase.database.eosTransactionDao().insert(transaction)
 		}
 	}
 	callback(GoldStoneError.None)

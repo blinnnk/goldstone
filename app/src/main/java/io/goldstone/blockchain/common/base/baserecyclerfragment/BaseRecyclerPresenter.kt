@@ -67,9 +67,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	}
 
 	// 适配的是有 `Header`， `Footer` 的 `adapter`
-	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(
-		newData: ArrayList<D>
-	) {
+	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> diffAndUpdateAdapterData(newData: ArrayList<D>) {
 		fragment.getAdapter<T>()?.apply {
 			// Comparison the data, if they are different then update adapter
 			diffDataSetChanged(dataSet, newData) {

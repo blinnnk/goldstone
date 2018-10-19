@@ -873,7 +873,7 @@ object EOSAccountText {
 		else -> ""
 	}
 
-	//	····················EOS账户权限····················
+	//	EOS账户权限
 	@JvmField
 	val multipleAccountHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Find multiple EOS accounts with this EOS public key, please select an account as your default account."

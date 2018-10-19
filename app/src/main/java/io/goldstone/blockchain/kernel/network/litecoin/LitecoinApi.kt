@@ -107,7 +107,7 @@ object LitecoinApi {
 					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
 					0,
 					address,
-					CoinSymbol.ltc,
+					CoinSymbol.LTC.symbol!!,
 					false,
 					ChainType.LTC.id
 				)

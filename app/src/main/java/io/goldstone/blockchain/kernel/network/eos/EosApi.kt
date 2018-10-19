@@ -316,8 +316,7 @@ object EOSAPI {
 		pageSize: Int,
 		starID: Long,
 		endID: Long,
-		codeName: String,
-		symbol: String,
+		contract: TokenContract,
 		@WorkerThread hold: (tokens: List<EOSTransactionTable>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
@@ -328,8 +327,8 @@ object EOSAPI {
 				pageSize,
 				starID,
 				endID,
-				codeName,
-				symbol
+				contract.contract.orEmpty(),
+				contract.symbol
 			),
 			"action_list",
 			true,
