@@ -7,6 +7,7 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -144,23 +145,21 @@ class WalletDetailFragment :
 	}
 
 	private fun showPinCodeFragment() {
-		AppConfigTable.getAppConfig {
-			if(it?.pincodeIsOpened.orFalse() || it?.fingerprintUnlockerIsOpened.orFalse()) {
-				if(activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull()) {
-					activity?.addFragmentAndSetArguments<PassCodeFragment>(
-						ContainerID.main,
-						FragmentTag.pinCode
-					) {
-						putBoolean(
-							ArgumentKey.disableTheBackButtonToExit,
-							true
-						)
-					}
+		if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
+			if(activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull()) {
+				activity?.addFragmentAndSetArguments<PassCodeFragment>(
+					ContainerID.main,
+					FragmentTag.pinCode
+				) {
+					putBoolean(
+						ArgumentKey.disableTheBackButtonToExit,
+						true
+					)
 				}
-			} else {
-				// 恢复回退站
-				getMainActivity()?.backEvent = null
 			}
+		} else {
+			// 恢复回退站
+			getMainActivity()?.backEvent = null
 		}
 	}
 }

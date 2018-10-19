@@ -21,6 +21,7 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.error.WalletSecurityError
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.FingerprintHelper
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.ShowBackToHomeConfirmationDialog
@@ -171,18 +172,16 @@ class PassCodeFragment : BaseFragment<PassCodePresenter>() {
 
 	private fun determineTheInterfaceMode(callback : () -> Unit) {
 		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			AppConfigTable.getAppConfig {
-				it?.pincodeIsOpened?.isTrue {
-					it.fingerprintUnlockerIsOpened.isTrue {
-						isTwoVerificationMethods = true
-					}
-				}?.otherwise {
-					it.fingerprintUnlockerIsOpened.isTrue {
-						isPinCode = true
-					}
+			SharedWallet.isPincodeOpened().orFalse().isTrue {
+				SharedWallet.isFingerprintUnlockerOpened().orFalse().isTrue {
+					isTwoVerificationMethods = true
 				}
-				callback()
+			}.otherwise {
+				SharedWallet.isFingerprintUnlockerOpened().orFalse().isTrue {
+					isPinCode = true
+				}
 			}
+			callback()
 		}
 	}
 

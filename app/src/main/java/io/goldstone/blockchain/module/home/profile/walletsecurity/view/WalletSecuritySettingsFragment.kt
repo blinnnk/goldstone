@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.FingerprintAvailableStatus
 import io.goldstone.blockchain.common.utils.FingerprintHelper
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -52,22 +53,20 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent,matchParent)
-			AppConfigTable.getAppConfig {
-				if(it?.pincodeIsOpened.orFalse() || it?.fingerprintUnlockerIsOpened.orFalse()) {
-					presenter.showPassCodeFragment()
-				}
-
-				AttentionView(context).apply {
-					text = FingerprintUnlockText.attention
-					textSize = fontSize(13)
-					textColor = Spectrum.white
-					setMargins<LinearLayout.LayoutParams> {
-						topMargin = 20.uiPX()
-					}
-				}.into(this)
-
-				initSwitchCell()
+			if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
+				presenter.showPassCodeFragment()
 			}
+
+			AttentionView(context).apply {
+				text = FingerprintUnlockText.attention
+				textSize = fontSize(13)
+				textColor = Spectrum.white
+				setMargins<LinearLayout.LayoutParams> {
+					topMargin = 20.uiPX()
+				}
+			}.into(this)
+
+			initSwitchCell()
 		}
 	}
 
@@ -76,9 +75,7 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 			// 指纹解锁
 			SingleLineSwitch(context,true).apply {
 				setHorizontalPadding()
-				AppConfigTable.getAppConfig { config ->
-					setSwitchStatus(config?.fingerprintUnlockerIsOpened.orFalse())
-				}
+				setSwitchStatus(SharedWallet.isFingerprintUnlockerOpened().orFalse())
 				setOnclick { switch ->
 					Log.e("setOnclick","setOnclick")
 					if(switch.isChecked) {
@@ -99,13 +96,11 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 
 		pinCodeSingleLineSwitch = SingleLineSwitch(context,true).apply {
 			setHorizontalPadding()
-			AppConfigTable.getAppConfig { config ->
-				setSwitchStatus(config?.pincodeIsOpened.orFalse())
-				if(config?.pincodeIsOpened.orFalse()) {
-					changePinCode.visibility = View.VISIBLE
-				} else {
-					changePinCode.visibility = View.GONE
-				}
+			setSwitchStatus(SharedWallet.isPincodeOpened().orFalse())
+			if(SharedWallet.isPincodeOpened().orFalse()) {
+				changePinCode.visibility = View.VISIBLE
+			} else {
+				changePinCode.visibility = View.GONE
 			}
 			setOnclick {
 				Log.e("setOnclick1","setOnclick1")
@@ -169,11 +164,9 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 	// 点击后根据更新的数据库情况显示指紋解锁开关状态
 	private fun openFingerprintEvent(switch : HoneyBaseSwitch) {
 		presenter.setFingerprintStatus(switch.isChecked) {
-			AppConfigTable.getAppConfig {
-				switch.isChecked = it?.fingerprintUnlockerIsOpened.orFalse()
-				if(!pinCodeSingleLineSwitch?.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
-					setPinCodeTips()
-				}
+			switch.isChecked = SharedWallet.isFingerprintUnlockerOpened().orFalse()
+			if(!pinCodeSingleLineSwitch?.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
+				setPinCodeTips()
 			}
 		}
 	}
@@ -213,12 +206,10 @@ class WalletSecuritySettingsFragment : BaseFragment<WalletSecuritySettingsPresen
 
 	override fun onHiddenChanged(hidden : Boolean) {
 		if(!hidden) {
-			AppConfigTable.getAppConfig {
-				// 设置新密码返回更新状态
-				if(it?.pincodeIsOpened.orFalse()) {
-					setChangePinCodeVisibility()
-					setPinCodeSingleLineSwitchStatus(true)
-				}
+			// 设置新密码返回更新状态
+			if(SharedWallet.isPincodeOpened().orFalse()) {
+				setChangePinCodeVisibility()
+				setPinCodeSingleLineSwitchStatus(true)
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import android.view.View
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orFalse
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
@@ -91,19 +92,15 @@ class WalletSettingsPresenter(override val fragment : WalletSettingsFragment) : 
 				// 恢复 `Header` 样式
 				recoveryHeaderStyle()
 				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
-				AppConfigTable.getAppConfig {
-					it?.apply {
-						// 如果有私密验证首先要通过 `Pin Code`
-						pincodeIsOpened.isTrue {
-							activity?.addFragmentAndSetArguments<PassCodeFragment>(
-								ContainerID.main,
-								FragmentTag.pinCode
-							)
-						}
-						// 加载 `Hint` 编辑界面
-						replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
-					}
+				// 如果有私密验证首先要通过 `Pin Code`
+				SharedWallet.isPincodeOpened().orFalse().isTrue {
+					activity?.addFragmentAndSetArguments<PassCodeFragment>(
+						ContainerID.main,
+						FragmentTag.pinCode
+					)
 				}
+				// 加载 `Hint` 编辑界面
+				replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
 			} else context.alert(WalletText.watchOnly)
 		}
 	}
