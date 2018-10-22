@@ -33,6 +33,9 @@ object ElementID {
 	const val dashboardOverlay = 2019
 	const val baseFragmentContainer = 2020
 	const val bottomLoading = 2021
+	const val checkBox = 2022
+	const val recycleriew = 2023
+	const val overlayContainer = 2024
 }
 
 object ViewPagerID {

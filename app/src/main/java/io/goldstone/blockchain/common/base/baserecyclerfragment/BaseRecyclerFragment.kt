@@ -298,7 +298,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		loadingView.visibility = View.GONE
 		recyclerView.y = 0f
 	}
-
+	fun getLoadingView(): View = loadingView
 	fun getOverlayHeader(): OverlayHeaderLayout? {
 		val parent = parentFragment
 		return (parent as? BaseOverlayFragment<*>)?.overlayView?.header

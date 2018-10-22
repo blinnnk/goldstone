@@ -1,14 +1,12 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.*
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.ContainerID
@@ -22,6 +20,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -120,6 +119,58 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						}.apply {
 							GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 						}
+					}
+				}
+			}
+		}
+		
+		fun updateExchangesTables(
+			callback: (RequestError) -> Unit
+		) {
+			doAsync {
+				AppConfigTable.getAppConfig {
+					GoldStoneAPI.getMarketList(
+						it?.exchangeListMD5.orEmpty(),
+						{
+							callback(it)
+						}
+					) { serverExchangeTables, md5 ->
+						serverExchangeTables.isNotEmpty() isTrue {
+							if (it?.exchangeListMD5.orEmpty() != md5) {
+								AppConfigTable.updateExchangeListMD5(md5)
+								ExchangeTable.getAll { localExchangeTables ->
+									localExchangeTables.isEmpty() isTrue {
+										ExchangeTable.insertAll(serverExchangeTables) {}
+									} otherwise {
+										localExchangeTables.filterNot { local ->
+											serverExchangeTables.any { server ->
+												local.id == server.id
+											}
+										}.apply {
+											// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
+											forEach {
+												ExchangeTable.delete(it)
+											}
+										}
+										
+										serverExchangeTables.forEach { serverTable ->
+											ExchangeTable.getExchangeTableByExchangeId(serverTable.exchangeId) { localTable ->
+												localTable.isNull() isTrue {
+													ExchangeTable.insert(serverTable)
+												} otherwise {
+													serverTable.isSelected = localTable.isSelected
+													serverTable.id = localTable.id
+													ExchangeTable.update(serverTable)
+												}
+											}
+											
+										}
+									}
+									
+								}
+							}
+						}
+						callback(RequestError.None)
 					}
 				}
 			}

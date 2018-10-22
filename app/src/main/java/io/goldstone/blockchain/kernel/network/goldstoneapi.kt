@@ -24,8 +24,7 @@ import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoDat
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.*
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -252,15 +251,16 @@ object GoldStoneAPI {
 			}
 		}
 	}
-
+	
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
+		marketIds: String,
 		errorCallback: (RequestError) -> Unit,
 		hold: (List<QuotationSelectionTable>) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
-			APIPath.marketSearch(APIPath.currentUrl) + pair,
+			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
 			"pair_list",
 			false,
 			errorCallback,
@@ -269,7 +269,34 @@ object GoldStoneAPI {
 			hold(this)
 		}
 	}
-
+	
+	@JvmStatic
+	fun getMarketList(
+		md5: String,
+		errorCallback: (RequestError) -> Unit,
+		hold: (ArrayList<ExchangeTable>, String) -> Unit) {
+		requestData<String>(
+			APIPath.marketList(APIPath.currentUrl, md5),
+			"",
+			true,
+			errorCallback,
+			isEncrypt = true
+		) {
+			try {
+				val data = JSONObject(this[0])
+				val exchangeTables = data.safeGet("list")
+				val newMd5 = data.safeGet("md5")
+				val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
+				val exchangeTableList =
+					if (exchangeTables.isEmpty()) arrayListOf<ExchangeTable>()
+					else Gson().fromJson(exchangeTables, collectionType)
+				hold(exchangeTableList, newMd5)
+			} catch (error: Exception) {
+				errorCallback(RequestError.ResolveDataError(error))
+			}
+		}
+	}
+	
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
 		errorCallback: (RequestError) -> Unit,

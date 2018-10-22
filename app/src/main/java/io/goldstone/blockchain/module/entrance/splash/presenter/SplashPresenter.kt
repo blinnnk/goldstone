@@ -234,6 +234,12 @@ class SplashPresenter(val activity: SplashActivity) {
 			StartingPresenter.updateLocalDefaultTokens {
 				LogUtil.error(activity::javaClass.name)
 			}
+			// update local exchangeTable info list
+			StartingPresenter.updateExchangesTables {
+				if (!it.isNone()) {
+					LogUtil.error(activity::javaClass.name)
+				}
+			}
 		}
 	}
 }
