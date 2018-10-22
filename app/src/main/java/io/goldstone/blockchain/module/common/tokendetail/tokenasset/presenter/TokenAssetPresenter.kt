@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -46,7 +47,7 @@ class TokenAssetPresenter(
 	}
 
 	private val currentAddress by lazy {
-		CoinSymbol(tokenInfo?.symbol).getAddress()
+		tokenInfo?.contract.getAddress()
 	}
 
 	override fun onFragmentShowFromHidden() {

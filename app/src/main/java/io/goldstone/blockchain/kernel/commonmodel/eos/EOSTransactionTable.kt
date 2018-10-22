@@ -183,7 +183,7 @@ interface EOSTransactionDao {
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND dataIndex LIKE :dataIndex AND symbol LIKE :symbol AND codeName LIKE :codeName")
 	fun getDataByDataIndex(recordAccountName: String, dataIndex: Int, symbol: String, codeName: String): EOSTransactionTable?
 
-	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND symbol LIKE :symbol AND codeName LIKE :codeName AND dataIndex BETWEEN :start AND :end")
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND symbol LIKE :symbol AND codeName LIKE :codeName AND dataIndex BETWEEN :start AND :end  ORDER BY time DESC")
 	fun getDataByRange(recordAccountName: String, start: Int, end: Int, symbol: String, codeName: String): List<EOSTransactionTable>
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAddress")

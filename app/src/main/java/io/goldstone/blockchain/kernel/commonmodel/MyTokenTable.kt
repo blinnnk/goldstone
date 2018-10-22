@@ -117,7 +117,7 @@ data class MyTokenTable(
 
 		fun getEOSAccountNamesByAddress(address: String, @UiThread hold: (List<String>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
+				GoldStoneDataBase.database.myTokenDao().getEOSData(address)
 			} then { myTokens ->
 				hold(
 					myTokens.asSequence().distinctBy { it.ownerName }.filter {
@@ -261,7 +261,7 @@ interface MyTokenDao {
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID LIKE :chainID")
-	fun getByAddressAndChainID(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
+	fun getEOSData(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
 
 	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress OR ownerName LIKE :walletAddress")
 	fun deleteAllByAddress(walletAddress: String)

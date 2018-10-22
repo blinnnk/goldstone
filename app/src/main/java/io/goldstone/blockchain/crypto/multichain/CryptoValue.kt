@@ -20,7 +20,6 @@ object CryptoValue {
 	const val ethMinGasLimit = 21000L
 	const val confirmBlockNumber = 6
 	const val ethDecimal = 18
-	const val etcDecimal = 18
 	const val eosDecimal = 4
 	const val btcSeriesDecimal = 8
 

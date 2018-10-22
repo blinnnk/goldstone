@@ -1,9 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.AddressUtils
 import java.io.Serializable
 
 
@@ -12,51 +9,6 @@ import java.io.Serializable
  * @date  2018/09/14
  */
 class CoinSymbol(val symbol: String?) : Serializable {
-	fun getAddress(isEOSAccountName: Boolean = true): String {
-		return when {
-			CoinSymbol(symbol).isBTC() ->
-				AddressUtils.getCurrentBTCAddress()
-			CoinSymbol(symbol).isLTC() ->
-				AddressUtils.getCurrentLTCAddress()
-			CoinSymbol(symbol).isBCH() ->
-				AddressUtils.getCurrentBCHAddress()
-			CoinSymbol(symbol).isETC() ->
-				SharedAddress.getCurrentETC()
-			CoinSymbol(symbol).isEOS() ->
-				if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
-				else SharedAddress.getCurrentEOS()
-			else ->
-				SharedAddress.getCurrentEthereum()
-		}
-	}
-
-	fun getChainID(): ChainID {
-		return when {
-			symbol.equals(CoinSymbol.btc(), true) ->
-				SharedChain.getBTCCurrent()
-			symbol.equals(CoinSymbol.etc, true) ->
-				SharedChain.getETCCurrent()
-			symbol.equals(CoinSymbol.ltc, true) ->
-				SharedChain.getLTCCurrent()
-			symbol.equals(CoinSymbol.bch, true) ->
-				SharedChain.getBCHCurrent()
-			symbol.equals(CoinSymbol.eos, true) ->
-				SharedChain.getEOSCurrent()
-			else -> SharedChain.getCurrentETH()
-		}
-	}
-
-	fun getCurrentChainName(): String {
-		return when {
-			isETH() -> SharedChain.getCurrentETHName()
-			isETC() -> SharedChain.getETCCurrentName()
-			isBTC() -> SharedChain.getBTCCurrentName()
-			isLTC() -> SharedChain.getLTCCurrentName()
-			isBCH() -> SharedChain.getBCHCurrentName()
-			isEOS() -> SharedChain.getEOSCurrentName()
-			else -> SharedChain.getCurrentETHName()
-		}
-	}
 
 	companion object {
 		const val eth = "ETH"
@@ -127,7 +79,7 @@ fun CoinSymbol?.getContract(): TokenContract? {
 			TokenContract.ETH
 		CoinSymbol(this?.symbol).isEOS() ->
 			TokenContract.EOS
-		else -> null // ERC20 Token 返回 `null`
+		else -> null // ERC20 Token 返回 `null` OR EOS Token
 	}
 }
 

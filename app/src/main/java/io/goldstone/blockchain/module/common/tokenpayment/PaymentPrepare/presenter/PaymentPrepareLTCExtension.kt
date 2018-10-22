@@ -11,13 +11,14 @@ import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
@@ -56,7 +57,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	changeAddress: String,
 	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = CoinSymbol.LTC.getAddress()
+	val myAddress = AddressUtils.getCurrentLTCAddress()
 	val chainName =
 		if (SharedValue.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -95,7 +96,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				CoinSymbol(getToken()?.symbol).getAddress(),
+				getToken()?.contract.getAddress(),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,
