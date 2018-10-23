@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.CheckBox
 import android.widget.CompoundButton
@@ -21,6 +22,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -288,24 +290,30 @@ class QuotationSearchPresenter(
 			}
 		}
 		
-		fun getMarketList(callback: (ArrayList<ExchangeTable>) -> Unit) {
-			ExchangeTable.getAll { it ->
-				if (it.isEmpty()) {
+		fun getMarketList(@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>) -> Unit) {
+			doAsync {
+				val localExchangeTableList: List<ExchangeTable> = GoldStoneDataBase.database.exchangeTableDao().getAll()
+				if (localExchangeTableList.isEmpty()) {
 					//数据库没有数据，从网络获取
 					StartingPresenter.updateExchangesTablesAndCallback { exchangeTables, error ->
 						if (!exchangeTables.isNull() && error.isNone()) {
-							callback(exchangeTables!!)
+							GoldStoneAPI.context.runOnUiThread {
+								hold(exchangeTables!!)
+							}
 						} else {
-							callback(arrayListOf())
+							GoldStoneAPI.context.runOnUiThread {
+								hold(arrayListOf())
+							}
 							LogUtil.error("getMarketList", error)
 						}
 					}
 				} else {
 					//数据库有数据
 					GoldStoneAPI.context.runOnUiThread {
-						callback(it.toArrayList())
+						hold(localExchangeTableList.toArrayList())
 					}
 				}
+				
 			}
 			
 		}

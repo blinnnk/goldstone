@@ -40,12 +40,6 @@ data class ExchangeTable(
 			doAsync { GoldStoneDataBase.database.exchangeTableDao().insert(exchangeTable) }
 		}
 		
-		fun getAll(hold: (List<ExchangeTable>) -> Unit) {
-			doAsync {
-				val exchangeSet = GoldStoneDataBase.database.exchangeTableDao().getAll()
-				hold(exchangeSet)
-			}
-		}
 		
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,

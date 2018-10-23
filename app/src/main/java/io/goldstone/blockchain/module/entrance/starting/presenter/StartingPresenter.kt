@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
@@ -125,37 +127,30 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		}
 		
 		fun updateExchangesTablesAndCallback(
-			hold: (ArrayList<ExchangeTable>?, RequestError) -> Unit
+			@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error :RequestError) -> Unit
 		) {
-			doAsync {
-				AppConfigTable.getAppConfig {
-					GoldStoneAPI.getMarketList(
-						it?.exchangeListMD5.orEmpty()
-					) { serverExchangeTables, md5, error ->
-						if (serverExchangeTables.isNull() || !error.isNone()) {
-							GoldStoneAPI.context.runOnUiThread {
-								hold(null, error)
-							}
-						} else {
-							serverExchangeTables!!.isNotEmpty() isTrue {
-								updateExchangeTables(serverExchangeTables, md5.orEmpty())
-							}
-							GoldStoneAPI.context.runOnUiThread {
-								hold(serverExchangeTables, RequestError.None)
-							}
+			AppConfigTable.getAppConfig {
+				GoldStoneAPI.getMarketList(
+					it?.exchangeListMD5.orEmpty()
+				) { serverExchangeTables, md5, error ->
+					if (serverExchangeTables.isNull() || !error.isNone()) {
+						hold(null, error)
+					} else {
+						serverExchangeTables!!.isNotEmpty() isTrue {
+							updateExchangeTables(serverExchangeTables, md5.orEmpty())
 						}
-						
+						hold(serverExchangeTables, RequestError.None)
 					}
+					
 				}
 			}
 		}
 		
 		private fun updateExchangeTables(serverTableList: ArrayList<ExchangeTable>, md5: String) {
-			ExchangeTable.getAll { localExchangeTables ->
+			GoldStoneDataBase.database.exchangeTableDao().getAll().let { localExchangeTables ->
 				localExchangeTables.isEmpty() isTrue {
 					ExchangeTable.insertAll(serverTableList)
 				} otherwise {
-					
 					serverTableList.forEach { serverTable ->
 						localExchangeTables.filter { localTable ->
 							localTable.exchangeId == serverTable.exchangeId
@@ -166,11 +161,9 @@ class StartingPresenter(override val fragment: StartingFragment) :
 							}
 						}
 					}
-					
 					ExchangeTable.deleteAll {
 						ExchangeTable.insertAll(serverTableList)
 					}
-					
 				}
 				
 				AppConfigTable.updateExchangeListMD5(md5.orEmpty())

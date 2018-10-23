@@ -256,7 +256,7 @@ object GoldStoneAPI {
 	fun getMarketSearchList(
 		pair: String,
 		marketIds: String,
-		hold: (List<QuotationSelectionTable>?, RequestError) -> Unit
+		hold: (quotationTableList: List<QuotationSelectionTable>?, error: RequestError) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
@@ -274,7 +274,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketList(
 		md5: String,
-		hold: (ArrayList<ExchangeTable>?, String?, RequestError) -> Unit) {
+		hold: (exchangeTableList: ArrayList<ExchangeTable>?, newMd5: String?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.marketList(APIPath.currentUrl, md5),
 			"",
