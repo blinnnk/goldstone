@@ -31,7 +31,10 @@ data class EOSTransactionData(
 		data.safeGet("from"),
 		data.safeGet("to"),
 		data.safeGet("quantity"),
-		data.safeGet("memo")
+		data.safeGet("memo").apply { if (contains("{")) {
+			replace("{", "")
+			replace("}", "")
+		} }
 	)
 }
 

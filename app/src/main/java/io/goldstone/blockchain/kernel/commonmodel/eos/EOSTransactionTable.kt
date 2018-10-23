@@ -1,15 +1,12 @@
 package io.goldstone.blockchain.kernel.commonmodel.eos
 
 import android.arch.persistence.room.*
-import android.support.annotation.UiThread
 import com.blinnnk.extension.getTargetObject
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -99,23 +96,6 @@ data class EOSTransactionTable(
 			}
 		}
 
-		fun getTransaction(
-			name: String,
-			symbol: String,
-			codeName: String,
-			chainID: ChainID,
-			@UiThread hold: (List<EOSTransactionTable>) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.eosTransactionDao().getDataByRecordAccount(
-					name,
-					symbol,
-					codeName,
-					chainID.id
-				)
-			} then (hold)
-		}
-
 		fun getMaxDataIndexTable(
 			account: EOSAccount,
 			contract: TokenContract,
@@ -146,7 +126,9 @@ data class EOSTransactionTable(
 			hold: (List<EOSTransactionTable>) -> Unit
 		) {
 			doAsync {
-				val data =
+				// `Server` 返回的 数据 `Memo` 中会带有不确定的 `SqlLite` 不支持的特殊符号,
+				// 这里用 `Try Catch` 兼容一下
+				val data = try {
 					GoldStoneDataBase.database.eosTransactionDao().getDataByRange(
 						account.accountName,
 						start,
@@ -154,6 +136,9 @@ data class EOSTransactionTable(
 						symbol,
 						codeName
 					)
+				} catch (error: Exception) {
+					listOf<EOSTransactionTable>()
+				}
 				if (isMainThread) uiThread {
 					hold(data)
 				} else hold(data)
@@ -200,6 +185,9 @@ interface EOSTransactionDao {
 
 	@Insert
 	fun insert(transaction: EOSTransactionTable)
+
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName Like :recordAccountName")
+	fun getAll(recordAccountName: String): List<EOSTransactionTable>
 
 	@Insert
 	fun insertAll(transactions: List<EOSTransactionTable>)

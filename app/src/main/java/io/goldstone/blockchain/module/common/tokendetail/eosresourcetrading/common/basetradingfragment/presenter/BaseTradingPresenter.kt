@@ -31,7 +31,7 @@ import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSBuyRamTransaction
@@ -134,15 +134,17 @@ open class BaseTradingPresenter(
 					toAccount.accountName,
 					tradingCount.toEOSUnit(),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!, callback) {
-					completeEvent(it)
+				).send(privateKey!!) { response, responseError ->
+					if (!response.isNull() && error.isNone()) completeEvent(response!!)
+					else callback(responseError)
 				} else EOSSellRamTransaction(
 					chainID,
 					fromAccount.accountName,
 					BigInteger.valueOf(tradingCount.toLong()),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!, callback) {
-					completeEvent(it)
+				).send(privateKey!!) { response, ramError ->
+					if (!response.isNull() && ramError.isNone()) completeEvent(response!!)
+					else callback(ramError)
 				}
 			} else callback(error)
 		}
@@ -174,14 +176,15 @@ open class BaseTradingPresenter(
 					stakeType,
 					fragment.isSelectedTransfer(stakeType),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!, callback) {
+				).send(privateKey!!) { response, responseError ->
 					// 显示成功的 `Dialog`
-					fragment.getParentContainer()?.apply { it.showDialog(this) }
+					if (!response.isNull() && responseError.isNone())
+						fragment.getParentContainer()?.apply { response!!.showDialog(this) }
 					// 清空输入框里面的值
 					fragment.clearInputValue()
 					// 更新数据库数据并且更新界面的数据
 					fragment.presenter.updateLocalDataAndUI()
-					callback(error)
+					callback(responseError)
 				}
 			} else callback(error)
 		}

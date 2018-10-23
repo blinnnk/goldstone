@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network
+package io.goldstone.blockchain.kernel.network.common
 
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.safeGet

@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -21,7 +20,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
@@ -89,9 +88,11 @@ class EOSAccountRegisterPresenter(
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
 								netAEOSCount.toEOSUnit()
-							).send(privateKey!!, callback) {
-								fragment.getParentContainer()?.apply { it.showDialog(this) }
-								callback(GoldStoneError.None)
+							).send(privateKey!!) { response, error ->
+								if (!response.isNull() && error.isNone()) {
+									fragment.getParentContainer()?.apply { response!!.showDialog(this) }
+									callback(GoldStoneError.None)
+								} else callback(error)
 							}
 						} else callback(privateKeyError)
 					}

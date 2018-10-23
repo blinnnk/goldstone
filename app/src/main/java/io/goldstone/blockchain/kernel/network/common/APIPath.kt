@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network
+package io.goldstone.blockchain.kernel.network.common
 
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.utils.toAddressCode
+import io.goldstone.blockchain.kernel.network.ChainURL
 
 /**
  * @date 31/03/2018 8:09 PM

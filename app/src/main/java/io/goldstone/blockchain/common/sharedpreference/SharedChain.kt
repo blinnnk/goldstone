@@ -5,7 +5,7 @@ import com.blinnnk.util.saveDataToSharedPreferences
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 
 /**

@@ -15,11 +15,11 @@ import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.EtherScanApi
-import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinCashTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.eosTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.litecoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.bitcoinCashTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.bitcoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.eosTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.litecoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
 import java.math.BigInteger

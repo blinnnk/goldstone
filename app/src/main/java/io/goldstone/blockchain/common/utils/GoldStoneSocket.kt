@@ -5,7 +5,7 @@ import android.os.Looper
 import android.util.Log
 import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.getCryptoGetRequest
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.getCryptoGetRequest
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import okhttp3.WebSocket

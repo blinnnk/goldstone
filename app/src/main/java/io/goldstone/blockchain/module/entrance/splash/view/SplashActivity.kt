@@ -9,16 +9,16 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -58,34 +58,31 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun prepareYingYongBaoInReviewStatus(callback: () -> Unit) {
+	private fun prepareYingYongBaoInReviewStatus(callback: (GoldStoneError) -> Unit) {
 		// 如果不是 `YingYongBao` 渠道跳过
 		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {
 			SharedWallet.updateYingYongBaoInReviewStatus(false)
-			callback()
+			callback(GoldStoneError.None)
 			return
 		}
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(this)) {
-			callback()
+			callback(GoldStoneError.None)
 			return
 		}
 		// 从服务器获取配置状态
-		GoldStoneAPI.getConfigList(
-			{
-				callback()
-				LogUtil.error("prepareStatusForYingYongBao", it)
-			}
-		) { serverConfigs ->
-			val isInReview = serverConfigs.find {
-				it.name.equals("inReview", true)
-			}?.switch?.toIntOrNull() == 1
-			if (isInReview) {
-				SharedWallet.updateYingYongBaoInReviewStatus(true)
-			} else {
-				SharedWallet.updateYingYongBaoInReviewStatus(false)
-			}
-			callback()
+		GoldStoneAPI.getConfigList { serverConfigs, error ->
+			if (!serverConfigs.isNull() && error.isNone()) {
+				val isInReview = serverConfigs!!.find {
+					it.name.equals("inReview", true)
+				}?.switch?.toIntOrNull() == 1
+				if (isInReview) {
+					SharedWallet.updateYingYongBaoInReviewStatus(true)
+				} else {
+					SharedWallet.updateYingYongBaoInReviewStatus(false)
+				}
+				callback(error)
+			} else callback(error)
 		}
 	}
 
@@ -140,11 +137,9 @@ class SplashActivity : AppCompatActivity() {
 		AppConfigTable.getAppConfig { it ->
 			it?.apply {
 				val md5 = terms.getObjectMD5HexString()
-				GoldStoneAPI.getTerms(md5, {
-					LogUtil.error("updateAgreement", it)
-				}) {
-					if (it.isNotEmpty()) {
-						AppConfigTable.updateTerms(it)
+				GoldStoneAPI.getTerms(md5) { term, error ->
+					if (!term.isNullOrBlank() && error.isNone()) {
+						AppConfigTable.updateTerms(term!!)
 					}
 				}
 			}

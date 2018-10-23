@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network
+package io.goldstone.blockchain.kernel.network.common
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
@@ -19,6 +19,8 @@ import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import okhttp3.*
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -38,18 +40,16 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		@WorkerThread hold: (String) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			condition
-		).let { requestBody ->
-			RequisitionUtil.postRequest(
-				requestBody,
-				api,
-				errorCallback,
-				isEncrypt,
-				hold
-			)
-		}
+		postRequest(
+			RequestBody.create(
+				GoldStoneEthCall.contentType,
+				condition
+			),
+			api,
+			errorCallback,
+			isEncrypt,
+			hold
+		)
 	}
 
 	inline fun <reified T> post(
@@ -60,20 +60,18 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		@WorkerThread noinline hold: (List<T>) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			condition
-		).let { requestBody ->
-			RequisitionUtil.postRequest(
-				requestBody,
-				keyName,
-				api,
-				false,
-				errorCallback,
-				isEncrypt,
-				hold
-			)
-		}
+		postRequest(
+			RequestBody.create(
+				GoldStoneEthCall.contentType,
+				condition
+			),
+			keyName,
+			api,
+			false,
+			errorCallback,
+			isEncrypt,
+			hold
+		)
 	}
 
 	inline fun <reified T> postSingle(
@@ -84,20 +82,18 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		@WorkerThread noinline holdSingle: (T?) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			condition
-		).let { requestBody ->
-			RequisitionUtil.postRequest<T>(
-				requestBody,
-				keyName,
-				api,
-				false,
-				errorCallback,
-				isEncrypt
-			) {
-				holdSingle(it.firstOrNull())
-			}
+		postRequest<T>(
+			RequestBody.create(
+				GoldStoneEthCall.contentType,
+				condition
+			),
+			keyName,
+			api,
+			false,
+			errorCallback,
+			isEncrypt
+		) {
+			holdSingle(it.firstOrNull())
 		}
 	}
 
@@ -109,20 +105,18 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		@WorkerThread holdString: (String?) -> Unit
 	) {
-		RequestBody.create(
-			GoldStoneEthCall.contentType,
-			condition
-		).let { requestBody ->
-			RequisitionUtil.postRequest<String>(
-				requestBody,
-				keyName,
-				api,
-				true,
-				errorCallback,
-				isEncrypt
-			) {
-				holdString(it.firstOrNull())
-			}
+		postRequest<String>(
+			RequestBody.create(
+				GoldStoneEthCall.contentType,
+				condition
+			),
+			keyName,
+			api,
+			true,
+			errorCallback,
+			isEncrypt
+		) {
+			holdString(it.firstOrNull())
 		}
 	}
 

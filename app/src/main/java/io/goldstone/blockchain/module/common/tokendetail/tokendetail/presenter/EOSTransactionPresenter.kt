@@ -73,9 +73,8 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 									fragment.context?.runOnUiThread { showBottomLoading(false) }
 									return@getEOSTransactions
 								}
-								// 排序后插入数据库
-								data.asSequence().sortedByDescending { it.serverID }.forEachIndexed { index, eosTransactionTable ->
-									EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - index })
+								data.forEachIndexed { index, eosTransactionTable ->
+									EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - (index + 1) })
 								}
 								flipPage(data.plus(localData), callback)
 								currentMaxCount = currentMaxCount!! - pageSize

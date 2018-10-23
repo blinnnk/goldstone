@@ -10,7 +10,7 @@ object DataValue {
 	const val pageCount = 100
 	const val quotationDataCount = 10
 	const val candleChartCount = 100
-	const val transactionPageCount = 10
+	const val transactionPageCount = 20
 }
 
 object Count {

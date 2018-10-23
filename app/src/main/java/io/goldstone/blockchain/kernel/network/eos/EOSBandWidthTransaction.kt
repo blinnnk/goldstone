@@ -1,12 +1,13 @@
 package io.goldstone.blockchain.kernel.network.eos
 
+import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.eos.transaction.completeZero
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
@@ -30,7 +31,7 @@ class EOSBandWidthTransaction(
 	private val expirationType: ExpirationType
 ) : Serializable, EOSTransactionInterface() {
 
-	override fun serialized(errorCallback: (GoldStoneError) -> Unit, hold: (EOSTransactionSerialization) -> Unit) {
+	override fun serialized(hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
 		val stakeToSelf = fromAccount.actor.equals(toAccountName, true)
 		// 抵押释放资源的时候, 当 `from account` 和 to account 一样的时候, `transfer` 的值不能设置为 `true`
 		// 这个状态下其实是否 `transfer` 无意义, 所以当程序辨别这种情况的时候默认修改这个值为 `false`
@@ -47,16 +48,18 @@ class EOSBandWidthTransaction(
 			stakeType,
 			transferStatus
 		)
-		EOSAPI.getTransactionHeaderFromChain(expirationType, errorCallback) { header ->
-			// 准备 Action
-			//  `contextFreeActions` 目前只有空的状态
-			val contextFreeActions = listOf<String>()
-			val serializedActionSize = "01" // 目前不支持批量给多账户购买所以 `ActionSize` 写死 `1`
-			val serializedContextFreeActions = EOSUtils.getVariableUInt(contextFreeActions.size)
-			val serializedTransactionExtension = "00"
-			val packedTX = header.serialize() + serializedContextFreeActions + serializedActionSize + bandWidthInfo.serialize() + serializedTransactionExtension
-			val serializedCode = (chainID.id + packedTX).completeZero()
-			hold(EOSTransactionSerialization(packedTX, serializedCode))
+		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
+			if (!header.isNull() && error.isNone()) {
+				// 准备 Action
+				//  `contextFreeActions` 目前只有空的状态
+				val contextFreeActions = listOf<String>()
+				val serializedActionSize = "01" // 目前不支持批量给多账户购买所以 `ActionSize` 写死 `1`
+				val serializedContextFreeActions = EOSUtils.getVariableUInt(contextFreeActions.size)
+				val serializedTransactionExtension = "00"
+				val packedTX = header!!.serialize() + serializedContextFreeActions + serializedActionSize + bandWidthInfo.serialize() + serializedTransactionExtension
+				val serializedCode = (chainID.id + packedTX).completeZero()
+				hold(EOSTransactionSerialization(packedTX, serializedCode), error)
+			} else hold(null, error)
 		}
 	}
 
