@@ -256,14 +256,14 @@ object GoldStoneAPI {
 	fun getMarketSearchList(
 		pair: String,
 		marketIds: String,
-		hold: (List<QuotationSelectionTable>, RequestError) -> Unit
+		hold: (List<QuotationSelectionTable>?, RequestError) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
 			"pair_list",
 			false,
 			{
-				hold(listOf(), it)
+				hold(null, it)
 			},
 			isEncrypt = true
 		) {
@@ -274,13 +274,13 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketList(
 		md5: String,
-		hold: (ArrayList<ExchangeTable>, String?, RequestError) -> Unit) {
+		hold: (ArrayList<ExchangeTable>?, String?, RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.marketList(APIPath.currentUrl, md5),
 			"",
 			true,
 			{
-				hold(arrayListOf(), null, it)
+				hold(null, null, it)
 			},
 			isEncrypt = true
 		) {
@@ -294,7 +294,7 @@ object GoldStoneAPI {
 					else Gson().fromJson(exchangeTables, collectionType)
 				hold(exchangeTableList, newMd5, RequestError.None)
 			} catch (error: Exception) {
-				hold(arrayListOf(), null, RequestError.ResolveDataError(error))
+				hold(null, null, RequestError.ResolveDataError(error))
 			}
 		}
 	}

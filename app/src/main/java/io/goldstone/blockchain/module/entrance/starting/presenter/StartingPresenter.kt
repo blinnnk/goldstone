@@ -125,19 +125,19 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		}
 		
 		fun updateExchangesTablesAndCallback(
-			hold: (ArrayList<ExchangeTable>, RequestError) -> Unit
+			hold: (ArrayList<ExchangeTable>?, RequestError) -> Unit
 		) {
 			doAsync {
 				AppConfigTable.getAppConfig {
 					GoldStoneAPI.getMarketList(
 						it?.exchangeListMD5.orEmpty()
 					) { serverExchangeTables, md5, error ->
-						if (!error.isNone()) {
+						if (serverExchangeTables.isNull() || !error.isNone()) {
 							GoldStoneAPI.context.runOnUiThread {
-								hold(arrayListOf(), error)
+								hold(null, error)
 							}
 						} else {
-							serverExchangeTables.isNotEmpty() isTrue {
+							serverExchangeTables!!.isNotEmpty() isTrue {
 								updateExchangeTables(serverExchangeTables, md5.orEmpty())
 							}
 							GoldStoneAPI.context.runOnUiThread {
@@ -150,34 +150,27 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 		
-		private fun updateExchangeTables(exchangetableList: ArrayList<ExchangeTable>, md5: String) {
+		private fun updateExchangeTables(serverTableList: ArrayList<ExchangeTable>, md5: String) {
 			ExchangeTable.getAll { localExchangeTables ->
 				localExchangeTables.isEmpty() isTrue {
-					ExchangeTable.insertAll(exchangetableList)
+					ExchangeTable.insertAll(serverTableList)
 				} otherwise {
-					localExchangeTables.filterNot { local ->
-						exchangetableList.any { server ->
-							local.id == server.id
-						}
-					}.apply {
-						// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
-						forEach {
-							ExchangeTable.delete(it)
+					
+					serverTableList.forEach { serverTable ->
+						localExchangeTables.filter { localTable ->
+							localTable.exchangeId == serverTable.exchangeId
+						}.apply {
+							// 逻辑上这里最多只能找到一条
+							this.isNotEmpty() isTrue {
+								serverTable.isSelected = this[0].isSelected
+							}
 						}
 					}
 					
-					exchangetableList.forEach { serverTable ->
-						ExchangeTable.getExchangeTableByExchangeId(serverTable.exchangeId) { localTable ->
-							localTable.isNull() isTrue {
-								ExchangeTable.insert(serverTable)
-							} otherwise {
-								serverTable.isSelected = localTable.isSelected
-								serverTable.id = localTable.id
-								ExchangeTable.update(serverTable)
-							}
-						}
-						
+					ExchangeTable.deleteAll {
+						ExchangeTable.insertAll(serverTableList)
 					}
+					
 				}
 				
 				AppConfigTable.updateExchangeListMD5(md5.orEmpty())

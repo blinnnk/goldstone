@@ -47,12 +47,6 @@ data class ExchangeTable(
 			}
 		}
 		
-		fun getExchangeTableByExchangeId(exchangeId: Int, hold: (ExchangeTable) -> Unit) {
-			doAsync {
-				hold(GoldStoneDataBase.database.exchangeTableDao().getExchangeTableByExchangeId(exchangeId))
-			}
-		}
-		
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,
 			hold: (List<ExchangeTable>) -> Unit
@@ -84,6 +78,13 @@ data class ExchangeTable(
 			}
 		}
 		
+		fun deleteAll(callback:() -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.exchangeTableDao().deleteAll()
+				callback()
+			}
+		}
+		
 	}
 	
 }
@@ -94,9 +95,6 @@ data class ExchangeTable(
 	
 	@Query("select * from exchangeTable where isSelected = :isSelected")
 	fun getByStatus(isSelected: Boolean): List<ExchangeTable>
-	
-	@Query("select * from exchangeTable where exchangeId = :exchangeId")
-	fun getExchangeTableByExchangeId(exchangeId: Int): ExchangeTable
 	
 	@Insert
 	fun insertAll(exchange: List<ExchangeTable>)
@@ -115,5 +113,8 @@ data class ExchangeTable(
 	
 	@Delete
 	fun delete(exchangeTable: ExchangeTable)
+	
+	@Query("delete from exchangeTable ")
+	fun deleteAll()
 	
 }

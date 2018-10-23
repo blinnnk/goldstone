@@ -149,8 +149,8 @@ class QuotationSearchPresenter(
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
-			if (error.isNone()) {
-				if (searchList.isEmpty()) {
+			if (!searchList.isNull() && error.isNone()) {
+				if (searchList!!.isEmpty()) {
 					fragment.context?.runOnUiThread { fragment.removeLoadingView() }
 					return@getMarketSearchList
 				}
@@ -293,8 +293,8 @@ class QuotationSearchPresenter(
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
 					StartingPresenter.updateExchangesTablesAndCallback { exchangeTables, error ->
-						if (error.isNone()) {
-							callback(exchangeTables)
+						if (!exchangeTables.isNull() && error.isNone()) {
+							callback(exchangeTables!!)
 						} else {
 							callback(arrayListOf())
 							LogUtil.error("getMarketList", error)
