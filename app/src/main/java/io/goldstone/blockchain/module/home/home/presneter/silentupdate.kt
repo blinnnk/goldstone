@@ -126,6 +126,10 @@ abstract class SilentUpdater {
 					override fun mergeCallBack() {}
 				}.start()
 			}
+			// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
+			myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
+				EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol))
+			}
 		}
 	}
 }
