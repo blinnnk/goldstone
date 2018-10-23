@@ -14,17 +14,20 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
+import io.goldstone.blockchain.crypto.eos.transaction.EOSChain
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
+import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -515,6 +518,72 @@ object EOSAPI {
 				hold(EOSRAMMarket(data), RequestError.None)
 			} else hold(EOSRAMMarket(data), RequestError.None)
 		}
+	}
+
+	// 从第三方 EOS 交易所拉取交易对
+	@JvmStatic
+	fun getPairsFromNewDex(@WorkerThread hold: (tokens: List<NewDexPair>?, error: RequestError) -> Unit) {
+		RequisitionUtil.requestData<NewDexPair>(
+			EOSUrl.getPairsFromNewDex(),
+			"data",
+			false,
+			{ hold(null, it) },
+			isEncrypt = false
+		) {
+			hold(this, RequestError.None)
+		}
+	}
+
+	@JvmStatic
+	fun getPriceByPair(
+		pair: String,
+		@WorkerThread hold: (price: Double?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<String>(
+			EOSUrl.getTokenPriceInEOS(pair),
+			"data",
+			true,
+			{ hold(null, it) },
+			isEncrypt = false
+		) {
+			if (!firstOrNull().isNull()) {
+				hold(JSONObject(first()).safeGet("price").toDoubleOrNull().orZero(), RequestError.None)
+			} else {
+				hold(null, RequestError.RPCResult("empty result"))
+			}
+		}
+	}
+
+	fun updateLocalTokenPrice(contract: TokenContract) {
+		EOSAPI.getPairsFromNewDex { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				val pair = data!!.find {
+					it.symbol.equals(contract.symbol, true) &&
+						it.contract.equals(contract.contract, true)
+				}?.pair
+				if (!pair.isNullOrBlank()) {
+					EOSAPI.getPriceByPair(pair!!) { priceInEOS, pairError ->
+						if (!priceInEOS.isNull() && pairError.isNone()) {
+							val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+							val eosToken = defaultDao.getTokenByContract(
+								TokenContract.EOS.contract!!,
+								TokenContract.EOS.symbol,
+								EOSChain.Main.id
+							)
+							val priceInUSD = priceInEOS!! * eosToken?.price.orZero()
+							defaultDao.updateTokenPrice(
+								priceInUSD,
+								contract.contract.orEmpty(),
+								contract.symbol,
+								EOSChain.Main.id
+							)
+						}
+					}
+				}
+			}
+		}
+
+
 	}
 
 }

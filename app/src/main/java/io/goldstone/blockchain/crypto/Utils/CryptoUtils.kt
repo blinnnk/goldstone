@@ -181,7 +181,7 @@ fun Double.toGWeiValue(): String {
 fun Double.formatCurrency(): String {
 	val rate = SharedWallet.getCurrentRate()
 	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 3
+	formatEditor.maximumFractionDigits = 6
 	val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同
 	val prefix = if (value * rate >= 1.0) "" else if (value == 0.0) "0." else "0"
 	return prefix + formatEditor.format(this * rate)

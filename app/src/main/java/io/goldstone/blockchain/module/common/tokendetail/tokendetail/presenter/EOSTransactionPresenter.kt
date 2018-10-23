@@ -19,7 +19,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
-
 /**
  * @author KaySaith
  * @date  2018/10/17

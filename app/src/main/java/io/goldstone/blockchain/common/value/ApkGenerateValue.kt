@@ -4,12 +4,9 @@ package io.goldstone.blockchain.common.value
  * @date 2018/6/13 12:18 AM
  * @author KaySaith
  */
-val currentChannel = ApkChannel.Home
+val currentChannel = ApkChannel.Tencent
 
-enum class ApkChannel(
-	val value: String,
-	val code: Int
-) {
+enum class ApkChannel(val value: String, val code: Int) {
 	Home("Home", 1),
 	Google("Google", 2),
 	Vivo("Vivo", 3),
