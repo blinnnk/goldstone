@@ -20,11 +20,11 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -93,10 +93,16 @@ data class MyTokenTable(
 					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
 					val pendingAccount = getPendingEOSAccount(address, chainID)
 					val existingAccount = getByOwnerName(name, chainID)
-					if (pendingAccount.isNull() && existingAccount.isNull()) {
+					if (pendingAccount.isNull() && existingAccount.isEmpty()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!, SharedChain.getEOSCurrent().id)
-						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
+							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(
+								TokenContract.EOS.contract!!,
+								CoinSymbol.EOS.symbol!!,
+								SharedChain.getEOSCurrent().id
+							)
+						defaultToken?.let {
+							MyTokenTable(it, name, address).preventDuplicateInsert()
+						}
 					} else if (!pendingAccount.isNull()) {
 						updatePendingAccountName(name, address, chainID)
 					}
