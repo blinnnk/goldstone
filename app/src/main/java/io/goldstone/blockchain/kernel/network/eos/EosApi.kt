@@ -19,9 +19,13 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.*
+import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.common.APIPath
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
@@ -166,17 +170,16 @@ object EOSAPI {
 	}
 
 	fun getChainInfo(
-		errorCallBack: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit
+		@WorkerThread hold: (chainInfo: EOSChainInfo?, error: GoldStoneError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			EOSUrl.getInfo(),
 			"",
 			true,
-			errorCallBack
+			{ hold(null, it) }
 		) {
 			isNotEmpty() isTrue {
-				hold(EOSChainInfo(JSONObject(first())))
+				hold(EOSChainInfo(JSONObject(first())), GoldStoneError.None)
 			}
 		}
 	}
@@ -184,8 +187,8 @@ object EOSAPI {
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,
-		errorCallBack: (GoldStoneError) -> Unit,
-		hold: (EOSResponse) -> Unit
+		isMainThread: Boolean = false,
+		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
@@ -195,7 +198,7 @@ object EOSAPI {
 				Pair("packed_context_free_data", "00")
 			),
 			EOSUrl.pushTransaction(),
-			errorCallBack,
+			{ hold(null, it) },
 			false
 		) {
 			val response = JSONObject(it)
@@ -203,20 +206,23 @@ object EOSAPI {
 				val result = JSONObject(response.safeGet("processed"))
 				val transactionID = response.safeGet("transaction_id")
 				val receipt = JSONObject(result.safeGet("receipt"))
-				hold(EOSResponse(transactionID, receipt))
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
+				} else hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
 			} else GoldStoneAPI.context.runOnUiThread {
-				errorCallBack(RequestError.ResolveDataError(GoldStoneError(it)))
+				hold(null, RequestError.ResolveDataError(GoldStoneError(it)))
 			}
 		}
 	}
 
 	fun getTransactionHeaderFromChain(
 		expirationType: ExpirationType,
-		errorCallBack: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (header: TransactionHeader) -> Unit
+		@WorkerThread hold: (header: TransactionHeader?, error: GoldStoneError) -> Unit
 	) {
-		getChainInfo(errorCallBack) { chainInfo ->
-			hold(TransactionHeader(chainInfo, expirationType))
+		getChainInfo { chainInfo, error ->
+			if (!chainInfo.isNull() && error.isNone()) {
+				hold(TransactionHeader(chainInfo!!, expirationType), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -450,40 +456,42 @@ object EOSAPI {
 
 	fun getBlockNumberByTxID(
 		txID: String,
-		errorCallBack: (Throwable) -> kotlin.Unit,
-		@WorkerThread hold: (blockNumber: Int?) -> Unit
+		@WorkerThread hold: (blockNumber: Int?, error: GoldStoneError) -> Unit
 	) {
-		getTransactionJSONObjectByTxID(txID, errorCallBack) {
-			hold(it.safeGet("block_num").toIntOrNull())
+		getTransactionJSONObjectByTxID(txID) { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				hold(data!!.safeGet("block_num").toIntOrNull(), error)
+			} else hold(null, error)
 		}
 	}
 
 	fun getBandWidthByTxID(
 		txID: String,
-		errorCallBack: (Throwable) -> kotlin.Unit,
-		@WorkerThread hold: (cpuUsage: BigInteger, netUsage: BigInteger) -> Unit
+		@WorkerThread hold: (cpuUsage: BigInteger?, netUsage: BigInteger?, error: RequestError) -> Unit
 	) {
-		getTransactionJSONObjectByTxID(txID, errorCallBack) { transaction ->
-			val receipt = transaction.getTargetObject("trx", "receipt")
-			hold(
-				receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
-				receipt.getTargetChild("net_usage_words").toBigIntegerOrZero()
-			)
+		getTransactionJSONObjectByTxID(txID) { transaction, error ->
+			if (!transaction.isNull() && error.isNone()) {
+				val receipt = transaction!!.getTargetObject("trx", "receipt")
+				hold(
+					receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
+					receipt.getTargetChild("net_usage_words").toBigIntegerOrZero(),
+					error
+				)
+			} else hold(null, null, error)
 		}
 	}
 
 	private fun getTransactionJSONObjectByTxID(
 		txID: String,
-		errorCallback: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (JSONObject) -> Unit
+		@WorkerThread hold: (data: JSONObject?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("id", txID)),
 			EOSUrl.getTransaction(),
-			errorCallback,
+			{ hold(null, it) },
 			false
 		) { jsonString ->
-			hold(JSONObject(jsonString))
+			hold(JSONObject(jsonString), RequestError.None)
 		}
 	}
 

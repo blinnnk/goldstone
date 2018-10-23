@@ -11,7 +11,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.json.JSONObject
 

@@ -1,6 +1,6 @@
 @file:Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 
-package io.goldstone.blockchain.kernel.network
+package io.goldstone.blockchain.kernel.network.ethereum
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -22,7 +22,10 @@ import io.goldstone.blockchain.crypto.utils.toAscii
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.crypto.utils.toIntFromHex
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.callChainBy
+import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.callChainBy
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread

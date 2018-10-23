@@ -40,7 +40,7 @@ fun PaymentPreparePresenter.transferEOS(
 		symbol.symbol!!,
 		codeName
 	).apply {
-		trade(fragment.context) { error, response ->
+		trade(fragment.context) { response, error ->
 			if (error.isNone() && !response.isNull())
 				insertPendingDataAndGoToTransactionDetail(this, response!!, callback)
 			else callback(error)

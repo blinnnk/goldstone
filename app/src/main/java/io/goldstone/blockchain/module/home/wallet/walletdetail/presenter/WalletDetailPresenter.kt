@@ -19,7 +19,7 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -161,11 +161,12 @@ class WalletDetailPresenter(
 				else notifications.maxBy { it.createTime }?.createTime.orElse(0)
 				GoldStoneAPI.getUnreadCount(
 					goldStoneID,
-					time,
-					{ hold(null, it) }
-				) { unreadCount ->
+					time
+				) { unreadCount, error ->
 					uiThread {
-						hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
+						if (!unreadCount.isNullOrBlank() && error.isNone()) {
+							hold(unreadCount!!.toIntOrNull().orZero(), GoldStoneError.None)
+						} else hold(null, error)
 					}
 				}
 			}

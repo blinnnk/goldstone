@@ -6,9 +6,9 @@ import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.ChainURL
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.ParameterUtil
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod
 import okhttp3.RequestBody
 import org.json.JSONObject

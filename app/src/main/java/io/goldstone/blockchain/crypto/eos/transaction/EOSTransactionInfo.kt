@@ -74,16 +74,11 @@ data class EOSTransactionInfo(
 		true
 	)
 
-	fun trade(context: Context?, callback: (error: GoldStoneError, response: EOSResponse?) -> Unit) {
+	fun trade(context: Context?, hold: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
 		prepare(context) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
-				transfer(
-					privateKey!!,
-					{ callback(it, null) }
-				) {
-					callback(GoldStoneError.None, it)
-				}
-			} else callback(error, null)
+				transfer(privateKey!!, hold)
+			} else hold(null, error)
 		}
 	}
 
@@ -105,8 +100,7 @@ data class EOSTransactionInfo(
 
 	private fun transfer(
 		privateKey: EOSPrivateKey,
-		errorCallback: (GoldStoneError) -> Unit,
-		hold: (EOSResponse) -> Unit
+		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		EOSTransaction(
 			EOSAuthorization(fromAccount.accountName, EOSActor.Active),
@@ -117,7 +111,7 @@ data class EOSTransactionInfo(
 			ExpirationType.FiveMinutes,
 			symbol,
 			codeName
-		).send(privateKey, errorCallback, hold)
+		).send(privateKey, hold)
 	}
 
 	override fun createObject(): String {

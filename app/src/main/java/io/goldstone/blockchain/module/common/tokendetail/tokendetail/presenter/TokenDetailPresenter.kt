@@ -21,7 +21,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
@@ -222,6 +222,7 @@ class TokenDetailPresenter(
 						}
 					}
 					token?.contract.isEOSSeries() -> getEOSSeriesData()
+
 					else -> getETHSeriesData(token?.contract.getAddress()) {
 						callback(it, null)
 					}

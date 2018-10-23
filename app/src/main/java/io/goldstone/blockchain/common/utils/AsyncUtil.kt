@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.common.utils
 
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
 import org.jetbrains.anko.doAsync

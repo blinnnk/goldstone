@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
@@ -30,10 +31,7 @@ class EOSTransaction(
 	private val codeName: EOSCodeName
 ) : Serializable, EOSTransactionInterface() {
 
-	override fun serialized(
-		errorCallback: (GoldStoneError) -> Unit,
-		@UiThread hold: (EOSTransactionSerialization) -> Unit
-	) {
+	override fun serialized(@UiThread hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
 		val transactionInfo = EOSTransactionInfo(
 			EOSAccount(fromAccount.actor),
 			EOSAccount(toAccountName),
@@ -43,7 +41,7 @@ class EOSTransaction(
 			codeName
 		)
 		val transactionInfoCode = transactionInfo.serialize()
-		EOSAPI.getTransactionHeaderFromChain(expirationType, errorCallback) { header ->
+		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
 			val authorization = fromAccount
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
@@ -53,15 +51,16 @@ class EOSTransaction(
 				EOSTransactionMethod.Transfer,
 				authorizationObjects
 			)
-			EOSTransactionUtils.serialize(
-				EOSChain.getCurrent(),
-				header,
-				listOf(action),
-				listOf(authorization),
-				transactionInfoCode
-			).let {
-				hold(it)
-			}
+			if (!header.isNull() && error.isNone()) {
+				val serialization = EOSTransactionUtils.serialize(
+					EOSChain.getCurrent(),
+					header!!,
+					listOf(action),
+					listOf(authorization),
+					transactionInfoCode
+				)
+				hold(serialization, error)
+			} else hold(null, error)
 		}
 	}
 }

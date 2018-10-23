@@ -3,7 +3,7 @@ package io.goldstone.blockchain.common.sharedpreference
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.multichain.WalletType
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 
 /**

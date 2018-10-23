@@ -4,7 +4,6 @@ import android.os.Handler
 import android.os.Looper
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.doAsync
 
@@ -27,9 +26,12 @@ abstract class EOSTransactionObserver {
 		doAsync {
 			// 首先获取线上的最近的不可逆的区块
 			if (transactionBlockNumber.isNull()) {
-				EOSAPI.getBlockNumberByTxID(
-					hash,
-					{
+				EOSAPI.getBlockNumberByTxID(hash) { blockNumber, error ->
+					if (!blockNumber.isNull() && error.isNone()) {
+						transactionBlockNumber = blockNumber
+						removeObserver()
+						handler.postDelayed(reDo, retryTime)
+					} else {
 						// 出错失败最大重试次数设定
 						if (maxRetryTimes <= 0) removeObserver()
 						else {
@@ -37,34 +39,29 @@ abstract class EOSTransactionObserver {
 							removeObserver()
 							handler.postDelayed(reDo, retryTime)
 						}
-						LogUtil.error("Observing EOS getBlockNumberByTxID", it)
 					}
-				) { blockNumber ->
-					transactionBlockNumber = blockNumber
-					removeObserver()
-					handler.postDelayed(reDo, retryTime)
 				}
-			} else EOSAPI.getChainInfo(
-				{
+			} else EOSAPI.getChainInfo { chainInfo, error ->
+				if (!chainInfo.isNull() && error.isNone()) {
+					if (totalConfirmedCount.isNull()) {
+						totalConfirmedCount = transactionBlockNumber!! - chainInfo!!.lastIrreversibleBlockNumber
+					}
+					// 如果当前转账信息大于最近一个不可逆的区块那么就确认完毕了
+					val hasConfirmed = chainInfo!!.lastIrreversibleBlockNumber > transactionBlockNumber!!
+					if (hasConfirmed) {
+						removeObserver()
+					} else {
+						// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+						removeObserver()
+						handler.postDelayed(reDo, retryTime)
+					}
+					val confirmedCount = totalConfirmedCount!! - (transactionBlockNumber!! - chainInfo.lastIrreversibleBlockNumber)
+					getStatus(hasConfirmed, transactionBlockNumber!!, confirmedCount, totalConfirmedCount!!)
+				} else {
 					// 出错失败最大重试次数设定
 					if (maxRetryTimes <= 0) removeObserver()
 					else maxRetryTimes -= 1
 				}
-			) {
-				if (totalConfirmedCount.isNull()) {
-					totalConfirmedCount = transactionBlockNumber!! - it.lastIrreversibleBlockNumber
-				}
-				// 如果当前转账信息大于最近一个不可逆的区块那么就确认完毕了
-				val hasConfirmed = it.lastIrreversibleBlockNumber > transactionBlockNumber!!
-				if (hasConfirmed) {
-					removeObserver()
-				} else {
-					// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-					removeObserver()
-					handler.postDelayed(reDo, retryTime)
-				}
-				val confirmedCount = totalConfirmedCount!! - (transactionBlockNumber!! - it.lastIrreversibleBlockNumber)
-				getStatus(hasConfirmed, transactionBlockNumber!!, confirmedCount, totalConfirmedCount!!)
 			}
 		}
 	}
