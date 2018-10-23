@@ -52,7 +52,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	GoldStoneEthCall.getUsableNonce(
 		errorCallback,
 		chainType,
-		CoinSymbol(getToken()?.symbol).getAddress()
+		getToken()?.contract.getAddress()
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, errorCallback, hold)
 	}
@@ -88,14 +88,14 @@ private fun PaymentPreparePresenter.generateTransaction(
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		CoinSymbol(getToken()?.symbol).getAddress(),
+		getToken()?.contract.getAddress(),
 		data,
 		errorCallback,
-		CoinSymbol(getToken()?.symbol).getCurrentChainName()
+		getToken()?.contract.getCurrentChainName()
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
-				CoinSymbol(getToken()?.symbol).getAddress(),
+				getToken()?.contract.getAddress(),
 				nonce,
 				limit,
 				to,

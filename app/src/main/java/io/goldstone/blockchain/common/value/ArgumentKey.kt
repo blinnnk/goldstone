@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.value
 /**
  * @date 26/03/2018 1:03 AM
  * @author KaySaith
+ * @Important `Argument Key` 仅用作  `Bundle` 的 `Key `值标记, 本身不能参与任何功能的值
  */
 object ArgumentKey {
 	

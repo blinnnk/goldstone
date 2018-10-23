@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
@@ -142,7 +141,7 @@ class TokenSearchPresenter(
 							null,
 							status,
 							0,
-							CoinSymbol(symbol).getChainID().id,
+							SharedChain.getCurrentETH().id,
 							isUsed = status
 						)
 					),

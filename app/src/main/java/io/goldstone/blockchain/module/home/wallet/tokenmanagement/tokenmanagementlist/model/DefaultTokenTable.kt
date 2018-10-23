@@ -181,7 +181,7 @@ data class DefaultTokenTable(
 	@WorkerThread
 	fun preventDuplicateInsert() {
 		GoldStoneDataBase.database.defaultTokenDao().apply {
-			if (getTargetEOSToken(contract, symbol, chainID).isNull()) {
+			if (getTokenByContract(contract, symbol, chainID).isNull()) {
 				insert(this@DefaultTokenTable)
 			}
 		}
@@ -299,7 +299,7 @@ data class DefaultTokenTable(
 		fun updateTokenName(contract: TokenContract, name: String) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenName(name, contract.contract.orEmpty(), contract.getCurrentChainID().id)
+					.updateTokenName(name, contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			}
 		}
 	}
@@ -314,8 +314,8 @@ interface DefaultTokenDao {
 	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
 	fun updateTokenPrice(newPrice: Double, contract: String, symbol: String, chainID: String)
 
-	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID")
-	fun updateTokenName(newName: String, contract: String, chainID: String)
+	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID AND symbol LIKE :symbol")
+	fun updateTokenName(newName: String, contract: String, symbol: String, chainID: String)
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID IN (:currentChainIDs)")
 	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chainIDs()): List<DefaultTokenTable>
@@ -328,9 +328,6 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>
-
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
-	fun getTargetEOSToken(contract: String, symbol: String, chainID: String): DefaultTokenTable?
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

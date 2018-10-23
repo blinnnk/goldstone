@@ -7,10 +7,13 @@ import com.blinnnk.extension.orFalse
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.isETC
+import io.goldstone.blockchain.crypto.multichain.isETH
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ChainURL
@@ -140,9 +143,12 @@ abstract class TransactionStatusObserver {
 
 /** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
 fun TransactionDetailPresenter.observerTransaction() {
+	val chainName =
+		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrentName()
+		else SharedChain.getCurrentETHName()
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	object : TransactionStatusObserver() {
-		override val chainID: String = ChainID.getChainIDByName(CoinSymbol(getUnitSymbol()).getCurrentChainName())
+		override val chainID: String = ChainID.getChainIDByName(chainName)
 		override val transactionHash = currentHash
 		override fun getStatus(
 			confirmed: Boolean,
@@ -196,9 +202,12 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 private fun TransactionDetailPresenter.getTransactionFromChain(
 	errorCallback: (RequestError) -> Unit
 ) {
+	val chainName =
+		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrentName()
+		else SharedChain.getCurrentETHName()
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		CoinSymbol(getUnitSymbol()).getCurrentChainName(),
+		chainName,
 		errorCallback = errorCallback
 	) {
 		fragment.context?.runOnUiThread {

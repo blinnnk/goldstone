@@ -9,19 +9,9 @@ import android.graphics.Typeface
  */
 
 object GoldStoneFont {
-	val light: Context.() -> Typeface =
-		fun Context.(): Typeface =
-			Typeface.createFromAsset(assets, "font/light.ttf")
-	val book: Context.() -> Typeface =
-		fun Context.(): Typeface =
-			Typeface.createFromAsset(assets, "font/book.ttf")
-	val medium: Context.() -> Typeface =
-		fun Context.(): Typeface =
-			Typeface.createFromAsset(assets, "font/medium.ttf")
-	val heavy: Context.() -> Typeface =
-		fun Context.(): Typeface =
-			Typeface.createFromAsset(assets, "font/heavy.ttf")
-	val black: Context.() -> Typeface =
-		fun Context.(): Typeface =
-			Typeface.createFromAsset(assets, "font/black.ttf")
+	val light: Context.() -> Typeface = { Typeface.createFromAsset(assets, "font/light.ttf") }
+	val book: Context.() -> Typeface = { Typeface.createFromAsset(assets, "font/book.ttf") }
+	val medium: Context.() -> Typeface = { Typeface.createFromAsset(assets, "font/medium.ttf") }
+	val heavy: Context.() -> Typeface = { Typeface.createFromAsset(assets, "font/heavy.ttf") }
+	val black: Context.() -> Typeface = { Typeface.createFromAsset(assets, "font/black.ttf") }
 }
