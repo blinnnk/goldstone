@@ -138,8 +138,8 @@ data class WalletTable(
 	fun getCurrentTestnetBip44Addresses(): List<Bip44Address> {
 		return listOf(
 			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.LTC.id),
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.BCH.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
 			Bip44Address(currentETCAddress, ChainType.ETC.id),
 			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
 			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
@@ -516,9 +516,8 @@ data class WalletTable(
 					updateCurrentEOSAccountNames(currentAccountNames.distinct())
 				}
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
-				if (accountNames.size == 1) {
-					val accountName = accountNames.first().name
-					WalletTable.updateEOSDefaultName(accountName) { callback() }
+				if (accountNames.isNotEmpty()) {
+					WalletTable.updateEOSDefaultName(accountNames.first().name) { callback() }
 				} else GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
@@ -527,13 +526,11 @@ data class WalletTable(
 			doAsync {
 				// 更新钱包数据库的 `Default EOS Address`
 				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
-							// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-							MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						}
+					findWhichIsUsing(true)?.apply {
+						update(apply { currentEOSAccountName.updateCurrent(defaultName) })
+						// 同时更新 `MyTokenTable` 里面的 `OwnerName`
+						MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
+						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
 				}
 			}

@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
