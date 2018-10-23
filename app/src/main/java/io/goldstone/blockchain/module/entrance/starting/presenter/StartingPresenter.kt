@@ -124,55 +124,63 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 		
-		fun updateExchangesTables(
-			callback: (RequestError) -> Unit
+		fun updateExchangesTablesAndCallback(
+			hold: (ArrayList<ExchangeTable>, RequestError) -> Unit
 		) {
 			doAsync {
 				AppConfigTable.getAppConfig {
 					GoldStoneAPI.getMarketList(
-						it?.exchangeListMD5.orEmpty(),
-						{
-							callback(it)
-						}
-					) { serverExchangeTables, md5 ->
-						serverExchangeTables.isNotEmpty() isTrue {
-							if (it?.exchangeListMD5.orEmpty() != md5) {
-								AppConfigTable.updateExchangeListMD5(md5)
-								ExchangeTable.getAll { localExchangeTables ->
-									localExchangeTables.isEmpty() isTrue {
-										ExchangeTable.insertAll(serverExchangeTables) {}
-									} otherwise {
-										localExchangeTables.filterNot { local ->
-											serverExchangeTables.any { server ->
-												local.id == server.id
-											}
-										}.apply {
-											// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
-											forEach {
-												ExchangeTable.delete(it)
-											}
-										}
-										
-										serverExchangeTables.forEach { serverTable ->
-											ExchangeTable.getExchangeTableByExchangeId(serverTable.exchangeId) { localTable ->
-												localTable.isNull() isTrue {
-													ExchangeTable.insert(serverTable)
-												} otherwise {
-													serverTable.isSelected = localTable.isSelected
-													serverTable.id = localTable.id
-													ExchangeTable.update(serverTable)
-												}
-											}
-											
-										}
-									}
-									
-								}
+						it?.exchangeListMD5.orEmpty()
+					) { serverExchangeTables, md5, error ->
+						if (!error.isNone()) {
+							GoldStoneAPI.context.runOnUiThread {
+								hold(arrayListOf(), error)
+							}
+						} else {
+							serverExchangeTables.isNotEmpty() isTrue {
+								updateExchangeTables(serverExchangeTables, md5.orEmpty())
+							}
+							GoldStoneAPI.context.runOnUiThread {
+								hold(serverExchangeTables, RequestError.None)
 							}
 						}
-						callback(RequestError.None)
+						
 					}
 				}
+			}
+		}
+		
+		private fun updateExchangeTables(exchangetableList: ArrayList<ExchangeTable>, md5: String) {
+			ExchangeTable.getAll { localExchangeTables ->
+				localExchangeTables.isEmpty() isTrue {
+					ExchangeTable.insertAll(exchangetableList)
+				} otherwise {
+					localExchangeTables.filterNot { local ->
+						exchangetableList.any { server ->
+							local.id == server.id
+						}
+					}.apply {
+						// 相同的数据过滤掉，剩下的数据是服务器没有的，本地存的老数据，一一删除
+						forEach {
+							ExchangeTable.delete(it)
+						}
+					}
+					
+					exchangetableList.forEach { serverTable ->
+						ExchangeTable.getExchangeTableByExchangeId(serverTable.exchangeId) { localTable ->
+							localTable.isNull() isTrue {
+								ExchangeTable.insert(serverTable)
+							} otherwise {
+								serverTable.isSelected = localTable.isSelected
+								serverTable.id = localTable.id
+								ExchangeTable.update(serverTable)
+							}
+						}
+						
+					}
+				}
+				
+				AppConfigTable.updateExchangeListMD5(md5.orEmpty())
 			}
 		}
 

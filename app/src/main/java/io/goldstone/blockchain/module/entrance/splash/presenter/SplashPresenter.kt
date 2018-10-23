@@ -235,8 +235,8 @@ class SplashPresenter(val activity: SplashActivity) {
 				LogUtil.error(activity::javaClass.name)
 			}
 			// update local exchangeTable info list
-			StartingPresenter.updateExchangesTables {
-				if (!it.isNone()) {
+			StartingPresenter.updateExchangesTablesAndCallback { _, error ->
+				if (!error.isNone()) {
 					LogUtil.error(activity::javaClass.name)
 				}
 			}

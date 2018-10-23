@@ -29,13 +29,10 @@ data class ExchangeTable(
 	
 	companion object {
 		fun insertAll(
-			exchangeTables: List<ExchangeTable>,
-			callback: () -> Unit
+			exchangeTables: List<ExchangeTable>
 		) {
-			load {
+			doAsync {
 				GoldStoneDataBase.database.exchangeTableDao().insertAll(exchangeTables)
-			} then {
-				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 		

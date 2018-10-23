@@ -256,30 +256,32 @@ object GoldStoneAPI {
 	fun getMarketSearchList(
 		pair: String,
 		marketIds: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (List<QuotationSelectionTable>) -> Unit
+		hold: (List<QuotationSelectionTable>, RequestError) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
 			"pair_list",
 			false,
-			errorCallback,
+			{
+				hold(listOf(), it)
+			},
 			isEncrypt = true
 		) {
-			hold(this)
+			hold(this, RequestError.None)
 		}
 	}
 	
 	@JvmStatic
 	fun getMarketList(
 		md5: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<ExchangeTable>, String) -> Unit) {
+		hold: (ArrayList<ExchangeTable>, String?, RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.marketList(APIPath.currentUrl, md5),
 			"",
 			true,
-			errorCallback,
+			{
+				hold(arrayListOf(), null, it)
+			},
 			isEncrypt = true
 		) {
 			try {
@@ -290,9 +292,9 @@ object GoldStoneAPI {
 				val exchangeTableList =
 					if (exchangeTables.isEmpty()) arrayListOf<ExchangeTable>()
 					else Gson().fromJson(exchangeTables, collectionType)
-				hold(exchangeTableList, newMd5)
+				hold(exchangeTableList, newMd5, RequestError.None)
 			} catch (error: Exception) {
-				errorCallback(RequestError.ResolveDataError(error))
+				hold(arrayListOf(), null, RequestError.ResolveDataError(error))
 			}
 		}
 	}

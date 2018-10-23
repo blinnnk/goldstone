@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
@@ -147,29 +148,32 @@ class QuotationSearchPresenter(
 	private fun searchTokenBy(symbol: String) {
 		fragment.showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
-		GoldStoneAPI.getMarketSearchList(symbol, selectedIds, {
-			// Show error information to user
-			fragment.context.alert(it.toString().showAfterColonContent())
-		}) { searchList ->
-			if (searchList.isEmpty()) {
-				fragment.context?.runOnUiThread { fragment.removeLoadingView() }
-				return@getMarketSearchList
-			}
-			// 获取本地自己选中的列表
-			QuotationSelectionTable.getMySelections { selectedList ->
-				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
-				selectedList.isEmpty() isTrue {
-					fragment.completeQuotationTable(searchList)
-				} otherwise {
-					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
-					searchList.forEachOrEnd { item, isEnd ->
-						item.isSelecting = selectedList.any { it.pair == item.pair }
-						if (isEnd) {
-							fragment.completeQuotationTable(searchList)
+		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
+			if (error.isNone()) {
+				if (searchList.isEmpty()) {
+					fragment.context?.runOnUiThread { fragment.removeLoadingView() }
+					return@getMarketSearchList
+				}
+				// 获取本地自己选中的列表
+				QuotationSelectionTable.getMySelections { selectedList ->
+					// 如果本地没有已经选中的直接返回搜索的数据展示在界面
+					selectedList.isEmpty() isTrue {
+						fragment.completeQuotationTable(searchList)
+					} otherwise {
+						// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
+						searchList.forEachOrEnd { item, isEnd ->
+							item.isSelecting = selectedList.any { it.pair == item.pair }
+							if (isEnd) {
+								fragment.completeQuotationTable(searchList)
+							}
 						}
 					}
 				}
+			} else {
+				// Show error information to user
+				fragment.context.alert(error.toString().showAfterColonContent())
 			}
+			
 		}
 	}
 
@@ -288,11 +292,12 @@ class QuotationSearchPresenter(
 			ExchangeTable.getAll { it ->
 				if (it.isEmpty()) {
 					//数据库没有数据，从网络获取
-					StartingPresenter.updateExchangesTables {
-						if (it.isNone()) {
-							getMarketList(callback)
+					StartingPresenter.updateExchangesTablesAndCallback { exchangeTables, error ->
+						if (error.isNone()) {
+							callback(exchangeTables)
 						} else {
-							LogUtil.error("getMarketList", it)
+							callback(arrayListOf())
+							LogUtil.error("getMarketList", error)
 						}
 					}
 				} else {
