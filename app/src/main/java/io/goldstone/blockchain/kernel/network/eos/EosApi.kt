@@ -54,7 +54,11 @@ object EOSAPI {
 				val blockTransactions = JSONArray(json.safeGet("transactions")).toList()
 				var txIndex: Int? = null
 				blockTransactions.forEachIndexed { index, jsonObject ->
-					if (jsonObject.getTargetChild("trx", "id").equals(txID, true)) txIndex = index
+					try {
+						// `block` 的 数据不确定有的时候会有不同结构体的内容, 这里用 `try catch` 跳过错误的情况
+						if (jsonObject.getTargetChild("trx", "id").equals(txID, true)) txIndex = index
+					} catch (error: Exception) {
+					}
 				}
 				val actions = JSONArray(blockTransactions[txIndex!!].getTargetChild("trx", "transaction", "actions")).toList()
 				var actionIndex: Int? = null
