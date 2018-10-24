@@ -571,12 +571,14 @@ object EOSAPI {
 								EOSChain.Main.id
 							)
 							val priceInUSD = priceInEOS!! * eosToken?.price.orZero()
-							defaultDao.updateTokenPrice(
-								priceInUSD,
-								contract.contract.orEmpty(),
-								contract.symbol,
-								EOSChain.Main.id
-							)
+							if (priceInUSD > 0.0) {
+								defaultDao.updateTokenPrice(
+									priceInUSD,
+									contract.contract.orEmpty(),
+									contract.symbol,
+									EOSChain.Main.id
+								)
+							}
 						}
 					}
 				}

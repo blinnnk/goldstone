@@ -210,7 +210,7 @@ data class DefaultTokenTable(
 			SharedChain.getCurrentETHName()
 		) {
 			val name = if (it.isEmpty()) symbol else it
-			DefaultTokenTable.updateTokenName(TokenContract(contract), name)
+			DefaultTokenTable.updateTokenName(TokenContract(this), name)
 		}
 	}
 

@@ -172,14 +172,14 @@ class AddressSelectionPresenter(
 	private fun isCorrectCoinOrChainID(qrModel: QRCodeModel, callback: () -> Unit) {
 		when {
 			token?.contract.isETC() -> when {
-				!TokenContract(qrModel.contractAddress).isETC() ->
+				!TokenContract(qrModel.contractAddress, "", null).isETC() ->
 					fragment.context.alert(QRText.invalidContract)
 				!qrModel.chainID.equals(SharedChain.getETCCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
 			token?.contract.isEOSSeries() -> when {
-				!TokenContract(qrModel.contractAddress).isEOSSeries() ->
+				!TokenContract(qrModel.contractAddress, "", null).isEOSSeries() ->
 					fragment.context.alert(QRText.invalidContract)
 				!qrModel.chainID.equals(SharedChain.getEOSCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
@@ -187,7 +187,7 @@ class AddressSelectionPresenter(
 			}
 
 			token?.contract.isBTC() -> when {
-				!TokenContract(qrModel.contractAddress).isBTC() ->
+				!TokenContract(qrModel.contractAddress, "", null).isBTC() ->
 					fragment.context.alert(QRText.invalidContract)
 				!qrModel.chainID.equals(SharedChain.getBTCCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
@@ -195,7 +195,7 @@ class AddressSelectionPresenter(
 			}
 
 			token?.contract.isLTC() -> when {
-				!TokenContract(qrModel.contractAddress).isLTC() ->
+				!TokenContract(qrModel.contractAddress, "", null).isLTC() ->
 					fragment.context.alert(QRText.invalidContract)
 				!qrModel.chainID.equals(SharedChain.getLTCCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
@@ -203,7 +203,7 @@ class AddressSelectionPresenter(
 			}
 
 			token?.contract.isBCH() -> when {
-				!TokenContract(qrModel.contractAddress).isBCH() ->
+				!TokenContract(qrModel.contractAddress, "", null).isBCH() ->
 					fragment.context.alert(QRText.invalidContract)
 				!qrModel.chainID.equals(SharedChain.getBCHCurrent().id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)

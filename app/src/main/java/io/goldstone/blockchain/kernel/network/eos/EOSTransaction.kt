@@ -8,6 +8,7 @@ import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.transaction.*
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
 import java.io.Serializable
 import java.math.BigInteger
@@ -27,8 +28,7 @@ class EOSTransaction(
 	private val amount: BigInteger,
 	private val memo: String,
 	private val expirationType: ExpirationType,
-	private val symbol: String,
-	private val codeName: EOSCodeName
+	private val contract: TokenContract
 ) : Serializable, EOSTransactionInterface() {
 
 	override fun serialized(@UiThread hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
@@ -37,8 +37,7 @@ class EOSTransaction(
 			EOSAccount(toAccountName),
 			amount,
 			memo,
-			symbol,
-			codeName
+			contract
 		)
 		val transactionInfoCode = transactionInfo.serialize()
 		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
@@ -46,7 +45,7 @@ class EOSTransaction(
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
 			val action = EOSAction(
-				codeName,
+				EOSCodeName(contract.contract.orEmpty()),
 				transactionInfoCode,
 				EOSTransactionMethod.Transfer,
 				authorizationObjects

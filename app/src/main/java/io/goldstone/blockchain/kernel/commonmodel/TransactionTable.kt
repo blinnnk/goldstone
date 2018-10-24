@@ -289,7 +289,7 @@ data class TransactionTable(
 				if (!contract.isERC20Token()) {
 					fee = dao.getCurrentChainFee(walletAddress, true, chainID)
 				}
-				transactions += fee.filter { TokenContract(it.contractAddress).isERC20Token() }
+				transactions += fee.filter { TokenContract(it.contractAddress, it.symbol, null).isERC20Token() }
 				transactions
 			} then { transactions ->
 				hold(

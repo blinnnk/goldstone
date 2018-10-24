@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presen
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -9,9 +10,10 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.orEmpty
-import io.goldstone.blockchain.crypto.utils.toEOSUnit
+import io.goldstone.blockchain.crypto.utils.toAmount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
@@ -27,18 +29,16 @@ import org.jetbrains.anko.doAsync
 // EOS 的 `Token` 转币只需写对 `Token` 的 `Symbol` 就可以转账成功
 fun PaymentPreparePresenter.transferEOS(
 	count: Double,
-	symbol: CoinSymbol,
-	codeName: EOSCodeName,
+	contract: TokenContract,
 	@UiThread callback: (error: GoldStoneError) -> Unit
 ) {
 	// 准备转账信息
 	EOSTransactionInfo(
 		SharedAddress.getCurrentEOSAccount(),
 		EOSAccount(fragment.address!!),
-		count.toEOSUnit(),
+		count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
 		fragment.getMemoContent(),
-		symbol.symbol!!,
-		codeName
+		contract
 	).apply {
 		trade(fragment.context) { response, error ->
 			if (error.isNone() && !response.isNull())

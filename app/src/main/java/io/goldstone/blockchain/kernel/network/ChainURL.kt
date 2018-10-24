@@ -4,8 +4,6 @@ import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 
 /**
  * @date 2018/6/21 10:36 AM
@@ -66,16 +64,6 @@ object ChainURL {
 		ChainText.eosMain,
 		ChainText.eosTest
 	)
-
-	fun getContractByTransaction(transaction: TransactionTable, chainName: String): TokenContract {
-		return when {
-			transaction.isERC20Token -> TokenContract(transaction.to)
-			ChainURL.etcChainName.any {
-				it.equals(chainName, true)
-			} -> TokenContract.ETH
-			else -> TokenContract.ETH
-		}
-	}
 
 	private val infuraKey: () -> String = {
 		infuraKeys.getRandom()
