@@ -55,7 +55,9 @@ class TokenSearchPresenter(
 				if (!result.isNull() && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
-						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.filterNot { TokenContract(it.contract).isBTCSeries() }.toArrayList())
+						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.filterNot {
+							TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries()
+						}.toArrayList())
 					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.toArrayList())
 					fragment.removeLoadingView()
 				} else fragment.context.alert(error.message)
@@ -64,10 +66,12 @@ class TokenSearchPresenter(
 	}
 
 	fun setMyTokenStatus(searchToken: DefaultTokenTable, isChecked: Boolean, callback: () -> Unit) {
-		DefaultTokenTable.getCurrentChainToken(TokenContract(searchToken.contract)) { localToken ->
+		DefaultTokenTable.getCurrentChainToken(
+			TokenContract(searchToken.contract, searchToken.symbol, searchToken.decimals)
+		) { localToken ->
 			// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
 			if (!localToken.isNull()) localToken!!.updateDefaultStatus(
-				TokenContract(localToken.contract),
+				TokenContract(localToken.contract, localToken.symbol, localToken.decimals),
 				isChecked,
 				searchToken.name
 			) {

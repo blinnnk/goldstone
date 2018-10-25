@@ -22,8 +22,8 @@ data class CoinInfoModel(
 	val startDate: String,
 	val contract: TokenContract,
 	val chainID: String
-): Serializable {
-	
+) : Serializable {
+
 	constructor(data: JSONObject, symbol: String, chainID: String) : this(
 		symbol,
 		data.safeGet("description"),
@@ -35,7 +35,7 @@ data class CoinInfoModel(
 		data.safeGet("social_media"),
 		data.safeGet("white_paper"),
 		data.safeGet("start_date"),
-		TokenContract(data.safeGet("address")),
+		TokenContract(data.safeGet("address"), symbol, null),
 		chainID
 	)
 }

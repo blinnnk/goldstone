@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -50,7 +51,7 @@ abstract class SilentUpdater {
 					DefaultTokenTable(
 						it.contract.orEmpty(),
 						it.symbol,
-						4,
+						it.decimal.orElse(4),
 						chainID,
 						true
 					).preventDuplicateInsert()
@@ -118,7 +119,7 @@ abstract class SilentUpdater {
 					override fun concurrentJobs() {
 						newPrices.forEach {
 							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract, it.symbol), it.price)
+							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract, it.symbol, null), it.price)
 							completeMark()
 						}
 					}
@@ -128,7 +129,7 @@ abstract class SilentUpdater {
 			}
 			// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
 			myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
-				EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol))
+				EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol, null))
 			}
 		}
 	}

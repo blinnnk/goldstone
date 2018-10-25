@@ -146,6 +146,10 @@ fun Double.toEOSUnit(): BigInteger {
 	return (this.toBigDecimal() * BigDecimal.valueOf(10000L)).toBigInteger()
 }
 
+fun Double.toAmount(decimal: Int): BigInteger {
+	return (this.toBigDecimal() * BigDecimal.valueOf(Math.pow(10.0, decimal.toDouble()))).toBigInteger()
+}
+
 fun BigInteger.toEOSCount(): Double {
 	return CryptoUtils.toCountByDecimal(this, CryptoValue.eosDecimal)
 }

@@ -62,9 +62,9 @@ class TokenManagementListPresenter(
 						val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
 						if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
 							if (isETHERCAndETCOnly) sortedList.filter {
-								TokenContract(it.contract).isETH() ||
-									TokenContract(it.contract).isERC20Token() ||
-									TokenContract(it.contract).isETC()
+								TokenContract(it).isETH() ||
+									TokenContract(it).isERC20Token() ||
+									TokenContract(it).isETC()
 							}.let {
 								memoryTokenData = it.toArrayList()
 							} else memoryTokenData = sortedList
@@ -80,9 +80,13 @@ class TokenManagementListPresenter(
 		fun insertOrDeleteMyToken(isChecked: Boolean, token: DefaultTokenTable) {
 			doAsync {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				if (isChecked) MyTokenTable.addNew(TokenContract(token.contract, token.symbol), token.chainID)
+				if (isChecked) MyTokenTable.addNew(TokenContract(token), token.chainID)
 				else GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(token.contract, token.symbol, TokenContract(token.contract).getAddress())
+					.deleteByContractAndAddress(
+						token.contract,
+						token.symbol,
+						TokenContract(token).getAddress()
+					)
 			}
 		}
 	}

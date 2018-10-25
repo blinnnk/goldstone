@@ -250,7 +250,7 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			to = raw.toWalletAddress
 			input = raw.inputData
 			contractAddress = token?.contract?.contract.orEmpty()
-			chainID = TokenContract(contractAddress).getCurrentChainID().id
+			chainID = TokenContract(contractAddress, symbol, null).getCurrentChainID().id
 			memo = memoData
 			minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
 		}.let {

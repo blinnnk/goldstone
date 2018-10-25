@@ -341,7 +341,7 @@ class MarketTokenDetailPresenter(
 		info: QuotationModel,
 		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
-		val chainID = TokenContract(info.contract).getMainnetChainID()
+		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(
 			info.symbol,
 			chainID,

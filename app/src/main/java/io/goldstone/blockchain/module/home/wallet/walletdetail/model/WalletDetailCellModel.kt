@@ -39,10 +39,10 @@ data class WalletDetailCellModel(
 		data.count,
 		data.price,
 		data.currency,
-		TokenContract(data.contract, data.symbol),
+		TokenContract(data),
 		data.weight,
 		data.chainID,
-		if (TokenContract(data.contract).isEOSSeries()) eosWalletType else EOSWalletType.None
+		if (TokenContract(data).isEOSSeries()) eosWalletType else EOSWalletType.None
 	)
 
 	constructor(
@@ -57,10 +57,10 @@ data class WalletDetailCellModel(
 		CryptoUtils.toCountByDecimal(amount, data.decimals),
 		data.price,
 		CryptoUtils.toCountByDecimal(amount, data.decimals) * data.price,
-		TokenContract(data.contract),
+		TokenContract(data),
 		data.weight,
 		data.chainID,
-		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None
+		if (TokenContract(data).isEOS()) eosWalletType else EOSWalletType.None
 	)
 
 	constructor(
@@ -75,9 +75,9 @@ data class WalletDetailCellModel(
 		balance,
 		data.price,
 		balance * data.price,
-		TokenContract(data.contract),
+		TokenContract(data),
 		data.weight,
 		data.chainID,
-		if (TokenContract(data.contract).isEOS()) eosWalletType else EOSWalletType.None
+		if (TokenContract(data).isEOS()) eosWalletType else EOSWalletType.None
 	)
 }

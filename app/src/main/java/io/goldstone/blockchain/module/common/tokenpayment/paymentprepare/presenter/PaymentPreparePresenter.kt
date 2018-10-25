@@ -74,9 +74,7 @@ class PaymentPreparePresenter(
 			token?.contract.isEOSSeries() ->
 				transferEOS(
 					count,
-					CoinSymbol(getToken()?.symbol),
-					if (token?.contract.isEOS()) EOSCodeName.EOSIOToken
-					else EOSCodeName(token?.contract?.contract.orEmpty()),
+					getToken()?.contract.orEmpty(),
 					callback
 				)
 			else -> prepareETHSeriesPaymentModel(count, callback)

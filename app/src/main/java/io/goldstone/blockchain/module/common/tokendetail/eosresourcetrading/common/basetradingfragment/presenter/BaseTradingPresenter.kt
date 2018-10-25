@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -26,6 +25,7 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -111,8 +111,7 @@ open class BaseTradingPresenter(
 			fromAccount,
 			toAccount,
 			tradingCount,
-			CoinSymbol.EOS,
-			EOSCodeName.EOSIOToken,
+			TokenContract.EOS,
 			stakeType.isSellRam()
 		) { privateKey, error ->
 			/** `Buy Ram` 是可以按照 `EOS Count` 来进行购买的, 但是 `Sell` 只能按照 `Byte` 进行销售 */
@@ -163,8 +162,7 @@ open class BaseTradingPresenter(
 			fromAccount,
 			toAccount,
 			transferCount,
-			CoinSymbol.EOS,
-			EOSCodeName.EOSIOToken
+			TokenContract.EOS
 		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
@@ -214,8 +212,7 @@ open class BaseTradingPresenter(
 			fromAccount: EOSAccount,
 			toAccount: EOSAccount,
 			tradingCount: Double,
-			symbol: CoinSymbol,
-			contract: EOSCodeName,
+			contract: TokenContract,
 			isSellRam: Boolean = false,
 			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
@@ -236,8 +233,8 @@ open class BaseTradingPresenter(
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
-						symbol,
-						contract.value
+						CoinSymbol(contract.symbol),
+						contract.contract.orEmpty()
 					) { balance, balanceError ->
 						if (!balance.isNull() && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够
