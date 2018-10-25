@@ -133,13 +133,13 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				GoldStoneAPI.getMarketList(
 					it?.exchangeListMD5.orEmpty()
 				) { serverExchangeTables, md5, error ->
-					if (serverExchangeTables.isNull() || !error.isNone()) {
-						hold(null, error)
-					} else {
+					if (!serverExchangeTables.isNull() && error.isNone()) {
 						serverExchangeTables!!.isNotEmpty() isTrue {
 							updateExchangeTables(serverExchangeTables, md5.orEmpty())
 						}
 						hold(serverExchangeTables, RequestError.None)
+					} else {
+						hold(null, error)
 					}
 					
 				}
