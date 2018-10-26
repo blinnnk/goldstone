@@ -192,6 +192,7 @@ data class DefaultTokenTable(
 		contract: TokenContract,
 		isDefault: Boolean,
 		name: String,
+		iconUrl: String,
 		callback: () -> Unit
 	) {
 		load {
@@ -200,6 +201,7 @@ data class DefaultTokenTable(
 				this.name = name
 				this.contract = contract.contract.orEmpty()
 				this.chainID = contract.getCurrentChainID().id
+				this.iconUrl = iconUrl
 			})
 		} then { callback() }
 	}

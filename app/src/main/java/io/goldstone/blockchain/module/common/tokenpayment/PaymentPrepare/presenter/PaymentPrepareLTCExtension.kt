@@ -21,8 +21,8 @@ import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
@@ -72,8 +72,12 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		LitecoinApi.getUnspentListByAddress(myAddress) { unspents ->
-			if (unspents.isEmpty()) {
+		LitecoinApi.getUnspentListByAddress(myAddress) { unspents, error ->
+			if (unspents.isNull() && error.hasError()) {
+				hold(error, null)
+				return@getUnspentListByAddress
+			}
+			if (unspents!!.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
 					hold(TransferError.BalanceIsNotEnough, null)

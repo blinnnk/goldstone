@@ -39,7 +39,9 @@ class TokenManagementListFragment :
 			switch.onClick {
 				switch.isClickable = false
 				// 更新内存数据防止上下滑动导致的复用问题
-				asyncData?.find { data -> data.contract.equals(default.contract, true) }?.isUsed = switch.isChecked
+				asyncData?.find { data ->
+					data.contract.equals(default.contract, true)
+				}?.isUsed = switch.isChecked
 				// 更新数据库
 				TokenManagementListPresenter.insertOrDeleteMyToken(switch.isChecked, default)
 				switch.isClickable = true
