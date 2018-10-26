@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
@@ -79,6 +78,14 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					}
 			}
 		}
+		
+		fun insertLocalMarketList(context: Context, callback: () -> Unit) {
+			context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list)
+				.forEachOrEnd { market, isEnd ->
+					GoldStoneDataBase.database.exchangeTableDao().insert(ExchangeTable(market))
+					if (isEnd) callback()
+				}
+		}
 
 		fun insertLocalCurrency(context: Context, callback: () -> Unit) {
 			doAsync {
@@ -125,49 +132,44 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				}
 			}
 		}
-		
-		fun updateExchangesTablesAndCallback(
-			@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error :RequestError) -> Unit
+
+		fun getAndUpdateExchangeTables(
+			 @WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error :RequestError) -> Unit
 		) {
 			AppConfigTable.getAppConfig {
 				GoldStoneAPI.getMarketList(
 					it?.exchangeListMD5.orEmpty()
 				) { serverExchangeTables, md5, error ->
 					if (!serverExchangeTables.isNull() && error.isNone()) {
-						serverExchangeTables!!.isNotEmpty() isTrue {
+						if (serverExchangeTables!!.isEmpty()) {
+							hold(null, RequestError.RPCResult("Empty Data"))
+						} else {
 							updateExchangeTables(serverExchangeTables, md5.orEmpty())
+							hold(serverExchangeTables, RequestError.None)
 						}
-						hold(serverExchangeTables, RequestError.None)
 					} else {
 						hold(null, error)
 					}
-					
 				}
 			}
 		}
 		
 		private fun updateExchangeTables(serverTableList: ArrayList<ExchangeTable>, md5: String) {
-			GoldStoneDataBase.database.exchangeTableDao().getAll().let { localExchangeTables ->
-				localExchangeTables.isEmpty() isTrue {
-					ExchangeTable.insertAll(serverTableList)
-				} otherwise {
-					serverTableList.forEach { serverTable ->
-						localExchangeTables.filter { localTable ->
-							localTable.exchangeId == serverTable.exchangeId
-						}.apply {
-							// 逻辑上这里最多只能找到一条
-							this.isNotEmpty() isTrue {
-								serverTable.isSelected = this[0].isSelected
-							}
+			val exchangeDao = GoldStoneDataBase.database.exchangeTableDao()
+			val localData = exchangeDao.getAll()
+			if (localData.isEmpty() ) exchangeDao.insertAll(serverTableList)
+			else exchangeDao.apply {
+				deleteAll()
+				insertAll(
+					serverTableList.map { serverData ->
+						serverData.apply {
+							isSelected = localData.find { local ->
+								local.marketId == serverData.marketId
+							}?.isSelected.orFalse()
 						}
-					}
-					ExchangeTable.deleteAll {
-						ExchangeTable.insertAll(serverTableList)
-					}
-				}
-				
-				AppConfigTable.updateExchangeListMD5(md5.orEmpty())
+					})
 			}
+			AppConfigTable.updateExchangeListMD5(md5)
 		}
 
 		private fun List<DefaultTokenTable>.updateLocalTokenIcon(localTokens: ArrayList<DefaultTokenTable>) {

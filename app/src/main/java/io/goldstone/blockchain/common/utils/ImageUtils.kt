@@ -22,13 +22,3 @@ fun <T> ImageView.glideImage(imagePath: T?) {
 		.transition(DrawableTransitionOptions().crossFade(fadeDuration))
 		.into(this)
 }
-fun <T> ImageView.glideRoundImage(imagePath: T?) {
-	// 这里的 `Context` 应该用 `Application` 的 `Context`, 不然在多线程下的 Context
-	// 可能会丢失 `Context`
-	Glide
-		.with(GoldStoneAPI.context.applicationContext)
-		.load(imagePath)
-		.apply(RequestOptions.circleCropTransform())
-		.transition(DrawableTransitionOptions().crossFade(fadeDuration))
-		.into(this)
-}

@@ -1,13 +1,14 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.json.JSONObject
 
 /**
  * @date: 2018/8/29.
@@ -19,27 +20,23 @@ data class ExchangeTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	@SerializedName("market_id")
-	var exchangeId: Int,
+	var marketId: Int,
 	@SerializedName("icon")
 	var iconUrl: String,
 	@SerializedName("market")
 	var exchangeName: String,
 	var isSelected: Boolean = false
 ) {
-	
+	constructor(
+		localData: JSONObject
+	) : this(
+		0,
+		localData.safeGet("market_id").toInt().orZero(),
+		localData.safeGet("icon"),
+		localData.safeGet("market"),
+		false
+	)
 	companion object {
-		fun insertAll(
-			exchangeTables: List<ExchangeTable>
-		) {
-			doAsync {
-				GoldStoneDataBase.database.exchangeTableDao().insertAll(exchangeTables)
-			}
-		}
-		
-		fun insert(exchangeTable: ExchangeTable) {
-			doAsync { GoldStoneDataBase.database.exchangeTableDao().insert(exchangeTable) }
-		}
-		
 		
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,
@@ -71,14 +68,6 @@ data class ExchangeTable(
 				GoldStoneDataBase.database.exchangeTableDao().delete(exchangeTable)
 			}
 		}
-		
-		fun deleteAll(callback:() -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.exchangeTableDao().deleteAll()
-				callback()
-			}
-		}
-		
 	}
 	
 }
@@ -96,11 +85,8 @@ data class ExchangeTable(
 	@Insert
 	fun insert(exchangeTable: ExchangeTable)
 	
-	@Query("UPDATE exchangeTable SET isSelected = :isSelected WHERE exchangeId = :id ")
-	fun updateSelectedStatusByExchangeId(
-		id: Int,
-		isSelected: Boolean
-	)
+	@Query("UPDATE exchangeTable SET isSelected = :isSelected WHERE marketId = :id ")
+	fun updateSelectedStatusByExchangeId(id: Int, isSelected: Boolean)
 	
 	@Update
 	fun update(exchangeTable: ExchangeTable)

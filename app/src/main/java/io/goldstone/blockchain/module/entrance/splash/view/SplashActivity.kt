@@ -118,6 +118,8 @@ class SplashActivity : AppCompatActivity() {
 							// Insert support currency list from local json
 							updateCurrencyRateFromServer(this@config)
 						}
+						
+						initDefaultMarketByNetWork()
 						// Check network to get default toke list
 						initDefaultTokenByNetWork {
 							prepareYingYongBaoInReviewStatus { hasAccountThenLogin() }

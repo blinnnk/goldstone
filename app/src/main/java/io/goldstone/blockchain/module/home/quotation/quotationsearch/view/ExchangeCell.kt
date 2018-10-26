@@ -1,18 +1,17 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
+import android.graphics.Color
 import android.widget.*
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import com.bumptech.glide.Glide
 import io.goldstone.blockchain.common.base.basecell.BaseCell
-import io.goldstone.blockchain.common.component.button.SquareIcon
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import org.jetbrains.anko.*
+import io.goldstone.blockchain.R
 
 /**
  * @date: 2018/8/29.
@@ -30,9 +29,10 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 			x += 10.uiPX()
 		}
 	}
-	val exchangeIcon by lazy {
-		ImageView(context).apply {
+	private val exchangeIcon by lazy {
+		ExchangeImageIcon(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
+			backgroundResource = R.drawable.bch_icon
 		}
 	}
 	
@@ -67,7 +67,8 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 	
 	var model: ExchangeTable? by observing(null) {
 		model?.apply {
-			exchangeIcon.glideRoundImage(iconUrl)
+			exchangeIcon.glideImage(iconUrl)
+			exchangeIcon.addCorner(18.uiPX(), Color.TRANSPARENT)
 			textView.text = exchangeName
 			checkBox.isChecked = isSelected
 		}

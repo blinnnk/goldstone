@@ -155,6 +155,9 @@ interface QuotationSelectionDao {
 
 	@Query("SELECT * FROM quotationSelection")
 	fun getQuotationSelfSelections(): List<QuotationSelectionTable>
+	
+	@Query("SELECT * FROM quotationSelection WHERE marketID IN (:marketIDs)")
+	fun getTargetMarketTables(marketIDs: List<Int>): List<QuotationSelectionTable>
 
 	@Query("SELECT * FROM quotationSelection WHERE pair LIKE :pair")
 	fun getSelectionByPair(pair: String): QuotationSelectionTable?

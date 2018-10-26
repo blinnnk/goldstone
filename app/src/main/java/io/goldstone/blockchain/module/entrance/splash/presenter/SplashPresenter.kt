@@ -1,30 +1,22 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.jump
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.otherwise
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
+import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.*
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.initEOSAccountName
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.currentPublicKeyHasActivated
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.hasActivatedOrWatchOnlyEOSAccount
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -144,6 +136,19 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
+	
+	fun initDefaultMarketByNetWork() {
+		doAsync {
+			GoldStoneDataBase.database.exchangeTableDao().getAll().isEmpty() isTrue {
+				StartingPresenter.insertLocalMarketList(activity) {
+					updateMarketListByNetWork()
+				}
+			} otherwise {
+				updateMarketListByNetWork()
+			}
+		}
+		
+	}
 
 	fun initSupportCurrencyList(callback: () -> Unit) {
 		SupportCurrencyTable.getSupportCurrencies {
@@ -231,15 +236,14 @@ class SplashPresenter(val activity: SplashActivity) {
 		// 每次有网络的时候都插入或更新网络数据
 		NetworkUtil.hasNetwork(activity) isTrue {
 			// update local `Tokens` info list
-			StartingPresenter.updateLocalDefaultTokens {
-				LogUtil.error(activity::javaClass.name)
-			}
+			StartingPresenter.updateLocalDefaultTokens { }
+		}
+	}
+	
+	private fun updateMarketListByNetWork() {
+		NetworkUtil.hasNetwork(activity) isTrue {
 			// update local exchangeTable info list
-			StartingPresenter.updateExchangesTablesAndCallback { _, error ->
-				if (!error.isNone()) {
-					LogUtil.error(activity::javaClass.name)
-				}
-			}
+			StartingPresenter.getAndUpdateExchangeTables { _, _ -> }
 		}
 	}
 }

@@ -7,7 +7,6 @@ import android.widget.*
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
@@ -116,13 +115,16 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 		hold(contentLayout)
 	}
 	
-	fun showConfirmButton(view: View) {
-		scrollViewContent.bottomPadding = 60.uiPX()
+	fun showBottomBar(view: LinearLayout) {
+		val barHeight = 60.uiPX()
+		scrollViewContent.bottomPadding = barHeight
 		container.apply {
 			relativeLayout {
 				gravity = Gravity.CENTER
-				lparams(matchParent, 60.uiPX()) {
-					addRule(RelativeLayout.ALIGN_BOTTOM, ElementID.overlayContainer)
+				lparams {
+					width = matchParent
+					height = barHeight
+					sameBottom(ElementID.overlayContainer)
 				}
 				addView(view, LayoutParams(matchParent, matchParent))
 			}

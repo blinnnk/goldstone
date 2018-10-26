@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.CheckBox
-import android.widget.CompoundButton
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import com.google.gson.JsonArray
@@ -14,7 +13,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
@@ -34,24 +32,23 @@ class QuotationSearchPresenter(
 ) : BaseRecyclerPresenter<QuotationSearchFragment, QuotationSelectionTable>() {
 	
 	private var selectedIds = ""
-	private var selectedStatusChangedList: ArrayList<Pair<Int, Boolean>> = arrayListOf()
-	private var overlayViewData: ArrayList<ExchangeTable> = arrayListOf()
-
+	// `ExchangeID` 是交易所列表对应的角标, `Boolean` 是用户选择对应角标的选择状态
+	private var selectedStatusChangedList: MutableList<Pair<Int, Boolean>> = arrayListOf()
+	private var exchangeListInMemory: ArrayList<ExchangeTable> = arrayListOf()
+	
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 	}
-
+	
 	private var hasNetWork = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.getFilterSearchInput().showFilterImage(true)
-			overlayView.header.searchInputListener(
-				{
-					// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
-					if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
-				}
-			) {
+			overlayView.header.searchInputListener({
+				// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
+				if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
+			}) {
 				hasNetWork isTrue { searchTokenBy(it) }
 			}
 			overlayView.header.setSearchFilterClickEvent {
@@ -65,11 +62,11 @@ class QuotationSearchPresenter(
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		getMarketList {
+		getExchangeList {
 			selectedStatusChangedList.clear()
-			overlayViewData.clear()
-			overlayViewData.addAll(it)
-			fragment.showSelectionListOverlayView(overlayViewData)
+			exchangeListInMemory.clear()
+			exchangeListInMemory.addAll(it)
+			fragment.showExchangeDashboard(exchangeListInMemory)
 		}
 	}
 	
@@ -78,12 +75,13 @@ class QuotationSearchPresenter(
 			getSelectedIdsAndExchangeName(it)
 		}
 	}
+	
 	private fun getSelectedIdsAndExchangeName(data: List<ExchangeTable>) {
 		selectedIds = ""
 		val selectedNames = arrayListOf<String>()
 		data.forEach { exchangeTable ->
 			if (exchangeTable.isSelected) {
-				selectedIds += "${exchangeTable.exchangeId},"
+				selectedIds += "${exchangeTable.marketId},"
 				selectedNames.add(exchangeTable.exchangeName)
 			}
 		}
@@ -101,11 +99,11 @@ class QuotationSearchPresenter(
 	private fun showExchangeFilterDescriptionBy(filterNames: List<String>) {
 		fragment.apply {
 			var filterText = ""
-			run onlyTwoFilters@ {
+			run onlyTwoFilters@{
 				filterNames.forEachIndexed { index, item ->
 					filterText += "$item,"
 					if (index >= 1 || index == filterNames.lastIndex) {
-						filterText  = filterText.substringBeforeLast(",")
+						filterText = filterText.substringBeforeLast(",")
 						return@onlyTwoFilters
 					}
 				}
@@ -116,10 +114,8 @@ class QuotationSearchPresenter(
 			} else {
 				fragment.showExchangeFilterDescriptionView(
 					QuotationText.searchFilterTextDescription(
-						if (filterNames.size > 2)
-							QuotationText.searchExchangesNames(filterText)
-						else
-							filterText
+						if (filterNames.size > 2) QuotationText.searchExchangesNames(filterText)
+						else filterText
 					)
 				)
 			}
@@ -156,18 +152,19 @@ class QuotationSearchPresenter(
 					fragment.context?.runOnUiThread { fragment.removeLoadingView() }
 					return@getMarketSearchList
 				}
-				// 获取本地自己选中的列表
-				QuotationSelectionTable.getMySelections { selectedList ->
-					// 如果本地没有已经选中的直接返回搜索的数据展示在界面
-					selectedList.isEmpty() isTrue {
-						fragment.completeQuotationTable(searchList)
-					} otherwise {
-						// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
-						searchList.forEachOrEnd { item, isEnd ->
-							item.isSelecting = selectedList.any { it.pair == item.pair }
-							if (isEnd) {
-								fragment.completeQuotationTable(searchList)
-							}
+				val localTargetMarketData =
+					GoldStoneDataBase.database.quotationSelectionDao().getTargetMarketTables(
+						selectedIds.split(",").map { it.toIntOrNull().orZero() }
+					)
+				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
+				localTargetMarketData.isEmpty() isTrue {
+					fragment.completeQuotationTable(searchList)
+				} otherwise {
+					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
+					searchList.forEachOrEnd { item, isEnd ->
+						item.isSelecting = localTargetMarketData.any { it.pair == item.pair }
+						if (isEnd) {
+							fragment.completeQuotationTable(searchList)
 						}
 					}
 				}
@@ -178,7 +175,7 @@ class QuotationSearchPresenter(
 			
 		}
 	}
-
+	
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: List<QuotationSelectionTable>) {
 		context?.runOnUiThread {
 			removeLoadingView()
@@ -188,7 +185,7 @@ class QuotationSearchPresenter(
 		}
 	}
 	
-	private fun QuotationSearchFragment.showSelectionListOverlayView(data: ArrayList<ExchangeTable>) {
+	private fun QuotationSearchFragment.showExchangeDashboard(data: ArrayList<ExchangeTable>) {
 		getMainActivity()?.getMainContainer()?.apply {
 			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
 				val overlay = ContentScrollOverlayView(context)
@@ -196,47 +193,47 @@ class QuotationSearchPresenter(
 				overlay.apply {
 					setTitle(TransactionText.tokenSelection)
 					addContent {
-						var singleCheckClick = false
 						val exchangeRecyclerView = ExchangeRecyclerView(context)
 						addView(exchangeRecyclerView, 0)
-						val exchangeAdater = ExchangeAdapter(data) { markeSetCell ->
-							markeSetCell.checkBox.setOnCheckedChangeListener { _, isChecked ->
-								singleCheckClick = true
-								markeSetCell.model?.apply {
+						val exchangeAdapter = ExchangeAdapter(data) { marketSetCell ->
+							marketSetCell.checkBox.setOnCheckedChangeListener { _, isChecked ->
+								marketSetCell.model?.apply {
 									isSelected = isChecked
-									updateSelectedChanged(exchangeId, isSelected)
-									updateSelectAllStatus(overlay.findViewById(ElementID.checkBox))
-									singleCheckClick = false
+									updateSelectedStatus(marketId, isSelected)
+									// 用户每次点击列表中的 CheckBox 都检测一下是否需要把 BottomBar
+									// 的 CheckBox 更新为全选状态
+									overlay.findViewById<CheckBox>(ElementID.checkBox).isChecked = data.filterNot{ it.isSelected }.isEmpty()
 								}
 							}
 						}
-						exchangeRecyclerView.adapter = exchangeAdater
-						val allCheckBox = CompoundButton.OnCheckedChangeListener {
-								_, isChecked ->
-							if (!singleCheckClick) {
-								data.forEach {
-									it.isSelected = isChecked
-									updateSelectedChanged(it.exchangeId, it.isSelected)
+						exchangeRecyclerView.adapter = exchangeAdapter
+						showBottomBar(
+							ExchangeFilterDashboardBottomBar(context).apply {
+								// 点击确认事件
+								confirmButtonClickEvent = Runnable {
+									selectedStatusChangedList.forEach {
+										ExchangeTable.updateSelectedStatusById(it.first, it.second)
+									}
+									getSelectedIdsAndExchangeName(data)
+									selectedStatusChangedList.clear()
+									overlay.remove()
+									updateResultAfterConditionChanged()
 								}
-								exchangeAdater.notifyDataSetChanged()
-							}
-						}
-						
-						val exchangeFilterBottomBar = ExchangeFilterDashboardBottomBar(maxWidth, context).apply {
-							setEvents(allCheckBox) {
-								selectedStatusChangedList.forEach {
-									ExchangeTable.updateSelectedStatusById(it.first, it.second)
+								// 全选事件
+								checkAllEvent = Runnable {
+									val checkBoxAll = overlay.findViewById<CheckBox>(ElementID.checkBox)
+//									checkBoxAll.isChecked = !checkBoxAll.isChecked
+									data.forEach {
+										it.isSelected = checkBoxAll.isChecked
+										updateSelectedStatus(it.marketId, it.isSelected)
+									}
+									exchangeAdapter.notifyDataSetChanged()
 								}
-								getSelectedIdsAndExchangeName(data)
-								selectedStatusChangedList.clear()
-								overlay.remove()
-								updateResultAfterConditionChanged()
 							}
-						}
-						showConfirmButton (exchangeFilterBottomBar)
+						)
 					}
-					
-					updateSelectAllStatus(overlay.findViewById(ElementID.checkBox))
+					// 初始化的时候判断是否是全部选中状态
+					overlay.findViewById<CheckBox>(ElementID.checkBox).isChecked = data.filterNot{ it.isSelected }.isEmpty()
 				}
 				
 			}
@@ -248,38 +245,27 @@ class QuotationSearchPresenter(
 	private fun updateResultAfterConditionChanged() {
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			val textForSearch = overlayView.header.getFilterSearchInput().editText.text.toString()
-			if (hasNetWork &&
-				!textForSearch.isBlank()
-			) {
+			if (hasNetWork && !textForSearch.isBlank()) {
 				searchTokenBy(textForSearch)
 			}
 		}
 	}
 	
-	private fun updateSelectAllStatus(checkBox: CheckBox) {
-		overlayViewData.filterNot {
-			it.isSelected
-		}.apply {
-			checkBox.isChecked = isEmpty()
+	private fun updateSelectedStatus(id: Int, isSelected: Boolean) {
+		val targetData =
+			selectedStatusChangedList.find { it.first == id }
+		if (targetData.isNull()) {
+			selectedStatusChangedList.add(Pair(id, isSelected))
+		} else {
+			selectedStatusChangedList.remove(targetData)
+			selectedStatusChangedList.add(Pair(id, isSelected))
 		}
-	}
-	
-	private fun updateSelectedChanged(id: Int, isSelected: Boolean) {
-		selectedStatusChangedList.forEach {
-			if (it.first == id) {
-				selectedStatusChangedList.remove(it)
-				selectedStatusChangedList.add(Pair(id, isSelected))
-				return
-			}
-		}
-		selectedStatusChangedList.add(Pair(id, isSelected))
 	}
 	
 	
 	companion object {
 		fun getLineChartDataByPair(
-			pair: String,
-			@WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
+			pair: String, @WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
 		) {
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(
@@ -290,28 +276,21 @@ class QuotationSearchPresenter(
 			}
 		}
 		
-		fun getMarketList(@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>) -> Unit) {
+		fun getExchangeList(
+			@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>) -> Unit
+		) {
 			doAsync {
-				val localExchangeTableList: List<ExchangeTable> = GoldStoneDataBase.database.exchangeTableDao().getAll()
-				if (localExchangeTableList.isEmpty()) {
+				val localData = GoldStoneDataBase.database.exchangeTableDao().getAll()
+				if (localData.isEmpty()) StartingPresenter.getAndUpdateExchangeTables { exchangeTables, error ->
 					//数据库没有数据，从网络获取
-					StartingPresenter.updateExchangesTablesAndCallback { exchangeTables, error ->
-						if (!exchangeTables.isNull() && error.isNone()) {
-							GoldStoneAPI.context.runOnUiThread {
-								hold(exchangeTables!!)
-							}
-						} else {
-							GoldStoneAPI.context.runOnUiThread {
-								hold(arrayListOf())
-							}
-							LogUtil.error("getMarketList", error)
-						}
+					if (!exchangeTables.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
+						hold(exchangeTables!!)
+					} else GoldStoneAPI.context.runOnUiThread {
+						hold(arrayListOf())
 					}
-				} else {
+				} else GoldStoneAPI.context.runOnUiThread {
 					//数据库有数据
-					GoldStoneAPI.context.runOnUiThread {
-						hold(localExchangeTableList.toArrayList())
-					}
+					hold(localData.toArrayList())
 				}
 				
 			}

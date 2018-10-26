@@ -1,15 +1,14 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
 
@@ -18,7 +17,10 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-class ExchangeFilterDashboardBottomBar(val maxWidth: Int, context: Context): LinearLayout(context) {
+class ExchangeFilterDashboardBottomBar(context: Context): LinearLayout(context) {
+	
+	var confirmButtonClickEvent: Runnable? = null
+	var checkAllEvent: Runnable? = null
 	val confirmButton by lazy {
 		RoundButton(context).apply {
 			text = CommonText.confirm
@@ -26,9 +28,10 @@ class ExchangeFilterDashboardBottomBar(val maxWidth: Int, context: Context): Lin
 			val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
 			val buttonHeight = 40.uiPX()
 			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight)
+			click {
+				confirmButtonClickEvent?.run()
+			}
 		}
-		
-		
 	}
 	
 	private val textView by lazy {
@@ -40,12 +43,13 @@ class ExchangeFilterDashboardBottomBar(val maxWidth: Int, context: Context): Lin
 		CheckBox(context).apply {
 			id = ElementID.checkBox
 			layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
+			click { checkAllEvent?.run() }
 		}
 	}
 	
 	private val selectedAllContainer by lazy {
 		LinearLayout(context).apply {
-			gravity = Gravity.RIGHT
+			gravity = Gravity.END
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		}
 	}
@@ -54,19 +58,10 @@ class ExchangeFilterDashboardBottomBar(val maxWidth: Int, context: Context): Lin
 		gravity = Gravity.CENTER
 		leftPadding = PaddingSize.device
 		rightPadding = PaddingSize.device
-		
 		addView(confirmButton)
 		addView(selectedAllContainer.apply {
 			addView(textView)
 			addView(checkBox)
 		})
 	}
-	
-	fun setEvents(onCheckedChangeListener: CompoundButton.OnCheckedChangeListener,
-		callback: () -> Unit) {
-		checkBox.setOnCheckedChangeListener(onCheckedChangeListener)
-		confirmButton.setOnClickListener { callback() }
-	}
-	
-	
 }

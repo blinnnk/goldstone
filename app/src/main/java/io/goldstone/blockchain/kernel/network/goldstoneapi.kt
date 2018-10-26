@@ -256,7 +256,7 @@ object GoldStoneAPI {
 	fun getMarketSearchList(
 		pair: String,
 		marketIds: String,
-		hold: (quotationTableList: List<QuotationSelectionTable>?, error: RequestError) -> Unit
+		@WorkerThread hold: (quotationTableList: List<QuotationSelectionTable>?, error: RequestError) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
@@ -274,7 +274,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketList(
 		md5: String,
-		hold: (exchangeTableList: ArrayList<ExchangeTable>?, newMd5: String?, error: RequestError) -> Unit) {
+		@WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, newMd5: String?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.marketList(APIPath.currentUrl, md5),
 			"",
@@ -285,7 +285,7 @@ object GoldStoneAPI {
 			isEncrypt = true
 		) {
 			try {
-				val data = JSONObject(this[0])
+				val data = JSONObject(firstOrNull())
 				val exchangeTables = data.safeGet("list")
 				val newMd5 = data.safeGet("md5")
 				val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
