@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
-import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import java.io.Serializable
 
 
@@ -56,6 +55,15 @@ data class TokenContract(
 			listOf(btcContract, ltcContract, bchContract).any { it.equals(contract, true) }
 		}
 	}
+}
+
+fun List<TokenContract>.generateObject(): String {
+	var data = ""
+	forEach {
+		data += "{\"address\":\"${it.contract}\",\"symbol\":\"${it.symbol}\"}" + ","
+	}
+	data = data.substringBeforeLast(",")
+	return "[$data]"
 }
 
 fun TokenContract?.orEmpty() = if (isNull()) TokenContract("", "", 0) else this!!

@@ -44,7 +44,7 @@ class TransactionDetailFragment :
 					presenter.showTransactionWebFragment()
 				} else {
 					// 比特币的多接受地址会是数组的状态
-					val content = if (model.info.contains("[")) model.info.substring(1, model.info.lastIndex - 1) else model.info
+					val content = if (model.info.contains("[")) model.info.substring(1, model.info.lastIndex) else model.info
 					this@cell.context?.clickToCopy(content)
 				}
 				preventDuplicateClicks()

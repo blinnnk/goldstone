@@ -154,12 +154,13 @@ data class DefaultTokenTable(
 		symbol: String,
 		decimals: Int,
 		chainID: ChainID,
+		iconUrl: String,
 		isDefault: Boolean = true
 	) : this(
 		0,
 		"",
 		contract,
-		"",
+		iconUrl,
 		symbol,
 		0,
 		0.0,
@@ -191,6 +192,7 @@ data class DefaultTokenTable(
 		contract: TokenContract,
 		isDefault: Boolean,
 		name: String,
+		iconUrl: String,
 		callback: () -> Unit
 	) {
 		load {
@@ -199,6 +201,7 @@ data class DefaultTokenTable(
 				this.name = name
 				this.contract = contract.contract.orEmpty()
 				this.chainID = contract.getCurrentChainID().id
+				this.iconUrl = iconUrl
 			})
 		} then { callback() }
 	}

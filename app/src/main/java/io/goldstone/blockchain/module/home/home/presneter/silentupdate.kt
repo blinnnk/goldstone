@@ -11,6 +11,8 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.getByTokenContract
+import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -46,25 +48,31 @@ abstract class SilentUpdater {
 			account
 		) { tokenList, error ->
 			if (!tokenList.isNull() && error.isNone()) {
-				tokenList!!.forEach {
-					// 插入 `DefaultToken`
-					DefaultTokenTable(
-						it.contract.orEmpty(),
-						it.symbol,
-						it.decimal.orElse(4),
-						chainID,
-						true
-					).preventDuplicateInsert()
-					// 插入 `MyTokenTable`
-					MyTokenTable(
-						0,
-						account.accountName,
-						SharedAddress.getCurrentEOS(),
-						it.symbol,
-						0.0,
-						it.contract.orEmpty(),
-						chainID.id
-					).preventDuplicateInsert()
+				// 拉取潜在资产的 `Icon Url`
+				GoldStoneAPI.getIconURL(tokenList!!) { tokenIcons, getIconError ->
+					if (!tokenIcons.isNull() && getIconError.isNone()) {
+						tokenList.forEach { contract ->
+							// 插入 `DefaultToken`
+							DefaultTokenTable(
+								contract.contract.orEmpty(),
+								contract.symbol,
+								contract.decimal.orElse(4),
+								chainID,
+								tokenIcons!!.getByTokenContract(contract.orEmpty())?.url.orEmpty(),
+								true
+							).preventDuplicateInsert()
+							// 插入 `MyTokenTable`
+							MyTokenTable(
+								0,
+								account.accountName,
+								SharedAddress.getCurrentEOS(),
+								contract.symbol,
+								0.0,
+								contract.contract.orEmpty(),
+								chainID.id
+							).preventDuplicateInsert()
+						}
+					}
 				}
 			}
 		}

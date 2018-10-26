@@ -73,7 +73,8 @@ class TokenSearchPresenter(
 			if (!localToken.isNull()) localToken!!.updateDefaultStatus(
 				TokenContract(localToken.contract, localToken.symbol, localToken.decimals),
 				isChecked,
-				searchToken.name
+				searchToken.name,
+				searchToken.iconUrl
 			) {
 				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, localToken)
 				callback()

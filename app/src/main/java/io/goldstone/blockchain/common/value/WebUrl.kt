@@ -50,8 +50,10 @@ object WebUrl {
 	const val backupBtcTest = "https://testnet.blockchain.info"
 	const val backUpBtcMain = "https://www.blockchain.info"
 	// LTC Transaction Data API From `insight`
-	const val ltcMain = "https://insight.litecore.io"
-	const val ltcTest = "https://testnet.litecore.io"
+	const val ltcMain = "https://insight.litecore.io/api"
+	const val ltcTest = "https://testnet.litecore.io/api"
+	const val ltcGoldStone = "https://btc-node-mainnet.goldstone.io/ltc-insight"
+	const val ltcTestGoldStone = "https://btc-node-testnet.goldstone.io/ltc-insight"
 	// BCH Transaction Data API From `insight`
 	const val bchMain = "https://bch-insight.bitpay.com"
 	const val bchTest = "https://test-bch-insight.bitpay.com"

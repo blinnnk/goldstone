@@ -204,8 +204,8 @@ data class MyTokenTable(
 						hold(balance?.toBTCCount(), error)
 					}
 				contract.isLTC() ->
-					LitecoinApi.getBalanceFromChainSo(ownerName) { balance, error ->
-						hold(balance, error)
+					LitecoinApi.getBalance(ownerName, false) { balance, error ->
+						hold(balance?.toBTCCount(), error)
 					}
 
 				contract.isBCH() ->
