@@ -154,12 +154,13 @@ data class DefaultTokenTable(
 		symbol: String,
 		decimals: Int,
 		chainID: ChainID,
+		iconUrl: String,
 		isDefault: Boolean = true
 	) : this(
 		0,
 		"",
 		contract,
-		"",
+		iconUrl,
 		symbol,
 		0,
 		0.0,

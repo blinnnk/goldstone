@@ -136,10 +136,12 @@ data class WalletTable(
 	}
 
 	fun getCurrentTestnetBip44Addresses(): List<Bip44Address> {
+		// 这里 `BTCTestSeries` 的地址返回的是实际的链 `ID` 因为这个数据是用来做展示
+		// 根据 `ChainID` 决定相同的地址展示什么 `Symbol` 前缀
 		return listOf(
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.BTC.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.BCH.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.LTC.id),
 			Bip44Address(currentETCAddress, ChainType.ETC.id),
 			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
 			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)

@@ -12,10 +12,15 @@ import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.TokenIcon
+import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -298,6 +303,21 @@ object GoldStoneAPI {
 			errorCallback
 		) {
 			hold(map { TransactionTable(it) }.toArrayList())
+		}
+	}
+
+	fun getIconURL(
+		contractList: List<TokenContract>,
+		hold: (data: List<TokenIcon>?, error: GoldStoneError) -> Unit
+	) {
+		RequisitionUtil.post<TokenIcon>(
+			AesCrypto.encrypt(contractList.generateObject()).orEmpty(),
+			APIPath.getIconURL(APIPath.currentUrl),
+			"token_list",
+			{ hold(null, it) },
+			true
+		) {
+			hold(it, RequestError.None)
 		}
 	}
 

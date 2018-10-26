@@ -81,7 +81,8 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 
 	companion object {
 		fun setBalanceInfo(): String {
-			return if (!SharedValue.isTestEnvironment()) {
+			val watchOnlyPrefix = if (SharedWallet.isWatchOnlyWallet()) WalletText.watchOnly + " · " else ""
+			return watchOnlyPrefix + if (!SharedValue.isTestEnvironment()) {
 				WalletText.totalAssets + " " + SharedWallet.getCurrencyCode()
 			} else {
 				ChainText.testnet + " · " + WalletText.totalAssets + " (" + SharedWallet.getCurrencyCode() + ")"

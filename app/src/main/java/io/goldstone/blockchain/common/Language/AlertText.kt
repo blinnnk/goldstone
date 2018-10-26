@@ -55,16 +55,7 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "沒有檢測到網絡，導入錢包時需要網絡環境查詢您的貨幣餘額"
 		else -> ""
 	}
-	@JvmField
-	val balanceNotEnough = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Insufficient funds for transfer and gas fees"
-		HoneyLanguage.Chinese.code -> "你的账户余额不足以支付转账金额与燃气费"
-		HoneyLanguage.Japanese.code -> "お客様のアカウントの残高は不足しています。金銭の振込やガス費を支払うことは出来ません"
-		HoneyLanguage.Korean.code -> "귀하의 계정 잔고 부족으로 이체 금액과 채굴수수료를 지불할 수 없습니다"
-		HoneyLanguage.Russian.code -> "Баланса вашего счета недостаточно для оплаты суммы перевода и платы за газ."
-		HoneyLanguage.TraditionalChinese.code -> "您的賬戶餘額不足以支付轉賬金額與燃氣費"
-		else -> ""
-	}
+
 	@JvmField
 	val transferWrongDecimal = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This decimal is not supported by this token. Please input a shorter decimal."
@@ -75,16 +66,7 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "當前的token不支持您輸入的小數位數，請修改金額重新提交"
 		else -> ""
 	}
-	@JvmField
-	val emptyTransferValue = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please add a transfer amount"
-		HoneyLanguage.Chinese.code -> "你需要设置转账的金额"
-		HoneyLanguage.Japanese.code -> "振り込む金額を設定する必要があります"
-		HoneyLanguage.Korean.code -> "이체 금액을 설정해야 합니다"
-		HoneyLanguage.Russian.code -> "Установите сумму для перевода"
-		HoneyLanguage.TraditionalChinese.code -> "你需要设置转账的金额"
-		else -> ""
-	}
+
 	@JvmField
 	val gasEditorEmpty = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please set a gas price and gas limit"
@@ -135,14 +117,5 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "切換語言"
 		else -> ""
 	}
-	@JvmField
-	val wrongKeyStorePassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Invalid keystore format or password"
-		HoneyLanguage.Chinese.code -> "出错啦，请检查keystore或密码的格式是否正确"
-		HoneyLanguage.Japanese.code -> "ミスが有りました。Keystoreやパスワードの形式が正しいかどうかとチェックして下さい"
-		HoneyLanguage.Korean.code -> "잘못된 키 저장소 형식 또는 암호"
-		HoneyLanguage.Russian.code -> "Возникала ошибка, пожалуйста, проверьте keystore или формат пароля"
-		HoneyLanguage.TraditionalChinese.code -> "出錯啦，請檢查keystore或密碼的格式是否正確"
-		else -> ""
-	}
+
 }
