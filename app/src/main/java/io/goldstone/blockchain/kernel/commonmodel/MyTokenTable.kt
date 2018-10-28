@@ -17,7 +17,6 @@ import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
@@ -181,31 +180,24 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
-				contract.isETH() ->
+				contract.isETH() || contract.isETC() ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
-						{ hold(null, it) },
 						contract.getCurrentChainName()
-					) {
-						val balance = it.toEthCount()
-						hold(balance, RequestError.None)
+					) { amount, error ->
+						if (!amount.isNull() && error.isNone()) {
+							val balance = amount!!.toEthCount()
+							hold(balance, RequestError.None)
+						} else hold(null, error)
 					}
-				contract.isETC() ->
-					GoldStoneEthCall.getEthBalance(
-						ownerName,
-						{ hold(null, it) },
-						contract.getCurrentChainName()
-					) {
-						val balance = it.toEthCount()
-						hold(balance, RequestError.None)
-					}
+
 				contract.isBTC() ->
 					BitcoinApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance?.toBTCCount(), error)
+						hold(balance?.toBTC(), error)
 					}
 				contract.isLTC() ->
 					LitecoinApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance?.toBTCCount(), error)
+						hold(balance?.toLTC(), error)
 					}
 
 				contract.isBCH() ->
@@ -236,11 +228,12 @@ data class MyTokenTable(
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerName,
-						{ hold(null, it) },
 						contract.getCurrentChainName()
-					) {
-						val balance = CryptoUtils.toCountByDecimal(it, token?.decimals.orZero())
-						hold(balance, RequestError.None)
+					) { amount, error ->
+						if (!amount.isNull() && error.isNone()) {
+							val balance = CryptoUtils.toCountByDecimal(amount!!, token?.decimals.orZero())
+							hold(balance, RequestError.None)
+						} else hold(null, error)
 					}
 				}
 			}

@@ -3,7 +3,6 @@ package io.goldstone.blockchain.common.base.view
 import android.content.Context
 import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
@@ -11,7 +10,10 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.bottomPadding
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.textColor
 
 
 /**

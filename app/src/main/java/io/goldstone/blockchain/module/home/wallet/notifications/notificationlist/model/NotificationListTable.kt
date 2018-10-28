@@ -113,20 +113,6 @@ data class NotificationTable(
 				TinyNumberUtils.isTrue(JSONObject(extra).safeGet("from_or_to"))
 			} else null
 		}
-
-		fun insertData(tables: ArrayList<NotificationTable>, callback: () -> Unit) {
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = tables.size
-				override fun concurrentJobs() {
-					tables.forEach {
-						GoldStoneDataBase.database.notificationDao().insert(it)
-						completeMark()
-					}
-				}
-
-				override fun mergeCallBack() = callback()
-			}.start()
-		}
 	}
 }
 
@@ -135,6 +121,9 @@ interface NotificationDao {
 
 	@Query("SELECT * FROM notification")
 	fun getAllNotifications(): List<NotificationTable>
+
+	@Insert
+	fun insertAll(notification: List<NotificationTable>)
 
 	@Insert
 	fun insert(notification: NotificationTable)

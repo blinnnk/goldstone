@@ -9,7 +9,9 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -18,10 +20,18 @@ import android.view.WindowManager
 import com.blinnnk.extension.isNull
 import com.google.zxing.ResultMetadataType
 import com.google.zxing.ResultPoint
-import com.google.zxing.client.android.*
-import com.journeyapps.barcodescanner.*
+import com.google.zxing.client.android.BeepManager
+import com.google.zxing.client.android.InactivityTimer
+import com.google.zxing.client.android.Intents
+import com.google.zxing.client.android.R
+import com.journeyapps.barcodescanner.BarcodeCallback
+import com.journeyapps.barcodescanner.BarcodeResult
+import com.journeyapps.barcodescanner.CameraPreview
+import com.journeyapps.barcodescanner.CaptureManager
 import io.goldstone.blockchain.module.common.qrcode.view.DecoratedQRCodeView
-import java.io.*
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 /**
  * @date: 2018/9/13.

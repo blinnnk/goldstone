@@ -6,14 +6,12 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
-import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
@@ -22,6 +20,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -79,33 +78,14 @@ class NotificationListPresenter(
 	}
 
 	private fun updateDataFromServer(requestTime: Long) {
-		GoldStoneAPI.getNotificationList(
-			requestTime,
-			{
-				showServerErrorDialog()
-			}
-		) {
+		GoldStoneAPI.getNotificationList(requestTime) { notificationList, error ->
 			fragment.removeLoadingView()
-			it.isNotEmpty() isTrue {
-				NotificationTable.insertData(it) {
-					getDataFromDatabase()
-				}
+			if (!notificationList.isNull() && error.isNone()) {
+				if (notificationList!!.isNotEmpty())
+					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)
 			}
-		}
-	}
-
-	private fun showServerErrorDialog() {
-		// Error callback
-		fragment.context?.let {
-			GoldStoneDialog.show(it) {
-				showOnlyConfirmButton {
-					GoldStoneDialog.remove(it)
-				}
-				setContent(
-					DialogText.serverBusyTitle,
-					DialogText.serverBusyDescription
-				)
-				setImage(R.drawable.server_error_banner)
+			fragment.context?.runOnUiThread {
+				getDataFromDatabase()
 			}
 		}
 	}

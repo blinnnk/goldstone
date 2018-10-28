@@ -244,8 +244,7 @@ data class DefaultTokenTable(
 		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit
 		) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenByContractFromAllChains(contract)
+				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractFromAllChains(contract)
 			} then { hold(it.firstOrNull()) }
 		}
 
@@ -261,7 +260,7 @@ data class DefaultTokenTable(
 
 		fun updateOrInsertCoinInfo(
 			data: CoinInfoModel,
-			callback: () -> Unit
+			@WorkerThread callback: () -> Unit
 		) {
 			doAsync {
 				GoldStoneDataBase.database.defaultTokenDao()

@@ -30,10 +30,9 @@ class SmartContractRegisterPresenter(
 	fun getEOSCurrencyPrice(hold: (currency: Double?, error: RequestError) -> Unit) {
 		GoldStoneAPI.getPriceByContractAddress(
 			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
-			// 网络获取价格出错后从本地数据库获取价格
-			{ hold(null, it) }
-		) {
-			hold(it.firstOrNull()?.price, RequestError.None)
+			true
+		) { currency, error ->
+			hold(currency?.firstOrNull()?.price, error)
 		}
 	}
 }

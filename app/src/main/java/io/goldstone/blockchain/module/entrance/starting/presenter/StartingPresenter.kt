@@ -49,15 +49,17 @@ class StartingPresenter(override val fragment: StartingFragment) :
 	companion object {
 
 		fun updateShareContentFromServer() {
-			GoldStoneAPI.getShareContent(
-				{ BackupServerChecker.checkBackupStatusByException(it) }
-			) {
-				val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
-					ProfileText.shareContent
+			GoldStoneAPI.getShareContent { shareContent, error ->
+				if (!shareContent.isNull() && error.isNone()) {
+					val shareText = if (shareContent!!.title.isEmpty() && shareContent.content.isEmpty()) {
+						ProfileText.shareContent
+					} else {
+						"${shareContent.title}\n${shareContent.content}\n${shareContent.url}"
+					}
+					AppConfigTable.updateShareContent(shareText)
 				} else {
-					"${it.title}\n${it.content}\n${it.url}"
+					BackupServerChecker.checkBackupStatusByException(error)
 				}
-				AppConfigTable.updateShareContent(shareText)
 			}
 		}
 

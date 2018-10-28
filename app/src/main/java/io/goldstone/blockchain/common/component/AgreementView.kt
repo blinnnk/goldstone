@@ -2,8 +2,6 @@ package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RadioButton

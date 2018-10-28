@@ -16,7 +16,6 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
@@ -43,14 +42,15 @@ class EOSAccountRegisterPresenter(
 	) {
 		GoldStoneAPI.getPriceByContractAddress(
 			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
-			// 网络获取价格出错后从本地数据库获取价格
-			{ hold(null, null, it) }
-		) {
-			EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, error ->
-				if (!price.isNull() && error.isNone()) {
-					hold(it.firstOrNull()?.price.orZero(), price!!, error)
-				} else hold(null, null, error)
-			}
+			true
+		) { currency, currencyError ->
+			if (!currency.isNull() && currencyError.isNone()) {
+				EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { ramPriceInEOS, error ->
+					if (!ramPriceInEOS.isNull() && error.isNone()) {
+						hold(currency!!.firstOrNull()?.price.orZero(), ramPriceInEOS!!, error)
+					} else hold(null, null, error)
+				}
+			} else hold(null, null, currencyError)
 		}
 	}
 

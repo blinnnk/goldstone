@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R

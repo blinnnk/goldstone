@@ -5,14 +5,9 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSUnit
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.multichain.getByTokenContract
-import io.goldstone.blockchain.crypto.multichain.orEmpty
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -42,7 +37,6 @@ abstract class SilentUpdater {
 	private fun checkAvailableEOSTokenList() {
 		val account = SharedAddress.getCurrentEOSAccount()
 		if (!account.isValid(false)) return
-		val chainID = SharedChain.getEOSCurrent()
 		EOSAPI.getEOSTokenList(
 			SharedChain.getEOSCurrent(),
 			account
@@ -57,7 +51,7 @@ abstract class SilentUpdater {
 								contract.contract.orEmpty(),
 								contract.symbol,
 								contract.decimal.orElse(4),
-								chainID,
+								ChainID.EOS, // 这个接口只服务主网下的 `Token`
 								tokenIcons!!.getByTokenContract(contract.orEmpty())?.url.orEmpty(),
 								true
 							).preventDuplicateInsert()
@@ -69,7 +63,7 @@ abstract class SilentUpdater {
 								contract.symbol,
 								0.0,
 								contract.contract.orEmpty(),
-								chainID.id
+								ChainID.EOS.id
 							).preventDuplicateInsert()
 						}
 					}
@@ -91,7 +85,7 @@ abstract class SilentUpdater {
 		EOSResourceUtil.getRAMPrice(EOSUnit.KB, false) { priceInEOS, error ->
 			if (!priceInEOS.isNull() && error.isNone()) {
 				SharedValue.updateRAMUnitPrice(priceInEOS!!)
-			} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+			}
 		}
 	}
 
@@ -100,7 +94,7 @@ abstract class SilentUpdater {
 			EOSResourceUtil.getCPUPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
 				if (!priceInEOS.isNull() && error.isNone()) {
 					SharedValue.updateCPUUnitPrice(priceInEOS!!)
-				} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+				}
 			}
 		}
 	}
@@ -110,7 +104,7 @@ abstract class SilentUpdater {
 			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
 				if (!priceInEOS.isNull() && error.isNone()) {
 					SharedValue.updateNETUnitPrice(priceInEOS!!)
-				} else LogUtil.error("SilentUpdater updateRAMUnitPrice", error)
+				}
 			}
 		}
 	}
@@ -118,22 +112,19 @@ abstract class SilentUpdater {
 	private fun updateMyTokenCurrencyPrice() {
 		MyTokenTable.getMyTokens(false) { myTokens ->
 			GoldStoneAPI.getPriceByContractAddress(
-				myTokens.map {
+				// `EOS` 的 `Token` 价格在下面的方法从第三方获取, 这里过滤掉 `EOS` 的 `Token`
+				myTokens.asSequence().filter {
+					ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
+				}.map {
 					"{\"address\":\"${it.contract}\",\"symbol\":\"${it.symbol}\"}"
-				}, {
-			}) { newPrices ->
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount: Int = newPrices.size
-					override fun concurrentJobs() {
-						newPrices.forEach {
-							// 同时更新缓存里面的数据
-							DefaultTokenTable.updateTokenPrice(TokenContract(it.contract, it.symbol, null), it.price)
-							completeMark()
-						}
+				}.toList(),
+				false
+			) { newPrices, error ->
+				if (!newPrices.isNull() && error.isNone()) {
+					newPrices!!.forEach {
+						DefaultTokenTable.updateTokenPrice(TokenContract(it.contract, it.symbol, null), it.price)
 					}
-
-					override fun mergeCallBack() {}
-				}.start()
+				}
 			}
 			// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
 			myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->

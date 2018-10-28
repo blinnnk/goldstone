@@ -29,7 +29,7 @@ fun GasSelectionPresenter.prepareToTransferLTC(callback: (GoldStoneError) -> Uni
 		LitecoinApi.getBalance(fromAddress, true) { balance, error ->
 			if (!balance.isNull() && error.isNone()) {
 				val isEnough =
-					balance.orElse(0) > value + gasUsedGasFee!!.toSatoshi()
+					balance?.value.orElse(0) > value + gasUsedGasFee!!.toSatoshi()
 				when {
 					isEnough -> showConfirmAttentionView(callback)
 					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
