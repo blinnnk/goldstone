@@ -17,9 +17,11 @@ import com.blinnnk.util.SafeLevel
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.hintTextColor
 import org.jetbrains.anko.sdk25.coroutines.onFocusChange
+import org.jetbrains.anko.singleLine
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 22/03/2018 3:11 PM

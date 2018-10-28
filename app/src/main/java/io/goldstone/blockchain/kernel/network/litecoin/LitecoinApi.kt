@@ -1,11 +1,9 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.getTargetObject
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -25,7 +23,7 @@ object LitecoinApi {
 	fun getBalance(
 		address: String,
 		isMainThread: Boolean,
-		hold: (balance: Long?, error: RequestError) -> Unit
+		hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getBalance(address),
@@ -35,9 +33,9 @@ object LitecoinApi {
 			null,
 			true
 		) {
-			val result = firstOrNull()?.toLongOrNull()
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, RequestError.None) }
-			else hold(result, RequestError.None)
+			val result = firstOrNull()?.toLongOrNull().orElse(0L)
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(Amount(result), RequestError.None) }
+			else hold(Amount(result), RequestError.None)
 		}
 	}
 

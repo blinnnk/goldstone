@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize

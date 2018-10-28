@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -161,9 +160,7 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getNewVersionOrElse(
-		hold: (versionData: VersionModel?, error: RequestError) -> Unit
-	) {
+	fun getNewVersionOrElse(hold: (versionData: VersionModel?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.getNewVersion(APIPath.currentUrl),
 			"",
@@ -237,18 +234,17 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getShareContent(
-		errorCallback: (RequestError) -> Unit,
-		hold: (ShareContentModel) -> Unit
+		hold: (content: ShareContentModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			this[0].isNotNull {
-				hold(ShareContentModel(JSONObject(this[0])))
+			firstOrNull().isNotNull {
+				hold(ShareContentModel(JSONObject(this[0])), RequestError.None)
 			}
 		}
 	}
@@ -256,17 +252,16 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (List<QuotationSelectionTable>) -> Unit
+		@WorkerThread hold: (markets: List<QuotationSelectionTable>?, error: RequestError) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl) + pair,
 			"pair_list",
 			false,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(this)
+			hold(this, RequestError.None)
 		}
 	}
 
@@ -373,23 +368,20 @@ object GoldStoneAPI {
 
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
-		errorCallback: (RequestError) -> Unit,
-		hold: (List<QuotationSelectionLineChartModel>) -> Unit
+		hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
+		RequisitionUtil.postRequest<QuotationSelectionLineChartModel>(
 			RequestBody.create(
 				requestContentType,
-				ParameterUtil.prepare(
-					true,
-					Pair("pair_list", pairList)
-				)
+				ParameterUtil.prepare(true, Pair("pair_list", pairList))
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-			errorCallback = errorCallback,
-			isEncrypt = true,
-			hold = hold
-		)
+			errorCallback = { hold(null, it) },
+			isEncrypt = true
+		) {
+			hold(it, RequestError.None)
+		}
 	}
 
 	fun registerWalletAddresses(
@@ -433,8 +425,7 @@ object GoldStoneAPI {
 
 	fun getNotificationList(
 		time: Long,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<NotificationTable>) -> Unit
+		@WorkerThread hold: (notifications: ArrayList<NotificationTable>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<String>(
 			RequestBody.create(
@@ -444,29 +435,27 @@ object GoldStoneAPI {
 			"message_list",
 			APIPath.getNotification(APIPath.currentUrl),
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			true
 		) { it ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不实用 `Gson`
 			val notificationData = arrayListOf<NotificationTable>()
 			val jsonArray = JSONArray(it[0])
-			context.runOnUiThread {
-				if (jsonArray.length() == 0) {
-					hold(arrayListOf())
-				} else {
-					(0 until jsonArray.length()).forEachOrEnd { it, isEnd ->
-						notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
-						if (isEnd) hold(notificationData)
-					}
+			if (jsonArray.length() == 0) {
+				hold(arrayListOf(), RequestError.None)
+			} else {
+				(0 until jsonArray.length()).forEach {
+					notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
 				}
+				hold(notificationData, RequestError.None)
 			}
 		}
 	}
 
 	fun getPriceByContractAddress(
 		addressList: List<String>,
-		errorCallback: (RequestError) -> Unit,
-		@UiThread hold: (List<TokenPriceModel>) -> Unit
+		isMainThread: Boolean,
+		hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<TokenPriceModel>(
 			RequestBody.create(
@@ -475,11 +464,13 @@ object GoldStoneAPI {
 			),
 			"price_list",
 			APIPath.getPriceByAddress(APIPath.currentUrl),
-			errorCallback = errorCallback,
+			errorCallback = { hold(null, it) },
 			isEncrypt = true
 		) {
-			context.runOnUiThread {
-				hold(it)
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(it, RequestError.None)
+			} else {
+				hold(it, RequestError.None)
 			}
 		}
 	}
@@ -488,49 +479,49 @@ object GoldStoneAPI {
 		pair: String,
 		period: String,
 		size: Int,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<CandleChartModel>) -> Unit
+		hold: (candleChart: ArrayList<CandleChartModel>?, error: RequestError) -> Unit
 	) {
 		requestData<CandleChartModel>(
 			APIPath.getQuotationCurrencyCandleChart(APIPath.currentUrl, pair, period, size),
 			"ticks",
-			errorCallback = errorCallback,
+			errorCallback = { hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(this.toArrayList())
+			hold(this.toArrayList(), RequestError.None)
 		}
 	}
 
 	fun getQuotationCurrencyInfo(
 		pair: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (JSONObject) -> Unit
+		@WorkerThread hold: (data: JSONObject?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getQuotationCurrencyInfo(APIPath.currentUrl, pair),
 			"",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(JSONObject(first()))
+			hold(JSONObject(firstOrNull().orEmpty()), RequestError.None)
 		}
 	}
 
 	fun getTokenInfoFromMarket(
 		symbol: String,
 		chainID: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (CoinInfoModel) -> Unit
+		hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getCoinInfo(APIPath.currentUrl) + symbol,
 			"",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID))
+			hold(
+				CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID),
+				RequestError.None
+			)
 		}
 	}
 }

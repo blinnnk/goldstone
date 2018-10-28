@@ -6,7 +6,6 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo

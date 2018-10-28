@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
+import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.kernel.network.bitcoin.model.BlockInfoUnspentModel
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -79,7 +80,7 @@ object BTCSeriesApiUtils {
 	fun getBalanceFromBlockInfo(
 		api: String,
 		address: String,
-		hold: (balance: Long?, error: RequestError) -> Unit
+		hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
@@ -87,7 +88,7 @@ object BTCSeriesApiUtils {
 			true,
 			{ hold(null, it) }
 		) {
-			if (isNotEmpty()) hold(JSONObject(first()).safeGet("final_balance").toLong(), RequestError.None)
+			if (isNotEmpty()) hold(Amount(JSONObject(first()).safeGet("final_balance").toLong()), RequestError.None)
 		}
 	}
 

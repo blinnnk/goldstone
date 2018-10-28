@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.qrcode.view
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
 import android.os.Handler
 import android.view.View
 import com.blinnnk.extension.isTrue

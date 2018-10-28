@@ -323,9 +323,8 @@ object GoldStoneEthCall {
 	fun getTokenBalanceWithContract(
 		contractAddress: String,
 		address: String,
-		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
-		hold: (BigInteger) -> Unit
+		hold: (amount: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -339,9 +338,11 @@ object GoldStoneEthCall {
 					Pair("data", EthereumMethod.GetTokenBalance.code withAddress address)
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetTokenBalance(it)) },
+			{ hold(null, it) },
 			chainName
-		) { hold(it.hexToDecimal()) }
+		) {
+			hold(it.hexToDecimal(), RequestError.None)
+		}
 	}
 
 	@JvmStatic
@@ -424,9 +425,8 @@ object GoldStoneEthCall {
 
 	fun getEthBalance(
 		address: String,
-		errorCallback: (EthereumRPCError) -> Unit,
 		chainName: String,
-		@WorkerThread holdValue: (BigInteger) -> Unit
+		@WorkerThread holdValue: (amount: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -440,10 +440,10 @@ object GoldStoneEthCall {
 					address
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetETHBalance(it)) },
+			{ holdValue(null, it) },
 			chainName
 		) {
-			holdValue(it.hexToDecimal())
+			holdValue(it.hexToDecimal(), RequestError.None)
 		}
 	}
 

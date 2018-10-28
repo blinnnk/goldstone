@@ -6,7 +6,6 @@ import com.blinnnk.extension.isFalse
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.language.EOSAccountText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
