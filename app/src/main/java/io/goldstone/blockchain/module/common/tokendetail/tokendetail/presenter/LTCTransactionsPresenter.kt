@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -21,17 +23,12 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentLTCAddress()
-	LitecoinApi.getTransactionCount(
-		address,
-		{
-			fragment.removeLoadingView()
-			LogUtil.error("loadLTCChainData", it)
-		}
-	) { transactionCount ->
+	LitecoinApi.getTransactionCount(address) { transactionCount, error ->
+		if (transactionCount.isNull() || error.hasError()) return@getTransactionCount
 		loadLitecoinTransactionsFromChain(
 			address,
 			localDataMaxIndex,
-			transactionCount,
+			transactionCount.orZero(),
 			{
 				fragment.removeLoadingView()
 				LogUtil.error("loadLTCChainData", it)
@@ -65,7 +62,7 @@ private fun loadLitecoinTransactionsFromChain(
 		errorCallback
 	) { transactions ->
 		// Calculate All Inputs to get transfer value
-		successCallback(transactions.mapIndexed { index, item ->
+		successCallback(transactions.asSequence().mapIndexed { index, item ->
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
@@ -87,6 +84,6 @@ private fun loadLitecoinTransactionsFromChain(
 				)
 			}
 			TransactionListModel(it)
-		}.isNotEmpty())
+		}.toList().isNotEmpty())
 	}
 }

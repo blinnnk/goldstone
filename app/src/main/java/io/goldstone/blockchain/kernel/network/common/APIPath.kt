@@ -37,6 +37,7 @@ object APIPath {
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
+	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
 	val getEOSTokenList: (
 		header: String,
 		chainID: String,

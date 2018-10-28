@@ -4,8 +4,7 @@ import android.annotation.SuppressLint
 import android.arch.persistence.room.*
 import android.provider.Settings
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
@@ -64,113 +63,62 @@ data class AppConfigTable(
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
 			load {
 				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			} then {
-				it.isNotEmpty() isTrue {
-					hold(it[0])
-				} otherwise {
-					hold(null)
-				}
-			}
+			} then (hold)
 		}
 
-		fun updatePinCode(
-			newPinCode: Int,
-			callback: () -> Unit
-		) {
+		fun updatePinCode(newPinCode: Int, callback: () -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.pincode = newPinCode })
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
-							}
-						}
-					}
+				GoldStoneDataBase.database.appConfigDao().updatePincode(newPinCode)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
 
 		fun updatePushToken(token: String) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.pushToken = token })
-						}
-					}
-				}
+				GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
 			}
 		}
 
 		fun updateDefaultTokenMD5(md5: String) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.defaultCoinListMD5 = md5 })
-						}
-					}
-				}
+				GoldStoneDataBase.database.appConfigDao().updateDefaultMD5(md5)
 			}
 		}
 
 		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.isRegisteredAddresses = isRegistered })
-							GoldStoneAPI.context.runOnUiThread {
-								callback()
-							}
-						}
-					}
+				GoldStoneDataBase.database.appConfigDao().updateHasRegisteredAddress(isRegistered)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
 
 		fun updateRetryTimes(times: Int) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.retryTimes = times })
-						}
-					}
-				}
+				GoldStoneDataBase.database.appConfigDao().updateRetryTimes(times)
 			}
 		}
 
-		fun setFrozenTime(
-			frozenTime: Long?,
-			callback: () -> Unit = {}
-		) {
+		fun setFrozenTime(frozenTime: Long?, callback: () -> Unit = {}) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						it.isNotEmpty() isTrue {
-							update(it[0].apply { this.frozenTime = frozenTime })
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						}
-					}
-				}
+				GoldStoneDataBase.database.appConfigDao().updateFrozenTime(frozenTime.orElse(0L))
+				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 
-		fun setShowPinCodeStatus(
-			status: Boolean,
-			callback: () -> Unit
-		) {
+		fun setShowPinCodeStatus(status: Boolean, callback: () -> Unit) {
 			AppConfigTable.getAppConfig { it ->
 				it?.let {
 					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(it.apply {
-							showPincode = status
-							if (!status) {
-								pincode = null
+						GoldStoneDataBase.database.appConfigDao().update(
+							it.apply {
+								showPincode = status
+								if (!status) pincode = null
 							}
-						})
+						)
 						GoldStoneAPI.context.runOnUiThread {
 							callback()
 						}
@@ -179,36 +127,20 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateLanguage(
-			code: Int,
-			callback: () -> Unit
-		) {
+		fun updateLanguage(code: Int, callback: () -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply { this.language = code })
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+				GoldStoneDataBase.database.appConfigDao().updateLanguageCode(code)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
 
-		fun updateChainStatus(
-			isMainnet: Boolean,
-			callback: () -> Unit
-		) {
+		fun updateChainStatus(isMainnet: Boolean, callback: () -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig().let {
-						update(it[0].apply {
-							this.isMainnet = isMainnet
-						})
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
+				GoldStoneDataBase.database.appConfigDao().updateChainStatus(isMainnet)
+				GoldStoneAPI.context.runOnUiThread {
+					callback()
 				}
 			}
 		}
@@ -281,10 +213,7 @@ data class AppConfigTable(
 					defaultCoinListMD5 = "",
 					exchangeListMD5 = ""
 				)
-				GoldStoneDataBase
-					.database
-					.appConfigDao()
-					.insert(config)
+				GoldStoneDataBase.database.appConfigDao().insert(config)
 				GoldStoneAPI.context.runOnUiThread { callback(config) }
 			}
 		}
@@ -310,11 +239,35 @@ data class AppConfigTable(
 @Dao
 interface AppConfigDao {
 
-	@Query("SELECT * FROM appConfig")
-	fun getAppConfig(): List<AppConfigTable>
+	@Query("SELECT * FROM appConfig LIMIT 1")
+	fun getAppConfig(): AppConfigTable?
 
 	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
 	fun updateCurrency(newCurrencyCode: String)
+
+	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
+	fun updatePincode(pinCode: Int)
+
+	@Query("UPDATE appConfig SET language = :code WHERE id = 1")
+	fun updateLanguageCode(code: Int)
+
+	@Query("UPDATE appConfig SET isRegisteredAddresses = :status WHERE id = 1")
+	fun updateHasRegisteredAddress(status: Boolean)
+
+	@Query("UPDATE appConfig SET pushToken = :token WHERE id = 1")
+	fun updatePushToken(token: String)
+
+	@Query("UPDATE appConfig SET retryTimes = :times WHERE id = 1")
+	fun updateRetryTimes(times: Int)
+
+	@Query("UPDATE appConfig SET isMainnet = :status WHERE id = 1")
+	fun updateChainStatus(status: Boolean)
+
+	@Query("UPDATE appConfig SET defaultCoinListMD5 = :md5 WHERE id = 1")
+	fun updateDefaultMD5(md5: String)
+
+	@Query("UPDATE appConfig SET frozenTime = :time WHERE id = 1")
+	fun updateFrozenTime(time: Long)
 
 	@Query("UPDATE appConfig SET shareContent = :content WHERE id = 1")
 	fun updateShareContent(content: String)

@@ -30,6 +30,7 @@ abstract class SilentUpdater {
 				updateCPUUnitPrice()
 				updateNETUnitPrice()
 				checkAvailableEOSTokenList()
+				updateNodeData()
 			}
 		}
 	}
@@ -105,6 +106,14 @@ abstract class SilentUpdater {
 				if (!priceInEOS.isNull() && error.isNone()) {
 					SharedValue.updateNETUnitPrice(priceInEOS!!)
 				}
+			}
+		}
+	}
+
+	private fun updateNodeData() {
+		GoldStoneAPI.getChainNodes { content, error ->
+			if (!content.isNull() && error.isNone() && content!!.isNotEmpty()) {
+				GoldStoneDataBase.database.chainNodeDao().insertAll(content)
 			}
 		}
 	}

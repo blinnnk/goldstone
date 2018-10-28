@@ -2,7 +2,6 @@ package io.goldstone.blockchain.kernel.network.bitcoin
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -46,50 +45,46 @@ object BitcoinApi {
 		address: String,
 		from: Int,
 		to: Int,
-		errorCallback: (Throwable) -> Unit,
-		hold: (List<JSONObject>) -> Unit
+		hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactions(
 			BitcoinUrl.getTransactions(address, from, to),
-			errorCallback,
 			hold
 		)
 	}
 
 	fun getTransactionCount(
 		address: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (count: Int) -> Unit
+		hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		// `from` 传入一个特大值, `to` 传入 `0` 确保返回的数据只有 `count` 参数而不包含子集
 		BTCSeriesApiUtils.getTransactionCount(
 			BitcoinUrl.getTransactions(address, 999999999, 0),
-			errorCallback,
 			hold
 		)
 	}
 
 	fun getUnspentListByAddress(
 		address: String,
-		hold: (List<UnspentModel>) -> Unit
+		hold: (unspents: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
 		// 向 `Insight` 发起请求
 		BTCSeriesApiUtils.getUnspentListByAddress(
-			BitcoinUrl.getUnspentInfo(address),
-			{ error ->
+			BitcoinUrl.getUnspentInfo(address)
+		) { unspentList, error ->
+			if (!unspentList.isNull() && error.isNone()) {
+				hold(unspentList!!, error)
+			} else {
 				// 当 `Insight` 接口出现问题的时候向 `BlockInfo` 重发请求
 				BTCSeriesApiUtils.getUnspentListByAddressFromBlockInfo(
-					BitcoinUrl.getUnspentInfoFromBlockInfo(address),
-					{ blockInfoError ->
-						LogUtil.error("getUnspentListByAddressFromBlockInfo", blockInfoError)
-					}
-				) { blockInfoUnspentModels ->
-					hold(blockInfoUnspentModels.map { UnspentModel(it) })
+					BitcoinUrl.getUnspentInfoFromBlockInfo(address)
+				) { blockInfoUnspentModels, blockError ->
+					if (!blockInfoUnspentModels.isNull() && blockError.isNone()) {
+						hold(blockInfoUnspentModels!!.map { UnspentModel(it) }, error)
+					} else hold(null, error)
 				}
-				LogUtil.error("getUnspentListByAddress", error)
-			},
-			hold
-		)
+			}
+		}
 	}
 
 	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
@@ -97,26 +92,23 @@ object BitcoinApi {
 		hash: String,
 		address: String,
 		targetNet: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (BTCSeriesTransactionTable?) -> Unit
+		hold: (transition: BTCSeriesTransactionTable?, error: RequestError) -> Unit
 	) {
-		BTCSeriesApiUtils.getTransactionByHash(
-			BitcoinUrl.getTransactionByHash(targetNet, hash),
-			errorCallback
-		) {
-			hold(
-				if (isNull()) null
-				else BTCSeriesTransactionTable(
-					it!!,
-					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 `DataIndex` 随便设置即可
-					0,
-					address,
-					CoinSymbol.pureBTCSymbol,
-					false,
-					ChainType.BTC.id
+		BTCSeriesApiUtils.getTransactionByHash(BitcoinUrl.getTransactionByHash(targetNet, hash)) { transactions, error ->
+			if (!transactions.isNull() && error.isNone()) {
+				hold(
+					BTCSeriesTransactionTable(
+						transactions!!,
+						// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 `DataIndex` 随便设置即可
+						0,
+						address,
+						CoinSymbol.pureBTCSymbol,
+						false,
+						ChainType.BTC.id
+					),
+					error
 				)
-			)
+			} else hold(null, error)
 		}
 	}
-
 }

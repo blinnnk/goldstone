@@ -185,12 +185,9 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID(info.chainID).getThirdPartyURL(),
-		{
-			LogUtil.error("updateBTCTransactionByNotificationHash", it)
-			fragment.context?.alert(it.toString())
-		}
-	) { receipt ->
+		ChainID(info.chainID).getThirdPartyURL()
+	) { receipt, error ->
+		if (receipt.isNull() || error.hasError()) return@getTransactionByHash
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()
@@ -243,12 +240,9 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID(info.chainID).getThirdPartyURL(),
-		{
-			LogUtil.error("updateBTCTransactionByNotificationHash", it)
-			fragment.context?.alert(it.toString())
-		}
-	) { receipt ->
+		ChainID(info.chainID).getThirdPartyURL()
+	) { receipt, error ->
+		if (receipt.isNull() && error.hasError()) return@getTransactionByHash
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()

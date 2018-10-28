@@ -33,13 +33,7 @@ fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>)
 		it.blockNumber
 	}?.blockNumber ?: "0"
 	fragment.showLoadingView(LoadingText.transactionData)
-	getTokenTransactions(
-		blockNumber,
-		{
-			fragment.removeLoadingView()
-			LogUtil.error("getTokenTransactions", it)
-		}
-	) {
+	getTokenTransactions(blockNumber) {
 		fragment.removeLoadingView()
 		loadDataFromDatabaseOrElse()
 	}
@@ -71,10 +65,9 @@ fun checkAddressNameInContacts(
 
 fun getTokenTransactions(
 	startBlock: String,
-	errorCallback: (Throwable) -> Unit,
 	@UiThread hold: (List<TransactionListModel>) -> Unit
 ) {
-	getTransactionsFromEtherScan(startBlock, errorCallback) { hasData ->
+	getTransactionsFromEtherScan(startBlock) { hasData ->
 		if (hasData) TransactionTable.getTokenTransactions(
 			SharedAddress.getCurrentEthereum()
 		) { transactions ->
@@ -88,64 +81,45 @@ fun getTokenTransactions(
 // 默认拉取全部的 `EtherScan` 的交易数据
 private fun getTransactionsFromEtherScan(
 	startBlock: String,
-	errorCallback: (RequestError) -> Unit,
 	@WorkerThread hold: (hasData: Boolean) -> Unit
 ) {
 	// 请求所有链上的数据
-	mergeETHAndERC20Incoming(startBlock, errorCallback) {
-		it.isNotEmpty() isTrue {
-			filterCompletedData(it, hold)
-		} otherwise {
-			hold(false)
-		}
+	mergeETHAndERC20Incoming(startBlock) { transactions, error ->
+		if (!transactions.isNull() && error.isNone()) {
+			if (transactions!!.isNotEmpty()) filterCompletedData(transactions, hold)
+			else hold(false)
+		} else hold(false)
 	}.start()
 }
 
 private fun mergeETHAndERC20Incoming(
 	startBlock: String,
-	errorCallback: (RequestError) -> Unit,
-	@WorkerThread hold: (List<TransactionTable>) -> Unit
+	@WorkerThread hold: (transactions: List<TransactionTable>?, error: RequestError) -> Unit
 ): ConcurrentAsyncCombine {
 	return object : ConcurrentAsyncCombine() {
 		override var asyncCount: Int = 2
 		// Get transaction data from `etherScan`
 		var chainData = listOf<TransactionTable>()
 		var logData = listOf<TransactionTable>()
-		var hasError = false
 		override fun concurrentJobs() {
 			doAsync {
 				GoldStoneAPI.getTransactionListByAddress(
 					startBlock,
-					SharedAddress.getCurrentEthereum(),
-					{
-						// 只弹出一次错误信息
-						if (!hasError) {
-							errorCallback(it)
-							hasError = true
-						}
-						completeMark()
-					}
-				) {
-					chainData = this
+					SharedAddress.getCurrentEthereum()
+				) { transactions, error ->
+					if (!transactions.isNull() && error.isNone()) {
+						chainData = transactions!!
+					} else hold(null, error)
 					completeMark()
 				}
-
 				GoldStoneAPI.getERC20TokenIncomingTransaction(
 					startBlock,
-					{
-						//error callback
-						// 只弹出一次错误信息
-						if (!hasError) {
-							errorCallback(it)
-							hasError = true
-						}
-						completeMark()
-					},
 					SharedAddress.getCurrentEthereum()
-				) { erc20Data ->
-					// 把请求回来的数据转换成 `TransactionTable` 格式
-					logData = erc20Data.map {
-						TransactionTable(ERC20TransactionModel(it)).apply {
+				) { erc20Data, error ->
+					if (!erc20Data.isNull() && error.isNone()) {
+						// 把请求回来的数据转换成 `TransactionTable` 格式
+						logData = erc20Data!!.map {
+							TransactionTable(ERC20TransactionModel(it))
 						}
 					}
 					completeMark()
@@ -155,12 +129,11 @@ private fun mergeETHAndERC20Incoming(
 
 		override fun getResultInMainThread() = false
 		override fun mergeCallBack() {
-			diffNewDataAndUpdateLocalData(chainData.asSequence().plus(logData)
-				.filter {
-					it.to.isNotEmpty()
-				}.distinctBy {
-					it.hash
-				}.toList(), hold)
+			diffNewDataAndUpdateLocalData(chainData.asSequence().plus(logData).filter {
+				it.to.isNotEmpty()
+			}.distinctBy { it.hash }.toList()) {
+				hold(this, RequestError.None)
+			}
 		}
 	}
 }

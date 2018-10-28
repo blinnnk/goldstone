@@ -16,10 +16,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.multichain.TokenIcon
-import io.goldstone.blockchain.crypto.multichain.generateObject
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -233,19 +230,30 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getShareContent(
-		hold: (content: ShareContentModel?, error: RequestError) -> Unit
-	) {
+	fun getShareContent(hold: (content: ShareContentModel?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
-			true,
+			false,
 			{ hold(null, it) },
 			isEncrypt = true
 		) {
 			firstOrNull().isNotNull {
 				hold(ShareContentModel(JSONObject(this[0])), RequestError.None)
 			}
+		}
+	}
+
+	@JvmStatic
+	fun getChainNodes(hold: (content: List<ChainNodeTable>?, error: RequestError) -> Unit) {
+		requestData<ChainNodeTable>(
+			APIPath.getChainNodes(APIPath.currentUrl),
+			"data",
+			false,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			hold(this, RequestError.None)
 		}
 	}
 
@@ -267,17 +275,16 @@ object GoldStoneAPI {
 
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
-		errorCallback: (RequestError) -> Unit,
 		address: String,
-		hold: (ArrayList<ERC20TransactionModel>) -> Unit
+		hold: (erc20Transactions: List<ERC20TransactionModel>?, error: RequestError) -> Unit
 	) {
 		requestUnCryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenIncomingTransaction(address, startBlock),
 			"result",
 			false,
-			errorCallback
+			{ hold(null, it) }
 		) {
-			hold(toArrayList())
+			hold(this, RequestError.None)
 		}
 	}
 
@@ -288,16 +295,15 @@ object GoldStoneAPI {
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
 		address: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: ArrayList<TransactionTable>.() -> Unit
+		hold: (transactions: List<TransactionTable>?, error: RequestError) -> Unit
 	) {
 		requestUnCryptoData<TransactionTable>(
 			EtherScanApi.transactions(address, startBlock),
 			"result",
 			false,
-			errorCallback
+			{ hold(null, it) }
 		) {
-			hold(map { TransactionTable(it) }.toArrayList())
+			hold(map { TransactionTable(it) }, RequestError.None)
 		}
 	}
 

@@ -89,8 +89,11 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		BitcoinApi.getUnspentListByAddress(myAddress) { unspents ->
-			if (unspents.isEmpty()) {
+		BitcoinApi.getUnspentListByAddress(myAddress) { unspents, error ->
+			if (unspents.isNull() || error.hasError()) {
+				hold(error, null)
+			}
+			if (unspents!!.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
 					hold(TransferError.BalanceIsNotEnough, null)

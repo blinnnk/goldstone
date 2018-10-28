@@ -23,7 +23,6 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
-import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
@@ -212,25 +211,20 @@ class TokenInfoPresenter(
 		fragment.showTotalValue(content(receivedValue), content(sentValue))
 	}
 
-	private fun getBTCSeriesTransactionCountFromChain(@UiThread hold: (count: Int?, error: RequestError) -> Unit) {
+	private fun getBTCSeriesTransactionCountFromChain(
+		@UiThread hold: (count: Int?, error: RequestError) -> Unit
+	) {
 		when (tokenInfo?.symbol) {
-			CoinSymbol.btc() -> BitcoinApi.getTransactionCount(
-				currentAddress,
-				{ hold(null, it) }
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
-			}
-			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(
-				currentAddress,
-				{ hold(null, it) }
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
-			}
-			CoinSymbol.bch -> BitcoinCashApi.getTransactionCount(
-				currentAddress,
-				{ hold(null, it) }
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
+			CoinSymbol.btc(), CoinSymbol.bch ->
+				BitcoinApi.getTransactionCount(currentAddress) { count, error ->
+					if (count.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
+						hold(count, RequestError.None)
+					} else hold(null, error)
+				}
+			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(currentAddress) { count, error ->
+				if (count.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
+					hold(count, RequestError.None)
+				} else hold(null, error)
 			}
 			else -> hold(0, RequestError.None)
 		}

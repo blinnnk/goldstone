@@ -2,6 +2,8 @@ package io.goldstone.blockchain.kernel.database
 
 import android.arch.persistence.room.*
 import android.content.Context
+import io.goldstone.blockchain.crypto.multichain.ChainNodeDao
+import io.goldstone.blockchain.crypto.multichain.ChainNodeTable
 import io.goldstone.blockchain.kernel.commonmodel.*
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
@@ -39,7 +41,8 @@ import java.math.BigInteger
 		(SupportCurrencyTable::class),
 		(BTCSeriesTransactionTable::class),
 		(EOSTransactionTable::class),
-		(EOSAccountTable::class)
+		(EOSAccountTable::class),
+		(ChainNodeTable::class)
 	],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
@@ -74,6 +77,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun eosTransactionDao(): EOSTransactionDao
 	abstract fun eosAccountDao(): EOSAccountDao
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
+	abstract fun chainNodeDao(): ChainNodeDao
 
 	companion object {
 		const val databaseVersion = 8

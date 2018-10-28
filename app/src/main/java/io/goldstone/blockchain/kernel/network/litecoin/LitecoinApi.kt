@@ -97,18 +97,17 @@ object LitecoinApi {
 
 	fun getTransactionCount(
 		address: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (count: Int) -> Unit
+		hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactions(address, 999999999, 0),
 			"totalItems",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			null,
 			true
 		) {
-			hold(this.firstOrNull()?.toIntOrNull().orZero())
+			hold(this.firstOrNull()?.toIntOrNull().orZero(), RequestError.None)
 		}
 	}
 
