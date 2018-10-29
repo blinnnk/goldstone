@@ -15,11 +15,10 @@ import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.showAlertView
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -74,9 +73,7 @@ class PaymentPreparePresenter(
 			token?.contract.isEOSSeries() ->
 				transferEOS(
 					count,
-					CoinSymbol(getToken()?.symbol),
-					if (token?.contract.isEOS()) EOSCodeName.EOSIOToken
-					else EOSCodeName(token?.contract?.contract.orEmpty()),
+					getToken()?.contract.orEmpty(),
 					callback
 				)
 			else -> prepareETHSeriesPaymentModel(count, callback)

@@ -110,7 +110,9 @@ data class QuotationSelectionTable(
 		}
 
 		fun getMySelections(@UiThread hold: (List<QuotationSelectionTable>) -> Unit) {
-			load { GoldStoneDataBase.database.quotationSelectionDao().getQuotationSelfSelections() } then (hold)
+			load {
+				GoldStoneDataBase.database.quotationSelectionDao().getQuotationSelfSelections()
+			} then (hold)
 		}
 
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {

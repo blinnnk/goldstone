@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.kernel.commonmodel.eos
 
 import android.arch.persistence.room.TypeConverter
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import org.json.JSONObject
 
@@ -23,7 +25,7 @@ data class EOSTransactionData(
 	constructor(data: EOSTransactionInfo) : this(
 		data.fromAccount.accountName,
 		data.toAccount.accountName,
-		"${CryptoUtils.toCountByDecimal(data.amount, data.decimal)} ${data.symbol}",
+		"${CryptoUtils.toCountByDecimal(data.amount, data.contract.decimal.orElse(CryptoValue.eosDecimal))} ${data.contract.symbol}",
 		data.memo
 	)
 
@@ -31,7 +33,12 @@ data class EOSTransactionData(
 		data.safeGet("from"),
 		data.safeGet("to"),
 		data.safeGet("quantity"),
-		data.safeGet("memo")
+		data.safeGet("memo").apply {
+			if (contains("{")) {
+				replace("{", "")
+				replace("}", "")
+			}
+		}
 	)
 }
 

@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import java.io.Serializable
 
 
@@ -17,32 +19,30 @@ data class TokenContract(
 	@SerializedName("code")
 	val contract: String?,
 	@SerializedName("symbol")
-	val symbol: String
+	val symbol: String,
+	@SerializedName("decimals")
+	val decimal: Int?
 ) : Serializable {
-	constructor(contract: String) : this(
-		contract,
-		when {
-			contract.equals(TokenContract.etcContract, true) -> CoinSymbol.etc
-			contract.equals(TokenContract.btcContract, true) -> CoinSymbol.pureBTCSymbol
-			contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.ltc
-			contract.equals(TokenContract.bchContract, true) -> CoinSymbol.bch
-			contract.equals(TokenContract.eosContract, true) -> CoinSymbol.eos
-			contract.equals(TokenContract.ethContract, true) -> CoinSymbol.eth
-			/** 以下两个通常用作燃气费的基础手续费的显示 `Symbol` */
-			// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-			contract.length == CryptoValue.contractAddressLength -> CoinSymbol.eth
-			// `EOS` 的 `Contract` 是 对应的 `CodeName` 例如 `eosio.token`
-			else -> CoinSymbol.eos
-		}
+
+	constructor(token: DefaultTokenTable) : this(
+		token.contract,
+		token.symbol,
+		token.decimals
+	)
+
+	constructor(token: MyTokenWithDefaultTable) : this(
+		token.contract,
+		token.symbol,
+		token.decimal
 	)
 
 	companion object {
-		val ETH = TokenContract(TokenContract.ethContract, CoinSymbol.ETH.symbol!!)
-		val ETC = TokenContract(TokenContract.etcContract, CoinSymbol.ETC.symbol!!)
-		val BTC = TokenContract(TokenContract.btcContract, CoinSymbol.BTC.symbol!!)
-		val LTC = TokenContract(TokenContract.ltcContract, CoinSymbol.LTC.symbol!!)
-		val BCH = TokenContract(TokenContract.bchContract, CoinSymbol.BCH.symbol!!)
-		val EOS = TokenContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!)
+		val ETH = TokenContract(TokenContract.ethContract, CoinSymbol.ETH.symbol!!, CryptoValue.ethDecimal)
+		val ETC = TokenContract(TokenContract.etcContract, CoinSymbol.ETC.symbol!!, CryptoValue.ethDecimal)
+		val BTC = TokenContract(TokenContract.btcContract, CoinSymbol.BTC.symbol!!, CryptoValue.btcSeriesDecimal)
+		val LTC = TokenContract(TokenContract.ltcContract, CoinSymbol.LTC.symbol!!, CryptoValue.btcSeriesDecimal)
+		val BCH = TokenContract(TokenContract.bchContract, CoinSymbol.BCH.symbol!!, CryptoValue.btcSeriesDecimal)
+		val EOS = TokenContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!, CryptoValue.eosDecimal)
 		// GoldStone 业务约定的值
 		const val ethContract = "0x60"
 		const val etcContract = "0x61"
@@ -57,7 +57,16 @@ data class TokenContract(
 	}
 }
 
-fun TokenContract?.orEmpty() = if (isNull()) TokenContract("") else this!!
+fun List<TokenContract>.generateObject(): String {
+	var data = ""
+	forEach {
+		data += "{\"address\":\"${it.contract}\",\"symbol\":\"${it.symbol}\"}" + ","
+	}
+	data = data.substringBeforeLast(",")
+	return "[$data]"
+}
+
+fun TokenContract?.orEmpty() = if (isNull()) TokenContract("", "", 0) else this!!
 
 fun TokenContract?.isEOS(): Boolean {
 	return this?.contract.equals(TokenContract.eosContract, true) && this?.symbol.equals(CoinSymbol.EOS.symbol, true)
@@ -133,18 +142,19 @@ fun TokenContract?.getSymbol(): CoinSymbol {
 
 fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 	return when {
-		TokenContract(this?.contract.orEmpty()).isBTC() ->
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.pureBTCSymbol, CryptoValue.btcSeriesDecimal).isBTC() ->
 			AddressUtils.getCurrentBTCAddress()
-		TokenContract(this?.contract.orEmpty()).isLTC() ->
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.ltc, CryptoValue.btcSeriesDecimal).isLTC() ->
 			AddressUtils.getCurrentLTCAddress()
-		TokenContract(this?.contract.orEmpty()).isBCH() ->
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.bch, CryptoValue.btcSeriesDecimal).isBCH() ->
 			AddressUtils.getCurrentBCHAddress()
-		TokenContract(this?.contract.orEmpty()).isETC() ->
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.etc, CryptoValue.ethDecimal).isETC() ->
 			SharedAddress.getCurrentETC()
-		TokenContract(this?.contract.orEmpty()).isEOSSeries() ->
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.eos, CryptoValue.eosDecimal).isEOSSeries() ->
 			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
 			else SharedAddress.getCurrentEOS()
-		TokenContract(this?.contract.orEmpty()).isETH() -> SharedAddress.getCurrentEthereum()
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.eth, CryptoValue.ethDecimal).isETH() ->
+			SharedAddress.getCurrentEthereum()
 		this?.contract?.length == CryptoValue.contractAddressLength -> SharedAddress.getCurrentEthereum()
 		else -> {
 			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName

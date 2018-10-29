@@ -34,7 +34,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
@@ -318,18 +318,20 @@ class ProfilePresenter(
 
 	private fun checkVersion() {
 		fragment.context?.let { context ->
-			GoldStoneAPI.getNewVersionOrElse { versionModel ->
-				version = if (versionModel.isNull()) {
-					SystemUtils.getVersionName(context)
-				} else {
-					newVersionDescription = versionModel?.description.orEmpty()
-					newVersionName = versionModel?.versionName.orEmpty()
-					newVersionUrl = versionModel?.url.orEmpty()
-					versionModel?.versionName + " " + CommonText.new
-				}
-				fragment.asyncData?.apply {
-					last().info = version
-					fragment.recyclerView.adapter?.notifyItemChanged(lastIndex)
+			GoldStoneAPI.getNewVersionOrElse { versionModel, error ->
+				if (error.isNone()) {
+					version = if (versionModel.isNull()) {
+						SystemUtils.getVersionName(context)
+					} else {
+						newVersionDescription = versionModel?.description.orEmpty()
+						newVersionName = versionModel?.versionName.orEmpty()
+						newVersionUrl = versionModel?.url.orEmpty()
+						versionModel?.versionName + " " + CommonText.new
+					}
+					fragment.asyncData?.apply {
+						last().info = version
+						fragment.recyclerView.adapter?.notifyItemChanged(lastIndex)
+					}
 				}
 			}
 		}

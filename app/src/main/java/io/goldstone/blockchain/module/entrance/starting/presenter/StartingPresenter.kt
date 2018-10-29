@@ -15,8 +15,8 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.BackupServerChecker
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.BackupServerChecker
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -53,15 +53,17 @@ class StartingPresenter(override val fragment: StartingFragment) :
 	companion object {
 
 		fun updateShareContentFromServer() {
-			GoldStoneAPI.getShareContent(
-				{ BackupServerChecker.checkBackupStatusByException(it) }
-			) {
-				val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
-					ProfileText.shareContent
+			GoldStoneAPI.getShareContent { shareContent, error ->
+				if (!shareContent.isNull() && error.isNone()) {
+					val shareText = if (shareContent!!.title.isEmpty() && shareContent.content.isEmpty()) {
+						ProfileText.shareContent
+					} else {
+						"${shareContent.title}\n${shareContent.content}\n${shareContent.url}"
+					}
+					AppConfigTable.updateShareContent(shareText)
 				} else {
-					"${it.title}\n${it.content}\n${it.url}"
+					BackupServerChecker.checkBackupStatusByException(error)
 				}
-				AppConfigTable.updateShareContent(shareText)
 			}
 		}
 
@@ -111,22 +113,22 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 
-		fun updateLocalDefaultTokens(errorCallback: (GoldStoneError) -> Unit) {
+		fun updateLocalDefaultTokens() {
 			doAsync {
-				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-					// 没有网络数据直接返回
-					if (serverTokens.isEmpty()) return@getDefaultTokens
-					DefaultTokenTable.getAllTokens(false) { localTokens ->
-						// 开一个线程更新图片
-						serverTokens.updateLocalTokenIcon(localTokens)
-						// 移除掉一样的数据
-						serverTokens.filterNot { server ->
-							localTokens.any { local ->
-								local.chainID.equals(server.chainID, true)
-									&& local.contract.equals(server.contract, true)
+				GoldStoneAPI.getDefaultTokens { serverTokens, error ->
+					if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
+						DefaultTokenTable.getAllTokens(false) { localTokens ->
+							// 开一个线程更新图片
+							serverTokens.updateLocalTokenIcon(localTokens)
+							// 移除掉一样的数据
+							serverTokens.filterNot { server ->
+								localTokens.any { local ->
+									local.chainID.equals(server.chainID, true)
+										&& local.contract.equals(server.contract, true)
+								}
+							}.apply {
+								GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 							}
-						}.apply {
-							GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 						}
 					}
 				}

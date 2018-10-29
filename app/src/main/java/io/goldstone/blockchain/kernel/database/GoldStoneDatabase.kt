@@ -77,7 +77,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
 
 	companion object {
-		const val databaseVersion = 7
+		const val databaseVersion = 8
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

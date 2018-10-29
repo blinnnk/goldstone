@@ -9,7 +9,6 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.Spectrum

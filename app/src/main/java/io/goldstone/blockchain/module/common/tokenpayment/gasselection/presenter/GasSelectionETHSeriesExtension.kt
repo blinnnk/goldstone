@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
@@ -20,8 +19,8 @@ import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
@@ -150,7 +149,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: (GoldStoneError) 
 			GoldStoneEthCall.sendRawTransaction(
 				signedHex,
 				callback,
-				CoinSymbol(getToken()?.symbol).getCurrentChainName()
+				getToken()?.contract.getCurrentChainName()
 			) { taxHash ->
 				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 				taxHash.isValidTaxHash() isTrue {
@@ -251,7 +250,7 @@ private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
 			to = raw.toWalletAddress
 			input = raw.inputData
 			contractAddress = token?.contract?.contract.orEmpty()
-			chainID = TokenContract(contractAddress).getCurrentChainID().id
+			chainID = TokenContract(contractAddress, symbol, null).getCurrentChainID().id
 			memo = memoData
 			minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
 		}.let {

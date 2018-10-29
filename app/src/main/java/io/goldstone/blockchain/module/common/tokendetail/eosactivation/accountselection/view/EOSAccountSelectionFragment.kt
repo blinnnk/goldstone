@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.EOSAccountText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
@@ -96,7 +95,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 					setBlueStyle(20.uiPX())
 				}.click {
 					container.findViewById<EOSAccountCell>(defaultIndex.orZero())?.getName()?.apply {
-						presenter.setEOSDefaultName(this)
+						if (isNotEmpty()) presenter.setEOSDefaultName(this)
 					}
 				}.into(this)
 			}

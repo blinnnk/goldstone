@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.uiThread

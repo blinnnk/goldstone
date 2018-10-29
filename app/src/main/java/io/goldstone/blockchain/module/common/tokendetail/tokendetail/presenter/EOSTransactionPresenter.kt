@@ -6,6 +6,7 @@ import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.isEOSSeries
@@ -18,12 +19,10 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
-
 /**
  * @author KaySaith
  * @date  2018/10/17
  */
-private const val pageCount = 10
 
 fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 	// 是否有合法的数据
@@ -41,9 +40,10 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 				if (token?.contract.isEOS()) EOSCodeName.EOSIOToken.value
 				else token?.contract?.contract.orEmpty()
 			doAsync {
+				val startIndex = currentMaxCount!! - DataValue.transactionPageCount
 				EOSTransactionTable.getRangeData(
 					account,
-					currentMaxCount!! - pageCount,
+					if (startIndex < 0) 0 else startIndex,
 					currentMaxCount!!,
 					token?.symbol.orEmpty(),
 					codeName,
@@ -56,7 +56,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 						it.updateChartAndHeaderData()
 					}
 					var endID = 0L
-					var pageSize = pageCount
+					var pageSize = DataValue.transactionPageCount
 					fun loadTargetRangeData() {
 						// 拉取指定范围和数量的账单
 						EOSAPI.getEOSTransactions(
@@ -72,9 +72,8 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 									fragment.context?.runOnUiThread { showBottomLoading(false) }
 									return@getEOSTransactions
 								}
-								// 排序后插入数据库
-								data.asSequence().sortedByDescending { it.serverID }.forEachIndexed { index, eosTransactionTable ->
-									EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - index })
+								data.forEachIndexed { index, eosTransactionTable ->
+									EOSTransactionTable.preventDuplicateInsert(account, eosTransactionTable.apply { dataIndex = currentMaxCount!! - (index + 1) })
 								}
 								flipPage(data.plus(localData), callback)
 								currentMaxCount = currentMaxCount!! - pageSize
@@ -98,7 +97,10 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 									)?.serverID ?: 0L
 							loadTargetRangeData()
 						}
-						localData.size < pageCount && localData.size < totalCount.orZero() -> {
+						// 防止天然数据不够一页的情况, 防止拉到最后一页数据不够一页数量的情况.
+						localData.size < DataValue.transactionPageCount &&
+							localData.size != totalCount.orZero() &&
+							localData.minBy { it.dataIndex }?.dataIndex.orZero() > 1 -> {
 							// 本地片段存在不足的情况
 							endID = if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
 								localData.minBy { it.dataIndex }?.serverID ?: 0L
@@ -108,7 +110,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 								token?.symbol.orEmpty(),
 								codeName
 							)?.serverID ?: 0L
-							pageSize = pageCount - localData.size
+							pageSize = DataValue.transactionPageCount - localData.size
 							loadTargetRangeData()
 						}
 						// 本地有数据

@@ -15,11 +15,11 @@ import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.EtherScanApi
-import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinCashTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.bitcoinTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.eosTransactionDetail
-import io.goldstone.blockchain.kernel.network.EtherScanApi.litecoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.bitcoinCashTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.bitcoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.eosTransactionDetail
+import io.goldstone.blockchain.kernel.network.common.EtherScanApi.litecoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
 import java.math.BigInteger
@@ -72,7 +72,7 @@ data class TransactionListModel(
 		data.time.toString(),
 		data.transactionData.quantity.substringBeforeLast(" "),
 		false,
-		TokenContract(data.codeName, data.symbol),
+		TokenContract(data.codeName, data.symbol, null),
 		false,
 		data.serverID,
 		false
@@ -97,7 +97,7 @@ data class TransactionListModel(
 		data.timeStamp,
 		data.value,
 		data.hasError == "1",
-		TokenContract(data.contractAddress, data.symbol),
+		TokenContract(data.contractAddress, data.symbol, null),
 		data.isFailed,
 		0L, // TODO
 		data.isFee

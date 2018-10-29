@@ -17,14 +17,13 @@ import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
@@ -93,10 +92,16 @@ data class MyTokenTable(
 					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
 					val pendingAccount = getPendingEOSAccount(address, chainID)
 					val existingAccount = getByOwnerName(name, chainID)
-					if (pendingAccount.isNull() && existingAccount.isNull()) {
+					if (pendingAccount.isNull() && existingAccount.isEmpty()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!, SharedChain.getEOSCurrent().id)
-						defaultToken?.let { insert(MyTokenTable(it, name, address)) }
+							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(
+								TokenContract.EOS.contract!!,
+								CoinSymbol.EOS.symbol!!,
+								SharedChain.getEOSCurrent().id
+							)
+						defaultToken?.let {
+							MyTokenTable(it, name, address).preventDuplicateInsert()
+						}
 					} else if (!pendingAccount.isNull()) {
 						updatePendingAccountName(name, address, chainID)
 					}
@@ -117,7 +122,7 @@ data class MyTokenTable(
 
 		fun getEOSAccountNamesByAddress(address: String, @UiThread hold: (List<String>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.myTokenDao().getByAddressAndChainID(address)
+				GoldStoneDataBase.database.myTokenDao().getEOSData(address)
 			} then { myTokens ->
 				hold(
 					myTokens.asSequence().distinctBy { it.ownerName }.filter {
@@ -175,31 +180,24 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
-				contract.isETH() ->
+				contract.isETH() || contract.isETC() ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
-						{ hold(null, it) },
 						contract.getCurrentChainName()
-					) {
-						val balance = it.toEthCount()
-						hold(balance, RequestError.None)
+					) { amount, error ->
+						if (!amount.isNull() && error.isNone()) {
+							val balance = amount!!.toEthCount()
+							hold(balance, RequestError.None)
+						} else hold(null, error)
 					}
-				contract.isETC() ->
-					GoldStoneEthCall.getEthBalance(
-						ownerName,
-						{ hold(null, it) },
-						contract.getCurrentChainName()
-					) {
-						val balance = it.toEthCount()
-						hold(balance, RequestError.None)
-					}
+
 				contract.isBTC() ->
 					BitcoinApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance?.toBTCCount(), error)
+						hold(balance?.toBTC(), error)
 					}
 				contract.isLTC() ->
-					LitecoinApi.getBalanceFromChainSo(ownerName) { balance, error ->
-						hold(balance, error)
+					LitecoinApi.getBalance(ownerName, false) { balance, error ->
+						hold(balance?.toLTC(), error)
 					}
 
 				contract.isBCH() ->
@@ -230,11 +228,12 @@ data class MyTokenTable(
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerName,
-						{ hold(null, it) },
 						contract.getCurrentChainName()
-					) {
-						val balance = CryptoUtils.toCountByDecimal(it, token?.decimals.orZero())
-						hold(balance, RequestError.None)
+					) { amount, error ->
+						if (!amount.isNull() && error.isNone()) {
+							val balance = CryptoUtils.toCountByDecimal(amount!!, token?.decimals.orZero())
+							hold(balance, RequestError.None)
+						} else hold(null, error)
 					}
 				}
 			}
@@ -261,7 +260,7 @@ interface MyTokenDao {
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID LIKE :chainID")
-	fun getByAddressAndChainID(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
+	fun getEOSData(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
 
 	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress OR ownerName LIKE :walletAddress")
 	fun deleteAllByAddress(walletAddress: String)

@@ -7,7 +7,6 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.setUnderline
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.view.CardTitleCell
 import io.goldstone.blockchain.common.language.CommonText
@@ -41,13 +40,13 @@ class TransactionInfoCell(context: Context) : CardTitleCell(context) {
 				}
 			}
 		} else {
-			val content =
-				when {
-						model.info.isEmpty() && model.description.equals(TransactionText.memo, true) -> TransactionText.noMemo
-						model.info.isEmpty() -> CommonText.waiting
-						model.description.equals(TransactionText.url, true) -> model.info.setUnderline()
-						else -> model.info
-				}
+			val content = when {
+				model.info.isEmpty() && model.description.equals(TransactionText.memo, true) ->
+					TransactionText.noMemo
+				model.info.isEmpty() -> CommonText.waiting
+				model.description.equals(TransactionText.url, true) -> model.info.setUnderline()
+				else -> model.info
+			}
 			setContent(content)
 		}
 		setTitle(model.description)

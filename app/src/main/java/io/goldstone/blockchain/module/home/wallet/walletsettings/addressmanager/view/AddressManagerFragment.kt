@@ -103,7 +103,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
-					ChainType.BTC,
+					if (SharedValue.isTestEnvironment()) ChainType.AllTest else ChainType.BTC,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -242,7 +242,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
-
 		val title = WalletSettingsText.bitcoinAddress(SharedWallet.getYingYongBaoInReviewStatus())
 		val addresses = wallet.btcAddresses
 		setMultiChainAddresses(wallet)
@@ -371,9 +370,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
 							coinType.isEOS() -> setEOSAddressesModel(wallet)
 							coinType.isLTC() -> setLitecoinAddressesModel(wallet)
-							coinType.isBTC() ->
-								if (SharedValue.isTestEnvironment()) setBTCSeriesTestAddressesModel(wallet)
-								else setBitcoinAddressesModel(wallet)
+							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
+							coinType.isAllTest() -> setBTCSeriesTestAddressesModel(wallet)
 						}
 						toast(CommonText.succeed)
 						removeDashboard(context)

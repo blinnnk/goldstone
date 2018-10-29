@@ -75,12 +75,10 @@ private fun loadBCHTransactionsFromChain(
 			)
 		}.map {
 			// 插入转账数据到数据库
-			BTCSeriesTransactionTable
-				.preventRepeatedInsert(it.hash, false, it)
+			BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
 			// 同样的账单插入一份燃气费的数据
 			if (!it.isReceive) {
-				BTCSeriesTransactionTable
-					.preventRepeatedInsert(
+				BTCSeriesTransactionTable.preventRepeatedInsert(
 						it.hash,
 						true,
 						it.apply { isFee = true }

@@ -86,16 +86,7 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
-	@JvmField
-	val agreeRemind = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please read and agree to the terms"
-		HoneyLanguage.Chinese.code -> "请阅读并同意用户协议"
-		HoneyLanguage.Japanese.code -> "本ユーザー契約書を読んで同意するようにして下さい"
-		HoneyLanguage.Korean.code -> "유저협의서를 열람 및 동의하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, прочитайте и примите пользовательское соглашение"
-		HoneyLanguage.TraditionalChinese.code -> "請閱讀並同意用戶協議"
-		else -> ""
-	}
+
 	@JvmField
 	val mnemonicBackupAttention = when (currentLanguage) {
 		HoneyLanguage.English.code -> "We do not save any record of our users' mnemonics, so please take good care of them! To minimize risk, it's best not to save them digitally. Maybe write it down, you know like your grandmother used to do!"
@@ -186,26 +177,7 @@ object CreateWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "密碼需要至少8位字符"
 		else -> ""
 	}
-	@JvmField
-	val passwordRepeatAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The password entered twice is inconsistent"
-		HoneyLanguage.Chinese.code -> "两次输入的密码不一致"
-		HoneyLanguage.Japanese.code -> "2回の入力したパスワードが一致していません"
-		HoneyLanguage.Korean.code -> "두 번 입력 한 암호가 일치하지 않습니다"
-		HoneyLanguage.Russian.code -> "Введенные пароли не одинаковы"
-		HoneyLanguage.TraditionalChinese.code -> "兩次輸入的密碼不一致"
-		else -> ""
-	}
-	@JvmField
-	val emptyRepeatPasswordAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please repeat the password for confirmation"
-		HoneyLanguage.Chinese.code -> "请重复输入密码以作确认"
-		HoneyLanguage.Japanese.code -> "確認するためにパスワードの入力を繰り返して下さい"
-		HoneyLanguage.Korean.code -> "확인을 위해 비밀번호를 반복하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите пароль заново для подтверждения"
-		HoneyLanguage.TraditionalChinese.code -> "請重複輸入密碼以作確認"
-		else -> ""
-	}
+
 	@JvmField
 	val name = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Name"

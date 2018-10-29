@@ -48,11 +48,6 @@ object BTCWalletUtils {
 		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
 		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
 		val chainID = if (isTest) testNetID else mainNetID
-		return Address(
-			chainID,
-			Utils.sha256hash160(
-				getKeyPairFromBase58PrivateKey(privateKey, isTest).pubKey
-			)
-		).toBase58()
+		return Address(chainID, Utils.sha256hash160(getKeyPairFromBase58PrivateKey(privateKey, isTest).pubKey)).toBase58()
 	}
 }

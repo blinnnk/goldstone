@@ -23,8 +23,8 @@ android {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 13
-    versionName "1.4.0"
+    versionCode 15
+    versionName "1.4.2"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
@@ -34,7 +34,7 @@ android {
       XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
-      abiFilters "armeabi", "armeabi-v7a"//, "x86" // PC 调试的时候恢复 `x86`
+      abiFilters "armeabi", "armeabi-v7a", "x86" // PC 调试的时候恢复 `x86`
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     // Leave only the supported languages

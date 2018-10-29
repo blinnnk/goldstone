@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -17,11 +16,10 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
@@ -44,14 +42,15 @@ class EOSAccountRegisterPresenter(
 	) {
 		GoldStoneAPI.getPriceByContractAddress(
 			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
-			// 网络获取价格出错后从本地数据库获取价格
-			{ hold(null, null, it) }
-		) {
-			EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { price, error ->
-				if (!price.isNull() && error.isNone()) {
-					hold(it.firstOrNull()?.price.orZero(), price!!, error)
-				} else hold(null, null, error)
-			}
+			true
+		) { currency, currencyError ->
+			if (!currency.isNull() && currencyError.isNone()) {
+				EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { ramPriceInEOS, error ->
+					if (!ramPriceInEOS.isNull() && error.isNone()) {
+						hold(currency!!.firstOrNull()?.price.orZero(), ramPriceInEOS!!, error)
+					} else hold(null, null, error)
+				}
+			} else hold(null, null, currencyError)
 		}
 	}
 
@@ -76,8 +75,7 @@ class EOSAccountRegisterPresenter(
 						creatorAccount,
 						validAccount!!,
 						totalSpent,
-						CoinSymbol.EOS,
-						EOSCodeName.EOSIOToken,
+						TokenContract.EOS,
 						false
 					) { privateKey, privateKeyError ->
 						if (error.isNone() && !privateKey.isNull()) {
@@ -89,9 +87,11 @@ class EOSAccountRegisterPresenter(
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
 								netAEOSCount.toEOSUnit()
-							).send(privateKey!!, callback) {
-								fragment.getParentContainer()?.apply { it.showDialog(this) }
-								callback(GoldStoneError.None)
+							).send(privateKey!!) { response, error ->
+								if (!response.isNull() && error.isNone()) {
+									fragment.getParentContainer()?.apply { response!!.showDialog(this) }
+									callback(GoldStoneError.None)
+								} else callback(error)
 							}
 						} else callback(privateKeyError)
 					}

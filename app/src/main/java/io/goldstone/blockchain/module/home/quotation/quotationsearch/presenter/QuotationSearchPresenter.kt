@@ -5,6 +5,10 @@ import android.support.annotation.WorkerThread
 import android.widget.CheckBox
 import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.toArrayList
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
@@ -14,8 +18,13 @@ import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
+import io.goldstone.blockchain.common.language.LoadingText
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -268,11 +277,10 @@ class QuotationSearchPresenter(
 			pair: String, @WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
 		) {
 			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(
-				parameter,
-				{ hold(null, it) }
-			) {
-				hold(it.first().pointList.toString().orEmpty(), RequestError.None)
+			GoldStoneAPI.getCurrencyLineChartData(parameter) { lineData, error ->
+				if (!lineData.isNull() && error.isNone()) {
+					hold(lineData!!.firstOrNull()?.pointList?.toString().orEmpty(), RequestError.None)
+				} else hold(null, error)
 			}
 		}
 		

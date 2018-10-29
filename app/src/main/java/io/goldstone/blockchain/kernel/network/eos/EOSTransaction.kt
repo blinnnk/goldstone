@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.transaction.*
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
 import java.io.Serializable
 import java.math.BigInteger
@@ -26,42 +28,38 @@ class EOSTransaction(
 	private val amount: BigInteger,
 	private val memo: String,
 	private val expirationType: ExpirationType,
-	private val symbol: String,
-	private val codeName: EOSCodeName
+	private val contract: TokenContract
 ) : Serializable, EOSTransactionInterface() {
 
-	override fun serialized(
-		errorCallback: (GoldStoneError) -> Unit,
-		@UiThread hold: (EOSTransactionSerialization) -> Unit
-	) {
+	override fun serialized(@UiThread hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
 		val transactionInfo = EOSTransactionInfo(
 			EOSAccount(fromAccount.actor),
 			EOSAccount(toAccountName),
 			amount,
 			memo,
-			symbol,
-			codeName
+			contract
 		)
 		val transactionInfoCode = transactionInfo.serialize()
-		EOSAPI.getTransactionHeaderFromChain(expirationType, errorCallback) { header ->
+		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
 			val authorization = fromAccount
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
 			val action = EOSAction(
-				codeName,
+				EOSCodeName(contract.contract.orEmpty()),
 				transactionInfoCode,
 				EOSTransactionMethod.Transfer,
 				authorizationObjects
 			)
-			EOSTransactionUtils.serialize(
-				EOSChain.getCurrent(),
-				header,
-				listOf(action),
-				listOf(authorization),
-				transactionInfoCode
-			).let {
-				hold(it)
-			}
+			if (!header.isNull() && error.isNone()) {
+				val serialization = EOSTransactionUtils.serialize(
+					EOSChain.getCurrent(),
+					header!!,
+					listOf(action),
+					listOf(authorization),
+					transactionInfoCode
+				)
+				hold(serialization, error)
+			} else hold(null, error)
 		}
 	}
 }

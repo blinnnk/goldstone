@@ -32,9 +32,7 @@ object EOSUrl {
 	val getTableRows: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
 	}
-	val getTransactionHistory: () -> String = {
-		"${currentHistoryURL()}/v1/history/${EOSMethod.GetTransactionHistory.method}"
-	}
+
 	val getTransaction: () -> String = {
 		"${currentHistoryURL()}/v1/history/${EOSMethod.GetTransaction.method}"
 	}
@@ -43,5 +41,13 @@ object EOSUrl {
 	}
 	val pushTransaction: () -> String = {
 		"${currentURL()}/v1/chain/${EOSMethod.PushTransaction.method}"
+	}
+
+	val getPairsFromNewDex: () -> String = {
+		"https://api.newdex.io/v1/common/symbols"
+	}
+
+	val getTokenPriceInEOS: (pair: String) -> String = {
+		"https://api.newdex.io/v1/ticker/price?symbol=$it"
 	}
 }

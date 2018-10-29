@@ -12,8 +12,8 @@ import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.utils.toSatoshi
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
@@ -29,7 +29,7 @@ fun GasSelectionPresenter.prepareToTransferLTC(callback: (GoldStoneError) -> Uni
 		LitecoinApi.getBalance(fromAddress, true) { balance, error ->
 			if (!balance.isNull() && error.isNone()) {
 				val isEnough =
-					balance.orElse(0) > value + gasUsedGasFee!!.toSatoshi()
+					balance?.value.orElse(0) > value + gasUsedGasFee!!.toSatoshi()
 				when {
 					isEnough -> showConfirmAttentionView(callback)
 					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
@@ -69,36 +69,38 @@ fun GasSelectionPresenter.transferLTC(
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareBTCSeriesModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
-			LitecoinApi.getUnspentListByAddress(fromAddress) { unspents ->
-				BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
-					value,
-					fee,
-					toAddress,
-					changeAddress,
-					unspents,
-					privateKey!!,
-					SharedValue.isTestEnvironment()
-				).let { signedModel ->
-					BTCSeriesJsonRPC.sendRawTransaction(
-						SharedChain.getLTCCurrentName(),
-						signedModel.signedMessage,
-						callback
-					) { hash ->
-						hash?.let {
-							// 插入 `Pending` 数据到本地数据库
-							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, it)
-							// 跳转到章党详情界面
-							GoldStoneAPI.context.runOnUiThread {
-								goToTransactionDetailFragment(
-									rootFragment,
-									fragment,
-									prepareReceiptModelFromBTCSeries(this@model, fee, it)
-								)
-								callback(GoldStoneError.None)
+			LitecoinApi.getUnspentListByAddress(fromAddress) { unspents, unspentError ->
+				if (!unspents.isNull() && error.isNone()) {
+					BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
+						value,
+						fee,
+						toAddress,
+						changeAddress,
+						unspents!!,
+						privateKey!!,
+						SharedValue.isTestEnvironment()
+					).let { signedModel ->
+						BTCSeriesJsonRPC.sendRawTransaction(
+							SharedChain.getLTCCurrentName(),
+							signedModel.signedMessage,
+							callback
+						) { hash ->
+							hash?.let {
+								// 插入 `Pending` 数据到本地数据库
+								insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, it)
+								// 跳转到章党详情界面
+								GoldStoneAPI.context.runOnUiThread {
+									goToTransactionDetailFragment(
+										rootFragment,
+										fragment,
+										prepareReceiptModelFromBTCSeries(this@model, fee, it)
+									)
+									callback(GoldStoneError.None)
+								}
 							}
 						}
 					}
-				}
+				} else callback(unspentError)
 			}
 		} else callback(error)
 	}

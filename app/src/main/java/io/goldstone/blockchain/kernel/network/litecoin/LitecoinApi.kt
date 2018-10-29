@@ -1,18 +1,17 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.getTargetObject
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
+import org.jetbrains.anko.runOnUiThread
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -24,13 +23,20 @@ object LitecoinApi {
 	fun getBalance(
 		address: String,
 		isMainThread: Boolean,
-		hold: (balance: Long?, error: RequestError) -> Unit
+		hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
-		BTCSeriesApiUtils.getBalance(
+		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getBalance(address),
-			isMainThread,
-			hold
-		)
+			"",
+			true,
+			{ hold(null, it) },
+			null,
+			true
+		) {
+			val result = firstOrNull()?.toLongOrNull().orElse(0L)
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(Amount(result), RequestError.None) }
+			else hold(Amount(result), RequestError.None)
+		}
 	}
 
 	fun getBalanceFromChainSo(
@@ -51,15 +57,18 @@ object LitecoinApi {
 
 	fun getUnspentListByAddress(
 		address: String,
-		@WorkerThread hold: (List<UnspentModel>) -> Unit
+		@WorkerThread hold: (unspentList: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
-		BTCSeriesApiUtils.getUnspentListByAddress(
+		RequisitionUtil.requestData<UnspentModel>(
 			LitecoinUrl.getUnspentInfo(address),
-			{
-				LogUtil.error("getUnspentListByAddress Litecoin", it)
-			},
-			hold
-		)
+			"",
+			false,
+			{ hold(null, it) },
+			null,
+			true
+		) {
+			hold(this, RequestError.None)
+		}
 	}
 
 	fun getTransactions(
@@ -69,11 +78,21 @@ object LitecoinApi {
 		errorCallback: (Throwable) -> Unit,
 		hold: (List<JSONObject>) -> Unit
 	) {
-		BTCSeriesApiUtils.getTransactions(
+		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactions(address, from, to),
-			errorCallback,
-			hold
-		)
+			"items",
+			true,
+			{ errorCallback(it) },
+			null,
+			true
+		) {
+			val jsonArray = JSONArray(this[0])
+			var data = listOf<JSONObject>()
+			(0 until jsonArray.length()).forEach {
+				data += JSONObject(jsonArray[it].toString())
+			}
+			hold(data)
+		}
 	}
 
 	fun getTransactionCount(
@@ -81,11 +100,16 @@ object LitecoinApi {
 		errorCallback: (RequestError) -> Unit,
 		hold: (count: Int) -> Unit
 	) {
-		BTCSeriesApiUtils.getTransactionCount(
+		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactions(address, 999999999, 0),
+			"totalItems",
+			true,
 			errorCallback,
-			hold
-		)
+			null,
+			true
+		) {
+			hold(this.firstOrNull()?.toIntOrNull().orZero())
+		}
 	}
 
 	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
@@ -96,14 +120,19 @@ object LitecoinApi {
 		errorCallback: (Throwable) -> Unit,
 		hold: (BTCSeriesTransactionTable?) -> Unit
 	) {
-		BTCSeriesApiUtils.getTransactionByHash(
+		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactionByHash(targetNet, hash),
-			errorCallback
+			"",
+			true,
+			{ errorCallback(it) },
+			null,
+			true
 		) {
+			val result = if (isNotEmpty()) JSONObject(this[0]) else null
 			hold(
 				if (isNull()) null
 				else BTCSeriesTransactionTable(
-					it!!,
+					result!!,
 					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
 					0,
 					address,

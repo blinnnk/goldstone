@@ -15,9 +15,9 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -113,7 +113,10 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
 			this.isReceive = info.isReceived
-			this.memo = getMemoFromInputCode(receipt.input, TokenContract(receipt.contractAddress).isERC20Token())
+			this.memo = getMemoFromInputCode(
+				receipt.input,
+				TokenContract(receipt.contractAddress, receipt.symbol, null).isERC20Token()
+			)
 			this.fromAddress = info.fromAddress
 		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
@@ -273,7 +276,7 @@ private fun TransactionDetailPresenter.updateHeaderFromNotification(info: Notifi
 private fun TransactionTable.toAsyncData(): ArrayList<TransactionDetailModel> {
 	val receiptData = arrayListOf(
 		(gas.toBigDecimal() * gasPrice.toBigDecimal()).toDouble().toUnitValue(
-			if (TokenContract(contractAddress).isETC()) CoinSymbol.etc
+			if (TokenContract(contractAddress, symbol, null).isETC()) CoinSymbol.etc
 			else CoinSymbol.eth
 		),
 		if (memo.isEmpty()) TransactionText.noMemo else memo,

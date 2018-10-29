@@ -68,7 +68,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	override val presenter = PaymentPreparePresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		changeAddress = CoinSymbol(rootFragment?.token?.symbol).getAddress()
+		changeAddress = rootFragment?.token?.contract.getAddress()
 		scrollView {
 			isVerticalScrollBarEnabled = false
 			lparams(matchParent, matchParent)

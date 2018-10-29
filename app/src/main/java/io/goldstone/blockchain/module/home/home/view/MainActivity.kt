@@ -5,6 +5,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
+import android.view.WindowManager
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.findChildFragmentByTag
@@ -35,6 +36,8 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		// 增加防止截屏事件拦截
+		window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 		val application = application as GoldStoneApp
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
