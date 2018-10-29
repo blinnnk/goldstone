@@ -10,7 +10,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import java.math.BigInteger
@@ -52,7 +52,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	GoldStoneEthCall.getUsableNonce(
 		errorCallback,
 		chainType,
-		CoinSymbol(getToken()?.symbol).getAddress()
+		getToken()?.contract.getAddress()
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, errorCallback, hold)
 	}
@@ -88,14 +88,14 @@ private fun PaymentPreparePresenter.generateTransaction(
 	}
 	GoldStoneEthCall.getTransactionExecutedValue(
 		to,
-		CoinSymbol(getToken()?.symbol).getAddress(),
+		getToken()?.contract.getAddress(),
 		data,
 		errorCallback,
-		CoinSymbol(getToken()?.symbol).getCurrentChainName()
+		getToken()?.contract.getCurrentChainName()
 	) { limit ->
 		hold(
 			PaymentPrepareModel(
-				CoinSymbol(getToken()?.symbol).getAddress(),
+				getToken()?.contract.getAddress(),
 				nonce,
 				limit,
 				to,

@@ -453,7 +453,7 @@ object TokenDetailText {
 		HoneyLanguage.English.code -> "EOS Amount"
 		HoneyLanguage.Chinese.code -> "EOS 数量"
 		HoneyLanguage.Japanese.code -> "EOSの数"
-		HoneyLanguage.Korean.code -> "EOS의 수"
+		HoneyLanguage.Korean.code -> "EOS 의 수"
 		HoneyLanguage.Russian.code -> "Количество EOS"
 		HoneyLanguage.TraditionalChinese.code -> "EOS 數量"
 		else -> ""
@@ -480,12 +480,12 @@ object TokenDetailText {
 	}
 	@JvmField
 	val tradeRamByBytesPlaceholder = when (currentLanguage) {
-		HoneyLanguage.English.code -> "How much bytes you want"
-		HoneyLanguage.Chinese.code -> "想要卖出的RAM数量(Byte)"
-		HoneyLanguage.Japanese.code -> "購入したい番号（バイト）"
-		HoneyLanguage.Korean.code -> "구매하려는 번호 (바이트)"
-		HoneyLanguage.Russian.code -> "Номер, который вы хотите купить (байт)"
-		HoneyLanguage.TraditionalChinese.code -> "想要買的數量(Byte)"
+		HoneyLanguage.English.code -> "Sell bytes"
+		HoneyLanguage.Chinese.code -> "卖出的RAM数量"
+		HoneyLanguage.Japanese.code -> "購入したい番号"
+		HoneyLanguage.Korean.code -> "구매하려는 번호"
+		HoneyLanguage.Russian.code -> "Номер, который вы хотите купить"
+		HoneyLanguage.TraditionalChinese.code -> "想要買的數量"
 		else -> ""
 	}
 
@@ -698,12 +698,12 @@ object EOSAccountText {
 	}
 	@JvmField
 	val checkNameResultAvailable = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This account name is available"
-		HoneyLanguage.Chinese.code -> "该用户名可用"
-		HoneyLanguage.Japanese.code -> "このユーザー名は利用可能です"
-		HoneyLanguage.Korean.code -> "이 사용자 이름을 사용할 수 있습니다."
-		HoneyLanguage.Russian.code -> "Это имя пользователя доступно"
-		HoneyLanguage.TraditionalChinese.code -> "該用戶名可用"
+		HoneyLanguage.English.code -> "Congratulations, this name has not yet been registered by others. If you have a friend using GoldStone Wallet, he/she could go to \"Settings > Register EOS Accounts\" to register with the following information."
+		HoneyLanguage.Chinese.code -> "恭喜，此名称尚未被其他人注册。 如果您有朋友使用GoldStone钱包，他/她可以转到设置界面的注册EOS帐户模块，并注册以下信息。"
+		HoneyLanguage.Japanese.code -> "おめでとう、この名前はまだ誰かに登録されていません。 あなたは、Goldstone Walletを使用している友人がいる場合、[設定 > EOSアカウントの登録]にアクセスして、次の情報を登録できます。"
+		HoneyLanguage.Korean.code -> "축하합니다.이 이름은 아직 다른 사람이 등록하지 않았습니다. 골드 스톤 월렛을 사용하는 친구가있는 경우 설정 화면의 EOS 계정 등록 모듈로 이동하여 다음 정보를 등록 할 수 있습니다."
+		HoneyLanguage.Russian.code -> "Поздравляю, это имя еще не зарегистрировано кем-то другим. Если у вас есть друг с помощью GoldStone Wallet, он может перейти в модуль учетных записей EOS на экране настроек и зарегистрировать следующую информацию."
+		HoneyLanguage.TraditionalChinese.code -> "恭喜，此名稱尚未被其他人註冊。如果您有朋友使用GoldStone錢包，他/她可以轉到設置界面的註冊EOS帳戶模塊，並註冊以下信息。"
 		else -> ""
 	}
 	@JvmField
@@ -779,14 +779,16 @@ object EOSAccountText {
 		else -> ""
 	}
 	@JvmField
-	val activeByContractMethod = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Transfer at least 2.0 EOS to the contract account (goldstonenew) from your exchange/ wallet, with memo."
-		HoneyLanguage.Chinese.code -> "通过交易所提币并备注/从钱包转账并备注的方式向合约账号(goldstonenew)转入至少2.0 EOS"
-		HoneyLanguage.Japanese.code -> "取引所のコインとノート/送金とウォレットからのメモを使用して、少なくとも2.0 EOSを契約口座に転送する（goldstonenew）"
-		HoneyLanguage.Korean.code -> "거래소의 동전과 노트 / 송금 및 지갑에서 노트를 통해 계약 계정 (goldstonenew)으로 최소한 2.0 EOS를 이체하십시오."
-		HoneyLanguage.Russian.code -> "Передайте по крайней мере 2,0 EOS на контрактную учетную запись (goldstonenew) с помощью монеты обмена и банкноты / банкноты и записку из кошелька"
-		HoneyLanguage.TraditionalChinese.code -> "通過交易所提幣並備註/從錢包轉賬並備註的方式向合約賬號(goldstonenew)轉入至少2.0 EOS"
-		else -> ""
+	val activeByContractMethod: (contract: String) -> String = { contract ->
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "Transfer at least 2.0 EOS to the contract account ($contract) from your exchange/ wallet, with memo."
+			HoneyLanguage.Chinese.code -> "通过交易所提币并备注/从钱包转账并备注的方式向合约账号($contract)转入至少2.0 EOS"
+			HoneyLanguage.Japanese.code -> "取引所のコインとノート/送金とウォレットからのメモを使用して、少なくとも2.0 EOSを契約口座に転送する（$contract）"
+			HoneyLanguage.Korean.code -> "거래소의 동전과 노트 / 송금 및 지갑에서 노트를 통해 계약 계정 ($contract)으로 최소한 2.0 EOS를 이체하십시오."
+			HoneyLanguage.Russian.code -> "Передайте по крайней мере 2,0 EOS на контрактную учетную запись ($contract) с помощью монеты обмена и банкноты / банкноты и записку из кошелька"
+			HoneyLanguage.TraditionalChinese.code -> "通過交易所提幣並備註/從錢包轉賬並備註的方式向合約賬號($contract)轉入至少2.0 EOS"
+			else -> ""
+		}
 	}
 	@JvmField
 	val smartContract = when (currentLanguage) {
@@ -870,4 +872,59 @@ object EOSAccountText {
 		HoneyLanguage.TraditionalChinese.code -> "自定義資源"
 		else -> ""
 	}
+
+	//	EOS账户权限
+	@JvmField
+	val multipleAccountHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Find multiple EOS accounts with this EOS public key, please select an account as your default account."
+		HoneyLanguage.Chinese.code -> "在此EOS公钥下找到多个EOS帐户，请选择一个帐户作为您的默认帐户。"
+		HoneyLanguage.Japanese.code -> "このEOS公開鍵で複数のEOSアカウントを検索するには、デフォルトアカウントとしてアカウントを選択してください。"
+		HoneyLanguage.Korean.code -> "이 EOS 공개 키로 여러 개의 EOS 계정을 찾으려면 계정을 기본 계정으로 선택하십시오."
+		HoneyLanguage.Russian.code -> "Чтобы найти несколько учетных записей EOS под этим открытым ключом EOS, выберите учетную запись в качестве учетной записи по умолчанию."
+		HoneyLanguage.TraditionalChinese.code -> "在此EOS公鑰下找到多個EOS帳戶，請選擇一個帳戶作為您的默認帳戶。"
+		else -> ""
+	}
+
+	@JvmField
+	val loadingAccountInfo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Loading account information from chain."
+		HoneyLanguage.Chinese.code -> "正在从链上加载账户信息"
+		HoneyLanguage.Japanese.code -> "チェーンからのアカウント情報の読み込み"
+		HoneyLanguage.Korean.code -> "체인에서 계정 정보로드"
+		HoneyLanguage.Russian.code -> "Загрузка информации о счете из сети"
+		HoneyLanguage.TraditionalChinese.code -> "正在從鏈上加載賬戶信息"
+		else -> ""
+	}
+
+	@JvmField
+	val permissionActive = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Active"
+		HoneyLanguage.Chinese.code -> "Active(管理者)"
+		HoneyLanguage.Japanese.code -> "Active(管理者)"
+		HoneyLanguage.Korean.code -> "Active(활성)"
+		HoneyLanguage.Russian.code -> "Active(Активный)"
+		HoneyLanguage.TraditionalChinese.code -> "Active(管理者)"
+		else -> ""
+	}
+	@JvmField
+	val permissionOwner = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Owner"
+		HoneyLanguage.Chinese.code -> "Owner(所有者)"
+		HoneyLanguage.Japanese.code -> "所有者（所有者）"
+		HoneyLanguage.Korean.code -> "Owner (소유자)"
+		HoneyLanguage.Russian.code -> "Owner(Владелец)"
+		HoneyLanguage.TraditionalChinese.code -> "Owner(所有者)"
+		else -> ""
+	}
+	@JvmField
+	val authorization = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Permission"
+		HoneyLanguage.Chinese.code -> "权限"
+		HoneyLanguage.Japanese.code -> "許可"
+		HoneyLanguage.Korean.code -> "허가"
+		HoneyLanguage.Russian.code -> "компетентность"
+		HoneyLanguage.TraditionalChinese.code -> "權限"
+		else -> ""
+	}
+
 }

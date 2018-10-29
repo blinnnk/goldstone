@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.common.error
 
+import io.goldstone.blockchain.common.Language.ErrorText
+
 
 /**
  * @author KaySaith
@@ -9,17 +11,19 @@ package io.goldstone.blockchain.common.error
 class TransferError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val BalanceIsNotEnough = TransferError("this account doesn't have enough balance")
+		val BalanceIsNotEnough = TransferError(ErrorText.balanceIsNotEnough)
 		@JvmStatic
-		val SellRAMTooLess = TransferError("the value you decide sell about RAM much greater than 1 byte")
+		val SellRAMTooLess = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
-		val IncorrectDecimal = TransferError("this input count's decimal is wrong with its own decimal value")
+		val IncorrectDecimal = TransferError(ErrorText.incorrectDecimal)
 		@JvmStatic
-		val GetWrongFeeFromChain = TransferError("there is error when get fee from chain")
+		val GetWrongFeeFromChain = TransferError(ErrorText.getWrongFeeFromChain)
 		@JvmStatic
-		val TradingInputIsEmpty = TransferError("please enter the count that you will trading")
+		val GetChainInfoError = TransferError(ErrorText.getChainInfoError)
 		@JvmStatic
-		val wrongRAMInputValue = TransferError("you must enter only Integer because of the unit of selling ram is byte")
+		val TradingInputIsEmpty = TransferError(ErrorText.tradingInputIsEmpty)
+		@JvmStatic
+		val wrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
 	}
 }
 
@@ -27,43 +31,43 @@ class StakeBandWidthError(override val message: String) : GoldStoneError(message
 	companion object {
 		/** EOS Delegate/Refund CPU Errors */
 		@JvmStatic
-		val TransferToSelf = StakeBandWidthError("you can't transfer to you self when stake resource and from account name is same as to account name")
+		val TransferToSelf = StakeBandWidthError(ErrorText.transferToSelf)
 	}
 }
 
 open class AccountError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val DecryptKeyStoreError = AccountError("decrypt your keystore by password found error")
+		val DecryptKeyStoreError = AccountError(ErrorText.decryptKeyStoreError)
 		@JvmStatic
-		val InvalidAccountName = AccountError("invalid eos account name")
+		val InvalidAccountName = AccountError(ErrorText.invalidAccountName)
 		@JvmStatic
-		val UnavailableAccountName = AccountError("Unavailable Account Name")
+		val UnavailableAccountName = AccountError(ErrorText.eosNameResultUnavailable)
 		@JvmStatic
-		val EmptyName = AccountError("please enter the account name which you decide to register")
+		val EmptyName = AccountError(ErrorText.emptyName)
 		@JvmStatic
-		val EmptyRepeatPassword = AccountError("Repeat Password Is Empty Now")
+		val EmptyRepeatPassword = AccountError(ErrorText.emptyRepeatPassword)
 		@JvmStatic
-		val DifferentRepeatPassword = AccountError("The password entered twice is inconsistent")
+		val DifferentRepeatPassword = AccountError(ErrorText.differentRepeatPassword)
 		@JvmStatic
-		val AgreeTerms = AccountError("Please read and agree to the terms")
+		val AgreeTerms = AccountError(ErrorText.agreeTerms)
 		@JvmStatic
-		val InvalidMnemonic = AccountError("Incorrect mnemonic format")
+		val InvalidMnemonic = AccountError(ErrorText.invalidMnemonic)
 		@JvmStatic
-		val InvalidBip44Path = AccountError("Incorrect Bip44 Path")
+		val InvalidBip44Path = AccountError(ErrorText.invalidBip44Path)
 		@JvmStatic
-		val EmptyPublicKey = AccountError("please enter the public key which you decide to bind the account name")
+		val EmptyPublicKey = AccountError(ErrorText.emptyPublicKey)
 		@JvmStatic
-		val WrongPassword = AccountError("Wrong Password")
+		val WrongPassword = AccountError(ErrorText.wrongPassword)
 		@JvmStatic
-		val InvalidAddress = AccountError("Address Formatted is Invalid")
+		val InvalidAddress = AccountError(ErrorText.invalidAddress)
 		@JvmStatic
-		val ExistAddress = AccountError("This Address Has Existed In Your Wallet")
+		val ExistAddress = AccountError(ErrorText.existAddress)
 		@JvmStatic
-		val InvalidPrivateKey = AccountError("Invalid Private Key")
+		val InvalidPrivateKey = AccountError(ErrorText.invalidPrivateKey)
 		@JvmStatic
 		val PasswordFormatted: (reason: String) -> AccountError = {
-			AccountError("Password Formatted is Wrong $it")
+			AccountError("${ErrorText.passwordFormatted} $it")
 		}
 		@JvmStatic
 		val None = AccountError(GoldStoneError.None.message)
@@ -83,22 +87,22 @@ open class RequestError(override val message: String) : GoldStoneError(message) 
 	companion object {
 		@JvmStatic
 		val PostFailed: (errorDetail: String) -> RequestError = { error ->
-			RequestError("post request failed \n[ERROR: $error]")
+			RequestError("${ErrorText.postFailed} \n[${ErrorText.error}: $error]")
 		}
 		@JvmStatic
 		val ResolveDataError: (errorDetail: Throwable) -> RequestError = { error ->
-			RequestError("resolve request result data failed \n[ERROR: ${error.message}]")
+			RequestError("${ErrorText.resolveDataError} \n[${ErrorText.error}: ${error.message}]")
 		}
 		@JvmStatic
 		val NullResponse: (description: String) -> RequestError = { description ->
-			RequestError("null response from server or chain \n[ERROR: $description]")
+			RequestError("${ErrorText.nullResponse} \n[${ErrorText.error}: $description]")
 		}
 		@JvmStatic
 		val None = RequestError(GoldStoneError.None.message)
 
 		@JvmStatic
 		val RPCResult: (description: String) -> RequestError = { description ->
-			RequestError("Error Description\n\n[ERROR: $description]")
+			RequestError("${ErrorText.error}\n\n[${ErrorText.error}: $description]")
 		}
 	}
 }

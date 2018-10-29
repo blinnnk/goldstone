@@ -1,15 +1,21 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.toArrayList
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchAdapter
@@ -38,7 +44,7 @@ class QuotationSearchPresenter(
 					if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
 				}
 			) {
-				hasNetWork isTrue { searchTokenBy(it) }
+				if (hasNetWork) fragment.searchTokenBy(it)
 			}
 		}
 	}
@@ -64,34 +70,25 @@ class QuotationSearchPresenter(
 		}
 	}
 
-	private fun searchTokenBy(symbol: String) {
-		fragment.showLoadingView(LoadingText.searchingQuotation)
+	private fun QuotationSearchFragment.searchTokenBy(symbol: String) {
+		showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
-		GoldStoneAPI.getMarketSearchList(
-			symbol,
-			{
-				// Show error information to user
-				fragment.context?.alert(it.toString().showAfterColonContent())
-			}
-		) { searchList ->
-			if (searchList.isEmpty()) {
-				fragment.context?.runOnUiThread { fragment.removeLoadingView() }
-				return@getMarketSearchList
-			}
-			// 获取本地自己选中的列表
-			QuotationSelectionTable.getMySelections { selectedList ->
+		GoldStoneAPI.getMarketSearchList(symbol) { searchList, error ->
+			if (!searchList.isNull() && error.isNone()) QuotationSelectionTable.getMySelections { selectedList ->
 				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
-				selectedList.isEmpty() isTrue {
-					fragment.completeQuotationTable(searchList)
-				} otherwise {
+				if (selectedList.isEmpty()) {
+					completeQuotationTable(searchList!!)
+				} else {
 					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
-					searchList.forEachOrEnd { item, isEnd ->
-						item.isSelecting = selectedList.any { it.pair == item.pair }
-						if (isEnd) {
-							fragment.completeQuotationTable(searchList)
-						}
+					searchList!!.map { data ->
+						data.apply { isSelecting = selectedList.any { it.pair == data.pair } }
+					}.apply {
+						completeQuotationTable(this)
 					}
 				}
+			} else {
+				context.alert(error.message)
+				removeLoadingView()
 			}
 		}
 	}
@@ -111,11 +108,10 @@ class QuotationSearchPresenter(
 			@WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
 		) {
 			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(
-				parameter,
-				{ hold(null, it) }
-			) {
-				hold(it.first().pointList.toString().orEmpty(), RequestError.None)
+			GoldStoneAPI.getCurrencyLineChartData(parameter) { lineData, error ->
+				if (!lineData.isNull() && error.isNone()) {
+					hold(lineData!!.firstOrNull()?.pointList?.toString().orEmpty(), RequestError.None)
+				} else hold(null, error)
 			}
 		}
 	}

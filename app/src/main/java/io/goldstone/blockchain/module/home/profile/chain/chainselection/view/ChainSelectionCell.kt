@@ -14,7 +14,6 @@ import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale

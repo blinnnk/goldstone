@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.kernel.network
+package io.goldstone.blockchain.kernel.network.common
 
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.utils.toAddressCode
+import io.goldstone.blockchain.kernel.network.ChainURL
 
 /**
  * @date 31/03/2018 8:09 PM
@@ -37,6 +38,35 @@ object APIPath {
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getEOSMemoryTransactionHistory: (header: String) -> String = { "$it/eosram/lastestTxList?mode=" }
 	val getPersonalMemoryTransactionRecord: (header: String) -> String = { "$it/eosram/txListByAccount?account=" }
+	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
+	val getEOSTokenList: (
+		header: String,
+		chainID: String,
+		account: String
+	) -> String = { header, chainID, account ->
+		"$header/eos/tokenList?chainid=$chainID&account=$account"
+	}
+	val getEOSTokenCountInfo: (
+		header: String,
+		chainID: String,
+		account: String,
+		code: String,
+		symbol: String
+	) -> String = { header, chainID, account, codeName, symbol ->
+		"$header/eos/txCountInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
+	}
+	val getEOSTransactions: (
+		header: String,
+		chainID: String,
+		account: String,
+		pageSize: Int,
+		startID: Long,
+		endID: Long,
+		codeName: String,
+		symbol: String
+	) -> String = { header, chainID, account, pageSize, startID, endID, codeName, symbol ->
+		"$header/eos/actionList?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
+	}
 	val defaultTokenList: (
 		header: String,
 		md5: String
@@ -117,6 +147,8 @@ object EtherScanApi {
 			else -> ropstenLogHeader
 		}
 	}
+
+	// `Html` 页面用的 `URL` 网址
 	private val transactionDetailHeader: (currentChain: ChainID) -> String = {
 		when {
 			it.isETHMain() -> "https://etherscan.io/tx/"

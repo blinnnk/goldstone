@@ -14,7 +14,6 @@ import com.blinnnk.util.getParentFragment
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
-import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
@@ -23,7 +22,7 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -91,7 +90,7 @@ class MarketTokenDetailPresenter(
 					val candleData = CandleChartModel.convertData(data!!)
 					val databaseTime = candleData.maxBy { it.time }?.time?.toLongOrNull().orElse(0)
 					// 校验数据库的数据时间是否有效，是否需要更新
-					checkDatabaseTimeIsValidBy(period, databaseTime) {
+					if (NetworkUtil.hasNetwork(fragment.context)) checkDatabaseTimeIsValidBy(period, databaseTime) {
 						isTrue {
 							// 合规就更新本地数据库的数据
 							chartView.updateCandleChartUI(candleData, dateType)
@@ -99,6 +98,9 @@ class MarketTokenDetailPresenter(
 							// 不合规就更新网络数据
 							chartView.updateCandleChartDataBy(pair, period, dateType)
 						}
+					} else {
+						// 没有网络就越过检查数据过期的方法直接显示数据库数据
+						chartView.updateCandleChartUI(candleData, dateType)
 					}
 				}
 			}
@@ -215,17 +217,14 @@ class MarketTokenDetailPresenter(
 		GoldStoneAPI.getQuotationCurrencyCandleChart(
 			pair,
 			period,
-			size,
-			{
-				// Show the error exception to user
-				fragment.context.alert(it.toString().showAfterColonContent())
+			size
+		) { candleData, error ->
+			if (!candleData.isNull() && error.isNone()) {
+				candleData!!.updateLocalCandleChartData(period, pair)
+				updateCandleChartUI(candleData, dateType)
+			} else {
 				updateCandleChartUI(arrayListOf(), dateType)
 			}
-		) {
-			// 把数据更新到数据库
-			it.updateLocalCandleChartData(period, pair)
-			// 更新 `UI` 界面
-			updateCandleChartUI(it, dateType)
 		}
 	}
 
@@ -261,7 +260,7 @@ class MarketTokenDetailPresenter(
 					try {
 						resetData(
 							dateType,
-							data.asSequence().sortedByDescending { it.time.toLong() }.mapIndexed { index, entry ->
+							data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
 								CandleEntry(
 									index.toFloat(),
 									entry.high.toFloat(),
@@ -299,21 +298,16 @@ class MarketTokenDetailPresenter(
 
 	private fun getCurrencyInfoFromServer(
 		info: QuotationModel,
-		hold: (PriceHistoryModel?) -> Unit
+		@UiThread hold: (PriceHistoryModel?) -> Unit
 	) {
-		GoldStoneAPI.getQuotationCurrencyInfo(
-			info.pair,
-			{
-				// Show error information to user
-				hold(null)
-				fragment.context.alert(DialogText.networkDescription)
-				LogUtil.error("getCurrencyInfoFromServer", it)
-			}
-		) { serverData ->
-			val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
-			fragment.context?.runOnUiThread {
-				hold(priceData)
-			}
+		GoldStoneAPI.getQuotationCurrencyInfo(info.pair
+		) { serverData, error ->
+			if (!serverData.isNull() && error.isNone()) {
+				val priceData = PriceHistoryModel(serverData!!, info.quoteSymbol)
+				fragment.context?.runOnUiThread {
+					hold(priceData)
+				}
+			} else hold(null)
 		}
 	}
 
@@ -339,18 +333,13 @@ class MarketTokenDetailPresenter(
 		info: QuotationModel,
 		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
-		val chainID = TokenContract(info.contract).getMainnetChainID()
+		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(
 			info.symbol,
-			chainID,
-			{
-				LogUtil.error("loadCoinInformationFromServer", it)
-			}
-		) { coinInfo ->
-			DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
-				DefaultTokenTable.getTokenByContractFromAllChains(info.contract) {
-					it?.let(hold)
-				}
+			chainID
+		) { coinInfo, error ->
+			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo!!) {
+				DefaultTokenTable.getTokenByContractFromAllChains(info.contract) { it?.let(hold) }
 			}
 		}
 	}

@@ -11,17 +11,18 @@ import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
@@ -56,7 +57,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	changeAddress: String,
 	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
-	val myAddress = CoinSymbol.LTC.getAddress()
+	val myAddress = AddressUtils.getCurrentLTCAddress()
 	val chainName =
 		if (SharedValue.isTestEnvironment()) ChainText.ltcTest else ChainText.ltcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
@@ -71,8 +72,12 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		LitecoinApi.getUnspentListByAddress(myAddress) { unspents ->
-			if (unspents.isEmpty()) {
+		LitecoinApi.getUnspentListByAddress(myAddress) { unspents, error ->
+			if (unspents.isNull() && error.hasError()) {
+				hold(error, null)
+				return@getUnspentListByAddress
+			}
+			if (unspents!!.isEmpty()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				GoldStoneAPI.context.runOnUiThread {
 					hold(TransferError.BalanceIsNotEnough, null)
@@ -95,7 +100,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 			val unitFee = feePerByte.orZero().toSatoshi() / 1000
 			PaymentBTCSeriesModel(
 				fragment.address.orEmpty(),
-				CoinSymbol(getToken()?.symbol).getAddress(),
+				getToken()?.contract.getAddress(),
 				changeAddress,
 				count.toSatoshi(),
 				unitFee,

@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.BorderSize
@@ -71,7 +72,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 
 				SessionTitleView(context).apply { setTitle(EOSAccountText.transferTo) }.into(this)
 				GraySquareCellWithButtons(context).apply {
-					val smartContractName = "goldstonenew"
+					val smartContractName = if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos"
 					setTitle(EOSAccountText.receiver)
 					setSubtitle(smartContractName)
 					showOnlyCopyButton {

@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -173,8 +172,8 @@ class GasSelectionPresenter(
 
 	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
+			TransactionText.confirmTransactionTitle.toUpperCase(),
 			TransactionText.confirmTransaction,
-			CommonText.enterPassword.toUpperCase(),
 			true
 		) {
 			val password = it?.text.toString()
@@ -261,12 +260,8 @@ class GasSelectionPresenter(
 		}
 	}
 
-	private fun getGasCurrencyPrice(
-		value: String,
-		hold: (String) -> Unit
-	) {
-		val coinContract =
-			when {
+	private fun getGasCurrencyPrice(value: String, hold: (String) -> Unit) {
+		val coinContract = when {
 				getToken()?.contract.isETC() -> TokenContract.ETC
 				getToken()?.contract.isBTC() -> TokenContract.BTC
 				getToken()?.contract.isLTC() -> TokenContract.LTC

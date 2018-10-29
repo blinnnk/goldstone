@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -26,12 +25,13 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSBuyRamTransaction
@@ -111,7 +111,7 @@ open class BaseTradingPresenter(
 			fromAccount,
 			toAccount,
 			tradingCount,
-			CoinSymbol.EOS,
+			TokenContract.EOS,
 			stakeType.isSellRam()
 		) { privateKey, error ->
 			/** `Buy Ram` 是可以按照 `EOS Count` 来进行购买的, 但是 `Sell` 只能按照 `Byte` 进行销售 */
@@ -133,15 +133,17 @@ open class BaseTradingPresenter(
 					toAccount.accountName,
 					tradingCount.toEOSUnit(),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!, callback) {
-					completeEvent(it)
+				).send(privateKey!!) { response, responseError ->
+					if (!response.isNull() && error.isNone()) completeEvent(response!!)
+					else callback(responseError)
 				} else EOSSellRamTransaction(
 					chainID,
 					fromAccount.accountName,
 					BigInteger.valueOf(tradingCount.toLong()),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!, callback) {
-					completeEvent(it)
+				).send(privateKey!!) { response, ramError ->
+					if (!response.isNull() && ramError.isNone()) completeEvent(response!!)
+					else callback(ramError)
 				}
 			} else callback(error)
 		}
@@ -160,7 +162,7 @@ open class BaseTradingPresenter(
 			fromAccount,
 			toAccount,
 			transferCount,
-			CoinSymbol.EOS
+			TokenContract.EOS
 		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
@@ -172,14 +174,15 @@ open class BaseTradingPresenter(
 					stakeType,
 					fragment.isSelectedTransfer(stakeType),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!, callback) {
+				).send(privateKey!!) { response, responseError ->
 					// 显示成功的 `Dialog`
-					fragment.getParentContainer()?.apply { it.showDialog(this) }
+					if (!response.isNull() && responseError.isNone())
+						fragment.getParentContainer()?.apply { response!!.showDialog(this) }
 					// 清空输入框里面的值
 					fragment.clearInputValue()
 					// 更新数据库数据并且更新界面的数据
 					fragment.presenter.updateLocalDataAndUI()
-					callback(error)
+					callback(responseError)
 				}
 			} else callback(error)
 		}
@@ -209,7 +212,7 @@ open class BaseTradingPresenter(
 			fromAccount: EOSAccount,
 			toAccount: EOSAccount,
 			tradingCount: Double,
-			symbol: CoinSymbol,
+			contract: TokenContract,
 			isSellRam: Boolean = false,
 			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
@@ -230,8 +233,8 @@ open class BaseTradingPresenter(
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
-						symbol,
-						EOSCodeName.EOSIOToken.value
+						CoinSymbol(contract.symbol),
+						contract.contract.orEmpty()
 					) { balance, balanceError ->
 						if (!balance.isNull() && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够

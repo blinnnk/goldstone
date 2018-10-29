@@ -19,11 +19,12 @@ import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
+import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
@@ -135,10 +136,12 @@ data class WalletTable(
 	}
 
 	fun getCurrentTestnetBip44Addresses(): List<Bip44Address> {
+		// 这里 `BTCTestSeries` 的地址返回的是实际的链 `ID` 因为这个数据是用来做展示
+		// 根据 `ChainID` 决定相同的地址展示什么 `Symbol` 前缀
 		return listOf(
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.AllTest.id),
-			Bip44Address(currentBTCSeriesTestAddress, ChainType.LTC.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.BTC.id),
 			Bip44Address(currentBTCSeriesTestAddress, ChainType.BCH.id),
+			Bip44Address(currentBTCSeriesTestAddress, ChainType.LTC.id),
 			Bip44Address(currentETCAddress, ChainType.ETC.id),
 			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
 			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
@@ -199,8 +202,9 @@ data class WalletTable(
 			currentETHSeriesAddress,
 			currentLTCAddress,
 			currentBCHAddress,
-			if (useEOSAccountName) currentEOSAccountName.getCurrent() isEmptyThen currentEOSAddress
-			else listOf(
+			if (useEOSAccountName) {
+				currentEOSAccountName.getCurrent() isEmptyThen currentEOSAddress
+			} else listOf(
 				currentEOSAddress,
 				currentEOSAccountName.getCurrent(),
 				currentEOSAccountName.getUnEmptyValue()
@@ -234,7 +238,9 @@ data class WalletTable(
 			Pair(WalletType.eosOnly, currentEOSAddress),
 			Pair(WalletType.eosMainnetOnly, currentEOSAccountName.main),
 			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle)
-		).filter { it.second.isNotEmpty() }
+		).filter {
+			it.second.isNotEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
+		}
 		return when {
 			// 减 `2` 是去除掉 `EOS` 的两个网络状态的计数, 此计数并不影响判断是否是全链钱包
 			// 通过私钥导入的多链钱包没有 Path 值所以通过这个来判断是否是
@@ -454,7 +460,7 @@ data class WalletTable(
 			}
 		}
 
-		fun getWatchOnlyWallet(hold:Bip44Address.() -> Unit) {
+		fun getWatchOnlyWallet(hold: Bip44Address.() -> Unit) {
 			WalletTable.getCurrentWallet {
 				if (isWatchOnly) getCurrentBip44Addresses().firstOrNull()?.let(hold)
 			}
@@ -512,9 +518,8 @@ data class WalletTable(
 					updateCurrentEOSAccountNames(currentAccountNames.distinct())
 				}
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
-				if (accountNames.size == 1) {
-					val accountName = accountNames.first().name
-					WalletTable.updateEOSDefaultName(accountName) { callback() }
+				if (accountNames.isNotEmpty()) {
+					WalletTable.updateEOSDefaultName(accountNames.first().name) { callback() }
 				} else GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
@@ -523,13 +528,11 @@ data class WalletTable(
 			doAsync {
 				// 更新钱包数据库的 `Default EOS Address`
 				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.let {
-						it.apply {
-							update(apply { currentEOSAccountName.updateCurrent(defaultName) })
-							// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-							MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
-							GoldStoneAPI.context.runOnUiThread { callback() }
-						}
+					findWhichIsUsing(true)?.apply {
+						update(apply { currentEOSAccountName.updateCurrent(defaultName) })
+						// 同时更新 `MyTokenTable` 里面的 `OwnerName`
+						MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
+						GoldStoneAPI.context.runOnUiThread { callback() }
 					}
 				}
 			}

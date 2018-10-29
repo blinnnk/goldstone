@@ -61,7 +61,7 @@ object MultiChainUtils {
 		}
 	}
 
-	private fun detectPrivateKeyType(privateKey: String): PrivateKeyType? {
+	fun detectPrivateKeyType(privateKey: String): PrivateKeyType? {
 		return when {
 			WalletUtil.isValidPrivateKey(privateKey) -> PrivateKeyType.ETHSeries
 			BTCUtils.isValidMainnetPrivateKey(privateKey) -> PrivateKeyType.BTCEOSAndBCH
@@ -90,7 +90,7 @@ object MultiChainUtils {
 				}
 			}
 			LTCWalletUtils.isValidAddress(address) -> AddressType.LTC
-			BCHWalletUtils.isValidAddress(address) -> AddressType.BCH
+			BCHWalletUtils.isValidAddress(address) && !EOSWalletUtils.isValidAddress(address) -> AddressType.BCH
 			EOSWalletUtils.isValidAddress(address) -> AddressType.EOS
 			EOSAccount(address).isValid(false) -> AddressType.EOSAccountName
 			else -> null

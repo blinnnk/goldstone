@@ -2,11 +2,11 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 
 import android.content.Context
 import android.widget.EditText
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.keystore.storeRootKeyByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
@@ -41,6 +41,10 @@ class PrivateKeyImportPresenter(
 			isAgree,
 			callback
 		) { passwordValue, walletName ->
+			if (MultiChainUtils.detectPrivateKeyType(privateKeyInput.text.toString()).isNull()) {
+				callback(AccountError.InvalidPrivateKey)
+				return@checkInputValue
+			}
 			val rootPrivateKey =
 				MultiChainUtils.getRootPrivateKey(privateKeyInput.text.toString())
 			fragment.context?.let {
@@ -59,6 +63,12 @@ class PrivateKeyImportPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
+		// 深度回退站恢复
+		fragment.getParentFragment<WalletImportFragment> {
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<PrivateKeyImportFragment>()
+			}
+		}
 	}
 
 	companion object {

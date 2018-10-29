@@ -6,6 +6,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -28,7 +29,7 @@ class WebViewPresenter(
 		}
 	}
 
-	fun prepareBackEvent() {
+	fun prepareBackEvent(callback: () -> Unit) {
 		fragment.parentFragment?.apply {
 			when (this) {
 				is TokenDetailOverlayFragment ->
@@ -41,6 +42,12 @@ class WebViewPresenter(
 					presenter.popFragmentFrom<WebViewFragment>()
 				is WalletSettingsFragment ->
 					presenter.popFragmentFrom<WebViewFragment>()
+				is ProfileOverlayFragment -> {
+					if (childFragmentManager.fragments.size > 1)
+						presenter.popFragmentFrom<WebViewFragment>()
+					else callback()
+				}
+				else -> callback()
 			}
 		}
 	}

@@ -11,27 +11,33 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.value.DataValue
-import io.goldstone.blockchain.common.value.PageInfo
+import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
+import io.goldstone.blockchain.crypto.eos.transaction.EOSChain
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
-import io.goldstone.blockchain.kernel.network.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.common.APIPath
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.model.EOSGolbalModel
 import io.goldstone.blockchain.kernel.network.eos.model.EosBalanceModel
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
+import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.TotalResources
+import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
@@ -39,6 +45,59 @@ import org.json.*
 import java.math.BigInteger
 
 object EOSAPI {
+
+	/**
+	 * 本地转账临时插入的 Pending Data 需要填充, 服务器自定义的 ServerID 格式
+	 * unique_id = block_num * 1000000 + tx_index * 1000 + action_index
+	 */
+	fun getTransactionServerID(blockNumber: Int, txID: String, fromAccount: EOSAccount, hold: (Long?) -> Unit) {
+		getBlockByNumber(blockNumber) { jsonString, error ->
+			if (!jsonString.isNull() && error.isNone()) {
+				val json = JSONObject(jsonString)
+				val blockTransactions = JSONArray(json.safeGet("transactions")).toList()
+				var txIndex: Int? = null
+				blockTransactions.forEachIndexed { index, jsonObject ->
+					try {
+						// `block` 的 数据不确定有的时候会有不同结构体的内容, 这里用 `try catch` 跳过错误的情况
+						if (jsonObject.getTargetChild("trx", "id").equals(txID, true)) txIndex = index
+					} catch (error: Exception) {
+					}
+				}
+				val actions = JSONArray(blockTransactions[txIndex!!].getTargetChild("trx", "transaction", "actions")).toList()
+				var actionIndex: Int? = null
+				actions.forEachIndexed { index, jsonObject ->
+					if (
+						jsonObject.safeGet("name").equals("transfer", true) &&
+						jsonObject.getTargetChild("data", "from").equals(fromAccount.accountName, true)
+					) {
+						actionIndex = index
+					}
+				}
+				if (!txIndex.isNull() && !actionIndex.isNull()) {
+					val uniqueID = blockNumber * 1000000L + txIndex!! * 1000L + actionIndex!!
+					hold(uniqueID)
+				}
+			}
+		}
+	}
+
+	private fun getBlockByNumber(blockNumber: Int, @WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber))
+		).let { requestBody ->
+			val api = EOSUrl.getBlock()
+			RequisitionUtil.postRequest(
+				requestBody,
+				api,
+				{ hold(null, it) },
+				false
+			) { result ->
+				if (result.isEmpty()) hold(null, RequestError.ResolveDataError(Throwable("Empty Result")))
+				else hold(result, RequestError.None)
+			}
+		}
+	}
 
 	fun getAccountInfo(
 		account: EOSAccount,
@@ -121,17 +180,16 @@ object EOSAPI {
 	}
 
 	fun getChainInfo(
-		errorCallBack: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (chainInfo: EOSChainInfo) -> Unit
+		@WorkerThread hold: (chainInfo: EOSChainInfo?, error: GoldStoneError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			EOSUrl.getInfo(),
 			"",
 			true,
-			errorCallBack
+			{ hold(null, it) }
 		) {
 			isNotEmpty() isTrue {
-				hold(EOSChainInfo(JSONObject(first())))
+				hold(EOSChainInfo(JSONObject(first())), GoldStoneError.None)
 			}
 		}
 	}
@@ -139,8 +197,8 @@ object EOSAPI {
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,
-		errorCallBack: (GoldStoneError) -> Unit,
-		hold: (EOSResponse) -> Unit
+		isMainThread: Boolean = false,
+		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
@@ -150,7 +208,7 @@ object EOSAPI {
 				Pair("packed_context_free_data", "00")
 			),
 			EOSUrl.pushTransaction(),
-			errorCallBack,
+			{ hold(null, it) },
 			false
 		) {
 			val response = JSONObject(it)
@@ -158,20 +216,23 @@ object EOSAPI {
 				val result = JSONObject(response.safeGet("processed"))
 				val transactionID = response.safeGet("transaction_id")
 				val receipt = JSONObject(result.safeGet("receipt"))
-				hold(EOSResponse(transactionID, receipt))
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
+				} else hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
 			} else GoldStoneAPI.context.runOnUiThread {
-				errorCallBack(RequestError.ResolveDataError(GoldStoneError(it)))
+				hold(null, RequestError.ResolveDataError(GoldStoneError(it)))
 			}
 		}
 	}
 
 	fun getTransactionHeaderFromChain(
 		expirationType: ExpirationType,
-		errorCallBack: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (header: TransactionHeader) -> Unit
+		@WorkerThread hold: (header: TransactionHeader?, error: GoldStoneError) -> Unit
 	) {
-		getChainInfo(errorCallBack) { chainInfo ->
-			hold(TransactionHeader(chainInfo, expirationType))
+		getChainInfo { chainInfo, error ->
+			if (!chainInfo.isNull() && error.isNone()) {
+				hold(TransactionHeader(chainInfo!!, expirationType), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -264,99 +325,183 @@ object EOSAPI {
 		)
 	}
 
-	fun getTransactionsLastIndex(
+	@JvmStatic
+	fun getEOSTransactions(
+		chainid: ChainID,
 		account: EOSAccount,
-		hold: (count: Int?, error: RequestError) -> Unit
+		pageSize: Int,
+		starID: Long,
+		endID: Long,
+		contract: TokenContract,
+		@WorkerThread hold: (tokens: List<EOSTransactionTable>?, error: RequestError) -> Unit
 	) {
-		// 传 `pos -1` 是倒序拉取最近一条, `offset` 是拉取倒序的第一条, 通过这个方法
-		// 拉取下来最近一条获取到 `dataIndex` 即这个 `account` 的账单总数, 并计算映射出
-		// 实际的翻页参数
-		getAccountTransactionHistory(
-			account.accountName,
-			-1,
-			-1
-		) { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				hold(data!!.firstOrNull()?.dataIndex, error)
+		RequisitionUtil.requestData<String>(
+			APIPath.getEOSTransactions(
+				APIPath.currentUrl,
+				chainid.id,
+				account.accountName,
+				pageSize,
+				starID,
+				endID,
+				contract.contract.orEmpty(),
+				contract.symbol
+			),
+			"action_list",
+			true,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			val data = firstOrNull()
+			if (!data.isNullOrEmpty()) hold(
+				JSONArray(data!!).toList().map {
+					EOSTransactionTable(it, SharedAddress.getCurrentEOSAccount().accountName)
+				},
+				RequestError.None
+			) else hold(null, RequestError.NullResponse("Empty or Null Result"))
+		}
+	}
+
+	fun getEOSCountInfo(
+		chainid: ChainID,
+		account: EOSAccount,
+		codeName: String,
+		symbol: String,
+		hold: (info: EOSTokenCountInfo?, error: RequestError) -> Unit
+	) {
+		getEOSTokenCountInfo(chainid, account, codeName, symbol) { data, error ->
+			if (!data.isNullOrEmpty() && error.isNone()) {
+				getTransactionCount(chainid, account, codeName, symbol) { count, totalCountError ->
+					if (!count.isNull() && totalCountError.isNone()) {
+						hold(
+							EOSTokenCountInfo(
+								JSONObject(data).safeGet("total_send").toIntOrNull().orZero(),
+								JSONObject(data).safeGet("total_receive").toIntOrNull().orZero(),
+								count.orZero()
+							),
+							RequestError.None
+						)
+					} else hold(null, totalCountError)
+				}
 			} else hold(null, error)
 		}
 	}
 
-	/** 拉取足页的最近的一页数据 */
-	fun getPageInfo(localDataMaxIndex: Int, totalCount: Int): PageInfo {
-		// 如果需要获取的数据个数为 `0` 那么直接返回 `0`
-		val notInLocalDataCount = totalCount - localDataMaxIndex
-		if (notInLocalDataCount == 0) return PageInfo(0, 0, 0)
-		// totalCount 的值是最新一条数据的值, from 的值通过这个倒退出来
-		val from =
-			when {
-				notInLocalDataCount > DataValue.pageCount -> totalCount - DataValue.pageCount
-				localDataMaxIndex > 0 -> notInLocalDataCount
-				else -> localDataMaxIndex
-			}
-		return PageInfo(from, totalCount, localDataMaxIndex)
+	@JvmStatic
+	fun getEOSTokenList(
+		chainid: ChainID,
+		account: EOSAccount,
+		@WorkerThread hold: (info: List<TokenContract>?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<TokenContract>(
+			APIPath.getEOSTokenList(
+				APIPath.currentUrl,
+				chainid.id,
+				account.accountName
+			),
+			"token_list",
+			false,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			hold(this, RequestError.None)
+		}
 	}
 
-	fun getAccountTransactionHistory(
-		accountName: String,
-		from: Int,
-		to: Int,
-		@WorkerThread hold: (data: List<EOSTransactionTable>?, error: RequestError) -> Unit
+	@JvmStatic
+	fun getEOSTokenCountInfo(
+		chainid: ChainID,
+		account: EOSAccount,
+		codeName: String,
+		symbol: String,
+		@WorkerThread hold: (info: String?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postString(
-			ParameterUtil.prepareObjectContent(
-				Pair("account_name", accountName),
-				Pair("pos", from),
-				Pair("offset", to)
+		RequisitionUtil.requestData<String>(
+			APIPath.getEOSTokenCountInfo(
+				APIPath.currentUrl,
+				chainid.id,
+				account.accountName,
+				codeName,
+				symbol
 			),
-			EOSUrl.getTransactionHistory(),
-			"actions",
+			"",
+			true,
 			{ hold(null, it) },
-			false
-		) { jsonString ->
-			JSONArray(jsonString).toList().map {
-				EOSTransactionTable(JSONObject(it), SharedAddress.getCurrentEOSAccount().accountName)
-			}.apply { hold(this, RequestError.None) }
+			isEncrypt = true
+		) {
+			val data = firstOrNull()
+			if (data.isNullOrEmpty()) hold(null, RequestError.NullResponse("Empty Result"))
+			else hold(data, RequestError.None)
+		}
+	}
+
+	@JvmStatic
+	fun getTransactionCount(
+		chainid: ChainID,
+		account: EOSAccount,
+		codeName: String,
+		symbol: String,
+		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<String>(
+			APIPath.getEOSTransactions(
+				APIPath.currentUrl,
+				chainid.id,
+				account.accountName,
+				0,
+				-1,
+				-1,
+				codeName,
+				symbol
+			),
+			"total_size",
+			true,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			val data = firstOrNull()
+			if (!data.isNullOrEmpty()) hold(data?.toIntOrNull(), RequestError.None)
+			else hold(null, RequestError.NullResponse("Empty or Null Result"))
 		}
 	}
 
 	fun getBlockNumberByTxID(
 		txID: String,
-		errorCallBack: (Throwable) -> kotlin.Unit,
-		@WorkerThread hold: (blockNumber: Int?) -> Unit
+		@WorkerThread hold: (blockNumber: Int?, error: GoldStoneError) -> Unit
 	) {
-		getTransactionJSONObjectByTxID(txID, errorCallBack) {
-			hold(it.safeGet("block_num").toIntOrNull())
+		getTransactionJSONObjectByTxID(txID) { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				hold(data!!.safeGet("block_num").toIntOrNull(), error)
+			} else hold(null, error)
 		}
 	}
 
 	fun getBandWidthByTxID(
 		txID: String,
-		errorCallBack: (Throwable) -> kotlin.Unit,
-		@WorkerThread hold: (cpuUsage: BigInteger, netUsage: BigInteger, status: String) -> Unit
+		@WorkerThread hold: (cpuUsage: BigInteger?, netUsage: BigInteger?, error: RequestError) -> Unit
 	) {
-		getTransactionJSONObjectByTxID(txID, errorCallBack) { transaction ->
-			val receipt = transaction.getTargetObject("trx", "receipt")
-			hold(
-				receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
-				receipt.getTargetChild("net_usage_words").toBigIntegerOrZero(),
-				receipt.getTargetChild("status")
-			)
+		getTransactionJSONObjectByTxID(txID) { transaction, error ->
+			if (!transaction.isNull() && error.isNone()) {
+				val receipt = transaction!!.getTargetObject("trx", "receipt")
+				hold(
+					receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
+					receipt.getTargetChild("net_usage_words").toBigIntegerOrZero(),
+					error
+				)
+			} else hold(null, null, error)
 		}
 	}
 
 	private fun getTransactionJSONObjectByTxID(
 		txID: String,
-		errorCallback: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (JSONObject) -> Unit
+		@WorkerThread hold: (data: JSONObject?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("id", txID)),
 			EOSUrl.getTransaction(),
-			errorCallback,
+			{ hold(null, it) },
 			false
 		) { jsonString ->
-			hold(JSONObject(jsonString))
+			hold(JSONObject(jsonString), RequestError.None)
 		}
 	}
 	fun getRAMMarket(
@@ -425,6 +570,39 @@ object EOSAPI {
 			}
 		}
 	}
+	// 从第三方 EOS 交易所拉取交易对
+	@JvmStatic
+	fun getPairsFromNewDex(@WorkerThread hold: (tokens: List<NewDexPair>?, error: RequestError) -> Unit) {
+		RequisitionUtil.requestData<NewDexPair>(
+			EOSUrl.getPairsFromNewDex(),
+			"data",
+			false,
+			{ hold(null, it) },
+			isEncrypt = false
+		) {
+			hold(this, RequestError.None)
+		}
+	}
+
+	@JvmStatic
+	fun getPriceByPair(
+		pair: String,
+		@WorkerThread hold: (price: Double?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<String>(
+			EOSUrl.getTokenPriceInEOS(pair),
+			"data",
+			true,
+			{ hold(null, it) },
+			isEncrypt = false
+		) {
+			if (!firstOrNull().isNull()) {
+				hold(JSONObject(first()).safeGet("price").toDoubleOrNull().orZero(), RequestError.None)
+			} else {
+				hold(null, RequestError.RPCResult("empty result"))
+			}
+		}
+	}
 
 	fun getGlobalInformation(
 		@WorkerThread hold: (EOSGolbalModel?, RequestError) -> Unit
@@ -454,4 +632,36 @@ object EOSAPI {
 			}
 		}
 	}
+	fun updateLocalTokenPrice(contract: TokenContract) {
+		EOSAPI.getPairsFromNewDex { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				val pair = data!!.find {
+					it.symbol.equals(contract.symbol, true) &&
+						it.contract.equals(contract.contract, true)
+				}?.pair
+				if (!pair.isNullOrBlank()) {
+					EOSAPI.getPriceByPair(pair!!) { priceInEOS, pairError ->
+						if (!priceInEOS.isNull() && pairError.isNone()) {
+							val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+							val eosToken = defaultDao.getTokenByContract(
+								TokenContract.EOS.contract!!,
+								TokenContract.EOS.symbol,
+								EOSChain.Main.id
+							)
+							val priceInUSD = priceInEOS!! * eosToken?.price.orZero()
+							if (priceInUSD > 0.0) {
+								defaultDao.updateTokenPrice(
+									priceInUSD,
+									contract.contract.orEmpty(),
+									contract.symbol,
+									EOSChain.Main.id
+								)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 }

@@ -8,7 +8,7 @@ import java.math.BigInteger
  * @author KaySaith
  * @date  2018/09/23
  */
-class Amount<T>(private val value: T) {
+class Amount<T>(val value: T) {
 
 	fun toBTC() = convertOrThrow(btcDecimal)
 	fun toETC() = convertOrThrow(etcDecimal)

@@ -1,10 +1,7 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.jump
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.otherwise
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -15,7 +12,7 @@ import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.initEOSAccountName
@@ -53,15 +50,14 @@ class SplashPresenter(val activity: SplashActivity) {
 		doAsync {
 			SharedWallet.updateCurrencyCode(config.currencyCode)
 			GoldStoneAPI.getCurrencyRate(
-				config.currencyCode,
-				{
-					LogUtil.error("Request of get currency rate has error")
+				config.currencyCode
+			) { rate, error ->
+				if (!rate.isNull() && error.isNone()) {
+					// 更新 `SharePreference` 中的值
+					SharedWallet.updateCurrentRate(rate!!)
+					// 更新数据库的值
+					SupportCurrencyTable.updateUsedRateValue(rate)
 				}
-			) {
-				// 更新 `SharePreference` 中的值
-				SharedWallet.updateCurrentRate(it)
-				// 更新数据库的值
-				SupportCurrencyTable.updateUsedRateValue(it)
 			}
 		}
 	}
@@ -231,9 +227,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		// 每次有网络的时候都插入或更新网络数据
 		NetworkUtil.hasNetwork(activity) isTrue {
 			// update local `Tokens` info list
-			StartingPresenter.updateLocalDefaultTokens {
-				LogUtil.error(activity::javaClass.name)
-			}
+			StartingPresenter.updateLocalDefaultTokens()
 		}
 	}
 }

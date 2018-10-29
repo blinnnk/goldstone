@@ -4,12 +4,10 @@ import android.content.Context
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCircleBorder
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -18,7 +16,10 @@ import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.imageResource
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.wrapContent
 
 
 /**

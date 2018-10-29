@@ -10,6 +10,8 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -20,10 +22,11 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainURL
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -50,7 +53,7 @@ class TokenInfoPresenter(
 	}
 
 	private val currentAddress by lazy {
-		CoinSymbol(tokenInfo?.symbol).getAddress()
+		tokenInfo?.contract.getAddress()
 	}
 
 	override fun onFragmentViewCreated() {
@@ -58,7 +61,7 @@ class TokenInfoPresenter(
 		val info = getDetailButtonInfo(tokenInfo, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName =
-			CryptoName.getChainNameBySymbol(tokenInfo?.symbol).toUpperCase() + " " + TokenDetailText.chainType
+			CryptoName.getChainNameByContract(tokenInfo?.contract).toUpperCase() + " " + TokenDetailText.chainType
 		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {
 			showThirdPartyAddressDetail(fragment.getGrandFather<TokenDetailOverlayFragment>(), info.second)
 		}
@@ -69,10 +72,7 @@ class TokenInfoPresenter(
 	}
 
 	fun getBalance(hold: (String) -> Unit) {
-		MyTokenTable.getTokenBalance(
-			tokenInfo?.contract.orEmpty(),
-			currentAddress
-		) {
+		MyTokenTable.getTokenBalance(tokenInfo?.contract.orEmpty(), currentAddress) {
 			hold("${it.orZero()} ${tokenInfo?.symbol}")
 		}
 	}
@@ -97,7 +97,7 @@ class TokenInfoPresenter(
 	fun showTransactionInfo(errorCallback: (RequestError) -> Unit) {
 		val chainType = tokenInfo?.contract.getChainType().id
 		when {
-			CoinSymbol(tokenInfo?.symbol).isBTCSeries() -> BTCSeriesTransactionTable
+			tokenInfo?.contract.isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
 					if (transactions.isEmpty()) {
@@ -148,6 +148,22 @@ class TokenInfoPresenter(
 						}?.timeStamp?.toMillisecond().orElse(0L)
 					)
 				fragment.updateLatestActivationDate(latestDate)
+			}
+
+			tokenInfo?.contract.isEOSToken() -> {
+				EOSAPI.getEOSCountInfo(
+					SharedChain.getEOSCurrent(),
+					SharedAddress.getCurrentEOSAccount(),
+					tokenInfo?.contract?.contract.orEmpty(),
+					tokenInfo?.symbol.orEmpty()
+				) { info, error ->
+					GoldStoneAPI.context.runOnUiThread {
+						if (!info.isNull() && error.isNone()) {
+							fragment.showTransactionCount(info!!.totalCount)
+							fragment.showTotalValue("${info.totalReceived}", "${info.totalSent}")
+						} else fragment.context.alert(error.message)
+					}
+				}
 			}
 
 			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->
@@ -222,20 +238,20 @@ class TokenInfoPresenter(
 
 	companion object {
 		fun getDetailButtonInfo(tokenInfo: WalletDetailCellModel?, currentAddress: String): Pair<Int, String> {
-			val icon = when (tokenInfo?.symbol) {
-				CoinSymbol.btc() -> R.drawable.blocktrail_icon
-				CoinSymbol.ltc -> R.drawable.blockcypher_icon
-				CoinSymbol.bch -> R.drawable.blocktrail_icon
-				CoinSymbol.eos -> R.drawable.bloks_io_icon
-				CoinSymbol.etc -> R.drawable.gastracker_icon
+			val icon = when {
+				tokenInfo?.contract.isBTC() -> R.drawable.blocktrail_icon
+				tokenInfo?.contract.isLTC() -> R.drawable.blockcypher_icon
+				tokenInfo?.contract.isBCH() -> R.drawable.blocktrail_icon
+				tokenInfo?.contract.isEOSSeries() -> R.drawable.bloks_io_icon
+				tokenInfo?.contract.isETC() -> R.drawable.gastracker_icon
 				else -> R.drawable.etherscan_icon
 			}
-			val url = when (tokenInfo?.symbol) {
-				CoinSymbol.btc() -> ChainURL.btcAddressDetail(currentAddress)
-				CoinSymbol.ltc -> ChainURL.ltcAddressDetail(currentAddress)
-				CoinSymbol.bch -> ChainURL.bchAddressDetail(currentAddress)
-				CoinSymbol.eos -> ChainURL.eosAddressDetail(currentAddress)
-				CoinSymbol.etc -> ChainURL.etcAddressDetail(currentAddress)
+			val url = when {
+				tokenInfo?.contract.isBTC() -> ChainURL.btcAddressDetail(currentAddress)
+				tokenInfo?.contract.isLTC() -> ChainURL.ltcAddressDetail(currentAddress)
+				tokenInfo?.contract.isBCH() -> ChainURL.bchAddressDetail(currentAddress)
+				tokenInfo?.contract.isEOSSeries() -> ChainURL.eosAddressDetail(currentAddress)
+				tokenInfo?.contract.isETC() -> ChainURL.etcAddressDetail(currentAddress)
 				else -> ChainURL.ethAddressDetail(currentAddress)
 			}
 			return Pair(icon, url)

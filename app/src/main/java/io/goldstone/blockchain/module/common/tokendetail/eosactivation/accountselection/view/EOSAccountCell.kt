@@ -10,10 +10,13 @@ import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.language.EOSAccountText
+import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.radioButton
 
@@ -53,10 +56,13 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 
 	@SuppressLint("SetTextI18n")
 	fun setAccountInfo(name: String, authorization: String) {
-		info.title.text = "Account Name: $name"
-		val wholeString = "Authorization: $authorization"
+		info.title.text = "${ImportWalletText.eosAccountName}: $name"
+		val permission =
+			if (authorization.equals(EOSActor.Owner.value, true)) EOSActor.Owner.value + "/" + EOSActor.Active.value
+			else authorization
+		val wholeString = "${EOSAccountText.authorization}: $permission"
 		info.subtitle.text = CustomTargetTextStyle(
-			authorization,
+			permission,
 			wholeString,
 			GrayScale.gray,
 			12.uiPX(),

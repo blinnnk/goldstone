@@ -15,7 +15,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSUnit
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel

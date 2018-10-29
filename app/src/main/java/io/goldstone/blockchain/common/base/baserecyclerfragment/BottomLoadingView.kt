@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
@@ -42,6 +43,7 @@ class BottomLoadingView(context: Context) : LinearLayout(context) {
 			text = "there is no new data"
 			visibility = View.GONE
 		}
+		hide()
 	}
 
 	fun show() {
@@ -51,6 +53,10 @@ class BottomLoadingView(context: Context) : LinearLayout(context) {
 
 	fun hide() {
 		loading.visibility = View.GONE
-		description.visibility = View.VISIBLE
+		description.visibility = View.GONE
+	}
+
+	fun setGrayDescription() {
+		description.textColor = GrayScale.lightGray
 	}
 }

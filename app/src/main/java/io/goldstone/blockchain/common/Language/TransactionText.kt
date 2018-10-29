@@ -67,6 +67,16 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
+	val confirmTransactionTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Transfer Token"
+		HoneyLanguage.Chinese.code -> "转账确认"
+		HoneyLanguage.Japanese.code -> "転送トークン"
+		HoneyLanguage.Korean.code -> "전송 토큰"
+		HoneyLanguage.Russian.code -> "Переносить токен"
+		HoneyLanguage.TraditionalChinese.code -> "轉賬確認"
+		else -> ""
+	}
+	@JvmField
 	val confirmTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Confirm transaction with your password"
 		HoneyLanguage.Chinese.code -> "输入您的密码以确认交易"

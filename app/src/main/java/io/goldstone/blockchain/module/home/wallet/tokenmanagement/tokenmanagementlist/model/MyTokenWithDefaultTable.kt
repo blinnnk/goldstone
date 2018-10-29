@@ -4,7 +4,7 @@ import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Query
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.runOnUiThread
@@ -48,6 +48,6 @@ data class MyTokenWithDefaultTable(
 
 @Dao
 interface MyTokenDefaultTableDao {
-	@Query("SELECT defaultTokens.iconUrl AS iconUrl, defaultTokens.symbol AS symbol, defaultTokens.name AS tokenName, defaultTokens.decimals AS decimal, defaultTokens.price AS price, defaultTokens.weight AS weight,  myTokens.balance * defaultTokens.price AS currency, myTokens.balance AS count, myTokens.contract AS contract, myTokens.chainID AS chainID FROM defaultTokens, myTokens WHERE defaultTokens.contract = myTokens.contract AND defaultTokens.chainID = myTokens.chainID AND myTokens.chainID IN (:currentChainIDs) AND myTokens.ownerName IN (:ownerNames)")
+	@Query("SELECT defaultTokens.iconUrl AS iconUrl, defaultTokens.symbol AS symbol, defaultTokens.name AS tokenName, defaultTokens.decimals AS decimal, defaultTokens.price AS price, defaultTokens.weight AS weight,  myTokens.balance * defaultTokens.price AS currency, myTokens.balance AS count, myTokens.contract AS contract, myTokens.chainID AS chainID FROM defaultTokens, myTokens WHERE defaultTokens.contract = myTokens.contract AND defaultTokens.chainID = myTokens.chainID AND defaultTokens.symbol = myTokens.symbol AND myTokens.chainID IN (:currentChainIDs) AND myTokens.ownerName IN (:ownerNames)")
 	fun getData(ownerNames: List<String>, currentChainIDs: List<String> = Current.chainIDs()): List<MyTokenWithDefaultTable>
 }

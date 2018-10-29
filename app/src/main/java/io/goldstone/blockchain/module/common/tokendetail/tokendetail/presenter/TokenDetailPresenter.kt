@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -13,7 +14,6 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -21,6 +21,8 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
@@ -30,6 +32,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 27/03/2018 3:21 PM
@@ -39,7 +42,7 @@ class TokenDetailPresenter(
 	override val fragment: TokenDetailFragment
 ) : BaseRecyclerPresenter<TokenDetailFragment, TransactionListModel>() {
 
-	private var allData: List<TransactionListModel>? = null
+	var allData: List<TransactionListModel>? = null
 	val token by lazy {
 		fragment.getParentFragment<TokenDetailCenterFragment>()?.token
 	}
@@ -56,34 +59,68 @@ class TokenDetailPresenter(
 		prepareTokenDetailData()
 	}
 
-	fun showOnlyReceiveData() {
-		allData?.filter {
-			it.isReceived
-		}?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+	var totalCount: Int? = null
+	var currentMaxCount: Int? = null
+
+	override fun loadMore() {
+		// 目前的翻页逻辑比较复杂, 暂时不支持分类 `Sort` 后的分页, 只在总类目下支持分页
+		if (fragment.currentMenu.isNull() || fragment.currentMenu == CommonText.all) {
+			super.loadMore()
+			flipEOSPageData()
 		}
 	}
 
+	fun showOnlyReceiveData() {
+		fun sortData() {
+			allData?.filter { it.isReceived }?.let {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+				if (it.isEmpty()) showBottomLoading(false)
+			}
+		}
+		if (token?.contract.isEOSSeries()) {
+			if (allData.isNull() || allData!!.isEmpty()) {
+				currentMaxCount = totalCount
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				flipEOSPageData { sortData() }
+			} else sortData()
+		} else sortData()
+	}
+
 	fun showOnlyFailedData() {
-		allData?.filter {
-			it.isFailed || it.hasError
-		}?.let {
+		allData?.filter { it.isFailed || it.hasError }?.let {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+			if (it.isEmpty()) showBottomLoading(false)
 		}
 	}
 
 	fun showOnlySendData() {
-		allData?.filter {
-			!it.isReceived && !it.isFee
-		}?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		fun sortData() {
+			allData?.filter { !it.isReceived && !it.isFee }?.let {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+				if (it.isEmpty()) showBottomLoading(false)
+			}
 		}
+		if (token?.contract.isEOSSeries()) {
+			if (allData.isNull() || allData!!.isEmpty()) {
+				currentMaxCount = totalCount
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				flipEOSPageData { sortData() }
+			} else sortData()
+		} else sortData()
 	}
 
 	fun showAllData() {
-		allData?.let {
-			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+		fun sortData() {
+			allData?.let {
+				diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
+				if (it.isEmpty()) showBottomLoading(false)
+			}
 		}
+		if (token?.contract.isEOSSeries()) {
+			currentMaxCount = totalCount
+			fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+			flipEOSPageData { sortData() }
+		} else sortData()
 	}
 
 	fun showAddressSelectionFragment() {
@@ -106,9 +143,9 @@ class TokenDetailPresenter(
 
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView(LoadingText.tokenData)
-		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData, localEOSSeriesData ->
+		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData ->
 			// 检查是否有网络
-			if (!NetworkUtil.hasNetworkWithAlert(fragment.context)) return@loadDataFromDatabaseOrElse
+			if (!NetworkUtil.hasNetwork(fragment.context)) return@loadDataFromDatabaseOrElse
 			// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
 			// `ETHERC20OrETC` 需要使用到 `localData`
 			when {
@@ -117,11 +154,7 @@ class TokenDetailPresenter(
 					val localDataMaxIndex = localBTCSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
 					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
 				}
-				token?.contract.isEOS() || token?.contract.isEOSToken() -> {
-					// This localDataMaxIndex is EOSSeries Transactions Only
-					val localDataMaxIndex = localEOSSeriesData?.maxBy { it.dataIndex }?.dataIndex ?: 0
-					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
-				}
+
 				!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
 					fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
 				}
@@ -161,11 +194,6 @@ class TokenDetailPresenter(
 				hasUpdateData = true
 			}
 
-			token?.contract.isEOS() -> {
-				if (!hasUpdateData) loadEOSDataFromChain(localDataMaxIndex)
-				hasUpdateData = true
-			}
-
 			else -> {
 				if (!hasUpdateData) loadERCChainData(localETHERC20OrETCData)
 				hasUpdateData = true
@@ -176,9 +204,8 @@ class TokenDetailPresenter(
 	fun loadDataFromDatabaseOrElse(
 		callback: (
 			localETHSeriesData: List<TransactionListModel>?,
-			localBTCSeriesData: List<BTCSeriesTransactionTable>?,
-			localEOSSeriesData: List<EOSTransactionTable>?
-		) -> Unit = { _, _, _ -> }
+			localBTCSeriesData: List<BTCSeriesTransactionTable>?
+		) -> Unit = { _, _ -> }
 	) {
 		val walletType = SharedWallet.getCurrentWalletType()
 		when {
@@ -186,58 +213,71 @@ class TokenDetailPresenter(
 				when {
 					token?.contract.isETC() ->
 						getETHSeriesData(token?.contract.getAddress()) {
-							callback(it, null, null)
+							callback(it, null)
 						}
 
 					token?.contract.isBTCSeries() -> {
 						getBTCSeriesData(token?.contract) {
-							callback(null, it, null)
+							callback(null, it)
 						}
 					}
-
-					token?.contract.isEOS() -> getEOSSeriesData(
-						CoinSymbol.EOS.symbol!!,
-						EOSCodeName.EOSIOToken
-					) {
-						callback(null, null, it)
-					}
-
-					token?.contract.isEOSToken() -> getEOSSeriesData(
-						token?.symbol.orEmpty(),
-						EOSCodeName(token?.contract?.contract.orEmpty())
-					) {
-						callback(null, null, it)
-					}
+					token?.contract.isEOSSeries() -> getEOSSeriesData()
 
 					else -> getETHSeriesData(token?.contract.getAddress()) {
-						callback(it, null, null)
+						callback(it, null)
 					}
 				}
 			}
 
-			token?.contract.isBTCSeries() ->
-				getBTCSeriesData(token?.contract) {
-					callback(null, it, null)
-				}
-
-			token?.contract.isEOS() -> getEOSSeriesData(
-				CoinSymbol.EOS.symbol!!,
-				EOSCodeName.EOSIOToken
-			) {
-				callback(null, null, it)
+			token?.contract.isBTCSeries() -> getBTCSeriesData(token?.contract) {
+				callback(null, it)
 			}
 
-			token?.contract.isEOSToken() -> getEOSSeriesData(
-				token?.symbol.orEmpty(),
-				EOSCodeName(token?.contract?.contract.orEmpty())
-			) {
-				callback(null, null, it)
-			}
+			token?.contract.isEOSSeries() -> getEOSSeriesData()
 
-			walletType.isETHSeries() ->
-				getETHSeriesData(SharedAddress.getCurrentEthereum()) {
-					callback(it, null, null)
+			walletType.isETHSeries() -> getETHSeriesData(SharedAddress.getCurrentEthereum()) {
+				callback(it, null)
+			}
+		}
+	}
+
+	private fun getEOSSeriesData() {
+		// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
+		val codeName = token?.contract?.contract.orEmpty()
+		if (!NetworkUtil.hasNetwork(fragment.context)) {
+			EOSTransactionTable.getMaxDataIndexTable(
+				SharedAddress.getCurrentEOSAccount(),
+				token?.contract.orEmpty(),
+				SharedChain.getEOSCurrent(),
+				true
+			) {
+				totalCount = it?.dataIndex
+				currentMaxCount = it?.dataIndex
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				// 初始化
+				loadMore()
+				fragment.removeLoadingView()
+			}
+		} else EOSAPI.getTransactionCount(
+			SharedChain.getEOSCurrent(),
+			SharedAddress.getCurrentEOSAccount(),
+			codeName,
+			token?.symbol.orEmpty()
+		) { count, error ->
+			if (!count.isNull() && error.isNone()) {
+				totalCount = count
+				currentMaxCount = count
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				fragment.getAdapter<TokenDetailAdapter>()?.dataSet?.clear()
+				// 初始化
+				loadMore()
+				GoldStoneAPI.context.runOnUiThread {
+					fragment.removeLoadingView()
 				}
+			}
 		}
 	}
 
@@ -251,36 +291,6 @@ class TokenDetailPresenter(
 		) { transactions ->
 			transactions.isNotEmpty() isTrue {
 				fragment.updatePageBy(transactions, address)
-				fragment.removeLoadingView()
-			}
-			callback(transactions)
-		}
-	}
-
-	private fun getEOSSeriesData(
-		symbol: String,
-		codeName: EOSCodeName,
-		callback: (List<EOSTransactionTable>) -> Unit
-	) {
-		val account = SharedAddress.getCurrentEOSAccount()
-		EOSTransactionTable.getTransaction(
-			account.accountName,
-			symbol,
-			codeName.value,
-			SharedChain.getEOSCurrent()
-		) { transactions ->
-			transactions.isNotEmpty() isTrue {
-				fragment.updatePageBy(
-					transactions.asSequence().filter {
-						// EOS 会存在一些 `FromName` 或 `ToName` 都为空的坏账这里过滤一下
-						it.transactionData.fromName.isNotEmpty()
-					}.map {
-						TransactionListModel(it)
-					}.sortedByDescending {
-						it.timeStamp
-					}.toList(),
-					account.accountName
-				)
 				fragment.removeLoadingView()
 			}
 			callback(transactions)
@@ -334,7 +344,7 @@ class TokenDetailPresenter(
 		emptyData.updateChartAndHeaderData()
 	}
 
-	private fun List<TokenBalanceTable>.updateChartAndHeaderData() {
+	fun List<TokenBalanceTable>.updateChartAndHeaderData() {
 		fragment.recyclerView.getItemAtAdapterPosition<TokenDetailHeaderView>(0) { header ->
 			val maxChartCount = 7
 			val chartArray = arrayListOf<ChartPoint>()
@@ -353,7 +363,7 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun List<TransactionListModel>.prepareTokenHistoryBalance(
+	fun List<TransactionListModel>.prepareTokenHistoryBalance(
 		contract: TokenContract,
 		ownerName: String,
 		callback: (List<TokenBalanceTable>) -> Unit

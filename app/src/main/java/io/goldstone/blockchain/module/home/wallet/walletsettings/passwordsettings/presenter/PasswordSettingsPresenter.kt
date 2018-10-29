@@ -17,7 +17,7 @@ import io.goldstone.blockchain.crypto.keystore.updatePassword
 import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.WalletType
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -83,7 +83,8 @@ class PasswordSettingsPresenter(
 							wallet.bchAddresses,
 							wallet.ltcAddresses,
 							wallet.btcAddresses,
-							wallet.btcSeriesTestAddresses
+							wallet.btcSeriesTestAddresses,
+							wallet.eosAddresses
 						).forEach { addresses ->
 							addresses.forEach { pair ->
 								updateKeystorePassword(

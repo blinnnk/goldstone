@@ -1,14 +1,10 @@
 package io.goldstone.blockchain.module.entrance.starting.presenter
 
 import android.content.Context
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.*
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.ContainerID
@@ -16,8 +12,8 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.BackupServerChecker
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.BackupServerChecker
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -53,15 +49,17 @@ class StartingPresenter(override val fragment: StartingFragment) :
 	companion object {
 
 		fun updateShareContentFromServer() {
-			GoldStoneAPI.getShareContent(
-				{ BackupServerChecker.checkBackupStatusByException(it) }
-			) {
-				val shareText = if (it.title.isEmpty() && it.content.isEmpty()) {
-					ProfileText.shareContent
+			GoldStoneAPI.getShareContent { shareContent, error ->
+				if (!shareContent.isNull() && error.isNone()) {
+					val shareText = if (shareContent!!.title.isEmpty() && shareContent.content.isEmpty()) {
+						ProfileText.shareContent
+					} else {
+						"${shareContent.title}\n${shareContent.content}\n${shareContent.url}"
+					}
+					AppConfigTable.updateShareContent(shareText)
 				} else {
-					"${it.title}\n${it.content}\n${it.url}"
+					BackupServerChecker.checkBackupStatusByException(error)
 				}
-				AppConfigTable.updateShareContent(shareText)
 			}
 		}
 
@@ -103,22 +101,22 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			}
 		}
 
-		fun updateLocalDefaultTokens(errorCallback: (GoldStoneError) -> Unit) {
+		fun updateLocalDefaultTokens() {
 			doAsync {
-				GoldStoneAPI.getDefaultTokens(errorCallback) { serverTokens ->
-					// 没有网络数据直接返回
-					if (serverTokens.isEmpty()) return@getDefaultTokens
-					DefaultTokenTable.getAllTokens { localTokens ->
-						// 开一个线程更新图片
-						serverTokens.updateLocalTokenIcon(localTokens)
-						// 移除掉一样的数据
-						serverTokens.filterNot { server ->
-							localTokens.any { local ->
-								local.chainID.equals(server.chainID, true)
-									&& local.contract.equals(server.contract, true)
+				GoldStoneAPI.getDefaultTokens { serverTokens, error ->
+					if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
+						DefaultTokenTable.getAllTokens(false) { localTokens ->
+							// 开一个线程更新图片
+							serverTokens.updateLocalTokenIcon(localTokens)
+							// 移除掉一样的数据
+							serverTokens.filterNot { server ->
+								localTokens.any { local ->
+									local.chainID.equals(server.chainID, true)
+										&& local.contract.equals(server.contract, true)
+								}
+							}.apply {
+								GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 							}
-						}.apply {
-							GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 						}
 					}
 				}
@@ -144,7 +142,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					if (isEmpty()) return@doAsync
 					forEach { server ->
 						GoldStoneDataBase.database.defaultTokenDao().apply {
-							getTokenByContract(server.contract, server.chainID)?.let {
+							getTokenByContract(server.contract, server.symbol, server.chainID)?.let {
 								update(it.apply {
 									iconUrl = server.iconUrl
 									isDefault = server.isDefault

@@ -8,7 +8,7 @@ import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -146,6 +146,10 @@ fun Double.toEOSUnit(): BigInteger {
 	return (this.toBigDecimal() * BigDecimal.valueOf(10000L)).toBigInteger()
 }
 
+fun Double.toAmount(decimal: Int): BigInteger {
+	return (this.toBigDecimal() * BigDecimal.valueOf(Math.pow(10.0, decimal.toDouble()))).toBigInteger()
+}
+
 fun BigInteger.toEOSCount(): Double {
 	return CryptoUtils.toCountByDecimal(this, CryptoValue.eosDecimal)
 }
@@ -181,7 +185,7 @@ fun Double.toGWeiValue(): String {
 fun Double.formatCurrency(): String {
 	val rate = SharedWallet.getCurrentRate()
 	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 3
+	formatEditor.maximumFractionDigits = 5
 	val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同
 	val prefix = if (value * rate >= 1.0) "" else if (value == 0.0) "0." else "0"
 	return prefix + formatEditor.format(this * rate)

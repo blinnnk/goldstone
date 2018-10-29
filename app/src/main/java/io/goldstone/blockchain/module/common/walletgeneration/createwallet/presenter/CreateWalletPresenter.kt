@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.annotation.UiThread
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -28,7 +29,7 @@ import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -208,8 +209,10 @@ class CreateWalletPresenter(
 				// 首先从本地查找数据
 				GoldStoneDataBase.database.defaultTokenDao().getAllTokens().apply {
 					// 本地没有数据从服务器获取数据
-					if (isEmpty()) GoldStoneAPI.getDefaultTokens(callback) { serverTokens ->
-						serverTokens.completeAddressInfo(addresses, callback)
+					if (isEmpty()) GoldStoneAPI.getDefaultTokens { serverTokens, error ->
+						if (!serverTokens.isNull() && error.isNone()) {
+							serverTokens!!.completeAddressInfo(addresses, callback)
+						} else callback(error)
 					} else completeAddressInfo(addresses, callback)
 				}
 			}
@@ -277,47 +280,47 @@ class CreateWalletPresenter(
 							ChainID.kovan,
 							ChainID.rinkeby -> {
 								if (currentAddresses.eth.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.eth.address).insert()
+									MyTokenTable(defaults, currentAddresses.eth.address).preventDuplicateInsert()
 								}
 							}
 
 							ChainID.etcMain, ChainID.etcTest -> {
 								if (currentAddresses.etc.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.etc.address).insert()
+									MyTokenTable(defaults, currentAddresses.etc.address).preventDuplicateInsert()
 								}
 							}
 
 							ChainID.eosMain, ChainID.eosTest -> {
 								if (currentAddresses.eos.isNotEmpty()) {
 									if (EOSWalletUtils.isValidAddress(currentAddresses.eos.address)) {
-										MyTokenTable(defaults, currentAddresses.eos.address).insert()
+										MyTokenTable(defaults, currentAddresses.eos.address).preventDuplicateInsert()
 									} else if (EOSAccount(currentAddresses.eos.address).isValid(false)) {
 										// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
-										MyTokenTable(defaults, currentAddresses.eos.address, currentAddresses.eos.address).insert()
+										MyTokenTable(defaults, currentAddresses.eos.address, currentAddresses.eos.address).preventDuplicateInsert()
 									}
 								}
 							}
 
 							ChainID.btcMain -> {
 								if (currentAddresses.btc.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.btc.address).insert()
+									MyTokenTable(defaults, currentAddresses.btc.address).preventDuplicateInsert()
 								}
 							}
 
 							ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
 								if (currentAddresses.btcSeriesTest.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.btcSeriesTest.address).insert()
+									MyTokenTable(defaults, currentAddresses.btcSeriesTest.address).preventDuplicateInsert()
 								}
 							}
 							ChainID.ltcMain -> {
 								if (currentAddresses.ltc.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.ltc.address).insert()
+									MyTokenTable(defaults, currentAddresses.ltc.address).preventDuplicateInsert()
 								}
 							}
 
 							ChainID.bchMain -> {
 								if (currentAddresses.bch.isNotEmpty()) {
-									MyTokenTable(defaults, currentAddresses.bch.address).insert()
+									MyTokenTable(defaults, currentAddresses.bch.address).preventDuplicateInsert()
 								}
 							}
 						}

@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.padding
-import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.wrapContent
 
 /**

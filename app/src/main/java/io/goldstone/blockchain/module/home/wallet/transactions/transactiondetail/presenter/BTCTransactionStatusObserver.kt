@@ -1,21 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinUrl
-import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -28,20 +23,17 @@ private var hasBlockNumber = false
 /** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
 fun TransactionDetailPresenter.observerBTCTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
-	val currentActivity = fragment.getMainActivity()
 	object : BTCSeriesTransactionStatusObserver() {
 		override val chainName = SharedChain.getBTCCurrentName()
 		override val hash = currentHash
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
+				doAsync {
+					GoldStoneDataBase.database.btcSeriesTransactionDao().updatePendingStatus(hash)
+				}
 				onBTCTransactionSucceed()
-				val address = CoinSymbol.BTC.getAddress()
-				updateBTCBalanceByTransaction(address, currentActivity) {
-					if (!it.isNone()) fragment.context.alert(it.message)
-				}
-				if (confirmed) {
-					updateConformationBarFinished()
-				}
+				updateConformationBarFinished()
+				updateTokenDetailPendingStatus()
 			} else {
 				if (!hasBlockNumber) {
 					// 更新 `BlockNumber` 及时间信息, 并未完全完成 `Pending` 状态
@@ -52,24 +44,6 @@ fun TransactionDetailPresenter.observerBTCTransaction() {
 			}
 		}
 	}.start()
-}
-
-fun updateBTCBalanceByTransaction(
-	address: String,
-	activity: MainActivity?,
-	callback: (GoldStoneError) -> Unit
-) {
-	MyTokenTable.getBalanceByContract(
-		TokenContract.BTC,
-		address
-	) { balance, error ->
-		if (!balance.isNull() && error.isNone()) {
-			MyTokenTable.updateBalanceByContract(balance!!, address, TokenContract.BTC)
-		} else GoldStoneAPI.context.runOnUiThread {
-			activity?.getWalletDetailFragment()?.presenter?.updateData()
-			callback(error)
-		}
-	}
 }
 
 /**
@@ -110,7 +84,7 @@ private fun TransactionDetailPresenter.getBTCTransactionFromChain(
 			fragment.asyncData?.clear()
 			val data = generateModels(transaction)
 			fragment.asyncData?.addAll(data)
-			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
+			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size + 1)
 		}
 		// Update Database
 		transaction?.let {

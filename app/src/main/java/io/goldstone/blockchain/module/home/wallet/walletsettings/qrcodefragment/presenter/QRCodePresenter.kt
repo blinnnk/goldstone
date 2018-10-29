@@ -14,12 +14,12 @@ import com.blinnnk.util.SoftKeyboard
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.journeyapps.barcodescanner.CaptureActivity
 import io.goldstone.blockchain.BuildConfig
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.common.qrcode.view.ScanCaptureActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import org.jetbrains.anko.support.v4.toast
@@ -94,7 +94,7 @@ open class QRCodePresenter(
 			val integrator = IntentIntegrator.forSupportFragment(fragment)
 			integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
 			integrator.setOrientationLocked(false)
-			integrator.captureActivity = CaptureActivity::class.java
+			integrator.captureActivity = ScanCaptureActivity::class.java
 			integrator.setCameraId(0)
 			integrator.setPrompt(QRText.screenText)
 			integrator.setBeepEnabled(true)

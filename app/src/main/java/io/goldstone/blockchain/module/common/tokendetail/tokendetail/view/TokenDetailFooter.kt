@@ -9,8 +9,8 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.matchParent
 
 /**
  * @date 27/03/2018 3:20 PM

@@ -16,11 +16,10 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -29,7 +28,6 @@ import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -38,10 +36,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetail
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.delay
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.uiThread
@@ -58,6 +52,11 @@ class WalletDetailPresenter(
 	// 把这个数据存在内存里面一份, 在打开快捷面板的时候可以复用这个数据
 	private var detailModels: List<WalletDetailCellModel>? = null
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		updateData()
+	}
+
 	override fun updateData() {
 		fragment.showMiniLoadingView()
 		// 先初始化空数组再更新列表
@@ -73,38 +72,16 @@ class WalletDetailPresenter(
 			// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
 			if (!lockGettingChainModelsThread) {
 				// 再检查链上的最新价格和数量
-				fragment.removeMiniLoadingView()
+				lockGettingChainModelsThread = true
 				models.getChainModels { chainModels, error ->
+					fragment.removeMiniLoadingView()
+					lockGettingChainModelsThread = false
 					// 更新内存的数据
 					detailModels = chainModels
 					updateUIByData(chainModels)
-					if (!error.isNone()) fragment.context.alert(error.message)
+					if (!error.isNone()) ErrorDisplayManager(fragment.context, error)
 				}
 			} else fragment.removeMiniLoadingView()
-		}
-	}
-
-	override fun loadMore() {
-		super.loadMore()
-		// 例子之后需要删除掉
-		/**
-		 * 1. 异步获取新数据
-		 * 2. 获取到的数据更新 adapter 的数据以及 asyncData 的数据
-		 * 		 2.1  asyncData.addAll(newData)
-		 *		 2.2 getAdapter<Type>().dataSet = asyncData
-		 * 3. recycler adapter notifyItemRangeChanged 增量更新
-		 */
-		launch(CommonPool) {
-			val testData = listOf(WalletDetailCellModel(DefaultTokenTable(), 2.0, EOSWalletType.None))
-			delay(2000L)
-			fragment.asyncData?.addAll(testData)
-			fragment.getAdapter<WalletDetailAdapter>()?.dataSet = fragment.asyncData.orEmptyArray()
-			launch(UI) {
-				fragment.recyclerView.adapter?.notifyItemRangeChanged(
-					fragment.asyncData?.count().orZero() - testData.size, fragment.asyncData?.count().orZero()
-				)
-				showBottomLoading(false)
-			}
 		}
 	}
 
@@ -184,23 +161,24 @@ class WalletDetailPresenter(
 				else notifications.maxBy { it.createTime }?.createTime.orElse(0)
 				GoldStoneAPI.getUnreadCount(
 					goldStoneID,
-					time,
-					{ hold(null, it) }
-				) { unreadCount ->
+					time
+				) { unreadCount, error ->
 					uiThread {
-						hold(unreadCount.toIntOrNull().orZero(), GoldStoneError.None)
+						if (!unreadCount.isNullOrBlank() && error.isNone()) {
+							hold(unreadCount!!.toIntOrNull().orZero(), GoldStoneError.None)
+						} else hold(null, error)
 					}
 				}
 			}
 		}
 	}
 
-	private fun List<WalletDetailCellModel>.getChainModels(hold: (List<WalletDetailCellModel>, GoldStoneError) -> Unit) {
+	private fun List<WalletDetailCellModel>.getChainModels(
+		hold: (data: List<WalletDetailCellModel>, error: GoldStoneError) -> Unit) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
 		else {
-			lockGettingChainModelsThread = true
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = size
 				override fun concurrentJobs() {

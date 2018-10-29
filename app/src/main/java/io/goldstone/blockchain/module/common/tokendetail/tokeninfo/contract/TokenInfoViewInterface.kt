@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract
 
 import android.graphics.Bitmap
+import java.io.Serializable
 
 
 /**
@@ -19,3 +20,9 @@ interface TokenInfoViewInterface {
 
 	fun updateLatestActivationDate(date: String)
 }
+
+data class EOSTokenCountInfo(
+	val totalSent: Int,
+	val totalReceived: Int,
+	val totalCount: Int
+): Serializable

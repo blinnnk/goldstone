@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.common.error
 
+import io.goldstone.blockchain.common.Language.ErrorText
+
 
 /**
  * @author KaySaith
@@ -7,9 +9,10 @@ package io.goldstone.blockchain.common.error
  */
 open class GoldStoneError(override val message: String, val tag: String = "GoldStoneError") : Throwable(message) {
 	fun isNone(): Boolean = message.equals(GoldStoneError.None.message, true)
+	fun hasError(): Boolean = !message.equals(GoldStoneError.None.message, true)
 
 	companion object {
 		@JvmStatic
-		val None = GoldStoneError("No errors")
+		val None = GoldStoneError(ErrorText.none)
 	}
 }

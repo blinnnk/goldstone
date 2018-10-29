@@ -6,8 +6,8 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.button.RoundIcon
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.imageResource

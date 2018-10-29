@@ -103,7 +103,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				showCellMoreDashboard(
 					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
-					ChainType.BTC,
+					if (SharedValue.isTestEnvironment()) ChainType.AllTest else ChainType.BTC,
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
@@ -252,7 +252,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setBTCSeriesTestAddressesModel(wallet: WalletTable) {
-		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} Test Addresses"
+		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
 		val addresses = wallet.btcSeriesTestAddresses
 		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCSeriesTestAddresses()
@@ -370,9 +370,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
 							coinType.isEOS() -> setEOSAddressesModel(wallet)
 							coinType.isLTC() -> setLitecoinAddressesModel(wallet)
-							coinType.isBTC() ->
-								if (SharedValue.isTestEnvironment()) setBTCSeriesTestAddressesModel(wallet)
-								else setBitcoinAddressesModel(wallet)
+							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
+							coinType.isAllTest() -> setBTCSeriesTestAddressesModel(wallet)
 						}
 						toast(CommonText.succeed)
 						removeDashboard(context)

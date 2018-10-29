@@ -1,11 +1,10 @@
-package io.goldstone.blockchain.kernel.network
+package io.goldstone.blockchain.kernel.network.common
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.UiThread
 import android.util.Log
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
@@ -13,15 +12,21 @@ import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.TokenIcon
+import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestData
-import io.goldstone.blockchain.kernel.network.RequisitionUtil.requestUnCryptoData
+import io.goldstone.blockchain.kernel.network.ParameterUtil
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestData
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestUnCryptoData
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -64,16 +69,15 @@ object GoldStoneAPI {
 	 */
 	@JvmStatic
 	fun getDefaultTokens(
-		errorCallback: (RequestError) -> Unit,
-		@WorkerThread hold: (List<DefaultTokenTable>) -> Unit
+		@WorkerThread hold: (defaultTokens: List<DefaultTokenTable>?, error: RequestError) -> Unit
 	) {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
-		AppConfigTable.getAppConfig { it ->
+		AppConfigTable.getAppConfig { config ->
 			requestData<String>(
-				APIPath.defaultTokenList(APIPath.currentUrl, it?.defaultCoinListMD5.orEmpty()),
+				APIPath.defaultTokenList(APIPath.currentUrl, config?.defaultCoinListMD5.orEmpty()),
 				"",
 				true,
-				errorCallback,
+				{ hold(null, it) },
 				isEncrypt = true
 			) {
 				// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
@@ -109,8 +113,9 @@ object GoldStoneAPI {
 					}
 
 					override fun getResultInMainThread(): Boolean = false
-					override fun mergeCallBack() = hold(allDefaultTokens)
-
+					override fun mergeCallBack() {
+						hold(allDefaultTokens, RequestError.None)
+					}
 				}.start()
 			}
 		}
@@ -141,8 +146,7 @@ object GoldStoneAPI {
 		chainID: ChainID,
 		address: String,
 		startBlock: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<ETCTransactionModel>) -> Unit
+		hold: (transactions: ArrayList<ETCTransactionModel>?, error: RequestError) -> Unit
 	) {
 		requestData<ETCTransactionModel>(
 			APIPath.getETCTransactions(
@@ -153,23 +157,20 @@ object GoldStoneAPI {
 			),
 			"list",
 			false,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(toArrayList())
+			hold(toArrayList(), RequestError.None)
 		}
 	}
 
 	@JvmStatic
-	fun getNewVersionOrElse(
-		errorCallback: (RequestError) -> Unit = {},
-		hold: (VersionModel?) -> Unit
-	) {
+	fun getNewVersionOrElse(hold: (versionData: VersionModel?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.getNewVersion(APIPath.currentUrl),
 			"",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
 			val data = JSONObject(this[0])
@@ -177,11 +178,11 @@ object GoldStoneAPI {
 				if (this[0].contains("has_new_version"))
 					TinyNumberUtils.isTrue(data.safeGet("has_new_version"))
 				else false
-			GoldStoneAPI.context.runOnUiThread {
+			context.runOnUiThread {
 				if (hasNewVersion) {
-					hold(VersionModel(JSONObject(data.safeGet("data"))))
+					hold(VersionModel(JSONObject(data.safeGet("data"))), RequestError.None)
 				} else {
-					hold(null)
+					hold(null, RequestError.RPCResult("empty result"))
 				}
 			}
 		}
@@ -190,69 +191,65 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (Double) -> Unit
+		hold: (rate: Double?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getCurrencyRate(APIPath.currentUrl) + symbols,
 			"rate",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			this[0].isNotNull { hold(this[0].toDouble()) }
+			this[0].isNotNull { hold(this[0].toDouble(), RequestError.None) }
 		}
 	}
 
 	@JvmStatic
 	fun getTerms(
 		md5: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (String) -> Unit
+		hold: (term: String?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.terms(APIPath.currentUrl) + md5,
 			"",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(JSONObject(this[0]).safeGet("result"))
+			hold(JSONObject(this[0]).safeGet("result"), RequestError.None)
 		}
 	}
 
 	@JvmStatic
 	fun getConfigList(
-		errorCallback: (RequestError) -> Unit,
-		@UiThread hold: (List<ServerConfigModel>) -> Unit
+		@UiThread hold: (configs: List<ServerConfigModel>?, error: RequestError) -> Unit
 	) {
 		requestData<ServerConfigModel>(
 			APIPath.getConfigList(APIPath.currentUrl),
 			"list",
 			false,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			GoldStoneAPI.context.runOnUiThread {
-				hold(this@requestData)
+			context.runOnUiThread {
+				hold(this@requestData, RequestError.None)
 			}
 		}
 	}
 
 	@JvmStatic
 	fun getShareContent(
-		errorCallback: (RequestError) -> Unit,
-		hold: (ShareContentModel) -> Unit
+		hold: (content: ShareContentModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			this[0].isNotNull {
-				hold(ShareContentModel(JSONObject(this[0])))
+			firstOrNull().isNotNull {
+				hold(ShareContentModel(JSONObject(this[0])), RequestError.None)
 			}
 		}
 	}
@@ -260,17 +257,16 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (List<QuotationSelectionTable>) -> Unit
+		@WorkerThread hold: (markets: List<QuotationSelectionTable>?, error: RequestError) -> Unit
 	) {
 		requestData<QuotationSelectionTable>(
 			APIPath.marketSearch(APIPath.currentUrl) + pair,
 			"pair_list",
 			false,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(this)
+			hold(this, RequestError.None)
 		}
 	}
 
@@ -307,6 +303,21 @@ object GoldStoneAPI {
 			errorCallback
 		) {
 			hold(map { TransactionTable(it) }.toArrayList())
+		}
+	}
+
+	fun getIconURL(
+		contractList: List<TokenContract>,
+		hold: (data: List<TokenIcon>?, error: GoldStoneError) -> Unit
+	) {
+		RequisitionUtil.post<TokenIcon>(
+			AesCrypto.encrypt(contractList.generateObject()).orEmpty(),
+			APIPath.getIconURL(APIPath.currentUrl),
+			"token_list",
+			{ hold(null, it) },
+			true
+		) {
+			hold(it, RequestError.None)
 		}
 	}
 
@@ -362,23 +373,20 @@ object GoldStoneAPI {
 
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
-		errorCallback: (RequestError) -> Unit,
-		hold: (List<QuotationSelectionLineChartModel>) -> Unit
+		hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
+		RequisitionUtil.postRequest<QuotationSelectionLineChartModel>(
 			RequestBody.create(
 				requestContentType,
-				ParameterUtil.prepare(
-					true,
-					Pair("pair_list", pairList)
-				)
+				ParameterUtil.prepare(true, Pair("pair_list", pairList))
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-			errorCallback = errorCallback,
-			isEncrypt = true,
-			hold = hold
-		)
+			errorCallback = { hold(null, it) },
+			isEncrypt = true
+		) {
+			hold(it, RequestError.None)
+		}
 	}
 
 	fun registerWalletAddresses(
@@ -401,8 +409,7 @@ object GoldStoneAPI {
 	fun getUnreadCount(
 		deviceID: String,
 		time: Long,
-		errorCallback: (RequestError) -> Unit,
-		hold: (String) -> Unit
+		hold: (unreadCount: String?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest(
 			RequestBody.create(
@@ -414,17 +421,16 @@ object GoldStoneAPI {
 				)
 			),
 			APIPath.getUnreadCount(APIPath.currentUrl),
-			errorCallback,
+			{ hold(null, it) },
 			true
 		) {
-			hold(JSONObject(it).safeGet("count"))
+			hold(JSONObject(it).safeGet("count"), RequestError.None)
 		}
 	}
 
 	fun getNotificationList(
 		time: Long,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<NotificationTable>) -> Unit
+		@WorkerThread hold: (notifications: ArrayList<NotificationTable>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<String>(
 			RequestBody.create(
@@ -434,29 +440,27 @@ object GoldStoneAPI {
 			"message_list",
 			APIPath.getNotification(APIPath.currentUrl),
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			true
 		) { it ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不实用 `Gson`
 			val notificationData = arrayListOf<NotificationTable>()
 			val jsonArray = JSONArray(it[0])
-			GoldStoneAPI.context.runOnUiThread {
-				if (jsonArray.length() == 0) {
-					hold(arrayListOf())
-				} else {
-					(0 until jsonArray.length()).forEachOrEnd { it, isEnd ->
-						notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
-						if (isEnd) hold(notificationData)
-					}
+			if (jsonArray.length() == 0) {
+				hold(arrayListOf(), RequestError.None)
+			} else {
+				(0 until jsonArray.length()).forEach {
+					notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
 				}
+				hold(notificationData, RequestError.None)
 			}
 		}
 	}
 
 	fun getPriceByContractAddress(
-		addressList: JsonArray,
-		errorCallback: (RequestError) -> Unit,
-		@UiThread hold: (List<TokenPriceModel>) -> Unit
+		addressList: List<String>,
+		isMainThread: Boolean,
+		hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<TokenPriceModel>(
 			RequestBody.create(
@@ -465,11 +469,13 @@ object GoldStoneAPI {
 			),
 			"price_list",
 			APIPath.getPriceByAddress(APIPath.currentUrl),
-			errorCallback = errorCallback,
+			errorCallback = { hold(null, it) },
 			isEncrypt = true
 		) {
-			GoldStoneAPI.context.runOnUiThread {
-				hold(it)
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(it, RequestError.None)
+			} else {
+				hold(it, RequestError.None)
 			}
 		}
 	}
@@ -478,49 +484,49 @@ object GoldStoneAPI {
 		pair: String,
 		period: String,
 		size: Int,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<CandleChartModel>) -> Unit
+		hold: (candleChart: ArrayList<CandleChartModel>?, error: RequestError) -> Unit
 	) {
 		requestData<CandleChartModel>(
 			APIPath.getQuotationCurrencyCandleChart(APIPath.currentUrl, pair, period, size),
 			"ticks",
-			errorCallback = errorCallback,
+			errorCallback = { hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(this.toArrayList())
+			hold(this.toArrayList(), RequestError.None)
 		}
 	}
 
 	fun getQuotationCurrencyInfo(
 		pair: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (JSONObject) -> Unit
+		@WorkerThread hold: (data: JSONObject?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getQuotationCurrencyInfo(APIPath.currentUrl, pair),
 			"",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(JSONObject(first()))
+			hold(JSONObject(firstOrNull().orEmpty()), RequestError.None)
 		}
 	}
 
 	fun getTokenInfoFromMarket(
 		symbol: String,
 		chainID: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (CoinInfoModel) -> Unit
+		hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getCoinInfo(APIPath.currentUrl) + symbol,
 			"",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			hold(CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID))
+			hold(
+				CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID),
+				RequestError.None
+			)
 		}
 	}
 

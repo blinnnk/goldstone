@@ -28,8 +28,8 @@ import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.GoldStoneCode
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -156,11 +156,11 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 				val option = if (isRemove) 0 else 1
 				if (getWalletType().isBIP44()) {
 					val all = getCurrentAllBip44Address()
-					all.asSequence().map {
+					val convertedData = all.asSequence().map {
 						prepareAddressData(AddressCommissionModel(it.address, it.getChainType().id, option, id))
 					}.toList()
 					GoldStoneAPI.registerWalletAddresses(
-						AesCrypto.encrypt("$all").orEmpty(),
+						AesCrypto.encrypt("$convertedData").orEmpty(),
 						{ LogUtil.error("registerAddressesAfterGenerateWallet", it) }
 					) {
 						if (!isRemove) updateRegisterAddressesStatus(it)

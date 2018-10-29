@@ -5,7 +5,7 @@ import com.blinnnk.util.getDoubleFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.SharesPreference
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 
 /**
@@ -13,8 +13,6 @@ import io.goldstone.blockchain.kernel.network.GoldStoneAPI
  * @date  2018/09/27
  */
 object SharedValue {
-
-	fun needShowPincCode(): Boolean = true
 
 	// EOS KB
 	fun getRAMUnitPrice(): Double =

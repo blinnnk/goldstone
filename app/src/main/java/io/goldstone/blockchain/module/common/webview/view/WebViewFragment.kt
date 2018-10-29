@@ -55,8 +55,9 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
-		presenter.prepareBackEvent()
+		presenter.prepareBackEvent {
+			super.setBaseBackEvent(activity, parent)
+		}
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")

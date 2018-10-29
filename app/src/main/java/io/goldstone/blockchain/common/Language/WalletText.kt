@@ -47,16 +47,7 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包"
 		else -> ""
 	}
-	@JvmField
-	val historyButton = when (currentLanguage) {
-		HoneyLanguage.English.code -> "History"
-		HoneyLanguage.Chinese.code -> "记录"
-		HoneyLanguage.Japanese.code -> "記録"
-		HoneyLanguage.Korean.code -> "기록"
-		HoneyLanguage.Russian.code -> "История"
-		HoneyLanguage.TraditionalChinese.code -> "記錄"
-		else -> ""
-	}
+
 	@JvmField
 	val notifyButton = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Notifications"
@@ -65,16 +56,6 @@ object WalletText {
 		HoneyLanguage.Korean.code -> "알림"
 		HoneyLanguage.Russian.code -> "Уведомления"
 		HoneyLanguage.TraditionalChinese.code -> "通知"
-		else -> ""
-	}
-	@JvmField
-	val tokenDetailHeaderText = when (currentLanguage) {
-		HoneyLanguage.English.code -> "MY"
-		HoneyLanguage.Chinese.code -> "我的"
-		HoneyLanguage.Japanese.code -> "私のもの"
-		HoneyLanguage.Korean.code -> "내"
-		HoneyLanguage.Russian.code -> "Мое"
-		HoneyLanguage.TraditionalChinese.code -> "我的"
 		else -> ""
 	}
 	@JvmField
@@ -109,7 +90,7 @@ object WalletText {
 	}
 	@JvmField
 	val bip44MultiChain = when (currentLanguage) {
-		HoneyLanguage.English.code -> "MULTI-CHAIN BASED ON BIP44"
+		HoneyLanguage.English.code -> "Multiple Chain Based On BIP44"
 		HoneyLanguage.Chinese.code -> "基于BIP44的多链钱包"
 		HoneyLanguage.Japanese.code -> "マルチチェーン(BIP44)"
 		HoneyLanguage.Korean.code -> "BIP44 기반의 다중 체인 지갑"
@@ -119,7 +100,7 @@ object WalletText {
 	}
 	@JvmField
 	val multiChain = when (currentLanguage) {
-		HoneyLanguage.English.code -> "MULTI-CHAIN"
+		HoneyLanguage.English.code -> "Multiple Chain"
 		HoneyLanguage.Chinese.code -> "支持多链"
 		HoneyLanguage.Japanese.code -> "マルチチェーン"
 		HoneyLanguage.Korean.code -> "다중 체인"
@@ -129,7 +110,7 @@ object WalletText {
 	}
 	@JvmField
 	val ethERCAndETC = when (currentLanguage) {
-		HoneyLanguage.English.code -> "ETH/ERC20 Token/ETC"
+		HoneyLanguage.English.code -> "ETH/ERC20/ETC"
 		HoneyLanguage.Chinese.code -> "ETH/ERC20代币/ETC"
 		HoneyLanguage.Japanese.code -> "ETH/ERC20トークン/ETC"
 		HoneyLanguage.Korean.code -> "ETH/ERC20 토큰/ETC"
@@ -139,18 +120,18 @@ object WalletText {
 	}
 	@JvmField
 	val ltcMainnet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "LITECOIN MAINNET"
+		HoneyLanguage.English.code -> "Litecoin Mainnet"
 		HoneyLanguage.Chinese.code -> "Litecoin(莱特币)主网"
-		HoneyLanguage.Japanese.code -> "LITECOIN メインネット"
-		HoneyLanguage.Korean.code -> "LITECOIN 메인 넷"
-		HoneyLanguage.Russian.code -> "LITECOIN Основная"
+		HoneyLanguage.Japanese.code -> "Litecoin メインネット"
+		HoneyLanguage.Korean.code -> "Litecoin 메인 넷"
+		HoneyLanguage.Russian.code -> "Litecoin Основная"
 		HoneyLanguage.TraditionalChinese.code -> "Litecoin(萊特幣)主网"
 		else -> ""
 	}
 
 	@JvmField
 	val eosMainnet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "EOS MAINNET"
+		HoneyLanguage.English.code -> "EOS Mainnet"
 		HoneyLanguage.Chinese.code -> "EOS主网"
 		HoneyLanguage.Japanese.code -> "EOS メインネット"
 		HoneyLanguage.Korean.code -> "EOS 메인 넷"
@@ -161,11 +142,11 @@ object WalletText {
 
 	@JvmField
 	val eosWallet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "EOS WALLET"
+		HoneyLanguage.English.code -> "EOS Wallet"
 		HoneyLanguage.Chinese.code -> "EOS 钱包"
 		HoneyLanguage.Japanese.code -> "EOS ウォレット"
-		HoneyLanguage.Korean.code -> "EOS WALLET"
-		HoneyLanguage.Russian.code -> "EOS WALLET"
+		HoneyLanguage.Korean.code -> "EOS Wallet"
+		HoneyLanguage.Russian.code -> "EOS Wallet"
 		HoneyLanguage.TraditionalChinese.code -> "EOS 錢包"
 		else -> ""
 	}
@@ -183,54 +164,45 @@ object WalletText {
 
 	@JvmField
 	val bchMainnet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BCH MAINNET"
-		HoneyLanguage.Chinese.code -> "BCH MAINNET"
+		HoneyLanguage.English.code -> "BCH Mainnet"
+		HoneyLanguage.Chinese.code -> "BCH Mainnet"
 		HoneyLanguage.Japanese.code -> "BCH メインネット"
 		HoneyLanguage.Korean.code -> "BCH 메인 넷"
 		HoneyLanguage.Russian.code -> "BCH Испытательная"
-		HoneyLanguage.TraditionalChinese.code -> "BCH MAINNET"
+		HoneyLanguage.TraditionalChinese.code -> "BCH Mainnet"
 		else -> ""
 	}
 	@JvmField
 	val btcMainnet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BITCOIN MAINNET"
+		HoneyLanguage.English.code -> "Bitcoin Mainnet"
 		HoneyLanguage.Chinese.code -> "Bitcoin(比特币)主网"
 		HoneyLanguage.Japanese.code -> "Bitcoin(ビットコイン)メインネット"
-		HoneyLanguage.Korean.code -> "BITCOIN  메인 넷"
-		HoneyLanguage.Russian.code -> "BITCOIN Испытательная"
+		HoneyLanguage.Korean.code -> "Bitcoin  메인 넷"
+		HoneyLanguage.Russian.code -> "Bitcoin Испытательная"
 		HoneyLanguage.TraditionalChinese.code -> "Bitcoin(比特幣)主網"
 		else -> ""
 	}
 	@JvmField
 	val bitcoinTestnet = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BITCOIN TESTNET"
+		HoneyLanguage.English.code -> "Bitcoin Testnet"
 		HoneyLanguage.Chinese.code -> "Bitcoin(比特币)测试网络"
-		HoneyLanguage.Japanese.code -> "BITCOIN(ビットコイン)テストネット"
-		HoneyLanguage.Korean.code -> "BITCOIN 테스트 넷"
-		HoneyLanguage.Russian.code -> "BITCOIN TESTNET"
+		HoneyLanguage.Japanese.code -> "Bitcoin(ビットコイン)テストネット"
+		HoneyLanguage.Korean.code -> "Bitcoin 테스트 넷"
+		HoneyLanguage.Russian.code -> "Bitcoin Testnet"
 		HoneyLanguage.TraditionalChinese.code -> "Bitcoin(比特幣)測試網絡"
 		else -> ""
 	}
 	@JvmField
 	val watchOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "WATCH ONLY"
+		HoneyLanguage.English.code -> "Watch Only"
 		HoneyLanguage.Chinese.code -> "观察钱包"
 		HoneyLanguage.Japanese.code -> "観察ウォレット"
 		HoneyLanguage.Korean.code -> "관측 지갑"
-		HoneyLanguage.Russian.code -> "Наблюдательный кошелек"
+		HoneyLanguage.Russian.code -> "Наблюдать"
 		HoneyLanguage.TraditionalChinese.code -> "觀察錢包"
 		else -> ""
 	}
-	@JvmField
-	val baseBip44 = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BASED ON BIP44"
-		HoneyLanguage.Chinese.code -> "钱包基于 BIP44标准"
-		HoneyLanguage.Japanese.code -> "BIP44規格に基づく"
-		HoneyLanguage.Korean.code -> "BIP44 표준 기반 월렛"
-		HoneyLanguage.Russian.code -> "Основано на bip44"
-		HoneyLanguage.TraditionalChinese.code -> "錢包基於 BIP44標準"
-		else -> ""
-	}
+
 	@JvmField
 	val qrCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "QR Code"

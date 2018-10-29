@@ -10,11 +10,11 @@ import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.chart.pie.PieChartView
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramrank.model.EOSRAMRankModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.tradepercent.view.RAMTradePercentFragment
 import org.jetbrains.anko.runOnUiThread
 

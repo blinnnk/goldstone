@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
-import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -25,7 +25,7 @@ object BitcoinApi {
 	fun getBalance(
 		address: String,
 		isMainThread: Boolean,
-		hold: (balance: Long?, error: RequestError) -> Unit
+		hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
 		// 向 `Insight` 发起余额查询请求
 		BTCSeriesApiUtils.getBalance(
@@ -33,7 +33,7 @@ object BitcoinApi {
 			isMainThread
 		) { balance, error ->
 			if (!balance.isNull() && error.isNone()) {
-				hold(balance!!, error)
+				hold(Amount(balance!!), error)
 			} else BTCSeriesApiUtils.getBalanceFromBlockInfo(
 				BitcoinUrl.getBalanceFromBlockInfo(address),
 				address,

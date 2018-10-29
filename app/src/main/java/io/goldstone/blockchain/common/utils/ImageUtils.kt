@@ -3,7 +3,7 @@ package io.goldstone.blockchain.common.utils
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 /**
  * @date 22/03/2018 12:32 AM

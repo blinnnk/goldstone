@@ -45,33 +45,34 @@ class TokenManagementListPresenter(
 	// 在异步线程更新数据
 	private fun prepareMyDefaultTokens(isETHERCAndETCOnly: Boolean) {
 		DefaultTokenTable.getDefaultTokens { defaultTokens ->
-			object : ConcurrentAsyncCombine() {
-				override var asyncCount: Int = defaultTokens.size
-				override fun concurrentJobs() {
-					defaultTokens.forEach { default ->
-						MyTokenTable.getMyTokens { myTokens ->
+			MyTokenTable.getMyTokens { myTokens ->
+				object : ConcurrentAsyncCombine() {
+					override var asyncCount: Int = defaultTokens.size
+					override fun concurrentJobs() {
+						defaultTokens.forEach { default ->
 							default.isUsed = !myTokens.find {
-								default.contract.equals(it.contract, true)
+								default.contract.equals(it.contract, true) &&
+									default.symbol.equals(it.symbol, true)
 							}.isNull()
 							completeMark()
 						}
 					}
-				}
 
-				override fun mergeCallBack() {
-					val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
-					if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-						if (isETHERCAndETCOnly) sortedList.filter {
-							TokenContract(it.contract).isETH() ||
-								TokenContract(it.contract).isERC20Token() ||
-								TokenContract(it.contract).isETC()
-						}.let {
-							memoryTokenData = it.toArrayList()
-						} else memoryTokenData = sortedList
-						diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
-					} else return
-				}
-			}.start()
+					override fun mergeCallBack() {
+						val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
+						if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
+							if (isETHERCAndETCOnly) sortedList.filter {
+								TokenContract(it).isETH() ||
+									TokenContract(it).isERC20Token() ||
+									TokenContract(it).isETC()
+							}.let {
+								memoryTokenData = it.toArrayList()
+							} else memoryTokenData = sortedList
+							diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
+						} else return
+					}
+				}.start()
+			}
 		}
 	}
 
@@ -79,9 +80,13 @@ class TokenManagementListPresenter(
 		fun insertOrDeleteMyToken(isChecked: Boolean, token: DefaultTokenTable) {
 			doAsync {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				if (isChecked) MyTokenTable.addNew(token.symbol, TokenContract(token.contract), token.chainID)
+				if (isChecked) MyTokenTable.addNew(TokenContract(token), token.chainID)
 				else GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(token.contract, TokenContract(token.contract).getAddress())
+					.deleteByContractAndAddress(
+						token.contract,
+						token.symbol,
+						TokenContract(token).getAddress()
+					)
 			}
 		}
 	}

@@ -39,10 +39,13 @@ class QuotationPresenter(
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 			selections.asSequence().map { selection ->
 				var linechart = listOf<ChartPoint>()
-				if (!selection.lineChartDay.isBlank()) {
+				if (selection.lineChartDay.isNotEmpty()) {
 					linechart = convertDataToChartData(selection.lineChartDay)
 				}
-				linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
+				// 如果有网络的情况下检查 `LineData` 是否有效
+				if (NetworkUtil.hasNetwork(fragment.context)) {
+					linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
+				}
 				QuotationModel(
 					selection,
 					ValueTag.emptyPrice,
@@ -51,9 +54,9 @@ class QuotationPresenter(
 				)
 			}.sortedByDescending {
 				it.orderID
-			}.toList().toArrayList().let { it ->
+			}.toList().let { it ->
 				// 更新 `UI`
-				diffAndUpdateAdapterData<QuotationAdapter>(it)
+				diffAndUpdateAdapterData<QuotationAdapter>(it.toArrayList())
 				// 设定 `Socket` 并执行
 				if (currentSocket.isNull()) setSocket {
 					hasInitSocket = true
@@ -89,7 +92,7 @@ class QuotationPresenter(
 		if (isEmpty()) return
 		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
-		if (maxDate + 1L < 0.daysAgoInMills()) {
+		if (maxDate + 1L < 1.daysAgoInMills()) {
 			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
 				if (!newChart.isNull() && error.isNone()) {
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {
@@ -105,9 +108,7 @@ class QuotationPresenter(
 	}
 
 	private var currentSocket: GoldStoneWebSocket? = null
-	private fun setSocket(
-		callback: (GoldStoneWebSocket?) -> Unit
-	) {
+	private fun setSocket(callback: (GoldStoneWebSocket?) -> Unit) {
 		fragment.asyncData?.isEmpty()?.isTrue { return }
 		getPriceInfoBySocket(
 			fragment.asyncData?.map { it.pair },
@@ -127,10 +128,7 @@ class QuotationPresenter(
 		}
 	}
 
-	private fun QuotationFragment.updateAdapterDataSet(
-		data: CurrencyPriceInfoModel,
-		isDisconnected: Boolean
-	) {
+	private fun QuotationFragment.updateAdapterDataSet(data: CurrencyPriceInfoModel, isDisconnected: Boolean) {
 		load {
 			asyncData?.find {
 				it.pair.equals(data.pair, true)

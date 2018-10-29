@@ -5,17 +5,10 @@ package io.goldstone.blockchain.crypto.bitcoincash;
  * @date 2018/8/20 7:54 PM
  */
 
-import io.goldstone.blockchain.crypto.litecoin.ChainPrefix;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 
-/**
- * Copyright (c) 2018 Igor Kiulian
- * <p>
- * Distributed under the MIT software license, see the accompanying file LICENSE
- * or http://www.opensource.org/licenses/mit-license.php.
- */
+import io.goldstone.blockchain.crypto.litecoin.ChainPrefix;
 public class AddressConverter {
 
   private static final String SEPARATOR = ":";

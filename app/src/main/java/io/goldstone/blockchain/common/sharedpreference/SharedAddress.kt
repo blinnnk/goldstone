@@ -4,7 +4,7 @@ import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 
 /**
