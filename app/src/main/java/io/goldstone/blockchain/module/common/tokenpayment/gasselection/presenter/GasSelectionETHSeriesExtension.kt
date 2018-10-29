@@ -149,7 +149,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: (GoldStoneError) 
 			GoldStoneEthCall.sendRawTransaction(
 				signedHex,
 				callback,
-				getToken()?.contract.getCurrentChainName()
+				getToken()?.contract?.getChainURL()!!
 			) { taxHash ->
 				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 				taxHash.isValidTaxHash() isTrue {

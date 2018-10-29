@@ -2,8 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager
 
 import android.content.Context
 import android.os.Bundle
-import com.blinnnk.extension.getParentFragment
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
@@ -12,7 +13,6 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
@@ -28,6 +28,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
@@ -42,6 +43,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/7/11 12:44 AM
@@ -59,17 +61,24 @@ class AddressManagerPresenter(
 
 	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
 		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
-			EOSAPI.getAccountNameByPublicKey(
-				key,
-				{ LogUtil.error("showEOSPublickeyDescription", it) }
-			) { accountNames ->
-				val description = if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey else WalletSettingsText.unactivatedPublicKey
-				cell.showDescriptionTitle(description)
-			} else cell.showDescriptionTitle(WalletSettingsText.activatedPublicKey)
+			EOSAPI.getAccountNameByPublicKey(key
+			) { accountNames, error ->
+				if (!accountNames.isNull() && error.isNone()) {
+					val description =
+						if (accountNames!!.isNotEmpty())
+							WalletSettingsText.activatedPublicKey
+						else WalletSettingsText.unactivatedPublicKey
+					fragment.context?.runOnUiThread {
+						cell.showDescriptionTitle(description)
+					}
+				} else fragment.context?.runOnUiThread {
+					cell.showDescriptionTitle(WalletSettingsText.activatedPublicKey)
+				}
+			}
 	}
 
 	fun setBackEvent() {
-		fragment.getParentFragment<WalletSettingsFragment> {
+		fragment.getParentFragment<WalletSettingsFragment>()?.apply {
 			overlayView.header.apply {
 				showBackButton(true) {
 					presenter.showWalletSettingListFragment()
@@ -202,13 +211,17 @@ class AddressManagerPresenter(
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
 					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
 						// 新创建的账号插入所有对应的链的默认 `Token`
-						ChainID.getAllEthereumChainID().forEach {
+
+						val eosNodes =
+							GoldStoneDataBase.database.chainNodeDao().getETHNodes()
+						eosNodes.forEach {
 							insertNewAddressToMyToken(
 								TokenContract.ethContract,
 								address,
-								it
+								it.chainID
 							)
 						}
+
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
@@ -238,12 +251,15 @@ class AddressManagerPresenter(
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
 					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address ->
 						// 新创建的账号插入所有对应的链的默认 `Token`
+
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-						ChainID.getAllETCChainID().forEach {
+						val eosNodes =
+							GoldStoneDataBase.database.chainNodeDao().getETCNodes()
+						eosNodes.forEach {
 							insertNewAddressToMyToken(
 								TokenContract.etcContract,
 								address,
-								it
+								it.chainID
 							)
 						}
 						// 注册新增的子地址
@@ -266,7 +282,7 @@ class AddressManagerPresenter(
 		fun createEOSAddress(
 			context: Context,
 			password: String,
-			hold: (List<Bip44Address>) -> Unit
+			@UiThread hold: (List<Bip44Address>) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
@@ -286,12 +302,15 @@ class AddressManagerPresenter(
 								password,
 								false
 							)
+
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							ChainID.getAllEOSChainID().forEach { chainID ->
+							val eosNodes =
+								GoldStoneDataBase.database.chainNodeDao().getEOSNodes()
+							eosNodes.forEach {
 								insertNewAddressToMyToken(
 									TokenContract.eosContract,
 									eosKeyPair.address,
-									chainID
+									it.chainID
 								)
 							}
 							// 注册新增的子地址
@@ -303,7 +322,9 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateEOSAddresses(Bip44Address(eosKeyPair.address, newAddressIndex, ChainType.EOS.id)) {
+							wallet.updateEOSAddresses(
+								Bip44Address(eosKeyPair.address, newAddressIndex, ChainType.EOS.id)
+							) {
 								hold(it)
 							}
 						}

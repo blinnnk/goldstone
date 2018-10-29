@@ -45,7 +45,7 @@ private fun loadDataFromChain(
 	callback: (error: RequestError) -> Unit
 ) {
 	GoldStoneAPI.getETCTransactions(
-		SharedChain.getETCCurrent(),
+		SharedChain.getETCCurrent().chainID,
 		SharedAddress.getCurrentETC(),
 		blockNumber
 	) { newData, error ->

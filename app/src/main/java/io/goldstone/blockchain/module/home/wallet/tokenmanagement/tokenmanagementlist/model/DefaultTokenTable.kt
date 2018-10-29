@@ -77,7 +77,7 @@ data class DefaultTokenTable(
 		"",
 		true,
 		0,
-		SharedChain.getCurrentETH().id
+		""
 	)
 
 	constructor(
@@ -99,9 +99,7 @@ data class DefaultTokenTable(
 		data.chainID
 	)
 
-	constructor(
-		localData: JSONObject
-	) : this(
+	constructor(localData: JSONObject) : this(
 		0,
 		"",
 		localData.safeGet("address"),
@@ -210,7 +208,7 @@ data class DefaultTokenTable(
 		GoldStoneEthCall.getTokenName(
 			contract,
 			{ },
-			SharedChain.getCurrentETHName()
+			SharedChain.getCurrentETH()
 		) {
 			val name = if (it.isEmpty()) symbol else it
 			DefaultTokenTable.updateTokenName(TokenContract(this), name)
@@ -271,9 +269,9 @@ data class DefaultTokenTable(
 								callback()
 							} else {
 								// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-								update(targetTokens.asSequence().filterNot { default ->
-									ChainID.getTestChains().any { it.equals(default.chainID, true) }
-								}.first().apply {
+								targetTokens.asSequence().firstOrNull {
+									ChainID(it.chainID).isTestnet()
+								}?.apply {
 									exchange = data.exchange
 									website = data.website
 									marketCap = data.marketCap
@@ -283,7 +281,7 @@ data class DefaultTokenTable(
 									totalSupply = data.supply
 									startDate = data.startDate
 									description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
-								})
+								}?.let { update(it) }
 								callback()
 							}
 						}
@@ -335,7 +333,7 @@ interface DefaultTokenDao {
 	fun insert(token: DefaultTokenTable)
 
 	@Insert
-	fun insertAll(token: List<DefaultTokenTable>)
+	fun insertAll(tokens: List<DefaultTokenTable>)
 
 	@Update
 	fun update(token: DefaultTokenTable)

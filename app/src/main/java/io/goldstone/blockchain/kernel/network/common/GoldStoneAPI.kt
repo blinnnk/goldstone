@@ -2,9 +2,9 @@ package io.goldstone.blockchain.kernel.network.common
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.TinyNumberUtils
@@ -16,10 +16,14 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.TokenIcon
+import io.goldstone.blockchain.crypto.multichain.generateObject
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestData
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestUnCryptoData
@@ -60,56 +64,48 @@ object GoldStoneAPI {
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
 	 */
 	@JvmStatic
-	fun getDefaultTokens(
-		@WorkerThread hold: (defaultTokens: List<DefaultTokenTable>?, error: RequestError) -> Unit
-	) {
+	fun getDefaultTokens(@WorkerThread hold: (default: List<DefaultTokenTable>?, error: RequestError) -> Unit) {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
-		AppConfigTable.getAppConfig { config ->
-			requestData<String>(
-				APIPath.defaultTokenList(APIPath.currentUrl, config?.defaultCoinListMD5.orEmpty()),
-				"",
-				true,
-				{ hold(null, it) },
-				isEncrypt = true
-			) {
-				// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
-				val data = JSONObject(this[0])
-				val defaultTokens = data.safeGet("data")
-				// MD5 值存入数据库
-				val md5 = data.safeGet("md5")
-				AppConfigTable.updateDefaultTokenMD5(md5)
-				val gson = Gson()
-				val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
-				val allDefaultTokens = arrayListOf<DefaultTokenTable>()
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount = ChainID.getAllChainID().size
-					override fun concurrentJobs() {
-						ChainID.getAllChainID().forEach { chainID ->
-							allDefaultTokens +=
-								try {
-									gson.fromJson<List<DefaultTokenTable>>(
-										JSONObject(defaultTokens).safeGet(chainID),
-										collectionType
-									)
-								} catch (error: Exception) {
-									listOf<DefaultTokenTable>()
-								}.map { defaultToken ->
-									defaultToken.apply {
-										this.chainID = chainID
-										this.isDefault = true
-									}
-								}.apply {
-									completeMark()
-								}
-						}
+		val config = GoldStoneDataBase.database.appConfigDao().getAppConfig()
+		requestData<String>(
+			APIPath.defaultTokenList(APIPath.currentUrl, config?.defaultCoinListMD5.orEmpty()),
+			"",
+			true,
+			{ hold(null, it) },
+			isEncrypt = true
+		) {
+			// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
+			val data = JSONObject(firstOrNull().orEmpty())
+			val defaultTokens = data.safeGet("data")
+			// MD5 值存入数据库
+			val md5 = data.safeGet("md5")
+			GoldStoneDataBase.database.appConfigDao().updateDefaultMD5(md5)
+			val gson = Gson()
+			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
+			val allDefaultTokens = arrayListOf<DefaultTokenTable>()
+			val allNode = GoldStoneDataBase.database.chainNodeDao().getAll()
+			object : ConcurrentAsyncCombine() {
+				override var asyncCount = allNode.size
+				override fun concurrentJobs() {
+					allNode.forEach { node ->
+						allDefaultTokens +=
+							try {
+								gson.fromJson<List<DefaultTokenTable>>(
+									JSONObject(defaultTokens).safeGet(node.chainID),
+									collectionType
+								)
+							} catch (error: Exception) {
+								listOf<DefaultTokenTable>()
+							}
+						completeMark()
 					}
+				}
 
-					override fun getResultInMainThread(): Boolean = false
-					override fun mergeCallBack() {
-						hold(allDefaultTokens, RequestError.None)
-					}
-				}.start()
-			}
+				override fun getResultInMainThread(): Boolean = false
+				override fun mergeCallBack() {
+					hold(allDefaultTokens, RequestError.None)
+				}
+			}.start()
 		}
 	}
 
@@ -122,7 +118,7 @@ object GoldStoneAPI {
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${SharedChain.getCurrentETH().id},${SharedChain.getETCCurrent().id},${SharedChain.getBTCCurrent().id},${SharedChain.getLTCCurrent().id},${SharedChain.getEOSCurrent().id},${SharedChain.getBCHCurrent().id}"
+				"${SharedChain.getCurrentETH().chainID.id},${SharedChain.getETCCurrent().chainID.id},${SharedChain.getBTCCurrent().chainID.id},${SharedChain.getLTCCurrent().chainID.id},${SharedChain.getEOSCurrent().chainID.id},${SharedChain.getBCHCurrent().chainID.id}"
 			),
 			"list",
 			false,
@@ -183,7 +179,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getCurrencyRate(
 		symbols: String,
-		hold: (rate: Double?, error: RequestError) -> Unit
+		@WorkerThread hold: (rate: Double?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getCurrencyRate(APIPath.currentUrl) + symbols,
@@ -192,14 +188,14 @@ object GoldStoneAPI {
 			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			this[0].isNotNull { hold(this[0].toDouble(), RequestError.None) }
+			firstOrNull().isNotNull { hold(firstOrNull()?.toDoubleOrNull().orZero(), RequestError.None) }
 		}
 	}
 
 	@JvmStatic
 	fun getTerms(
 		md5: String,
-		hold: (term: String?, error: RequestError) -> Unit
+		@WorkerThread hold: (term: String?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.terms(APIPath.currentUrl) + md5,
@@ -214,7 +210,7 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getConfigList(
-		@UiThread hold: (configs: List<ServerConfigModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (configs: List<ServerConfigModel>?, error: RequestError) -> Unit
 	) {
 		requestData<ServerConfigModel>(
 			APIPath.getConfigList(APIPath.currentUrl),
@@ -223,9 +219,7 @@ object GoldStoneAPI {
 			{ hold(null, it) },
 			isEncrypt = true
 		) {
-			context.runOnUiThread {
-				hold(this@requestData, RequestError.None)
-			}
+			hold(this, RequestError.None)
 		}
 	}
 

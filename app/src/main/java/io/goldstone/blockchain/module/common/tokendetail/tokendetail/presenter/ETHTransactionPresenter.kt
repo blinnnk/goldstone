@@ -145,7 +145,7 @@ private fun diffNewDataAndUpdateLocalData(
 	GoldStoneDataBase.database.transactionDao().apply {
 		getTransactionsByAddress(
 			SharedAddress.getCurrentEthereum(),
-			SharedChain.getCurrentETH().id
+			SharedChain.getCurrentETH().chainID.id
 		).let { localData ->
 			newData.filterNot { new ->
 				localData.any {
@@ -187,14 +187,14 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 								completeMark()
 								LogUtil.error("getUnknownTokenInfo ", it)
 							},
-							SharedChain.getCurrentETHName()
+							SharedChain.getCurrentETH()
 						) { symbol, decimal ->
 							unknownData.add(
 								DefaultTokenTable(
 									transaction.contractAddress,
 									symbol,
 									decimal,
-									SharedChain.getCurrentETH(),
+									SharedChain.getCurrentETH().chainID,
 									""
 								)
 							)

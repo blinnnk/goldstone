@@ -123,7 +123,7 @@ class TokenSearchPresenter(
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
 			{ fragment.context?.alert(it.message) },
-			SharedChain.getCurrentETHName()
+			SharedChain.getCurrentETH()
 		) { symbol, name, decimal ->
 			if (symbol.isEmpty() || name.isEmpty())
 				hold(arrayListOf(), RequestError.NullResponse("empty symbol and name"))
@@ -146,7 +146,7 @@ class TokenSearchPresenter(
 							null,
 							status,
 							0,
-							SharedChain.getCurrentETH().id,
+							SharedChain.getCurrentETH().chainID.id,
 							isUsed = status
 						)
 					),

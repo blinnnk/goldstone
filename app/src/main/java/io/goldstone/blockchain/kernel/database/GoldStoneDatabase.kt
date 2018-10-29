@@ -2,8 +2,8 @@ package io.goldstone.blockchain.kernel.database
 
 import android.arch.persistence.room.*
 import android.content.Context
-import io.goldstone.blockchain.crypto.multichain.ChainNodeDao
-import io.goldstone.blockchain.crypto.multichain.ChainNodeTable
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeDao
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.kernel.commonmodel.*
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter

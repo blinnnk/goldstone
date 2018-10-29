@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.kernel.network
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
@@ -22,7 +23,7 @@ import org.json.JSONObject
 object BTCSeriesApiUtils {
 	fun getTransactions(
 		api: String,
-		hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
+		@WorkerThread hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
@@ -41,7 +42,7 @@ object BTCSeriesApiUtils {
 
 	fun getTransactionCount(
 		api: String,
-		hold: (count: Int?, error: RequestError) -> Unit
+		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,

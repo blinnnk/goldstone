@@ -81,7 +81,7 @@ fun GasSelectionPresenter.transferLTC(
 						SharedValue.isTestEnvironment()
 					).let { signedModel ->
 						BTCSeriesJsonRPC.sendRawTransaction(
-							SharedChain.getLTCCurrentName(),
+							SharedChain.getLTCCurrent(),
 							signedModel.signedMessage,
 							callback
 						) { hash ->

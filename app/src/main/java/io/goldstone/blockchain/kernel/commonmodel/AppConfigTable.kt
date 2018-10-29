@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.annotation.SuppressLint
 import android.arch.persistence.room.*
 import android.provider.Settings
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
@@ -13,7 +14,6 @@ import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.crypto.multichain.ChainNameID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -43,20 +43,9 @@ data class AppConfigTable(
 	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
 	var terms: String = "",
-	var currentETCTestChainNameID: Int,
-	var currentETHSeriesTestChainNameID: Int,
-	var currentBTCTestChainNameID: Int,
-	var currentLTCTestChainNameID: Int,
-	var currentBCHTestChainNameID: Int,
-	var currentEOSTestChainNameID: Int,
-	var currentETCChainNameID: Int,
-	var currentBTCChainNameID: Int,
-	var currentETHSeriesChainNameID: Int,
-	var currentBCHChainNameID: Int,
-	var currentLTCChainNameID: Int,
-	var currentEOSChainNameID: Int,
 	var defaultCoinListMD5: String,
-	var exchangeListMD5: String
+	var exchangeListMD5: String,
+	var nodeListMD5: String
 ) {
 
 	companion object {
@@ -78,12 +67,6 @@ data class AppConfigTable(
 		fun updatePushToken(token: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
-			}
-		}
-
-		fun updateDefaultTokenMD5(md5: String) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateDefaultMD5(md5)
 			}
 		}
 
@@ -145,37 +128,6 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateChainInfo(
-			isMainnet: Boolean,
-			etcChainNameID: Int,
-			ethSeriesID: Int,
-			btcChainNameID: Int,
-			bchChainNameID: Int,
-			ltcChainNameID: Int,
-			eosChainNameID: Int,
-			callback: () -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					if (isMainnet) updateMainnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
-					else updateTestnetChainName(isMainnet, bchChainNameID, ltcChainNameID, eosChainNameID, ethSeriesID, btcChainNameID, etcChainNameID)
-					callback()
-				}
-			}
-		}
-
-		fun updateTerms(terms: String) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateTerms(terms)
-			}
-		}
-
-		fun updateShareContent(shareContent: String) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateShareContent(shareContent)
-			}
-		}
-
 		fun updateCurrency(code: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateCurrency(code)
@@ -184,38 +136,22 @@ data class AppConfigTable(
 		}
 
 		@SuppressLint("HardwareIds")
-		fun insertAppConfig(callback: (AppConfigTable) -> Unit) {
-			doAsync {
-				val goldStoneID =
-					Settings.Secure.getString(
-						GoldStoneAPI.context.contentResolver,
-						Settings.Secure.ANDROID_ID
-					) + System.currentTimeMillis()
+		fun insertAppConfig(@WorkerThread callback: (AppConfigTable) -> Unit) {
+			val goldStoneID =
+				Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID) + System.currentTimeMillis()
 
-				val config = AppConfigTable(
-					0,
-					goldStoneID = goldStoneID,
-					language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
-					terms = getLocalTerms(),
-					isMainnet = true,
-					currentBTCChainNameID = ChainNameID.GoldStoneBTCMain.id,
-					currentETCChainNameID = ChainNameID.GasTrackerETCMain.id,
-					currentETHSeriesChainNameID = ChainNameID.InfuraETHMain.id,
-					currentBTCTestChainNameID = ChainNameID.GoldStoneBTCTest.id,
-					currentETCTestChainNameID = ChainNameID.GasTrackerETCMorden.id,
-					currentETHSeriesTestChainNameID = ChainNameID.InfuraRopsten.id,
-					currentLTCTestChainNameID = ChainNameID.GoldStoneLTCTest.id,
-					currentLTCChainNameID = ChainNameID.GoldStoneLTC.id,
-					currentBCHChainNameID = ChainNameID.GoldStoneBCHMain.id,
-					currentBCHTestChainNameID = ChainNameID.GoldStoneBCHTest.id,
-					currentEOSChainNameID = ChainNameID.GoldStoneEOSMain.id,
-					currentEOSTestChainNameID = ChainNameID.GoldStoneEOSTest.id,
-					defaultCoinListMD5 = "",
-					exchangeListMD5 = ""
-				)
-				GoldStoneDataBase.database.appConfigDao().insert(config)
-				GoldStoneAPI.context.runOnUiThread { callback(config) }
-			}
+			val config = AppConfigTable(
+				0,
+				goldStoneID = goldStoneID,
+				language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+				terms = getLocalTerms(),
+				isMainnet = true,
+				defaultCoinListMD5 = "",
+				exchangeListMD5 = "",
+				nodeListMD5 = ""
+			)
+			GoldStoneDataBase.database.appConfigDao().insert(config)
+			callback(config)
 		}
 
 		private fun getLocalTerms(): String {
@@ -260,8 +196,11 @@ interface AppConfigDao {
 	@Query("UPDATE appConfig SET retryTimes = :times WHERE id = 1")
 	fun updateRetryTimes(times: Int)
 
-	@Query("UPDATE appConfig SET isMainnet = :status WHERE id = 1")
-	fun updateChainStatus(status: Boolean)
+	@Query("UPDATE appConfig SET nodeListMD5 = :md5 WHERE id = 1")
+	fun updateNodeListMD5(md5: String)
+
+	@Query("UPDATE appConfig SET isMainnet = :isMainnet WHERE id = 1")
+	fun updateChainStatus(isMainnet: Boolean)
 
 	@Query("UPDATE appConfig SET defaultCoinListMD5 = :md5 WHERE id = 1")
 	fun updateDefaultMD5(md5: String)
@@ -274,12 +213,6 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET terms = :content WHERE id = 1")
 	fun updateTerms(content: String)
-
-	@Query("UPDATE appConfig SET isMainnet = :isMainnet, currentBCHChainNameID = :bchChainNameID, currentLTCChainNameID = :ltcChainNameID, currentEOSChainNameID = :eosChainNameID, currentETHSeriesChainNameID = :ethSeriesChainNameID, currentBTCChainNameID = :btcChainNameID, currentETCChainNameID = :etcChainNameID   WHERE id = 1")
-	fun updateMainnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
-
-	@Query("UPDATE appConfig SET isMainnet = :isMainnet,  currentBCHTestChainNameID = :bchChainNameID, currentLTCTestChainNameID = :ltcChainNameID, currentEOSTestChainNameID = :eosChainNameID, currentETHSeriesTestChainNameID = :ethSeriesChainNameID, currentBTCTestChainNameID = :btcChainNameID, currentETCTestChainNameID = :etcChainNameID   WHERE id = 1")
-	fun updateTestnetChainName(isMainnet: Boolean, bchChainNameID: Int, ltcChainNameID: Int, eosChainNameID: Int, ethSeriesChainNameID: Int, btcChainNameID: Int, etcChainNameID: Int)
 
 	@Insert
 	fun insert(appConfigTable: AppConfigTable)

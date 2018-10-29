@@ -188,7 +188,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				}
 				setImage(R.drawable.node_error_banner)
 				setContent(
-					SharedChain.getCurrentETHName() + " ERROR",
+					"${SharedChain.getCurrentETH().chainID} ERROR",
 					"there are some errors on this chain, please search more information on internet"
 				)
 			}

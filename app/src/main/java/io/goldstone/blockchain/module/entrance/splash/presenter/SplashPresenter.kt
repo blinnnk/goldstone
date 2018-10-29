@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
-import android.support.annotation.UiThread
-import com.blinnnk.extension.*
+import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.jump
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -10,7 +12,6 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -22,7 +23,6 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.File
@@ -33,55 +33,56 @@ import java.io.File
  */
 class SplashPresenter(val activity: SplashActivity) {
 
+	@WorkerThread
 	fun hasAccountThenLogin() {
-		WalletTable.getCurrentWallet {
+		GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
 			if (
 				!eosAccountNames.currentPublicKeyHasActivated() &&
 				!eosAccountNames.hasActivatedOrWatchOnlyEOSAccount() &&
 				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				checkOrUpdateEOSAccount()
-			} else cacheDataAndSetNetBy(this) { activity.jump<MainActivity>() }
+			} else cacheDataAndSetNetBy(this) {
+				activity.jump<MainActivity>()
+			}
 		}
 	}
 
 	// 获取当前的汇率
+	@WorkerThread
 	fun updateCurrencyRateFromServer(config: AppConfigTable) {
-		doAsync {
-			SharedWallet.updateCurrencyCode(config.currencyCode)
-			GoldStoneAPI.getCurrencyRate(
-				config.currencyCode
-			) { rate, error ->
-				if (!rate.isNull() && error.isNone()) {
-					// 更新 `SharePreference` 中的值
-					SharedWallet.updateCurrentRate(rate!!)
-					// 更新数据库的值
-					SupportCurrencyTable.updateUsedRateValue(rate)
-				}
+		SharedWallet.updateCurrencyCode(config.currencyCode)
+		GoldStoneAPI.getCurrencyRate(config.currencyCode) { rate, error ->
+			if (!rate.isNull() && error.isNone()) {
+				// 更新 `SharePreference` 中的值
+				SharedWallet.updateCurrentRate(rate!!)
+				// 更新数据库的值
+				GoldStoneDataBase.database.currencyDao().updateUsedRate(rate)
 			}
 		}
 	}
 
 	private fun WalletTable.checkOrUpdateEOSAccount() {
-		EOSAPI.getAccountNameByPublicKey(
-			currentEOSAddress,
-			{
-				activity.alert(it.message)
-				activity.jump<MainActivity>()
-			}
-		) { accounts ->
-			if (accounts.isEmpty()) cacheDataAndSetNetBy(this) {
-				activity.jump<MainActivity>()
-			} else initEOSAccountName(accounts) {
-				// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
-				cacheDataAndSetNetBy(apply { currentEOSAccountName.updateCurrent(accounts.first().name) }) {
+		EOSAPI.getAccountNameByPublicKey(currentEOSAddress) { accounts, error ->
+			if (!accounts.isNull() && error.isNone()) {
+				if (accounts!!.isEmpty()) cacheDataAndSetNetBy(this) {
+					activity.jump<MainActivity>()
+				} else initEOSAccountName(accounts) {
+					// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
+					cacheDataAndSetNetBy(apply { currentEOSAccountName.updateCurrent(accounts.first().name) }) {
+						activity.jump<MainActivity>()
+					}
+				}
+			} else {
+				activity.runOnUiThread {
+					activity.alert(error.message)
 					activity.jump<MainActivity>()
 				}
 			}
 		}
 	}
 
-	private fun cacheDataAndSetNetBy(wallet: WalletTable, callback: () -> Unit) {
+	private fun cacheDataAndSetNetBy(wallet: WalletTable, @WorkerThread callback: () -> Unit) {
 		val type = wallet.getWalletType()
 		type.updateSharedPreference()
 		when {
@@ -125,36 +126,37 @@ class SplashPresenter(val activity: SplashActivity) {
 		}
 	}
 
-	fun initDefaultTokenByNetWork(callback: () -> Unit) {
+	fun initDefaultToken(@WorkerThread callback: () -> Unit) {
 		// if there isn't network init local token list
-		DefaultTokenTable.getAllTokens {
-			// 先判断是否插入本地的 `JSON` 数据
-			it.isEmpty() isTrue {
-				StartingPresenter.insertLocalTokens(activity) {
-					updateLocalTokensByNetWork()
-					callback()
-				}
-			} otherwise {
-				updateLocalTokensByNetWork()
-				callback()
-			}
+		val localDefaultTokens =
+			GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+		// 先判断是否插入本地的 `JSON` 数据
+		if (localDefaultTokens.isEmpty()) {
+			StartingPresenter.insertLocalTokens(activity, callback)
+		} else {
+			callback()
 		}
 	}
 
-	fun initSupportCurrencyList(callback: () -> Unit) {
-		SupportCurrencyTable.getSupportCurrencies {
-			it.isEmpty() isTrue {
-				StartingPresenter.insertLocalCurrency(activity, callback)
-			} otherwise {
-				callback()
-			}
-		}
+	fun initNodeList(@WorkerThread callback: () -> Unit) {
+		val localNode = GoldStoneDataBase.database.chainNodeDao().getAll()
+		if (localNode.isEmpty()) {
+			StartingPresenter.insertLocalNodeList(activity, callback)
+		} else callback()
+	}
+
+	fun initSupportCurrencyList(@WorkerThread callback: () -> Unit) {
+		val localCurrencies =
+			GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
+		if (localCurrencies.isEmpty()) {
+			StartingPresenter.insertLocalCurrency(activity, callback)
+		} else callback()
 	}
 
 
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
-	fun cleanWhenUpdateDatabaseOrElse(@UiThread callback: (allWallets: List<WalletTable>) -> Unit) {
+	fun cleanWhenUpdateDatabaseOrElse(@WorkerThread callback: (allWallets: List<WalletTable>) -> Unit) {
 		doAsync {
 			val allWallets = GoldStoneDataBase.database.walletDao().getAllWallets()
 			if (allWallets.isEmpty()) {
@@ -167,7 +169,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					unregisterGoldStoneID(SharedWallet.getNeedUnregisterGoldStoneID())
 				}
 			}
-			uiThread { callback(allWallets) }
+			callback(allWallets)
 		}
 	}
 
@@ -220,14 +222,6 @@ class SplashPresenter(val activity: SplashActivity) {
 				SharedWallet.updateCurrentName(name)
 				uiThread { callback() }
 			}
-		}
-	}
-
-	private fun updateLocalTokensByNetWork() {
-		// 每次有网络的时候都插入或更新网络数据
-		NetworkUtil.hasNetwork(activity) isTrue {
-			// update local `Tokens` info list
-			StartingPresenter.updateLocalDefaultTokens()
 		}
 	}
 }

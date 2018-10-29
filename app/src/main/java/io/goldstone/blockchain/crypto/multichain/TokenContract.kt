@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import java.io.Serializable
@@ -35,6 +36,17 @@ data class TokenContract(
 		token.symbol,
 		token.decimal
 	)
+
+	fun getChainURL(): ChainURL {
+		return when {
+			isETH() || isERC20Token() -> SharedChain.getCurrentETH()
+			isBTC() -> SharedChain.getBTCCurrent()
+			isLTC() -> SharedChain.getLTCCurrent()
+			isBCH() -> SharedChain.getBCHCurrent()
+			isETC() -> SharedChain.getETCCurrent()
+			else -> SharedChain.getEOSCurrent()
+		}
+	}
 
 	companion object {
 		val ETH = TokenContract(TokenContract.ethContract, CoinSymbol.ETH.symbol!!, CryptoValue.ethDecimal)
@@ -165,27 +177,14 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 
 fun TokenContract?.getCurrentChainID(): ChainID {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrent()
-		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrent()
-		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrent()
-		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrent()
-		this.isEOSSeries() -> SharedChain.getEOSCurrent()
-		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETH()
-		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETH()
-		else -> SharedChain.getEOSCurrent() // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-	}
-}
-
-fun TokenContract?.getCurrentChainName(): String {
-	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrentName()
-		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrentName()
-		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrentName()
-		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrentName()
-		this.isEOSSeries() -> SharedChain.getEOSCurrentName()
-		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETHName()
-		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETHName()
-		else -> SharedChain.getEOSCurrentName()
+		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrent().chainID
+		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrent().chainID
+		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrent().chainID
+		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrent().chainID
+		this.isEOSSeries() -> SharedChain.getEOSCurrent().chainID
+		this?.contract.equals(TokenContract.ethContract, true) -> SharedChain.getCurrentETH().chainID
+		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETH().chainID
+		else -> SharedChain.getEOSCurrent().chainID // 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
 	}
 }
 

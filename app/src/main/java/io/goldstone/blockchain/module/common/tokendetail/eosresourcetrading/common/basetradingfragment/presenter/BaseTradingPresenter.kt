@@ -103,7 +103,7 @@ open class BaseTradingPresenter(
 		@UiThread callback: (GoldStoneError) -> Unit
 	) {
 		val fromAccount = SharedAddress.getCurrentEOSAccount()
-		val chainID = SharedChain.getEOSCurrent()
+		val chainID = SharedChain.getEOSCurrent().chainID
 		val toAccount = getInputValue(stakeType).first
 		val tradingCount = getInputValue(stakeType).second
 		prepareTransaction(
@@ -166,7 +166,7 @@ open class BaseTradingPresenter(
 		) { privateKey, error ->
 			if (error.isNone() && !privateKey.isNull()) {
 				EOSBandWidthTransaction(
-					SharedChain.getEOSCurrent(),
+					SharedChain.getEOSCurrent().chainID,
 					EOSAuthorization(fromAccount.accountName, EOSActor.Active),
 					toAccount.accountName,
 					transferCount.toEOSUnit(),

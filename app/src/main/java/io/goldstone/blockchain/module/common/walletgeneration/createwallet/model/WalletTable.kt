@@ -121,7 +121,9 @@ data class WalletTable(
 			Bip44Address(currentETCAddress, ChainType.ETC.id),
 			Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
 			Bip44Address(currentEOSAddress isEmptyThen currentEOSAccountName.getCurrent(), ChainType.EOS.id)
-		).filter { it.address.isNotEmpty() }
+		).filter {
+			it.address.isNotEmpty()
+		}
 	}
 
 	fun getCurrentMainnetBip44Addresses(): List<Bip44Address> {
@@ -250,7 +252,7 @@ data class WalletTable(
 		}
 	}
 
-	fun insertWatchOnlyWallet(callback: (wallet: WalletTable) -> Unit) {
+	fun insertWallet(callback: (wallet: WalletTable) -> Unit) {
 		load {
 			GoldStoneDataBase.database.walletDao().apply {
 				findWhichIsUsing(true)?.let { update(it.apply { isUsing = false }) }
@@ -267,7 +269,7 @@ data class WalletTable(
 			EOSAccount(currentEOSAccountName.getCurrent()).isValid(false) -> EOSWalletType.Available
 			// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态
 			eosAccountNames.filter {
-				it.chainID.equals(SharedChain.getEOSCurrent().id, true) &&
+				it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true) &&
 					it.publicKey.equals(SharedAddress.getCurrentEOS(), true)
 			}.size > 1 -> EOSWalletType.NoDefault
 			else -> EOSWalletType.Inactivated
@@ -472,11 +474,14 @@ data class WalletTable(
 			}
 		}
 
+		@WorkerThread
 		fun getLatestAddressIndexByChainType(
 			chainType: ChainType,
 			hold: (wallet: WalletTable, ethAddressIndex: Int) -> Unit
 		) {
-			WalletTable.getCurrentWallet {
+			val currentWallet =
+				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+			currentWallet?.apply {
 				// 清理数据格式
 				val latestIndex = when {
 					chainType.isETH() -> ethAddresses.maxBy { it.index }?.index

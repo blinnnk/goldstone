@@ -200,7 +200,9 @@ class WalletDetailPresenter(
 					}
 				}
 
-				override fun mergeCallBack() = hold(this@getChainModels, balanceError)
+				override fun mergeCallBack() {
+					hold(this@getChainModels, balanceError)
+				}
 
 			}.start()
 		}

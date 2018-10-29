@@ -14,7 +14,7 @@ enum class EOSChain(val id: String) {
 
 	companion object {
 		fun getCurrent(): EOSChain {
-			return if (SharedChain.getEOSCurrent().isEOSMain()) Main else Test
+			return if (SharedChain.getEOSCurrent().chainID.isEOSMain()) Main else Test
 		}
 	}
 }

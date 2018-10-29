@@ -24,6 +24,7 @@ abstract class SilentUpdater {
 	fun star() {
 		doAsync {
 			if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+				updateLocalDefaultTokens()
 				updateUnknownDefaultToken()
 				updateRAMUnitPrice()
 				updateMyTokenCurrencyPrice()
@@ -39,7 +40,7 @@ abstract class SilentUpdater {
 		val account = SharedAddress.getCurrentEOSAccount()
 		if (!account.isValid(false)) return
 		EOSAPI.getEOSTokenList(
-			SharedChain.getEOSCurrent(),
+			SharedChain.getEOSCurrent().chainID,
 			account
 		) { tokenList, error ->
 			if (!tokenList.isNull() && error.isNone()) {
@@ -111,9 +112,20 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateNodeData() {
-		GoldStoneAPI.getChainNodes { content, error ->
-			if (!content.isNull() && error.isNone() && content!!.isNotEmpty()) {
-				GoldStoneDataBase.database.chainNodeDao().insertAll(content)
+		// 拉取网络数据, 更新本地的选中状态后覆盖本地数据库 TODO 需要增加 MD5 校验减少网络请求
+		GoldStoneAPI.getChainNodes { serverNodes, error ->
+			val nodeDao = GoldStoneDataBase.database.chainNodeDao()
+			if (!serverNodes.isNull() && error.isNone() && serverNodes!!.isNotEmpty()) {
+				val localNodes = nodeDao.getAll()
+				serverNodes.map { node ->
+					node.apply {
+						isUsed = localNodes.find {
+							it.url.equals(node.url, true)
+						}?.isUsed.orElse(1)
+					}
+				}.let {
+					nodeDao.insertAll(it)
+				}
 			}
 		}
 	}
@@ -138,6 +150,58 @@ abstract class SilentUpdater {
 			// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
 			myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
 				EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol, null))
+			}
+		}
+	}
+
+	private fun updateLocalDefaultTokens() {
+		GoldStoneAPI.getDefaultTokens { serverTokens, error ->
+			if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
+				DefaultTokenTable.getAllTokens(false) { localTokens ->
+					// 开一个线程更新图片
+					serverTokens.updateLocalTokenIcon(localTokens)
+					// 移除掉一样的数据
+					serverTokens.filterNot { server ->
+						localTokens.any { local ->
+							local.chainID.equals(server.chainID, true)
+								&& local.contract.equals(server.contract, true)
+						}
+					}.apply {
+						GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
+					}
+				}
+			}
+		}
+	}
+
+	private fun List<DefaultTokenTable>.updateLocalTokenIcon(localTokens: ArrayList<DefaultTokenTable>) {
+		doAsync {
+			val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+			filter { server ->
+				unManuallyData.find {
+					it.serverTokenID.equals(server.serverTokenID, true)
+				}?.let {
+					// 如果本地的非手动添加的数据没有存在于最新从 `Server` 拉取下来的意味着已经被 `CMS` 移除
+					GoldStoneDataBase.database.defaultTokenDao().update(it.apply { isDefault = false })
+				}
+
+				localTokens.any { local ->
+					local.chainID.equals(server.chainID, true)
+						&& local.contract.equals(server.contract, true)
+				}
+			}.apply {
+				if (isEmpty()) return@doAsync
+				forEach { server ->
+					GoldStoneDataBase.database.defaultTokenDao().apply {
+						getTokenByContract(server.contract, server.symbol, server.chainID)?.let {
+							update(it.apply {
+								iconUrl = server.iconUrl
+								isDefault = server.isDefault
+								forceShow = server.forceShow
+							})
+						}
+					}
+				}
 			}
 		}
 	}

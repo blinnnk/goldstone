@@ -182,9 +182,7 @@ data class BTCSeriesTransactionTable(
 			@UiThread hold: (List<BTCSeriesTransactionTable>) -> Unit
 		) {
 			load {
-				GoldStoneDataBase
-					.database
-					.btcSeriesTransactionDao()
+				GoldStoneDataBase.database.btcSeriesTransactionDao()
 					.getDataByAddressAndChainType(address, chainType)
 			} then (hold)
 		}

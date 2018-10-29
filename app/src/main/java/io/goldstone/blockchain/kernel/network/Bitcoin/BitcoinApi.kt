@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.Amount
@@ -55,7 +56,7 @@ object BitcoinApi {
 
 	fun getTransactionCount(
 		address: String,
-		hold: (count: Int?, error: RequestError) -> Unit
+		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		// `from` 传入一个特大值, `to` 传入 `0` 确保返回的数据只有 `count` 参数而不包含子集
 		BTCSeriesApiUtils.getTransactionCount(

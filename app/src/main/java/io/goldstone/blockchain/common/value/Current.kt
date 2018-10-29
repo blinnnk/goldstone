@@ -10,11 +10,11 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 
 object Current {
 	fun chainIDs(): List<String> = listOf(
-		SharedChain.getCurrentETH().id,
-		SharedChain.getETCCurrent().id,
-		SharedChain.getBTCCurrent().id,
-		SharedChain.getLTCCurrent().id,
-		SharedChain.getBCHCurrent().id,
-		SharedChain.getEOSCurrent().id
+		SharedChain.getCurrentETH().chainID.id,
+		SharedChain.getETCCurrent().chainID.id,
+		SharedChain.getBTCCurrent().chainID.id,
+		SharedChain.getLTCCurrent().chainID.id,
+		SharedChain.getBCHCurrent().chainID.id,
+		SharedChain.getEOSCurrent().chainID.id
 	)
 }

@@ -4,7 +4,6 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
@@ -39,32 +38,26 @@ class EOSAccountSelectionPresenter(
 	}
 
 	private fun getNewAccountNameFromChain(
-		errorCallback: (RequestError) -> Unit,
 		@UiThread hold: (newAccount: List<EOSAccountInfo>) -> Unit
 	) {
 		WalletTable.getCurrentWallet {
 			// 获取本地数据库里面的此公钥地址对应的用户名字
 			val currentChainNames =
 				eosAccountNames.filter {
-					it.chainID.equals(SharedChain.getEOSCurrent().id, true)
+					it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true)
 				}
-			EOSAPI.getAccountNameByPublicKey(
-				SharedAddress.getCurrentEOS(),
-				{
-					errorCallback(it)
-					// 如果请求出错的话, 仍要保持不阻碍用户的模式, 那么暂时通过只显示
-					// 本地数据库里面存储的 `AccountNames` 作为结果
-					hold(currentChainNames)
-				},
-				hold = hold
-			)
+			EOSAPI.getAccountNameByPublicKey(SharedAddress.getCurrentEOS()) { accounts, error ->
+				if (!accounts.isNull() && error.isNone()) {
+					hold(accounts!!)
+				} else hold(currentChainNames)
+			}
 		}
 	}
 
-	fun showAvailableNames(errorCallback: (RequestError) -> Unit) {
+	fun showAvailableNames() {
 		fragment.showLoadingView(true)
 		// 从链上重新拉取一次该公钥的对应的 AccountNames,
-		getNewAccountNameFromChain(errorCallback) { allAccountNames ->
+		getNewAccountNameFromChain { allAccountNames ->
 			EOSAccountTable.getAccountsByNames(
 				allAccountNames.map { it.name },
 				false

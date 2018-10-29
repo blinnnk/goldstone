@@ -119,7 +119,14 @@ object EOSAPI {
 				if (result.isEmpty()) {
 					hold(null, AccountError.UnavailableAccountName)
 				} else {
-					hold(EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent()), RequestError.None)
+					hold(
+						EOSAccountTable(
+							JSONObject(result),
+							SharedAddress.getCurrentEOS(),
+							SharedChain.getEOSCurrent().chainID
+						),
+						RequestError.None
+					)
 				}
 			}
 		}
@@ -139,9 +146,8 @@ object EOSAPI {
 
 	fun getAccountNameByPublicKey(
 		publicKey: String,
-		errorCallBack: (RequestError) -> Unit,
 		targetNet: String = "",
-		@UiThread hold: (accountNames: List<EOSAccountInfo>) -> Unit
+		@WorkerThread hold: (accountNames: List<EOSAccountInfo>?, error: RequestError) -> Unit
 	) {
 		val api =
 			if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
@@ -149,7 +155,7 @@ object EOSAPI {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey)),
 			api,
-			errorCallBack,
+			{ hold(null, it) },
 			false
 		) { result ->
 			val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
@@ -159,8 +165,14 @@ object EOSAPI {
 			}
 			// 生成指定的包含链信息的结果类型
 			val accountNames =
-				names.map { EOSAccountInfo(it, SharedChain.getEOSCurrent().id, SharedAddress.getCurrentEOS()) }
-			GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
+				names.map {
+					EOSAccountInfo(
+						it,
+						SharedChain.getEOSCurrent().chainID.id,
+						SharedAddress.getCurrentEOS()
+					)
+				}
+			hold(accountNames, RequestError.None)
 		}
 	}
 

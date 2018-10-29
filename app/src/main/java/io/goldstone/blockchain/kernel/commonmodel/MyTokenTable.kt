@@ -87,7 +87,7 @@ data class MyTokenTable(
 		fun updateOrInsertOwnerName(name: String, address: String) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
-					val chainID = SharedChain.getEOSCurrent().id
+					val chainID = SharedChain.getEOSCurrent().chainID.id
 					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
 					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
 					val pendingAccount = getPendingEOSAccount(address, chainID)
@@ -97,7 +97,7 @@ data class MyTokenTable(
 							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(
 								TokenContract.EOS.contract!!,
 								CoinSymbol.EOS.symbol!!,
-								SharedChain.getEOSCurrent().id
+								SharedChain.getEOSCurrent().chainID.id
 							)
 						defaultToken?.let {
 							MyTokenTable(it, name, address).preventDuplicateInsert()
@@ -183,7 +183,7 @@ data class MyTokenTable(
 				contract.isETH() || contract.isETC() ->
 					GoldStoneEthCall.getEthBalance(
 						ownerName,
-						contract.getCurrentChainName()
+						contract.getChainURL()
 					) { amount, error ->
 						if (!amount.isNull() && error.isNone()) {
 							val balance = amount!!.toEthCount()
@@ -228,7 +228,7 @@ data class MyTokenTable(
 					GoldStoneEthCall.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerName,
-						contract.getCurrentChainName()
+						SharedChain.getCurrentETH()
 					) { amount, error ->
 						if (!amount.isNull() && error.isNone()) {
 							val balance = CryptoUtils.toCountByDecimal(amount!!, token?.decimals.orZero())
@@ -260,7 +260,7 @@ interface MyTokenDao {
 	fun getAll(walletAddress: String): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress AND chainID LIKE :chainID")
-	fun getEOSData(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().id): List<MyTokenTable>
+	fun getEOSData(walletAddress: String, chainID: String = SharedChain.getEOSCurrent().chainID.id): List<MyTokenTable>
 
 	@Query("DELETE FROM myTokens WHERE ownerAddress LIKE :walletAddress OR ownerName LIKE :walletAddress")
 	fun deleteAllByAddress(walletAddress: String)

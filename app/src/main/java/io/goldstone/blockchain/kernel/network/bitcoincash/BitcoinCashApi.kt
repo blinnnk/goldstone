@@ -39,7 +39,7 @@ object BitcoinCashApi {
 		address: String,
 		from: Int,
 		to: Int,
-		hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
+		@WorkerThread hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactions(
 			BitcoinCashUrl.getTransactions(address, from, to),

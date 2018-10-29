@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.entrance.splash.view
 
 import android.graphics.Color
 import android.os.Bundle
+import android.support.annotation.WorkerThread
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.RelativeLayout
@@ -12,12 +13,20 @@ import io.goldstone.blockchain.common.component.container.SplashContainer
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ApkChannel
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.common.value.currentChannel
+import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
@@ -53,6 +62,7 @@ class SplashActivity : AppCompatActivity() {
 				initWaveView()
 			})
 			presenter.cleanWhenUpdateDatabaseOrElse {
+				// WorkThread
 				prepareData(it)
 			}
 		}
@@ -86,7 +96,9 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
+	@WorkerThread
 	private fun prepareData(allWallet: List<WalletTable>) {
+		// WorkThread
 		prepareAppConfig config@{
 			// 如果本地的钱包数量不为空那么才开始注册设备
 			if (allWallet.isNotEmpty()) {
@@ -96,28 +108,32 @@ class SplashActivity : AppCompatActivity() {
 			}
 			initLaunchLanguage(language)
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
-				supportFragmentManager.fragments.find {
-					it is StartingFragment
-				}.isNull {
-					addFragment<StartingFragment>(it.id)
+				supportFragmentManager.fragments.find { it is StartingFragment }.isNull {
+					// UI 切回主线程
+					runOnUiThread {
+						addFragment<StartingFragment>(it.id)
+					}
 				}
 			}
 			// 错开动画时间再执行数据请求
-			Duration.wave timeUpThen {
-				// Add currency data from local JSON file
-				presenter.apply {
-					initSupportCurrencyList {
-						doAsync {
-							// 更新分享的文案内容
-							updateShareContentFromServer()
-							// 更新用户条款如果有必要
-							updateAgreement()
-							// Insert support currency list from local json
-							updateCurrencyRateFromServer(this@config)
-						}
+			// Add currency data from local JSON file
+			presenter.apply {
+				initSupportCurrencyList {
+					// 更新分享的文案内容
+					updateShareContentFromServer()
+					// 更新用户条款如果有必要
+					updateAgreement()
+					// Insert support currency list from local json
+					updateCurrencyRateFromServer(this@config)
+				}
+				// Init Node List
+				initNodeList {
+					prepareNodeInfo {
 						// Check network to get default toke list
-						initDefaultTokenByNetWork {
-							prepareYingYongBaoInReviewStatus { hasAccountThenLogin() }
+						initDefaultToken {
+							prepareYingYongBaoInReviewStatus {
+								hasAccountThenLogin()
+							}
 						}
 					}
 				}
@@ -133,21 +149,50 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
-	private fun updateAgreement() {
-		AppConfigTable.getAppConfig { it ->
-			it?.apply {
-				val md5 = terms.getObjectMD5HexString()
-				GoldStoneAPI.getTerms(md5) { term, error ->
-					if (!term.isNullOrBlank() && error.isNone()) {
-						AppConfigTable.updateTerms(term!!)
+	@WorkerThread
+	private fun prepareNodeInfo(callback: () -> Unit) {
+		val chainDao = GoldStoneDataBase.database.chainNodeDao()
+		val localNode = if (SharedValue.isTestEnvironment()) {
+			chainDao.getTestnet()
+		} else chainDao.getMainnet()
+		localNode.forEach {
+			when {
+				ChainType(it.chainType).isETH() -> SharedChain.updateCurrentETH(ChainURL(it))
+				ChainType(it.chainType).isBTC() -> SharedChain.updateBTCCurrent(ChainURL(it))
+				ChainType(it.chainType).isLTC() -> SharedChain.updateLTCCurrent(ChainURL(it))
+				ChainType(it.chainType).isBCH() -> SharedChain.updateBCHCurrent(ChainURL(it))
+				ChainType(it.chainType).isEOS() -> {
+					SharedChain.updateEOSCurrent(ChainURL(it))
+					if (SharedValue.isTestEnvironment()) {
+						SharedChain.updateEOSTestnet(ChainURL(it))
+					} else {
+						SharedChain.updateEOSMainnet(ChainURL(it))
 					}
+				}
+				ChainType(it.chainType).isETC() -> SharedChain.updateETCCurrent(ChainURL(it))
+			}
+		}
+		callback()
+	}
+
+	@WorkerThread
+	private fun updateAgreement() {
+		val configDao = GoldStoneDataBase.database.appConfigDao()
+		val config = configDao.getAppConfig()
+		config?.apply {
+			val md5 = terms.getObjectMD5HexString()
+			GoldStoneAPI.getTerms(md5) { term, error ->
+				if (!term.isNullOrBlank() && error.isNone()) {
+					configDao.updateTerms(terms)
 				}
 			}
 		}
 	}
 
-	private fun prepareAppConfig(callback: AppConfigTable.() -> Unit) {
-		AppConfigTable.getAppConfig { config ->
+	private fun prepareAppConfig(@WorkerThread callback: AppConfigTable.() -> Unit) {
+		doAsync {
+			val config =
+				GoldStoneDataBase.database.appConfigDao().getAppConfig()
 			config.isNull() isTrue {
 				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
 				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
@@ -158,9 +203,9 @@ class SplashActivity : AppCompatActivity() {
 					 * 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里
 					 * 检测并重新注册
 					 */
-					WalletTable.getCurrentWallet {
-						XinGePushReceiver.registerAddressesForPush(this)
-					}
+					val currentWallet =
+						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
 				config?.let(callback)
 			}

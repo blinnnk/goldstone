@@ -24,7 +24,7 @@ private var hasBlockNumber = false
 fun TransactionDetailPresenter.observerBTCTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	object : BTCSeriesTransactionStatusObserver() {
-		override val chainName = SharedChain.getBTCCurrentName()
+		override val chainURL = SharedChain.getBTCCurrent()
 		override val hash = currentHash
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {

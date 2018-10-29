@@ -22,7 +22,8 @@ import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
@@ -73,16 +74,12 @@ class WatchOnlyImportPresenter(
 					callback(AccountError.InvalidAddress)
 					return
 				}
-			AddressType.EOS.value ->
+			AddressType.EOS.value, AddressType.EOSJungle.value ->
 				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
-			AddressType.EOSJungle.value ->
-				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
-					callback(AccountError.InvalidAddress)
-					return
-				}
+
 			AddressType.BCH.value ->
 				if (!BCHWalletUtils.isValidAddress(address)) {
 					callback(AccountError.InvalidAddress)
@@ -117,7 +114,7 @@ class WatchOnlyImportPresenter(
 							EOSAccountInfo(eosMainnetAccountName, ChainID.EOS.id),
 							EOSAccountInfo(eosTestnetAccountName, ChainID.EOSTest.id)
 						)
-					).insertWatchOnlyWallet { thisWallet ->
+					).insertWallet { thisWallet ->
 						CreateWalletPresenter.generateMyTokenInfo(
 							ChainAddresses(
 								Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
@@ -156,7 +153,11 @@ class WatchOnlyImportPresenter(
 		}
 	}
 
-	private fun setAddressByChainType(address: String, addressType: String, callback: (GoldStoneError) -> Unit) {
+	private fun setAddressByChainType(
+		address: String,
+		addressType: String,
+		callback: (GoldStoneError) -> Unit
+	) {
 		when (addressType) {
 			AddressType.ETHSeries.value -> {
 				currentETHSeriesAddress = address
@@ -184,11 +185,16 @@ class WatchOnlyImportPresenter(
 					SharedValue.updateIsTestEnvironment(false)
 					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
-					EOSAPI.getAccountInfo(EOSAccount(address), ChainURL.eosMain) { info, error ->
+					EOSAPI.getAccountInfo(
+						EOSAccount(address),
+						SharedChain.getEOSMainnet().chainID.id
+					) { info, error ->
 						if (!info.isNull() || error.isNone()) {
 							eosMainnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
-							SharedChain.updateEOSCurrent(ChainID.eosMain)
+							SharedChain.updateEOSCurrent(
+								ChainURL(GoldStoneDataBase.database.chainNodeDao().getCurrentEOSNode())
+							)
 							SharedValue.updateIsTestEnvironment(false)
 							callback(error)
 						} else callback(AccountError.InvalidAccountName)
@@ -201,11 +207,16 @@ class WatchOnlyImportPresenter(
 					SharedValue.updateIsTestEnvironment(true)
 					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
-					EOSAPI.getAccountInfo(EOSAccount(address), ChainURL.eosJungleHistory) { info, error ->
+					EOSAPI.getAccountInfo(
+						EOSAccount(address),
+						SharedChain.getEOSTestnet().chainID.id
+					) { info, error ->
 						if (!info.isNull() || error.isNone()) {
 							eosTestnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
-							SharedChain.updateEOSCurrent(ChainID.eosTest)
+							SharedChain.updateEOSCurrent(
+								ChainURL(GoldStoneDataBase.database.chainNodeDao().getCurrentEOSNode())
+							)
 							SharedValue.updateIsTestEnvironment(true)
 							callback(error)
 						} else callback(AccountError.InvalidAccountName)

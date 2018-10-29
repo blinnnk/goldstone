@@ -4,7 +4,6 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -28,11 +27,7 @@ fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 		loadLitecoinTransactionsFromChain(
 			address,
 			localDataMaxIndex,
-			transactionCount.orZero(),
-			{
-				fragment.removeLoadingView()
-				LogUtil.error("loadLTCChainData", it)
-			}
+			transactionCount.orZero()
 		) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
@@ -46,44 +41,45 @@ private fun loadLitecoinTransactionsFromChain(
 	address: String,
 	localDataMaxIndex: Int,
 	transactionCount: Int,
-	errorCallback: (Throwable) -> Unit,
-	successCallback: (hasData: Boolean) -> Unit
+	callback: () -> Unit
 ) {
 	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) {
-		successCallback(false)
+		callback()
 		return
 	}
 	LitecoinApi.getTransactions(
 		address,
 		pageInfo.from,
-		pageInfo.to,
-		errorCallback
-	) { transactions ->
+		pageInfo.to
+	) { transactions, error ->
 		// Calculate All Inputs to get transfer value
-		successCallback(transactions.asSequence().mapIndexed { index, item ->
-			// 转换数据格式
-			BTCSeriesTransactionTable(
-				item,
-				pageInfo.maxDataIndex + index + 1,
-				address,
-				CoinSymbol.ltc,
-				false,
-				ChainType.LTC.id
-			)
-		}.map {
-			// 插入转账数据到数据库
-			BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
-			// 同样的账单插入一份燃气费的数据
-			if (!it.isReceive) {
-				BTCSeriesTransactionTable.preventRepeatedInsert(
-					it.hash,
-					true,
-					it.apply { isFee = true }
+		if (!transactions.isNull() && error.isNone()) {
+			transactions!!.asSequence().mapIndexed { index, item ->
+				// 转换数据格式
+				BTCSeriesTransactionTable(
+					item,
+					pageInfo.maxDataIndex + index + 1,
+					address,
+					CoinSymbol.ltc,
+					false,
+					ChainType.LTC.id
 				)
-			}
-			TransactionListModel(it)
-		}.toList().isNotEmpty())
+			}.map {
+				// 插入转账数据到数据库
+				BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
+				// 同样的账单插入一份燃气费的数据
+				if (!it.isReceive) {
+					BTCSeriesTransactionTable.preventRepeatedInsert(
+						it.hash,
+						true,
+						it.apply { isFee = true }
+					)
+				}
+				TransactionListModel(it)
+			}.toList()
+			callback()
+		} else callback()
 	}
 }

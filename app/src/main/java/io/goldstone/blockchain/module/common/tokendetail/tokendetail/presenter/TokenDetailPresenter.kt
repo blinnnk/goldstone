@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -248,7 +249,7 @@ class TokenDetailPresenter(
 			EOSTransactionTable.getMaxDataIndexTable(
 				SharedAddress.getCurrentEOSAccount(),
 				token?.contract.orEmpty(),
-				SharedChain.getEOSCurrent(),
+				SharedChain.getEOSCurrent().chainID,
 				true
 			) {
 				totalCount = it?.dataIndex
@@ -261,7 +262,7 @@ class TokenDetailPresenter(
 				fragment.removeLoadingView()
 			}
 		} else EOSAPI.getTransactionCount(
-			SharedChain.getEOSCurrent(),
+			SharedChain.getEOSCurrent().chainID,
 			SharedAddress.getCurrentEOSAccount(),
 			codeName,
 			token?.symbol.orEmpty()
@@ -299,23 +300,25 @@ class TokenDetailPresenter(
 
 	private fun getBTCSeriesData(
 		contract: TokenContract?,
-		callback: (List<BTCSeriesTransactionTable>) -> Unit
+		@UiThread callback: (List<BTCSeriesTransactionTable>) -> Unit
 	) {
-		BTCSeriesTransactionTable
-			.getTransactionsByAddressAndChainType(contract.getAddress(), contract.getChainType().id) { transactions ->
-				transactions.isNotEmpty() isTrue {
-					fragment.updatePageBy(
-						transactions.asSequence().map {
-							TransactionListModel(it)
-						}.sortedByDescending {
-							it.timeStamp
-						}.toList(),
-						contract.getAddress()
-					)
-					fragment.removeLoadingView()
-				}
-				callback(transactions)
+		BTCSeriesTransactionTable.getTransactionsByAddressAndChainType(
+			contract.getAddress(),
+			contract.getChainType().id
+		) { transactions ->
+			if (transactions.isNotEmpty()) {
+				fragment.updatePageBy(
+					transactions.asSequence().map {
+						TransactionListModel(it)
+					}.sortedByDescending {
+						it.timeStamp
+					}.toList(),
+					contract.getAddress()
+				)
+				fragment.removeLoadingView()
 			}
+			callback(transactions)
+		}
 	}
 
 	private fun TokenDetailFragment.updatePageBy(

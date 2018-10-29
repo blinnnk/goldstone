@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -75,11 +76,9 @@ private fun PaymentPreparePresenter.generateBTCPaymentModel(
 	hold: (error: GoldStoneError, PaymentBTCSeriesModel?) -> Unit
 ) {
 	val myAddress = getToken()?.contract.getAddress()
-	val chainName =
-		if (SharedValue.isTestEnvironment()) ChainText.btcTest else ChainText.btcMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
-		chainName,
+		SharedChain.getBTCCurrent(),
 		3,
 		true,
 		{ hold(it, null) }
