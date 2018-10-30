@@ -80,7 +80,7 @@ class EOSAccountRegisterPresenter(
 					) { privateKey, privateKeyError ->
 						if (error.isNone() && !privateKey.isNull()) {
 							EOSRegisterTransaction(
-								SharedChain.getEOSCurrent(),
+								SharedChain.getEOSCurrent().chainID,
 								EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
 								validAccount.accountName,
 								validPublicKey.orEmpty(),

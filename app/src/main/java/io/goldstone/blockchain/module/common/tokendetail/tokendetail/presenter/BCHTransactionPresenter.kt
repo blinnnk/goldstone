@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -19,21 +19,12 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentBCHAddress()
-	BitcoinCashApi.getTransactionCount(
-		address,
-		{
-			fragment.removeLoadingView()
-			LogUtil.error("loadBCHChainData", it)
-		}
-	) { transactionCount ->
+	BitcoinCashApi.getTransactionCount(address) { transactionCount, error ->
+		if (transactionCount.isNull() || error.hasError()) return@getTransactionCount
 		loadBCHTransactionsFromChain(
 			address,
 			localDataMaxIndex,
-			transactionCount,
-			{
-				fragment.removeLoadingView()
-				LogUtil.error("loadBCHChainData", it)
-			}
+			transactionCount!!
 		) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
@@ -47,23 +38,25 @@ private fun loadBCHTransactionsFromChain(
 	address: String,
 	localDataMaxIndex: Int,
 	transactionCount: Int,
-	errorCallback: (Throwable) -> Unit,
-	successCallback: (hasData: Boolean) -> Unit
+	callback: (hasData: Boolean) -> Unit
 ) {
 	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) {
-		successCallback(false)
+		callback(false)
 		return
 	}
 	BitcoinCashApi.getTransactions(
 		address,
 		pageInfo.from,
-		pageInfo.to,
-		errorCallback
-	) { transactions ->
+		pageInfo.to
+	) { transactions, error ->
+		if (transactionCount.isNull() || error.hasError()) {
+			callback(false)
+			return@getTransactions
+		}
 		// Calculate All Inputs to get transfer value
-		successCallback(transactions.mapIndexed { index, item ->
+		callback(transactions!!.asSequence().mapIndexed { index, item ->
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
@@ -79,12 +72,12 @@ private fun loadBCHTransactionsFromChain(
 			// 同样的账单插入一份燃气费的数据
 			if (!it.isReceive) {
 				BTCSeriesTransactionTable.preventRepeatedInsert(
-						it.hash,
-						true,
-						it.apply { isFee = true }
-					)
+					it.hash,
+					true,
+					it.apply { isFee = true }
+				)
 			}
 			TransactionListModel(it)
-		}.isNotEmpty())
+		}.toList().isNotEmpty())
 	}
 }

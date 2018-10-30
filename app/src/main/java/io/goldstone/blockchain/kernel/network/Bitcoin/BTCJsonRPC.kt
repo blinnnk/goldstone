@@ -5,7 +5,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
@@ -24,7 +24,7 @@ object BTCSeriesJsonRPC {
 	 * 如果没有足够的交易和区块用来估算则会返回一个负值，-1 表示交易费为 0
 	 */
 	fun estimatesmartFee(
-		chainName: String,
+		chainURL: ChainURL,
 		blocks: Int,
 		isSmartFee: Boolean,
 		errorCallback: (RequestError) -> Unit,
@@ -36,7 +36,7 @@ object BTCSeriesJsonRPC {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
-				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+				chainURL.isEncrypt,
 				method,
 				1,
 				false,
@@ -47,7 +47,7 @@ object BTCSeriesJsonRPC {
 			RequisitionUtil.callChainBy(
 				it,
 				errorCallback,
-				chainName
+				chainURL
 			) {
 				if (it.isNotEmpty()) {
 					val fee = if (isSmartFee) JSONObject(it).safeGet("feerate").toDoubleOrNull()
@@ -59,7 +59,7 @@ object BTCSeriesJsonRPC {
 	}
 
 	fun sendRawTransaction(
-		chainName: String,
+		chainURL: ChainURL,
 		signedMessage: String,
 		errorCallback: (RequestError) -> Unit,
 		@WorkerThread hold: (String?) -> Unit
@@ -67,7 +67,7 @@ object BTCSeriesJsonRPC {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
-				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+				chainURL.isEncrypt,
 				BitcoinMethod.SendRawTansaction.method,
 				1,
 				false,
@@ -79,7 +79,7 @@ object BTCSeriesJsonRPC {
 			RequisitionUtil.callChainBy(
 				requestBody,
 				errorCallback,
-				chainName
+				chainURL
 			) {
 				// Return Transaction hash
 				hold(if (it.isNotEmpty()) it else null)
@@ -88,7 +88,7 @@ object BTCSeriesJsonRPC {
 	}
 
 	fun getConfirmations(
-		chainName: String,
+		chainURL: ChainURL,
 		txID: String,
 		errorCallback: (RequestError) -> Unit,
 		hold: (Int?) -> Unit
@@ -96,7 +96,7 @@ object BTCSeriesJsonRPC {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareJsonRPC(
-				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+				chainURL.isEncrypt,
 				BitcoinMethod.GetRawTransaction.method,
 				null,
 				false,
@@ -108,7 +108,7 @@ object BTCSeriesJsonRPC {
 			RequisitionUtil.callChainBy(
 				it,
 				errorCallback,
-				chainName
+				chainURL
 			) {
 				val confirmations = try {
 					JSONObject(it).safeGet("confirmations").toIntOrNull()

@@ -64,18 +64,22 @@ fun GasSelectionPresenter.transferBCH(
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareBTCSeriesModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
-			BitcoinCashApi.getUnspentListByAddress(fromAddress) { unspents ->
+			BitcoinCashApi.getUnspentListByAddress(fromAddress) { unspents, error ->
+				if (unspents.isNull() || error.hasError()) {
+					callback(error)
+					return@getUnspentListByAddress
+				}
 				BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 					value,
 					fee,
 					toAddress,
 					changeAddress,
-					unspents,
+					unspents!!,
 					privateKey!!,
 					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						SharedChain.getBCHCurrentName(),
+						SharedChain.getBCHCurrent(),
 						signedModel.signedMessage,
 						callback
 					) { hash ->

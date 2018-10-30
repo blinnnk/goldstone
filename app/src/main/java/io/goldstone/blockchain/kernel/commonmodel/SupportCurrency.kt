@@ -24,7 +24,7 @@ data class SupportCurrencyTable(
 	var isUsed: Boolean,
 	var rate: Double
 ) {
-	
+
 	@Ignore
 	constructor() : this(
 		0,
@@ -33,7 +33,7 @@ data class SupportCurrencyTable(
 		false,
 		0.0
 	)
-	
+
 	constructor(data: JSONObject) : this(
 		0,
 		data.safeGet("countrySymbol"),
@@ -41,9 +41,9 @@ data class SupportCurrencyTable(
 		data.safeGet("isUsed").toBoolean(),
 		data.safeGet("rate").toDouble()
 	)
-	
+
 	companion object {
-		
+
 		fun updateUsedStatus(symbol: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.currencyDao()
@@ -59,20 +59,7 @@ data class SupportCurrencyTable(
 					}
 			}
 		}
-		
-		fun updateUsedRateValue(rate: Double) {
-			doAsync {
-				GoldStoneDataBase.database.currencyDao()
-					.apply {
-						getSupportCurrencies().find {
-							it.isUsed
-						}?.let {
-							update(it.apply { this.rate = rate })
-						}
-					}
-			}
-		}
-		
+
 		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
@@ -85,19 +72,25 @@ data class SupportCurrencyTable(
 
 @Dao
 interface SupportCurrencyDao {
-	
+
 	@Query("SELECT * FROM supportCurrency")
 	fun getSupportCurrencies(): List<SupportCurrencyTable>
-	
+
 	@Query("SELECT * FROM supportCurrency WHERE currencySymbol LIKE :symbol")
 	fun getCurrencyBySymbol(symbol: String): SupportCurrencyTable?
-	
+
+	@Query("UPDATE supportCurrency SET rate = :rate WHERE isUsed LIKE :isUsed")
+	fun updateUsedRate(rate: Double, isUsed: Boolean = true)
+
 	@Insert
 	fun insert(token: SupportCurrencyTable)
-	
+
+	@Insert
+	fun insertAll(tokens: List<SupportCurrencyTable>)
+
 	@Update
 	fun update(token: SupportCurrencyTable)
-	
+
 	@Delete
 	fun delete(token: SupportCurrencyTable)
 }

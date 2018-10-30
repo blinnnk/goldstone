@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.kernel.network
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.multichain.Amount
@@ -23,39 +23,34 @@ import org.json.JSONObject
 object BTCSeriesApiUtils {
 	fun getTransactions(
 		api: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (List<JSONObject>) -> Unit
+		@WorkerThread hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"items",
 			true,
-			{
-				errorCallback(it)
-				LogUtil.error("getTransactions", it)
-			}
+			{ hold(null, it) }
 		) {
 			val jsonArray = JSONArray(this[0])
 			var data = listOf<JSONObject>()
 			(0 until jsonArray.length()).forEach {
 				data += JSONObject(jsonArray[it].toString())
 			}
-			hold(data)
+			hold(data, RequestError.None)
 		}
 	}
 
 	fun getTransactionCount(
 		api: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (count: Int) -> Unit
+		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"totalItems",
 			true,
-			errorCallback
+			{ hold(null, it) }
 		) {
-			hold(this.firstOrNull()?.toIntOrNull().orZero())
+			hold(this.firstOrNull()?.toIntOrNull().orZero(), RequestError.None)
 		}
 	}
 
@@ -112,56 +107,46 @@ object BTCSeriesApiUtils {
 
 	fun getTransactionByHash(
 		api: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (JSONObject?) -> Unit
+		hold: (transaction: JSONObject?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
 			true,
-			{
-				errorCallback(it)
-				LogUtil.error("Bitcoin getTransactionByHash", it)
-			}
+			{ hold(null, it) }
 		) {
-			hold(if (isNotEmpty()) JSONObject(this[0]) else null)
+			if (isNotEmpty()) {
+				hold(JSONObject(first()), RequestError.None)
+			} else hold(null, RequestError.RPCResult("Empty Result"))
 		}
 	}
 
 	fun getUnspentListByAddress(
 		api: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (List<UnspentModel>) -> Unit
+		hold: (unspentList: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<UnspentModel>(
 			api,
 			"",
 			false,
-			{
-				errorCallback(it)
-				LogUtil.error("getUnspentListByAddress", it)
-			}
+			{ hold(null, it) }
 		) {
-			hold(if (isNotEmpty()) this else listOf())
+			hold(if (isNotEmpty()) this else listOf(), RequestError.None)
 		}
 	}
 
 	// `Insight` 接口挂掉的时候向 `BlockInfo` 发起请求
 	fun getUnspentListByAddressFromBlockInfo(
 		api: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (List<BlockInfoUnspentModel>) -> Unit
+		hold: (unspents: List<BlockInfoUnspentModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestUnCryptoData<BlockInfoUnspentModel>(
 			api,
 			"unspent_outputs",
 			false,
-			{
-				errorCallback(it)
-				LogUtil.error("getUnspentListByAddressFromBlockInfo", it)
-			}
+			{ hold(null, it) }
 		) {
-			hold(if (isNotEmpty()) this else listOf())
+			hold(if (isNotEmpty()) this else listOf(), RequestError.None)
 		}
 	}
 

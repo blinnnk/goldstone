@@ -128,7 +128,7 @@ class TokenAssetPresenter(
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
 		val account = SharedAddress.getCurrentEOSAccount()
 		if (NetworkUtil.hasNetwork(fragment.context)) EOSAPI.getTransactionCount(
-			SharedChain.getEOSCurrent(),
+			SharedChain.getEOSCurrent().chainID,
 			account,
 			EOSCodeName.EOSIOToken.value,
 			CoinSymbol.EOS.symbol!!

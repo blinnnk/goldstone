@@ -15,7 +15,6 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.isETC
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -38,10 +37,13 @@ abstract class TransactionStatusObserver {
 
 	open fun checkStatusByTransaction() {
 		doAsync {
+			val chainURL =
+				if (ChainID(chainID).isETHSeries()) SharedChain.getCurrentETH()
+				else SharedChain.getETCCurrent()
 			if (transaction.isNull()) {
 				GoldStoneEthCall.getTransactionByHash(
 					transactionHash,
-					ChainID(chainID).getChainName(),
+					chainURL,
 					{
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
@@ -60,7 +62,7 @@ abstract class TransactionStatusObserver {
 					{
 						LogUtil.error("checkStatus getBlockNumber", it)
 					},
-					ChainID(chainID).getChainName()
+					chainURL
 				) { blockNumber ->
 					val blockInterval = blockNumber - transaction?.blockNumber?.toInt()!!
 					val hasConfirmed = blockInterval > targetInterval
@@ -82,9 +84,7 @@ abstract class TransactionStatusObserver {
 							}
 						}
 					} else {
-						if (ChainURL.etcChainName.any {
-								it.equals(ChainID(chainID).getChainName(), true)
-							}) {
+						if (ChainID(chainID).isETCSeries()) {
 							isFailed = false
 							// 没有达到 `6` 个新的 `Block` 确认一直执行监测
 							removeObserver()
@@ -96,7 +96,7 @@ abstract class TransactionStatusObserver {
 								{
 									LogUtil.error("checkStatusByTransaction", it)
 								},
-								ChainID(chainID).getChainName()
+								chainURL
 							) { failed ->
 								isFailed = failed
 								if (isFailed == true) {
@@ -142,12 +142,12 @@ abstract class TransactionStatusObserver {
 
 /** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
 fun TransactionDetailPresenter.observerTransaction() {
-	val chainName =
-		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrentName()
-		else SharedChain.getCurrentETHName()
+	val chaiURL =
+		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrent()
+		else SharedChain.getCurrentETH()
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	object : TransactionStatusObserver() {
-		override val chainID: String = ChainID.getChainIDByName(chainName)
+		override val chainID: String = chaiURL.chainID.id
 		override val transactionHash = currentHash
 		override fun getStatus(
 			confirmed: Boolean,
@@ -198,15 +198,13 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-private fun TransactionDetailPresenter.getTransactionFromChain(
-	errorCallback: (RequestError) -> Unit
-) {
-	val chainName =
-		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrentName()
-		else SharedChain.getCurrentETHName()
+private fun TransactionDetailPresenter.getTransactionFromChain(errorCallback: (RequestError) -> Unit) {
+	val chainURL =
+		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrent()
+		else SharedChain.getCurrentETH()
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		chainName,
+		chainURL,
 		errorCallback = errorCallback
 	) {
 		fragment.context?.runOnUiThread {

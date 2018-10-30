@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
@@ -77,7 +78,7 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = SharedChain.getCurrentETH().id,
+	var chainID: String = SharedChain.getCurrentETH().chainID.id,
 	var isFee: Boolean = false,
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
@@ -173,7 +174,7 @@ data class TransactionTable(
 	constructor(
 		data: JSONObject,
 		isETC: Boolean = false,
-		chainID: String = SharedChain.getCurrentETH().id
+		chainID: String
 	) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
@@ -237,7 +238,7 @@ data class TransactionTable(
 		CoinSymbol.etc,
 		SharedAddress.getCurrentETC(),
 		tokenReceiveAddress = data.to,
-		chainID = SharedChain.getETCCurrent().id,
+		chainID = SharedChain.getETCCurrent().chainID.id,
 		isFee = data.isFee,
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
@@ -261,7 +262,7 @@ data class TransactionTable(
 		// `ERC` 类型的 `Transactions` 专用
 		fun getTokenTransactions(address: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().id)
+				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().chainID.id)
 			} then { it ->
 				hold(it.map { TransactionListModel(it) })
 			}
@@ -304,7 +305,7 @@ data class TransactionTable(
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
-			chainName: String,
+			chainURL: ChainURL,
 			errorCallback: (EthereumRPCError) -> Unit,
 			callback: (memo: String) -> Unit
 		) {
@@ -316,7 +317,7 @@ data class TransactionTable(
 						getInputCodeByHash(
 							hash,
 							errorCallback,
-							chainName
+							chainURL
 						) { input ->
 							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
 							val memo = getMemoFromInputCode(input, isErc20Token)
@@ -343,7 +344,11 @@ data class TransactionTable(
 			}
 		}
 
-		fun getByHashAndReceivedStatus(hash: String, isReceived: Boolean, hold: (TransactionTable?) -> Unit) {
+		fun getByHashAndReceivedStatus(
+			hash: String,
+			isReceived: Boolean,
+			@UiThread hold: (TransactionTable?) -> Unit
+		) {
 			load {
 				GoldStoneDataBase.database.transactionDao().getByTaxHashAndReceivedStatus(hash, isReceived)
 			} then (hold)
@@ -361,7 +366,7 @@ interface TransactionDao {
 	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
-	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().id): List<TransactionTable>
+	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().chainID.id): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>

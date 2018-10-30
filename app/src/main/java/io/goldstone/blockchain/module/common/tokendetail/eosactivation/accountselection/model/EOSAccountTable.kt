@@ -142,7 +142,7 @@ interface EOSAccountDao {
 	fun getAccount(name: String): EOSAccountTable?
 
 	@Query("SELECT * FROM eosAccount WHERE name IN (:names) AND chainID = :chainID")
-	fun getAccounts(names: List<String>, chainID: String = SharedChain.getEOSCurrent().id): List<EOSAccountTable>
+	fun getAccounts(names: List<String>, chainID: String = SharedChain.getEOSCurrent().chainID.id): List<EOSAccountTable>
 
 	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
 	fun getByKey(publicKey: String): List<EOSAccountTable>

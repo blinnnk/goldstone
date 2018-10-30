@@ -40,7 +40,6 @@ class WalletImportPresenter(
 					multiChainAddresses.bch,
 					multiChainAddresses.eos
 				).firstOrNull { it.isNotEmpty() }?.address.orEmpty()
-
 			WalletTable.getWalletByAddress(currentAddress) { it ->
 				if (it.isNull()) WalletTable(
 					0,
@@ -74,7 +73,7 @@ class WalletImportPresenter(
 					ltcPath = multiChainPath.ltcPath,
 					bchPath = multiChainPath.bchPath,
 					eosPath = multiChainPath.eosPath
-				).insertWatchOnlyWallet { wallet ->
+				).insertWallet { wallet ->
 					// 创建钱包并获取默认的 `token` 信息
 					CreateWalletPresenter.generateMyTokenInfo(multiChainAddresses) {
 						callback(wallet.id, GoldStoneError.None)

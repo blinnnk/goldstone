@@ -5,9 +5,8 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
@@ -34,7 +33,7 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 ) {
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
 		callback(TransferError.IncorrectDecimal)
-	else generateBCHPaymentModel(count, changeAddress, callback) { error, paymentModel ->
+	else generateBCHPaymentModel(count, changeAddress) { paymentModel, error ->
 		if (!paymentModel.isNull()) fragment.rootFragment?.apply {
 			presenter.showTargetFragment<GasSelectionFragment>(
 				Bundle().apply {
@@ -49,41 +48,43 @@ fun PaymentPreparePresenter.prepareBCHPaymentModel(
 private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	count: Double,
 	changeAddress: String,
-	errorCallback: (RequestError) -> Unit,
-	@UiThread hold: (GoldStoneError, PaymentBTCSeriesModel?) -> Unit
+	@UiThread hold: (model: PaymentBTCSeriesModel?, error: GoldStoneError) -> Unit
 ) {
 	val myAddress = getToken()?.contract.getAddress()
-	val chainName =
-		if (SharedValue.isTestEnvironment()) ChainText.bchTest else ChainText.bchMain
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
-		chainName,
+		SharedChain.getBCHCurrent(),
 		4,
 		false,
-		errorCallback
+		{ hold(null, it) }
 	) { feePerByte ->
 		if (feePerByte.orZero() < 0) {
 			GoldStoneAPI.context.runOnUiThread {
-				hold(TransferError.GetWrongFeeFromChain, null)
+				hold(null, TransferError.GetWrongFeeFromChain)
 			}
 			return@estimatesmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		BitcoinCashApi.getUnspentListByAddress(myAddress) { unspents ->
-			if (unspents.isEmpty()) {
-				// 如果余额不足或者出错这里会返回空的数组
-				GoldStoneAPI.context.runOnUiThread {
-					hold(TransferError.BalanceIsNotEnough, null)
-				}
+		BitcoinCashApi.getUnspentListByAddress(myAddress) { unspents, error ->
+			if (unspents.isNull() || error.hasError()) {
+				hold(null, error)
 				return@getUnspentListByAddress
 			}
+			if (unspents.isNull() || error.hasError())
+				if (unspents.orEmpty().isEmpty()) {
+					// 如果余额不足或者出错这里会返回空的数组
+					GoldStoneAPI.context.runOnUiThread {
+						hold(null, TransferError.BalanceIsNotEnough)
+					}
+					return@getUnspentListByAddress
+				}
 
 			val size = BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 				count.toSatoshi(),
 				1L,
 				fragment.address.orEmpty(),
 				changeAddress,
-				unspents,
+				unspents!!,
 				if (SharedValue.isTestEnvironment()) CryptoValue.signedSecret
 				else CryptoValue.signedBTCMainnetSecret, // 测算 `MessageSize` 的默认无效私钥
 				SharedValue.isTestEnvironment()
@@ -99,7 +100,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(GoldStoneError.None, it)
+					hold(it, GoldStoneError.None)
 				}
 			}
 		}

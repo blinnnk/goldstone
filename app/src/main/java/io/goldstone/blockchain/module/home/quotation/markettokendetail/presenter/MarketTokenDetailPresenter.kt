@@ -334,12 +334,11 @@ class MarketTokenDetailPresenter(
 		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
 		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
-		GoldStoneAPI.getTokenInfoFromMarket(
-			info.symbol,
-			chainID
-		) { coinInfo, error ->
+		GoldStoneAPI.getTokenInfoFromMarket(info.symbol, chainID) { coinInfo, error ->
 			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo!!) {
-				DefaultTokenTable.getTokenByContractFromAllChains(info.contract) { it?.let(hold) }
+				DefaultTokenTable.getTokenByContractAndChainID(info.contract, chainID) {
+					it?.let(hold)
+				}
 			}
 		}
 	}

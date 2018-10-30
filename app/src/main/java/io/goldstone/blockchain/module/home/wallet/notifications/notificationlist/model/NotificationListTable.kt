@@ -63,12 +63,12 @@ data class NotificationTable(
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.notificationDao().getAllNotifications()
-			} then { it ->
-				hold(it.sortedByDescending { it.createTime }.toArrayList())
+			} then { list ->
+				hold(list.sortedByDescending { it.createTime }.toArrayList())
 			}
 		}
 
-		fun getChianID(extra: String): String {
+		fun getChainID(extra: String): String {
 			return if (extra.isNotEmpty()) {
 				JSONObject(extra).safeGet("chainid")
 			} else ""

@@ -51,7 +51,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 ) {
 	GoldStoneEthCall.getUsableNonce(
 		errorCallback,
-		chainType,
+		chainType.getChainURL(),
 		getToken()?.contract.getAddress()
 	) {
 		generateTransaction(fragment.address!!, count, memo, it, errorCallback, hold)
@@ -91,7 +91,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 		getToken()?.contract.getAddress(),
 		data,
 		errorCallback,
-		getToken()?.contract.getCurrentChainName()
+		getToken()?.contract?.getChainURL()!!
 	) { limit ->
 		hold(
 			PaymentPrepareModel(

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
@@ -40,16 +41,14 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 		 * 而是打开了账单详情. 这条数据已经被存入本地. 这个时候通知中心就不必再从链上查询数据了.
 		 */
 		when {
-			CoinSymbol(transaction.symbol).isBTCSeries() ->
+			ChainID(transaction.chainID).isBTCSeries() ->
 				getBitcoinSeriesTransaction(transaction)
 			else -> getETHERC20OrETCTransaction(transaction)
 		}
 	}
 }
 
-fun TransactionDetailPresenter.getETHERC20OrETCTransaction(
-	transaction: NotificationTransactionInfo
-) {
+fun TransactionDetailPresenter.getETHERC20OrETCTransaction(transaction: NotificationTransactionInfo) {
 	TransactionTable.getByHashAndReceivedStatus(
 		transaction.hash,
 		transaction.isReceived
@@ -100,11 +99,11 @@ fun TransactionDetailPresenter.prepareHeaderValueFromNotification(
 
 fun TransactionDetailPresenter.updateByNotificationHash(
 	info: NotificationTransactionInfo,
-	callback: (RequestError) -> Unit
+	@UiThread callback: (RequestError) -> Unit
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		ChainID(info.chainID).getChainName(),
+		ChainID(info.chainID).getChainURL()!!,
 		errorCallback = callback
 	) { receipt ->
 		// 通过 `Notification` 获取确实信息
@@ -185,12 +184,9 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 	BitcoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID(info.chainID).getThirdPartyURL(),
-		{
-			LogUtil.error("updateBTCTransactionByNotificationHash", it)
-			fragment.context?.alert(it.toString())
-		}
-	) { receipt ->
+		ChainID(info.chainID).getThirdPartyURL()
+	) { receipt, error ->
+		if (receipt.isNull() || error.hasError()) return@getTransactionByHash
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()
@@ -243,12 +239,9 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID(info.chainID).getThirdPartyURL(),
-		{
-			LogUtil.error("updateBTCTransactionByNotificationHash", it)
-			fragment.context?.alert(it.toString())
-		}
-	) { receipt ->
+		ChainID(info.chainID).getThirdPartyURL()
+	) { receipt, error ->
+		if (receipt.isNull() && error.hasError()) return@getTransactionByHash
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()

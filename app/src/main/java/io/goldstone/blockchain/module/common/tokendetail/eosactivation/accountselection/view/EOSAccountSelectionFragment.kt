@@ -17,7 +17,6 @@ import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.GrayScale
@@ -104,9 +103,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		presenter.showAvailableNames {
-			if (!it.isNone()) context.alert(it.message)
-		}
+		presenter.showAvailableNames()
 	}
 
 	fun setAccountNameList(actors: List<AccountActor>) {

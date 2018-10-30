@@ -4,7 +4,6 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
@@ -74,8 +73,8 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(
 		TransactionTable.getMemoByHashAndReceiveStatus(
 			currentHash,
 			isReceived,
-			if (contract.isETC()) SharedChain.getETCCurrentName()
-			else contract.getCurrentChainName(),
+			if (contract.isETC()) SharedChain.getETCCurrent()
+			else SharedChain.getCurrentETH(),
 			errorCallback
 		) { memo ->
 			fragment.removeLoadingView()
@@ -93,10 +92,8 @@ private fun TransactionListModel.checkTokenNameInfoOrUpdate() {
 			if (token.name.isEmpty()) {
 				GoldStoneEthCall.getTokenName(
 					token.contract,
-					{
-						LogUtil.error("getCurrentChainToken", it)
-					},
-					contract.getCurrentChainName()
+					{},
+					contract.getChainURL()
 				) {
 					DefaultTokenTable.updateTokenName(contract, it)
 				}

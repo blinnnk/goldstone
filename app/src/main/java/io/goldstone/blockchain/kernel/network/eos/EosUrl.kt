@@ -1,15 +1,16 @@
 package io.goldstone.blockchain.kernel.network.eos
 
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 
 object EOSUrl {
+
 	private val currentURL: () -> String = {
-		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain
+		SharedChain.getEOSCurrent().getURL()
 	}
 	private val currentHistoryURL: () -> String = {
-		if (SharedValue.isTestEnvironment()) ChainURL.eosJungleHistory else ChainURL.eosMain
+		SharedChain.getEOSCurrent().getURL()
 	}
+
 	val getKeyAccount: () -> String = {
 		"${currentURL()}/v1/history/${EOSMethod.GetKeyAccountName.method}"
 	}

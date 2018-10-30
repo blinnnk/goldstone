@@ -61,7 +61,7 @@ data class EOSTransactionTable(
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
 		info.fromAccount.accountName,
 		SharedAddress.getCurrentEOS(),
-		SharedChain.getEOSCurrent().id,
+		SharedChain.getEOSCurrent().chainID.id,
 		true
 	)
 
@@ -82,7 +82,7 @@ data class EOSTransactionTable(
 		actionName = data.safeGet("action_name"),
 		recordAccountName = recordAccountName,
 		recordPublicKey = SharedAddress.getCurrentEOS(),
-		chainID = SharedChain.getEOSCurrent().id,
+		chainID = SharedChain.getEOSCurrent().chainID.id,
 		isPending = false
 	)
 

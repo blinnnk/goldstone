@@ -120,7 +120,8 @@ class WalletListPresenter(
 		fragment.context?.showAlertView(
 			"Switch Chain Network",
 			WalletSettingsText.switchChainNetAlert(content),
-			false
+			false,
+			{ callback() } // Cancel Event
 		) {
 			callback()
 		}

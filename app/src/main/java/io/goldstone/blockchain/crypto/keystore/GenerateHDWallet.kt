@@ -295,6 +295,7 @@ fun Context.verifyCurrentWalletKeyStorePassword(
 	}
 }
 
+@WorkerThread
 fun Context.verifyKeystorePassword(
 	password: String,
 	address: String,

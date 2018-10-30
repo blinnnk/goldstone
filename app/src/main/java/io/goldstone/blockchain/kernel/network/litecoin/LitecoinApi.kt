@@ -75,14 +75,13 @@ object LitecoinApi {
 		address: String,
 		from: Int,
 		to: Int,
-		errorCallback: (Throwable) -> Unit,
-		hold: (List<JSONObject>) -> Unit
+		hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactions(address, from, to),
 			"items",
 			true,
-			{ errorCallback(it) },
+			{ hold(null, it) },
 			null,
 			true
 		) {
@@ -91,24 +90,23 @@ object LitecoinApi {
 			(0 until jsonArray.length()).forEach {
 				data += JSONObject(jsonArray[it].toString())
 			}
-			hold(data)
+			hold(data, RequestError.None)
 		}
 	}
 
 	fun getTransactionCount(
 		address: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (count: Int) -> Unit
+		hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactions(address, 999999999, 0),
 			"totalItems",
 			true,
-			errorCallback,
+			{ hold(null, it) },
 			null,
 			true
 		) {
-			hold(this.firstOrNull()?.toIntOrNull().orZero())
+			hold(this.firstOrNull()?.toIntOrNull().orZero(), RequestError.None)
 		}
 	}
 
