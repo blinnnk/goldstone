@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.home.presneter
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -134,7 +135,7 @@ abstract class SilentUpdater {
 		MyTokenTable.getMyTokens(false) { myTokens ->
 			GoldStoneAPI.getPriceByContractAddress(
 				// `EOS` 的 `Token` 价格在下面的方法从第三方获取, 这里过滤掉 `EOS` 的 `Token`
-				myTokens.asSequence().filter {
+				myTokens.asSequence().filterNot {
 					ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
 				}.map {
 					"{\"address\":\"${it.contract}\",\"symbol\":\"${it.symbol}\"}"
@@ -157,18 +158,18 @@ abstract class SilentUpdater {
 	private fun updateLocalDefaultTokens() {
 		GoldStoneAPI.getDefaultTokens { serverTokens, error ->
 			if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
-				DefaultTokenTable.getAllTokens(false) { localTokens ->
-					// 开一个线程更新图片
-					serverTokens.updateLocalTokenIcon(localTokens)
-					// 移除掉一样的数据
-					serverTokens.filterNot { server ->
-						localTokens.any { local ->
-							local.chainID.equals(server.chainID, true)
-								&& local.contract.equals(server.contract, true)
-						}
-					}.apply {
-						GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
+				val localTokens =
+					GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+				// 开一个线程更新图片
+				serverTokens.updateLocalTokenIcon(localTokens.toArrayList())
+				// 移除掉一样的数据
+				serverTokens.filterNot { server ->
+					localTokens.any { local ->
+						local.chainID.equals(server.chainID, true)
+							&& local.contract.equals(server.contract, true)
 					}
+				}.apply {
+					GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
 				}
 			}
 		}

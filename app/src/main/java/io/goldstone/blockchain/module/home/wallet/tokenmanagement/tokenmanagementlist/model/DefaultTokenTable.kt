@@ -217,26 +217,14 @@ data class DefaultTokenTable(
 
 	companion object {
 
-		fun getAllTokens(isMainThread: Boolean = true, hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			doAsync {
-				val data = GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(data.toArrayList()) }
-				else hold(data.toArrayList())
-			}
-		}
-
 		fun getCurrentChainTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
 			} then (hold)
 		}
 
-		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
-			} then {
-				hold(it.toArrayList())
-			}
+		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
+			load { GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens() } then (hold)
 		}
 
 		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit
@@ -244,6 +232,12 @@ data class DefaultTokenTable(
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractFromAllChains(contract)
 			} then { hold(it.firstOrNull()) }
+		}
+
+		fun getTokenByContractAndChainID(contract: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractAndChainID(contract, chainID.id)
+			} then (hold)
 		}
 
 		fun getCurrentChainToken(
@@ -261,31 +255,29 @@ data class DefaultTokenTable(
 			@WorkerThread callback: () -> Unit
 		) {
 			doAsync {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getTokenByContractFromAllChains(data.contract.contract.orEmpty()).let { targetTokens ->
-							if (targetTokens.isEmpty()) {
-								insert(DefaultTokenTable(data))
-								callback()
-							} else {
-								// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-								targetTokens.asSequence().firstOrNull {
-									ChainID(it.chainID).isTestnet()
-								}?.apply {
-									exchange = data.exchange
-									website = data.website
-									marketCap = data.marketCap
-									whitePaper = data.whitePaper
-									socialMedia = data.socialMedia
-									rank = data.rank
-									totalSupply = data.supply
-									startDate = data.startDate
-									description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
-								}?.let { update(it) }
-								callback()
-							}
+				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+				defaultDao.getTokenByContractAndChainID(data.contract.contract.orEmpty(), data.chainID).let { targetTokens ->
+					if (targetTokens.isNull()) {
+						defaultDao.insert(DefaultTokenTable(data))
+						callback()
+					} else {
+						// 插入行情的 `TokenInformation` 只需要插入主链数据即可
+						targetTokens?.apply {
+							exchange = data.exchange
+							website = data.website
+							marketCap = data.marketCap
+							whitePaper = data.whitePaper
+							socialMedia = data.socialMedia
+							rank = data.rank
+							totalSupply = data.supply
+							startDate = data.startDate
+							description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
+						}?.let {
+							defaultDao.update(it)
+							callback()
 						}
 					}
+				}
 			}
 		}
 
@@ -328,6 +320,9 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>
+
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun getTokenByContractAndChainID(contract: String, chainID: String): DefaultTokenTable?
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

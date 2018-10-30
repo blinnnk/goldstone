@@ -75,7 +75,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						onClick { _ ->
 							showLoadingStatus()
 							presenter.confirmTransfer {
-								if (!it.isNone()) {
+								if (it.hasError()) {
 									if (it is AccountError) setCanUseStyle(false)
 									this@GasSelectionFragment.context.alert(it.message)
 								}

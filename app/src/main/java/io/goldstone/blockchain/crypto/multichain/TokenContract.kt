@@ -188,14 +188,15 @@ fun TokenContract?.getCurrentChainID(): ChainID {
 	}
 }
 
-fun TokenContract?.getMainnetChainID(): String {
+fun TokenContract?.getMainnetChainID(): ChainID {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> ChainID.etcMain
-		this?.contract.equals(TokenContract.btcContract, true) -> ChainID.btcMain
-		this?.contract.equals(TokenContract.ltcContract, true) -> ChainID.ltcMain
-		this?.contract.equals(TokenContract.bchContract, true) -> ChainID.bchMain
-		this.isEOSSeries() -> ChainID.eosMain
-		this?.contract?.length == CryptoValue.contractAddressLength -> ChainID.ethMain
-		else -> ChainID.eosMain
+		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getCurrentETH().chainID
+		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrent().chainID
+		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrent().chainID
+		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrent().chainID
+		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrent().chainID
+		this.isEOSSeries() -> SharedChain.getEOSCurrent().chainID
+		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETH().chainID
+		else -> SharedChain.getEOSCurrent().chainID
 	}
 }

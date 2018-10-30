@@ -27,6 +27,10 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 	fun isEOS(): Boolean = isEOSMain() || isEOSTest()
 
+
+	fun isEOSSeries(): Boolean {
+		return isEOS() || isEOSTest()
+	}
 	fun isETHSeries(): Boolean {
 		return isETHMain() || isRopsten() || isRinkeby() || isKovan()
 	}

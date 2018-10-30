@@ -9,13 +9,10 @@ import com.blinnnk.extension.getTargetChild
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -116,19 +113,6 @@ class GoldStoneUtilUnitTest {
 	fun getMyContactTable() {
 		ContactTable.getAllContacts {
 			LogUtil.debug("getMyContactTable", "$it")
-		}
-	}
-
-	@Test
-	fun getCoinInfo() {
-		GoldStoneAPI.getTokenInfoFromMarket(
-			CoinSymbol.btc(),
-			ChainID.BTC.id,
-			{
-				LogUtil.error("getCoinInfo", it)
-			}
-		) {
-			LogUtil.debug("getCoinInfo", "$it")
 		}
 	}
 

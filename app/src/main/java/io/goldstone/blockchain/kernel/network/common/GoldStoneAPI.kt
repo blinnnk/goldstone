@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
@@ -438,16 +439,14 @@ object GoldStoneAPI {
 			{ hold(null, it) },
 			true
 		) { it ->
-			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不实用 `Gson`
-			val notificationData = arrayListOf<NotificationTable>()
-			val jsonArray = JSONArray(it[0])
+			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不用 `Gson`
+			val jsonArray = JSONArray(it.firstOrNull().orEmpty())
 			if (jsonArray.length() == 0) {
 				hold(arrayListOf(), RequestError.None)
 			} else {
-				(0 until jsonArray.length()).forEach {
-					notificationData.add(NotificationTable(JSONObject(jsonArray[it].toString())))
-				}
-				hold(notificationData, RequestError.None)
+				val notifications =
+					jsonArray.toList().map { NotificationTable(it) }.toArrayList()
+				hold(notifications, RequestError.None)
 			}
 		}
 	}
@@ -508,7 +507,7 @@ object GoldStoneAPI {
 
 	fun getTokenInfoFromMarket(
 		symbol: String,
-		chainID: String,
+		chainID: ChainID,
 		hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(

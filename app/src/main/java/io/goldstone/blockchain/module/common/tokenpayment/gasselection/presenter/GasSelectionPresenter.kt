@@ -174,7 +174,9 @@ class GasSelectionPresenter(
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransactionTitle.toUpperCase(),
 			TransactionText.confirmTransaction,
-			true
+			true,
+			// 点击取消按钮
+			{ callback(GoldStoneError.None) }
 		) {
 			val password = it?.text.toString()
 			when {
@@ -262,13 +264,13 @@ class GasSelectionPresenter(
 
 	private fun getGasCurrencyPrice(value: String, hold: (String) -> Unit) {
 		val coinContract = when {
-				getToken()?.contract.isETC() -> TokenContract.ETC
-				getToken()?.contract.isBTC() -> TokenContract.BTC
-				getToken()?.contract.isLTC() -> TokenContract.LTC
-				getToken()?.contract.isEOS() -> TokenContract.EOS
-				getToken()?.contract.isBCH() -> TokenContract.BCH
-				else -> TokenContract.ETH
-			}
+			getToken()?.contract.isETC() -> TokenContract.ETC
+			getToken()?.contract.isBTC() -> TokenContract.BTC
+			getToken()?.contract.isLTC() -> TokenContract.LTC
+			getToken()?.contract.isEOS() -> TokenContract.EOS
+			getToken()?.contract.isBCH() -> TokenContract.BCH
+			else -> TokenContract.ETH
+		}
 		DefaultTokenTable.getCurrentChainToken(coinContract) {
 			hold(
 				"≈ " + (getGasUnitCount(value) * it?.price.orElse(0.0)).formatCurrency() + " " + SharedWallet.getCurrencyCode()

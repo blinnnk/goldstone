@@ -87,7 +87,8 @@ class WalletSettingsListPresenter(
 		showAlertView(
 			WalletSettingsText.deleteInfoTitle,
 			WalletSettingsText.deleteInfoSubtitle,
-			!SharedWallet.isWatchOnlyWallet()
+			!SharedWallet.isWatchOnlyWallet(),
+			{}
 		) { passwordInput ->
 			if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
 			else {

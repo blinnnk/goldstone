@@ -57,7 +57,7 @@ fun Context.showAlertView(
 	title: String,
 	subtitle: String,
 	showEditText: Boolean = true,
-	cancelAction: () -> Unit = {},
+	cancelAction: () -> Unit,
 	action: (EditText?) -> Unit
 ) {
 	var input: EditText? = null
