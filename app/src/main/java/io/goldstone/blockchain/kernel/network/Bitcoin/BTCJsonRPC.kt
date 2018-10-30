@@ -41,11 +41,10 @@ object BTCSeriesJsonRPC {
 				blocks
 			)
 		).let { it ->
-			RequisitionUtil.callChainBy(
-				it,
-				chainURL
-			) { result, error ->
-				hold(JSONObject(result).safeGet("feerate").toDoubleOrNull(), error)
+			RequisitionUtil.callChainBy(it, chainURL) { result, error ->
+				if (!result.isNullOrEmpty() && error.isNone()) {
+					hold(result?.toDoubleOrNull(), error)
+				} else hold(null, error)
 			}
 		}
 	}

@@ -66,6 +66,12 @@ interface ChainNodeDao {
 	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND isUsed LIKE :isUsed")
 	fun getCurrentEOSNode(isUsed: Boolean = true): ChainNodeTable
 
+	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND netType LIKE 0")
+	fun getMainnetEOSNode(): ChainNodeTable
+
+	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND netType LIKE 1")
+	fun getTestnetEOSNode(): ChainNodeTable
+
 	@Query("SELECT * FROM chainNode WHERE chainType LIKE 61")
 	fun getETCNodes(): List<ChainNodeTable>
 

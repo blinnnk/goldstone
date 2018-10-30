@@ -174,7 +174,8 @@ class WalletDetailPresenter(
 	}
 
 	private fun List<WalletDetailCellModel>.getChainModels(
-		hold: (data: List<WalletDetailCellModel>, error: GoldStoneError) -> Unit) {
+		hold: (data: List<WalletDetailCellModel>, error: GoldStoneError) -> Unit
+	) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
@@ -248,7 +249,7 @@ class WalletDetailPresenter(
 					.sortedByDescending { it.weight }.toList()
 			hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
 		} then {
-			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
+			updateAdapterData<WalletDetailAdapter>(it)
 			fragment.updateHeaderValue()
 		} else {
 			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())

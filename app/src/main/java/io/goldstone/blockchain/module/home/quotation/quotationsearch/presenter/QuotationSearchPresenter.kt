@@ -44,7 +44,7 @@ class QuotationSearchPresenter(
 					if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
 				}
 			) {
-				if (hasNetWork) fragment.searchTokenBy(it)
+				if (NetworkUtil.hasNetwork(context)) fragment.searchTokenBy(it)
 			}
 		}
 	}
@@ -86,7 +86,7 @@ class QuotationSearchPresenter(
 						completeQuotationTable(this)
 					}
 				}
-			} else {
+			} else GoldStoneAPI.context.runOnUiThread {
 				context.alert(error.message)
 				removeLoadingView()
 			}

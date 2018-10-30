@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.RequestError
@@ -11,9 +13,11 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 /**
@@ -22,22 +26,24 @@ import java.math.BigInteger
  */
 fun PaymentPreparePresenter.prepareETHSeriesPaymentModel(
 	count: Double,
-	callback: (RequestError) -> Unit
+	@UiThread callback: (RequestError) -> Unit
 ) {
 	generatePaymentPrepareModel(
 		count,
 		fragment.getMemoContent(),
 		fragment.rootFragment?.token?.contract.getChainType()
 	) { model, error ->
-		if (model.isNull() && error.isNone()) {
-			fragment.rootFragment?.apply {
-				presenter.showTargetFragment<GasSelectionFragment>(
-					Bundle().apply {
-						putSerializable(ArgumentKey.gasPrepareModel, model)
-					})
-				callback(RequestError.None)
-			}
-		} else callback(error)
+		GoldStoneAPI.context.runOnUiThread {
+			if (!model.isNull() && error.isNone()) {
+				fragment.rootFragment?.apply {
+					presenter.showTargetFragment<GasSelectionFragment>(
+						Bundle().apply {
+							putSerializable(ArgumentKey.gasPrepareModel, model)
+						})
+					callback(RequestError.None)
+				}
+			} else callback(error)
+		}
 	}
 }
 
@@ -48,7 +54,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
 	chainType: ChainType,
-	hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
+	@WorkerThread hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
 ) {
 	GoldStoneEthCall.getUsableNonce(
 		chainType.getChainURL(),
@@ -56,7 +62,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	) { nonce, error ->
 		if (!nonce.isNull() && error.isNone()) {
 			generateTransaction(fragment.address!!, count, memo, nonce!!, hold)
-		}
+		} else hold(null, error)
 	}
 }
 
@@ -65,7 +71,7 @@ private fun PaymentPreparePresenter.generateTransaction(
 	count: Double,
 	memo: String,
 	nonce: BigInteger,
-	hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
+	@WorkerThread hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
 ) {
 	val countWithDecimal: BigInteger
 	val data: String

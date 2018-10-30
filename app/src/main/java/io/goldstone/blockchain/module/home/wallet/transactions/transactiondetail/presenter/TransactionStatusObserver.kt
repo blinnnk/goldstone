@@ -202,17 +202,15 @@ private fun TransactionDetailPresenter.getTransactionFromChain(errorCallback: (R
 
 // 自动监听交易完成后, 将转账信息插入数据库
 private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String) {
-	GoldStoneDataBase.database.transactionDao().apply {
-		getTransactionByTaxHash(currentHash).let { it ->
-			it.forEach {
-				update(it.apply {
-					this.blockNumber = blockNumber
-					isPending = false
-					hasError = "0"
-					txReceiptStatus = "1"
-				})
-			}
-		}
+	val transactionDao = GoldStoneDataBase.database.transactionDao()
+	val transactions = transactionDao.getTransactionByTaxHash(currentHash)
+	transactions.forEach {
+		transactionDao.update(it.apply {
+			this.blockNumber = blockNumber
+			isPending = false
+			hasError = "0"
+			txReceiptStatus = "1"
+		})
 	}
 }
 

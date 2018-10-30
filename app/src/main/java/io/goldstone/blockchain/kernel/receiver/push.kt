@@ -178,7 +178,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					AesCrypto.encrypt("$it").orEmpty()
 				) { result, error ->
 					// API 错误
-					if (!result.isNullOrEmpty() && error.isNone()) {
+					if (result.isNullOrEmpty() || error.hasError()) {
 						return@registerWalletAddresses
 					}
 					// 如果是注册地址 `option = 1` 的情况下在数据库标记注册成功与否的状态

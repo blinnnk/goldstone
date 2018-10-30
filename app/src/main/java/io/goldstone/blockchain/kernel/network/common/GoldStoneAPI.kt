@@ -205,7 +205,9 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			hold(JSONObject(result?.firstOrNull()).safeGet("result"), error)
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result!!.firstOrNull()).safeGet("result"), error)
+			} else hold(null, error)
 		}
 	}
 

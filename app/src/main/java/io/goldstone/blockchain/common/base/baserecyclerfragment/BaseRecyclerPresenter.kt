@@ -74,16 +74,26 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 				it.isFalse {
 					fragment.asyncData?.clear()
 					fragment.asyncData?.addAll(newData)
-					if (newData.isNotEmpty()) {
-						fragment.removeEmptyView()
-					} else {
-						fragment.showEmptyView()
-					}
+					if (newData.isNotEmpty()) fragment.removeEmptyView()
+					else fragment.showEmptyView()
 					dataSet.clear()
 					dataSet.addAll(newData)
 					notifyDataSetChanged()
 				}
 			}
+		}
+	}
+
+	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> updateAdapterData(newData: ArrayList<D>) {
+		fragment.getAdapter<T>()?.apply {
+			// Comparison the data, if they are different then update adapter
+			fragment.asyncData?.clear()
+			fragment.asyncData?.addAll(newData)
+			if (newData.isNotEmpty()) fragment.removeEmptyView()
+			else fragment.showEmptyView()
+			dataSet.clear()
+			dataSet.addAll(newData)
+			notifyDataSetChanged()
 		}
 	}
 
