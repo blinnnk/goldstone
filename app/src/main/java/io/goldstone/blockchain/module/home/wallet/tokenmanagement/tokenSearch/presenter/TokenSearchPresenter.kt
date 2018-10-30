@@ -98,7 +98,8 @@ class TokenSearchPresenter(
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
 							val status = any {
-								it.contract.equals(serverToken.contract, true)
+								it.contract.equals(serverToken.contract, true) &&
+									it.symbol.equals(serverToken.symbol, true)
 							}
 							isDefault = status
 							isUsed = status

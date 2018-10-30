@@ -258,7 +258,7 @@ object EOSAPI {
 			EOSUrl.getAccountEOSBalance(),
 			false
 		) { result, error ->
-			if (result.isNullOrEmpty() || error.isNone()) {
+			if (result.isNullOrEmpty() || error.hasError()) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(null, error)
 				}

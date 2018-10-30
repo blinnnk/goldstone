@@ -8,6 +8,7 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -39,7 +40,9 @@ class ChainAddressesFragment
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		presenter.updateAddAddressEvent()
+		presenter.updateAddAddressEvent {
+			if (it.hasError()) context.alert(it.message)
+		}
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {

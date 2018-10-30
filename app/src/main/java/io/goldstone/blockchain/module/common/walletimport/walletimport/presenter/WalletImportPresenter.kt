@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -27,7 +28,7 @@ class WalletImportPresenter(
 			encryptMnemonic: String,
 			multiChainPath: ChainPath,
 			hint: String?,
-			callback: (walletID: Int?, error: GoldStoneError) -> Unit
+			@UiThread callback: (walletID: Int?, error: GoldStoneError) -> Unit
 		) {
 			// 不为空的地址进行
 			val currentAddress =

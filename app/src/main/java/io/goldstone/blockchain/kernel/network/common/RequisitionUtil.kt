@@ -20,7 +20,6 @@ import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import okhttp3.*
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -373,7 +372,7 @@ object RequisitionUtil {
 						else response.body()?.string().orEmpty()
 					checkChainErrorCode(data).let {
 						if (it.isNotEmpty()) {
-							hold(null, RequestError.ResolveDataError(Throwable(it)))
+							hold(null, RequestError.ResolveDataError(Throwable("$it\n$data")))
 							return
 						}
 					}
@@ -383,7 +382,7 @@ object RequisitionUtil {
 					} catch (error: Exception) {
 						hold(
 							null,
-							RequestError.ResolveDataError(Throwable("$error onResponse Error in ${chainURL.chainType.id}\n[URL: ${chainURL.getURL()}]\n[Detail:\n $data]"))
+							RequestError.ResolveDataError(Throwable("$error onResponse Error in ${chainURL.chainType.id}\n[URL: ${chainURL.getURL()}]\n[Detail:\n ${AesCrypto.decrypt(data.orEmpty())}]"))
 						)
 					}
 				}
@@ -447,16 +446,17 @@ object GoldStoneCode {
 			if (code.isNotEmpty()) {
 				when (code.toInt()) {
 					-1 -> {
-						GoldStoneAPI.context.runOnUiThread {
-							errorCallback()
-						}
+						errorCallback()
 						LogUtil.error("Server Error GoldStone")
 					}
 
+					-6 -> {
+						errorCallback()
+						LogUtil.error("参数错误 \n [DATA: $data]")
+					}
+
 					-4 -> {
-						GoldStoneAPI.context.runOnUiThread {
-							errorCallback()
-						}
+						errorCallback()
 						LogUtil.error("Url Error")
 						/**
 						 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误

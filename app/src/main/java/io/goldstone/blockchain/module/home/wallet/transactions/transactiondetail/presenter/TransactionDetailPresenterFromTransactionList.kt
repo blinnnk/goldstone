@@ -53,7 +53,6 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 				getETHERC20OrETCMemo(headerData)
 				if (isPending) observerTransaction()
 			}
-
 			else -> {
 				//  从 `EtherScan` 拉取账单列表的时候，并没有从链上获取
 				// 未知 `Token` 的 `Name`, 这里需要额外判断补充一下.
@@ -75,7 +74,7 @@ private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: Transact
 		) { memo, error ->
 			if (!memo.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
 				fragment.removeLoadingView()
-				fragment.asyncData = generateModels(this).toArrayList().apply {
+				fragment.asyncData = generateModels(this@apply).toArrayList().apply {
 					this[1].info = memo!!
 				}
 				updateHeaderValue(headerData)

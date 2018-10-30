@@ -196,9 +196,11 @@ object GoldStoneEthCall {
 			),
 			chainURL
 		) { result, error ->
-			val data = result?.toJsonObject()
-			if (data?.safeGet("blockNumber")?.isNullValue() == true) unfinishedCallback()
-			else hold(TransactionTable(data!!, chainURL.chainType.isETC(), chainURL.chainID.id), error)
+			if (!result.isNullOrEmpty() && error.isNone()) {
+				val data = result!!.toJsonObject()
+				if (data.safeGet("blockNumber").isNullValue()) unfinishedCallback()
+				else hold(TransactionTable(data, chainURL.chainType.isETC(), chainURL.chainID.id), error)
+			} else hold(null, error)
 		}
 	}
 

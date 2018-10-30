@@ -6,7 +6,7 @@
 		"chain_id": "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f",
 		"node_name": "BTC(GoldStone)",
 		"url": "https://btc-node-mainnet.goldstone.io/btc",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 1,
 		"is_default": 1
 	},
@@ -17,9 +17,9 @@
 		"chain_id": "61",
 		"node_name": "Mainnet (GoldStone)",
 		"url": "https://etc-node-mainnet.goldstone.io/eth",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 1,
-		"is_default": 0
+		"is_default": 1
 	},
 	{
 		"key_list": [],
@@ -28,7 +28,7 @@
 		"chain_id": "12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2",
 		"node_name": "Mainnet (GoldStone)",
 		"url": "https://btc-node-mainnet.goldstone.io/ltc",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 0,
 		"is_default": 1
 	},
@@ -39,9 +39,9 @@
 		"chain_id": "1",
 		"node_name": "Mainnet (GoldStone)",
 		"url": "https://eth-node-mainnet.goldstone.io/eth",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 0,
-		"is_default": 0
+		"is_default": 1
 	},
 	{
 		"key_list": [
@@ -71,9 +71,9 @@
 		"chain_id": "1",
 		"node_name": "Mainnet (Infura)",
 		"url": "https://mainnet.infura.io",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 0,
-		"is_default": 1
+		"is_default": 0
 	},
 	{
 		"key_list": [],
@@ -82,9 +82,9 @@
 		"chain_id": "61",
 		"node_name": "Mainnet (Gastracker)",
 		"url": "https://web3.gastracker.io",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 0,
-		"is_default": 1
+		"is_default": 0
 	},
 	{
 		"key_list": [],
@@ -93,7 +93,7 @@
 		"chain_id": "00000000000000000019f112ec0a9982926f1258cdcc558dd7c3b7e5dc7fa148",
 		"node_name": "Mainnet (GoldStone)",
 		"url": "https://btc-node-mainnet.goldstone.io/bch",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 0,
 		"is_default": 1
 	},
@@ -104,7 +104,7 @@
 		"chain_id": "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
 		"node_name": "Mainnet (EOSAsia)",
 		"url": "https://api1.eosasia.one",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 0,
 		"is_default": 1
 	},
@@ -115,7 +115,7 @@
 		"chain_id": "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
 		"node_name": "Testnet3 (GoldStone)",
 		"url": "https://btc-node-testnet.goldstone.io/btc",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 200,
 		"is_default": 1
 	},
@@ -126,7 +126,7 @@
 		"chain_id": "3",
 		"node_name": "Ropsten(GoldStone)",
 		"url": "https://eth-node-ropsten.goldstone.io/eth",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 110,
 		"is_default": 0
 	},
@@ -158,7 +158,7 @@
 		"chain_id": "3",
 		"node_name": "Ropsten(Infura)",
 		"url": "https://ropsten.infura.io",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 100,
 		"is_default": 1
 	},
@@ -190,7 +190,7 @@
 		"chain_id": "4",
 		"node_name": "Rinkeby (Infura)",
 		"url": "https://rinkeby.infura.io",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 80,
 		"is_default": 0
 	},
@@ -222,7 +222,7 @@
 		"chain_id": "42",
 		"node_name": "Kovan (Infura)",
 		"url": "https://kovan.infura.io",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 70,
 		"is_default": 0
 	},
@@ -233,7 +233,7 @@
 		"chain_id": "4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0",
 		"node_name": "Testnet (GoldStone)",
 		"url": "https://btc-node-testnet.goldstone.io/ltc",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 0,
 		"is_default": 1
 	},
@@ -244,7 +244,7 @@
 		"chain_id": "62",
 		"node_name": "Morden(GoldStone)",
 		"url": "https://etc-node-testnet.goldstone.io/eth",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 0,
 		"is_default": 0
 	},
@@ -255,7 +255,7 @@
 		"chain_id": "62",
 		"node_name": "Morden(Gastracker)",
 		"url": "https://web3.gastracker.io/morden",
-		"encrypt_status": 1,
+		"encrypt_status": 0,
 		"weight": 0,
 		"is_default": 1
 	},
@@ -266,7 +266,7 @@
 		"chain_id": "00000000000e38fef93ed9582a7df43815d5c2ba9fd37ef70c9a0ea4a285b8f5",
 		"node_name": "Testnet (GoldStone)",
 		"url": "https://btc-node-testnet.goldstone.io/bch",
-		"encrypt_status": 0,
+		"encrypt_status": 1,
 		"weight": 0,
 		"is_default": 1
 	}

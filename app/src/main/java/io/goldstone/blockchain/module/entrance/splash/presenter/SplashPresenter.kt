@@ -40,7 +40,8 @@ class SplashPresenter(val activity: SplashActivity) {
 				!eosAccountNames.hasActivatedOrWatchOnlyEOSAccount() &&
 				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
-				checkOrUpdateEOSAccount()
+				if (NetworkUtil.hasNetwork(activity)) checkOrUpdateEOSAccount()
+				else activity.jump<MainActivity>()
 			} else cacheDataAndSetNetBy(this) {
 				activity.jump<MainActivity>()
 			}
@@ -73,9 +74,11 @@ class SplashPresenter(val activity: SplashActivity) {
 					}
 				}
 			} else {
-				activity.runOnUiThread {
-					activity.alert(error.message)
-					activity.jump<MainActivity>()
+				cacheDataAndSetNetBy(this) {
+					activity.runOnUiThread {
+						activity.alert(error.message)
+						activity.jump<MainActivity>()
+					}
 				}
 			}
 		}
@@ -94,15 +97,15 @@ class SplashPresenter(val activity: SplashActivity) {
 			type.isLTC() -> NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
 			}
-			type.isEOS() -> if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
-				cacheWalletData(wallet, callback)
-			} else NodeSelectionPresenter.setAllMainnet {
-				cacheWalletData(wallet, callback)
-			}
 			type.isEOSJungle() -> NodeSelectionPresenter.setAllTestnet {
 				cacheWalletData(wallet, callback)
 			}
 			type.isEOSMainnet() -> NodeSelectionPresenter.setAllMainnet {
+				cacheWalletData(wallet, callback)
+			}
+			type.isEOS() -> if (SharedValue.isTestEnvironment()) NodeSelectionPresenter.setAllTestnet {
+				cacheWalletData(wallet, callback)
+			} else NodeSelectionPresenter.setAllMainnet {
 				cacheWalletData(wallet, callback)
 			}
 			type.isBCH() -> NodeSelectionPresenter.setAllMainnet {

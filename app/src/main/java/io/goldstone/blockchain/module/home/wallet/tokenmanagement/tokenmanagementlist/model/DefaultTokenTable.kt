@@ -223,11 +223,12 @@ data class DefaultTokenTable(
 		}
 
 		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
-			load { GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens() } then (hold)
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
+			} then (hold)
 		}
 
-		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit
-		) {
+		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractFromAllChains(contract)
 			} then { hold(it.firstOrNull()) }
@@ -239,13 +240,9 @@ data class DefaultTokenTable(
 			} then (hold)
 		}
 
-		fun getCurrentChainToken(
-			contract: TokenContract,
-			hold: (DefaultTokenTable?) -> Unit
-		) {
+		fun getCurrentChainToken(contract: TokenContract, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenByContract(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
+				GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			} then (hold)
 		}
 

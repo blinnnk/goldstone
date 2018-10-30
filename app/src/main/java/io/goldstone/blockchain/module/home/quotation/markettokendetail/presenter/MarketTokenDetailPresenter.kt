@@ -115,8 +115,9 @@ class MarketTokenDetailPresenter(
 				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
-					DefaultTokenTable.getTokenByContractFromAllChains(
-						fragment.currencyInfo?.contract.orEmpty()
+					DefaultTokenTable.getTokenByContractAndChainID(
+						fragment.currencyInfo?.contract.orEmpty(),
+						TokenContract(fragment.currencyInfo).getMainnetChainID()
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
 						val content =

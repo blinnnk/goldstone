@@ -71,10 +71,10 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 		// 签名测速总的签名后的信息的 `Size`
 		BitcoinCashApi.getUnspentListByAddress(myAddress) { unspents, error ->
 			if (unspents.isNull() || error.hasError()) {
-				hold(null, error)
+				GoldStoneAPI.context.runOnUiThread { hold(null, error) }
 				return@getUnspentListByAddress
 			}
-			if (unspents.isNull() || error.hasError())
+			if (unspents.isNull() || error.hasError()) {
 				if (unspents.orEmpty().isEmpty()) {
 					// 如果余额不足或者出错这里会返回空的数组
 					GoldStoneAPI.context.runOnUiThread {
@@ -82,6 +82,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 					}
 					return@getUnspentListByAddress
 				}
+			}
 
 			val size = BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 				count.toSatoshi(),

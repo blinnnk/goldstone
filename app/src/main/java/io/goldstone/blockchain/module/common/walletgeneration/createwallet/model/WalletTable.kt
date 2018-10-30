@@ -237,9 +237,9 @@ data class WalletTable(
 			Pair(WalletType.ethSeries, currentETHSeriesAddress),
 			Pair(WalletType.ltcOnly, currentLTCAddress),
 			Pair(WalletType.bchOnly, currentBCHAddress),
-			Pair(WalletType.eosOnly, currentEOSAddress),
 			Pair(WalletType.eosMainnetOnly, currentEOSAccountName.main),
-			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle)
+			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle),
+			Pair(WalletType.eosOnly, currentEOSAddress)
 		).filter {
 			it.second.isNotEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
 		}

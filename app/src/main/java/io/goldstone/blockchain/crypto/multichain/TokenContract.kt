@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import java.io.Serializable
@@ -35,6 +36,12 @@ data class TokenContract(
 		token.contract,
 		token.symbol,
 		token.decimal
+	)
+
+	constructor(data: QuotationModel?) : this(
+		data?.contract.orEmpty(),
+		data?.symbol.orEmpty(),
+		null
 	)
 
 	fun getChainURL(): ChainURL {

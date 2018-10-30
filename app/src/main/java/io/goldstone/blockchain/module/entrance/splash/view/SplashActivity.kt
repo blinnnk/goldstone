@@ -110,9 +110,7 @@ class SplashActivity : AppCompatActivity() {
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
 				supportFragmentManager.fragments.find { it is StartingFragment }.isNull {
 					// UI 切回主线程
-					runOnUiThread {
-						addFragment<StartingFragment>(it.id)
-					}
+					runOnUiThread { addFragment<StartingFragment>(it.id) }
 				}
 			}
 			// 错开动画时间再执行数据请求

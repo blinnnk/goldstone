@@ -5,15 +5,13 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.error.AccountError
-import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.PasswordError
-import io.goldstone.blockchain.common.error.TransferError
+import io.goldstone.blockchain.common.error.*
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
@@ -55,6 +53,10 @@ class PaymentPreparePresenter(
 	}
 
 	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
+		if (!NetworkUtil.hasNetwork(fragment.context)) {
+			callback(NetworkError.WithOutNetwork)
+			return
+		}
 		val count = fragment.getTransferCount()
 		val token = getToken()
 		if (!token?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)

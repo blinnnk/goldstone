@@ -187,13 +187,13 @@ class WatchOnlyImportPresenter(
 				} else if (EOSAccount(address).isValid(false)) {
 					EOSAPI.getAccountInfo(
 						EOSAccount(address),
-						SharedChain.getEOSMainnet().chainID.id
+						SharedChain.getEOSMainnet().getURL()
 					) { info, error ->
 						if (!info.isNull() || error.isNone()) {
 							eosMainnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
 							SharedChain.updateEOSCurrent(
-								ChainURL(GoldStoneDataBase.database.chainNodeDao().getCurrentEOSNode())
+								ChainURL(GoldStoneDataBase.database.chainNodeDao().getMainnetEOSNode())
 							)
 							SharedValue.updateIsTestEnvironment(false)
 							callback(error)
@@ -209,13 +209,13 @@ class WatchOnlyImportPresenter(
 				} else if (EOSAccount(address).isValid(false)) {
 					EOSAPI.getAccountInfo(
 						EOSAccount(address),
-						SharedChain.getEOSTestnet().chainID.id
+						SharedChain.getEOSTestnet().getURL()
 					) { info, error ->
 						if (!info.isNull() || error.isNone()) {
 							eosTestnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
 							SharedChain.updateEOSCurrent(
-								ChainURL(GoldStoneDataBase.database.chainNodeDao().getCurrentEOSNode())
+								ChainURL(GoldStoneDataBase.database.chainNodeDao().getTestnetEOSNode())
 							)
 							SharedValue.updateIsTestEnvironment(true)
 							callback(error)

@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.language.NotificationText
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -158,9 +157,7 @@ class TransactionDetailPresenter(
 	}
 
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
-	fun generateModels(
-		receipt: Any? = null
-	): List<TransactionDetailModel> {
+	fun generateModels(receipt: Any? = null): List<TransactionDetailModel> {
 		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
 		val timStamp =
 			data?.timestamp
