@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -66,20 +66,16 @@ private fun TransactionDetailPresenter.onLTCTransactionSucceed() {
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-private fun TransactionDetailPresenter.getLTCTransactionFromChain(
-	isPending: Boolean
-) {
+private fun TransactionDetailPresenter.getLTCTransactionFromChain(isPending: Boolean) {
 	val address =
 		if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
 		else SharedAddress.getCurrentLTC()
 	LitecoinApi.getTransactionByHash(
 		currentHash,
 		address,
-		LitecoinUrl.currentUrl(),
-		{
-			fragment.context?.alert(it.toString())
-		}
-	) { transaction ->
+		LitecoinUrl.currentUrl()
+	) { transaction, error ->
+		if (transaction.isNull() || error.hasError()) return@getTransactionByHash
 		GoldStoneAPI.context.runOnUiThread {
 			fragment.asyncData?.clear()
 			val data = generateModels(transaction)

@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
@@ -183,17 +182,13 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 					filterData.forEach { transaction ->
 						GoldStoneEthCall.getSymbolAndDecimalByContract(
 							transaction.contractAddress,
-							{
-								completeMark()
-								LogUtil.error("getUnknownTokenInfo ", it)
-							},
 							SharedChain.getCurrentETH()
-						) { symbol, decimal ->
-							unknownData.add(
+						) { symbol, decimal, error ->
+							if (error.isNone()) unknownData.add(
 								DefaultTokenTable(
 									transaction.contractAddress,
-									symbol,
-									decimal,
+									symbol!!,
+									decimal!!,
 									SharedChain.getCurrentETH().chainID,
 									""
 								)

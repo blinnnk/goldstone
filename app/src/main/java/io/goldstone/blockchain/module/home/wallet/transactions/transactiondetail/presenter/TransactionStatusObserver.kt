@@ -2,13 +2,13 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Handler
 import android.os.Looper
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -47,24 +47,19 @@ abstract class TransactionStatusObserver {
 					{
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
-					},
-					{
-						removeObserver()
-						LogUtil.error("checkStatus getTransactionByHash", it)
 					}
-				) { data ->
+				) { data, error ->
+					if (data.isNull() || error.isNone()) {
+						removeObserver()
+					}
 					transaction = data
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
 				}
 			} else {
-				GoldStoneEthCall.getBlockNumber(
-					{
-						LogUtil.error("checkStatus getBlockNumber", it)
-					},
-					chainURL
-				) { blockNumber ->
-					val blockInterval = blockNumber - transaction?.blockNumber?.toInt()!!
+				GoldStoneEthCall.getBlockNumber(chainURL) { blockNumber, error ->
+					if (blockNumber.isNull() || error.hasError()) return@getBlockNumber
+					val blockInterval = blockNumber!! - transaction?.blockNumber?.toInt()!!
 					val hasConfirmed = blockInterval > targetInterval
 					val hasError = TinyNumberUtils.isTrue(transaction?.hasError!!)
 					if (!isFailed.isNull() || hasConfirmed) {
@@ -83,36 +78,22 @@ abstract class TransactionStatusObserver {
 								handler.postDelayed(reDo, retryTime)
 							}
 						}
-					} else {
-						if (ChainID(chainID).isETCSeries()) {
-							isFailed = false
+					} else if (ChainID(chainID).isETCSeries()) {
+						isFailed = false
+						// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+						removeObserver()
+						handler.postDelayed(reDo, retryTime)
+					} else GoldStoneEthCall.getReceiptByHash(transactionHash, chainURL) { failed, failedError ->
+						// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
+						if (failed.isNull() || failedError.hasError()) return@getReceiptByHash
+						isFailed = failed
+						if (isFailed == true) {
+							getStatus(false, 1, false, failed!!)
+							removeObserver()
+						} else {
 							// 没有达到 `6` 个新的 `Block` 确认一直执行监测
 							removeObserver()
 							handler.postDelayed(reDo, retryTime)
-						} else {
-							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
-							GoldStoneEthCall.getReceiptByHash(
-								transactionHash,
-								{
-									LogUtil.error("checkStatusByTransaction", it)
-								},
-								chainURL
-							) { failed ->
-								isFailed = failed
-								if (isFailed == true) {
-									getStatus(
-										false,
-										1,
-										false,
-										failed
-									)
-									removeObserver()
-								} else {
-									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-									removeObserver()
-									handler.postDelayed(reDo, retryTime)
-								}
-							}
 						}
 					}
 				}
@@ -171,15 +152,13 @@ fun TransactionDetailPresenter.observerTransaction() {
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
-private fun TransactionDetailPresenter.onTransactionSucceed(
-	hasError: Boolean,
-	isFailed: Boolean
-) {
-	// 交易过程中发生错误
-	if (hasError) updateDataWhenHasError()
-	// 交易流程全部成功, 但是合约的问题导致失败
-	if (isFailed) updateDataWhenFailed()
-
+private fun TransactionDetailPresenter.onTransactionSucceed(hasError: Boolean, isFailed: Boolean) {
+	doAsync {
+		// 交易过程中发生错误
+		if (hasError) updateDataWhenHasError()
+		// 交易流程全部成功, 但是合约的问题导致失败
+		if (isFailed) updateDataWhenFailed()
+	}
 	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
 	val symbol = getUnitSymbol()
 	updateHeaderValue(
@@ -204,17 +183,20 @@ private fun TransactionDetailPresenter.getTransactionFromChain(errorCallback: (R
 		else SharedChain.getCurrentETH()
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		chainURL,
-		errorCallback = errorCallback
-	) {
+		chainURL
+	) { result, error ->
+		if (result.isNull() || error.hasError()) {
+			errorCallback(error)
+			return@getTransactionByHash
+		}
 		fragment.context?.runOnUiThread {
 			fragment.asyncData?.clear()
-			val data = generateModels(it)
-			fragment.asyncData?.addAll(generateModels(it))
+			val data = generateModels(result)
+			fragment.asyncData?.addAll(generateModels(result))
 			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
 		}
 		// 成功获取数据后在异步线程更新数据库记录
-		updateDataInDatabase(it.blockNumber)
+		updateDataInDatabase(result!!.blockNumber)
 	}
 }
 
@@ -234,36 +216,20 @@ private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String)
 	}
 }
 
+@WorkerThread
 fun TransactionDetailPresenter.updateDataWhenHasError() {
-	TransactionTable.getTransactionByHash(currentHash) { it ->
-		it.find {
-			it.hash == currentHash
-		}?.let {
-			doAsync {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.update(
-						it.apply {
-							this.hasError = TinyNumber.True.value.toString()
-						}
-					)
-			}
-		}
+	val transactionDao = GoldStoneDataBase.database.transactionDao()
+	val transaction = transactionDao.getTransactionByTaxHash(currentHash)
+	transaction.find { it.hash.equals(currentHash, true) }?.let {
+		transactionDao.update(it.apply { this.hasError = TinyNumber.True.value.toString() })
 	}
 }
 
+@WorkerThread
 private fun TransactionDetailPresenter.updateDataWhenFailed() {
-	TransactionTable.getTransactionByHash(currentHash) { it ->
-		it.find {
-			it.hash == currentHash
-		}?.let {
-			doAsync {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.update(it.apply { isFailed = true })
-			}
-		}
+	val transactionDao = GoldStoneDataBase.database.transactionDao()
+	val transaction = transactionDao.getTransactionByTaxHash(currentHash)
+	transaction.find { it.hash == currentHash }?.let {
+		transactionDao.update(it.apply { isFailed = true })
 	}
 }

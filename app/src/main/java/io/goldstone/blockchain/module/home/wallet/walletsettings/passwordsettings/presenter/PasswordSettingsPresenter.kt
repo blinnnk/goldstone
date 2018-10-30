@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter
 
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
 import com.blinnnk.util.getDeviceBrand
@@ -17,6 +18,7 @@ import io.goldstone.blockchain.crypto.keystore.updatePassword
 import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.WalletType
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
@@ -122,7 +124,7 @@ class PasswordSettingsPresenter(
 		newPassword: String,
 		passwordHint: String,
 		isBTCSeriesWallet: Boolean,
-		callback: (AccountError) -> Unit
+		@WorkerThread callback: (AccountError) -> Unit
 	) {
 		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
 		fragment.context?.updatePassword(
@@ -132,7 +134,7 @@ class PasswordSettingsPresenter(
 			isBTCSeriesWallet
 		) { _, error ->
 			// Update User Password Hint
-			if (error.isNone()) WalletTable.updateHint(passwordHint)
+			if (error.isNone()) GoldStoneDataBase.database.walletDao().updateHint(passwordHint)
 			callback(error)
 		}
 	}

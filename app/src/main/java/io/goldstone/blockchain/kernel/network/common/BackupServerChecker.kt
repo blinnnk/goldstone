@@ -1,12 +1,11 @@
 package io.goldstone.blockchain.kernel.network.common
 
-import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.WebUrl
 import org.json.JSONObject
 
@@ -26,13 +25,8 @@ object BackupServerChecker {
 			|| error.message.contains("StringIndexOutOfBoundsException")
 			|| error.message.contains("java.lang.Exception")
 		) {
-			checkWhetherNeedToSwitchToBackupServer(
-				{
-					// Error Callback
-					LogUtil.error("CheckWhetherNeedToSwitchToBackupServer", it)
-				}
-			) {
-				isTrue {
+			checkWhetherNeedToSwitchToBackupServer { needSwitch, switchError ->
+				if (!needSwitch.isNull() && switchError.isNone()) {
 					APIPath.updateServerUrl(WebUrl.backUpServer)
 					GoldStoneWebSocket.updateSocketUrl(WebUrl.backUpSocket)
 				}
@@ -45,17 +39,15 @@ object BackupServerChecker {
 	 * 是否需要把业务切换到备份网络。
 	 */
 	private fun checkWhetherNeedToSwitchToBackupServer(
-		errorCallback: (RequestError) -> Unit,
-		hold: Boolean.() -> Unit
+		hold: (needSwitch: Boolean?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			APIPath.serverStatus,
 			"",
 			true,
-			errorCallback,
 			isEncrypt = true
-		) {
-			hold(TinyNumberUtils.isTrue(JSONObject(this[0]).safeGet("inuse")))
+		) { result, error ->
+			hold(TinyNumberUtils.isTrue(JSONObject(result?.firstOrNull()).safeGet("inuse")), error)
 		}
 	}
 }

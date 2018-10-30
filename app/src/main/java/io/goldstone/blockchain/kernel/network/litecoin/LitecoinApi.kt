@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.kernel.network.litecoin
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getTargetChild
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -29,13 +32,15 @@ object LitecoinApi {
 			LitecoinUrl.getBalance(address),
 			"",
 			true,
-			{ hold(null, it) },
 			null,
 			true
-		) {
-			val result = firstOrNull()?.toLongOrNull().orElse(0L)
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(Amount(result), RequestError.None) }
-			else hold(Amount(result), RequestError.None)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val data = result?.firstOrNull()?.toLongOrNull().orElse(0L)
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(Amount(data), RequestError.None) }
+				else hold(Amount(data), RequestError.None)
+			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(null, error) }
+			else hold(null, error)
 		}
 	}
 
@@ -46,12 +51,11 @@ object LitecoinApi {
 		RequisitionUtil.requestUnCryptoData<String>(
 			LitecoinUrl.getBalanceFromChainSo(address),
 			"",
-			true,
-			{ hold(null, it) }
-		) {
-			val result = JSONObject(firstOrNull())
-			val balance = result.getTargetObject("data").safeGet("confirmed_balance").toDoubleOrNull().orZero()
-			hold(balance, RequestError.None)
+			true
+		) { result, error ->
+			val data = JSONObject(result?.firstOrNull())
+			val balance = data.getTargetChild("data", "confirmed_balance").toDoubleOrNull().orZero()
+			hold(balance, error)
 		}
 	}
 
@@ -59,38 +63,37 @@ object LitecoinApi {
 		address: String,
 		@WorkerThread hold: (unspentList: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.requestData<UnspentModel>(
+		RequisitionUtil.requestData(
 			LitecoinUrl.getUnspentInfo(address),
 			"",
 			false,
-			{ hold(null, it) },
 			null,
-			true
-		) {
-			hold(this, RequestError.None)
-		}
+			true,
+			hold = hold
+		)
 	}
 
 	fun getTransactions(
 		address: String,
 		from: Int,
 		to: Int,
-		hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
+		@WorkerThread hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactions(address, from, to),
 			"items",
 			true,
-			{ hold(null, it) },
 			null,
 			true
-		) {
-			val jsonArray = JSONArray(this[0])
-			var data = listOf<JSONObject>()
-			(0 until jsonArray.length()).forEach {
-				data += JSONObject(jsonArray[it].toString())
-			}
-			hold(data, RequestError.None)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val jsonArray = JSONArray(result?.firstOrNull())
+				var data = listOf<JSONObject>()
+				(0 until jsonArray.length()).forEach {
+					data += JSONObject(jsonArray[it].toString())
+				}
+				hold(data, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -102,11 +105,10 @@ object LitecoinApi {
 			LitecoinUrl.getTransactions(address, 999999999, 0),
 			"totalItems",
 			true,
-			{ hold(null, it) },
 			null,
 			true
-		) {
-			hold(this.firstOrNull()?.toIntOrNull().orZero(), RequestError.None)
+		) { result, error ->
+			hold(result?.firstOrNull()?.toIntOrNull(), error)
 		}
 	}
 
@@ -115,30 +117,30 @@ object LitecoinApi {
 		hash: String,
 		address: String,
 		targetNet: String,
-		errorCallback: (Throwable) -> Unit,
-		hold: (BTCSeriesTransactionTable?) -> Unit
+		@WorkerThread hold: (transaction: BTCSeriesTransactionTable?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			LitecoinUrl.getTransactionByHash(targetNet, hash),
 			"",
 			true,
-			{ errorCallback(it) },
 			null,
 			true
-		) {
-			val result = if (isNotEmpty()) JSONObject(this[0]) else null
-			hold(
-				if (isNull()) null
-				else BTCSeriesTransactionTable(
-					result!!,
-					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
-					0,
-					address,
-					CoinSymbol.LTC.symbol!!,
-					false,
-					ChainType.LTC.id
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val data = JSONObject(result?.firstOrNull())
+				hold(
+					BTCSeriesTransactionTable(
+						data,
+						// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
+						0,
+						address,
+						CoinSymbol.LTC.symbol!!,
+						false,
+						ChainType.LTC.id
+					),
+					error
 				)
-			)
+			} else hold(null, error)
 		}
 	}
 }

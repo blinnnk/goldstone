@@ -122,10 +122,9 @@ class TokenSearchPresenter(
 	) {
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
-			{ fragment.context?.alert(it.message) },
 			SharedChain.getCurrentETH()
-		) { symbol, name, decimal ->
-			if (symbol.isEmpty() || name.isEmpty())
+		) { symbol, name, decimal, error ->
+			if (symbol.isNullOrEmpty() || name.isNullOrEmpty() || decimal.isNull() || error.hasError())
 				hold(arrayListOf(), RequestError.NullResponse("empty symbol and name"))
 			else {
 				val status = myTokens.any {
@@ -138,11 +137,11 @@ class TokenSearchPresenter(
 							"",
 							contract,
 							"",
-							symbol,
+							symbol!!,
 							TinyNumber.False.value,
 							0.0,
-							name,
-							decimal,
+							name!!,
+							decimal!!,
 							null,
 							status,
 							0,
