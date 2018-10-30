@@ -12,7 +12,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
-import io.goldstone.blockchain.module.home.quotation.tradermemory.TraderMemoryDetailOverlay.view.TraderMemoryOverlayFragment
+import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketFragment
 
 /**
  * @date 21/04/2018 4:14 PM
@@ -39,7 +39,7 @@ class QuotationOverlayPresenter(
 	}
 
 	fun showTraderMemoryDetailOverlayFragment() {
-		fragment.activity?.addFragmentAndSetArguments<TraderMemoryOverlayFragment>(ContainerID.main) {
+		fragment.activity?.addFragmentAndSetArguments<RAMMarketFragment>(ContainerID.main) {
 			putString(
 				"内存交易",
 				"内存交易"

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
  * @date 2018/4/28 3:33 PM
  * @author KaySaith
  */
-abstract class GoldStoneWebSocket : WebSocketListener() {
+abstract class GoldStoneWebSocket(private val closeMessage: String) : WebSocketListener() {
 
 	/**
 	 * 添加日志，需要观察长链接断的情况
@@ -137,7 +137,7 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 	fun closeSocket() {
 		webSocket?.let {
 			// 取消订阅
-			webSocket?.send(AesCrypto.encrypt("{\"t\": \"unsub_tick\"}").orEmpty())
+			webSocket?.send(AesCrypto.encrypt(closeMessage).orEmpty())
 			it.close(normalCloseCode, null)
 			webSocket = null
 		}
