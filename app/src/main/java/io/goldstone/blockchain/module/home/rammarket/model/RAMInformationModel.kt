@@ -1,0 +1,16 @@
+package io.goldstone.blockchain.module.home.rammarket.model
+
+/**
+ * @date: 2018/9/28.
+ * @author: yanglihai
+ * @description: ram市场头部的信息的model
+ */
+data class RAMInformationModel(
+	var openPrice: String?,
+	var HighPrice: String?,
+	var lowPrice: String?,
+	var currentPrice: String?,
+	var maxAmount: String?,
+	var occupyAmount: String?,
+	var ramAmountPercent: String?
+)

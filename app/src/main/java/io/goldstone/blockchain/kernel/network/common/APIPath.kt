@@ -99,6 +99,13 @@ object APIPath {
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}
+	val getEosRamPriceTendcyCandle: (
+		header: String,
+		period: String,
+		size: Int
+	) -> String = { header, period, size ->
+		"$header/eosram/lineData?period=$period&size=$size"
+	}
 }
 
 object EtherScanApi {

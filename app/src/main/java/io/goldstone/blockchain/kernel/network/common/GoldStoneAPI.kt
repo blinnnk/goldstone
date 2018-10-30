@@ -33,6 +33,7 @@ import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -523,6 +524,44 @@ object GoldStoneAPI {
 			)
 		}
 	}
+	
+	fun getEOSRAMPriceTendcyCandle(
+		period: String,
+		size: Int,
+		errorCallback: (RequestError) -> Unit,
+		hold: (ArrayList<CandleChartModel>) -> Unit
+	) {
+		requestData<CandleChartModel>(
+			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, period, size),
+			"ticks",
+			errorCallback = errorCallback,
+			isEncrypt = true
+		) {
+			hold(this.toArrayList())
+		}
+		
+	}
+	
+	fun getEOSRAMPriceToday(
+		hold: (CandleChartModel?, RequestError) -> Unit
+	) {
+		requestData<CandleChartModel>(
+			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
+			"ticks",
+			errorCallback = {
+				hold(null, it)
+			},
+			isEncrypt = true
+		) {
+			if (isNotEmpty()) {
+				hold(this[0], RequestError.None)
+			} else {
+				hold(null, RequestError.NullResponse("no values for ticks"))
+			}
+		}
+		
+	}
+	
 }
 
 

@@ -39,6 +39,11 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		super.onAttach(context)
 		presenter.onFragmentAttach()
 	}
+	
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		presenter.onFragmentCreate()
+	}
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -106,6 +111,11 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		super.onResume()
 		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 		presenter.onFragmentResume()
+	}
+	
+	override fun onPause() {
+		super.onPause()
+		presenter.onFragmentPause()
 	}
 
 	override fun onDestroy() {
