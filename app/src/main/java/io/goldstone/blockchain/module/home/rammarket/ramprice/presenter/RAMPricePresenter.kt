@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.rammarket.ramprice.presenter
 
 import android.annotation.SuppressLint
 import android.text.format.DateUtils
-import com.blinnnk.extension.isNull
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.github.mikephil.charting.data.CandleEntry
@@ -13,18 +12,13 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
-import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMInformationModel
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.*
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.model.RAMInformationModel
 import io.goldstone.blockchain.module.home.rammarket.ramprice.view.RAMPriceDetailFragment
 import io.goldstone.blockchain.module.home.rammarket.ramprice.view.RAMPriceDetailView
+import io.goldstone.blockchain.module.home.rammarket.view.EOSRAMPriceCandleChart
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.textColor
 import org.json.JSONObject
@@ -87,7 +81,15 @@ class RAMPricePresenter(override val fragment: RAMPriceDetailFragment)
 				val jsonData = getStringFromSharedPreferences(ramInformationKey)
 				Gson().fromJson(jsonData, RAMInformationModel::class.java)
 			} catch (error: Exception) {
-				RAMInformationModel(null, null, null, null, null, null, null)
+				RAMInformationModel(
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+				)
 			}
 			
 			candleDataMap = try {
@@ -139,7 +141,7 @@ class RAMPricePresenter(override val fragment: RAMPriceDetailFragment)
 		}
 	}
 	
-	private fun EOSRAMPriceTrendCandleChart.updateCandleChartUI() {
+	private fun EOSRAMPriceCandleChart.updateCandleChartUI() {
 		candleDataMap[period]?.apply {
 			resetData(dateType, this.mapIndexed { index, entry ->
 				CandleEntry(

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model
+package io.goldstone.blockchain.module.home.rammarket.model
 
 import io.goldstone.blockchain.common.language.DateAndTimeText
 

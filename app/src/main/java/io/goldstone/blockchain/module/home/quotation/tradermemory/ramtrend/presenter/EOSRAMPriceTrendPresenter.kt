@@ -5,12 +5,10 @@ import android.text.format.DateUtils
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.*
 import com.github.mikephil.charting.data.CandleEntry
-import com.google.android.gms.common.util.SharedPreferencesUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.Language.EOSRAMText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.Spectrum
@@ -21,12 +19,12 @@ import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RAMTradeRefreshEvent
 import io.goldstone.blockchain.module.home.quotation.tradermemory.RefreshReceiver
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.RAMInformationModel
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.model.RAMInformationModel
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.view.*
+import io.goldstone.blockchain.module.home.rammarket.view.EOSRAMPriceCandleChart
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.textColor
-import org.json.JSONException
 import java.math.BigDecimal
 
 /**
@@ -60,7 +58,15 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 				val jsonData = getStringFromSharedPreferences(ramInformationKey)
 				Gson().fromJson(jsonData, RAMInformationModel::class.java)
 			} catch (error: Exception) {
-				RAMInformationModel(null, null, null, null, null, null, null)
+				RAMInformationModel(
+					null,
+					null,
+					null,
+					null,
+					null,
+					null,
+					null
+				)
 			}
 			
 			candleDataMap = try {
@@ -116,7 +122,7 @@ class EOSRAMPriceTrendPresenter(override val fragment: EOSRAMPriceTrendFragment)
 		}
 	}
 	
-	private fun EOSRAMPriceTrendCandleChart.updateCandleChartUI() {
+	private fun EOSRAMPriceCandleChart.updateCandleChartUI() {
 		candleDataMap[period]?.apply {
 			resetData(dateType, this.mapIndexed { index, entry ->
 				CandleEntry(

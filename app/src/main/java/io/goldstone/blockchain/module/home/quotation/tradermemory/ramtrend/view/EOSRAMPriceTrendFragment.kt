@@ -7,8 +7,9 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.ButtonMenu
-import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.quotation.tradermemory.ramtrend.presenter.EOSRAMPriceTrendPresenter
+import io.goldstone.blockchain.module.home.rammarket.view.EOSRAMPriceCandleChart
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -21,7 +22,7 @@ class EOSRAMPriceTrendFragment : BaseFragment<EOSRAMPriceTrendPresenter>() {
 	override val pageTitle: String
 		get() = ""
 	
-	val candleChart by lazy { EOSRAMPriceTrendCandleChart(context!!) }
+	val candleChart by lazy { EOSRAMPriceCandleChart(context!!) }
 	private val menu by lazy { ButtonMenu(context!!) }
 	
 	val ramInformationHeader by lazy { RAMInformationHeader(context!!) }
