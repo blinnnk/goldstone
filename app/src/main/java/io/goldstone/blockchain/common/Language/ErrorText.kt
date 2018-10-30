@@ -1,7 +1,4 @@
-package io.goldstone.blockchain.common.Language
-
-import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.common.language.currentLanguage
+package io.goldstone.blockchain.common.language
 
 /**
  * @date 2018/9/29 18:25 AM
@@ -49,16 +46,7 @@ object ErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "從鏈上獲取手續費信息失敗"
 		else -> ""
 	}
-	@JvmField
-	val getChainInfoError = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Failed to get hand information from the chain"
-		HoneyLanguage.Chinese.code -> "从链上获取手信息失败"
-		HoneyLanguage.Japanese.code -> "チェーンから手の情報を得ることができなかった"
-		HoneyLanguage.Korean.code -> "사슬에서 손 정보를 가져 오는 데 실패했습니다."
-		HoneyLanguage.Russian.code -> "Не удалось получить ручную информацию из цепочки"
-		HoneyLanguage.TraditionalChinese.code -> "從鏈上獲取手信息失敗"
-		else -> ""
-	}
+
 	@JvmField
 	val tradingInputIsEmpty = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter the quantity you want to trade."
@@ -69,31 +57,6 @@ object ErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "請輸入想交易的數量"
 		else -> ""
 	}
-	@JvmField
-	val wrongRAMInputValue = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The number of bytes (Byte) purchased for RAM can only be an integer. 1KB = 1024Byte"
-		HoneyLanguage.Chinese.code -> "购买RAM的字节(Byte)数只能是整数。1KB = 1024Byte"
-		HoneyLanguage.Japanese.code -> "RAMのために購入されたバイト（Byte）の数は整数にしかなりません。 1KB = 1024Byte"
-		HoneyLanguage.Korean.code -> "RAM 용으로 구입 한 바이트 수 (Byte)는 정수일 수 있습니다. 1KB = 1024Byte"
-		HoneyLanguage.Russian.code -> "Количество байтов (Byte), приобретенных для ОЗУ, может быть только целым числом. 1KB = 1024Byte"
-		HoneyLanguage.TraditionalChinese.code -> "購買RAM的字節(Byte)數只能是整數。 1KB = 1024Byte"
-		else -> ""
-	}
-	@JvmField
-	val transferToSelf = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Decrypt your keystore by password found error"
-		HoneyLanguage.Chinese.code -> "交易资源时不能转移给自​​己。"
-		HoneyLanguage.Japanese.code -> "あなたは、取引リソースのときにお金を転送することはできません。"
-		HoneyLanguage.Korean.code -> "리소스를 스테이크하는 동안 자신에게 전송할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Вы не можете перенести себя во время размещения ресурсов."
-		HoneyLanguage.TraditionalChinese.code -> "交易資源時不能轉移給自​​己。"
-		else -> ""
-	}
-
-
-
-
-
 
 	@JvmField
 	val decryptKeyStoreError = when (currentLanguage) {
@@ -280,16 +243,6 @@ object ErrorText {
 		else -> ""
 	}
 
-	@JvmField
-	val rpcResult = when (currentLanguage) {
-		HoneyLanguage.English.code -> "RPC request error"
-		HoneyLanguage.Chinese.code -> "RPC请求出错"
-		HoneyLanguage.Japanese.code -> "RPC要求エラー"
-		HoneyLanguage.Korean.code -> "RPC 요청 오류"
-		HoneyLanguage.Russian.code -> "Ошибка запроса RPC"
-		HoneyLanguage.TraditionalChinese.code -> "RPC請求出錯"
-		else -> ""
-	}
 	@JvmField
 	val none = when (currentLanguage) {
 		HoneyLanguage.English.code -> "No error."

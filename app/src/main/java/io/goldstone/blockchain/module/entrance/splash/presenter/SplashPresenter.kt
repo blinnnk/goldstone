@@ -7,7 +7,6 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.isEOS
@@ -175,17 +174,15 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	private fun unregisterGoldStoneID(targetGoldStoneID: String) {
 		if (NetworkUtil.hasNetwork(activity)) {
-			GoldStoneAPI.unregisterDevice(
-				targetGoldStoneID,
-				{
+			GoldStoneAPI.unregisterDevice(targetGoldStoneID) { isSuccessful, error ->
+				if (!isSuccessful.isNull() && error.isNone()) {
+					// 服务器操作失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`, 成功的话清空.
+					val newID = if (isSuccessful == true) "Default" else targetGoldStoneID
+					SharedWallet.updateUnregisterGoldStoneID(newID)
+				} else {
 					// 出现请求错误标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
 					SharedWallet.updateUnregisterGoldStoneID(targetGoldStoneID)
-					LogUtil.error("unregisterDevice", it)
 				}
-			) { isSuccessful ->
-				// 服务器操作失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`, 成功的话清空.
-				val newID = if (isSuccessful) "Default" else targetGoldStoneID
-				SharedWallet.updateUnregisterGoldStoneID(newID)
 			}
 		} else {
 			// 没有网络的情况下标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`

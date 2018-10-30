@@ -171,15 +171,11 @@ fun Context.getPrivateKey(
 	walletAddress: String,
 	password: String,
 	isBTCSeriesWallet: Boolean,
-	isMainThreadResult: Boolean = true,
+	isMainThreadResult: Boolean,
 	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	doAsync {
-		getKeystoreFile(
-			walletAddress,
-			password,
-			isBTCSeriesWallet
-		) { keyStoreFile, error ->
+		getKeystoreFile(walletAddress, password, isBTCSeriesWallet) { keyStoreFile, error ->
 			if (!keyStoreFile.isNull() && error.isNone()) {
 				val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile!!, password)
 				if (keyPair.isNull()) hold(null, AccountError.WrongPassword)
@@ -188,7 +184,9 @@ fun Context.getPrivateKey(
 						hold(keyPair!!.privateKey.toString(16), AccountError.None)
 					} else hold(keyPair!!.privateKey.toString(16), AccountError.None)
 				}
-			} else runOnUiThread { hold(null, error) }
+			} else if (isMainThreadResult) runOnUiThread {
+				hold(null, error)
+			} else hold(null, error)
 		}
 	}
 }
@@ -360,12 +358,13 @@ fun Context.updatePassword(
 	oldPassword: String,
 	newPassword: String,
 	isBTCSeriesWallet: Boolean,
-	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
+	@WorkerThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	getPrivateKey(
 		walletAddress,
 		oldPassword,
-		isBTCSeriesWallet
+		isBTCSeriesWallet,
+		false
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) deleteAccount(
 			walletAddress,

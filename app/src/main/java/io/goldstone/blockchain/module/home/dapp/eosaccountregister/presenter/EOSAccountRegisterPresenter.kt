@@ -142,12 +142,12 @@ class EOSAccountRegisterPresenter(
 			// 检查当前合规的用户名是否可被注册
 			EOSAPI.getAccountResource(
 				newAccount,
-				EOSCodeName.EOSIO,
-				{ hold(null, it) }
-			) {
+				EOSCodeName.EOSIO
+			) { resource, error ->
 				GoldStoneAPI.context.runOnUiThread {
-					if (!it.isNull()) hold(null, RequestError.RPCResult("this account name has been registered"))
-					else hold(true, RequestError.None)
+					if (!resource.isNull())
+						hold(null, RequestError.RPCResult("this account name has been registered"))
+					else hold(true, error)
 				}
 			}
 		}

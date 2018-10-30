@@ -8,9 +8,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toUnitValue
@@ -18,6 +16,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
@@ -103,11 +102,12 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		ChainID(info.chainID).getChainURL()!!,
-		errorCallback = callback
-	) { receipt ->
-		// 通过 `Notification` 获取确实信息
-		receipt.apply {
+		ChainID(info.chainID).getChainURL()!!
+	) { receipt, error ->
+		if (receipt.isNull() || error.hasError()) GoldStoneAPI.context.runOnUiThread {
+			callback(error)
+		} else receipt!!.apply {
+			// 通过 `Notification` 获取确实信息
 			this.recordOwnerAddress = if (info.isReceived) info.toAddress else info.fromAddress
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
@@ -205,23 +205,20 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 
 fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
 	info: NotificationTransactionInfo,
-	callback: () -> Unit
+	@UiThread callback: () -> Unit
 ) {
 	LitecoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID(info.chainID).getThirdPartyURL(),
-		{
-			LogUtil.error("updateBTCTransactionByNotificationHash", it)
-			fragment.context?.alert(it.toString())
-		}
-	) { receipt ->
-		// 通过 `Notification` 获取确实信息
-		receipt?.apply {
+		ChainID(info.chainID).getThirdPartyURL()
+	) { receipt, error ->
+		if (receipt.isNull() || error.isNone()) return@getTransactionByHash
+		receipt!!.apply {
+			// 通过 `Notification` 获取确实信息
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
 			this.isReceive = info.isReceived
-		}?.toAsyncData()?.let {
+		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
 				if (fragment.asyncData.isNull()) fragment.asyncData = it
 				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
@@ -241,7 +238,7 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 		info.fromAddress,
 		ChainID(info.chainID).getThirdPartyURL()
 	) { receipt, error ->
-		if (receipt.isNull() && error.hasError()) return@getTransactionByHash
+		if (receipt.isNull() || error.hasError()) return@getTransactionByHash
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()

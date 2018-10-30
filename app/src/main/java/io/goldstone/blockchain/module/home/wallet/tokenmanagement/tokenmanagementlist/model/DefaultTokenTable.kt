@@ -207,10 +207,9 @@ data class DefaultTokenTable(
 	fun updateTokenNameFromChain() {
 		GoldStoneEthCall.getTokenName(
 			contract,
-			{ },
 			SharedChain.getCurrentETH()
-		) {
-			val name = if (it.isEmpty()) symbol else it
+		) { result, _ ->
+			val name = if (result.isNullOrEmpty()) symbol else result!!
 			DefaultTokenTable.updateTokenName(TokenContract(this), name)
 		}
 	}

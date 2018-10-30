@@ -2,10 +2,11 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
@@ -16,13 +17,12 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -306,41 +306,32 @@ data class TransactionTable(
 			hash: String,
 			isReceive: Boolean,
 			chainURL: ChainURL,
-			errorCallback: (EthereumRPCError) -> Unit,
-			callback: (memo: String) -> Unit
+			@WorkerThread hold: (memo: String?, error: RequestError) -> Unit
 		) {
-			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
+			doAsync {
+				val transaction =
+					GoldStoneDataBase.database.transactionDao().getByTaxHashAndReceivedStatus(hash, isReceive)
 				if (transaction?.memo?.isNotEmpty() == true) {
-					callback(transaction.memo)
+					hold(transaction.memo, RequestError.None)
 				} else {
-					GoldStoneEthCall.apply {
-						getInputCodeByHash(
-							hash,
-							errorCallback,
-							chainURL
-						) { input ->
-							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
-							val memo = getMemoFromInputCode(input, isErc20Token)
-							// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
-							// TODO ETC 类型的数据需要维护数据库插入
-							if (!transaction.isNull()) {
-								GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
-									this.input = input
-									this.memo = memo
-								})
-							}
-							GoldStoneAPI.context.runOnUiThread {
-								callback(memo)
-							}
+					GoldStoneEthCall.getInputCodeByHash(hash, chainURL) { inputCode, error ->
+						// API 错误
+						if (inputCode.isNullOrEmpty() || error.hasError()) {
+							hold(null, error)
+							return@getInputCodeByHash
 						}
+						val isErc20Token = CryptoUtils.isERC20TransferByInputCode(inputCode!!)
+						val memo = getMemoFromInputCode(inputCode, isErc20Token)
+						// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
+						if (!transaction.isNull()) {
+							GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
+								this.input = inputCode
+								this.memo = memo
+							})
+						}
+						hold(memo, error)
 					}
 				}
-			}
-		}
-
-		fun getTransactionByHash(taxHash: String, hold: (List<TransactionTable>) -> Unit) {
-			GoldStoneDataBase.database.transactionDao().apply {
-				hold(getTransactionByTaxHash(taxHash))
 			}
 		}
 

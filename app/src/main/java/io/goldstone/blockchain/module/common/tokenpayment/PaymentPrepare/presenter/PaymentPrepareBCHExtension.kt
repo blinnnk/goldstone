@@ -55,9 +55,13 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 	BTCSeriesJsonRPC.estimatesmartFee(
 		SharedChain.getBCHCurrent(),
 		4,
-		false,
-		{ hold(null, it) }
-	) { feePerByte ->
+		false
+	) { feePerByte, feeError ->
+		// API 错误的时候
+		if (feePerByte.isNull() || feeError.hasError()) {
+			GoldStoneAPI.context.runOnUiThread { hold(null, feeError) }
+			return@estimatesmartFee
+		}
 		if (feePerByte.orZero() < 0) {
 			GoldStoneAPI.context.runOnUiThread {
 				hold(null, TransferError.GetWrongFeeFromChain)
@@ -100,7 +104,7 @@ private fun PaymentPreparePresenter.generateBCHPaymentModel(
 				size.toLong()
 			).let {
 				GoldStoneAPI.context.runOnUiThread {
-					hold(it, GoldStoneError.None)
+					hold(it, error)
 				}
 			}
 		}

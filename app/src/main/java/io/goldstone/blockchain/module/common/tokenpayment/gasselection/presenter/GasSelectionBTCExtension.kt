@@ -79,21 +79,21 @@ fun GasSelectionPresenter.transferBTC(
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
 						SharedChain.getBTCCurrent(),
-						signedModel.signedMessage,
-						callback
-					) { hash ->
-						hash?.let {
+						signedModel.signedMessage
+					) { hash, error ->
+						if (!hash.isNullOrEmpty() && error.isNone()) {
 							// 插入 `Pending` 数据到本地数据库
-							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, it)
+							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, hash!!)
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
 									rootFragment,
 									fragment,
-									prepareReceiptModelFromBTCSeries(this@model, fee, it)
+									prepareReceiptModelFromBTCSeries(this@model, fee, hash)
 								)
-								callback(GoldStoneError.None)
 							}
+						} else GoldStoneAPI.context.runOnUiThread {
+							callback(error)
 						}
 					}
 				}
