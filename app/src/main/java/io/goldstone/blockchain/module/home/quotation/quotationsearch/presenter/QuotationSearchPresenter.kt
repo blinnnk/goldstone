@@ -12,6 +12,8 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -62,8 +64,9 @@ class QuotationSearchPresenter(
 				})
 				callback(error)
 			} else callback(error)
-		} else {
+		} else load {
 			GoldStoneDataBase.database.quotationSelectionDao().deleteByPairs(model.pair)
+		} then {
 			callback(RequestError.None)
 		}
 	}

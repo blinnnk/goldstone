@@ -38,6 +38,7 @@ object ArgumentKey {
 	const val defaultEOSAccountName = "defaultEOSAccountName"
 	const val contact = "contact"
 	const val eosAccountRegister = "eosAccountRegister"
+	const val contactID = "contactID"
 }
 
 object IntentKey {
