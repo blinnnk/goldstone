@@ -77,16 +77,17 @@ class TokenManagementListPresenter(
 	}
 
 	companion object {
-		fun insertOrDeleteMyToken(isChecked: Boolean, token: DefaultTokenTable) {
+		fun addOrCloseMyToken(isChecked: Boolean, token: DefaultTokenTable) {
 			doAsync {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				if (isChecked) MyTokenTable.addNew(TokenContract(token), token.chainID)
-				else GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(
-						token.contract,
-						token.symbol,
-						TokenContract(token).getAddress()
-					)
+				if (isChecked) MyTokenTable.addNewOrOpen(TokenContract(token), token.chainID)
+				else GoldStoneDataBase.database.myTokenDao().updateCloseStatus(
+					token.contract,
+					token.symbol,
+					TokenContract(token).getAddress(),
+					token.chainID,
+					true
+				)
 			}
 		}
 	}

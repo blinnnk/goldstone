@@ -43,7 +43,7 @@ class TokenManagementListFragment :
 					data.contract.equals(default.contract, true)
 				}?.isUsed = switch.isChecked
 				// 更新数据库
-				TokenManagementListPresenter.insertOrDeleteMyToken(switch.isChecked, default)
+				TokenManagementListPresenter.addOrCloseMyToken(switch.isChecked, default)
 				switch.isClickable = true
 			}
 		}

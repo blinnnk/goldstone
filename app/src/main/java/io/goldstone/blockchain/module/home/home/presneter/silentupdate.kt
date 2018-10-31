@@ -38,13 +38,11 @@ abstract class SilentUpdater {
 	private fun checkAvailableEOSTokenList() {
 		val account = SharedAddress.getCurrentEOSAccount()
 		if (!account.isValid(false)) return
-		EOSAPI.getEOSTokenList(
-			SharedChain.getEOSCurrent().chainID,
-			account
-		) { tokenList, error ->
+		EOSAPI.getEOSTokenList(SharedChain.getEOSCurrent().chainID, account) { tokenList, error ->
 			if (!tokenList.isNull() && error.isNone()) {
 				// 拉取潜在资产的 `Icon Url`
 				GoldStoneAPI.getIconURL(tokenList!!) { tokenIcons, getIconError ->
+					val myTokenDao = GoldStoneDataBase.database.myTokenDao()
 					if (!tokenIcons.isNull() && getIconError.isNone()) {
 						tokenList.forEach { contract ->
 							// 插入 `DefaultToken`
@@ -56,16 +54,26 @@ abstract class SilentUpdater {
 								tokenIcons!!.getByTokenContract(contract.orEmpty())?.url.orEmpty(),
 								true
 							).preventDuplicateInsert()
-							// 插入 `MyTokenTable`
-							MyTokenTable(
-								0,
-								account.accountName,
-								SharedAddress.getCurrentEOS(),
-								contract.symbol,
-								0.0,
+							val targetToken = myTokenDao.getTokenByContractAndAddress(
 								contract.contract.orEmpty(),
+								contract.symbol,
+								account.accountName,
 								ChainID.EOS.id
-							).preventDuplicateInsert()
+							)
+							// 有可能用户本地已经插入并且被用户手动关闭了, 所以只有本地不存在的时候才插入
+							// 插入 `MyTokenTable`
+							if (targetToken.isNull()) myTokenDao.insert(
+								MyTokenTable(
+									0,
+									account.accountName,
+									SharedAddress.getCurrentEOS(),
+									contract.symbol,
+									0.0,
+									contract.contract.orEmpty(),
+									ChainID.EOS.id,
+									false
+								)
+							)
 						}
 					}
 				}
@@ -130,7 +138,6 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateMyTokenCurrencyPrice() {
-		System.out.println("what happened 1")
 		MyTokenTable.getMyTokens(false) { myTokens ->
 			GoldStoneAPI.getPriceByContractAddress(
 				// `EOS` 的 `Token` 价格在下面的方法从第三方获取, 这里过滤掉 `EOS` 的 `Token`
@@ -161,7 +168,7 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private suspend fun updateLocalDefaultTokens() {
+	private fun updateLocalDefaultTokens() {
 		GoldStoneAPI.getDefaultTokens { serverTokens, error ->
 			if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
 				val localTokens =

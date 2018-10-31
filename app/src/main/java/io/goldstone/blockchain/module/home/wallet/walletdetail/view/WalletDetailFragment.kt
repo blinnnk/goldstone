@@ -46,7 +46,6 @@ class WalletDetailFragment :
 			addTokenButton.onClick { presenter.showTokenManagementFragment() }
 			sendButton.onClick { presenter.setQuickTransferEvent(true) }
 			depositButton.onClick { presenter.setQuickTransferEvent(false) }
-			System.out.println("fuck &&&& ${Thread.currentThread().name}")
 		}
 	}
 

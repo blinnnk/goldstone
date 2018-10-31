@@ -34,21 +34,17 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun hasAccountThenLogin() {
-		System.out.println("lfuck you ${Thread.currentThread().name}****")
 		GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
 			if (
 				!eosAccountNames.currentPublicKeyHasActivated() &&
 				!eosAccountNames.hasActivatedOrWatchOnlyEOSAccount() &&
 				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
-				System.out.println("Thread ${Thread.currentThread().name} 000")
 				if (NetworkUtil.hasNetwork(activity)) checkOrUpdateEOSAccount()
-				else {
-					System.out.println("Thread ${Thread.currentThread().name} 001")
+				else GoldStoneAPI.context.runOnUiThread {
 					activity.jump<MainActivity>()
 				}
 			} else cacheDataAndSetNetBy(this) {
-				System.out.println("Thread ${Thread.currentThread().name} 002")
 				activity.jump<MainActivity>()
 			}
 		}
@@ -69,23 +65,18 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	private fun WalletTable.checkOrUpdateEOSAccount() {
-		System.out.println("currentEOSAddress $currentEOSAddress")
 		// 观察钱包的时候会把 account name 存成 address 当删除钱包检测到下一个默认钱包
 		// 刚好是 EOS 观察钱包的时候越过检查 Account Name 的缓解
 		val isEOSWatchOnly = EOSAccount(currentEOSAddress).isValid(false)
 		if (isEOSWatchOnly) cacheDataAndSetNetBy(this) {
-			System.out.println("Thread${Thread.currentThread().name}")
 			activity.jump<SplashActivity>()
 		} else EOSAPI.getAccountNameByPublicKey(currentEOSAddress) { accounts, error ->
 			if (!accounts.isNull() && error.isNone()) {
 				if (accounts!!.isEmpty()) cacheDataAndSetNetBy(this) {
-					System.out.println("isEmpty")
 					activity.jump<MainActivity>()
 				} else initEOSAccountName(accounts) {
-					System.out.println("init account")
 					// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
 					cacheDataAndSetNetBy(apply { currentEOSAccountName.updateCurrent(accounts.first().name) }) {
-						System.out.println("*** ${Thread.currentThread().name}")
 						activity.jump<MainActivity>()
 					}
 				}

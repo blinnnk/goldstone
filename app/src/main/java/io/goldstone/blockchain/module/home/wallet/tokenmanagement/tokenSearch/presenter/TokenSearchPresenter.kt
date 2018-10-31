@@ -76,10 +76,10 @@ class TokenSearchPresenter(
 				searchToken.name,
 				searchToken.iconUrl
 			) {
-				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, localToken)
+				TokenManagementListPresenter.addOrCloseMyToken(isChecked, localToken)
 				callback()
 			} else searchToken.apply { isDefault = isChecked } insertThen {
-				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, searchToken)
+				TokenManagementListPresenter.addOrCloseMyToken(isChecked, searchToken)
 				callback()
 			}
 		}

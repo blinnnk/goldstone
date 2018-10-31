@@ -42,7 +42,8 @@ data class MyTokenTable(
 	var symbol: String,
 	var balance: Double, // 含有精度的余额 eg: `1.02` BTC
 	var contract: String,
-	var chainID: String
+	var chainID: String,
+	var isClosed: Boolean // 用户手动关闭的 `Token` 用来防止 `Server` 给出 `EOS` 潜在资产的重复添加
 ) {
 
 	constructor(
@@ -55,7 +56,8 @@ data class MyTokenTable(
 		data.symbol,
 		0.0,
 		data.contract,
-		data.chainID
+		data.chainID,
+		false
 	)
 
 	constructor(
@@ -69,16 +71,18 @@ data class MyTokenTable(
 		data.symbol,
 		0.0,
 		data.contract,
-		data.chainID
+		data.chainID,
+		false
 	)
 
 	fun preventDuplicateInsert() {
 		doAsync {
 			// 防止重复添加
-			GoldStoneDataBase.database.myTokenDao().apply {
-				if (getTokenByContractAndAddress(contract, symbol, ownerName, chainID).isNull()) {
-					insert(this@MyTokenTable)
-				}
+			val myTokenDao = GoldStoneDataBase.database.myTokenDao()
+			val targetToken =
+				myTokenDao.getTokenByContractAndAddress(contract, symbol, ownerName, chainID)
+			if (targetToken == null) {
+				myTokenDao.insert(this@MyTokenTable)
 			}
 		}
 	}
@@ -157,20 +161,28 @@ data class MyTokenTable(
 		}
 
 		@WorkerThread
-		fun addNew(contract: TokenContract, chainID: String) {
+		fun addNewOrOpen(contract: TokenContract, chainID: String) {
 			val currentAddress = contract.getAddress(false)
 			val accountName =
 				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
+			val myTokenDao = GoldStoneDataBase.database.myTokenDao()
+			val targetToken = myTokenDao.getTokenByContractAndAddress(
+				contract.contract.orEmpty(),
+				contract.symbol,
+				accountName,
+				chainID
+			)
 			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-			MyTokenTable(
+			if (targetToken.isNull()) myTokenDao.insert(MyTokenTable(
 				0,
 				accountName,
 				currentAddress,
 				contract.symbol,
 				0.0,
 				contract.contract.orEmpty(),
-				chainID
-			).preventDuplicateInsert()
+				chainID,
+				false
+			)) else myTokenDao.update(targetToken!!.apply { isClosed = false })
 		}
 
 		fun getBalanceByContract(
@@ -253,8 +265,8 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND symbol LIKE :symbol AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, symbol: String, ownerName: String, chainID: String): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
-	fun getTokensByAddress(addresses: List<String>, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
+	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND isClosed = :isClose AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
+	fun getTokensByAddress(addresses: List<String>, isClose: Boolean = false, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
@@ -283,6 +295,9 @@ interface MyTokenDao {
 
 	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract AND symbol = :symbol")
 	fun deleteByContractAndAddress(contract: String, symbol: String, address: String)
+
+	@Query("UPDATE myTokens SET isClosed = :isClose  WHERE ownerName LIKE :address AND contract LIKE :contract AND symbol = :symbol AND chainID = :chainID")
+	fun updateCloseStatus(contract: String, symbol: String, address: String, chainID: String, isClose: Boolean)
 
 	@Insert
 	fun insert(token: MyTokenTable)

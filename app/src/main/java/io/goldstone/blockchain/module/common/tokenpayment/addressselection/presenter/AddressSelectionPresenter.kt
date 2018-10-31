@@ -250,10 +250,12 @@ class AddressSelectionPresenter(
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			val header = overlayView.header
 			if (!isFromQuickTransfer) {
-				overlayView.header.showBackButton(true) {
+				header.showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
+				header.showCloseButton(false)
 			}
 		}
 	}

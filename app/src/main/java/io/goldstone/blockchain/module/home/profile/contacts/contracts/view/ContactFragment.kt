@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.view
 
 import android.os.Bundle
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -10,7 +11,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -50,8 +50,23 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 				preventDuplicateClicks()
 			}
 		}
+
+		// 没有这两个参数意味着就是在 `ContactFragment` 本页, 不然可能会在 `BaseTradingFragment` 做内联的公用模块
 		if (chainType.isNull() && clickCellEvent.isNull()) {
-			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX()) { position, cell ->
+			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX(), ItemTouchHelper.LEFT) { position, cell ->
+				alert {
+					isCancelable = false
+					title = ProfileText.deletContactAlertTitle
+					message = ProfileText.deleteContactAlertDescription
+					yesButton { cell?.apply { presenter.deleteContact(model.id) } }
+					cancelButton {
+						recyclerView.adapter?.notifyItemChanged(position)
+						it.dismiss()
+					}
+				}.show()
+			}
+
+			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.edit_contact_icon, 20.uiPX(), ItemTouchHelper.RIGHT) { position, cell ->
 				alert {
 					isCancelable = false
 					title = ProfileText.deletContactAlertTitle
