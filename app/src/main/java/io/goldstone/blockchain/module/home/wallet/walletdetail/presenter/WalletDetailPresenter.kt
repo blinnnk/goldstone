@@ -174,7 +174,8 @@ class WalletDetailPresenter(
 	}
 
 	private fun List<WalletDetailCellModel>.getChainModels(
-		hold: (data: List<WalletDetailCellModel>, error: GoldStoneError) -> Unit) {
+		hold: (data: List<WalletDetailCellModel>, error: GoldStoneError) -> Unit
+	) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
@@ -200,7 +201,9 @@ class WalletDetailPresenter(
 					}
 				}
 
-				override fun mergeCallBack() = hold(this@getChainModels, balanceError)
+				override fun mergeCallBack() {
+					hold(this@getChainModels, balanceError)
+				}
 
 			}.start()
 		}
@@ -246,8 +249,9 @@ class WalletDetailPresenter(
 					.sortedByDescending { it.weight }.toList()
 			hasPrice.asSequence().plus(hasBalance).plus(others).toList().toArrayList()
 		} then {
-			diffAndUpdateAdapterData<WalletDetailAdapter>(it)
-			fragment.updateHeaderValue()
+			updateAdapterData<WalletDetailAdapter>(it) {
+				fragment.updateHeaderValue()
+			}
 		} else {
 			diffAndUpdateAdapterData<WalletDetailAdapter>(arrayListOf())
 			fragment.updateHeaderValue()
@@ -267,10 +271,11 @@ class WalletDetailPresenter(
 	}
 
 	private fun generateHeaderModel(hold: (WalletDetailHeaderModel) -> Unit) {
-		var totalBalance = fragment.asyncData?.sumByDouble { it.currency }
+		val totalBalance = fragment.asyncData?.sumByDouble {
+			if (it.currency == 0.0) it.price * it.count else it.currency
+		}
 		// Once the calculation is finished then update `WalletTable`
 		if (!totalBalance.isNull()) SharedWallet.updateCurrentBalance(totalBalance!!)
-		else totalBalance = SharedWallet.getCurrentBalance()
 		WalletTable.getCurrentWallet {
 			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
@@ -285,7 +290,7 @@ class WalletDetailPresenter(
 				} else {
 					CryptoUtils.scaleMiddleAddress(subtitle, 5)
 				},
-				totalBalance.toString()
+				balance.toString()
 			).let(hold)
 		}
 	}

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import org.json.JSONObject
 import java.io.Serializable
@@ -24,7 +25,7 @@ data class CoinInfoModel(
 	val chainID: String
 ) : Serializable {
 
-	constructor(data: JSONObject, symbol: String, chainID: String) : this(
+	constructor(data: JSONObject, symbol: String, chainID: ChainID) : this(
 		symbol,
 		data.safeGet("description"),
 		data.safeGet("website"),
@@ -36,6 +37,6 @@ data class CoinInfoModel(
 		data.safeGet("white_paper"),
 		data.safeGet("start_date"),
 		TokenContract(data.safeGet("address"), symbol, null),
-		chainID
+		chainID.id
 	)
 }

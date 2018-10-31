@@ -7,7 +7,6 @@ package io.goldstone.blockchain.common.error
  */
 class TypeConvertError(override val message: String) : GoldStoneError(message) {
 	companion object {
-		val StringToInt = TypeConvertError("string content contains illegal symbol except number")
 		val AmountToCount = TypeConvertError("wrong amount input value, Amount Input Only Support String or Long as Input Value")
 	}
 }

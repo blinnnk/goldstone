@@ -77,7 +77,7 @@ data class DefaultTokenTable(
 		"",
 		true,
 		0,
-		SharedChain.getCurrentETH().id
+		""
 	)
 
 	constructor(
@@ -99,9 +99,7 @@ data class DefaultTokenTable(
 		data.chainID
 	)
 
-	constructor(
-		localData: JSONObject
-	) : this(
+	constructor(localData: JSONObject) : this(
 		0,
 		"",
 		localData.safeGet("address"),
@@ -209,23 +207,14 @@ data class DefaultTokenTable(
 	fun updateTokenNameFromChain() {
 		GoldStoneEthCall.getTokenName(
 			contract,
-			{ },
-			SharedChain.getCurrentETHName()
-		) {
-			val name = if (it.isEmpty()) symbol else it
+			SharedChain.getCurrentETH()
+		) { result, _ ->
+			val name = if (result.isNullOrEmpty()) symbol else result!!
 			DefaultTokenTable.updateTokenName(TokenContract(this), name)
 		}
 	}
 
 	companion object {
-
-		fun getAllTokens(isMainThread: Boolean = true, hold: (ArrayList<DefaultTokenTable>) -> Unit) {
-			doAsync {
-				val data = GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(data.toArrayList()) }
-				else hold(data.toArrayList())
-			}
-		}
 
 		fun getCurrentChainTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
@@ -233,28 +222,27 @@ data class DefaultTokenTable(
 			} then (hold)
 		}
 
-		fun getDefaultTokens(hold: (ArrayList<DefaultTokenTable>) -> Unit) {
+		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
-			} then {
-				hold(it.toArrayList())
-			}
+			} then (hold)
 		}
 
-		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit
-		) {
+		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractFromAllChains(contract)
 			} then { hold(it.firstOrNull()) }
 		}
 
-		fun getCurrentChainToken(
-			contract: TokenContract,
-			hold: (DefaultTokenTable?) -> Unit
-		) {
+		fun getTokenByContractAndChainID(contract: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.getTokenByContract(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
+				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractAndChainID(contract, chainID.id)
+			} then (hold)
+		}
+
+		fun getCurrentChainToken(contract: TokenContract, hold: (DefaultTokenTable?) -> Unit) {
+			load {
+				GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			} then (hold)
 		}
 
@@ -263,31 +251,29 @@ data class DefaultTokenTable(
 			@WorkerThread callback: () -> Unit
 		) {
 			doAsync {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.apply {
-						getTokenByContractFromAllChains(data.contract.contract.orEmpty()).let { targetTokens ->
-							if (targetTokens.isEmpty()) {
-								insert(DefaultTokenTable(data))
-								callback()
-							} else {
-								// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-								update(targetTokens.asSequence().filterNot { default ->
-									ChainID.getTestChains().any { it.equals(default.chainID, true) }
-								}.first().apply {
-									exchange = data.exchange
-									website = data.website
-									marketCap = data.marketCap
-									whitePaper = data.whitePaper
-									socialMedia = data.socialMedia
-									rank = data.rank
-									totalSupply = data.supply
-									startDate = data.startDate
-									description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
-								})
-								callback()
-							}
+				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+				defaultDao.getTokenByContractAndChainID(data.contract.contract.orEmpty(), data.chainID).let { targetTokens ->
+					if (targetTokens.isNull()) {
+						defaultDao.insert(DefaultTokenTable(data))
+						callback()
+					} else {
+						// 插入行情的 `TokenInformation` 只需要插入主链数据即可
+						targetTokens?.apply {
+							exchange = data.exchange
+							website = data.website
+							marketCap = data.marketCap
+							whitePaper = data.whitePaper
+							socialMedia = data.socialMedia
+							rank = data.rank
+							totalSupply = data.supply
+							startDate = data.startDate
+							description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
+						}?.let {
+							defaultDao.update(it)
+							callback()
 						}
 					}
+				}
 			}
 		}
 
@@ -331,11 +317,14 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
 	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>
 
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun getTokenByContractAndChainID(contract: String, chainID: String): DefaultTokenTable?
+
 	@Insert
 	fun insert(token: DefaultTokenTable)
 
 	@Insert
-	fun insertAll(token: List<DefaultTokenTable>)
+	fun insertAll(tokens: List<DefaultTokenTable>)
 
 	@Update
 	fun update(token: DefaultTokenTable)

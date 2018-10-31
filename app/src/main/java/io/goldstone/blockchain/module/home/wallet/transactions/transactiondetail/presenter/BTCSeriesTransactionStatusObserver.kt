@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import org.jetbrains.anko.doAsync
 
@@ -14,7 +15,7 @@ import org.jetbrains.anko.doAsync
 abstract class BTCSeriesTransactionStatusObserver {
 
 	abstract val hash: String
-	abstract val chainName: String
+	abstract val chainURL: ChainURL
 	private val handler = Handler(Looper.getMainLooper())
 	private val targetInterval = 6
 	private val retryTime = 20000L
@@ -23,18 +24,19 @@ abstract class BTCSeriesTransactionStatusObserver {
 	open fun checkStatusByTransaction() {
 		doAsync {
 			BTCSeriesJsonRPC.getConfirmations(
-				chainName,
-				hash,
-				{
+				chainURL,
+				hash
+			) { confirmationCount, error ->
+				if (error.hasError()) {
 					// 出错失败最大重试次数设定
 					if (maxRetryTimes <= 0) removeObserver() else maxRetryTimes -= 1
+					return@getConfirmations
 				}
-			) {
-				if (it.isNull()) {
+				if (confirmationCount.isNull()) {
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
 				} else {
-					val hasConfirmed = it!! > targetInterval
+					val hasConfirmed = confirmationCount!! > targetInterval
 					if (hasConfirmed) {
 						removeObserver()
 					} else {
@@ -42,7 +44,7 @@ abstract class BTCSeriesTransactionStatusObserver {
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
 					}
-					getStatus(hasConfirmed, it)
+					getStatus(hasConfirmed, confirmationCount)
 				}
 			}
 		}

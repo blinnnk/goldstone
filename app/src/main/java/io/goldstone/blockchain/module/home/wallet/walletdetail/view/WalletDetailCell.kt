@@ -62,7 +62,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			} else {
 				clearStatusButton()
 				valueInfo.title.text = count.formatCount()
-				valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
+				val money = if (currency == 0.0) count * price else currency
+				valueInfo.subtitle.text = "≈ " + money.formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
 			}
 		}
 	}

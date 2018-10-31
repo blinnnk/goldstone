@@ -28,8 +28,8 @@ data class EOSDefaultAllChainName(
 	fun getCurrent(): String {
 		val currentChainID = SharedChain.getEOSCurrent()
 		return when {
-			currentChainID.isEOSMain() -> main
-			currentChainID.isEOSTest() -> jungle
+			currentChainID.chainID.isEOSMain() -> main
+			currentChainID.chainID.isEOSTest() -> jungle
 			else -> main
 		}
 	}
@@ -42,8 +42,8 @@ data class EOSDefaultAllChainName(
 		val currentChainID = SharedChain.getEOSCurrent()
 		return apply {
 			when {
-				currentChainID.isEOSMain() -> main = name
-				currentChainID.isEOSTest() -> jungle = name
+				currentChainID.chainID.isEOSMain() -> main = name
+				currentChainID.chainID.isEOSTest() -> jungle = name
 				else -> main = name
 			}
 		}

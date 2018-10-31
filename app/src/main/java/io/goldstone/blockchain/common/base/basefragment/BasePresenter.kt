@@ -70,9 +70,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	companion object {
 
 		// SplashActivity 的回退栈在公用组件下的特殊设定
-		inline fun <reified T : BaseOverlayFragment<*>> setRootChildFragmentBackEvent(
-			fragment: Fragment
-		) {
+		inline fun <reified T : BaseOverlayFragment<*>> setRootChildFragmentBackEvent(fragment: Fragment) {
 			fragment.activity?.let {
 				if (it is SplashActivity) {
 					fragment.getParentFragment<T> {

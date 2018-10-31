@@ -45,6 +45,7 @@ fun Context.exportLTCBase58PrivateKey(
 	getPrivateKey(
 		walletAddress,
 		password,
+		true,
 		true
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) {

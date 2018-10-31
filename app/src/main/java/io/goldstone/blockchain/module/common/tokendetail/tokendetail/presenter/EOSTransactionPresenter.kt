@@ -60,7 +60,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit = {}) {
 					fun loadTargetRangeData() {
 						// 拉取指定范围和数量的账单
 						EOSAPI.getEOSTransactions(
-							SharedChain.getEOSCurrent(),
+							SharedChain.getEOSCurrent().chainID,
 							account,
 							pageSize,
 							0L,

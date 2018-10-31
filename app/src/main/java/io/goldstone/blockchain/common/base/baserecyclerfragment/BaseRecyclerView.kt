@@ -38,12 +38,13 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		itemAnimator?.changeDuration = 0
 	}
 
-	fun <T>addSwipeEvent(
+	fun <T> addSwipeEvent(
 		icon: Int,
 		iconPaddingSize: Int,
+		direction: Int, // ItemTouchHelper.LEFT 格式
 		callback: (position: Int, itemView: T?) -> Unit
 	) {
-		object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.LEFT) {
+		object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_DRAG, direction) {
 			override fun onMove(
 				recyclerView: RecyclerView,
 				viewHolder: ViewHolder,
@@ -72,13 +73,14 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 				isCurrentlyActive: Boolean
 			) {
 				val itemView = viewHolder.itemView
+				val boundsStart= if (direction == ItemTouchHelper.LEFT) itemView.right else itemView.left
 				// not interested in those
 				if (viewHolder.adapterPosition == -1) return
 				if (!initiated) init()
 				// draw red background
-				background?.setBounds(itemView.right + directionX.toInt(), itemView.top, itemView.right, itemView.bottom)
+				background?.setBounds(boundsStart + directionX.toInt(), itemView.top, boundsStart, itemView.bottom)
 				background?.draw(canvas)
-				val markLeft = (itemView.right + directionX).toInt()
+				val markLeft = (itemView.right  + directionX).toInt()
 				val markRight = markLeft + (itemView.bottom - itemView.top)
 				val leftPadding = 5.uiPX()
 				markIcon?.setBounds(

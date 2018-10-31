@@ -2,26 +2,27 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.error.EthereumRPCError
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -77,7 +78,7 @@ data class TransactionTable(
 	var isPending: Boolean = false,
 	var logIndex: String = "",
 	var memo: String = "",
-	var chainID: String = SharedChain.getCurrentETH().id,
+	var chainID: String = SharedChain.getCurrentETH().chainID.id,
 	var isFee: Boolean = false,
 	var isFailed: Boolean = false,
 	var minerFee: String = ""
@@ -173,7 +174,7 @@ data class TransactionTable(
 	constructor(
 		data: JSONObject,
 		isETC: Boolean = false,
-		chainID: String = SharedChain.getCurrentETH().id
+		chainID: String
 	) : this(
 		0,
 		data.safeGet("blockNumber").toDecimalFromHex(),
@@ -237,7 +238,7 @@ data class TransactionTable(
 		CoinSymbol.etc,
 		SharedAddress.getCurrentETC(),
 		tokenReceiveAddress = data.to,
-		chainID = SharedChain.getETCCurrent().id,
+		chainID = SharedChain.getETCCurrent().chainID.id,
 		isFee = data.isFee,
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice)
 	)
@@ -261,7 +262,7 @@ data class TransactionTable(
 		// `ERC` 类型的 `Transactions` 专用
 		fun getTokenTransactions(address: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().id)
+				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().chainID.id)
 			} then { it ->
 				hold(it.map { TransactionListModel(it) })
 			}
@@ -304,46 +305,41 @@ data class TransactionTable(
 		fun getMemoByHashAndReceiveStatus(
 			hash: String,
 			isReceive: Boolean,
-			chainName: String,
-			errorCallback: (EthereumRPCError) -> Unit,
-			callback: (memo: String) -> Unit
+			chainURL: ChainURL,
+			@WorkerThread hold: (memo: String?, error: RequestError) -> Unit
 		) {
-			TransactionTable.getByHashAndReceivedStatus(hash, isReceive) { transaction ->
+			doAsync {
+				val transaction =
+					GoldStoneDataBase.database.transactionDao().getByTaxHashAndReceivedStatus(hash, isReceive)
 				if (transaction?.memo?.isNotEmpty() == true) {
-					callback(transaction.memo)
+					hold(transaction.memo, RequestError.None)
 				} else {
-					GoldStoneEthCall.apply {
-						getInputCodeByHash(
-							hash,
-							errorCallback,
-							chainName
-						) { input ->
-							val isErc20Token = CryptoUtils.isERC20TransferByInputCode(input)
-							val memo = getMemoFromInputCode(input, isErc20Token)
-							// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
-							// TODO ETC 类型的数据需要维护数据库插入
-							if (!transaction.isNull()) {
-								GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
-									this.input = input
-									this.memo = memo
-								})
-							}
-							GoldStoneAPI.context.runOnUiThread {
-								callback(memo)
-							}
+					GoldStoneEthCall.getInputCodeByHash(hash, chainURL) { inputCode, error ->
+						// API 错误
+						if (inputCode.isNullOrEmpty() || error.hasError()) {
+							hold(null, error)
+							return@getInputCodeByHash
 						}
+						val isErc20Token = CryptoUtils.isERC20TransferByInputCode(inputCode!!)
+						val memo = getMemoFromInputCode(inputCode, isErc20Token)
+						// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
+						if (!transaction.isNull()) {
+							GoldStoneDataBase.database.transactionDao().update(transaction!!.apply {
+								this.input = inputCode
+								this.memo = memo
+							})
+						}
+						hold(memo, error)
 					}
 				}
 			}
 		}
 
-		fun getTransactionByHash(taxHash: String, hold: (List<TransactionTable>) -> Unit) {
-			GoldStoneDataBase.database.transactionDao().apply {
-				hold(getTransactionByTaxHash(taxHash))
-			}
-		}
-
-		fun getByHashAndReceivedStatus(hash: String, isReceived: Boolean, hold: (TransactionTable?) -> Unit) {
+		fun getByHashAndReceivedStatus(
+			hash: String,
+			isReceived: Boolean,
+			@UiThread hold: (TransactionTable?) -> Unit
+		) {
 			load {
 				GoldStoneDataBase.database.transactionDao().getByTaxHashAndReceivedStatus(hash, isReceived)
 			} then (hold)
@@ -361,7 +357,7 @@ interface TransactionDao {
 	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
-	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().id): List<TransactionTable>
+	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().chainID.id): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>

@@ -35,7 +35,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter.To
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoViewInterface
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoView
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.math.BigInteger
 
 

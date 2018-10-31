@@ -9,7 +9,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.presenter.WalletListPresenter
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 24/03/2018 8:50 PM

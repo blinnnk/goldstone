@@ -17,7 +17,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.onPageChangeListener
 
 /**

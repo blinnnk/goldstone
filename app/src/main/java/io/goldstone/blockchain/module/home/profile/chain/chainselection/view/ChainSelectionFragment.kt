@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.presenter.ChainSelectionPresenter
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 2018/5/11 4:26 PM

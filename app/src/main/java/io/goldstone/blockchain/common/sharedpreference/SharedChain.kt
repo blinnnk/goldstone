@@ -2,10 +2,10 @@ package io.goldstone.blockchain.common.sharedpreference
 
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
-import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.value.SharesPreference
-import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import org.json.JSONObject
 
 
 /**
@@ -14,175 +14,81 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
  */
 object SharedChain {
 	/** Chain Config */
-	fun getCurrentETH(): ChainID =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.currentChain)
-				.equals("Default", true)
-		) {
-			ChainID(ChainID.ethMain)
-		} else {
-			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChain))
-		}
+	fun getCurrentETH(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ethCurrentChain))
+		return ChainURL(chainObject)
+	}
 
-	fun getCurrentETHName(): String =
-		if (GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName).equals("Default", true)) {
-			ChainText.infuraMain
-		} else {
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentChainName)
-		}
-
-	fun updateCurrentETH(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChain, chainID)
-
-	fun updateCurrentETHName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentChainName, chainName)
+	fun updateCurrentETH(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ethCurrentChain, chainInfo.generateObject())
 
 	/** LTC ChainID And Chain Name in Shared Preference*/
-	fun getLTCCurrent(): ChainID =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain)
-				.equals("Default", true)
-		) {
-			ChainID.LTC
-		} else {
-			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain))
-		}
+	fun getLTCCurrent(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain))
+		return ChainURL(chainObject)
+	}
 
-	fun getLTCCurrentName(): String =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
-				.equals("Default", true)
-		) {
-			ChainText.ltcMain
-		} else {
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChainName)
-		}
-
-	fun updateLTCCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain, chainID)
-
-	fun updateLTCCurrentName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.ltcCurrentChainName,
-			chainName
-		)
+	fun updateLTCCurrent(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain, chainInfo.generateObject())
 
 	/** BCH ChainID And Chain Name in Shared Preference */
-	fun getBCHCurrent(): ChainID =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.bchCurrentChain)
-				.equals("Default", true)
-		) {
-			ChainID.BCH
-		} else {
-			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain))
-		}
+	fun getBCHCurrent(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain))
+		return ChainURL(chainObject)
+	}
 
-	fun getBCHCurrentName(): String =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
-				.equals("Default", true)
-		) {
-			ChainText.bchMain
-		} else {
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChainName)
-		}
-
-	fun updateBCHCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.bchCurrentChain, chainID)
-
-	fun updateBCHCurrentName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.bchCurrentChainName,
-			chainName
-		)
+	fun updateBCHCurrent(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.bchCurrentChain, chainInfo.generateObject())
 
 	/** EOS ChainID And ChainName In Shared Preference*/
-	fun getEOSCurrent(): ChainID =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.eosCurrentChain)
-				.equals("Default", true)
-		) {
-			ChainID.EOS
-		} else {
-			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain))
-		}
+	fun getEOSCurrent(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain))
+		return ChainURL(chainObject)
+	}
 
-	fun getEOSCurrentName(): String =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.eosCurrentChainName)
-				.equals("Default", true)
-		) {
-			ChainText.eosMain
-		} else {
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChainName)
-		}
+	fun updateEOSCurrent(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosCurrentChain, chainInfo.generateObject())
 
-	fun updateEOSCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosCurrentChain, chainID)
+	fun getEOSMainnet(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosMainnet))
+		return ChainURL(chainObject)
+	}
 
-	fun updateEOSCurrentName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.eosCurrentChainName,
-			chainName
-		)
+	fun updateEOSMainnet(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosMainnet, chainInfo.generateObject())
+
+	fun getEOSTestnet(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosTestnet))
+		return ChainURL(chainObject)
+	}
+
+	fun updateEOSTestnet(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosTestnet, chainInfo.generateObject())
+
 
 	/** ETC ChainID And Chain Name in Shared Preference*/
-	fun getETCCurrent(): ChainID =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.etcCurrentChain)
-				.equals("Default", true)
-		) {
-			ChainID.ETC
-		} else {
-			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain))
-		}
+	fun getETCCurrent(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain))
+		return ChainURL(chainObject)
+	}
 
-	fun getETCCurrentName(): String =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
-				.equals("Default", true)
-		) {
-			ChainText.etcMainGasTracker
-		} else {
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChainName)
-		}
+	fun updateETCCurrent(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainInfo.generateObject())
 
-	fun updateETCCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainID)
+	fun getBTCCurrent(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain))
+		return ChainURL(chainObject)
+	}
 
-	fun updateETCCurrentName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.etcCurrentChainName,
-			chainName
-		)
+	fun updateBTCCurrent(chainInfo: ChainURL) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainInfo.generateObject())
 
-	fun getBTCCurrent(): ChainID =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.btcCurrentChain)
-				.equals("Default", true)
-		) {
-			ChainID.BTC
-		} else {
-			ChainID(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain))
-		}
-
-	fun updateBTCCurrent(chainID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainID)
-
-	fun getBTCCurrentName(): String =
-		if (GoldStoneAPI.context
-				.getStringFromSharedPreferences(SharesPreference.btcCurrentChainName)
-				.equals("Default", true)
-		) {
-			ChainText.btcMain
-		} else {
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChainName)
-		}
-
-	fun updateBTCCurrentName(chainName: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
-			SharesPreference.btcCurrentChainName,
-			chainName
-		)
 }

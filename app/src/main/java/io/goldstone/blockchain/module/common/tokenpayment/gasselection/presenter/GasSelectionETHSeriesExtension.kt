@@ -128,7 +128,7 @@ private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
 	)
 }
 
-fun GasSelectionPresenter.transfer(password: String, callback: (GoldStoneError) -> Unit) {
+fun GasSelectionPresenter.transfer(password: String, @UiThread callback: (GoldStoneError) -> Unit) {
 	getCurrentETHORETCPrivateKey(password) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareModel?.apply model@{
 			// 更新 `prepareModel`  的 `gasPrice` 的值
@@ -148,20 +148,22 @@ fun GasSelectionPresenter.transfer(password: String, callback: (GoldStoneError) 
 			// 发起 `sendRawTransaction` 请求
 			GoldStoneEthCall.sendRawTransaction(
 				signedHex,
-				callback,
-				getToken()?.contract.getCurrentChainName()
-			) { taxHash ->
-				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
-				taxHash.isValidTaxHash() isTrue {
-					// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-					insertPendingDataToTransactionTable(
-						toWalletAddress,
-						countWithDecimal,
-						this@model,
-						taxHash,
-						prepareModel?.memo ?: TransactionText.noMemo
-					)
+				getToken()?.contract?.getChainURL()!!
+			) { taxHash, error ->
+				// API 错误的时候
+				if (taxHash.isNullOrEmpty() || error.hasError()) {
+					GoldStoneAPI.context.runOnUiThread { callback(error) }
+					return@sendRawTransaction
 				}
+				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
+				// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+				if (taxHash!!.isValidTaxHash()) insertPendingDataToTransactionTable(
+					toWalletAddress,
+					countWithDecimal,
+					this@model,
+					taxHash,
+					prepareModel?.memo ?: TransactionText.noMemo
+				)
 				// 主线程跳转到账目详情界面
 				fragment.context?.runOnUiThread {
 					goToTransactionDetailFragment(
@@ -172,7 +174,7 @@ fun GasSelectionPresenter.transfer(password: String, callback: (GoldStoneError) 
 					callback(RequestError.None)
 				}
 			}
-		} else callback(error)
+		} else GoldStoneAPI.context.runOnUiThread { callback(error) }
 	}
 }
 

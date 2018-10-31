@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.error
 
-import io.goldstone.blockchain.common.Language.ErrorText
+import io.goldstone.blockchain.common.language.ErrorText
 
 
 /**

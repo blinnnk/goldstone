@@ -22,7 +22,7 @@ enum class HoneyLanguage(
 	companion object {
 
 		fun currentLanguageIsSupported(): Boolean {
-			return SharedWallet.getCurrentLanguageCode() in 0..5
+			return SharedWallet.getCurrentLanguageCode() in 0 .. 5
 		}
 
 		fun getPluralLanguageCode(): ArrayList<Int> {

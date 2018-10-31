@@ -11,16 +11,18 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.support.v4.onUiThread
+import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.util.*
 
 /**
@@ -62,7 +64,10 @@ class QuotationSearchFragment :
 				cell.switch.onClick { _ ->
 					getMainActivity()?.showLoadingView()
 					presenter.updateMyQuotation(model, cell.switch.isChecked) {
-						onUiThread { getMainActivity()?.removeLoadingView() }
+						GoldStoneAPI.context.runOnUiThread {
+							this@QuotationSearchFragment.getMainActivity()?.removeLoadingView()
+							if (it.hasError()) this@QuotationSearchFragment.context.alert(it.message)
+						}
 					}
 				}
 			}

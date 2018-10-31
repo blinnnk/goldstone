@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.walletimport.presenter
 
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -27,7 +28,7 @@ class WalletImportPresenter(
 			encryptMnemonic: String,
 			multiChainPath: ChainPath,
 			hint: String?,
-			callback: (walletID: Int?, error: GoldStoneError) -> Unit
+			@UiThread callback: (walletID: Int?, error: GoldStoneError) -> Unit
 		) {
 			// 不为空的地址进行
 			val currentAddress =
@@ -40,7 +41,6 @@ class WalletImportPresenter(
 					multiChainAddresses.bch,
 					multiChainAddresses.eos
 				).firstOrNull { it.isNotEmpty() }?.address.orEmpty()
-
 			WalletTable.getWalletByAddress(currentAddress) { it ->
 				if (it.isNull()) WalletTable(
 					0,
@@ -74,7 +74,7 @@ class WalletImportPresenter(
 					ltcPath = multiChainPath.ltcPath,
 					bchPath = multiChainPath.bchPath,
 					eosPath = multiChainPath.eosPath
-				).insertWatchOnlyWallet { wallet ->
+				).insertWallet { wallet ->
 					// 创建钱包并获取默认的 `token` 信息
 					CreateWalletPresenter.generateMyTokenInfo(multiChainAddresses) {
 						callback(wallet.id, GoldStoneError.None)

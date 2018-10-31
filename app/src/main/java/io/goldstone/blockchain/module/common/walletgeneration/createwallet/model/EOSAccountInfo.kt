@@ -4,6 +4,7 @@ import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.databaseinterface.RoomModel
@@ -33,15 +34,19 @@ data class EOSAccountInfo(
 		""
 	)
 
+	private val isCurrent: () -> Boolean = {
+		SharedChain.getEOSCurrent().chainID.id.equals(chainID, true)
+	}
+
 	fun hasActivated(): Boolean {
-		return if (SharedWallet.isWatchOnlyWallet() && name.isNotEmpty()) ChainID(chainID).isCurrent()
+		return if (SharedWallet.isWatchOnlyWallet() && name.isNotEmpty()) isCurrent()
 		else {
-			ChainID(chainID).isCurrent() && publicKey.equals(SharedAddress.getCurrentEOS(), true)
+			isCurrent() && publicKey.equals(SharedAddress.getCurrentEOS(), true)
 		}
 	}
 
 	fun isActivatedOrWatchOnlyEOSAccount(): Boolean {
-		return ChainID(chainID).isCurrent() && name.equals(SharedAddress.getCurrentEOSAccount().accountName, true)
+		return isCurrent() && name.equals(SharedAddress.getCurrentEOSAccount().accountName, true)
 	}
 
 	override fun getObject(): String {

@@ -94,24 +94,19 @@ class TokenInfoPresenter(
 		hold(currentAddress, hash160)
 	}
 
-	fun showTransactionInfo(errorCallback: (RequestError) -> Unit) {
+	fun showTransactionInfo() {
 		val chainType = tokenInfo?.contract.getChainType().id
 		when {
 			tokenInfo?.contract.isBTCSeries() -> BTCSeriesTransactionTable
 				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
-					if (transactions.isEmpty()) {
-						getBTCSeriesTransactionCountFromChain { count, error ->
-							if (!count.isNull() && error.isNone()) {
-								fragment.showTransactionCount(count)
-							} else {
-								fragment.context.alert(error.message)
-							}
-
-							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
-							if (count == 0) {
-								setTotalValue(0.0, 0.0)
-							}
+					if (transactions.isEmpty()) getBTCSeriesTransactionCount { count, error ->
+						if (!count.isNull() && error.isNone())
+							fragment.showTransactionCount(count)
+						else if (error.hasError()) fragment.context.alert(error.message)
+						// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
+						if (count == 0) {
+							setTotalValue(0.0, 0.0)
 						}
 					} else {
 						// 去除燃气费的部分剩下的计算为交易数量
@@ -152,7 +147,7 @@ class TokenInfoPresenter(
 
 			tokenInfo?.contract.isEOSToken() -> {
 				EOSAPI.getEOSCountInfo(
-					SharedChain.getEOSCurrent(),
+					SharedChain.getEOSCurrent().chainID,
 					SharedAddress.getCurrentEOSAccount(),
 					tokenInfo?.contract?.contract.orEmpty(),
 					tokenInfo?.symbol.orEmpty()
@@ -161,7 +156,7 @@ class TokenInfoPresenter(
 						if (!info.isNull() && error.isNone()) {
 							fragment.showTransactionCount(info!!.totalCount)
 							fragment.showTotalValue("${info.totalReceived}", "${info.totalSent}")
-						} else fragment.context.alert(error.message)
+						} else if (error.hasError()) fragment.context.alert(error.message)
 					}
 				}
 			}
@@ -170,13 +165,14 @@ class TokenInfoPresenter(
 				if (transactions.isEmpty()) {
 					// 本地没有数据的话从链上获取 `Count`
 					GoldStoneEthCall.getUsableNonce(
-						errorCallback,
-						ChainType.ETH,
+						SharedChain.getCurrentETH(),
 						currentAddress
-					) {
-						val convertedCount = it.toInt()
-						val count = if (convertedCount > 0) convertedCount + 1 else it.toInt()
-						fragment.showTransactionCount(count)
+					) { result, error ->
+						if (!result.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
+							val convertedCount = result!!.toInt()
+							val count = if (convertedCount > 0) convertedCount + 1 else result.toInt()
+							fragment.showTransactionCount(count)
+						}
 					}
 				} else {
 					fragment.showTransactionCount(
@@ -212,27 +208,32 @@ class TokenInfoPresenter(
 		fragment.showTotalValue(content(receivedValue), content(sentValue))
 	}
 
-	private fun getBTCSeriesTransactionCountFromChain(@UiThread hold: (count: Int?, error: RequestError) -> Unit) {
+	private fun getBTCSeriesTransactionCount(@UiThread hold: (count: Int?, error: RequestError) -> Unit) {
 		when (tokenInfo?.symbol) {
-			CoinSymbol.btc() -> BitcoinApi.getTransactionCount(
-				currentAddress,
-				{ hold(null, it) }
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
+			CoinSymbol.btc(), CoinSymbol.pureBTCSymbol ->
+				BitcoinApi.getTransactionCount(currentAddress) { count, error ->
+					GoldStoneAPI.context.runOnUiThread {
+						if (!count.isNull() && error.isNone()) hold(count, error)
+						else hold(null, error)
+					}
+				}
+
+			CoinSymbol.bch -> BitcoinCashApi.getTransactionCount(currentAddress) { count, error ->
+				GoldStoneAPI.context.runOnUiThread {
+					if (!count.isNull() && error.isNone()) hold(count, error)
+					else hold(null, error)
+				}
 			}
-			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(
-				currentAddress,
-				{ hold(null, it) }
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
+
+			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(currentAddress) { count, error ->
+				GoldStoneAPI.context.runOnUiThread {
+					if (!count.isNull() && error.isNone()) hold(count, error)
+					else hold(null, error)
+				}
 			}
-			CoinSymbol.bch -> BitcoinCashApi.getTransactionCount(
-				currentAddress,
-				{ hold(null, it) }
-			) {
-				GoldStoneAPI.context.runOnUiThread { hold(it, RequestError.None) }
+			else -> GoldStoneAPI.context.runOnUiThread {
+				hold(0, RequestError.None)
 			}
-			else -> hold(0, RequestError.None)
 		}
 	}
 
@@ -257,10 +258,7 @@ class TokenInfoPresenter(
 			return Pair(icon, url)
 		}
 
-		fun showThirdPartyAddressDetail(
-			fragment: TokenDetailOverlayFragment?,
-			url: String
-		) {
+		fun showThirdPartyAddressDetail(fragment: TokenDetailOverlayFragment?, url: String) {
 			fragment?.presenter?.showTargetFragment<WebViewFragment>(
 				Bundle().apply {
 					putString(ArgumentKey.webViewUrl, url)

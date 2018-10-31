@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
@@ -19,20 +19,11 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadBTCChainData(localMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentBTCAddress()
-	BitcoinApi.getTransactionCount(
-		address,
-		{
-			LogUtil.error("loadBTCChainData", it)
-		}
-	) { transactionCount ->
-		loadTransactionsFromChain(
+	BitcoinApi.getTransactionCount(address) { transactionCount, error ->
+		if (!transactionCount.isNull() && error.isNone()) loadTransactionsFromChain(
 			address,
 			localMaxIndex,
-			transactionCount,
-			{
-				fragment.removeLoadingView()
-				LogUtil.error("loadBTCChainData", it)
-			}
+			transactionCount!!
 		) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
@@ -46,40 +37,40 @@ private fun loadTransactionsFromChain(
 	address: String,
 	localDataMaxIndex: Int,
 	transactionCount: Int,
-	errorCallback: (Throwable) -> Unit,
-	successCallback: (hasData: Boolean) -> Unit
+	callback: (hasData: Boolean) -> Unit
 ) {
 	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) {
-		successCallback(false)
+		callback(false)
 		return
 	}
 	BitcoinApi.getBTCTransactions(
 		address,
 		pageInfo.from,
-		pageInfo.to,
-		errorCallback
-	) { transactions ->
+		pageInfo.to
+	) { transactions, error ->
 		// Calculate All Inputs to get transfer value
-		successCallback(transactions.asSequence().mapIndexed { index, item ->
-			// 转换数据格式
-			BTCSeriesTransactionTable(
-				item,
-				pageInfo.maxDataIndex + index + 1,
-				address,
-				CoinSymbol.pureBTCSymbol,
-				false,
-				ChainType.BTC.id
-			)
-		}.map {
-			// 插入转账数据到数据库
-			BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
-			// 同样的账单插入一份燃气费的数据
-			if (!it.isReceive) {
-				BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, true, it.apply { isFee = true })
-			}
-			TransactionListModel(it)
-		}.toList().isNotEmpty())
+		if (!transactions.isNull() && error.isNone())
+			callback(transactions!!.asSequence().mapIndexed { index, item ->
+				// 转换数据格式
+				BTCSeriesTransactionTable(
+					item,
+					pageInfo.maxDataIndex + index + 1,
+					address,
+					CoinSymbol.pureBTCSymbol,
+					false,
+					ChainType.BTC.id
+				)
+			}.map {
+				// 插入转账数据到数据库
+				BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
+				// 同样的账单插入一份燃气费的数据
+				if (!it.isReceive) {
+					BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, true, it.apply { isFee = true })
+				}
+				TransactionListModel(it)
+			}.toList().isNotEmpty())
+		else callback(false)
 	}
 }

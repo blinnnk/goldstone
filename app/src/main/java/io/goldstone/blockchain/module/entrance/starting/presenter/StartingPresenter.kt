@@ -3,6 +3,9 @@ package io.goldstone.blockchain.module.entrance.starting.presenter
 import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -12,6 +15,7 @@ import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -24,7 +28,6 @@ import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
 /**
@@ -60,24 +63,19 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					} else {
 						"${shareContent.title}\n${shareContent.content}\n${shareContent.url}"
 					}
-					AppConfigTable.updateShareContent(shareText)
+					GoldStoneDataBase.database.appConfigDao().updateShareContent(shareText)
 				} else {
 					BackupServerChecker.checkBackupStatusByException(error)
 				}
 			}
 		}
-
-		fun insertLocalTokens(context: Context, callback: () -> Unit) {
-			doAsync {
-				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list)
-					.forEachOrEnd { token, isEnd ->
-						DefaultTokenTable(token).let {
-							GoldStoneDataBase.database.defaultTokenDao().insert(it)
-							context.runOnUiThread {
-								if (isEnd) callback()
-							}
-						}
-					}
+		
+		fun insertLocalTokens(context: Context, @WorkerThread callback: () -> Unit) {
+			context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list).map {
+				DefaultTokenTable(it)
+			}.let {
+				GoldStoneDataBase.database.defaultTokenDao().insertAll(it)
+				callback()
 			}
 		}
 		
@@ -89,48 +87,13 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				}
 		}
 
-		fun insertLocalCurrency(context: Context, callback: () -> Unit) {
+		fun insertLocalNodeList(context: Context, @WorkerThread callback: () -> Unit) {
 			doAsync {
-				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list)
-					.forEachOrEnd { item, isEnd ->
-						val model =
-							if (item.safeGet("currencySymbol") == CountryCode.currentCurrency) {
-								SupportCurrencyTable(item).apply {
-									isUsed = true
-									// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-									SharedWallet.updateCurrentRate(rate)
-								}
-							} else {
-								SupportCurrencyTable(item)
-							}
-
-						GoldStoneDataBase.database.currencyDao().insert(model)
-
-						context.runOnUiThread {
-							if (isEnd) callback()
-						}
-					}
-			}
-		}
-
-		fun updateLocalDefaultTokens() {
-			doAsync {
-				GoldStoneAPI.getDefaultTokens { serverTokens, error ->
-					if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
-						DefaultTokenTable.getAllTokens(false) { localTokens ->
-							// 开一个线程更新图片
-							serverTokens.updateLocalTokenIcon(localTokens)
-							// 移除掉一样的数据
-							serverTokens.filterNot { server ->
-								localTokens.any { local ->
-									local.chainID.equals(server.chainID, true)
-										&& local.contract.equals(server.contract, true)
-								}
-							}.apply {
-								GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
-							}
-						}
-					}
+				context.convertLocalJsonFileToJSONObjectArray(R.raw.node_list).map {
+					ChainNodeTable(it)
+				}.let {
+					GoldStoneDataBase.database.chainNodeDao().insertAll(it)
+					callback()
 				}
 			}
 		}
@@ -203,6 +166,20 @@ class StartingPresenter(override val fragment: StartingFragment) :
 						}
 					}
 				}
+			}
+		}
+		fun insertLocalCurrency(context: Context, @WorkerThread callback: () -> Unit) {
+			context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
+				SupportCurrencyTable(it).apply {
+					// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+					if (currencySymbol.equals(CountryCode.currentCurrency, true)) {
+						isUsed = true
+						SharedWallet.updateCurrentRate(rate)
+					}
+				}
+			}.let {
+				GoldStoneDataBase.database.currencyDao().insertAll(it)
+				callback()
 			}
 		}
 	}

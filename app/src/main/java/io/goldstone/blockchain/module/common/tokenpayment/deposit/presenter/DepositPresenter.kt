@@ -37,7 +37,7 @@ class DepositPresenter(
 					QRCode.generateETHOrETCCode(
 						SharedAddress.getCurrentETC(),
 						amount,
-						SharedChain.getETCCurrent().id
+						SharedChain.getETCCurrent().chainID.id
 					)
 				}
 
@@ -45,7 +45,7 @@ class DepositPresenter(
 					QRCode.generateETHOrETCCode(
 						SharedAddress.getCurrentEthereum(),
 						amount,
-						SharedChain.getCurrentETH().id
+						SharedChain.getCurrentETH().chainID.id
 					)
 				}
 
@@ -77,7 +77,7 @@ class DepositPresenter(
 						if (token?.contract.isEOSToken()) token?.contract?.contract.orEmpty() else EOSCodeName.EOSIO.value,
 						amount,
 						token?.decimal.orZero(),
-						SharedChain.getEOSCurrent().id
+						SharedChain.getEOSCurrent().chainID.id
 					)
 				}
 
@@ -87,7 +87,7 @@ class DepositPresenter(
 						token?.contract?.contract.orEmpty(),
 						amount,
 						token?.decimal.orZero(),
-						SharedChain.getCurrentETH().id
+						SharedChain.getCurrentETH().chainID.id
 					)
 				}
 			}

@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -78,7 +77,10 @@ object EOSAPI {
 		}
 	}
 
-	private fun getBlockByNumber(blockNumber: Int, @WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit) {
+	private fun getBlockByNumber(
+		blockNumber: Int,
+		@WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit
+	) {
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber))
@@ -87,12 +89,9 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				{ hold(null, it) },
-				false
-			) { result ->
-				if (result.isEmpty()) hold(null, RequestError.ResolveDataError(Throwable("Empty Result")))
-				else hold(result, RequestError.None)
-			}
+				false,
+				hold
+			)
 		}
 	}
 
@@ -111,16 +110,16 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				{ hold(null, it) },
 				false
-			) { result ->
+			) { result, error ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
-				if (result.isEmpty()) {
-					hold(null, AccountError.UnavailableAccountName)
-				} else {
-					hold(EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent()), RequestError.None)
-				}
+				if (!result.isNullOrEmpty() && error.isNone()) {
+					hold(
+						EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent().chainID),
+						error
+					)
+				} else hold(null, error)
 			}
 		}
 	}
@@ -139,9 +138,8 @@ object EOSAPI {
 
 	fun getAccountNameByPublicKey(
 		publicKey: String,
-		errorCallBack: (RequestError) -> Unit,
 		targetNet: String = "",
-		@UiThread hold: (accountNames: List<EOSAccountInfo>) -> Unit
+		@WorkerThread hold: (accountNames: List<EOSAccountInfo>?, error: RequestError) -> Unit
 	) {
 		val api =
 			if (targetNet.isEmpty()) EOSUrl.getKeyAccount()
@@ -149,9 +147,12 @@ object EOSAPI {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey)),
 			api,
-			errorCallBack,
 			false
-		) { result ->
+		) { result, error ->
+			if (result.isNullOrEmpty() || error.hasError()) {
+				hold(null, error)
+				return@post
+			}
 			val namesJsonArray = JSONArray(JSONObject(result).safeGet("account_names"))
 			var names = listOf<String>()
 			(0 until namesJsonArray.length()).forEach {
@@ -159,8 +160,14 @@ object EOSAPI {
 			}
 			// 生成指定的包含链信息的结果类型
 			val accountNames =
-				names.map { EOSAccountInfo(it, SharedChain.getEOSCurrent().id, SharedAddress.getCurrentEOS()) }
-			GoldStoneAPI.context.runOnUiThread { hold(accountNames) }
+				names.map {
+					EOSAccountInfo(
+						it,
+						SharedChain.getEOSCurrent().chainID.id,
+						SharedAddress.getCurrentEOS()
+					)
+				}
+			hold(accountNames, RequestError.None)
 		}
 	}
 
@@ -182,12 +189,9 @@ object EOSAPI {
 		RequisitionUtil.requestUnCryptoData<String>(
 			EOSUrl.getInfo(),
 			"",
-			true,
-			{ hold(null, it) }
-		) {
-			isNotEmpty() isTrue {
-				hold(EOSChainInfo(JSONObject(first())), GoldStoneError.None)
-			}
+			true
+		) { result, error ->
+			hold(EOSChainInfo(JSONObject(result?.firstOrNull())), error)
 		}
 	}
 
@@ -205,20 +209,25 @@ object EOSAPI {
 				Pair("packed_context_free_data", "00")
 			),
 			EOSUrl.pushTransaction(),
-			{ hold(null, it) },
 			false
-		) {
-			val response = JSONObject(it)
-			if (it.contains("processed")) {
-				val result = JSONObject(response.safeGet("processed"))
+		) { result, error ->
+			if (result.isNullOrEmpty() || error.hasError()) {
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(null, error)
+				} else hold(null, error)
+				return@post
+			}
+			val response = JSONObject(result)
+			if (result!!.contains("processed")) {
+				val data = JSONObject(response.safeGet("processed"))
 				val transactionID = response.safeGet("transaction_id")
-				val receipt = JSONObject(result.safeGet("receipt"))
+				val receipt = JSONObject(data.safeGet("receipt"))
 				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
 					hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
 				} else hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
-			} else GoldStoneAPI.context.runOnUiThread {
-				hold(null, RequestError.ResolveDataError(GoldStoneError(it)))
-			}
+			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
+			} else hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
 		}
 	}
 
@@ -247,10 +256,15 @@ object EOSAPI {
 				Pair("symbol", symbol.symbol)
 			),
 			EOSUrl.getAccountEOSBalance(),
-			{ hold(null, it) },
 			false
-		) {
-			val balances = JSONArray(it)
+		) { result, error ->
+			if (result.isNullOrEmpty() || error.hasError()) {
+				GoldStoneAPI.context.runOnUiThread {
+					hold(null, error)
+				}
+				return@post
+			}
+			val balances = JSONArray(result)
 			val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
 			GoldStoneAPI.context.runOnUiThread {
 				hold(balance.toDoubleOrNull().orZero(), RequestError.None)
@@ -262,8 +276,7 @@ object EOSAPI {
 	fun getAccountResource(
 		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		errorCallBack: (RequestError) -> Unit,
-		@WorkerThread hold: (resource: TotalResources?) -> Unit
+		@WorkerThread hold: (resource: TotalResources?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postSingle<TotalResources>(
 			ParameterUtil.prepareObjectContent(
@@ -274,7 +287,6 @@ object EOSAPI {
 			),
 			EOSUrl.getTableRows(),
 			"rows",
-			errorCallBack,
 			false,
 			hold
 		)
@@ -283,8 +295,7 @@ object EOSAPI {
 	fun getRecycledBandWidthList(
 		accountName: String,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		errorCallback: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (data: List<RefundRequestInfo>) -> Unit
+		@WorkerThread hold: (data: List<RefundRequestInfo>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
@@ -295,7 +306,6 @@ object EOSAPI {
 			),
 			EOSUrl.getTableRows(),
 			"rows",
-			errorCallback,
 			false,
 			hold
 		)
@@ -304,8 +314,7 @@ object EOSAPI {
 	fun getDelegateBandWidthList(
 		accountName: String,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		errorCallback: (GoldStoneError) -> Unit,
-		@WorkerThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>) -> Unit
+		@WorkerThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
@@ -316,7 +325,6 @@ object EOSAPI {
 			),
 			EOSUrl.getTableRows(),
 			"rows",
-			errorCallback,
 			false,
 			hold
 		)
@@ -345,10 +353,13 @@ object EOSAPI {
 			),
 			"action_list",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			val data = firstOrNull()
+		) { result, error ->
+			if (result.isNull() || error.hasError()) {
+				hold(null, error)
+				return@requestData
+			}
+			val data = result?.firstOrNull()
 			if (!data.isNullOrEmpty()) hold(
 				JSONArray(data!!).toList().map {
 					EOSTransactionTable(it, SharedAddress.getCurrentEOSAccount().accountName)
@@ -389,7 +400,7 @@ object EOSAPI {
 		account: EOSAccount,
 		@WorkerThread hold: (info: List<TokenContract>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.requestData<TokenContract>(
+		RequisitionUtil.requestData(
 			APIPath.getEOSTokenList(
 				APIPath.currentUrl,
 				chainid.id,
@@ -397,11 +408,9 @@ object EOSAPI {
 			),
 			"token_list",
 			false,
-			{ hold(null, it) },
-			isEncrypt = true
-		) {
-			hold(this, RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	@JvmStatic
@@ -422,12 +431,13 @@ object EOSAPI {
 			),
 			"",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			val data = firstOrNull()
-			if (data.isNullOrEmpty()) hold(null, RequestError.NullResponse("Empty Result"))
-			else hold(data, RequestError.None)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val data = result?.firstOrNull()
+				if (data.isNullOrEmpty()) hold(null, RequestError.NullResponse("Empty Result"))
+				else hold(data, RequestError.None)
+			} else hold(null, error)
 		}
 	}
 
@@ -452,12 +462,13 @@ object EOSAPI {
 			),
 			"total_size",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			val data = firstOrNull()
-			if (!data.isNullOrEmpty()) hold(data?.toIntOrNull(), RequestError.None)
-			else hold(null, RequestError.NullResponse("Empty or Null Result"))
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val data = result?.firstOrNull()
+				if (!data.isNullOrEmpty()) hold(data?.toIntOrNull(), RequestError.None)
+				else hold(null, RequestError.NullResponse("Empty or Null Result"))
+			} else hold(null, error)
 		}
 	}
 
@@ -495,10 +506,9 @@ object EOSAPI {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("id", txID)),
 			EOSUrl.getTransaction(),
-			{ hold(null, it) },
 			false
-		) { jsonString ->
-			hold(JSONObject(jsonString), RequestError.None)
+		) { jsonString, error ->
+			hold(JSONObject(jsonString), error)
 		}
 	}
 
@@ -514,13 +524,16 @@ object EOSAPI {
 			),
 			EOSUrl.getTableRows(),
 			"rows",
-			{ hold(null, it) },
 			false
-		) {
-			val data = JSONObject(JSONArray(it).get(0).toString())
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(EOSRAMMarket(data), RequestError.None)
-			} else hold(EOSRAMMarket(data), RequestError.None)
+		) { result, error ->
+			if (!result.isNullOrEmpty() && error.isNone()) {
+				val data = JSONObject(JSONArray(result).get(0).toString())
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(EOSRAMMarket(data), RequestError.None)
+				} else hold(EOSRAMMarket(data), RequestError.None)
+			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(null, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -531,11 +544,9 @@ object EOSAPI {
 			EOSUrl.getPairsFromNewDex(),
 			"data",
 			false,
-			{ hold(null, it) },
-			isEncrypt = false
-		) {
-			hold(this, RequestError.None)
-		}
+			isEncrypt = false,
+			hold = hold
+		)
 	}
 
 	@JvmStatic
@@ -547,14 +558,14 @@ object EOSAPI {
 			EOSUrl.getTokenPriceInEOS(pair),
 			"data",
 			true,
-			{ hold(null, it) },
 			isEncrypt = false
-		) {
-			if (!firstOrNull().isNull()) {
-				hold(JSONObject(first()).safeGet("price").toDoubleOrNull().orZero(), RequestError.None)
-			} else {
-				hold(null, RequestError.RPCResult("empty result"))
-			}
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val data = result?.firstOrNull()
+				if (!data.isNull())
+					hold(JSONObject(data).safeGet("price").toDoubleOrNull().orZero(), RequestError.None)
+				else hold(null, RequestError.RPCResult("empty result"))
+			} else hold(null, error)
 		}
 	}
 

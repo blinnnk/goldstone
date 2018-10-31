@@ -157,7 +157,7 @@ class WalletSettingsPresenter(
 		}
 	}
 
-	private fun showCurrentWalletInfo() {
+	fun showCurrentWalletInfo() {
 		fragment.header?.apply {
 			walletInfo.apply {
 				title.text = SharedWallet.getCurrentName()

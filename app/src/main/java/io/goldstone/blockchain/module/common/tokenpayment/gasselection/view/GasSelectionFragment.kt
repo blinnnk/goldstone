@@ -27,7 +27,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 2018/5/16 3:53 PM
@@ -75,7 +75,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						onClick { _ ->
 							showLoadingStatus()
 							presenter.confirmTransfer {
-								if (!it.isNone()) {
+								if (it.hasError()) {
 									if (it is AccountError) setCanUseStyle(false)
 									this@GasSelectionFragment.context.alert(it.message)
 								}

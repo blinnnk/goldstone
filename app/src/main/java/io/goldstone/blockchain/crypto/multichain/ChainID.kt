@@ -1,9 +1,8 @@
 package io.goldstone.blockchain.crypto.multichain
 
-import io.goldstone.blockchain.common.language.ChainText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import java.io.Serializable
 
 @Suppress("DUPLICATE_LABEL_IN_WHEN")
@@ -28,16 +27,24 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 	fun isEOS(): Boolean = isEOSMain() || isEOSTest()
 
-	fun isCurrent(): Boolean {
-		return when (id) {
-			btcMain, btcTest -> id.equals(SharedChain.getBTCCurrent().id, true)
-			ltcMain, ltcTest -> id.equals(SharedChain.getLTCCurrent().id, true)
-			bchMain, bchTest -> id.equals(SharedChain.getBCHCurrent().id, true)
-			ethMain, ropsten, rinkeby, kovan -> id.equals(SharedChain.getCurrentETH().id, true)
-			etcMain, etcTest -> id.equals(SharedChain.getETCCurrent().id, true)
-			eosMain, eosTest -> id.equals(SharedChain.getEOSCurrent().id, true)
-			else -> false
-		}
+
+	fun isEOSSeries(): Boolean {
+		return isEOS() || isEOSTest()
+	}
+	fun isETHSeries(): Boolean {
+		return isETHMain() || isRopsten() || isRinkeby() || isKovan()
+	}
+
+	fun isETCSeries(): Boolean {
+		return isETCTest() || isETCMain()
+	}
+
+	fun isBTCSeries(): Boolean {
+		return isBTCMain() || isBTCTest() || isBCHTest() || isBCHMain() || isLTCTest() || isLTCMain()
+	}
+
+	fun isTestnet(): Boolean {
+		return isRinkeby() || isRopsten() || isKovan() || isBTCTest() || isBCHTest() || isLTCTest() || isEOSTest() || isETCTest()
 	}
 
 	fun getContract(): String? {
@@ -47,47 +54,20 @@ class ChainID(val id: String) : Serializable {
 			ltcMain, ltcTest -> TokenContract.ltcContract
 			bchMain, bchTest -> TokenContract.bchContract
 			eosMain, eosTest -> TokenContract.eosContract
+			ethMain, ropsten, rinkeby, kovan -> TokenContract.ethContract
 			else -> null
 		}
 	}
 
-	fun getCurrentAddress(): String {
+	fun getChainURL(): ChainURL? {
 		return when (id) {
-			etcMain, etcTest -> SharedAddress.getCurrentETC()
-			btcTest, ltcTest, bchTest -> SharedAddress.getCurrentBTCSeriesTest()
-			btcMain -> SharedAddress.getCurrentBTC()
-			ltcMain -> SharedAddress.getCurrentLTC()
-			bchMain -> SharedAddress.getCurrentBCH()
-			eosMain, eosTest -> SharedAddress.getCurrentEOS()
-			else -> SharedAddress.getCurrentETC()
-		}
-	}
-
-	fun getChainName(): String {
-		return when (id) {
-			// Third Party Nodes
-			kovan -> ChainText.infuraKovan
-			ropsten -> ChainText.infuraRopsten
-			ethMain -> ChainText.infuraMain
-			rinkeby -> ChainText.infuraRinkeby
-			etcTest -> ChainText.etcMorden
-			etcMain -> ChainText.etcMainGasTracker
-			btcMain -> ChainText.btcMain
-			ltcMain -> ChainText.ltcMain
-			bchMain -> ChainText.bchMain
-			eosMain -> ChainText.eosMain
-			eosTest -> ChainText.eosTest
-			// GoldStone Nodes
-			ethMain -> ChainText.goldStoneMain
-			ropsten -> ChainText.ropsten
-			kovan -> ChainText.kovan
-			rinkeby -> ChainText.rinkeby
-			etcMain -> ChainText.goldStoneEtcMain
-			etcTest -> ChainText.goldStoneEtcMordenTest
-			btcTest -> ChainText.btcTest
-			ltcTest -> ChainText.ltcTest
-			bchTest -> ChainText.bchTest
-			else -> ChainText.goldStoneMain
+			etcMain, etcTest -> SharedChain.getETCCurrent()
+			btcTest, btcMain -> SharedChain.getBTCCurrent()
+			ltcMain, ltcTest -> SharedChain.getLTCCurrent()
+			bchMain, bchTest -> SharedChain.getBCHCurrent()
+			eosMain, eosTest -> SharedChain.getEOSCurrent()
+			ethMain, ropsten, rinkeby, kovan -> SharedChain.getCurrentETH()
+			else -> null
 		}
 	}
 
@@ -133,171 +113,5 @@ class ChainID(val id: String) : Serializable {
 		val LTCTest = ChainID(ltcTest)
 		val EOS = ChainID(eosMain)
 		val EOSTest = ChainID(eosTest)
-
-		fun getChainIDByName(chainName: String): String {
-			return when (chainName) {
-				// GoldStone ERC Node
-				ChainText.goldStoneMain -> ethMain
-				ChainText.ropsten -> ropsten
-				ChainText.kovan -> kovan
-				ChainText.rinkeby -> rinkeby
-				// Infura ERC Node
-				ChainText.infuraMain -> ethMain
-				ChainText.infuraRopsten -> ropsten
-				ChainText.infuraKovan -> kovan
-				ChainText.infuraRinkeby -> rinkeby
-				// ETC Node
-				ChainText.etcMorden -> etcTest
-				ChainText.goldStoneEtcMain -> etcMain
-				ChainText.goldStoneEtcMordenTest -> etcTest
-				ChainText.etcMainGasTracker -> etcMain
-				// BTC Node
-				ChainText.btcMain -> btcMain
-				ChainText.btcTest -> btcTest
-				// LTC Node
-				ChainText.ltcMain -> ltcMain
-				ChainText.ltcTest -> ltcTest
-				// BCH Node
-				ChainText.bchMain -> bchMain
-				ChainText.bchTest -> bchTest
-				// EOS Node
-				ChainText.eosMain -> eosMain
-				ChainText.eosTest -> eosTest
-				else -> ethMain
-			}
-		}
-
-		fun getTestChains(): List<String> {
-			return listOf(
-				etcTest,
-				btcTest,
-				ropsten,
-				kovan,
-				rinkeby,
-				ltcTest,
-				bchTest,
-				eosTest
-			)
-		}
-
-		fun getAllChainID(): List<String> {
-			return listOf(
-				ethMain,
-				ropsten,
-				kovan,
-				rinkeby,
-				etcTest,
-				etcMain,
-				btcMain,
-				btcTest,
-				ltcMain,
-				ltcTest,
-				bchMain,
-				bchTest,
-				eosMain,
-				eosTest
-			)
-		}
-
-		fun getAllETCChainID(): List<String> {
-			return listOf(
-				etcTest,
-				etcMain
-			)
-		}
-
-		fun getAllEOSChainID(): List<String> {
-			return listOf(
-				eosTest,
-				eosMain
-			)
-		}
-
-		fun getAllEthereumChainID(): List<String> {
-			return listOf(
-				ethMain,
-				ropsten,
-				kovan,
-				rinkeby
-			)
-		}
-	}
-}
-
-// `ChainName ID` 这个值是用来通过国际化的 `Name` 找回对应的 `ID` 的值
-enum class ChainNameID(val id: Int) {
-	GoldStoneETHMain(0),
-	GoldStoneRopsten(1),
-	GoldStoneRinkeby(2),
-	GoldStoneKovan(3),
-	InfuraETHMain(4),
-	InfuraRopsten(5),
-	InfuraRinkeby(6),
-	InfuraKovan(7),
-	GoldStoneETCMain(8),
-	GoldStoneETCMorden(9),
-	GasTrackerETCMain(10),
-	GasTrackerETCMorden(11),
-	GoldStoneBTCMain(12),
-	GoldStoneBTCTest(13),
-	GoldStoneLTC(14),
-	GoldStoneLTCTest(15),
-	GoldStoneBCHMain(16),
-	GoldStoneBCHTest(17),
-	GoldStoneEOSMain(18),
-	GoldStoneEOSTest(19);
-
-	companion object {
-		fun getChainNameByID(chainNameID: Int): String {
-			return when (chainNameID) {
-				0 -> ChainText.goldStoneMain
-				1 -> ChainText.ropsten
-				2 -> ChainText.rinkeby
-				3 -> ChainText.kovan
-				4 -> ChainText.infuraMain
-				5 -> ChainText.infuraRopsten
-				6 -> ChainText.infuraRinkeby
-				7 -> ChainText.infuraKovan
-				8 -> ChainText.goldStoneEtcMain
-				9 -> ChainText.goldStoneEtcMordenTest
-				10 -> ChainText.etcMainGasTracker
-				11 -> ChainText.etcMorden
-				12 -> ChainText.btcMain
-				13 -> ChainText.btcTest
-				14 -> ChainText.ltcMain
-				15 -> ChainText.ltcTest
-				16 -> ChainText.bchMain
-				17 -> ChainText.bchTest
-				18 -> ChainText.eosMain
-				19 -> ChainText.eosTest
-				else -> ChainText.eosTest
-			}
-		}
-
-		fun getChainNameIDByName(chainName: String): Int {
-			return when (chainName) {
-				ChainText.goldStoneMain -> 0
-				ChainText.ropsten -> 1
-				ChainText.rinkeby -> 2
-				ChainText.kovan -> 3
-				ChainText.infuraMain -> 4
-				ChainText.infuraRopsten -> 5
-				ChainText.infuraRinkeby -> 6
-				ChainText.infuraKovan -> 7
-				ChainText.goldStoneEtcMain -> 8
-				ChainText.goldStoneEtcMordenTest -> 9
-				ChainText.etcMainGasTracker -> 10
-				ChainText.etcMorden -> 11
-				ChainText.btcMain -> 12
-				ChainText.btcTest -> 13
-				ChainText.ltcMain -> 14
-				ChainText.ltcTest -> 15
-				ChainText.bchMain -> 16
-				ChainText.bchTest -> 17
-				ChainText.eosMain -> 18
-				ChainText.eosTest -> 19
-				else -> 19
-			}
-		}
 	}
 }

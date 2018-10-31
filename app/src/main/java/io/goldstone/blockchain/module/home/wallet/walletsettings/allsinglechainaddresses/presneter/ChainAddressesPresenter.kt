@@ -1,12 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter
 
-import com.blinnnk.extension.getChildFragment
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.getViewAbsolutelyPositionInScreen
-import com.blinnnk.extension.toArrayList
+import android.support.annotation.UiThread
+import com.blinnnk.extension.*
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.alert
@@ -25,6 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechaina
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -43,7 +43,9 @@ class ChainAddressesPresenter(
 				headerTitle = WalletSettingsText.viewAddresses
 				presenter.popFragmentFrom<ChainAddressesFragment>()
 			}
-			updateAddAddressEvent()
+			updateAddAddressEvent {
+				if (it.hasError()) context.alert(it.message)
+			}
 		}
 	}
 
@@ -92,51 +94,65 @@ class ChainAddressesPresenter(
 		)
 	}
 
-	fun updateAddAddressEvent() {
+	fun updateAddAddressEvent(@UiThread callback: (AccountError) -> Unit) {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
 				context?.apply {
-					AddressManagerFragment.verifyMultiChainWalletPassword(this) { password ->
-						when {
+					AddressManagerFragment.verifyMultiChainWalletPassword(this) { password, verifyError ->
+						if (password.isNullOrEmpty() || verifyError.hasError()) runOnUiThread {
+							callback(verifyError)
+						} else when {
 							fragment.coinType.isETH() ->
-								AddressManagerPresenter.createETHSeriesAddress(this, password) {
-									updateAddressManagerDataBy(ChainType.ETH)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								AddressManagerPresenter.createETHSeriesAddress(this, password!!) { addresses, error ->
+									if (!addresses.isNull() && error.isNone()) {
+										updateAddressManagerDataBy(ChainType.ETH)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
+									} else callback(error)
 								}
 							fragment.coinType.isETC() ->
-								AddressManagerPresenter.createETCAddress(this, password) {
-									updateAddressManagerDataBy(ChainType.ETC)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								AddressManagerPresenter.createETCAddress(this, password!!) { addresses, error ->
+									if (!addresses.isNull() && error.isNone()) {
+										updateAddressManagerDataBy(ChainType.ETC)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
+									} else callback(error)
 								}
 
 							fragment.coinType.isLTC() ->
-								AddressManagerPresenter.createLTCAddress(this, password) {
-									updateAddressManagerDataBy(ChainType.LTC)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								AddressManagerPresenter.createLTCAddress(this, password!!) { addresses, error ->
+									if (!addresses.isNull() && error.isNone()) {
+										updateAddressManagerDataBy(ChainType.LTC)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
+									} else callback(error)
 								}
 
 							fragment.coinType.isEOS() ->
-								AddressManagerPresenter.createEOSAddress(this, password) {
+								AddressManagerPresenter.createEOSAddress(this, password!!) {
 									updateAddressManagerDataBy(ChainType.EOS)
 									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
 								}
 
 							fragment.coinType.isBCH() ->
-								AddressManagerPresenter.createBCHAddress(this, password) {
-									updateAddressManagerDataBy(ChainType.BCH)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								AddressManagerPresenter.createBCHAddress(this, password!!) { addresses, error ->
+									if (!addresses.isNull() && error.isNone()) {
+										updateAddressManagerDataBy(ChainType.BCH)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
+									} else callback(error)
 								}
 
 							fragment.coinType.isBTC() -> {
-								AddressManagerPresenter.createBTCAddress(this, password) {
-									updateAddressManagerDataBy(ChainType.BTC)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								AddressManagerPresenter.createBTCAddress(this, password!!) { addresses, error ->
+									if (!addresses.isNull() && error.isNone()) {
+										updateAddressManagerDataBy(ChainType.BTC)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
+									} else callback(error)
 								}
 							}
 							fragment.coinType.isAllTest() -> {
-								AddressManagerPresenter.createBTCTestAddress(this, password) {
-									updateAddressManagerDataBy(ChainType.AllTest)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
+								AddressManagerPresenter.createBTCTestAddress(this, password!!) { addresses, error ->
+									if (!addresses.isNull() && error.isNone()) {
+										updateAddressManagerDataBy(ChainType.AllTest)
+										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
+									} else callback(error)
 								}
 							}
 						}

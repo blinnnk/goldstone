@@ -1,14 +1,15 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import android.support.annotation.UiThread
-import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 
 
@@ -18,15 +19,16 @@ import java.io.Serializable
  */
 class ChainType(val id: Int) : Serializable {
 
-	fun getCurrentChainName(): String {
+	fun getChainURL(): ChainURL {
 		return when (id) {
-			ChainType.ETH.id -> SharedChain.getCurrentETHName()
-			ChainType.ETC.id -> SharedChain.getETCCurrentName()
-			ChainType.BTC.id -> SharedChain.getBTCCurrentName()
-			ChainType.LTC.id -> SharedChain.getLTCCurrentName()
-			ChainType.BCH.id -> SharedChain.getBCHCurrentName()
-			ChainType.EOS.id -> SharedChain.getEOSCurrentName()
-			else -> SharedChain.getCurrentETHName()
+			ChainType.ETH.id -> SharedChain.getCurrentETH()
+			ChainType.ETC.id -> SharedChain.getETCCurrent()
+			ChainType.BTC.id -> SharedChain.getBTCCurrent()
+			ChainType.AllTest.id -> SharedChain.getBTCCurrent()
+			ChainType.LTC.id -> SharedChain.getLTCCurrent()
+			ChainType.BCH.id -> SharedChain.getBCHCurrent()
+			ChainType.EOS.id -> SharedChain.getEOSCurrent()
+			else -> SharedChain.getCurrentETH()
 		}
 	}
 
@@ -43,26 +45,6 @@ class ChainType(val id: Int) : Serializable {
 		}
 	}
 
-	fun getMainnetChainName(): String {
-		return when (id) {
-			ChainType.ETH.id -> {
-				// 这个是节点选择显示链名字的地方用到的, 如果当前不是主网链, 那么默认推荐使用 `InfuraMain`
-				if (!SharedChain.getCurrentETH().isETHMain()) ChainText.infuraMain
-				else SharedChain.getCurrentETHName()
-			}
-
-			ChainType.BTC.id -> ChainText.btcMain
-			ChainType.LTC.id -> ChainText.ltcMain
-			ChainType.BCH.id -> ChainText.bchMain
-			ChainType.EOS.id -> ChainText.eosMain
-
-			else -> {
-				if (!SharedChain.getETCCurrent().isETCMain()) ChainText.etcMainGasTracker
-				else SharedChain.getETCCurrentName()
-			}
-		}
-	}
-
 	fun getContract(): TokenContract {
 		return when (id) {
 			ChainType.ETH.id -> TokenContract.ETH
@@ -71,24 +53,6 @@ class ChainType(val id: Int) : Serializable {
 			ChainType.BCH.id -> TokenContract.BCH
 			ChainType.EOS.id -> TokenContract.EOS
 			else -> TokenContract.ETC
-		}
-	}
-
-	fun getTestnetChainName(): String {
-		return when (id) {
-			ChainType.ETH.id -> {
-				// 这个是节点选择显示链名字的地方用到的, 如果当前是主网链, 那么默认推荐使用 `InfuraRopsten`
-				if (SharedChain.getCurrentETH().isETHMain()) ChainText.infuraRopsten
-				else SharedChain.getCurrentETHName()
-			}
-			ChainType.BTC.id -> ChainText.btcTest
-			ChainType.LTC.id -> ChainText.ltcTest
-			ChainType.BCH.id -> ChainText.bchTest
-			ChainType.EOS.id -> ChainText.eosTest
-			else -> {
-				if (SharedChain.getETCCurrent().isETCMain()) ChainText.etcMorden
-				else SharedChain.getETCCurrentName()
-			}
 		}
 	}
 
@@ -135,8 +99,8 @@ class ChainType(val id: Int) : Serializable {
 			}
 			currentWallet?.apply {
 				walletDao.update(this)
-				uiThread {
-					callback(this)
+				GoldStoneAPI.context.runOnUiThread {
+					callback(this@apply)
 				}
 			}
 		}

@@ -19,7 +19,7 @@ import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.wrapContent
 
 /**

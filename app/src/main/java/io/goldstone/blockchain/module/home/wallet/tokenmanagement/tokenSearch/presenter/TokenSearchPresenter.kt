@@ -76,10 +76,10 @@ class TokenSearchPresenter(
 				searchToken.name,
 				searchToken.iconUrl
 			) {
-				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, localToken)
+				TokenManagementListPresenter.addOrCloseMyToken(isChecked, localToken)
 				callback()
 			} else searchToken.apply { isDefault = isChecked } insertThen {
-				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, searchToken)
+				TokenManagementListPresenter.addOrCloseMyToken(isChecked, searchToken)
 				callback()
 			}
 		}
@@ -98,7 +98,8 @@ class TokenSearchPresenter(
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
 							val status = any {
-								it.contract.equals(serverToken.contract, true)
+								it.contract.equals(serverToken.contract, true) &&
+									it.symbol.equals(serverToken.symbol, true)
 							}
 							isDefault = status
 							isUsed = status
@@ -122,10 +123,9 @@ class TokenSearchPresenter(
 	) {
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
-			{ fragment.context?.alert(it.message) },
-			SharedChain.getCurrentETHName()
-		) { symbol, name, decimal ->
-			if (symbol.isEmpty() || name.isEmpty())
+			SharedChain.getCurrentETH()
+		) { symbol, name, decimal, error ->
+			if (symbol.isNullOrEmpty() || name.isNullOrEmpty() || decimal.isNull() || error.hasError())
 				hold(arrayListOf(), RequestError.NullResponse("empty symbol and name"))
 			else {
 				val status = myTokens.any {
@@ -138,15 +138,15 @@ class TokenSearchPresenter(
 							"",
 							contract,
 							"",
-							symbol,
+							symbol!!,
 							TinyNumber.False.value,
 							0.0,
-							name,
-							decimal,
+							name!!,
+							decimal!!,
 							null,
 							status,
 							0,
-							SharedChain.getCurrentETH().id,
+							SharedChain.getCurrentETH().chainID.id,
 							isUsed = status
 						)
 					),

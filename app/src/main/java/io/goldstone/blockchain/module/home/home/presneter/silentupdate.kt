@@ -5,7 +5,6 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -14,7 +13,7 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.experimental.*
 
 /**
  * @author KaySaith
@@ -22,14 +21,16 @@ import org.jetbrains.anko.doAsync
  */
 abstract class SilentUpdater {
 	fun star() {
-		doAsync {
-			if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+		launch {
+			withContext(CommonPool, CoroutineStart.LAZY) {
+				updateLocalDefaultTokens()
 				updateUnknownDefaultToken()
 				updateRAMUnitPrice()
 				updateMyTokenCurrencyPrice()
 				updateCPUUnitPrice()
 				updateNETUnitPrice()
 				checkAvailableEOSTokenList()
+				updateNodeData()
 			}
 		}
 	}
@@ -37,13 +38,11 @@ abstract class SilentUpdater {
 	private fun checkAvailableEOSTokenList() {
 		val account = SharedAddress.getCurrentEOSAccount()
 		if (!account.isValid(false)) return
-		EOSAPI.getEOSTokenList(
-			SharedChain.getEOSCurrent(),
-			account
-		) { tokenList, error ->
+		EOSAPI.getEOSTokenList(SharedChain.getEOSCurrent().chainID, account) { tokenList, error ->
 			if (!tokenList.isNull() && error.isNone()) {
 				// 拉取潜在资产的 `Icon Url`
 				GoldStoneAPI.getIconURL(tokenList!!) { tokenIcons, getIconError ->
+					val myTokenDao = GoldStoneDataBase.database.myTokenDao()
 					if (!tokenIcons.isNull() && getIconError.isNone()) {
 						tokenList.forEach { contract ->
 							// 插入 `DefaultToken`
@@ -55,16 +54,26 @@ abstract class SilentUpdater {
 								tokenIcons!!.getByTokenContract(contract.orEmpty())?.url.orEmpty(),
 								true
 							).preventDuplicateInsert()
-							// 插入 `MyTokenTable`
-							MyTokenTable(
-								0,
-								account.accountName,
-								SharedAddress.getCurrentEOS(),
-								contract.symbol,
-								0.0,
+							val targetToken = myTokenDao.getTokenByContractAndAddress(
 								contract.contract.orEmpty(),
+								contract.symbol,
+								account.accountName,
 								ChainID.EOS.id
-							).preventDuplicateInsert()
+							)
+							// 有可能用户本地已经插入并且被用户手动关闭了, 所以只有本地不存在的时候才插入
+							// 插入 `MyTokenTable`
+							if (targetToken.isNull()) myTokenDao.insert(
+								MyTokenTable(
+									0,
+									account.accountName,
+									SharedAddress.getCurrentEOS(),
+									contract.symbol,
+									0.0,
+									contract.contract.orEmpty(),
+									ChainID.EOS.id,
+									false
+								)
+							)
 						}
 					}
 				}
@@ -109,11 +118,30 @@ abstract class SilentUpdater {
 		}
 	}
 
+	private fun updateNodeData() {
+		// 拉取网络数据, 更新本地的选中状态后覆盖本地数据库 TODO 需要增加 MD5 校验减少网络请求
+		GoldStoneAPI.getChainNodes { serverNodes, error ->
+			val nodeDao = GoldStoneDataBase.database.chainNodeDao()
+			if (!serverNodes.isNull() && error.isNone() && serverNodes!!.isNotEmpty()) {
+				val localNodes = nodeDao.getAll()
+				serverNodes.map { node ->
+					node.apply {
+						isUsed = localNodes.find {
+							it.url.equals(node.url, true)
+						}?.isUsed.orElse(1)
+					}
+				}.let {
+					nodeDao.insertAll(it)
+				}
+			}
+		}
+	}
+
 	private fun updateMyTokenCurrencyPrice() {
 		MyTokenTable.getMyTokens(false) { myTokens ->
 			GoldStoneAPI.getPriceByContractAddress(
 				// `EOS` 的 `Token` 价格在下面的方法从第三方获取, 这里过滤掉 `EOS` 的 `Token`
-				myTokens.asSequence().filter {
+				myTokens.asSequence().filterNot {
 					ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
 				}.map {
 					"{\"address\":\"${it.contract}\",\"symbol\":\"${it.symbol}\"}"
@@ -126,9 +154,71 @@ abstract class SilentUpdater {
 					}
 				}
 			}
-			// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
-			myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
-				EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol, null))
+			launch {
+				// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
+				myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
+					// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
+					// 线程开启太多的内存溢出. 限制没 500ms 检查一个 Symbol 的价格
+					delay(500)
+					withContext(CommonPool, CoroutineStart.LAZY) {
+						EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol, null))
+					}
+				}
+			}
+		}
+	}
+
+	private fun updateLocalDefaultTokens() {
+		GoldStoneAPI.getDefaultTokens { serverTokens, error ->
+			if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
+				val localTokens =
+					GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+				// 开一个线程更新图片
+				launch {
+					updateLocalTokenIcon(serverTokens, localTokens)
+				}
+				// 移除掉一样的数据
+				serverTokens.filterNot { server ->
+					localTokens.any { local ->
+						local.chainID.equals(server.chainID, true)
+							&& local.contract.equals(server.contract, true)
+					}
+				}.apply {
+					GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
+				}
+			}
+		}
+	}
+
+	private fun updateLocalTokenIcon(
+		serverTokens: List<DefaultTokenTable>,
+		localTokens: List<DefaultTokenTable>
+	) {
+		val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+		serverTokens.filter { server ->
+			unManuallyData.find {
+				it.serverTokenID.equals(server.serverTokenID, true)
+			}?.let {
+				// 如果本地的非手动添加的数据没有存在于最新从 `Server` 拉取下来的意味着已经被 `CMS` 移除
+				GoldStoneDataBase.database.defaultTokenDao().update(it.apply { isDefault = false })
+			}
+
+			localTokens.any { local ->
+				local.chainID.equals(server.chainID, true)
+					&& local.contract.equals(server.contract, true)
+			}
+		}.apply {
+			if (isEmpty()) return
+			forEach { server ->
+				GoldStoneDataBase.database.defaultTokenDao().apply {
+					getTokenByContract(server.contract, server.symbol, server.chainID)?.let {
+						update(it.apply {
+							iconUrl = server.iconUrl
+							isDefault = server.isDefault
+							forceShow = server.forceShow
+						})
+					}
+				}
 			}
 		}
 	}

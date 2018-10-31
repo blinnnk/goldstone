@@ -24,7 +24,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -174,14 +174,14 @@ class AddressSelectionPresenter(
 			token?.contract.isETC() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isETC() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(SharedChain.getETCCurrent().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getETCCurrent().chainID.id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
 			token?.contract.isEOSSeries() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isEOSSeries() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(SharedChain.getEOSCurrent().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -189,7 +189,7 @@ class AddressSelectionPresenter(
 			token?.contract.isBTC() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isBTC() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(SharedChain.getBTCCurrent().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getBTCCurrent().chainID.id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -197,7 +197,7 @@ class AddressSelectionPresenter(
 			token?.contract.isLTC() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isLTC() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(SharedChain.getLTCCurrent().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getLTCCurrent().chainID.id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -205,7 +205,7 @@ class AddressSelectionPresenter(
 			token?.contract.isBCH() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isBCH() ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(SharedChain.getBCHCurrent().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getBCHCurrent().chainID.id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -213,7 +213,7 @@ class AddressSelectionPresenter(
 			else -> when {
 				!qrModel.contractAddress.equals(token?.contract?.contract, true) ->
 					fragment.context.alert(QRText.invalidContract)
-				!qrModel.chainID.equals(SharedChain.getCurrentETH().id, true) ->
+				!qrModel.chainID.equals(SharedChain.getCurrentETH().chainID.id, true) ->
 					fragment.context.alert(CommonText.wrongChainID)
 				else -> callback()
 			}
@@ -250,10 +250,12 @@ class AddressSelectionPresenter(
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			val header = overlayView.header
 			if (!isFromQuickTransfer) {
-				overlayView.header.showBackButton(true) {
+				header.showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
+				header.showCloseButton(false)
 			}
 		}
 	}

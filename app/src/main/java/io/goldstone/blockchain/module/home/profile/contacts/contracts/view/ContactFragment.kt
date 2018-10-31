@@ -1,21 +1,23 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.view
 
 import android.os.Bundle
+import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.cancelButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -48,8 +50,23 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 				preventDuplicateClicks()
 			}
 		}
+
+		// 没有这两个参数意味着就是在 `ContactFragment` 本页, 不然可能会在 `BaseTradingFragment` 做内联的公用模块
 		if (chainType.isNull() && clickCellEvent.isNull()) {
-			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX()) { position, cell ->
+			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX(), ItemTouchHelper.LEFT) { position, cell ->
+				alert {
+					isCancelable = false
+					title = ProfileText.deletContactAlertTitle
+					message = ProfileText.deleteContactAlertDescription
+					yesButton { cell?.apply { presenter.deleteContact(model.id) } }
+					cancelButton {
+						recyclerView.adapter?.notifyItemChanged(position)
+						it.dismiss()
+					}
+				}.show()
+			}
+
+			recyclerView.addSwipeEvent<ContactsCell>(R.drawable.edit_contact_icon, 20.uiPX(), ItemTouchHelper.RIGHT) { position, cell ->
 				alert {
 					isCancelable = false
 					title = ProfileText.deletContactAlertTitle
@@ -76,6 +93,20 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		} else {
 			showAddButton()
 		}
+	}
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		val parent = parentFragment
+		if (parent is TokenDetailOverlayFragment) {
+			val dashboard =
+				parent.overlayView.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+			// 判断是否打开通讯录来更改回退栈
+			if (!dashboard.isNull()) {
+				parent.overlayView.removeView(dashboard)
+				parent.removeChildFragment(this)
+			} else super.setBackEvent(mainActivity)
+		} else super.setBackEvent(mainActivity)
+
 	}
 
 	private fun showAddButton(status: Boolean = true) {

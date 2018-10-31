@@ -1,10 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.isFalse
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.LoadingText
@@ -59,33 +56,34 @@ class NotificationListPresenter(
 		}
 	}
 
+	private var hasLoadFromServer = false
 	private fun getDataFromDatabase() {
 		fragment.showLoadingView(LoadingText.notificationData)
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTime }?.createTime
 			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
-			fragment.asyncData.isNull() isFalse {
-				diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
-			} otherwise {
+			if (fragment.asyncData.isNull())
 				fragment.asyncData = localData
-			}
-			NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
+			else diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
+			if (NetworkUtil.hasNetworkWithAlert(fragment.context) && !hasLoadFromServer)
 				updateDataFromServer(requestTime)
-			} otherwise {
-				fragment.removeLoadingView()
-			}
+			else fragment.removeLoadingView()
 		}
 	}
 
 	private fun updateDataFromServer(requestTime: Long) {
 		GoldStoneAPI.getNotificationList(requestTime) { notificationList, error ->
-			fragment.removeLoadingView()
 			if (!notificationList.isNull() && error.isNone()) {
-				if (notificationList!!.isNotEmpty())
+				hasLoadFromServer = true
+				if (notificationList!!.isNotEmpty()) {
 					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)
+					fragment.context?.runOnUiThread {
+						getDataFromDatabase()
+					}
+				}
 			}
 			fragment.context?.runOnUiThread {
-				getDataFromDatabase()
+				fragment.removeLoadingView()
 			}
 		}
 	}

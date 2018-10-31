@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view
 
 import android.content.Context
+import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
@@ -36,7 +38,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -287,8 +289,16 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
 							cell.onClick { _ ->
 								this@getParentFragment.context?.apply {
-									verifyMultiChainWalletPassword(this) {
-										createChildAddressByButtonTitle(title, it)
+									verifyMultiChainWalletPassword(this) { password, error ->
+										if (!password.isNullOrEmpty() && error.isNone()) {
+											createChildAddressByButtonTitle(title, password!!) { createAddressError ->
+												if (error.hasError()) runOnUiThread {
+													alert(createAddressError.message)
+												}
+											}
+										} else if (error.hasError()) runOnUiThread {
+											alert(error.message)
+										}
 									}
 								}
 								cell.preventDuplicateClicks()
@@ -304,17 +314,21 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	private fun createChildAddressByButtonTitle(title: String, password: String) {
+	private fun createChildAddressByButtonTitle(title: String, password: String, callback: (AccountError) -> Unit) {
 		context?.apply {
 			when (title) {
 				WalletSettingsText.newETHSeriesAddress ->
-					AddressManagerPresenter.createETHSeriesAddress(this, password) {
-						ethSeriesView.model = it
+					AddressManagerPresenter.createETHSeriesAddress(this, password) { addresses, error ->
+						if (!addresses.isNull() && error.isNone()) {
+							ethSeriesView.model = addresses
+						} else callback(error)
 					}
 
 				WalletSettingsText.newETCAddress ->
-					AddressManagerPresenter.createETCAddress(this, password) {
-						etcAddressesView.model = it
+					AddressManagerPresenter.createETCAddress(this, password) { addresses, error ->
+						if (!addresses.isNull() && error.isNone()) {
+							etcAddressesView.model = addresses
+						} else callback(error)
 					}
 
 				WalletSettingsText.newEOSAddress ->
@@ -323,26 +337,40 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					}
 
 				WalletSettingsText.newLTCAddress -> {
-					if (SharedValue.isTestEnvironment()) AddressManagerPresenter.createBTCTestAddress(this, password) {
-						btcAddressesView.model = it
-					} else AddressManagerPresenter.createLTCAddress(this, password) {
-						ltcAddressesView.model = it
+					if (SharedValue.isTestEnvironment())
+						AddressManagerPresenter.createBTCTestAddress(this, password) { addresses, error ->
+							if (!addresses.isNull() && error.isNone()) {
+								btcAddressesView.model = addresses
+							} else callback(error)
+						} else AddressManagerPresenter.createLTCAddress(this, password) { addresses, error ->
+						if (!addresses.isNull() && error.isNone()) {
+							ltcAddressesView.model = addresses
+						} else callback(error)
 					}
 				}
 
 				WalletSettingsText.newBCHAddress -> {
-					if (SharedValue.isTestEnvironment()) AddressManagerPresenter.createBTCTestAddress(this, password) {
-						btcAddressesView.model = it
-					} else AddressManagerPresenter.createBCHAddress(this, password) {
-						bchAddressesView.model = it
+					if (SharedValue.isTestEnvironment())
+						AddressManagerPresenter.createBTCTestAddress(this, password) { addresses, error ->
+							if (!addresses.isNull() && error.isNone()) {
+								btcAddressesView.model = addresses
+							} else callback(error)
+						} else AddressManagerPresenter.createBCHAddress(this, password) { addresses, error ->
+						if (!addresses.isNull() && error.isNone()) {
+							bchAddressesView.model = addresses
+						} else callback(error)
 					}
 				}
 
 				WalletSettingsText.newBTCAddress -> {
-					if (SharedValue.isTestEnvironment()) AddressManagerPresenter.createBTCTestAddress(this, password) {
-						btcAddressesView.model = it
-					} else AddressManagerPresenter.createBTCAddress(this, password) {
-						btcAddressesView.model = it
+					if (SharedValue.isTestEnvironment())
+						AddressManagerPresenter.createBTCTestAddress(this, password) { addresses, error ->
+							if (!addresses.isNull() && error.isNone()) btcAddressesView.model = addresses
+							else callback(error)
+						} else AddressManagerPresenter.createBTCAddress(this, password) { addresses, error ->
+						if (!addresses.isNull() && error.isNone()) {
+							btcAddressesView.model = addresses
+						} else callback(error)
 					}
 				}
 			}
@@ -456,12 +484,13 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 		fun verifyMultiChainWalletPassword(
 			context: Context,
-			callback: (password: String) -> Unit
+			@WorkerThread hold: (password: String?, error: AccountError) -> Unit
 		) {
 			context.showAlertView(
 				WalletSettingsText.createSubAccount,
 				WalletSettingsText.createSubAccountIntro,
-				!SharedWallet.isWatchOnlyWallet()
+				!SharedWallet.isWatchOnlyWallet(),
+				{}
 			) { passwordInput ->
 				val password = passwordInput?.text.toString()
 				context.verifyKeystorePassword(
@@ -469,8 +498,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					SharedAddress.getCurrentBTC(),
 					true
 				) {
-					if (it) callback(password)
-					else context.alert(CommonText.wrongPassword)
+					if (it) hold(password, AccountError.None)
+					else hold(null, AccountError.WrongPassword)
 				}
 			}
 			removeDashboard(context)

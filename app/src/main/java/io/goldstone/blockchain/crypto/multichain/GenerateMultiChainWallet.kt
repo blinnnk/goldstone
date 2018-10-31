@@ -51,8 +51,8 @@ object GenerateMultiChainWallet {
 			override fun concurrentJobs() {
 				context.apply {
 					// Ethereum
-					getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
-						addresses.eth = Bip44Address(ethAddress, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
+					getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress, _ ->
+						addresses.eth = Bip44Address(ethAddress!!, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
 						completeMark()
 					}
 					// Ethereum Classic
@@ -60,8 +60,8 @@ object GenerateMultiChainWallet {
 						mnemonic,
 						path.etcPath,
 						password
-					) { etcAddress ->
-						addresses.etc = Bip44Address(etcAddress, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
+					) { etcAddress, _ ->
+						addresses.etc = Bip44Address(etcAddress!!, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
 						completeMark()
 					}
 					// Bitcoin

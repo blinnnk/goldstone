@@ -2,20 +2,19 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.os.Handler
 import android.os.Looper
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.isETC
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -38,31 +37,29 @@ abstract class TransactionStatusObserver {
 
 	open fun checkStatusByTransaction() {
 		doAsync {
+			val chainURL =
+				if (ChainID(chainID).isETHSeries()) SharedChain.getCurrentETH()
+				else SharedChain.getETCCurrent()
 			if (transaction.isNull()) {
 				GoldStoneEthCall.getTransactionByHash(
 					transactionHash,
-					ChainID(chainID).getChainName(),
+					chainURL,
 					{
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
-					},
-					{
-						removeObserver()
-						LogUtil.error("checkStatus getTransactionByHash", it)
 					}
-				) { data ->
+				) { data, error ->
+					if (data.isNull() || error.isNone()) {
+						removeObserver()
+					}
 					transaction = data
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
 				}
 			} else {
-				GoldStoneEthCall.getBlockNumber(
-					{
-						LogUtil.error("checkStatus getBlockNumber", it)
-					},
-					ChainID(chainID).getChainName()
-				) { blockNumber ->
-					val blockInterval = blockNumber - transaction?.blockNumber?.toInt()!!
+				GoldStoneEthCall.getBlockNumber(chainURL) { blockNumber, error ->
+					if (blockNumber.isNull() || error.hasError()) return@getBlockNumber
+					val blockInterval = blockNumber!! - transaction?.blockNumber?.toInt()!!
 					val hasConfirmed = blockInterval > targetInterval
 					val hasError = TinyNumberUtils.isTrue(transaction?.hasError!!)
 					if (!isFailed.isNull() || hasConfirmed) {
@@ -81,38 +78,22 @@ abstract class TransactionStatusObserver {
 								handler.postDelayed(reDo, retryTime)
 							}
 						}
-					} else {
-						if (ChainURL.etcChainName.any {
-								it.equals(ChainID(chainID).getChainName(), true)
-							}) {
-							isFailed = false
+					} else if (ChainID(chainID).isETCSeries()) {
+						isFailed = false
+						// 没有达到 `6` 个新的 `Block` 确认一直执行监测
+						removeObserver()
+						handler.postDelayed(reDo, retryTime)
+					} else GoldStoneEthCall.getReceiptByHash(transactionHash, chainURL) { failed, failedError ->
+						// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
+						if (failed.isNull() || failedError.hasError()) return@getReceiptByHash
+						isFailed = failed
+						if (isFailed == true) {
+							getStatus(false, 1, false, failed!!)
+							removeObserver()
+						} else {
 							// 没有达到 `6` 个新的 `Block` 确认一直执行监测
 							removeObserver()
 							handler.postDelayed(reDo, retryTime)
-						} else {
-							// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
-							GoldStoneEthCall.getReceiptByHash(
-								transactionHash,
-								{
-									LogUtil.error("checkStatusByTransaction", it)
-								},
-								ChainID(chainID).getChainName()
-							) { failed ->
-								isFailed = failed
-								if (isFailed == true) {
-									getStatus(
-										false,
-										1,
-										false,
-										failed
-									)
-									removeObserver()
-								} else {
-									// 没有达到 `6` 个新的 `Block` 确认一直执行监测
-									removeObserver()
-									handler.postDelayed(reDo, retryTime)
-								}
-							}
 						}
 					}
 				}
@@ -142,12 +123,12 @@ abstract class TransactionStatusObserver {
 
 /** ———————————— 这里是从转账完成后跳入的账单详情界面用到的数据 ————————————*/
 fun TransactionDetailPresenter.observerTransaction() {
-	val chainName =
-		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrentName()
-		else SharedChain.getCurrentETHName()
+	val chaiURL =
+		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrent()
+		else SharedChain.getCurrentETH()
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	object : TransactionStatusObserver() {
-		override val chainID: String = ChainID.getChainIDByName(chainName)
+		override val chainID: String = chaiURL.chainID.id
 		override val transactionHash = currentHash
 		override fun getStatus(
 			confirmed: Boolean,
@@ -171,15 +152,13 @@ fun TransactionDetailPresenter.observerTransaction() {
 /**
  * 当 `Transaction` 监听到自身发起的交易的时候执行这个函数, 关闭监听以及执行动作
  */
-private fun TransactionDetailPresenter.onTransactionSucceed(
-	hasError: Boolean,
-	isFailed: Boolean
-) {
-	// 交易过程中发生错误
-	if (hasError) updateDataWhenHasError()
-	// 交易流程全部成功, 但是合约的问题导致失败
-	if (isFailed) updateDataWhenFailed()
-
+private fun TransactionDetailPresenter.onTransactionSucceed(hasError: Boolean, isFailed: Boolean) {
+	doAsync {
+		// 交易过程中发生错误
+		if (hasError) updateDataWhenHasError()
+		// 交易流程全部成功, 但是合约的问题导致失败
+		if (isFailed) updateDataWhenFailed()
+	}
 	val address = data?.toAddress ?: dataFromList?.addressName ?: ""
 	val symbol = getUnitSymbol()
 	updateHeaderValue(
@@ -198,74 +177,57 @@ private fun TransactionDetailPresenter.onTransactionSucceed(
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-private fun TransactionDetailPresenter.getTransactionFromChain(
-	errorCallback: (RequestError) -> Unit
-) {
-	val chainName =
-		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrentName()
-		else SharedChain.getCurrentETHName()
+private fun TransactionDetailPresenter.getTransactionFromChain(errorCallback: (RequestError) -> Unit) {
+	val chainURL =
+		if (CoinSymbol(getUnitSymbol()).isETC()) SharedChain.getETCCurrent()
+		else SharedChain.getCurrentETH()
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		chainName,
-		errorCallback = errorCallback
-	) {
+		chainURL
+	) { result, error ->
+		if (result.isNull() || error.hasError()) {
+			errorCallback(error)
+			return@getTransactionByHash
+		}
 		fragment.context?.runOnUiThread {
 			fragment.asyncData?.clear()
-			val data = generateModels(it)
-			fragment.asyncData?.addAll(generateModels(it))
+			val data = generateModels(result)
+			fragment.asyncData?.addAll(generateModels(result))
 			fragment.recyclerView.adapter?.notifyItemRangeChanged(1, data.size)
 		}
 		// 成功获取数据后在异步线程更新数据库记录
-		updateDataInDatabase(it.blockNumber)
+		updateDataInDatabase(result!!.blockNumber)
 	}
 }
 
 // 自动监听交易完成后, 将转账信息插入数据库
 private fun TransactionDetailPresenter.updateDataInDatabase(blockNumber: String) {
-	GoldStoneDataBase.database.transactionDao().apply {
-		getTransactionByTaxHash(currentHash).let { it ->
-			it.forEach {
-				update(it.apply {
-					this.blockNumber = blockNumber
-					isPending = false
-					hasError = "0"
-					txReceiptStatus = "1"
-				})
-			}
-		}
+	val transactionDao = GoldStoneDataBase.database.transactionDao()
+	val transactions = transactionDao.getTransactionByTaxHash(currentHash)
+	transactions.forEach {
+		transactionDao.update(it.apply {
+			this.blockNumber = blockNumber
+			isPending = false
+			hasError = "0"
+			txReceiptStatus = "1"
+		})
 	}
 }
 
+@WorkerThread
 fun TransactionDetailPresenter.updateDataWhenHasError() {
-	TransactionTable.getTransactionByHash(currentHash) { it ->
-		it.find {
-			it.hash == currentHash
-		}?.let {
-			doAsync {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.update(
-						it.apply {
-							this.hasError = TinyNumber.True.value.toString()
-						}
-					)
-			}
-		}
+	val transactionDao = GoldStoneDataBase.database.transactionDao()
+	val transaction = transactionDao.getTransactionByTaxHash(currentHash)
+	transaction.find { it.hash.equals(currentHash, true) }?.let {
+		transactionDao.update(it.apply { this.hasError = TinyNumber.True.value.toString() })
 	}
 }
 
+@WorkerThread
 private fun TransactionDetailPresenter.updateDataWhenFailed() {
-	TransactionTable.getTransactionByHash(currentHash) { it ->
-		it.find {
-			it.hash == currentHash
-		}?.let {
-			doAsync {
-				GoldStoneDataBase
-					.database
-					.transactionDao()
-					.update(it.apply { isFailed = true })
-			}
-		}
+	val transactionDao = GoldStoneDataBase.database.transactionDao()
+	val transaction = transactionDao.getTransactionByTaxHash(currentHash)
+	transaction.find { it.hash == currentHash }?.let {
+		transactionDao.update(it.apply { isFailed = true })
 	}
 }

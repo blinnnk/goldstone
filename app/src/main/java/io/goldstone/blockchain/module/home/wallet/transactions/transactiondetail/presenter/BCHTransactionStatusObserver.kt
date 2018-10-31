@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
@@ -24,7 +24,7 @@ private var hasBlockNumber = false
 fun TransactionDetailPresenter.observerBCHTransaction() {
 	// 在页面销毁后需要用到, `activity` 所以提前存储起来
 	object : BTCSeriesTransactionStatusObserver() {
-		override val chainName = SharedChain.getBCHCurrentName()
+		override val chainURL = SharedChain.getBCHCurrent()
 		override val hash = currentHash
 		override fun getStatus(confirmed: Boolean, blockInterval: Int) {
 			if (confirmed) {
@@ -66,20 +66,16 @@ private fun TransactionDetailPresenter.onBCHTransactionSucceed() {
 }
 
 // 从转账界面进入后, 自动监听交易完成后, 用来更新交易数据的工具方法
-private fun TransactionDetailPresenter.getBCHTransactionFromChain(
-	isPending: Boolean
-) {
+private fun TransactionDetailPresenter.getBCHTransactionFromChain(isPending: Boolean) {
 	val address =
 		if (SharedValue.isTestEnvironment()) SharedAddress.getCurrentBTCSeriesTest()
 		else SharedAddress.getCurrentBCH()
 	BitcoinCashApi.getTransactionByHash(
 		currentHash,
 		address,
-		BitcoinCashUrl.currentUrl(),
-		{
-			fragment.context?.alert(it.toString())
-		}
-	) { transaction ->
+		BitcoinCashUrl.currentUrl()
+	) { transaction, error ->
+		if (transaction.isNull() || error.isNone()) return@getTransactionByHash
 		GoldStoneAPI.context.runOnUiThread {
 			fragment.asyncData?.clear()
 			val data = generateModels(transaction)

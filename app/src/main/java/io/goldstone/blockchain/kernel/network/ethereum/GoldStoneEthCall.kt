@@ -5,30 +5,24 @@ package io.goldstone.blockchain.kernel.network.ethereum
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isNullValue
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumberUtils
-import io.goldstone.blockchain.common.error.EthereumRPCError
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
-import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.isETC
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toAscii
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.crypto.utils.toIntFromHex
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.ChainURL
 import io.goldstone.blockchain.kernel.network.ParameterUtil
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.callChainBy
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.math.BigInteger
 
@@ -49,18 +43,22 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getTokenInfoByContractAddress(
 		contractAddress: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		hold: (
-			symbol: String,
-			name: String,
-			decimal: Int
-		) -> Unit
+		chainURL: ChainURL,
+		hold: (symbol: String?, name: String?, decimal: Int?, error: RequestError) -> Unit
 	) {
-		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
-			getTokenName(contractAddress, errorCallback, chainName) { name ->
-				getTokenDecimal(contractAddress, errorCallback, chainName) { decimal ->
-					hold(symbol, name, decimal)
+		getTokenSymbolByContract(contractAddress, chainURL) { symbol, error ->
+			getTokenName(contractAddress, chainURL) { name, nameError ->
+				getTokenDecimal(contractAddress, chainURL) { decimal, decimalError ->
+					hold(
+						symbol,
+						name,
+						decimal,
+						when {
+							error.isNone() && nameError.isNone() -> decimalError
+							!nameError.isNone() -> nameError
+							else -> error
+						}
+					)
 				}
 			}
 		}
@@ -69,16 +67,12 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getSymbolAndDecimalByContract(
 		contractAddress: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		hold: (
-			symbol: String,
-			decimal: Int
-		) -> Unit
+		chainURL: ChainURL,
+		hold: (symbol: String?, decimal: Int?, error: RequestError) -> Unit
 	) {
-		getTokenSymbolByContract(contractAddress, errorCallback, chainName) { symbol ->
-			getTokenDecimal(contractAddress, errorCallback, chainName) { decimal ->
-				hold(symbol, decimal)
+		getTokenSymbolByContract(contractAddress, chainURL) { symbol, symbolError ->
+			getTokenDecimal(contractAddress, chainURL) { decimal, decimalError ->
+				hold(symbol, decimal, if (symbolError.isNone()) decimalError else symbolError)
 			}
 		}
 	}
@@ -86,15 +80,14 @@ object GoldStoneEthCall {
 	@JvmStatic
 	fun getInputCodeByHash(
 		hash: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		holdValue: (String) -> Unit
+		chainURL: ChainURL,
+		holdValue: (inputCode: String?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTransactionByHash.method,
 					1,
 					false,
@@ -102,27 +95,23 @@ object GoldStoneEthCall {
 					hash
 				)
 			),
-			{
-				errorCallback(EthereumRPCError.GetInputCode(it))
-			},
-			chainName
-		) {
-			holdValue(JSONObject(it).safeGet("input"))
+			chainURL
+		) { result, error ->
+			holdValue(JSONObject(result).safeGet("input"), error)
 		}
 	}
 
 	@JvmStatic
 	fun getUsableNonce(
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainType: ChainType,
+		chainURL: ChainURL,
 		address: String,
-		holdValue: (BigInteger) -> Unit
+		@WorkerThread hold: (nonce: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					getCurrentEncryptStatusByChainType(chainType),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTransactionCount.method,
 					1,
 					true,
@@ -130,25 +119,22 @@ object GoldStoneEthCall {
 					address
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetUsableNonce(it)) },
-			ChainType(chainType.id).getCurrentChainName()
-		) {
-			holdValue(it.hexToDecimal().toBigDecimal().toBigInteger())
+			chainURL
+		) { result, error ->
+			hold(result?.hexToDecimal()?.toBigDecimal()?.toBigInteger(), error)
 		}
 	}
 
 	@JvmStatic
 	fun getBlockNumber(
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		holdValue: (Int) -> Unit
+		chainURL: ChainURL,
+		holdValue: (blockNumber: Int?, error: RequestError) -> Unit
 	) {
-
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetBlockNumber.method,
 					83,
 					false,
@@ -156,25 +142,23 @@ object GoldStoneEthCall {
 					null
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetBlockNumber(it)) },
-			chainName
-		) {
-			holdValue(it.hexToDecimal().toInt())
+			chainURL
+		) { result, error ->
+			holdValue(result?.hexToDecimal()?.toInt(), error)
 		}
 	}
 
 	@JvmStatic
 	fun getBlockTimeStampByBlockHash(
 		blockHash: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		holdValue: (BigInteger) -> Unit
+		chainURL: ChainURL,
+		@WorkerThread hold: (timeStamp: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetBlockByHash.method,
 					1,
 					false,
@@ -183,29 +167,26 @@ object GoldStoneEthCall {
 					true
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetBlockTimeByBlockHash(it)) },
-			chainName
-		) {
-			if (it.isNull()) LogUtil.error("getBlockTimeStampByBlockHash result is null")
-			else {
-				holdValue(JSONObject(it).safeGet("timestamp").hexToDecimal())
-			}
+			chainURL
+		) { result, error ->
+			val timeStamp = JSONObject(result).safeGet("timestamp")
+			if (timeStamp.isEmpty()) hold(null, error)
+			else hold(timeStamp.hexToDecimal(), error)
 		}
 	}
 
 	@JvmStatic
 	fun getTransactionByHash(
 		hash: String,
-		chainName: String,
+		chainURL: ChainURL,
 		unfinishedCallback: () -> Unit = {},
-		errorCallback: (EthereumRPCError) -> Unit,
-		hold: (TransactionTable) -> Unit
+		@WorkerThread hold: (transaction: TransactionTable?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTransactionByHash.method,
 					1,
 					false,
@@ -213,36 +194,27 @@ object GoldStoneEthCall {
 					hash
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetTransactionByHash(it)) },
-			chainName
-		) { it ->
-			val data = it.toJsonObject()
-			if (data.safeGet("blockNumber").isNullValue()) {
-				unfinishedCallback()
-			} else {
-				hold(
-					TransactionTable(
-						data,
-						ChainURL.etcChainName.any { it.equals(chainName, true) },
-						ChainID.getChainIDByName(chainName)
-					)
-				)
-			}
+			chainURL
+		) { result, error ->
+			if (!result.isNullOrEmpty() && error.isNone()) {
+				val data = result!!.toJsonObject()
+				if (data.safeGet("blockNumber").isNullValue()) unfinishedCallback()
+				else hold(TransactionTable(data, chainURL.chainType.isETC(), chainURL.chainID.id), error)
+			} else hold(null, error)
 		}
 	}
 
 	@JvmStatic
 	fun getReceiptByHash(
 		hash: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		hold: (Boolean) -> Unit
+		chainURL: ChainURL,
+		hold: (success: Boolean?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTransactionReceiptByHash.method,
 					1,
 					false,
@@ -250,12 +222,11 @@ object GoldStoneEthCall {
 					hash
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetReceiptByHash(it)) },
-			chainName
-		) {
-			val data = it.toJsonObject()
+			chainURL
+		) { result, error ->
+			val data = result?.toJsonObject()
 			// Return Status hasError or Not if
-			hold(!TinyNumberUtils.isTrue(data.safeGet("status").toIntFromHex()))
+			hold(!TinyNumberUtils.isTrue(data?.safeGet("status")?.toIntFromHex().orZero()), error)
 		}
 	}
 
@@ -264,15 +235,14 @@ object GoldStoneEthCall {
 		to: String,
 		from: String,
 		data: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		hold: (BigInteger) -> Unit
+		chainURL: ChainURL,
+		@WorkerThread hold: (executedValue: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.preparePairJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetEstimateGas.method,
 					false,
 					true,
@@ -281,30 +251,22 @@ object GoldStoneEthCall {
 					Pair("data", data)
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetTransactionExecutedValue(it)) },
-			chainName
-		) {
-			GoldStoneAPI.context.runOnUiThread {
-				try {
-					hold(it.toDecimalFromHex().toBigDecimal().toBigInteger())
-				} catch (error: Exception) {
-					LogUtil.error(this.javaClass.simpleName, error)
-				}
-			}
+			chainURL
+		) { result, error ->
+			hold(result?.toDecimalFromHex()?.toBigDecimal()?.toBigInteger(), error)
 		}
 	}
 
 	@JvmStatic
 	fun sendRawTransaction(
 		signTransactions: String,
-		errorCallback: (RequestError) -> Unit,
-		chainName: String,
-		@WorkerThread hold: (String) -> Unit
+		chainURL: ChainURL,
+		@WorkerThread hold: (hash: String?, error: RequestError) -> Unit
 	) {
 		callChainBy(RequestBody.create(
 			contentType,
 			ParameterUtil.prepareJsonRPC(
-				ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+				chainURL.isEncrypt,
 				EthereumMethod.SendRawTransaction.method,
 				1,
 				false,
@@ -312,25 +274,23 @@ object GoldStoneEthCall {
 				signTransactions
 			)
 		),
-			errorCallback,
-			chainName
-		) {
-			hold(it)
-		}
+			chainURL,
+			hold
+		)
 	}
 
 	@JvmStatic
 	fun getTokenBalanceWithContract(
 		contractAddress: String,
 		address: String,
-		chainName: String,
+		chainURL: ChainURL,
 		hold: (amount: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.preparePairJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTokenBalance.method,
 					true,
 					true,
@@ -338,25 +298,23 @@ object GoldStoneEthCall {
 					Pair("data", EthereumMethod.GetTokenBalance.code withAddress address)
 				)
 			),
-			{ hold(null, it) },
-			chainName
-		) {
-			hold(it.hexToDecimal(), RequestError.None)
+			chainURL
+		) { result, error ->
+			hold(result?.hexToDecimal(), error)
 		}
 	}
 
 	@JvmStatic
 	fun getTokenSymbolByContract(
 		contractAddress: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		hold: (String) -> Unit
+		chainURL: ChainURL,
+		hold: (symbol: String?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.preparePairJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetSymbol.method,
 					true,
 					true,
@@ -364,25 +322,23 @@ object GoldStoneEthCall {
 					Pair("data", EthereumMethod.GetSymbol.code)
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetSymbol(it)) },
-			chainName
-		) {
-			hold(it.toAscii())
+			chainURL
+		) { result, error ->
+			hold(result?.toAscii(), error)
 		}
 	}
 
 	@JvmStatic
 	fun getTokenDecimal(
 		contractAddress: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		holdValue: (Int) -> Unit
+		chainURL: ChainURL,
+		holdValue: (decimal: Int?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.preparePairJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTokenDecimal.method,
 					true,
 					true,
@@ -390,25 +346,23 @@ object GoldStoneEthCall {
 					Pair("data", EthereumMethod.GetTokenDecimal.code)
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetTokenDecimal(it)) },
-			chainName
-		) {
-			holdValue(it.toIntFromHex())
+			chainURL
+		) { result, error ->
+			holdValue(result?.toIntFromHex(), error)
 		}
 	}
 
 	@JvmStatic
 	fun getTokenName(
 		contractAddress: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		holdValue: (String) -> Unit
+		chainURL: ChainURL,
+		holdValue: (name: String?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.preparePairJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTokenName.method,
 					true,
 					true,
@@ -416,23 +370,22 @@ object GoldStoneEthCall {
 					Pair("data", EthereumMethod.GetTokenName.code)
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetTokenName(it)) },
-			chainName
-		) {
-			holdValue(it.toAscii())
+			chainURL
+		) { result, error ->
+			holdValue(result?.toAscii(), error)
 		}
 	}
 
 	fun getEthBalance(
 		address: String,
-		chainName: String,
+		chainURL: ChainURL,
 		@WorkerThread holdValue: (amount: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.prepareJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetBalance.method,
 					1,
 					true,
@@ -440,24 +393,22 @@ object GoldStoneEthCall {
 					address
 				)
 			),
-			{ holdValue(null, it) },
-			chainName
-		) {
-			holdValue(it.hexToDecimal(), RequestError.None)
+			chainURL
+		) { result, error ->
+			holdValue(result?.hexToDecimal(), error)
 		}
 	}
 
 	fun getTokenTotalSupply(
 		contractAddress: String,
-		errorCallback: (EthereumRPCError) -> Unit,
-		chainName: String,
-		holdValue: (BigInteger) -> Unit
+		chainURL: ChainURL,
+		holdValue: (supply: BigInteger?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
 				contentType,
 				ParameterUtil.preparePairJsonRPC(
-					ChainURL.getCurrentEncryptStatusByNodeName(chainName),
+					chainURL.isEncrypt,
 					EthereumMethod.GetTotalSupply.method,
 					true,
 					true,
@@ -465,10 +416,9 @@ object GoldStoneEthCall {
 					Pair("data", EthereumMethod.GetTotalSupply.code)
 				)
 			),
-			{ errorCallback(EthereumRPCError.GetTokenTotalSupply(it)) },
-			chainName
-		) {
-			holdValue(it.hexToDecimal())
+			chainURL
+		) { result, error ->
+			holdValue(result?.hexToDecimal(), error)
 		}
 	}
 
@@ -480,12 +430,4 @@ object GoldStoneEthCall {
 	private fun String.checkAddressInRules() =
 		if (substring(0, 2) == "0x") substring(2 until length) else this
 
-	@JvmStatic
-	private fun getCurrentEncryptStatusByChainType(type: ChainType): Boolean {
-		return when (type) {
-			ChainType.ETC -> SharedValue.isEncryptETCNodeRequest()
-			ChainType.ETH -> SharedValue.isEncryptERCNodeRequest()
-			else -> SharedValue.isEncryptERCNodeRequest()
-		}
-	}
 }

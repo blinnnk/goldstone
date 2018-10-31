@@ -14,13 +14,7 @@ fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListMode
 	doAsync {
 		val startBlockNumber = localERCData.maxBy { it.blockNumber }?.blockNumber ?: "0"
 		// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-		getTokenTransactions(
-			startBlockNumber,
-			{
-				// ToDo 等自定义的 `Alert` 完成后应当友好提示
-				LogUtil.error("error in getTransactionDataFromEtherScan $it")
-			}
-		) { transactionListModel ->
+		getTokenTransactions(startBlockNumber) { transactionListModel ->
 			// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 			transactionListModel.find { it.contract == token?.contract }.isNotNull {
 				// 有数据后重新执行从数据库拉取数据

@@ -63,33 +63,37 @@ fun GasSelectionPresenter.transferBTC(
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareBTCModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
-			BitcoinApi.getUnspentListByAddress(fromAddress) { unspents ->
+			BitcoinApi.getUnspentListByAddress(fromAddress) { unspents, error ->
+				if (unspents.isNull() || error.hasError()) {
+					callback(error)
+					return@getUnspentListByAddress
+				}
 				BTCSeriesTransactionUtils.generateBTCSignedRawTransaction(
 					value,
 					fee,
 					toAddress,
 					changeAddress,
-					unspents,
+					unspents!!,
 					privateKey!!,
 					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						SharedChain.getBTCCurrentName(),
-						signedModel.signedMessage,
-						callback
-					) { hash ->
-						hash?.let {
+						SharedChain.getBTCCurrent(),
+						signedModel.signedMessage
+					) { hash, error ->
+						if (!hash.isNullOrEmpty() && error.isNone()) {
 							// 插入 `Pending` 数据到本地数据库
-							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, it)
+							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, hash!!)
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
 									rootFragment,
 									fragment,
-									prepareReceiptModelFromBTCSeries(this@model, fee, it)
+									prepareReceiptModelFromBTCSeries(this@model, fee, hash)
 								)
-								callback(GoldStoneError.None)
 							}
+						} else GoldStoneAPI.context.runOnUiThread {
+							callback(error)
 						}
 					}
 				}

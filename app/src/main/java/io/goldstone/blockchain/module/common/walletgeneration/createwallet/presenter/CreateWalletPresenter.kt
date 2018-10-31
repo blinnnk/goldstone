@@ -154,7 +154,7 @@ class CreateWalletPresenter(
 					isUsing = true,
 					// 防止用户跳过助记词, 把使用 `RSA` 加密后的助记词存入数据库
 					encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
-				).insertWatchOnlyWallet { wallet ->
+				).insertWallet { wallet ->
 					generateMyTokenInfo(multiChainAddresses) {
 						// 传递数据到下一个 `Fragment`
 						val arguments = Bundle().apply {

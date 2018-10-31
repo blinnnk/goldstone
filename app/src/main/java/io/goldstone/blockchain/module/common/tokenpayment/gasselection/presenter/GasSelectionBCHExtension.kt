@@ -1,5 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
@@ -22,7 +24,7 @@ import org.jetbrains.anko.runOnUiThread
  * @author KaySaith
  */
 
-fun GasSelectionPresenter.prepareToTransferBCH(callback: (GoldStoneError) -> Unit) {
+fun GasSelectionPresenter.prepareToTransferBCH(@UiThread callback: (GoldStoneError) -> Unit) {
 	prepareBTCSeriesModel?.apply {
 		// 检查余额状况
 		BitcoinCashApi.getBalance(fromAddress, true) { balance, error ->
@@ -56,7 +58,7 @@ private fun GasSelectionPresenter.getCurrentBCHPrivateKey(
 fun GasSelectionPresenter.transferBCH(
 	prepareBTCSeriesModel: PaymentBTCSeriesModel,
 	password: String,
-	callback: (GoldStoneError) -> Unit
+	@WorkerThread callback: (GoldStoneError) -> Unit
 ) {
 	getCurrentBCHPrivateKey(
 		prepareBTCSeriesModel.fromAddress,
@@ -64,34 +66,37 @@ fun GasSelectionPresenter.transferBCH(
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareBTCSeriesModel.apply model@{
 			val fee = gasUsedGasFee?.toSatoshi()!!
-			BitcoinCashApi.getUnspentListByAddress(fromAddress) { unspents ->
+			BitcoinCashApi.getUnspentListByAddress(fromAddress) { unspents, error ->
+				if (unspents.isNull() || error.hasError()) {
+					callback(error)
+					return@getUnspentListByAddress
+				}
 				BTCSeriesTransactionUtils.generateBCHSignedRawTransaction(
 					value,
 					fee,
 					toAddress,
 					changeAddress,
-					unspents,
+					unspents!!,
 					privateKey!!,
 					SharedValue.isTestEnvironment()
 				).let { signedModel ->
 					BTCSeriesJsonRPC.sendRawTransaction(
-						SharedChain.getBCHCurrentName(),
-						signedModel.signedMessage,
-						callback
-					) { hash ->
-						hash?.let {
+						SharedChain.getBCHCurrent(),
+						signedModel.signedMessage
+					) { hash, error ->
+						if (!hash.isNullOrEmpty() && error.isNone()) {
 							// 插入 `Pending` 数据到本地数据库
-							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, it)
+							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, hash!!)
 							// 跳转到章党详情界面
 							GoldStoneAPI.context.runOnUiThread {
 								goToTransactionDetailFragment(
 									rootFragment,
 									fragment,
-									prepareReceiptModelFromBTCSeries(this@model, fee, it)
+									prepareReceiptModelFromBTCSeries(this@model, fee, hash)
 								)
 								callback(GoldStoneError.None)
 							}
-						}
+						} else callback(error)
 					}
 				}
 			}

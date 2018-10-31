@@ -46,6 +46,7 @@ object APIPath {
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
+	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
 	val getEOSTokenList: (
 		header: String,
 		chainID: String,
@@ -162,17 +163,17 @@ object EtherScanApi {
 		"${ChainURL.bchWebHeader()}$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
-		"${transactionDetailHeader(SharedChain.getCurrentETH())}$it"
+		"${transactionDetailHeader(SharedChain.getCurrentETH().chainID)}$it"
 	}
 	val eosTransactionDetail: (taxHash: String) -> String = {
 		ChainURL.eosTransactionDetail(it)
 	}
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
-		"${etherScanHeader(SharedChain.getCurrentETH())}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
+		"${etherScanHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock =99999999&sort=desc&apikey=${apikey()}"
 	}
 	val getTokenIncomingTransaction: (address: String, startBlock: String) -> String =
 		{ address, startBlock ->
-			"${etherScanLogHeader(SharedChain.getCurrentETH())}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
+			"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=logs&action=getLogs&fromBlock=$startBlock&toBlock=latest&topic0=${SolidityCode.logTransferFilter}&topic2=${address.toAddressCode()}"
 		}
 }
 

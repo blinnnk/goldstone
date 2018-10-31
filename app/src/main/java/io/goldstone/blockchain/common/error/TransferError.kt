@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.error
 
-import io.goldstone.blockchain.common.Language.ErrorText
+import io.goldstone.blockchain.common.language.ErrorText
 
 
 /**
@@ -19,19 +19,9 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val GetWrongFeeFromChain = TransferError(ErrorText.getWrongFeeFromChain)
 		@JvmStatic
-		val GetChainInfoError = TransferError(ErrorText.getChainInfoError)
-		@JvmStatic
 		val TradingInputIsEmpty = TransferError(ErrorText.tradingInputIsEmpty)
 		@JvmStatic
 		val wrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
-	}
-}
-
-class StakeBandWidthError(override val message: String) : GoldStoneError(message) {
-	companion object {
-		/** EOS Delegate/Refund CPU Errors */
-		@JvmStatic
-		val TransferToSelf = StakeBandWidthError(ErrorText.transferToSelf)
 	}
 }
 
