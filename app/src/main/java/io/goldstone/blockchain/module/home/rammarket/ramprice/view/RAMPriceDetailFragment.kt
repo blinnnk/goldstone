@@ -3,8 +3,7 @@ package io.goldstone.blockchain.module.home.rammarket.ramprice.view
 import android.support.v4.app.Fragment
 import android.text.format.DateUtils
 import android.widget.LinearLayout
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
@@ -15,6 +14,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.view.EOSRAMPriceCandleChart
 import io.goldstone.blockchain.module.home.rammarket.ramprice.presenter.RAMPricePresenter
+import io.goldstone.blockchain.module.home.rammarket.ramtrade.view.TradingView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.math.BigDecimal
@@ -54,8 +54,11 @@ class RAMPriceDetailFragment : BaseFragment<RAMPricePresenter>() {
 			addView(ramPriceView)
 			addView(menu)
 			addView(candleChart.apply { x += 10.uiPX() })
+			addView(TradingView(context!!))
 			presenter.updateRAMCandleData(EOSRAMChartType.Minute)
 		}
+		
+		
 	}
 	
 	private fun updateCurrentData(buttonId: Int){

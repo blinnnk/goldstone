@@ -131,10 +131,10 @@ object EOSRAMExchangeText {
 		}
 	}
 	
-	val sall: (value: String) -> String = { value ->
+	val sell: (value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "卖出$value"
+			HoneyLanguage.English.code -> "sell$value"
+			HoneyLanguage.Chinese.code -> "sell$value"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -164,8 +164,79 @@ object EOSRAMExchangeText {
 	}
 	
 	val ramExchange = when(currentLanguage) {
-		HoneyLanguage.English.code -> "ram exchange"
-		HoneyLanguage.Chinese.code -> "ram exchange"
+		HoneyLanguage.English.code -> "RAM exchange"
+		HoneyLanguage.Chinese.code -> "RAM exchange"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val ram = when(currentLanguage) {
+		HoneyLanguage.English.code -> "RAM"
+		HoneyLanguage.Chinese.code -> "内存"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val eos = when(currentLanguage) {
+			HoneyLanguage.English.code -> "EOS"
+		HoneyLanguage.Chinese.code -> "EOS"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val enterCountHint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "please input your count"
+		HoneyLanguage.Chinese.code -> "please input your count"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val transactionHistory = when(currentLanguage) {
+		HoneyLanguage.English.code -> "transaction history"
+		HoneyLanguage.Chinese.code -> "transaction history"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val ramBalanceDescription: (count: String) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "balance $it KB"
+			HoneyLanguage.Chinese.code -> "balance $it KB"
+			HoneyLanguage.Japanese.code -> ""
+			HoneyLanguage.Korean.code -> ""
+			HoneyLanguage.Russian.code -> ""
+			HoneyLanguage.TraditionalChinese.code -> ""
+			else -> ""
+		}
+	}
+	val eosBalanceDescription: (count: String) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "balance $it EOS"
+			HoneyLanguage.Chinese.code -> "balance $it EOS"
+			HoneyLanguage.Japanese.code -> ""
+			HoneyLanguage.Korean.code -> ""
+			HoneyLanguage.Russian.code -> ""
+			HoneyLanguage.TraditionalChinese.code -> ""
+			else -> ""
+		}
+	}
+	
+	val confirmToTrade = when(currentLanguage) {
+		HoneyLanguage.English.code -> "confirm"
+		HoneyLanguage.Chinese.code -> "confirm"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""

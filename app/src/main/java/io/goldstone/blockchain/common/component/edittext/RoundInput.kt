@@ -34,7 +34,7 @@ open class RoundInput(context: Context) : EditText(context) {
 	}
 	private var safeLevel = ""
 	private val paint = Paint()
-	private val textPaint = Paint()
+	val textPaint = Paint()
 	private val alertPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 14.uiPX().toFloat()
