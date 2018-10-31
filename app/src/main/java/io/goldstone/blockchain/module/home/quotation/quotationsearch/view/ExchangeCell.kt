@@ -30,9 +30,9 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 		}
 	}
 	private val exchangeIcon by lazy {
-		ExchangeImageIcon(context).apply {
+		ImageView(context).apply {
+			addCorner(18.uiPX(), GrayScale.midGray)
 			layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
-			backgroundResource = R.drawable.bch_icon
 		}
 	}
 	
@@ -68,7 +68,6 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 	var model: ExchangeTable? by observing(null) {
 		model?.apply {
 			exchangeIcon.glideImage(iconUrl)
-			exchangeIcon.addCorner(18.uiPX(), Color.TRANSPARENT)
 			textView.text = exchangeName
 			checkBox.isChecked = isSelected
 		}
