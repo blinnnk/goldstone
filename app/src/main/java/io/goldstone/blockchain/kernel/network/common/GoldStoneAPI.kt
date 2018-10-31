@@ -528,21 +528,22 @@ object GoldStoneAPI {
 	fun getEOSRAMPriceTendcyCandle(
 		period: String,
 		size: Int,
-		errorCallback: (RequestError) -> Unit,
-		hold: (ArrayList<CandleChartModel>) -> Unit
+		hold: (candleData: ArrayList<CandleChartModel>?, error: RequestError) -> Unit
 	) {
 		requestData<CandleChartModel>(
 			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, period, size),
 			"ticks",
-			errorCallback = errorCallback,
+			errorCallback = {
+				hold(null, it)
+			},
 			isEncrypt = true
 		) {
-			hold(this.toArrayList())
+			hold(this.toArrayList(), RequestError.None)
 		}
 		
 	}
 	
-	fun getEOSRAMPriceToday(
+	fun getEOSRAMTodayPrice(
 		hold: (CandleChartModel?, RequestError) -> Unit
 	) {
 		requestData<CandleChartModel>(

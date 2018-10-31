@@ -16,6 +16,8 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.rammarket.ramprice.model.RAMPriceDao
+import io.goldstone.blockchain.module.home.rammarket.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
@@ -42,7 +44,8 @@ import java.math.BigInteger
 		(BTCSeriesTransactionTable::class),
 		(EOSTransactionTable::class),
 		(EOSAccountTable::class),
-		(ChainNodeTable::class)
+		(ChainNodeTable::class),
+		(RAMPriceTable::class)
 	],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
@@ -78,6 +81,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun eosAccountDao(): EOSAccountDao
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
 	abstract fun chainNodeDao(): ChainNodeDao
+	abstract fun ramPriceDao(): RAMPriceDao
 
 	companion object {
 		const val databaseVersion = 8

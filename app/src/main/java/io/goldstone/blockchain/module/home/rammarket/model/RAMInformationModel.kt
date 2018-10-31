@@ -6,11 +6,12 @@ package io.goldstone.blockchain.module.home.rammarket.model
  * @description: ram市场头部的信息的model
  */
 data class RAMInformationModel(
-	var openPrice: String?,
-	var HighPrice: String?,
-	var lowPrice: String?,
-	var currentPrice: String?,
-	var maxAmount: String?,
-	var occupyAmount: String?,
-	var ramAmountPercent: String?
+	var openPrice: Float?,
+	var HighPrice: Float?,
+	var lowPrice: Float?,
+	var currentPrice: Float?,
+	var pricePercent: Float?,
+	var maxAmount: Float?,
+	var occupyAmount: Float?,
+	var ramAmountPercent: Float?
 )

@@ -1,7 +1,4 @@
-package io.goldstone.blockchain.common.Language
-
-import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.common.language.currentLanguage
+package io.goldstone.blockchain.common.language
 
 /**
  * @date 2018/9/29 18:25 AM

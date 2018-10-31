@@ -6,13 +6,12 @@ import io.goldstone.blockchain.common.language.currentLanguage
 /**
  * @date: 2018/9/27.
  * @author: yanglihai
- * @description:
+ * @description: eos 内存交易所所需字段
  */
-object EOSRAMText {
-	
+object EOSRAMExchangeText {
 	val currentPrice = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "当前价"
+		HoneyLanguage.English.code -> "current price"
+		HoneyLanguage.Chinese.code -> "current price"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -22,8 +21,8 @@ object EOSRAMText {
 	
 	val openPrice:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "开盘价：$value"
+			HoneyLanguage.English.code -> "open price:$value"
+			HoneyLanguage.Chinese.code -> "open price:$value"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -34,8 +33,8 @@ object EOSRAMText {
 	
 	val highPrice:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "最高：$value"
+			HoneyLanguage.English.code -> "high price:$value"
+			HoneyLanguage.Chinese.code -> "high price:$value"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -46,8 +45,8 @@ object EOSRAMText {
 	
 	val lowPrice:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "最低：$value"
+			HoneyLanguage.English.code -> "low price:$value"
+			HoneyLanguage.Chinese.code -> "low price:$value"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -56,9 +55,9 @@ object EOSRAMText {
 		}
 	}
 	
-	val ramUtilization = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "内存占用率"
+	val ramOccupyRate = when(currentLanguage) {
+		HoneyLanguage.English.code -> " RAM occupy rate"
+		HoneyLanguage.Chinese.code -> "RAM occupy rate"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -66,10 +65,10 @@ object EOSRAMText {
 		else -> ""
 	}
 	
-	val ramAccupyAmount:(value: String) -> String = { value ->
+	val ramOccupyAmount:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "占用${value}GB"
+			HoneyLanguage.English.code -> "ram occupy amount ${value}GB"
+			HoneyLanguage.Chinese.code -> "ram occupy amount ${value}GB"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -80,8 +79,8 @@ object EOSRAMText {
 	
 	val ramTotalAmount:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "总量${value}GB"
+			HoneyLanguage.English.code -> "ram total amount ${value}GB"
+			HoneyLanguage.Chinese.code -> "ram total amount ${value}GB"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -91,8 +90,8 @@ object EOSRAMText {
 	}
 	
 	val bigOrder = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "大单"
+		HoneyLanguage.English.code -> "big order"
+		HoneyLanguage.Chinese.code -> "big order"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -101,8 +100,8 @@ object EOSRAMText {
 	}
 	
 	val middleOrder = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "中单"
+		HoneyLanguage.English.code -> "middle order"
+		HoneyLanguage.Chinese.code -> "middle order"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -111,8 +110,8 @@ object EOSRAMText {
 	}
 	
 	val smallOrder = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "小单"
+		HoneyLanguage.English.code -> "small order"
+		HoneyLanguage.Chinese.code -> "small order"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -120,10 +119,10 @@ object EOSRAMText {
 		else -> ""
 	}
 	
-	val buying:(value: String) -> String = { value ->
+	val buy: (value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "买入$value"
+			HoneyLanguage.English.code -> "buy$value"
+			HoneyLanguage.Chinese.code -> "buy$value"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -132,7 +131,7 @@ object EOSRAMText {
 		}
 	}
 	
-	val saling:(value: String) -> String = { value ->
+	val sall: (value: String) -> String = { value ->
 		when(currentLanguage) {
 			HoneyLanguage.English.code -> ""
 			HoneyLanguage.Chinese.code -> "卖出$value"
@@ -145,8 +144,8 @@ object EOSRAMText {
 	}
 	
 	val ramOrderRules = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "大单 >2000EOS  中单 500~2000EOS 小单 <500EOS"
+		HoneyLanguage.English.code -> "big order >2000EOS  middle order 500~2000EOS small order <500EOS"
+		HoneyLanguage.Chinese.code -> "big order >2000EOS  middle order 500~2000EOS small order <500EOS"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -154,9 +153,9 @@ object EOSRAMText {
 		else -> ""
 	}
 	
-	val tradeDistribute = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "成交分布"
+	val transactionDistribute = when(currentLanguage) {
+		HoneyLanguage.English.code -> "transaction distribute"
+		HoneyLanguage.Chinese.code -> "transaction distribute"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -164,9 +163,9 @@ object EOSRAMText {
 		else -> ""
 	}
 	
-	val ramTradeRoom = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "内存交易所"
+	val ramExchange = when(currentLanguage) {
+		HoneyLanguage.English.code -> "ram exchange"
+		HoneyLanguage.Chinese.code -> "ram exchange"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
