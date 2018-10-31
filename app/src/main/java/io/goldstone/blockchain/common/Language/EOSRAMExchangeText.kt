@@ -67,8 +67,8 @@ object EOSRAMExchangeText {
 	
 	val ramOccupyAmount:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> "ram occupy amount ${value}GB"
-			HoneyLanguage.Chinese.code -> "ram occupy amount ${value}GB"
+			HoneyLanguage.English.code -> "RAM occupy amount ${value}GB"
+			HoneyLanguage.Chinese.code -> "RAM occupy amount ${value}GB"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""
@@ -79,8 +79,8 @@ object EOSRAMExchangeText {
 	
 	val ramTotalAmount:(value: String) -> String = { value ->
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> "ram total amount ${value}GB"
-			HoneyLanguage.Chinese.code -> "ram total amount ${value}GB"
+			HoneyLanguage.English.code -> "RAM total amount ${value}GB"
+			HoneyLanguage.Chinese.code -> "RAM total amount ${value}GB"
 			HoneyLanguage.Japanese.code -> ""
 			HoneyLanguage.Korean.code -> ""
 			HoneyLanguage.Russian.code -> ""

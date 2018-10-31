@@ -18,15 +18,6 @@ class RAMPriceTable(
 
 @Dao
 interface RAMPriceDao {
-	@Query("select minuteData from ramPrice limit 0,1")
-	fun getMinuteData(): String?
-	
-	@Query("select minuteData from ramPrice limit 0,1")
-	fun getHourData(): String?
-	
-	@Query("select minuteData from ramPrice limit 0,1")
-	fun getDayData(): String?
-	
 	@Query("select * from ramPrice limit 0,1")
 	fun getData(): RAMPriceTable?
 	
