@@ -31,7 +31,8 @@ data class ContactTable(
 	var bchAddress: String
 ) : Serializable {
 
-	@Ignore constructor() : this(
+	@Ignore
+	constructor() : this(
 		0,
 		"",
 		"",
@@ -48,10 +49,7 @@ data class ContactTable(
 
 	companion object {
 
-		fun insertContact(
-			contact: ContactTable,
-			callback: () -> Unit = {}
-		) {
+		fun insertContact(contact: ContactTable, callback: () -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.contactDao().insert(contact)
 			} then {
@@ -131,12 +129,12 @@ interface ContractDao {
 	fun getAllContacts(): List<ContactTable>
 
 	@Query("SELECT * FROM contact WHERE id LIKE :id")
-	fun getContacts(id: Int): ContactTable?
+	fun getContact(id: Int): ContactTable?
 
 	@Query("SELECT * FROM contact WHERE (ethSeriesAddress LIKE :address OR bchAddress LIKE :address  OR ltcAddress LIKE :address  OR etcAddress LIKE :address  OR btcMainnetAddress LIKE :address OR btcSeriesTestnetAddress LIKE :address)")
 	fun getContactByAddress(address: String): ContactTable?
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(contact: ContactTable)
 
 	@Query("DELETE FROM contact WHERE id LIKE :id")

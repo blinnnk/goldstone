@@ -6,6 +6,7 @@ import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
@@ -15,6 +16,9 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -25,6 +29,7 @@ import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -38,6 +43,10 @@ class ContactInputPresenter(
 	override val fragment: ContactInputFragment
 ) : BasePresenter<ContactInputFragment>() {
 
+	private val contactID by lazy {
+		fragment.arguments?.getInt(ArgumentKey.contactID)
+	}
+
 	private var nameText = ""
 	private var ethSeriesAddressText = ""
 	private var eosAccountNameText = ""
@@ -47,6 +56,17 @@ class ContactInputPresenter(
 	private var etcAddressText = ""
 	private var ltcAddressText = ""
 	private var bchAddressText = ""
+
+	override fun onFragmentViewCreated() {
+		super.onFragmentViewCreated()
+		contactID?.apply {
+			load {
+				GoldStoneDataBase.database.contactDao().getContact(this)
+			} then {
+				it?.apply { fragment.setAddressValue(this) }
+			}
+		}
+	}
 
 	fun getAddressIfExist(
 		ethSeriesInput: EditText,
@@ -168,7 +188,7 @@ class ContactInputPresenter(
 		// 符合以上规则的可以进入插入地址
 		ContactTable.insertContact(
 			ContactTable(
-				0,
+				contactID.orZero(),
 				"",
 				nameText,
 				"",

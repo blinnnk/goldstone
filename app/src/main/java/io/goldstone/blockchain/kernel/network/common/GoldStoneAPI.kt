@@ -361,16 +361,19 @@ object GoldStoneAPI {
 		pairList: JsonArray,
 		@WorkerThread hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
+		RequisitionUtil.postRequest<QuotationSelectionLineChartModel>(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(true, Pair("pair_list", pairList))
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-			isEncrypt = true,
-			hold = hold
-		)
+			isEncrypt = true
+		) { result, error ->
+			if (result != null && error.isNone()) {
+				hold(result, error)
+			} else hold(null, error)
+		}
 	}
 
 	fun registerWalletAddresses(

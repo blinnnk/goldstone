@@ -71,7 +71,10 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 					isCancelable = false
 					title = ProfileText.deletContactAlertTitle
 					message = ProfileText.deleteContactAlertDescription
-					yesButton { cell?.apply { presenter.deleteContact(model.id) } }
+					yesButton {
+						cell?.apply { presenter.shoEditContactFragment(model.id) }
+						recyclerView.adapter?.notifyItemChanged(position)
+					}
 					cancelButton {
 						recyclerView.adapter?.notifyItemChanged(position)
 						it.dismiss()
