@@ -310,9 +310,7 @@ object RequisitionUtil {
 	) {
 		when {
 			isEncrypt && targetGoldStoneID.isEmpty() -> AppConfigTable.getAppConfig {
-				it?.apply {
-					hold(generateRequest(path, goldStoneID, body))
-				}
+				it?.apply { hold(generateRequest(path, goldStoneID, body)) }
 			}
 			targetGoldStoneID.isNotEmpty() ->
 				hold(generateRequest(path, SharedWallet.getGoldStoneID(), body))

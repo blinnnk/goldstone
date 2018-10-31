@@ -12,8 +12,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -49,10 +47,11 @@ class QuotationSearchPresenter(
 		}
 	}
 
+	@WorkerThread
 	fun updateMyQuotation(
 		model: QuotationSelectionTable,
 		isSelect: Boolean,
-		callback: (error: GoldStoneError) -> Unit
+		@WorkerThread callback: (error: GoldStoneError) -> Unit
 	) {
 		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
 		if (isSelect) getLineChartDataByPair(model.pair) { chartData, error ->
@@ -63,9 +62,8 @@ class QuotationSearchPresenter(
 				})
 				callback(error)
 			} else callback(error)
-		} else load {
+		} else {
 			GoldStoneDataBase.database.quotationSelectionDao().deleteByPairs(model.pair)
-		} then {
 			callback(RequestError.None)
 		}
 	}
@@ -74,7 +72,7 @@ class QuotationSearchPresenter(
 		showLoadingView(LoadingText.searchingQuotation)
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol) { searchList, error ->
-			if (!searchList.isNull() && error.isNone()) QuotationSelectionTable.getMySelections { selectedList ->
+			if (!searchList.isNull() && error.isNone()) QuotationSelectionTable.getAll { selectedList ->
 				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
 				if (selectedList.isEmpty()) {
 					completeQuotationTable(searchList!!)
@@ -94,11 +92,10 @@ class QuotationSearchPresenter(
 	}
 
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: List<QuotationSelectionTable>) {
-		context?.runOnUiThread {
+		val data = searchList.map { QuotationSelectionTable(it, "") }
+		GoldStoneAPI.context.runOnUiThread {
 			removeLoadingView()
-			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(searchList.map {
-				QuotationSelectionTable(it, "")
-			}.toArrayList())
+			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(data.toArrayList())
 		}
 	}
 
@@ -110,7 +107,7 @@ class QuotationSearchPresenter(
 			val parameter = JsonArray().apply { add(pair) }
 			GoldStoneAPI.getCurrencyLineChartData(parameter) { lineData, error ->
 				if (!lineData.isNull() && error.isNone()) {
-					hold(lineData!!.firstOrNull()?.pointList?.toString().orEmpty(), RequestError.None)
+					hold(lineData!!.firstOrNull()?.pointList?.toString().orEmpty(), error)
 				} else hold(null, error)
 			}
 		}

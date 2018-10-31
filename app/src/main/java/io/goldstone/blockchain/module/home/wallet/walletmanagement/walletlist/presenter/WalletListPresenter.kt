@@ -52,7 +52,7 @@ class WalletListPresenter(
 				walletType.isBTCTest() -> {
 					if (!SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Testnet") {
-							NodeSelectionPresenter.setAllTestnet {
+							NodeSelectionPresenter.setAllTestnet(true) {
 								fragment.activity?.jump<SplashActivity>()
 							}
 						}
@@ -82,7 +82,7 @@ class WalletListPresenter(
 				walletType.isEOSJungle() -> {
 					if (!SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("EOS Jungle Testnet") {
-							NodeSelectionPresenter.setAllTestnet {
+							NodeSelectionPresenter.setAllTestnet(true) {
 								fragment.activity?.jump<SplashActivity>()
 							}
 						}
@@ -101,11 +101,11 @@ class WalletListPresenter(
 
 				walletType.isBIP44() -> {
 					if (SharedValue.isTestEnvironment()) {
-						NodeSelectionPresenter.setAllTestnet {
+						NodeSelectionPresenter.setAllTestnet(true) {
 							fragment.activity?.jump<SplashActivity>()
 						}
 					} else {
-						NodeSelectionPresenter.setAllMainnet {
+						NodeSelectionPresenter.setAllMainnet(true) {
 							fragment.activity?.jump<SplashActivity>()
 						}
 					}

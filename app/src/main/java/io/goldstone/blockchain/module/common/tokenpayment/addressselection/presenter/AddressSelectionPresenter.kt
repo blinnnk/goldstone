@@ -24,7 +24,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 

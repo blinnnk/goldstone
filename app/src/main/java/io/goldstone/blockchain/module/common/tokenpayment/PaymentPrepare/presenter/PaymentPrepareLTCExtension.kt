@@ -61,7 +61,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
 	BTCSeriesJsonRPC.estimatesmartFee(
 		SharedChain.getLTCCurrent(),
-		3,
+		6,
 		true
 	) { feePerByte, feeError ->
 		// API 拉取出错
@@ -78,7 +78,7 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 		// 签名测速总的签名后的信息的 `Size`
 		LitecoinApi.getUnspentListByAddress(myAddress) { unspents, error ->
 			if (unspents.isNull() || error.hasError()) {
-				hold(null, error)
+				GoldStoneAPI.context.runOnUiThread { hold(null, error) }
 				return@getUnspentListByAddress
 			}
 			// 如果余额不足或者出错这里会返回空的数组

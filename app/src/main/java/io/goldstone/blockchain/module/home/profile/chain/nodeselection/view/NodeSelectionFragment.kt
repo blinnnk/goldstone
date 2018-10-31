@@ -7,6 +7,7 @@ import com.blinnnk.extension.jump
 import com.blinnnk.extension.orFalse
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ChainText
@@ -21,10 +22,13 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.*
 
 /**
@@ -63,6 +67,11 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				}
 			}
 		}
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<ProfileOverlayFragment>()?.presenter
+			?.popFragmentFrom<NodeSelectionFragment>()
 	}
 
 	private val ethTypeID = 10
@@ -168,7 +177,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			selectedNode.forEach {
 				dao.updateIsUsedByURL(it.url, true)
 			}
-			uiThread { callback() }
+			GoldStoneAPI.context.runOnUiThread  { callback() }
 		}
 	}
 }

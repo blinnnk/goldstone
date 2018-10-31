@@ -2,14 +2,17 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.PriceHistoryModel
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.uiThread
 import java.io.Serializable
 
@@ -88,17 +91,13 @@ data class QuotationSelectionTable(
 			}
 		}
 
+		@WorkerThread
 		fun insertSelection(table: QuotationSelectionTable) {
-			doAsync {
-				GoldStoneDataBase.database.quotationSelectionDao().apply {
-					// 添加的时候赋予新的最大的 `orderID`
-					getQuotationSelfSelections().let { it ->
-						val currentID = it.maxBy { it.orderID }?.orderID
-						val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
-						insert(table.apply { orderID = newOrderID })
-					}
-				}
-			}
+			val quotationDao = GoldStoneDataBase.database.quotationSelectionDao()
+			// 添加的时候赋予新的最大的 `orderID`
+			val currentID = quotationDao.getMaxOrderIDTable()?.orderID
+			val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
+			quotationDao.insert(table.apply { orderID = newOrderID })
 		}
 
 		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable) -> Unit) {
@@ -109,44 +108,45 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun getMySelections(@UiThread hold: (List<QuotationSelectionTable>) -> Unit) {
+		fun getAll(@UiThread hold: (List<QuotationSelectionTable>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.quotationSelectionDao().getQuotationSelfSelections()
+				GoldStoneDataBase.database.quotationSelectionDao().getAll()
 			} then (hold)
 		}
 
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateOrderIDByPair(fromPair, newOrderID)
-				uiThread { callback() }
+				GoldStoneAPI.context.runOnUiThread  { callback() }
 			}
 		}
 
 		fun updateLineChartDataBy(pair: String, lineChart: String, callback: () -> Unit) {
-			doAsync {
+			load {
 				GoldStoneDataBase.database.quotationSelectionDao().updateDayLineChartByPair(pair, lineChart)
-				uiThread { callback() }
+			} then {
+				callback()
 			}
 		}
 
 		fun updateLineChartWeekBy(pair: String, weekLineChart: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateWeekLineChartByPair(pair, weekLineChart)
-				uiThread { callback() }
+				GoldStoneAPI.context.runOnUiThread  { callback() }
 			}
 		}
 
 		fun updateLineChartMontyBy(pair: String, monthChart: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateMonthLineChartByPair(pair, monthChart)
-				uiThread { callback() }
+				GoldStoneAPI.context.runOnUiThread  { callback() }
 			}
 		}
 
 		fun updateLineChartHourBy(pair: String, hourChart: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateHourLineChartByPair(pair, hourChart)
-				uiThread { callback() }
+				GoldStoneAPI.context.runOnUiThread  { callback() }
 			}
 		}
 	}
@@ -156,7 +156,10 @@ data class QuotationSelectionTable(
 interface QuotationSelectionDao {
 
 	@Query("SELECT * FROM quotationSelection")
-	fun getQuotationSelfSelections(): List<QuotationSelectionTable>
+	fun getAll(): List<QuotationSelectionTable>
+
+	@Query("SELECT * FROM quotationSelection WHERE orderID = (SELECT MAX(orderID) FROM quotationSelection)")
+	fun getMaxOrderIDTable(): QuotationSelectionTable?
 
 	@Query("SELECT * FROM quotationSelection WHERE pair LIKE :pair")
 	fun getSelectionByPair(pair: String): QuotationSelectionTable?

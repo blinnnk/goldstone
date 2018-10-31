@@ -84,7 +84,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 		}
 	}
 
-	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> updateAdapterData(newData: ArrayList<D>) {
+	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> updateAdapterData(newData: ArrayList<D>, callback: () -> Unit = {}) {
 		fragment.getAdapter<T>()?.apply {
 			// Comparison the data, if they are different then update adapter
 			fragment.asyncData?.clear()
@@ -94,6 +94,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 			dataSet.clear()
 			dataSet.addAll(newData)
 			notifyDataSetChanged()
+			callback()
 		}
 	}
 

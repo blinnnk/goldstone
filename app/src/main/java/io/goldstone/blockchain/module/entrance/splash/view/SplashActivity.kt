@@ -68,6 +68,7 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
+	@WorkerThread
 	private fun prepareYingYongBaoInReviewStatus(callback: (GoldStoneError) -> Unit) {
 		// 如果不是 `YingYongBao` 渠道跳过
 		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {

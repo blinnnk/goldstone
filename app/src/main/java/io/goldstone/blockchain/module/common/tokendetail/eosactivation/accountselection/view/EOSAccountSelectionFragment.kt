@@ -11,6 +11,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.title.AttentionTextView
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.presenter.EOSAccountSelectionPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 
 
@@ -104,6 +106,12 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.showAvailableNames()
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		if (parent is BaseOverlayFragment<*>) {
+			parent.presenter.popFragmentFrom<EOSAccountSelectionFragment>()
+		}
 	}
 
 	fun setAccountNameList(actors: List<AccountActor>) {

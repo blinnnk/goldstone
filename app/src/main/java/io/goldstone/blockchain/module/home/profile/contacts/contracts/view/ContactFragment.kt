@@ -2,20 +2,22 @@ package io.goldstone.blockchain.module.home.profile.contacts.contracts.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.cancelButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -76,6 +78,20 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		} else {
 			showAddButton()
 		}
+	}
+
+	override fun setBackEvent(mainActivity: MainActivity?) {
+		val parent = parentFragment
+		if (parent is TokenDetailOverlayFragment) {
+			val dashboard =
+				parent.overlayView.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+			// 判断是否打开通讯录来更改回退栈
+			if (!dashboard.isNull()) {
+				parent.overlayView.removeView(dashboard)
+				parent.removeChildFragment(this)
+			} else super.setBackEvent(mainActivity)
+		} else super.setBackEvent(mainActivity)
+
 	}
 
 	private fun showAddButton(status: Boolean = true) {

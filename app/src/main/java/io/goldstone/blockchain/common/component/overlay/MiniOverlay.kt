@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 @SuppressLint("ViewConstructor")
 /**

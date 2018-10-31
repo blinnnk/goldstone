@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter
 
-import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -48,23 +47,23 @@ class NodeSelectionPresenter(
 	}
 
 	companion object {
-		fun setAllTestnet(@UiThread callback: () -> Unit) {
+		fun setAllTestnet(isMainnet: Boolean = false, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateChainStatus(false)
 				val testnetList = GoldStoneDataBase.database.chainNodeDao().getUsedTestnet()
 				SharedValue.updateIsTestEnvironment(true)
 				updateSharedChainInfo(testnetList)
-				uiThread { callback() }
+				if (isMainnet) uiThread { callback() } else callback()
 			}
 		}
 
-		fun setAllMainnet(callback: () -> Unit) {
+		fun setAllMainnet(isMainnet: Boolean = false, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateChainStatus(true)
 				val mainnetList = GoldStoneDataBase.database.chainNodeDao().getUsedMainnet()
 				SharedValue.updateIsTestEnvironment(false)
 				updateSharedChainInfo(mainnetList)
-				uiThread { callback() }
+				if (isMainnet) uiThread { callback() } else callback()
 			}
 		}
 

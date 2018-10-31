@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 import io.goldstone.blockchain.module.home.profile.lanaguage.presenter.LanguagePresenter
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 26/03/2018 6:41 PM

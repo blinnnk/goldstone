@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.kernel.network
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.value.DataValue
@@ -29,12 +31,14 @@ object BTCSeriesApiUtils {
 			"items",
 			true
 		) { result, error ->
-			val jsonArray = JSONArray(result?.firstOrNull())
-			var data = listOf<JSONObject>()
-			(0 until jsonArray.length()).forEach {
-				data += JSONObject(jsonArray[it].toString())
-			}
-			hold(data, error)
+			if (!result.isNull() && error.isNone()) {
+				val jsonArray = JSONArray(result!!.firstOrNull())
+				var data = listOf<JSONObject>()
+				(0 until jsonArray.length()).forEach {
+					data += JSONObject(jsonArray[it].toString())
+				}
+				hold(data, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -47,7 +51,9 @@ object BTCSeriesApiUtils {
 			"totalItems",
 			true
 		) { data, error ->
-			hold(data?.firstOrNull()?.toIntOrNull(), error)
+			if (!data.isNull() && error.isNone()) {
+				hold(data!!.firstOrNull()?.toIntOrNull(), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -61,9 +67,11 @@ object BTCSeriesApiUtils {
 			"",
 			true
 		) { data, error ->
-			val result = data?.firstOrNull()?.toLongOrNull()
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, error) }
-			else hold(result, error)
+			if (!data.isNull() && error.isNone()) {
+				val result = data!!.firstOrNull()?.toLongOrNull()
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, error) }
+				else hold(result, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -78,7 +86,9 @@ object BTCSeriesApiUtils {
 			address,
 			true
 		) { data, error ->
-			hold(Amount(JSONObject(data?.firstOrNull()).safeGet("final_balance").toLong()), error)
+			if (!data.isNull() && error.isNone()) {
+				hold(Amount(JSONObject(data!!.firstOrNull()).safeGet("final_balance").toLong()), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -92,10 +102,12 @@ object BTCSeriesApiUtils {
 			"",
 			true
 		) { data, error ->
-			val balance = data?.firstOrNull()?.toDoubleOrNull() ?: 0.0
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(balance, error)
-			} else hold(balance, error)
+			if (!data.isNull() && error.isNone()) {
+				val balance = data!!.firstOrNull()?.toDoubleOrNull().orZero()
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(balance, error)
+				} else hold(balance, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -108,7 +120,9 @@ object BTCSeriesApiUtils {
 			"",
 			true
 		) { result, error ->
-			hold(JSONObject(result?.firstOrNull()), error)
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result!!.firstOrNull()), error)
+			} else hold(null, error)
 		}
 	}
 

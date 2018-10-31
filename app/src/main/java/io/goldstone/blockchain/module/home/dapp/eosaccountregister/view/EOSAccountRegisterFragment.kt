@@ -24,6 +24,7 @@ import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -31,6 +32,7 @@ import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -118,6 +120,14 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		if (NetworkUtil.hasNetworkWithAlert(context)) setExpenditure()
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		val dashboard =
+			getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay)
+		if (!dashboard.isNull()) {
+			getParentContainer()?.removeView(dashboard)
+		} else super.setBaseBackEvent(activity, parent)
 	}
 
 	private fun setExpenditure() {

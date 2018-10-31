@@ -16,7 +16,7 @@ import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.verticalLayout
 
 /**

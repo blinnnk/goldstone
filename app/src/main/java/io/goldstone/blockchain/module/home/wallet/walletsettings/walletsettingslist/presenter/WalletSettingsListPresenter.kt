@@ -43,7 +43,12 @@ class WalletSettingsListPresenter(
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
 		// 如果键盘在显示那么销毁键盘
-		fragment.activity?.apply { SoftKeyboard.hide(this) }
+		fragment.activity?.apply {
+			SoftKeyboard.hide(this)
+		}
+		// 每次进入这个界面更新一次钱包地址总数
+		fragment.getParentFragment<WalletSettingsFragment>()
+			?.presenter?.showCurrentWalletInfo()
 	}
 
 	override fun updateData() {

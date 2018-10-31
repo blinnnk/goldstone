@@ -115,18 +115,16 @@ class PrivateKeyImportPresenter(
 			doAsync {
 				val allNewAddresses = newMultipleAddresses.getAllAddresses()
 				val allWallet = GoldStoneDataBase.database.walletDao().getAllWallets()
-				allWallet.map {
+				if (allWallet.isEmpty()) hold(false)
+				else allWallet.map {
 					it.ethAddresses + it.btcAddresses + it.ltcAddresses + it.etcAddresses + it.btcSeriesTestAddresses + it.eosAddresses + it.bchAddresses
 				}.flatMap { allBIP44Address ->
 					allBIP44Address
-				}.map {
+				}.asSequence().map {
 					it.address
-				}.forEach {
-					if (allNewAddresses.any { new -> new.equals(it, true) }) {
-						hold(true)
-						return@doAsync
-					}
-				}
+				}.any {
+					!allNewAddresses.find { new -> new.equals(it, true) }.isNull()
+				}.let(hold)
 			}
 		}
 	}

@@ -258,10 +258,7 @@ class TokenInfoPresenter(
 			return Pair(icon, url)
 		}
 
-		fun showThirdPartyAddressDetail(
-			fragment: TokenDetailOverlayFragment?,
-			url: String
-		) {
+		fun showThirdPartyAddressDetail(fragment: TokenDetailOverlayFragment?, url: String) {
 			fragment?.presenter?.showTargetFragment<WebViewFragment>(
 				Bundle().apply {
 					putString(ArgumentKey.webViewUrl, url)
