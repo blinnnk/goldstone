@@ -111,6 +111,17 @@
 	{
 		"key_list": [],
 		"net_type": 1,
+		"chain_type": 194,
+		"chain_id": "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca",
+		"node_name": "Jungle (Cryptolions)",
+		"url": "https://junglehistory.cryptolions.io",
+		"encrypt_status": 0,
+		"weight": 0,
+		"is_default": 1
+	},
+	{
+		"key_list": [],
+		"net_type": 1,
 		"chain_type": 0,
 		"chain_id": "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943",
 		"node_name": "Testnet3 (GoldStone)",

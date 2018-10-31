@@ -11,11 +11,13 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.uiThread
@@ -50,9 +52,11 @@ data class AppConfigTable(
 
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
-			load {
-				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			} then (hold)
+			launch {
+				val config =
+					withContext(CommonPool) { GoldStoneDataBase.database.appConfigDao().getAppConfig() }
+				withContext(UI) { hold(config) }
+			}
 		}
 
 		fun updatePinCode(newPinCode: Int, callback: () -> Unit) {
@@ -119,15 +123,6 @@ data class AppConfigTable(
 			}
 		}
 
-		fun updateChainStatus(isMainnet: Boolean, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateChainStatus(isMainnet)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
-			}
-		}
-
 		fun updateCurrency(code: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateCurrency(code)
@@ -139,7 +134,6 @@ data class AppConfigTable(
 		fun insertAppConfig(@WorkerThread callback: (AppConfigTable) -> Unit) {
 			val goldStoneID =
 				Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID) + System.currentTimeMillis()
-
 			val config = AppConfigTable(
 				0,
 				goldStoneID = goldStoneID,

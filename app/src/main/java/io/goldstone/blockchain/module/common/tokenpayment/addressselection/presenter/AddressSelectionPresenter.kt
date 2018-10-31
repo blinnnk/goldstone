@@ -24,7 +24,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -250,10 +250,12 @@ class AddressSelectionPresenter(
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			val header = overlayView.header
 			if (!isFromQuickTransfer) {
-				overlayView.header.showBackButton(true) {
+				header.showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
+				header.showCloseButton(false)
 			}
 		}
 	}

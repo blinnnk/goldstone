@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model
 
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 /**
@@ -20,12 +21,12 @@ data class WalletListModel(
 	var type: String = ""
 ) {
 
-	constructor(data: WalletTable, balance: Double, type: String) : this(
+	constructor(data: WalletTable, type: String) : this(
 		data.id,
 		data.name,
 		data.getCurrentAddresses().first(),
 		data.getAddressDescription(),
-		balance,
+		data.balance.orZero(),
 		data.isWatchOnly,
 		data.isUsing,
 		type

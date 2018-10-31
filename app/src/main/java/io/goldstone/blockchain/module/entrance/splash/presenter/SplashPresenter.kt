@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
@@ -8,7 +9,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -22,8 +23,7 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import org.jetbrains.anko.*
 import java.io.File
 
 /**
@@ -41,7 +41,9 @@ class SplashPresenter(val activity: SplashActivity) {
 				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				if (NetworkUtil.hasNetwork(activity)) checkOrUpdateEOSAccount()
-				else activity.jump<MainActivity>()
+				else GoldStoneAPI.context.runOnUiThread {
+					activity.jump<MainActivity>()
+				}
 			} else cacheDataAndSetNetBy(this) {
 				activity.jump<MainActivity>()
 			}
@@ -53,9 +55,9 @@ class SplashPresenter(val activity: SplashActivity) {
 	fun updateCurrencyRateFromServer(config: AppConfigTable) {
 		SharedWallet.updateCurrencyCode(config.currencyCode)
 		GoldStoneAPI.getCurrencyRate(config.currencyCode) { rate, error ->
-			if (!rate.isNull() && error.isNone()) {
+			if (rate != null && error.isNone()) {
 				// 更新 `SharePreference` 中的值
-				SharedWallet.updateCurrentRate(rate!!)
+				SharedWallet.updateCurrentRate(rate)
 				// 更新数据库的值
 				GoldStoneDataBase.database.currencyDao().updateUsedRate(rate)
 			}
@@ -63,7 +65,12 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	private fun WalletTable.checkOrUpdateEOSAccount() {
-		EOSAPI.getAccountNameByPublicKey(currentEOSAddress) { accounts, error ->
+		// 观察钱包的时候会把 account name 存成 address 当删除钱包检测到下一个默认钱包
+		// 刚好是 EOS 观察钱包的时候越过检查 Account Name 的缓解
+		val isEOSWatchOnly = EOSAccount(currentEOSAddress).isValid(false)
+		if (isEOSWatchOnly) cacheDataAndSetNetBy(this) {
+			activity.jump<SplashActivity>()
+		} else EOSAPI.getAccountNameByPublicKey(currentEOSAddress) { accounts, error ->
 			if (!accounts.isNull() && error.isNone()) {
 				if (accounts!!.isEmpty()) cacheDataAndSetNetBy(this) {
 					activity.jump<MainActivity>()
@@ -73,10 +80,14 @@ class SplashPresenter(val activity: SplashActivity) {
 						activity.jump<MainActivity>()
 					}
 				}
-			} else {
-				cacheDataAndSetNetBy(this) {
-					activity.runOnUiThread {
-						activity.alert(error.message)
+			} else GoldStoneAPI.context.runOnUiThread {
+				val title = "Check EOS Account Name Error"
+				val subtitle = error.message
+				alert(subtitle, title) {
+					yesButton {
+						activity.jump<MainActivity>()
+					}
+					cancelButton {
 						activity.jump<MainActivity>()
 					}
 				}
@@ -84,7 +95,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		}
 	}
 
-	private fun cacheDataAndSetNetBy(wallet: WalletTable, @WorkerThread callback: () -> Unit) {
+	private fun cacheDataAndSetNetBy(wallet: WalletTable, @UiThread callback: () -> Unit) {
 		val type = wallet.getWalletType()
 		type.updateSharedPreference()
 		when {
@@ -205,23 +216,22 @@ class SplashPresenter(val activity: SplashActivity) {
 		return dir.delete()
 	}
 
-	private fun cacheWalletData(wallet: WalletTable, callback: () -> Unit) {
+	@WorkerThread
+	private fun cacheWalletData(wallet: WalletTable, @UiThread callback: () -> Unit) {
 		wallet.apply {
-			doAsync {
-				SharedAddress.updateCurrentEthereum(currentETHSeriesAddress)
-				SharedAddress.updateCurrentBTC(currentBTCAddress)
-				SharedAddress.updateCurrentBTCSeriesTest(currentBTCSeriesTestAddress)
-				SharedAddress.updateCurrentETC(currentETCAddress)
-				SharedAddress.updateCurrentLTC(currentLTCAddress)
-				SharedAddress.updateCurrentBCH(currentBCHAddress)
-				SharedAddress.updateCurrentEOS(currentEOSAddress)
-				SharedAddress.updateCurrentEOSName(currentEOSAccountName.getCurrent())
-				SharedWallet.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				SharedWallet.updateCurrentWalletID(id)
-				SharedWallet.updateCurrentBalance(balance.orElse(0.0))
-				SharedWallet.updateCurrentName(name)
-				uiThread { callback() }
-			}
+			SharedAddress.updateCurrentEthereum(currentETHSeriesAddress)
+			SharedAddress.updateCurrentBTC(currentBTCAddress)
+			SharedAddress.updateCurrentBTCSeriesTest(currentBTCSeriesTestAddress)
+			SharedAddress.updateCurrentETC(currentETCAddress)
+			SharedAddress.updateCurrentLTC(currentLTCAddress)
+			SharedAddress.updateCurrentBCH(currentBCHAddress)
+			SharedAddress.updateCurrentEOS(currentEOSAddress)
+			SharedAddress.updateCurrentEOSName(currentEOSAccountName.getCurrent())
+			SharedWallet.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
+			SharedWallet.updateCurrentWalletID(id)
+			SharedWallet.updateCurrentBalance(balance.orElse(0.0))
+			SharedWallet.updateCurrentName(name)
+			GoldStoneAPI.context.runOnUiThread { callback() }
 		}
 	}
 }

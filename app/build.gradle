@@ -79,7 +79,7 @@ dependencies {
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   // ANKO
-  implementation 'org.jetbrains.anko:anko:0.10.5'
+  implementation 'org.jetbrains.anko:anko:0.10.7'
   // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.3.2.8'
   // Crypto Ethereum

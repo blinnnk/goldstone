@@ -2,23 +2,20 @@ package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.pres
 
 import android.content.Context
 import android.support.annotation.UiThread
-import android.support.annotation.WorkerThread
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.utils.AddressUtils.hasExistAddress
 import io.goldstone.blockchain.crypto.keystore.storeRootKeyByWalletID
-import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -89,7 +86,7 @@ class PrivateKeyImportPresenter(
 		) {
 			val multiChainAddresses =
 				MultiChainUtils.getMultiChainAddressesByRootKey(rootPrivateKey)
-			hasExistAddress(multiChainAddresses) {
+			hasExistAddress(multiChainAddresses.getAllAddresses()) {
 				if (it) context.runOnUiThread {
 					callback(AccountError.ExistAddress)
 				} else WalletImportPresenter.insertWalletToDatabase(
@@ -104,28 +101,6 @@ class PrivateKeyImportPresenter(
 						context.storeRootKeyByWalletID(walletID!!, rootPrivateKey, password)
 						callback(error)
 					} else callback(error)
-				}
-			}
-		}
-
-		private fun hasExistAddress(
-			newMultipleAddresses: ChainAddresses,
-			@WorkerThread hold: (hasExistAddress: Boolean) -> Unit
-		) {
-			doAsync {
-				val allNewAddresses = newMultipleAddresses.getAllAddresses()
-				val allWallet = GoldStoneDataBase.database.walletDao().getAllWallets()
-				allWallet.map {
-					it.ethAddresses + it.btcAddresses + it.ltcAddresses + it.etcAddresses + it.btcSeriesTestAddresses + it.eosAddresses + it.bchAddresses
-				}.flatMap { allBIP44Address ->
-					allBIP44Address
-				}.map {
-					it.address
-				}.forEach {
-					if (allNewAddresses.any { new -> new.equals(it, true) }) {
-						hold(true)
-						return@doAsync
-					}
 				}
 			}
 		}

@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -17,6 +18,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFra
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -34,7 +36,7 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		QuotationSelectionTable.getMySelections { selections ->
+		QuotationSelectionTable.getAll { selections ->
 			/** 记录可能需要更新的 `Line Chart` 最大个数 */
 			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 			selections.asSequence().map { selection ->
@@ -96,13 +98,16 @@ class QuotationPresenter(
 			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
 				if (!newChart.isNull() && error.isNone()) {
 					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {
+						// Main Thread
 						/** 防止服务器数据出错或不足, 可能导致的死循环 */
 						if (updateChartTimes.orZero() > 0) {
 							updateData()
 							updateChartTimes = updateChartTimes.orZero() - 1
 						}
 					}
-				} else fragment.context.alert(error.message)
+				} else GoldStoneAPI.context.runOnUiThread {
+					fragment.context.alert(error.message)
+				}
 			}
 		}
 	}

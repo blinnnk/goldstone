@@ -24,7 +24,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.qrcode.QRcodeCaptureManager
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date: 2018/9/11.

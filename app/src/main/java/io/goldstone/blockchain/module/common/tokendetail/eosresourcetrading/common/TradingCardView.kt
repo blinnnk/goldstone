@@ -24,7 +24,7 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.linearLayout
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.wrapContent
 import java.math.BigInteger
 

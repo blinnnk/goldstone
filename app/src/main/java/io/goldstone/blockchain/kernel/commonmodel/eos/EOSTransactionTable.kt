@@ -15,7 +15,9 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import java.io.Serializable
@@ -110,7 +112,7 @@ data class EOSTransactionTable(
 					contract.symbol,
 					chainID.id
 				)
-				if (isMainThread) uiThread {
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread  {
 					hold(data)
 				} else hold(data)
 			}
@@ -139,7 +141,7 @@ data class EOSTransactionTable(
 				} catch (error: Exception) {
 					listOf<EOSTransactionTable>()
 				}
-				if (isMainThread) uiThread {
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread  {
 					hold(data)
 				} else hold(data)
 			}

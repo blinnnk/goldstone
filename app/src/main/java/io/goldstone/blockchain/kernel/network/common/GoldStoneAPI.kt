@@ -292,7 +292,9 @@ object GoldStoneAPI {
 			"result",
 			false
 		) { result, error ->
-			hold(result?.map { TransactionTable(it) }, error)
+			if (!result.isNull() && error.isNone()) {
+				hold(result?.map { TransactionTable(it) }, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -349,7 +351,9 @@ object GoldStoneAPI {
 			targetGoldStoneID = targetGoldStoneID,
 			maxConnectTime = 5
 		) { result, error ->
-			hold(result?.firstOrNull() == "0", error)
+			if (!result.isNull() && error.isNone()) {
+				hold(result!!.firstOrNull() == "0", error)
+			} else hold(null, error)
 		}
 	}
 
@@ -401,7 +405,9 @@ object GoldStoneAPI {
 			APIPath.getUnreadCount(APIPath.currentUrl),
 			true
 		) { result, error ->
-			hold(JSONObject(result).safeGet("count"), error)
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result).safeGet("count"), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -445,9 +451,11 @@ object GoldStoneAPI {
 			APIPath.getPriceByAddress(APIPath.currentUrl),
 			isEncrypt = true
 		) { result, error ->
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(result, error)
-			} else hold(result, error)
+			if (!result.isNull() && error.isNone()) {
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(result, error)
+				} else hold(result, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -475,7 +483,9 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			hold(JSONObject(result?.firstOrNull().orEmpty()), error)
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result!!.firstOrNull().orEmpty()), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -490,10 +500,12 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			hold(
-				CoinInfoModel(JSONObject(result?.firstOrNull().orEmpty()), symbol, chainID),
-				error
-			)
+			if (!result.isNull() && error.isNone()) {
+				hold(
+					CoinInfoModel(JSONObject(result!!.firstOrNull().orEmpty()), symbol, chainID),
+					error
+				)
+			} else hold(null, error)
 		}
 	}
 }

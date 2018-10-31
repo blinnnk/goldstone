@@ -25,7 +25,7 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger

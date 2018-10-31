@@ -68,6 +68,7 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
+	@WorkerThread
 	private fun prepareYingYongBaoInReviewStatus(callback: (GoldStoneError) -> Unit) {
 		// 如果不是 `YingYongBao` 渠道跳过
 		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {
@@ -150,6 +151,8 @@ class SplashActivity : AppCompatActivity() {
 	@WorkerThread
 	private fun prepareNodeInfo(callback: () -> Unit) {
 		val chainDao = GoldStoneDataBase.database.chainNodeDao()
+		val eosTest = chainDao.getTestnetEOSNode()
+		val eosMain = chainDao.getMainnetEOSNode()
 		val localNode = if (SharedValue.isTestEnvironment()) {
 			chainDao.getTestnet()
 		} else chainDao.getMainnet()
@@ -161,11 +164,8 @@ class SplashActivity : AppCompatActivity() {
 				ChainType(it.chainType).isBCH() -> SharedChain.updateBCHCurrent(ChainURL(it))
 				ChainType(it.chainType).isEOS() -> {
 					SharedChain.updateEOSCurrent(ChainURL(it))
-					if (SharedValue.isTestEnvironment()) {
-						SharedChain.updateEOSTestnet(ChainURL(it))
-					} else {
-						SharedChain.updateEOSMainnet(ChainURL(it))
-					}
+					SharedChain.updateEOSTestnet(ChainURL(eosTest))
+					SharedChain.updateEOSMainnet(ChainURL(eosMain))
 				}
 				ChainType(it.chainType).isETC() -> SharedChain.updateETCCurrent(ChainURL(it))
 			}

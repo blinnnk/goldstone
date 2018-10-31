@@ -33,7 +33,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.vi
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 
 /**

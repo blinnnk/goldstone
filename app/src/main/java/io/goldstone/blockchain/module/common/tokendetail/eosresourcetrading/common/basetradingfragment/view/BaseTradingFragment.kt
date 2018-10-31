@@ -6,6 +6,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
@@ -21,6 +22,7 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.TradingCardView
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.component.showContactDashboard
 import org.jetbrains.anko.*
 import java.math.BigInteger
@@ -32,11 +34,12 @@ import java.math.BigInteger
 open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	open val tradingType: TradingType = TradingType.CPU
-	override val pageTitle get() = when (tradingType) {
-		TradingType.CPU -> TokenDetailText.tradingCPU
-		TradingType.NET -> TokenDetailText.tradingNET
-		TradingType.RAM -> TokenDetailText.tradingRAM
-	}
+	override val pageTitle
+		get() = when (tradingType) {
+			TradingType.CPU -> TokenDetailText.tradingCPU
+			TradingType.NET -> TokenDetailText.tradingNET
+			TradingType.RAM -> TokenDetailText.tradingRAM
+		}
 	private val delegateTitle by lazy {
 		val title = when (tradingType) {
 			TradingType.CPU -> TokenDetailText.delegateTitle suffix TokenDetailText.cpu
@@ -128,6 +131,12 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		}
 	}
 
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		val overlayFragment =
+			getParentFragment<TokenDetailOverlayFragment>()
+		overlayFragment?.presenter?.popFragmentFrom<BaseTradingFragment>()
+	}
+	
 	fun setProcessUsage(weight: String, available: BigInteger, total: BigInteger, priceEOS: Double) {
 		val title = when (tradingType) {
 			TradingType.CPU -> TokenDetailText.cpu
