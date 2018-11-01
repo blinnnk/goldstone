@@ -46,7 +46,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				if (NetworkUtil.hasNetwork(activity)) checkOrUpdateEOSAccount()
-				else GoldStoneAPI.context.runOnUiThread {
+				else cacheDataAndSetNetBy(this) {
 					activity.jump<MainActivity>()
 				}
 			} else cacheDataAndSetNetBy(this) {

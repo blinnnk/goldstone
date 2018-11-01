@@ -118,12 +118,15 @@ class SplashActivity : AppCompatActivity() {
 			// Add currency data from local JSON file
 			presenter.apply {
 				initSupportCurrencyList {
-					// 更新分享的文案内容
-					updateShareContentFromServer()
-					// 更新用户条款如果有必要
-					updateAgreement()
-					// Insert support currency list from local json
-					updateCurrencyRateFromServer(this@config)
+					// 网络判断是否执行更新网络上数据的方法
+					if (NetworkUtil.hasNetwork(activity)) {
+						// 更新分享的文案内容
+						updateShareContentFromServer()
+						// 更新用户条款如果有必要
+						updateAgreement()
+						// Insert support currency list from local json
+						updateCurrencyRateFromServer(this@config)
+					}
 				}
 				initDefaultMarketByNetWork()
 				
