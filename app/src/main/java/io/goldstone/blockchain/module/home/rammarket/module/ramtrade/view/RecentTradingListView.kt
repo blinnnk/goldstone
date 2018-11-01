@@ -1,10 +1,10 @@
-package io.goldstone.blockchain.module.home.rammarket.ramtrade.view
+package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.LinearLayout
-import io.goldstone.blockchain.module.home.rammarket.ramtrade.model.TradingInfoModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
 
@@ -24,7 +24,11 @@ class RecentTradingListView(context: Context): RecyclerView(context) {
 		buyList: List<TradingInfoModel>,
 		sellList: List<TradingInfoModel>
 	) {
-		adapter = RecentTradingAdapter(context, buyList, sellList)
+		adapter = RecentTradingAdapter(
+			context,
+			buyList,
+			sellList
+		)
 	}
 	
 }

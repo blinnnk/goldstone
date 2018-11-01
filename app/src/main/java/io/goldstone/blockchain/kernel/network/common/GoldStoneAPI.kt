@@ -34,7 +34,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
-import io.goldstone.blockchain.module.home.rammarket.ramtrade.model.RecentTransactionModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel

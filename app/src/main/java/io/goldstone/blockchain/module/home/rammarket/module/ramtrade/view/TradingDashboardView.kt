@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramtrade.view
+package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
 import android.view.Gravity
@@ -24,7 +24,7 @@ import org.jetbrains.anko.*
 class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  ButtonMenu
 	private val ramEditText by lazy { RAMPriceRoundInputView(context, "KB") }
-	private val eosEditText by lazy { RAMPriceRoundInputView(context,"EOS") }
+	private val eosEditText by lazy { RAMPriceRoundInputView(context, "EOS") }
 	private val ramBalance by lazy { TextView(context) }
 	private val eosBalance by lazy { TextView(context) }
 	private val confirmButton by lazy { RoundButton(context) }

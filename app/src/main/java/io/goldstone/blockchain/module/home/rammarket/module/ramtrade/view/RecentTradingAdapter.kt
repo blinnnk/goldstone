@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramtrade.view
+package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,7 +10,7 @@ import android.widget.TextView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.module.home.rammarket.ramtrade.model.TradingInfoModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.*
 
 /**

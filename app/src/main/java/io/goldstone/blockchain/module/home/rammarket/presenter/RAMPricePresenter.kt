@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramprice.presenter
+package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import android.annotation.SuppressLint
 import android.text.format.DateUtils
@@ -13,8 +13,8 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.model.*
-import io.goldstone.blockchain.module.home.rammarket.ramprice.model.RAMPriceTable
-import io.goldstone.blockchain.module.home.rammarket.ramprice.view.RAMPriceDetailFragment
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
+import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -25,8 +25,8 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: 头部的price展示presenter
  */
-class RAMPricePresenter(override val fragment: RAMPriceDetailFragment)
- : BasePresenter<RAMPriceDetailFragment>() {
+class RAMPricePresenter(override val fragment: RAMMarketDetailFragment)
+ : BasePresenter<RAMMarketDetailFragment>() {
 	
 	private var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	private var period: String = EOSRAMChartType.Hour.info
@@ -107,7 +107,14 @@ class RAMPricePresenter(override val fragment: RAMPriceDetailFragment)
 				Gson().toJson(it)
 			}
 			if (localData.isNull()) {
-				GoldStoneDataBase.database.ramPriceDao().insert(RAMPriceTable(0, minuteJson, hourJson, dayJson))
+				GoldStoneDataBase.database.ramPriceDao().insert(
+					RAMPriceTable(
+						0,
+						minuteJson,
+						hourJson,
+						dayJson
+					)
+				)
 			} else {
 				localData!!.minuteData = minuteJson
 				localData.hourData = hourJson

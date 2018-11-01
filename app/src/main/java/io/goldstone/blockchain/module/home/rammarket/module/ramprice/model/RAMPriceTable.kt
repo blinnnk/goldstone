@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramprice.model
+package io.goldstone.blockchain.module.home.rammarket.module.ramprice.model
 
 import android.arch.persistence.room.*
 

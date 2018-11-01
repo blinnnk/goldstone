@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramprice.view
+package io.goldstone.blockchain.module.home.rammarket.module.ramprice.view
 
 import android.content.Context
 import android.view.Gravity

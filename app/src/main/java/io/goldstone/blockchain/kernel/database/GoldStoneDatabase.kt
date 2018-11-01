@@ -16,8 +16,8 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import io.goldstone.blockchain.module.home.rammarket.ramprice.model.RAMPriceDao
-import io.goldstone.blockchain.module.home.rammarket.ramprice.model.RAMPriceTable
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceDao
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao

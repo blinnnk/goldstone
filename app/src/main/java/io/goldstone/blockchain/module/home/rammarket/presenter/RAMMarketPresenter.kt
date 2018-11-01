@@ -1,13 +1,13 @@
 package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketFragment
+import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 
 /**
  * @date: 2018/10/29.
  * @author: yanglihai
  * @description:
  */
-class RAMMarketPresenter(override val fragment: RAMMarketFragment) : BaseOverlayPresenter<RAMMarketFragment>() {
+class RAMMarketPresenter(override val fragment: RAMMarketOverlayFragment) : BaseOverlayPresenter<RAMMarketOverlayFragment>() {
 
 }

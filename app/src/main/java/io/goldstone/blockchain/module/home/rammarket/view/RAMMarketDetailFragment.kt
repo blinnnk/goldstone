@@ -1,7 +1,7 @@
-package io.goldstone.blockchain.module.home.rammarket.ramprice.view
+package io.goldstone.blockchain.module.home.rammarket.view
 
 import android.support.v4.app.Fragment
-import android.text.format.DateUtils
+import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -12,9 +12,9 @@ import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
-import io.goldstone.blockchain.module.home.rammarket.view.EOSRAMPriceCandleChart
-import io.goldstone.blockchain.module.home.rammarket.ramprice.presenter.RAMPricePresenter
-import io.goldstone.blockchain.module.home.rammarket.ramtrade.view.TradingView
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
+import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPricePresenter
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.math.BigDecimal
@@ -24,50 +24,30 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: price信息，包含蜡烛走势图
  */
-class RAMPriceDetailFragment : BaseFragment<RAMPricePresenter>() {
+class RAMMarketDetailFragment : BaseFragment<RAMPricePresenter>() {
 	override val pageTitle: String = EOSRAMExchangeText.ramExchange
-	val candleChart by lazy { EOSRAMPriceCandleChart(context!!) }
-	private val menu by lazy { ButtonMenu(context!!) }
-	val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
+	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
+	private val priceChartWithMenuLayout by lazy {
+		PriceChartWithMenuLayout(context!!) {
+			presenter.updateRAMCandleData(it)
+		}
+	}
 	override val presenter: RAMPricePresenter = RAMPricePresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
-		menu.apply {
-			setMargins<LinearLayout.LayoutParams> {
-				topMargin = 16.uiPX()
-				leftMargin = 20.uiPX()
+		scrollView {
+			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+			verticalLayout {
+				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+				gravity = Gravity.CENTER_HORIZONTAL
+				
+				addView(ramPriceView)
+				addView(priceChartWithMenuLayout)
+				addView(TradingView(context!!))
+				presenter.updateRAMCandleData(EOSRAMChartType.Minute)
+				
 			}
 		}
-		menu.titles = arrayListOf(
-			EOSRAMChartType.Minute.display,
-			EOSRAMChartType.Hour.display,
-			EOSRAMChartType.Day.display
-		)
-		menu.getButton { button ->
-			button.onClick {
-				updateCurrentData(button.id)
-				menu.selected(button.id)
-				button.preventDuplicateClicks()
-			}
-		}
-		menu.selected(EOSRAMChartType.Minute.code)
-		verticalLayout {
-			addView(ramPriceView)
-			addView(menu)
-			addView(candleChart.apply { x += 10.uiPX() })
-			addView(TradingView(context!!))
-			presenter.updateRAMCandleData(EOSRAMChartType.Minute)
-		}
 		
-		
-	}
-	
-	private fun updateCurrentData(buttonId: Int){
-		presenter.updateRAMCandleData( when(buttonId) {
-			EOSRAMChartType.Minute.code -> EOSRAMChartType.Minute
-			EOSRAMChartType.Hour.code -> EOSRAMChartType.Hour
-			EOSRAMChartType.Day.code -> EOSRAMChartType.Day
-			else -> EOSRAMChartType.Minute
-		})
 	}
 	
 	fun setCurrentPriceAndPercent(price: String, percent: Float) {
@@ -97,7 +77,7 @@ class RAMPriceDetailFragment : BaseFragment<RAMPricePresenter>() {
 	
 	fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
 		data.apply {
-			candleChart.resetData(dateType, this.mapIndexed { index, entry ->
+			priceChartWithMenuLayout.candleChart.resetData(dateType, this.mapIndexed { index, entry ->
 				CandleEntry(
 					index.toFloat(),
 					entry.high.toFloat(),

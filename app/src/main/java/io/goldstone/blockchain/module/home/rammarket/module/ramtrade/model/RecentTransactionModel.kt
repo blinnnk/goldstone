@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramtrade.model
+package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model
 
 import com.google.gson.annotations.SerializedName
 import org.json.JSONObject

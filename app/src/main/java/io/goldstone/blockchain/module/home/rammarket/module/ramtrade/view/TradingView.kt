@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.rammarket.ramtrade.view
+package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
 import android.widget.LinearLayout
