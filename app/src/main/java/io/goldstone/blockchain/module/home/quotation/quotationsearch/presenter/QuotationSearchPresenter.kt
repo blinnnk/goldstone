@@ -56,10 +56,11 @@ class QuotationSearchPresenter(
 		@WorkerThread callback: (error: GoldStoneError) -> Unit
 	) {
 		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
-		if (isSelect) getLineChartDataByPair(model.pair) { chartData, error ->
-			if (!chartData.isNull() && error.isNone()) {
+		val parameter = JsonArray().apply { add(model.pair) }
+		if (isSelect) GoldStoneAPI.getCurrencyLineChartData(parameter) { chartData, error ->
+			if (chartData != null && error.isNone()) {
 				QuotationSelectionTable.insertSelection(model.apply {
-					lineChartDay = chartData!!
+					lineChartDay = chartData.firstOrNull()?.pointList?.toString().orEmpty()
 					isSelecting = isSelect
 				})
 				callback(error)
@@ -99,20 +100,6 @@ class QuotationSearchPresenter(
 		GoldStoneAPI.context.runOnUiThread {
 			removeLoadingView()
 			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(data.toArrayList())
-		}
-	}
-
-	companion object {
-		fun getLineChartDataByPair(
-			pair: String,
-			@WorkerThread hold: (lineChar: String?, error: RequestError) -> Unit
-		) {
-			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(parameter) { lineData, error ->
-				if (!lineData.isNull() && error.isNone()) {
-					hold(lineData!!.firstOrNull()?.pointList?.toString().orEmpty(), error)
-				} else hold(null, error)
-			}
 		}
 	}
 }

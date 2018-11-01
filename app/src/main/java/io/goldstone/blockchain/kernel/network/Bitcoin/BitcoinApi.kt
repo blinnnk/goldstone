@@ -32,8 +32,8 @@ object BitcoinApi {
 			BitcoinUrl.getBalance(address),
 			isMainThread
 		) { balance, error ->
-			if (!balance.isNull() && error.isNone()) {
-				hold(Amount(balance!!), error)
+			if (balance != null && error.isNone()) {
+				hold(Amount(balance), error)
 			} else BTCSeriesApiUtils.getBalanceFromBlockInfo(
 				BitcoinUrl.getBalanceFromBlockInfo(address),
 				address,

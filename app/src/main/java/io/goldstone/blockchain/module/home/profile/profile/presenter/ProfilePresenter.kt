@@ -82,10 +82,7 @@ class ProfilePresenter(
 			.setContentTitle("GoldStone")
 	}
 
-	fun onActivityResult(
-		requestCode: Int,
-		resultCode: Int
-	) {
+	fun onActivityResult(requestCode: Int, resultCode: Int) {
 		if (
 			requestCode == installPermissionRequestCode
 			&& resultCode == Activity.RESULT_OK
@@ -386,10 +383,7 @@ class ProfilePresenter(
 	private fun showShareChooser() {
 		val intent = Intent(Intent.ACTION_SEND)
 		fun getShareContentThenShowView(content: String) {
-			intent.putExtra(
-				Intent.EXTRA_TEXT,
-				content
-			)
+			intent.putExtra(Intent.EXTRA_TEXT, content)
 			intent.type = "text/plain"
 			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 		}

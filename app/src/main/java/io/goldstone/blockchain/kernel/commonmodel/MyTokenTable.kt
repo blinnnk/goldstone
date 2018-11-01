@@ -138,14 +138,6 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getTokensByAddress(
-			addresses: List<String>,
-			@UiThread hold: (List<MyTokenTable>) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses)
-			} then (hold)
-		}
 
 		fun getTokenBalance(
 			contract: TokenContract,
@@ -200,7 +192,9 @@ data class MyTokenTable(
 						if (!amount.isNull() && error.isNone()) {
 							val balance = amount!!.toEthCount()
 							hold(balance, RequestError.None)
-						} else hold(null, error)
+						} else {
+							hold(null, error)
+						}
 					}
 
 				contract.isBTC() ->
@@ -208,8 +202,22 @@ data class MyTokenTable(
 						hold(balance?.toBTC(), error)
 					}
 				contract.isLTC() ->
+					// 首先从 GoldStone LTC Insight 拉取 Balance 如果遇到错误那么切换到
+					// Chain.So 拉取 Balance 如果还有错误就报错
 					LitecoinApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance?.toLTC(), error)
+						if (balance != null && error.isNone()) {
+							hold(balance.toLTC(), error)
+						} else LitecoinApi.getBalanceFromChainSo(ownerName) { chainSoBalance, chainSoError ->
+							if (chainSoBalance != null && chainSoError.isNone()) {
+								hold(chainSoBalance, chainSoError)
+							} else hold(
+								null,
+								RequestError.RPCResult(
+									"1. Get litecoin balance from GoldStone has error\n" +
+										"2. Then get balance from Chain.so has error too"
+								)
+							)
+						}
 					}
 
 				contract.isBCH() ->

@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
+import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
@@ -46,7 +47,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	abstract val pageTitle: String
 	lateinit var wrapper: RelativeLayout
 	lateinit var recyclerView: BaseRecyclerView
-	private lateinit var loadingView: RecyclerLoadingView
+	private lateinit var topMiniLoading: TopMiniLoadingView
 	/**
 	 * @description
 	 * 当 `RecyclerView` 需要异步数据更新列表的时候, 通常网络的业务都会是异步的,就可以通过在异步为
@@ -178,13 +179,13 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 				else -> ScreenSize.Height + ScreenSize.statusBarHeight - HomeSize.headerHeight
 			}
 			wrapper = relativeLayout {
-				loadingView = RecyclerLoadingView(context!!)
-				loadingView.visibility = View.GONE
-				addView(loadingView, 0)
+				topMiniLoading = TopMiniLoadingView(context)
+				topMiniLoading.visibility = View.GONE
 				layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
 				addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))
+				addView(topMiniLoading)
 			}
 		}.view
 	}
@@ -289,14 +290,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	 * `Inside loadingView` 非阻碍式的 `Loading`
 	 */
 	open fun showLoadingView(content: String) {
-		loadingView.setTextContent(content)
-		loadingView.visibility = View.VISIBLE
-		recyclerView.y = loadingView.layoutParams.height.toFloat()
+		topMiniLoading.visibility = View.VISIBLE
 	}
 
 	open fun removeLoadingView() {
-		loadingView.visibility = View.GONE
-		recyclerView.y = 0f
+		topMiniLoading.visibility = View.GONE
 	}
 
 	fun getOverlayHeader(): OverlayHeaderLayout? {
