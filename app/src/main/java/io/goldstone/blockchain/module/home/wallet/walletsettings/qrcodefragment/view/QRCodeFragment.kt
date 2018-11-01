@@ -3,9 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment
 import android.graphics.Bitmap
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
@@ -79,13 +77,9 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
-		getParentFragment<WalletSettingsFragment> {
-			headerTitle = WalletSettingsText.walletSettings
-			presenter.showWalletSettingListFragment()
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		when (parent) {
+			is WalletSettingsFragment -> parent.presenter.popFragmentFrom<QRCodeFragment>()
 		}
 	}
 }

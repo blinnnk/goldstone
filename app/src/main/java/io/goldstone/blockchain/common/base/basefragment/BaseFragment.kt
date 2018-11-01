@@ -8,7 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ScrollView
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
+import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -32,7 +37,8 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 	abstract val pageTitle: String
 
 	abstract fun AnkoContext<Fragment>.initView()
-	open val isRelativeContainer = false
+	// 非阻碍的 `LoadingView`
+	private var topMiniLoadingView: TopMiniLoadingView? = null
 	private lateinit var scrollView: ScrollView
 
 	override fun onAttach(context: Context?) {
@@ -134,12 +140,31 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		}
 	}
 
-	fun getParentContainer(): ViewGroup? {
+	fun getParentContainer(): OverlayView? {
 		val parent = parentFragment
-		return if (parent is BaseOverlayFragment<*>) {
-			parent.overlayView
-		} else {
-			null
+		return when {
+			parent is BaseOverlayFragment<*> -> parent.overlayView
+			parent?.parentFragment is BaseOverlayFragment<*> ->
+				(parent.parentFragment as? BaseOverlayFragment<*>)?.overlayView
+			else -> null
+		}
+	}
+
+	// 非阻碍的小圆 `LoadingView`
+	fun showLoadingView() {
+		getParentContainer()?.contentLayout?.apply {
+			findViewById<LoadingView>(ElementID.loadingView).isNull() isTrue {
+				topMiniLoadingView = TopMiniLoadingView(context).apply {
+					y += 50.uiPX()
+				}
+				addView(topMiniLoadingView)
+			}
+		}
+	}
+
+	fun removeLoadingView() {
+		topMiniLoadingView?.let {
+			getParentContainer()?.contentLayout?.removeView(it)
 		}
 	}
 
