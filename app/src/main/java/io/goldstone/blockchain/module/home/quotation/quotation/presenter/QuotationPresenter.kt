@@ -108,9 +108,7 @@ class QuotationPresenter(
 						updateData()
 						updateChartTimes = updateChartTimes.orZero() - 1
 					}
-				} else GoldStoneAPI.context.runOnUiThread {
-					alert(error.message)
-				}
+				} else LogUtil.error("checkTimeStampIfNeedUpdateBy", error)
 			}
 		}
 	}

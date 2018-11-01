@@ -95,11 +95,6 @@ fun <T : Iterable<String>> T.toJsonArray(): JsonArray {
 	return stringArray
 }
 
-fun String.showAfterColonContent(): String {
-	return if (contains(":")) toString().substringAfter(":")
-	else this
-}
-
 fun BigInteger.convertToDiskUnit(): String {
 	val convertValue = ("$this".length / 3.0).toInt()
 	val diskUnit = when (convertValue) {

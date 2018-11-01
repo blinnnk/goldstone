@@ -84,7 +84,7 @@ class MarketTokenDetailPresenter(
 				}
 				// 更新网络数据
 				if (data.isNullOrBlank() && NetworkUtil.hasNetwork(fragment.context)) {
-					fragment.getMainActivity()?.showLoadingView()
+					fragment.showLoadingView()
 					chartView.updateCandleChartDataBy(pair, period, dateType)
 					// 本地数据库如果没有数据就跳出逻辑
 					return@getSelectionByPair
@@ -237,28 +237,26 @@ class MarketTokenDetailPresenter(
 	}
 
 	private fun MarketTokenCandleChart.updateCandleChartUI(data: List<CandleChartModel>, dateType: Int) {
-		fragment.context?.apply {
-			runOnUiThread {
-				fragment.getMainActivity()?.removeLoadingView()
-				// 服务器抓取的数据返回有一定概率返回错误格式数据
-				data.isEmpty() isFalse {
-					try {
-						resetData(
-							dateType,
-							data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
-								CandleEntry(
-									index.toFloat(),
-									entry.high.toFloat(),
-									entry.low.toFloat(),
-									entry.open.toFloat(),
-									entry.close.toFloat(),
-									entry.time)
-							}.toList()
-						)
-					} catch (error: Exception) {
-						LogUtil.error("updateChartUI", error)
-						return@runOnUiThread
-					}
+		GoldStoneAPI.context.runOnUiThread {
+			fragment.removeLoadingView()
+			// 服务器抓取的数据返回有一定概率返回错误格式数据
+			data.isEmpty() isFalse {
+				try {
+					resetData(
+						dateType,
+						data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
+							CandleEntry(
+								index.toFloat(),
+								entry.high.toFloat(),
+								entry.low.toFloat(),
+								entry.open.toFloat(),
+								entry.close.toFloat(),
+								entry.time)
+						}.toList()
+					)
+				} catch (error: Exception) {
+					LogUtil.error("updateChartUI", error)
+					return@runOnUiThread
 				}
 			}
 		}

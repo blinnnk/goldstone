@@ -30,6 +30,7 @@ import org.jetbrains.anko.relativeLayout
 class MainActivity : AppCompatActivity() {
 
 	var backEvent: Runnable? = null
+	// 阻碍的 `LoadingView`
 	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 	private var tracker: Tracker? = null
