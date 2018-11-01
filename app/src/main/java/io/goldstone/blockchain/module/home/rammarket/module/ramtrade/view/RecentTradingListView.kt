@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.LinearLayout
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
@@ -16,7 +17,6 @@ import org.jetbrains.anko.wrapContent
 class RecentTradingListView(context: Context): RecyclerView(context) {
 	
 	init {
-		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		layoutManager = LinearLayoutManager(context)
 	}
 	

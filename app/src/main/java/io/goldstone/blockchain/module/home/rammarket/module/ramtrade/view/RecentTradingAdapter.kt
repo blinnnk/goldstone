@@ -7,6 +7,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.formatCount
@@ -36,10 +40,10 @@ class RecentTradingAdapter(
 	
 	
 	override fun getItemViewType(position: Int): Int {
-		return if (position / (buyList.size + 1) == 0) 0 else 1
+		return if (position % (buyList.size + 1) == 0) 0 else 1
 	}
 	
-	override fun getItemCount(): Int = 12
+	override fun getItemCount(): Int = buyList.size + sellList.size + 2
 	
 	override fun onBindViewHolder(
 		holder: RecyclerView.ViewHolder,
@@ -49,7 +53,7 @@ class RecentTradingAdapter(
 		if (holder is TradingTitleHolder) {
 			(holder.itemView as? TitleView)?.apply {
 				title.text = if (position == 0) "买入" else "卖出"
-				title.textColor = if (position == 0) Spectrum.red else Spectrum.red
+				title.textColor = if (position == 0) Spectrum.green else Spectrum.red
 			}
 		} else if (holder is TradingHolder) {
 			(holder.itemView as? TradingItemView)?.apply {
@@ -58,7 +62,7 @@ class RecentTradingAdapter(
 					val maxValue = buyList.maxBy { it.quantity }?.quantity?:0.toDouble()
 					setData(model.account, model.quantity, maxValue, Spectrum.green)
 				} else {
-					val model = sellList[position - 6]
+					val model = sellList[position - buyList.size - 2]
 					val maxValue = sellList.maxBy { it.quantity }?.quantity?:0.toDouble()
 					setData(model.account, model.quantity, maxValue, Spectrum.red)
 				}
@@ -86,18 +90,27 @@ class TitleView(context: Context) : RelativeLayout(context) {
 			).apply {
 				alignParentRight()
 			}
+			setMargins<RelativeLayout.LayoutParams> {
+				topMargin = 10.uiPX()
+				bottomMargin = 10.uiPX()
+			}
 		}
 	}
 }
 
 class TradingItemView(context: Context) : RelativeLayout(context) {
+	val viewWidth = ScreenSize.Width - ScreenSize.Width/2 - 20.uiPX()
 	val name: TextView
 	val transactionAmount: TextView
+	val backgroundView: View
 	var percent: Float = 0f
-	val backgroundPaint = Paint()
 	
 	init {
 		gravity = Gravity.CENTER_VERTICAL
+		layoutParams = ViewGroup.LayoutParams(matchParent, 22.uiPX())
+		backgroundView = view {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+		}
 		name = textView {
 			textColor = GrayScale.midGray
 			textSize = fontSize(12)
@@ -107,25 +120,21 @@ class TradingItemView(context: Context) : RelativeLayout(context) {
 			textColor = GrayScale.midGray
 			textSize = fontSize(12)
 			typeface = GoldStoneFont.heavy(context)
-			layoutParams = RelativeLayout.LayoutParams(
-				wrapContent,
-				wrapContent
-			).apply {
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				alignParentRight()
 			}
+			setMargins<RelativeLayout.LayoutParams> { rightMargin = 5.uiPX() }
 		}
 	}
 	
-	override fun onDraw(canvas: Canvas?) {
-		super.onDraw(canvas)
-		canvas?.drawRect(width * (1 - percent), 0f, width.toFloat(), height.toFloat(), backgroundPaint)
-	}
-	
 	fun setData(account: String, quantity: Double, maxValue:Double, backgroundColor: Int) {
-		backgroundPaint.color = backgroundColor
 		percent = if (maxValue == 0.toDouble()) 0f else (quantity / maxValue).toFloat()
 		name.text = account
 		transactionAmount.text = if (quantity > 10000) (quantity/ 1000f).formatCount(1) + "k" else quantity.formatCount(1)
+		backgroundView.setMargins<RelativeLayout.LayoutParams> {
+			leftMargin = (viewWidth * (1 - percent)).toInt()
+		}
+		backgroundView.backgroundColor = backgroundColor
 	}
 	
 	

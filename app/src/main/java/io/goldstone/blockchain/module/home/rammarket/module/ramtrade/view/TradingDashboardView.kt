@@ -35,6 +35,7 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		menu = ButtonMenu(context)
 		menu.layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, 32.uiPX())
 		menu.setMargins<LinearLayout.LayoutParams> {
+			topMargin = 16.uiPX()
 			bottomMargin = 14.uiPX()
 		}
 		menu.titles = listOf(EOSRAMExchangeText.buy(""), EOSRAMExchangeText.sell(""))

@@ -3,17 +3,15 @@ package io.goldstone.blockchain.module.home.rammarket.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
-import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPricePresenter
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
+import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPMarketDetailPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -24,7 +22,7 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: price信息，包含蜡烛走势图
  */
-class RAMMarketDetailFragment : BaseFragment<RAMPricePresenter>() {
+class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 	override val pageTitle: String = EOSRAMExchangeText.ramExchange
 	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
 	private val priceChartWithMenuLayout by lazy {
@@ -32,7 +30,8 @@ class RAMMarketDetailFragment : BaseFragment<RAMPricePresenter>() {
 			presenter.updateRAMCandleData(it)
 		}
 	}
-	override val presenter: RAMPricePresenter = RAMPricePresenter(this)
+	private val tradingView by lazy { TradingView(context!!) }
+	override val presenter: RAMPMarketDetailPresenter = RAMPMarketDetailPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
@@ -42,7 +41,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMPricePresenter>() {
 				
 				addView(ramPriceView)
 				addView(priceChartWithMenuLayout)
-				addView(TradingView(context!!))
+				addView(tradingView)
 				presenter.updateRAMCandleData(EOSRAMChartType.Minute)
 				
 			}
@@ -87,6 +86,15 @@ class RAMMarketDetailFragment : BaseFragment<RAMPricePresenter>() {
 					entry.time)
 			})
 		}
+	}
+	
+	fun setTradingViewData(
+		buyList: List<TradingInfoModel>,
+		sellList: List<TradingInfoModel>) {
+		tradingView.recentTradingListView.setData(buyList, sellList)
+	}
+	fun notifyTradingViewData() {
+		tradingView.recentTradingListView.adapter?.notifyDataSetChanged()
 	}
 	
 }

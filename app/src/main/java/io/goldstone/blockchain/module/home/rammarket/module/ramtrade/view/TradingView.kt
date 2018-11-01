@@ -15,8 +15,8 @@ import org.jetbrains.anko.*
  * @description:
  */
 class TradingView(context: Context): LinearLayout(context) {
-	private val tradingDashboardView by lazy { TradingDashboardView(context) }
-	private val recentTradingListView  by lazy { RecentTradingListView(context) }
+	val tradingDashboardView by lazy { TradingDashboardView(context) }
+	val recentTradingListView  by lazy { RecentTradingListView(context) }
 	
 	init {
 		orientation = LinearLayout.VERTICAL
@@ -26,7 +26,6 @@ class TradingView(context: Context): LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
 			backgroundColor = GrayScale.lightGray
 			setMargins<LinearLayout.LayoutParams> {
-				topMargin = 16.uiPX()
 				bottomMargin = 16.uiPX()
 			}
 		}
@@ -35,7 +34,8 @@ class TradingView(context: Context): LinearLayout(context) {
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, wrapContent)
 			}.into(this)
 			recentTradingListView.apply {
-				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+				layoutParams = LinearLayout.LayoutParams(matchParent, 282.uiPX())
+				setMargins<LinearLayout.LayoutParams> { topMargin = 6.uiPX() }
 			}.into(this)
 		}
 	}

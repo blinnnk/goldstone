@@ -14,6 +14,8 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.model.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.recentTransactions
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -25,10 +27,10 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: 头部的price展示presenter
  */
-class RAMPricePresenter(override val fragment: RAMMarketDetailFragment)
+class RAMPMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
  : BasePresenter<RAMMarketDetailFragment>() {
-	
 	private var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
+	var recentTransactionModel: RecentTransactionModel? = null
 	private var period: String = EOSRAMChartType.Hour.info
 	private var dateType: Int = DateUtils.FORMAT_SHOW_TIME
 	private val ramPriceSocket by lazy {
@@ -73,6 +75,7 @@ class RAMPricePresenter(override val fragment: RAMMarketDetailFragment)
 	override fun onFragmentCreateView() {
 		super.onFragmentCreateView()
 		getTodayPrice()
+		recentTransactions()
 	}
 	
 	override fun onFragmentResume() {
@@ -143,8 +146,8 @@ class RAMPricePresenter(override val fragment: RAMMarketDetailFragment)
 	}
 	
 	fun updateRAMCandleData(ramChartType: EOSRAMChartType) {
-		this@RAMPricePresenter.period = ramChartType.info
-		this@RAMPricePresenter.dateType = ramChartType.dateType
+		this@RAMPMarketDetailPresenter.period = ramChartType.info
+		this@RAMPMarketDetailPresenter.dateType = ramChartType.dateType
 		
 		if (candleDataMap.isEmpty()) {
 			getChartDataFromDatebase {
