@@ -97,8 +97,8 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 
 	fun setGrayStyle() {
 		arrowIcon.setGrayStyle()
-		paint.color = GrayScale.Opacity1Black
+		paint.color = GrayScale.lightGray
 		invalidate()
-		addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square)
+		addTouchRippleAnimation(Color.WHITE, GrayScale.whiteGray, RippleMode.Square)
 	}
 }

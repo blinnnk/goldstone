@@ -1,17 +1,23 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
-import android.graphics.Color
-import android.widget.*
-import com.blinnnk.extension.*
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
+import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.utils.isDefaultStyle
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import org.jetbrains.anko.*
-import io.goldstone.blockchain.R
 
 /**
  * @date: 2018/8/29.
@@ -19,57 +25,43 @@ import io.goldstone.blockchain.R
  * @description:
  */
 class ExchangeCell(context: Context) : BaseCell(context) {
-	
-	val checkBox by lazy { CheckBox(context) }
-	val textView by lazy {
-		TextView(context).apply {
-			textSize = fontSize(14)
-			textColor = GrayScale.black
-			typeface = GoldStoneFont.heavy(context)
-			x += 10.uiPX()
-		}
-	}
-	private val exchangeIcon by lazy {
-		ImageView(context).apply {
-			addCorner(18.uiPX(), GrayScale.midGray)
-			layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
-		}
-	}
-	
-	init {
-		hasArrow = false
-		setHorizontalPadding()
-		addView(exchangeIcon.apply {
-			setGrayStyle()
-		})
-		
-		addView(textView)
-		
-		addView(checkBox.apply {
-			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent)
-		})
-		
-		exchangeIcon.apply {
-			setCenterInVertical()
-		}
-		textView.apply {
-			setCenterInVertical()
-			x += 40.uiPX()
-		}
-		
-		checkBox.apply {
-			setCenterInVertical()
-			setAlignParentRight()
-		}
-		
-		setGrayStyle()
-	}
-	
+
 	var model: ExchangeTable? by observing(null) {
 		model?.apply {
 			exchangeIcon.glideImage(iconUrl)
 			textView.text = exchangeName
 			checkBox.isChecked = isSelected
 		}
+	}
+
+	var checkBox: CheckBox
+	var textView: TextView
+	private var exchangeIcon: ImageView
+	private val iconSize = 36.uiPX()
+
+	init {
+		hasArrow = false
+		setHorizontalPadding()
+		exchangeIcon = imageView {
+			addCorner(18.uiPX(), GrayScale.whiteGray)
+			layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize)
+		}
+		textView = textView {
+			textSize = fontSize(14)
+			textColor = GrayScale.black
+			typeface = GoldStoneFont.heavy(context)
+			x = 50.uiPX().toFloat()
+		}
+		checkBox = checkBox {
+			isDefaultStyle()
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent)
+		}
+		exchangeIcon.setCenterInVertical()
+		textView.setCenterInVertical()
+		checkBox.apply {
+			setCenterInVertical()
+			setAlignParentRight()
+		}
+		setGrayStyle()
 	}
 }

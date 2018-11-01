@@ -109,6 +109,16 @@ object QuotationText {
 		else -> ""
 	}
 	@JvmField
+	val exchangeList = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Select An Exchange"
+		HoneyLanguage.Chinese.code -> "Select An Exchange"
+		HoneyLanguage.Japanese.code -> "Select An Exchange"
+		HoneyLanguage.Korean.code -> "Select An Exchange"
+		HoneyLanguage.Russian.code -> "Select An Exchange"
+		HoneyLanguage.TraditionalChinese.code -> "Select An Exchange"
+		else -> ""
+	}
+	@JvmField
 	val tokenInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Information"
 		HoneyLanguage.Chinese.code -> "Token 信息"
@@ -241,35 +251,35 @@ object QuotationText {
 	@JvmField
 	val searchExchangesNames: (exchangeNames: String) -> String = {
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "${it}等"
-			HoneyLanguage.Japanese.code -> ""
-			HoneyLanguage.Korean.code -> ""
-			HoneyLanguage.Russian.code -> ""
-			HoneyLanguage.TraditionalChinese.code -> ""
+			HoneyLanguage.English.code -> "$it etc."
+			HoneyLanguage.Chinese.code -> "$it etc."
+			HoneyLanguage.Japanese.code -> "$it etc."
+			HoneyLanguage.Korean.code -> "$it etc."
+			HoneyLanguage.Russian.code -> "$it etc."
+			HoneyLanguage.TraditionalChinese.code -> "$it etc."
 			else -> ""
 		}
 	}
 	@JvmField
 	val searchFilterTextDescription: (exchangeNames: String) -> String = {
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> ""
-			HoneyLanguage.Chinese.code -> "为您展示${it}市场的搜索结果"
-			HoneyLanguage.Japanese.code -> ""
-			HoneyLanguage.Korean.code -> ""
-			HoneyLanguage.Russian.code -> ""
-			HoneyLanguage.TraditionalChinese.code -> ""
+			HoneyLanguage.English.code -> "Show $it search result"
+			HoneyLanguage.Chinese.code -> "Show $it search result"
+			HoneyLanguage.Japanese.code -> "Show $it search result"
+			HoneyLanguage.Korean.code -> "Show $it search result"
+			HoneyLanguage.Russian.code -> "Show $it search result"
+			HoneyLanguage.TraditionalChinese.code -> "Show $it search result"
 			else -> ""
 		}
 	}
 	@JvmField
 	val selectAll = when (currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "全选"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> "全选"
+		HoneyLanguage.English.code -> "Check All"
+		HoneyLanguage.Chinese.code ->  "Check All"
+		HoneyLanguage.Japanese.code ->  "Check All"
+		HoneyLanguage.Korean.code ->  "Check All"
+		HoneyLanguage.Russian.code -> "Check All"
+		HoneyLanguage.TraditionalChinese.code ->  "Check All"
 		else -> ""
 	}
 }

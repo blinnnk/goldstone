@@ -398,6 +398,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isETC() -> setEthereumClassicAddressesModel(wallet)
 							coinType.isEOS() -> setEOSAddressesModel(wallet)
 							coinType.isLTC() -> setLitecoinAddressesModel(wallet)
+							coinType.isBCH() -> setBitcoinCashAddressesModel(wallet)
 							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
 							coinType.isAllTest() -> setBTCSeriesTestAddressesModel(wallet)
 						}
