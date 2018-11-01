@@ -88,9 +88,9 @@ class MarketTokenDetailPresenter(
 					chartView.updateCandleChartDataBy(pair, period, dateType)
 					// 本地数据库如果没有数据就跳出逻辑
 					return@getSelectionByPair
-				} else {
+				} else if (data != null) {
 					// 本地数据库有数据的话判断是否是有效的数据
-					val candleData = CandleChartModel.convertData(data!!)
+					val candleData = CandleChartModel.convertData(data)
 					val databaseTime = candleData.maxBy { it.time }?.time?.toLongOrNull().orElse(0)
 					// 校验数据库的数据时间是否有效，是否需要更新
 					checkDatabaseTimeIsValidBy(period, databaseTime) {

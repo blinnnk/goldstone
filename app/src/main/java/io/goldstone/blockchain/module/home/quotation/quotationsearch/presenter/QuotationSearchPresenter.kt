@@ -256,7 +256,7 @@ class QuotationSearchPresenter(
 	private fun updateResultAfterConditionChanged() {
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			val textForSearch = overlayView.header.getFilterSearchInput().editText.text.toString()
-			if (hasNetWork && !textForSearch.isBlank()) {
+			if (NetworkUtil.hasNetworkWithAlert(context) && !textForSearch.isBlank()) {
 				searchTokenBy(textForSearch)
 			}
 		}
