@@ -71,7 +71,8 @@ object BTCSeriesApiUtils {
 				val result = data!!.firstOrNull()?.toLongOrNull()
 				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, error) }
 				else hold(result, error)
-			} else hold(null, error)
+			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(null, error) }
+			else hold(null, error)
 		}
 	}
 

@@ -53,9 +53,11 @@ object LitecoinApi {
 			"",
 			true
 		) { result, error ->
-			val data = JSONObject(result?.firstOrNull())
-			val balance = data.getTargetChild("data", "confirmed_balance").toDoubleOrNull().orZero()
-			hold(balance, error)
+			if (result != null && error.isNone()) {
+				val data = JSONObject(result.firstOrNull())
+				val balance = data.getTargetChild("data", "confirmed_balance").toDoubleOrNull().orZero()
+				hold(balance, error)
+			} else hold(null, error)
 		}
 	}
 

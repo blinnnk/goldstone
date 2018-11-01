@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
 import com.blinnnk.extension.*
+import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
@@ -9,6 +10,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
@@ -17,7 +19,6 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAda
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
@@ -95,15 +96,17 @@ class QuotationPresenter(
 		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
 		if (maxDate + 1L < 1.daysAgoInMills()) {
-			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
-				if (!newChart.isNull() && error.isNone()) {
-					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {
-						// Main Thread
-						/** 防止服务器数据出错或不足, 可能导致的死循环 */
-						if (updateChartTimes.orZero() > 0) {
-							updateData()
-							updateChartTimes = updateChartTimes.orZero() - 1
-						}
+			val parameter = JsonArray().apply { add(pair) }
+			GoldStoneAPI.getCurrencyLineChartData(parameter) { newChart, error ->
+				if (newChart != null && error.isNone()) {
+					// 更新数据库的数据
+					val quotationDao =
+						GoldStoneDataBase.database.quotationSelectionDao()
+					quotationDao.updateDayLineChartByPair(pair, newChart.firstOrNull()?.pointList?.toString().orEmpty())
+					/** 防止服务器数据出错或不足, 可能导致的死循环 */
+					if (updateChartTimes.orZero() > 0) GoldStoneAPI.context.runOnUiThread {
+						updateData()
+						updateChartTimes = updateChartTimes.orZero() - 1
 					}
 				} else GoldStoneAPI.context.runOnUiThread {
 					fragment.context.alert(error.message)

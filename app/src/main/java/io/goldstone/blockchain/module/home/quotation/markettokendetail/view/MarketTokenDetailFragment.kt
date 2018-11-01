@@ -77,9 +77,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				menu.selected(MarketTokenDetailChartType.Hour.code)
 				candleChart.into(this)
 				// 默认加载小时的图标数据
-				presenter.updateChartByMenu(
-					candleChart, MarketTokenDetailChartType.Hour.code
-				)
+				presenter.updateChartByMenu(candleChart, MarketTokenDetailChartType.Hour.code)
 
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {
