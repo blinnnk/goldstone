@@ -296,7 +296,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	open fun removeLoadingView() {
 		topMiniLoading.visibility = View.GONE
 	}
-	fun getLoadingView(): View = topMiniLoading
+
 	fun getOverlayHeader(): OverlayHeaderLayout? {
 		val parent = parentFragment
 		return (parent as? BaseOverlayFragment<*>)?.overlayView?.header

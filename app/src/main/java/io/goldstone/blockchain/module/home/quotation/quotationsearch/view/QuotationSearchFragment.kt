@@ -101,16 +101,7 @@ class QuotationSearchFragment :
 	
 	fun removeExchangeFilterDescriptionView() {
 		exchangeFilterDescriptionView.visibility = View.GONE
-		if (getLoadingView().visibility != View.VISIBLE) {
-			recyclerView.y = 0f
-		}
+		recyclerView.y = 0f
 	}
 	
-	
-	override fun removeLoadingView() {
-		getLoadingView().visibility = View.GONE
-		if (exchangeFilterDescriptionView.visibility != View.VISIBLE) {
-			recyclerView.y = 0f
-		}
-	}
 }
