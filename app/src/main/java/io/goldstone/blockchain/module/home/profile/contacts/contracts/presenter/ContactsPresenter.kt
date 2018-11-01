@@ -1,12 +1,16 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter
 
+import android.os.Bundle
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
+import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 
 /**
  * @date 26/03/2018 1:36 PM
@@ -29,6 +33,14 @@ class ContactPresenter(
 	fun deleteContact(id: Int) {
 		ContactTable.deleteContactByID(id) {
 			updateAddressList()
+		}
+	}
+
+	fun shoEditContactFragment(contactID: Int) {
+		fragment.getParentFragment<ProfileOverlayFragment> {
+			presenter.showTargetFragment<ContactInputFragment>(
+				Bundle().apply { putInt(ArgumentKey.contactID, contactID) }
+			)
 		}
 	}
 

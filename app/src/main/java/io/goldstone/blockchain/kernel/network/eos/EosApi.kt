@@ -374,7 +374,7 @@ object EOSAPI {
 		account: EOSAccount,
 		codeName: String,
 		symbol: String,
-		hold: (info: EOSTokenCountInfo?, error: RequestError) -> Unit
+		@WorkerThread hold: (info: EOSTokenCountInfo?, error: RequestError) -> Unit
 	) {
 		getEOSTokenCountInfo(chainid, account, codeName, symbol) { data, error ->
 			if (!data.isNullOrEmpty() && error.isNone()) {
@@ -433,8 +433,8 @@ object EOSAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val data = result?.firstOrNull()
+			if (result != null && error.isNone()) {
+				val data = result.firstOrNull()
 				if (data.isNullOrEmpty()) hold(null, RequestError.NullResponse("Empty Result"))
 				else hold(data, RequestError.None)
 			} else hold(null, error)
@@ -464,8 +464,8 @@ object EOSAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val data = result?.firstOrNull()
+			if (result != null && error.isNone()) {
+				val data = result.firstOrNull()
 				if (!data.isNullOrEmpty()) hold(data?.toIntOrNull(), RequestError.None)
 				else hold(null, RequestError.NullResponse("Empty or Null Result"))
 			} else hold(null, error)
@@ -477,8 +477,8 @@ object EOSAPI {
 		@WorkerThread hold: (blockNumber: Int?, error: GoldStoneError) -> Unit
 	) {
 		getTransactionJSONObjectByTxID(txID) { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				hold(data!!.safeGet("block_num").toIntOrNull(), error)
+			if (data != null && error.isNone()) {
+				hold(data.safeGet("block_num").toIntOrNull(), error)
 			} else hold(null, error)
 		}
 	}
@@ -488,8 +488,8 @@ object EOSAPI {
 		@WorkerThread hold: (cpuUsage: BigInteger?, netUsage: BigInteger?, error: RequestError) -> Unit
 	) {
 		getTransactionJSONObjectByTxID(txID) { transaction, error ->
-			if (!transaction.isNull() && error.isNone()) {
-				val receipt = transaction!!.getTargetObject("trx", "receipt")
+			if (transaction != null && error.isNone()) {
+				val receipt = transaction.getTargetObject("trx", "receipt")
 				hold(
 					receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
 					receipt.getTargetChild("net_usage_words").toBigIntegerOrZero(),
@@ -540,7 +540,7 @@ object EOSAPI {
 	// 从第三方 EOS 交易所拉取交易对
 	@JvmStatic
 	fun getPairsFromNewDex(@WorkerThread hold: (tokens: List<NewDexPair>?, error: RequestError) -> Unit) {
-		RequisitionUtil.requestData<NewDexPair>(
+		RequisitionUtil.requestData(
 			EOSUrl.getPairsFromNewDex(),
 			"data",
 			false,

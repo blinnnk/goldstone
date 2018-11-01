@@ -10,10 +10,8 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.PriceHistoryModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.uiThread
 import java.io.Serializable
 
 /**
@@ -77,20 +75,6 @@ data class QuotationSelectionTable(
 
 	companion object {
 
-		fun updatePrice(
-			quotationData: QuotationSelectionTable,
-			priceData: PriceHistoryModel?
-		): QuotationSelectionTable {
-			return quotationData.apply {
-				priceData?.apply {
-					high24 = dayHighest
-					low24 = dayLow
-					highTotal = totalHighest
-					lowTotal = totalLow
-				}
-			}
-		}
-
 		@WorkerThread
 		fun insertSelection(table: QuotationSelectionTable) {
 			val quotationDao = GoldStoneDataBase.database.quotationSelectionDao()
@@ -117,7 +101,7 @@ data class QuotationSelectionTable(
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateOrderIDByPair(fromPair, newOrderID)
-				GoldStoneAPI.context.runOnUiThread  { callback() }
+				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 
@@ -132,21 +116,21 @@ data class QuotationSelectionTable(
 		fun updateLineChartWeekBy(pair: String, weekLineChart: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateWeekLineChartByPair(pair, weekLineChart)
-				GoldStoneAPI.context.runOnUiThread  { callback() }
+				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 
 		fun updateLineChartMontyBy(pair: String, monthChart: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateMonthLineChartByPair(pair, monthChart)
-				GoldStoneAPI.context.runOnUiThread  { callback() }
+				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 
 		fun updateLineChartHourBy(pair: String, hourChart: String, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.quotationSelectionDao().updateHourLineChartByPair(pair, hourChart)
-				GoldStoneAPI.context.runOnUiThread  { callback() }
+				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 	}
@@ -166,6 +150,9 @@ interface QuotationSelectionDao {
 
 	@Query("SELECT * FROM quotationSelection WHERE pair LIKE :pair")
 	fun getSelectionByPair(pair: String): QuotationSelectionTable?
+
+	@Query("UPDATE quotationSelection SET high24 = :highPrice, low24 = :lowPrice, highTotal = :highTotal, lowTotal = :lowTotal WHERE pair = :pair")
+	fun updatePriceInfo(highPrice: String, lowPrice: String, highTotal: String, lowTotal: String, pair: String)
 
 	@Query("UPDATE quotationSelection SET lineChartDay = :lineChartDay WHERE pair LIKE :pair")
 	fun updateDayLineChartByPair(pair: String, lineChartDay: String)

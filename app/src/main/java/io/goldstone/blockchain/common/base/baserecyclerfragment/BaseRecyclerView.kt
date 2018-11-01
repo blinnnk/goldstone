@@ -14,7 +14,6 @@ import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.load
@@ -57,7 +56,9 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 			var markIcon: Drawable? = null
 			var initiated: Boolean = false
 			private fun init() {
-				background = ColorDrawable(Spectrum.red)
+				val cellColor =
+					if (direction == ItemTouchHelper.LEFT) Spectrum.red else Spectrum.green
+				background = ColorDrawable(cellColor)
 				markIcon = ContextCompat.getDrawable(context, icon)
 				markIcon?.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP)
 				initiated = true
@@ -72,21 +73,24 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 				actionState: Int,
 				isCurrentlyActive: Boolean
 			) {
+				val isMovingToLeft = direction == ItemTouchHelper.LEFT
 				val itemView = viewHolder.itemView
-				val boundsStart= if (direction == ItemTouchHelper.LEFT) itemView.right else itemView.left
+				val boundsStart = if (isMovingToLeft) itemView.right else itemView.left
 				// not interested in those
 				if (viewHolder.adapterPosition == -1) return
 				if (!initiated) init()
 				// draw red background
 				background?.setBounds(boundsStart + directionX.toInt(), itemView.top, boundsStart, itemView.bottom)
 				background?.draw(canvas)
-				val markLeft = (itemView.right  + directionX).toInt()
-				val markRight = markLeft + (itemView.bottom - itemView.top)
-				val leftPadding = 5.uiPX()
+				val start = (boundsStart + directionX).toInt()
+				val modulus = if (isMovingToLeft) -1 else 1
+				val end = start - (itemView.bottom - itemView.top) * modulus
+				val markLeft = if (isMovingToLeft) start else end
+				val markRight = if (isMovingToLeft) end else start
 				markIcon?.setBounds(
-					markLeft + iconPaddingSize + leftPadding,
+					markLeft + iconPaddingSize,
 					itemView.top + iconPaddingSize,
-					markRight - iconPaddingSize + leftPadding,
+					markRight - iconPaddingSize,
 					itemView.bottom - iconPaddingSize
 				)
 				markIcon?.draw(canvas)

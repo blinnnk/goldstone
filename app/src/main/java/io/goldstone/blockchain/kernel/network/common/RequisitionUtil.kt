@@ -69,10 +69,7 @@ object RequisitionUtil {
 		@WorkerThread noinline holdSingle: (result: T?, error: RequestError) -> Unit
 	) {
 		postRequest<T>(
-			RequestBody.create(
-				GoldStoneEthCall.contentType,
-				condition
-			),
+			RequestBody.create(GoldStoneEthCall.contentType, condition),
 			keyName,
 			api,
 			false,
@@ -90,10 +87,7 @@ object RequisitionUtil {
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest<String>(
-			RequestBody.create(
-				GoldStoneEthCall.contentType,
-				condition
-			),
+			RequestBody.create(GoldStoneEthCall.contentType, condition),
 			keyName,
 			api,
 			true,
@@ -138,7 +132,6 @@ object RequisitionUtil {
 						val collectionType = object : TypeToken<Collection<T>>() {}.type
 						hold(gson.fromJson(jsonData, collectionType), RequestError.None)
 					} catch (error: Exception) {
-						LogUtil.error(keyName, error)
 						GoldStoneCode.showErrorCodeReason(data)
 						hold(null, RequestError.ResolveDataError(error))
 					}
@@ -407,7 +400,6 @@ object RequisitionUtil {
 		}
 		return when {
 			data.isNullOrBlank() -> return ""
-
 			errorData.isNotEmpty() -> {
 				try {
 					if (errorData.equals("null", true)) ""
@@ -423,10 +415,7 @@ object RequisitionUtil {
 }
 
 object GoldStoneCode {
-	fun isSuccess(
-		code: Any,
-		callback: (isSuccessful: Boolean) -> Unit
-	) {
+	fun isSuccess(code: Any, callback: (isSuccessful: Boolean) -> Unit) {
 		if (code == 0) callback(true)
 		else {
 			callback(false)

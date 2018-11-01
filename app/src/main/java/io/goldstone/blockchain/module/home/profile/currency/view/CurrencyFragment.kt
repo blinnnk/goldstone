@@ -25,6 +25,12 @@ class CurrencyFragment : BaseRecyclerFragment<CurrencyPresenter, SupportCurrency
 		recyclerView.adapter = CurrencyAdapter(asyncData.orEmptyArray()) { item, _ ->
 			item.apply {
 				onClick {
+					// 更新内存的数据状态
+					asyncData?.forEach { data ->
+						if (data.isUsed) data.isUsed = false
+						if (data.currencySymbol.equals(model.currencySymbol, true))
+							data.isUsed = true
+					}
 					presenter.setCurrencyAlert(model.currencySymbol) {
 						setSwitchStatusBy(this)
 					}

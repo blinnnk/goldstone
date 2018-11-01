@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.utils.load
@@ -44,19 +45,14 @@ data class SupportCurrencyTable(
 
 	companion object {
 
-		fun updateUsedStatus(symbol: String, callback: () -> Unit) {
+		fun updateUsedStatus(symbol: String, @UiThread callback: (rate: Double?) -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.currencyDao()
-					.apply {
-						getSupportCurrencies().find { it.isUsed }
-							?.let {
-								update(it.apply { isUsed = false })
-							}
-						getCurrencyBySymbol(symbol)?.let {
-							update(it.apply { isUsed = true })
-						}
-						GoldStoneAPI.context.runOnUiThread { callback() }
-					}
+				val currencyDao =
+					GoldStoneDataBase.database.currencyDao()
+				currencyDao.setCurrentCurrencyUnused()
+				currencyDao.setCurrencyInUse(symbol)
+				val rate = currencyDao.getCurrencyBySymbol(symbol)?.rate
+				GoldStoneAPI.context.runOnUiThread { callback(rate) }
 			}
 		}
 
@@ -75,6 +71,15 @@ interface SupportCurrencyDao {
 
 	@Query("SELECT * FROM supportCurrency")
 	fun getSupportCurrencies(): List<SupportCurrencyTable>
+
+	@Query("SELECT * FROM supportCurrency WHERE isUsed = :isUsed")
+	fun getCurrentCurrency(isUsed: Boolean = true): SupportCurrencyTable
+
+	@Query("UPDATE supportCurrency set isUsed = :unused WHERE isUsed = :isUsed")
+	fun setCurrentCurrencyUnused(unused: Boolean = false, isUsed: Boolean = true)
+
+	@Query("UPDATE supportCurrency set isUsed = :isUsed WHERE currencySymbol = :symbol")
+	fun setCurrencyInUse(symbol: String, isUsed: Boolean = true)
 
 	@Query("SELECT * FROM supportCurrency WHERE currencySymbol LIKE :symbol")
 	fun getCurrencyBySymbol(symbol: String): SupportCurrencyTable?

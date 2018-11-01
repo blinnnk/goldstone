@@ -21,6 +21,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -122,6 +123,17 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				)
 			}
 		}
+	}
+
+	fun setAddressValue(data: ContactTable) {
+		nameInput.setText(data.name)
+		ethSeriesAddressInput.setText(data.ethSeriesAddress)
+		eosAddressInput.setText(data.eosAddress)
+		eosJungleAddressInput.setText(data.eosJungle)
+		btcMainnetAddressInput.setText(data.btcMainnetAddress)
+		btcTestnetAddressInput.setText(data.btcSeriesTestnetAddress)
+		ltcAddressInput.setText(data.ltcAddress)
+		bchAddressInput.setText(data.bchAddress)
 	}
 
 	override fun onViewCreated(
