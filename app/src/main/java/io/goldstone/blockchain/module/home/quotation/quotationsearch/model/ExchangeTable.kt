@@ -36,8 +36,9 @@ data class ExchangeTable(
 		localData.safeGet("market"),
 		false
 	)
+
 	companion object {
-		
+
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,
 			hold: (List<ExchangeTable>) -> Unit
@@ -47,54 +48,52 @@ data class ExchangeTable(
 				GoldStoneAPI.context.runOnUiThread { hold(marketList) }
 			}
 		}
-		
+
 		fun update(exchangeTable: ExchangeTable) {
 			doAsync {
 				GoldStoneDataBase.database.exchangeTableDao().update(exchangeTable)
 			}
 		}
-		
-		fun updateSelectedStatusById(
-			id: Int,
-			isSelected: Boolean
-		) {
+
+		fun updateSelectedStatusById(id: Int, isSelected: Boolean) {
 			doAsync {
 				GoldStoneDataBase.database.exchangeTableDao().updateSelectedStatusByExchangeId(id, isSelected)
 			}
 		}
-		
-		fun delete( exchangeTable: ExchangeTable) {
+
+		fun delete(exchangeTable: ExchangeTable) {
 			doAsync {
 				GoldStoneDataBase.database.exchangeTableDao().delete(exchangeTable)
 			}
 		}
 	}
-	
+
 }
 
-@Dao interface ExchangeDao {
+@Dao
+interface ExchangeDao {
 	@Query("select * from exchangeTable")
 	fun getAll(): List<ExchangeTable>
-	
+
 	@Query("select * from exchangeTable where isSelected = :isSelected")
 	fun getByStatus(isSelected: Boolean): List<ExchangeTable>
-	
+
 	@Insert
 	fun insertAll(exchange: List<ExchangeTable>)
-	
+
 	@Insert
 	fun insert(exchangeTable: ExchangeTable)
-	
+
 	@Query("UPDATE exchangeTable SET isSelected = :isSelected WHERE marketId = :id ")
 	fun updateSelectedStatusByExchangeId(id: Int, isSelected: Boolean)
-	
+
 	@Update
 	fun update(exchangeTable: ExchangeTable)
-	
+
 	@Delete
 	fun delete(exchangeTable: ExchangeTable)
-	
+
 	@Query("delete from exchangeTable ")
 	fun deleteAll()
-	
+
 }

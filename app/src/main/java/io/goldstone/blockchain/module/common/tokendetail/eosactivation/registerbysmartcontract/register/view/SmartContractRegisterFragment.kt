@@ -23,6 +23,7 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.MutablePair
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -92,7 +93,7 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 				}.into(this)
 
 				resourceCoast.apply {
-					presenter.getEOSCurrencyPrice { currency, error ->
+					if (NetworkUtil.hasNetwork(context)) presenter.getEOSCurrencyPrice { currency, error ->
 						if (!currency.isNull() && error.isNone()) {
 							setSubtitle("2.0 EOS ≈ ${(2 * currency!!).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
 						} else context.alert(error.message)

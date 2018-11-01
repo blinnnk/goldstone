@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioButton
 import com.blinnnk.extension.isTrue
@@ -141,6 +142,17 @@ fun JSONArray.toList(): List<JSONObject> {
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
 
 fun RadioButton.isDefaultStyle() {
+	buttonTintList = ColorStateList(
+		arrayOf(
+			intArrayOf(-R.attr.state_checked), //disabled
+			intArrayOf(R.attr.state_checked) //enabled
+		),
+		// disabled - enabled
+		intArrayOf(GrayScale.midGray, Spectrum.blue)
+	)
+}
+
+fun CheckBox.isDefaultStyle() {
 	buttonTintList = ColorStateList(
 		arrayOf(
 			intArrayOf(-R.attr.state_checked), //disabled

@@ -217,9 +217,11 @@ class AddressManagerPresenter(
 							return@getEthereumWalletByMnemonic
 						}
 						// 新创建的账号插入所有对应的链的默认 `Token`
-						val eosNodes =
-							GoldStoneDataBase.database.chainNodeDao().getETHNodes()
-						eosNodes.forEach {
+						// 因为数据库存储的 Nodes 可能在同一个 ChainID 下存在多条, 例如 Infura Mainnet, GoldStone Mainnet
+						// 所以这里拉取回来的数据做一次去重复处理
+						val ethNodes =
+							GoldStoneDataBase.database.chainNodeDao().getETHNodes().distinctBy { it.chainID }
+						ethNodes.forEach {
 							insertNewAddressToMyToken(
 								TokenContract.ethContract,
 								address!!,
@@ -261,9 +263,9 @@ class AddressManagerPresenter(
 						}
 						// 新创建的账号插入所有对应的链的默认 `Token`
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-						val eosNodes =
-							GoldStoneDataBase.database.chainNodeDao().getETCNodes()
-						eosNodes.forEach {
+						val etcNodes =
+							GoldStoneDataBase.database.chainNodeDao().getETCNodes().distinctBy { it.chainID }
+						etcNodes.forEach {
 							insertNewAddressToMyToken(
 								TokenContract.etcContract,
 								address!!,
@@ -315,7 +317,7 @@ class AddressManagerPresenter(
 
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							val eosNodes =
-								GoldStoneDataBase.database.chainNodeDao().getEOSNodes()
+								GoldStoneDataBase.database.chainNodeDao().getEOSNodes().distinctBy { it.chainID }
 							eosNodes.forEach {
 								insertNewAddressToMyToken(
 									TokenContract.eosContract,

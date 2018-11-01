@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.common.component.overlay
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
-import android.view.*
+import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.*
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
@@ -23,17 +25,21 @@ import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
  * @date 2018/6/5 1:50 AM
  * @author KaySaith
  */
-open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
-	
+@SuppressLint("ViewConstructor")
+open class ContentScrollOverlayView(
+	context: Context,
+	isAddingRecyclerView: Boolean = false
+) : RelativeLayout(context) {
+
 	var recoveryBackEvent: Runnable? = null
 	private var container: RelativeLayout
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
 	private lateinit var scrollViewContent: ScrollView
-	val maxWidth = 300.uiPX()
+	private val maxWidth = 300.uiPX()
 	private val headerHeight = 50.uiPX()
-	
+
 	init {
 		isClickable = true
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
@@ -69,19 +75,27 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 					}
 					closeButton.setAlignParentRight()
 				}
-				scrollViewContent = scrollView {
-					lparams(matchParent, wrapContent)
+
+				fun addContentView() {
 					contentLayout = verticalLayout {
 						id = ContainerID.contentOverlay
 						bottomPadding = 15.uiPX()
 						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					}
 				}
-				// 设定最大高度
-				onLayoutChange { _, _, top, _, bottom, _, _, _, _ ->
-					if (bottom - top > ScreenSize.fullHeight * 0.9) {
-						layoutParams.height = (ScreenSize.fullHeight * 0.9).toInt()
+				if (isAddingRecyclerView) {
+					addContentView()
+				} else {
+					scrollViewContent = scrollView {
+						lparams(matchParent, wrapContent)
+						addContentView()
 					}
+				}
+			}
+			// 设定最大高度
+			onLayoutChange { _, _, top, _, bottom, _, _, _, _ ->
+				if (bottom - top > ScreenSize.fullHeight * 0.9) {
+					layoutParams.height = (ScreenSize.fullHeight * 0.9).toInt()
 				}
 			}
 			addCorner(CornerSize.small.toInt(), Spectrum.white)
@@ -89,7 +103,7 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 		container.updateAlphaAnimation(1f)
 		container.setCenterInParent()
 	}
-	
+
 	fun setContentPadding(
 		left: Int = 20.uiPX(),
 		top: Int = 10.uiPX(),
@@ -98,11 +112,11 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 	) {
 		contentLayout.setPadding(left, top, right, bottom)
 	}
-	
+
 	fun setTitle(text: String) {
 		titleView.text = text
 	}
-	
+
 	open fun remove() {
 		(parent as? ViewGroup)?.apply {
 			findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
@@ -110,25 +124,13 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 			}
 		}
 	}
-	
+
 	fun addContent(hold: ViewGroup.() -> Unit) {
 		hold(contentLayout)
 	}
-	
-	fun showBottomBar(view: LinearLayout) {
-		val barHeight = 60.uiPX()
-		scrollViewContent.bottomPadding = barHeight
-		container.apply {
-			relativeLayout {
-				gravity = Gravity.CENTER
-				lparams {
-					width = matchParent
-					height = barHeight
-					sameBottom(ElementID.overlayContainer)
-				}
-				addView(view, LayoutParams(matchParent, matchParent))
-			}
-		}
+
+	fun getOverlay(paddingBottomSize: Int, hold: RelativeLayout.() -> Unit) {
+		hold(container)
+		contentLayout.bottomPadding = paddingBottomSize
 	}
-	
 }
