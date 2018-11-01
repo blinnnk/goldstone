@@ -91,10 +91,10 @@ class TokenSearchPresenter(
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		GoldStoneAPI.getTokenInfoBySymbolFromServer(content) { result, error ->
-			if (!result.isNull() && error.isNone()) {
+			if (result != null && result.isNotEmpty() && error.isNone()) {
 				// 从服务器请求目标结果
 				hold(
-					result!!.map { serverToken ->
+					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
 							val status = any {
