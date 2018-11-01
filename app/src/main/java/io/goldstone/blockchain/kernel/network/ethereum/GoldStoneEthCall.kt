@@ -54,9 +54,10 @@ object GoldStoneEthCall {
 						name,
 						decimal,
 						when {
-							error.isNone() && nameError.isNone() -> decimalError
-							!nameError.isNone() -> nameError
-							else -> error
+							error.hasError() -> error
+							nameError.hasError() -> nameError
+							decimalError.hasError() -> decimalError
+							else -> RequestError.None
 						}
 					)
 				}
