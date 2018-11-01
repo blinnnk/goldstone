@@ -38,6 +38,7 @@ object APIPath {
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
+	val eosRAMLatestTrading: (header: String) -> String = { "$it/eosram/lastestTxListContainsSellAndBuy" }
 	val getEOSTokenList: (
 		header: String,
 		chainID: String,

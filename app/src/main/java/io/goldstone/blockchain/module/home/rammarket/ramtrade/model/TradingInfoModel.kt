@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
  * @author: yanglihai
  * @description: 买入卖出的model
  */
-class RecentTradingModel(
+class TradingInfoModel(
 	val account: String,
 	val price: Double,
 	@SerializedName("tx_id")

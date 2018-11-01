@@ -34,6 +34,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.ramtrade.model.RecentTransactionModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -560,7 +561,22 @@ object GoldStoneAPI {
 				hold(null, RequestError.NullResponse("no values for ticks"))
 			}
 		}
-		
+	}
+	
+	fun getEOSRAMRecentTransactions(hold: (data: RecentTransactionModel?, error: RequestError) -> Unit) {
+		requestData<String>(
+			APIPath.eosRAMLatestTrading(APIPath.currentUrl),
+			"",
+			justGetData = true,
+			errorCallback = {
+				hold(null, it)
+			},
+			isEncrypt = true
+		) {
+			val type = object : TypeToken<RecentTransactionModel>() {}.type
+			hold(Gson().fromJson(firstOrNull().orEmpty(), type), RequestError.None)
+		}
+	
 	}
 	
 }
