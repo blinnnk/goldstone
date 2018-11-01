@@ -23,6 +23,7 @@ import io.goldstone.blockchain.common.component.edittext.EditTextWithButton
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.FilterSearchInput
 import org.jetbrains.anko.*
 
 /**
@@ -67,9 +68,13 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setRightPosition()
 		}
 	}
+	
 	private val searchInput by lazy {
-		EditTextWithButton(context)
+		FilterSearchInput(context)
 	}
+	
+	fun getFilterSearchInput(): FilterSearchInput = searchInput
+	
 	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
 	
@@ -117,7 +122,9 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-	
+	fun resetFilterStatus(filtered: Boolean) {
+		searchInput.setFiltered(filtered)
+	}
 	fun showBackButton(
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit = {}
@@ -161,6 +168,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 				}
 			}
 		}
+	}
+	
+	fun setSearchFilterClickEvent(callback: () -> Unit) {
+		searchInput.setFilterClickEvent(callback)
 	}
 	
 	fun searchInputListener(isFocus: (Boolean) -> Unit, action: (String) -> Unit) {
@@ -218,10 +229,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 		// 复用的 `OverlayFragment Header` 首先隐藏常规 `Title`
 		title.visibility = View.GONE
-		findViewById<EditTextWithButton>(ElementID.searchInput).let {
+		findViewById<FilterSearchInput>(ElementID.searchInput).let {
 			it.isNull() isTrue {
 				searchInput.apply {
-					setCancelButton {
+					setCancelClick {
 						// 取消搜索后自动清空搜索框里面的内容
 						searchInput.editText.text.clear()
 						SoftKeyboard.hide(context as Activity)

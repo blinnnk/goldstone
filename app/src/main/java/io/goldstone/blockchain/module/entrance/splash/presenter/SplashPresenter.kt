@@ -1,6 +1,9 @@
 package io.goldstone.blockchain.module.entrance.splash.presenter
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.*
+import io.goldstone.blockchain.common.utils.*
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.jump
@@ -15,14 +18,16 @@ import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable.Companion.initEOSAccountName
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.currentPublicKeyHasActivated
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.hasActivatedOrWatchOnlyEOSAccount
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 import org.jetbrains.anko.*
 import java.io.File
 
@@ -150,6 +155,19 @@ class SplashPresenter(val activity: SplashActivity) {
 			callback()
 		}
 	}
+	
+	fun initDefaultMarketByNetWork() {
+		doAsync {
+			GoldStoneDataBase.database.exchangeTableDao().getAll().isEmpty() isTrue {
+				StartingPresenter.insertLocalMarketList(activity) {
+					updateMarketListByNetWork()
+				}
+			} otherwise {
+				updateMarketListByNetWork()
+			}
+		}
+		
+	}
 
 	fun initNodeList(@WorkerThread callback: () -> Unit) {
 		val localNode = GoldStoneDataBase.database.chainNodeDao().getAll()
@@ -232,6 +250,13 @@ class SplashPresenter(val activity: SplashActivity) {
 			SharedWallet.updateCurrentBalance(balance.orElse(0.0))
 			SharedWallet.updateCurrentName(name)
 			GoldStoneAPI.context.runOnUiThread { callback() }
+		}
+	}
+	
+	private fun updateMarketListByNetWork() {
+		NetworkUtil.hasNetwork(activity) isTrue {
+			// update local exchangeTable info list
+			StartingPresenter.getAndUpdateExchangeTables { _, _ -> }
 		}
 	}
 }

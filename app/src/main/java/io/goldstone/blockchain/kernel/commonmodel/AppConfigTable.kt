@@ -73,6 +73,17 @@ data class AppConfigTable(
 				GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
 			}
 		}
+		
+		fun updateExchangeListMD5(md5: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig()?.let {
+						update(it.apply { this.exchangeListMD5 = md5 })
+						
+					}
+				}
+			}
+		}
 
 		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
 			doAsync {

@@ -2,12 +2,8 @@ package io.goldstone.blockchain.common.component.overlay
 
 import android.content.Context
 import android.graphics.Color
-import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.view.*
+import android.widget.*
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
@@ -34,7 +30,8 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
-	private val maxWidth = 300.uiPX()
+	private lateinit var scrollViewContent: ScrollView
+	val maxWidth = 300.uiPX()
 	private val headerHeight = 50.uiPX()
 	
 	init {
@@ -48,6 +45,7 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 			lparams(maxWidth, wrapContent)
 			minimumHeight = 400.uiPX()
 			verticalLayout {
+				id = ElementID.overlayContainer
 				// Header
 				relativeLayout {
 					backgroundColor = GrayScale.whiteGray
@@ -71,7 +69,7 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 					}
 					closeButton.setAlignParentRight()
 				}
-				scrollView {
+				scrollViewContent = scrollView {
 					lparams(matchParent, wrapContent)
 					contentLayout = verticalLayout {
 						id = ContainerID.contentOverlay
@@ -116,4 +114,21 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 	fun addContent(hold: ViewGroup.() -> Unit) {
 		hold(contentLayout)
 	}
+	
+	fun showBottomBar(view: LinearLayout) {
+		val barHeight = 60.uiPX()
+		scrollViewContent.bottomPadding = barHeight
+		container.apply {
+			relativeLayout {
+				gravity = Gravity.CENTER
+				lparams {
+					width = matchParent
+					height = barHeight
+					sameBottom(ElementID.overlayContainer)
+				}
+				addView(view, LayoutParams(matchParent, matchParent))
+			}
+		}
+	}
+	
 }

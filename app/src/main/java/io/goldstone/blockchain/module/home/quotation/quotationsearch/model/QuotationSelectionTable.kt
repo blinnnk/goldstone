@@ -141,6 +141,9 @@ interface QuotationSelectionDao {
 
 	@Query("SELECT * FROM quotationSelection")
 	fun getAll(): List<QuotationSelectionTable>
+	
+	@Query("SELECT * FROM quotationSelection WHERE marketID IN (:marketIDs)")
+	fun getTargetMarketTables(marketIDs: List<Int>): List<QuotationSelectionTable>
 
 	@Query("SELECT * FROM quotationSelection WHERE orderID = (SELECT MAX(orderID) FROM quotationSelection)")
 	fun getMaxOrderIDTable(): QuotationSelectionTable?

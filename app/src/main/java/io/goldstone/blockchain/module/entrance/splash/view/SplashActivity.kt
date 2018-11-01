@@ -125,6 +125,8 @@ class SplashActivity : AppCompatActivity() {
 					// Insert support currency list from local json
 					updateCurrencyRateFromServer(this@config)
 				}
+				initDefaultMarketByNetWork()
+				
 				// Init Node List
 				initNodeList {
 					prepareNodeInfo {

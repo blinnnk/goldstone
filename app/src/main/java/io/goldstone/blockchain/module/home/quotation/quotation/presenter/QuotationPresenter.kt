@@ -109,7 +109,7 @@ class QuotationPresenter(
 						updateChartTimes = updateChartTimes.orZero() - 1
 					}
 				} else GoldStoneAPI.context.runOnUiThread {
-					fragment.context.alert(error.message)
+					alert(error.message)
 				}
 			}
 		}
