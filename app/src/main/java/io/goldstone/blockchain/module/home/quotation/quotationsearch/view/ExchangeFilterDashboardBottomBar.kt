@@ -32,7 +32,7 @@ class ExchangeFilterDashboardBottomBar(context: Context) : LinearLayout(context)
 		RoundButton(context).apply {
 			text = CommonText.confirm
 			setBlueStyle()
-			val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
+			val buttonWidth = OverlaySize.maxWidth - 50.uiPX()
 			val buttonHeight = 40.uiPX()
 			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight)
 			onClick { confirmButtonClickEvent?.run() }

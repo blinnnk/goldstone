@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -20,10 +19,11 @@ fun TokenDetailPresenter.loadBTCChainData(localMaxIndex: Int) {
 	fragment.showLoadingView(LoadingText.transactionData)
 	val address = AddressUtils.getCurrentBTCAddress()
 	BitcoinApi.getTransactionCount(address) { transactionCount, error ->
-		if (!transactionCount.isNull() && error.isNone()) loadTransactionsFromChain(
+		if (transactionCount != null && error.isNone()) loadTransactionsFromChain(
 			address,
 			localMaxIndex,
-			transactionCount!!
+			// TODO 第三方 `Insight` 限制一次请求数量, 暂时这样, 下个版本做分页拉取(当前版本1.4.2)
+			if (transactionCount > 50) 50 else transactionCount
 		) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
@@ -51,8 +51,8 @@ private fun loadTransactionsFromChain(
 		pageInfo.to
 	) { transactions, error ->
 		// Calculate All Inputs to get transfer value
-		if (!transactions.isNull() && error.isNone())
-			callback(transactions!!.asSequence().mapIndexed { index, item ->
+		if (transactions != null && error.isNone())
+			callback(transactions.asSequence().mapIndexed { index, item ->
 				// 转换数据格式
 				BTCSeriesTransactionTable(
 					item,

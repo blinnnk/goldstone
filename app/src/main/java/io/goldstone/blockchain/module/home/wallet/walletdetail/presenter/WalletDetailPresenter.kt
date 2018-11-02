@@ -216,12 +216,11 @@ class WalletDetailPresenter(
 		// Prepare token list and show content scroll overlay view
 		getMainActivity()?.getMainContainer()?.apply {
 			if (findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
-				val overlay = ContentScrollOverlayView(context)
+				val overlay = ContentScrollOverlayView(context, true)
 				overlay.into(this)
 				overlay.apply {
 					setTitle(TransactionText.tokenSelection)
 					addContent {
-						topPadding = 10.uiPX()
 						val data =
 							tokens.sortedByDescending { it.weight }.toArrayList()
 						val tokenList = TokenSelectionRecyclerView(context)

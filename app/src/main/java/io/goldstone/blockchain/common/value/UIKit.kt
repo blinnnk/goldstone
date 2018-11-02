@@ -169,10 +169,11 @@ object WalletDetailSize {
 	val headerHeight = 365.uiPX()
 }
 
-fun View.fontSize(defaultSize: Int): Float {
-	return px2sp((Resources.getSystem().displayMetrics.density * defaultSize).toInt())
+object OverlaySize {
+	@JvmField
+	val maxWidth = 300.uiPX()
 }
 
-object Duration {
-	const val wave = 1500L
+fun View.fontSize(defaultSize: Int): Float {
+	return px2sp((Resources.getSystem().displayMetrics.density * defaultSize).toInt())
 }

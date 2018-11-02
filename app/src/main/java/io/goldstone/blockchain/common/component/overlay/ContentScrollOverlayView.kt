@@ -37,7 +37,7 @@ open class ContentScrollOverlayView(
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
 	private lateinit var scrollViewContent: ScrollView
-	private val maxWidth = 300.uiPX()
+
 	private val headerHeight = 50.uiPX()
 
 	init {
@@ -48,8 +48,8 @@ open class ContentScrollOverlayView(
 		// 主容器
 		container = relativeLayout {
 			alpha = 0f
-			lparams(maxWidth, wrapContent)
-			minimumHeight = 400.uiPX()
+			lparams(OverlaySize.maxWidth, wrapContent)
+			minimumHeight = 360.uiPX()
 			verticalLayout {
 				id = ElementID.overlayContainer
 				// Header
@@ -76,19 +76,13 @@ open class ContentScrollOverlayView(
 					closeButton.setAlignParentRight()
 				}
 
-				fun addContentView() {
+				if (isAddingRecyclerView) contentLayout = verticalLayout {
+					id = ContainerID.contentOverlay
+					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+				} else scrollViewContent = scrollView {
 					contentLayout = verticalLayout {
 						id = ContainerID.contentOverlay
-						bottomPadding = 15.uiPX()
 						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-					}
-				}
-				if (isAddingRecyclerView) {
-					addContentView()
-				} else {
-					scrollViewContent = scrollView {
-						lparams(matchParent, wrapContent)
-						addContentView()
 					}
 				}
 			}

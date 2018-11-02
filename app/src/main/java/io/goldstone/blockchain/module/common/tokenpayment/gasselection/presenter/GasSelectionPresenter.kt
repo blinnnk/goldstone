@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -13,6 +15,8 @@ import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -143,7 +147,7 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(callback: (GoldStoneError) -> Unit) {
+	fun confirmTransfer(@UiThread callback: (GoldStoneError) -> Unit) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
@@ -170,7 +174,7 @@ class GasSelectionPresenter(
 		return isValid
 	}
 
-	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
+	fun showConfirmAttentionView(@WorkerThread callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
 			TransactionText.confirmTransactionTitle.toUpperCase(),
 			TransactionText.confirmTransaction,
@@ -178,18 +182,43 @@ class GasSelectionPresenter(
 			// 点击取消按钮
 			{ callback(GoldStoneError.None) }
 		) {
+			if (prepareBTCSeriesModel == null) {
+				callback(GoldStoneError("Empty PrepareBTCSeriesModel Data"))
+				return@showAlertView
+			}
+			val tokenContract = getToken()?.contract ?: return@showAlertView
 			val password = it?.text.toString()
+			transfer(tokenContract.getAddress().orEmpty(), tokenContract.getChainType(), password, callback)
 			when {
-				getToken()?.contract.isBTC() -> prepareBTCSeriesModel?.apply {
-					transferBTC(this, password, callback)
-				}
-				getToken()?.contract.isLTC() -> prepareBTCSeriesModel?.apply {
-					transferLTC(this, password, callback)
-				}
-				getToken()?.contract.isBCH() -> prepareBTCSeriesModel?.apply {
-					transferBCH(this, password, callback)
-				}
-				else -> transfer(password, callback)
+				getToken()?.contract.isBTC() -> transferBTC(
+					prepareBTCSeriesModel!!,
+					AddressUtils.getCurrentBTCAddress(),
+					ChainType.BTC,
+					password,
+					callback
+				)
+				getToken()?.contract.isLTC() -> transferLTC(
+					prepareBTCSeriesModel!!,
+					AddressUtils.getCurrentLTCAddress(),
+					if (SharedValue.isTestEnvironment()) ChainType.BTC else ChainType.LTC,
+					password,
+					callback
+				)
+				getToken()?.contract.isBCH() -> transferBCH(
+					prepareBTCSeriesModel!!,
+					AddressUtils.getCurrentBCHAddress(),
+					ChainType.BCH,
+					password,
+					callback
+				)
+
+				getToken()?.contract.isETC() -> transfer(
+					SharedAddress.getCurrentETC(),
+					ChainType.ETC,
+					password,
+					callback
+				)
+				else -> transfer(SharedAddress.getCurrentEthereum(), ChainType.ETH, password, callback)
 			}
 		}
 	}

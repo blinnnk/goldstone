@@ -28,6 +28,7 @@ import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.support.v4.runOnUiThread
 
 /**
  * @date 2018/5/16 3:53 PM
@@ -72,15 +73,15 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						}
 					}
 					getConfirmButton {
-						onClick { _ ->
+						onClick {
 							showLoadingStatus()
-							presenter.confirmTransfer {
-								if (it.hasError()) {
-									if (it is AccountError) setCanUseStyle(false)
-									this@GasSelectionFragment.context.alert(it.message)
-								}
+							presenter.confirmTransfer { error ->
 								resetMinerType()
-								showLoadingStatus(false, Spectrum.white, CommonText.next)
+								if (error.hasError()) runOnUiThread {
+									if (error is AccountError) setCanUseStyle(false)
+									this@GasSelectionFragment.context.alert(error.message)
+									showLoadingStatus(false, Spectrum.white, CommonText.next)
+								}
 							}
 						}
 					}

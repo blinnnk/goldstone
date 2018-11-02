@@ -1,16 +1,16 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
-import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
@@ -20,6 +20,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -54,11 +55,15 @@ fun GasSelectionPresenter.insertCustomBTCSatoshi() {
 
 fun GasSelectionPresenter.transferBTC(
 	prepareBTCModel: PaymentBTCSeriesModel,
+	address: String,
+	chainType: ChainType,
 	password: String,
-	@UiThread callback: (GoldStoneError) -> Unit
+	@WorkerThread callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentBTCPrivateKey(
-		prepareBTCModel.fromAddress,
+	PrivateKeyExportPresenter.getPrivateKey(
+		fragment.context!!,
+		address,
+		chainType,
 		password
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareBTCModel.apply model@{
@@ -92,9 +97,7 @@ fun GasSelectionPresenter.transferBTC(
 									prepareReceiptModelFromBTCSeries(this@model, fee, hash)
 								)
 							}
-						} else GoldStoneAPI.context.runOnUiThread {
-							callback(error)
-						}
+						} else callback(error)
 					}
 				}
 			}
@@ -102,21 +105,7 @@ fun GasSelectionPresenter.transferBTC(
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentBTCPrivateKey(
-	walletAddress: String,
-	password: String,
-	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
-) {
-	fragment.context?.exportBase58PrivateKey(
-		walletAddress,
-		password,
-		SharedValue.isTestEnvironment(),
-		true,
-		hold
-	)
-}
-
-fun GasSelectionPresenter.prepareToTransferBTC(callback: (GoldStoneError) -> Unit) {
+fun GasSelectionPresenter.prepareToTransferBTC(@WorkerThread callback: (GoldStoneError) -> Unit) {
 	prepareBTCSeriesModel?.apply {
 		BitcoinApi.getBalance(fromAddress, true) { balance, error ->
 			if (!balance.isNull() && error.isNone()) {

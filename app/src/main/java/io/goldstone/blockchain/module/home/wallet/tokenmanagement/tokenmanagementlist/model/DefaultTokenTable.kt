@@ -228,15 +228,15 @@ data class DefaultTokenTable(
 			} then (hold)
 		}
 
-		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit) {
+		fun getTokenFromAllChains(contract: String, symbol: String, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractFromAllChains(contract)
+				GoldStoneDataBase.database.defaultTokenDao().getTokenFromAllChains(contract, symbol)
 			} then { hold(it.firstOrNull()) }
 		}
 
-		fun getTokenByContractAndChainID(contract: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
+		fun getToken(contract: String, symbol: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractAndChainID(contract, chainID.id)
+				GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(contract, symbol, chainID.id)
 			} then (hold)
 		}
 
@@ -252,7 +252,7 @@ data class DefaultTokenTable(
 		) {
 			doAsync {
 				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-				defaultDao.getTokenByContractAndChainID(data.contract.contract.orEmpty(), data.chainID).let { targetTokens ->
+				defaultDao.getTokenByContract(data.contract.contract.orEmpty(), data.symbol, data.chainID).let { targetTokens ->
 					if (targetTokens.isNull()) {
 						defaultDao.insert(DefaultTokenTable(data))
 						callback()
@@ -314,11 +314,8 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
 	fun getTokenByContract(contract: String, symbol: String, chainID: String): DefaultTokenTable?
 
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
-	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>
-
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND chainID LIKE :chainID")
-	fun getTokenByContractAndChainID(contract: String, chainID: String): DefaultTokenTable?
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol")
+	fun getTokenFromAllChains(contract: String, symbol: String): List<DefaultTokenTable>
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

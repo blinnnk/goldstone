@@ -4,19 +4,19 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
-import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -41,27 +41,17 @@ fun GasSelectionPresenter.prepareToTransferBCH(@UiThread callback: (GoldStoneErr
 	}
 }
 
-private fun GasSelectionPresenter.getCurrentBCHPrivateKey(
-	walletAddress: String,
-	password: String,
-	hold: (privateKey: String?, error: AccountError) -> Unit
-) {
-	fragment.context?.exportBase58PrivateKey(
-		walletAddress,
-		password,
-		SharedValue.isTestEnvironment(),
-		true,
-		hold
-	)
-}
-
 fun GasSelectionPresenter.transferBCH(
 	prepareBTCSeriesModel: PaymentBTCSeriesModel,
+	address: String,
+	chainType: ChainType,
 	password: String,
 	@WorkerThread callback: (GoldStoneError) -> Unit
 ) {
-	getCurrentBCHPrivateKey(
-		prepareBTCSeriesModel.fromAddress,
+	PrivateKeyExportPresenter.getPrivateKey(
+		fragment.context!!,
+		address,
+		chainType,
 		password
 	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareBTCSeriesModel.apply model@{
