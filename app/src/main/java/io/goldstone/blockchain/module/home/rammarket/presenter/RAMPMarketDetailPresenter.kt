@@ -30,8 +30,6 @@ class RAMPMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
  : BasePresenter<RAMMarketDetailFragment>() {
 	var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	var recentTransactionModel: RecentTransactionModel? = null
-	var period: String = EOSRAMChartType.Hour.info
-	var dateType: Int = DateUtils.FORMAT_SHOW_TIME
 	private val ramPriceSocket by lazy {
 		object : GoldStoneWebSocket("{\"t\": \"unsub_eos_ram_service\"}") {
 			override fun onOpened() {
