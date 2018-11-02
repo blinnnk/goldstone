@@ -20,15 +20,8 @@ class RecentTradingListView(context: Context): RecyclerView(context) {
 		layoutManager = LinearLayoutManager(context)
 	}
 	
-	fun setData(
-		buyList: List<TradingInfoModel>,
-		sellList: List<TradingInfoModel>
-	) {
-		adapter = RecentTradingAdapter(
-			context,
-			buyList,
-			sellList
-		)
+	fun setData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
+		adapter = RecentTradingAdapter(context, buyList, sellList)
 	}
 	
 }

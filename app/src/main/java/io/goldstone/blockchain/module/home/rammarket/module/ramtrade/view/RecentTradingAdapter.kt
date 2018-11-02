@@ -1,8 +1,7 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
+import android.graphics.*
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.RelativeLayout
@@ -28,7 +27,6 @@ class RecentTradingAdapter(
 	private val sellList: List<TradingInfoModel>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 	
-	
 	override fun onCreateViewHolder(
 		parent: ViewGroup,
 		viewType: Int
@@ -49,30 +47,29 @@ class RecentTradingAdapter(
 		holder: RecyclerView.ViewHolder,
 		position: Int
 	) {
-		
 		if (holder is TradingTitleHolder) {
 			(holder.itemView as? TitleView)?.apply {
 				title.text = if (position == 0) "买入" else "卖出"
-				title.textColor = if (position == 0) Spectrum.green else Spectrum.red
+				title.textColor = if (position == 0) Spectrum.green else Spectrum.lightRed
 			}
 		} else if (holder is TradingHolder) {
 			(holder.itemView as? TradingItemView)?.apply {
 				if (position <= buyList.size ) {
 					val model = buyList[position - 1]
 					val maxValue = buyList.maxBy { it.quantity }?.quantity?:0.toDouble()
-					setData(model.account, model.quantity, maxValue, Spectrum.green)
+					setData(model.account, model.quantity, maxValue, Color.parseColor("#0F1CC881"))
 				} else {
 					val model = sellList[position - buyList.size - 2]
 					val maxValue = sellList.maxBy { it.quantity }?.quantity?:0.toDouble()
-					setData(model.account, model.quantity, maxValue, Spectrum.red)
+					setData(model.account, model.quantity, maxValue, Color.parseColor("#0FFF6464"))
 				}
 			}
 		}
 		
 	}
 	
-	inner class TradingHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}
-	inner class TradingTitleHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {}
+	inner class TradingHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+	inner class TradingTitleHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 }
 
 class TitleView(context: Context) : RelativeLayout(context) {
@@ -99,10 +96,10 @@ class TitleView(context: Context) : RelativeLayout(context) {
 }
 
 class TradingItemView(context: Context) : RelativeLayout(context) {
-	val viewWidth = ScreenSize.Width - ScreenSize.Width/2 - 20.uiPX()
+	private val viewWidth = ScreenSize.Width - ScreenSize.Width/2 - 20.uiPX()
 	val name: TextView
-	val transactionAmount: TextView
-	val backgroundView: View
+	private val transactionAmount: TextView
+	private val backgroundView: View
 	var percent: Float = 0f
 	
 	init {

@@ -21,12 +21,11 @@ class PriceChartWithMenuLayout(
 	private val menu by lazy { ButtonMenu(context) }
 	init {
 	  orientation = LinearLayout.VERTICAL
-		menu.apply {
-			setMargins<LinearLayout.LayoutParams> {
+		menu.setMargins<LinearLayout.LayoutParams> {
 				topMargin = 16.uiPX()
 				leftMargin = 20.uiPX()
-			}
 		}
+		
 		menu.titles = arrayListOf(
 			EOSRAMChartType.Minute.display,
 			EOSRAMChartType.Hour.display,

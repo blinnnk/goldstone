@@ -14,7 +14,6 @@ enum class EOSRAMChartType(
 	val display: String,
 	val dateType: Int
 ) {
-	
 	Minute(0, "1min", DateAndTimeText.minute.toUpperCase(), DateUtils.FORMAT_SHOW_TIME),
 	Hour(1, "1hour", DateAndTimeText.hour.toUpperCase(), DateUtils.FORMAT_SHOW_TIME),
 	Day(2, "1day", DateAndTimeText.day.toUpperCase(), DateUtils.FORMAT_SHOW_DATE)

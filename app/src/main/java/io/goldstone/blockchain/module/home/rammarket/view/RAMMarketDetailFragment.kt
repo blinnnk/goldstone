@@ -43,7 +43,6 @@ class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 				addView(ramPriceView)
 				addView(priceChartWithMenuLayout)
 				addView(tradingView)
-				presenter.updateRAMCandleData(EOSRAMChartType.Minute)
 				
 			}
 		}
@@ -77,22 +76,19 @@ class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 	}
 	
 	fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
-		data.apply {
-			priceChartWithMenuLayout.candleChart.resetData(dateType, this.mapIndexed { index, entry ->
-				CandleEntry(
-					index.toFloat(),
-					entry.high.toFloat(),
-					entry.low.toFloat(),
-					entry.open.toFloat(),
-					entry.close.toFloat(),
-					entry.time)
-			})
-		}
+		priceChartWithMenuLayout.candleChart.resetData(dateType, data.mapIndexed { index, entry ->
+			CandleEntry(
+				index.toFloat(),
+				entry.high.toFloat(),
+				entry.low.toFloat(),
+				entry.open.toFloat(),
+				entry.close.toFloat(),
+				entry.time)
+		})
+	
 	}
 	
-	fun setTradingViewData(
-		buyList: List<TradingInfoModel>,
-		sellList: List<TradingInfoModel>) {
+	fun setTradingViewData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
 		tradingView.recentTradingListView.setData(buyList, sellList)
 	}
 	fun notifyTradingViewData() {

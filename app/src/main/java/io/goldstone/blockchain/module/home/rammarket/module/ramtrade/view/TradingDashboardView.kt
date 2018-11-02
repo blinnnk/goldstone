@@ -81,10 +81,7 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.heavy(context)
 			textSize = fontSize(10)
-			
 		}.into(this)
-		
-		
 		
 		linearLayout {
 			topPadding = 26.uiPX()

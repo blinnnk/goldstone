@@ -157,9 +157,9 @@ fun RAMPMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTy
 fun RAMPMarketDetailPresenter.updateTodayPriceUI() {
 	RAMTradeRoomData.ramInformationModel?.let {
 		fragment.setTodayPrice(
-			BigDecimal("${it.openPrice}").toPlainString(),
-			BigDecimal("${it.HighPrice}").toPlainString(),
-			BigDecimal("${it.lowPrice}").toPlainString()
+			BigDecimal("${it.openPrice.orZero()}").toPlainString(),
+			BigDecimal("${it.HighPrice.orZero()}").toPlainString(),
+			BigDecimal("${it.lowPrice.orZero()}").toPlainString()
 		)
 	}
 	
@@ -218,6 +218,15 @@ fun RAMPMarketDetailPresenter.getTodayPrice() {
 		} else {
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.context.alert(error.message)
+				RAMTradeRoomData.ramInformationModel?.let {
+					// 出错了可能长连接已经断了， 需要在此给当前价格赋值
+					if (!it.currentPrice.isNull() && !it.pricePercent.isNull()) {
+						fragment.setCurrentPriceAndPercent(
+							BigDecimal("${it.currentPrice}").toPlainString(),
+							it.pricePercent!!
+						)
+					}
+				}
 			}
 		}
 		GoldStoneAPI.context.runOnUiThread {
