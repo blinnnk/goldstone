@@ -1,15 +1,9 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramprice.view
 
 import android.content.Context
-import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.*
-import com.blinnnk.uikit.ScreenSize
+import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
-import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**

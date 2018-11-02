@@ -96,7 +96,7 @@ fun RAMPMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType)
 fun RAMPMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartType) {
 	val period = ramChartType.info
 	val dateType = ramChartType.dateType
-	var size: Int = 0
+	var size = 0
 	if (candleDataMap.containsKey(ramChartType.info)) {
 		val ramTypeData = candleDataMap[ramChartType.info]
 		ramTypeData!!.maxBy { it.time }?.apply {
@@ -121,7 +121,7 @@ fun RAMPMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTy
 			}
 		}
 	} else {
-		GoldStoneAPI.getEOSRAMPriceTendcyCandle(period, size) { candleData, error ->
+		GoldStoneAPI.getEOSRAMPriceTrendCandle(period, size) { candleData, error ->
 			if (error.isNone()) {
 				// 更新 `UI` 界面
 				candleData?.let {

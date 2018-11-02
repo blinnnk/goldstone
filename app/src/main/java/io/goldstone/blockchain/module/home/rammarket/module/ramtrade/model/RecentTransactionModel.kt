@@ -14,5 +14,4 @@ class RecentTransactionModel(
 	val sellList: ArrayList<TradingInfoModel>,
 	@SerializedName("buy_list")
 	val buyList: ArrayList<TradingInfoModel>
-) {
-}
+)

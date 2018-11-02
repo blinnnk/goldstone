@@ -526,7 +526,7 @@ object GoldStoneAPI {
 		}
 	}
 	
-	fun getEOSRAMPriceTendcyCandle(
+	fun getEOSRAMPriceTrendCandle(
 		period: String,
 		size: Int,
 		hold: (candleData: ArrayList<CandleChartModel>?, error: RequestError) -> Unit

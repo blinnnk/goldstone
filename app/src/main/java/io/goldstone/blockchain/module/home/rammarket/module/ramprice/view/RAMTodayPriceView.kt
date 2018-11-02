@@ -30,7 +30,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 			topPadding = 16.uiPX()
 			bottomPadding = 16.uiPX()
 			startPrice = textView {
-				gravity = Gravity.LEFT
+				gravity = Gravity.START
 				text = EOSRAMExchangeText.openPrice("")
 				textSize = fontSize(10)
 				textColor = GrayScale.midGray
@@ -46,7 +46,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 				singleLine = true
 			}.lparams(viewWidth/3, wrapContent)
 			lowPrice = textView {
-				gravity = Gravity.RIGHT
+				gravity = Gravity.END
 				text = EOSRAMExchangeText.lowPrice("")
 				textSize = fontSize(10)
 				textColor = GrayScale.midGray

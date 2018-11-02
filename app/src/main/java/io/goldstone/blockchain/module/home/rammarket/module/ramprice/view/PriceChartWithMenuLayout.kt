@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramprice.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.LinearLayout
 import com.blinnnk.extension.preventDuplicateClicks
@@ -8,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import org.jetbrains.anko.sdk25.coroutines.onClick
+@SuppressLint("ViewConstructor")
 /**
  * @date: 2018/11/1.
  * @author: yanglihai
