@@ -100,4 +100,9 @@ class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 		tradingView.recentTradingListView.adapter?.notifyDataSetChanged()
 	}
 	
+	fun setRAMBalance(ramBalance: String, eosBalance: String) {
+		tradingView.tradingDashboardView.ramBalance.text = EOSRAMExchangeText.ramBalanceDescription(ramBalance)
+		tradingView.tradingDashboardView.eosBalance.text = EOSRAMExchangeText.eosBalanceDescription(eosBalance)
+	}
+	
 }

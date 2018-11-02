@@ -3,16 +3,19 @@ package io.goldstone.blockchain.module.home.rammarket.presenter
 import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.model.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.recentTransactions
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.setAcountInfoFromDatabase
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -74,6 +77,7 @@ class RAMPMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 	override fun onFragmentCreate() {
 		super.onFragmentCreate()
 		fragment.context?.apply {
+			setAcountInfoFromDatabase()
 			RAMTradeRoomData.ramInformationModel.isNull {
 				RAMTradeRoomData.ramInformationModel = RAMInformationModel(
 					null,

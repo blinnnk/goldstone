@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import com.google.gson.Gson
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
@@ -25,8 +26,7 @@ import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
-import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
-import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.*
 import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
@@ -600,8 +600,35 @@ object EOSAPI {
 				}
 			}
 		}
-
-
+	}
+	
+	fun getGlobalInformation(
+		@WorkerThread hold: (EOSGolbalModel?, RequestError) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "global"),
+				Pair("json", "true")
+			)
+		).let {
+			RequisitionUtil.postRequest(
+				it,
+				EOSUrl.getTableRows(),
+				{
+					hold(null, it)
+				},
+				false
+			) {
+				val globalInformation = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
+				globalInformation?.apply {
+					val model = Gson().fromJson(globalInformation.toString(), EOSGolbalModel::class.java)
+					hold(model, RequestError.None)
+				}
+			}
+		}
 	}
 
 }

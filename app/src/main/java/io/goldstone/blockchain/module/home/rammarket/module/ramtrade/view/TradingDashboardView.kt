@@ -25,8 +25,8 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  ButtonMenu
 	val ramEditText by lazy { RAMPriceRoundInputView(context, "KB") }
 	private val eosEditText by lazy { RAMPriceRoundInputView(context, "EOS") }
-	private val ramBalance by lazy { TextView(context) }
-	private val eosBalance by lazy { TextView(context) }
+	val ramBalance by lazy { TextView(context) }
+	val eosBalance by lazy { TextView(context) }
 	private val confirmButton by lazy { RoundButton(context) }
 	
 	init {
