@@ -23,7 +23,7 @@ import org.jetbrains.anko.*
  */
 class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  ButtonMenu
-	private val ramEditText by lazy { RAMPriceRoundInputView(context, "KB") }
+	val ramEditText by lazy { RAMPriceRoundInputView(context, "KB") }
 	private val eosEditText by lazy { RAMPriceRoundInputView(context, "EOS") }
 	private val ramBalance by lazy { TextView(context) }
 	private val eosBalance by lazy { TextView(context) }
@@ -84,14 +84,20 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			
 		}.into(this)
 		
-		textView {
-			topPadding = 36.uiPX()
-			textColor = Spectrum.blue
-			textSize = fontSize(12)
-			typeface = GoldStoneFont.black(context)
-			text = EOSRAMExchangeText.transactionHistory
-			gravity = Gravity.CENTER_VERTICAL
-			setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.back,0, 0, 0)
+		
+		
+		linearLayout {
+			topPadding = 26.uiPX()
+			imageView {
+				imageResource = R.drawable.back
+			}.lparams(15.uiPX(), 15.uiPX())
+			textView {
+				textColor = Spectrum.blue
+				textSize = fontSize(12)
+				typeface = GoldStoneFont.black(context)
+				text = EOSRAMExchangeText.transactionHistory
+				gravity = Gravity.CENTER_VERTICAL
+			}
 		}
 		
 		confirmButton.apply {
@@ -99,6 +105,9 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			text = EOSRAMExchangeText.confirmToTrade
 			(layoutParams as? LinearLayout.LayoutParams)?.apply {
 				gravity = Gravity.CENTER_HORIZONTAL
+			}
+			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 11.uiPX()
 			}
 		}.into(this)
 		

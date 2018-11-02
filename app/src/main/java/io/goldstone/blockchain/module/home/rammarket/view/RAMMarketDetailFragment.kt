@@ -7,8 +7,10 @@ import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.updateRAMCandleData
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPMarketDetailPresenter
@@ -50,9 +52,10 @@ class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 	}
 	
 	fun setCurrentPriceAndPercent(price: String, percent: Float) {
+		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.toDouble().formatCount(3)} EOS/KB)"
 		ramPriceView.currentPriceView.currentPrice.text = price
 		ramPriceView.currentPriceView.trendcyPercent.apply {
-			val trendBigDecimal = BigDecimal(percent.toString()).divide(BigDecimal(1), 2, BigDecimal.ROUND_HALF_UP)
+			val trendBigDecimal = percent.toDouble().formatCount(3)
 			if (percent > 0) {
 				text = "+$trendBigDecimal%"
 				textColor = Spectrum.green
