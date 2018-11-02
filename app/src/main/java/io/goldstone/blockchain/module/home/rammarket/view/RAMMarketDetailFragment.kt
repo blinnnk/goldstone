@@ -40,7 +40,6 @@ class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 			verticalLayout {
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL
-				
 				addView(ramPriceView)
 				addView(priceChartWithMenuLayout)
 				addView(tradingView)

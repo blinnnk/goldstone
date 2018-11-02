@@ -66,7 +66,9 @@ class RAMPMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 					buyList.removeAt(0)
 					buyList.add(model)
 				}
-				fragment.notifyTradingViewData()
+				GoldStoneAPI.context.runOnUiThread {
+					fragment.notifyTradingViewData()
+				}
 			}
 			
 		}

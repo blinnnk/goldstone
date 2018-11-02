@@ -26,6 +26,7 @@ class TradingView(context: Context): LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
 			backgroundColor = GrayScale.lightGray
 			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 16.uiPX()
 				bottomMargin = 16.uiPX()
 			}
 		}
