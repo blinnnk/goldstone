@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -18,7 +21,6 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -37,34 +39,25 @@ fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>)
 	}
 }
 
-fun checkAddressNameInContacts(
-	transactions: List<TransactionListModel>,
-	@UiThread callback: () -> Unit
-) {
+fun checkAddressNameInContacts(transactions: List<TransactionListModel>, @UiThread callback: () -> Unit) {
 	ContactTable.getAllContacts { contacts ->
-		if (contacts.isEmpty()) {
-			callback()
-		} else {
-			transactions.forEachOrEnd { item, isEnd ->
-				item.addressName =
+		if (contacts.isEmpty()) callback()
+		else {
+			transactions.forEach { transaction ->
+				transaction.addressName =
 					contacts.find {
 						// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
-						it.ethSeriesAddress.equals(item.addressName, true)
-							|| it.btcSeriesTestnetAddress.contains(item.addressName, true)
-							|| it.btcMainnetAddress.contains(item.addressName, true)
-					}?.name ?: item.addressName
-				if (isEnd) {
-					callback()
-				}
+						it.ethSeriesAddress.equals(transaction.addressName, true)
+							|| it.btcSeriesTestnetAddress.contains(transaction.addressName, true)
+							|| it.btcMainnetAddress.contains(transaction.addressName, true)
+					}?.name ?: transaction.addressName
 			}
+			callback()
 		}
 	}
 }
 
-fun getTokenTransactions(
-	startBlock: String,
-	@UiThread hold: (List<TransactionListModel>) -> Unit
-) {
+fun getTokenTransactions(startBlock: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
 	getTransactionsFromEtherScan(startBlock) { hasData ->
 		if (hasData) TransactionTable.getTokenTransactions(
 			SharedAddress.getCurrentEthereum()
@@ -95,37 +88,35 @@ private fun mergeETHAndERC20Incoming(
 	@WorkerThread hold: (transactions: List<TransactionTable>?, error: RequestError) -> Unit
 ): ConcurrentAsyncCombine {
 	return object : ConcurrentAsyncCombine() {
+		override val completeInUIThread: Boolean = false
 		override var asyncCount: Int = 2
 		// Get transaction data from `etherScan`
 		var chainData = listOf<TransactionTable>()
 		var logData = listOf<TransactionTable>()
-		override fun concurrentJobs() {
-			doAsync {
-				GoldStoneAPI.getTransactionListByAddress(
-					startBlock,
-					SharedAddress.getCurrentEthereum()
-				) { transactions, error ->
-					if (!transactions.isNull() && error.isNone()) {
-						chainData = transactions!!
-					} else hold(null, error)
-					completeMark()
-				}
-				GoldStoneAPI.getERC20TokenIncomingTransaction(
-					startBlock,
-					SharedAddress.getCurrentEthereum()
-				) { erc20Data, error ->
-					if (!erc20Data.isNull() && error.isNone()) {
-						// 把请求回来的数据转换成 `TransactionTable` 格式
-						logData = erc20Data!!.map {
-							TransactionTable(ERC20TransactionModel(it))
-						}
+		override fun doChildTask(index: Int) {
+			GoldStoneAPI.getTransactionListByAddress(
+				startBlock,
+				SharedAddress.getCurrentEthereum()
+			) { transactions, error ->
+				if (!transactions.isNull() && error.isNone()) {
+					chainData = transactions!!
+				} else hold(null, error)
+				completeMark()
+			}
+			GoldStoneAPI.getERC20TokenIncomingTransaction(
+				startBlock,
+				SharedAddress.getCurrentEthereum()
+			) { erc20Data, error ->
+				if (erc20Data != null && error.isNone()) {
+					// 把请求回来的数据转换成 `TransactionTable` 格式
+					logData = erc20Data.map {
+						TransactionTable(ERC20TransactionModel(it))
 					}
-					completeMark()
 				}
+				completeMark()
 			}
 		}
 
-		override fun getResultInMainThread() = false
 		override fun mergeCallBack() {
 			diffNewDataAndUpdateLocalData(chainData.asSequence().plus(logData).filter {
 				it.to.isNotEmpty()
@@ -176,28 +167,26 @@ private fun List<TransactionTable>.getUnknownTokenInfo(callback: (List<DefaultTo
 			}.isNull()
 		}.toList().let { filterData ->
 			object : ConcurrentAsyncCombine() {
+				override val completeInUIThread: Boolean = false
 				override var asyncCount = filterData.size
-				override fun concurrentJobs() {
-					filterData.forEach { transaction ->
-						GoldStoneEthCall.getSymbolAndDecimalByContract(
-							transaction.contractAddress,
-							SharedChain.getCurrentETH()
-						) { symbol, decimal, error ->
-							if (error.isNone()) unknownData.add(
-								DefaultTokenTable(
-									transaction.contractAddress,
-									symbol!!,
-									decimal!!,
-									SharedChain.getCurrentETH().chainID,
-									""
-								)
+				override fun doChildTask(index: Int) {
+					GoldStoneEthCall.getSymbolAndDecimalByContract(
+						filterData[index].contractAddress,
+						SharedChain.getCurrentETH()
+					) { symbol, decimal, error ->
+						if (error.isNone()) unknownData.add(
+							DefaultTokenTable(
+								filterData[index].contractAddress,
+								symbol!!,
+								decimal!!,
+								SharedChain.getCurrentETH().chainID,
+								""
 							)
-							completeMark()
-						}
+						)
+						completeMark()
 					}
 				}
 
-				override fun getResultInMainThread() = false
 				override fun mergeCallBack() {
 					GoldStoneDataBase.database.defaultTokenDao().insertAll(unknownData)
 					// 把更新数据的 `DefaultToken` 和内存中待使用的 `DefaultToken List` 合并更新方便在后
@@ -246,50 +235,50 @@ private fun completeTransactionInfo(
 	@WorkerThread hold: List<TransactionTable>.() -> Unit
 ) {
 	object : ConcurrentAsyncCombine() {
+		override val completeInUIThread: Boolean = false
 		override var asyncCount: Int = data.size
-		override fun concurrentJobs() {
-			data.forEach { transaction ->
-				if (CryptoUtils.isERC20Transfer(transaction.input)) {
-					val contract =
-						if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
-						else transaction.to
-					var receiveAddress: String? = null
-					var count = 0.0
-					/** 从本地数据库检索 `contract` 对应的 `symbol` */
-					val targetToken = localTokens.find { it.contract.equals(contract, true) }
-					if (targetToken.isNull()) completeMark() // 如果找不到对应的数据就标记完成一次查询
-					targetToken?.let { tokenInfo ->
-						transaction.logIndex.isNotEmpty() isTrue {
-							count = CryptoUtils.toCountByDecimal(transaction.value.toBigInteger(), tokenInfo.decimals.orZero())
-							receiveAddress = transaction.to
-						} otherwise {
-							// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
-							val transactionInfo = CryptoUtils.getTransferInfoFromInputData(transaction.input)
-							count = CryptoUtils.toCountByDecimal(transactionInfo?.amount!!, tokenInfo.decimals.orZero())
-							receiveAddress = transactionInfo.address
-						}
-						transaction.updateModelInfo(
-							true,
-							tokenInfo.symbol,
-							count.toString(),
-							receiveAddress
-						)
-						completeMark()
+		override val delayTime: Long? = if (asyncCount > 6) 50 else 0
+		override fun doChildTask(index: Int) {
+			val transaction = if (data.isNotEmpty()) data[index] else return
+			if (CryptoUtils.isERC20Transfer(data[index].input)) {
+				val contract =
+					if (transaction.logIndex.isNotEmpty()) transaction.contractAddress
+					else transaction.to
+				var receiveAddress: String? = null
+				var count = 0.0
+				/** 从本地数据库检索 `contract` 对应的 `symbol` */
+				val targetToken = localTokens.find { it.contract.equals(contract, true) }
+				if (targetToken.isNull()) completeMark() // 如果找不到对应的数据就标记完成一次查询
+				targetToken?.let { tokenInfo ->
+					transaction.logIndex.isNotEmpty() isTrue {
+						count = CryptoUtils.toCountByDecimal(transaction.value.toBigInteger(), tokenInfo.decimals.orZero())
+						receiveAddress = transaction.to
+					} otherwise {
+						// 解析 `input code` 获取 `ERC20` 接收 `address`, 及接收 `count`
+						val transactionInfo = CryptoUtils.getTransferInfoFromInputData(transaction.input)
+						count = CryptoUtils.toCountByDecimal(transactionInfo?.amount!!, tokenInfo.decimals.orZero())
+						receiveAddress = transactionInfo.address
 					}
-				} else {
-					/** 不是 ERC20 币种直接默认为 `ETH` */
 					transaction.updateModelInfo(
-						false,
-						CoinSymbol.eth,
-						transaction.value.toBigInteger().toEthCount().toString(),
-						transaction.to
+						true,
+						tokenInfo.symbol,
+						count.toString(),
+						receiveAddress
 					)
 					completeMark()
 				}
+			} else {
+				/** 不是 ERC20 币种直接默认为 `ETH` */
+				transaction.updateModelInfo(
+					false,
+					CoinSymbol.eth,
+					transaction.value.toBigInteger().toEthCount().toString(),
+					transaction.to
+				)
+				completeMark()
 			}
 		}
 
-		override fun getResultInMainThread() = false
 		override fun mergeCallBack() {
 			hold(data)
 		}

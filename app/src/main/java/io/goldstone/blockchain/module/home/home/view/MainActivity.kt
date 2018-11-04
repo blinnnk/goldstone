@@ -19,10 +19,12 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -126,6 +128,10 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
+
+	// 检查 MainActivity 是否存在悬浮层, 并返回
+	fun getContentScrollOverlay() = getMainContainer()
+		?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
 
 	// 防止重绘的专用方法
 	fun showHomeFragment() {

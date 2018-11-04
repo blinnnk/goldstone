@@ -101,6 +101,7 @@ class SplashActivity : AppCompatActivity() {
 	private fun prepareData(allWallet: List<WalletTable>) {
 		// WorkThread
 		prepareAppConfig config@{
+			SharedValue.updatePincodeDisplayStatus(showPincode)
 			// 如果本地的钱包数量不为空那么才开始注册设备
 			if (allWallet.isNotEmpty()) {
 				registerDeviceForPush()

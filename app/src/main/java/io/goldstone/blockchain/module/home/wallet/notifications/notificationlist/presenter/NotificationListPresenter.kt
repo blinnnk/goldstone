@@ -33,7 +33,7 @@ class NotificationListPresenter(
 
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
-		fragment.getMainActivity()?.getWalletDetailFragment()?.updateUnreadCount()
+		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateUnreadCount()
 	}
 
 	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {

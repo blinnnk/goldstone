@@ -2,16 +2,13 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNullOrEmpty
+import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -94,13 +91,12 @@ class WalletDetailFragment :
 	override fun onResume() {
 		super.onResume()
 		// 检查更新未读消息数字
-		updateUnreadCount()
+		presenter.updateUnreadCount()
 		// 检查是否需要更新数据
-		if (!asyncData.isNullOrEmpty()) {
-			presenter.updateData()
-		}
+		if (!asyncData.isNullOrEmpty()) presenter.updateData()
 		// 检查是否需要显示 `PIN Code` 界面
-		showPinCodeFragment()
+		if (SharedValue.getPincodeDisplayStatus())
+			PasscodeFragment.show(this)
 		// 恢复回退站
 		getMainActivity()?.backEvent = null
 	}
@@ -111,46 +107,23 @@ class WalletDetailFragment :
 			// 恢复显示的时候检查更新数据
 			presenter.updateData()
 			// 检查更新未读消息数字
-			updateUnreadCount()
+			presenter.updateUnreadCount()
 			// 恢复回退站
 			getMainActivity()?.backEvent = null
 		}
-
 	}
 
-	fun updateUnreadCount() {
-		presenter.updateUnreadCount { unreadCount, error ->
-			if (error.isNone() && !unreadCount.isNull()) {
-				if (unreadCount!! > 0) {
-					slideHeader.notifyButton.setRedDotStyle(unreadCount)
-				} else {
-					slideHeader.notifyButton.removeRedDot()
-				}
-			} else context.alert(error.message)
-		}
+	fun setUnreadCount(unreadCount: Int) {
+		if (unreadCount > 0) slideHeader.notifyButton.setRedDotStyle(unreadCount)
+		else slideHeader.notifyButton.removeRedDot()
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
-		val overlay = mainActivity
-			?.getMainContainer()
-			?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
-		overlay.isNull() isTrue {
-			super.setBackEvent(mainActivity)
-		} otherwise {
-			overlay?.remove()
-			mainActivity?.backEvent = null
+		val overlay = mainActivity?.getContentScrollOverlay()
+		if (overlay == null) super.setBackEvent(mainActivity)
+		else {
+			overlay.remove()
+			mainActivity.backEvent = null
 		}
-	}
-
-	private fun showPinCodeFragment() {
-		if (activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull())
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					activity?.addFragmentAndSetArguments<PasscodeFragment>(
-						ContainerID.main,
-						FragmentTag.pinCode
-					)
-				}
-			}
 	}
 }

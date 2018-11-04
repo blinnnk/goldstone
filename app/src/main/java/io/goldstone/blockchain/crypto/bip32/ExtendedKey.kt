@@ -144,7 +144,6 @@ data class ExtendedKey(
 
 		return out.array().encodeToBase58WithChecksum()
 	}
-
 	companion object {
 
 		private val BITCOIN_SEED = "Bitcoin seed".toByteArray()

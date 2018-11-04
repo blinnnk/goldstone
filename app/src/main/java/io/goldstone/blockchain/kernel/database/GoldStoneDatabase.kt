@@ -14,7 +14,10 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.Token
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.*
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeDao
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao

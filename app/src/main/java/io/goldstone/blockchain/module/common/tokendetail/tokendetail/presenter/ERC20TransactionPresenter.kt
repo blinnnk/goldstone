@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import com.blinnnk.extension.isNotNull
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.doAsync
 

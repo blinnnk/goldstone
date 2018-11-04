@@ -59,7 +59,7 @@ class TokenSearchPresenter(
 						}.toArrayList())
 					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.toArrayList())
 					fragment.removeLoadingView()
-				} else fragment.context.alert(error.message)
+				} else fragment.showError(error)
 			}
 		}
 	}

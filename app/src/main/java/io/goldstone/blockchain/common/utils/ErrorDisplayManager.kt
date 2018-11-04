@@ -1,19 +1,33 @@
 package io.goldstone.blockchain.common.utils
 
 import android.content.Context
+import org.jetbrains.anko.runOnUiThread
 
 
 /**
  * @author KaySaith
  * @date  2018/10/19
  */
-class ErrorDisplayManager(context: Context?, error: Throwable) {
+class ErrorDisplayManager(error: Throwable) {
+	var displayMessage: String? = null
+
 	init {
-		when {
-			error.message.orEmpty().contains("Timeout", true) -> {
+		displayMessage = when {
+			error.message!!.contains("Timeout", true) -> {
 				// 上报 Server 逻辑, 这部分超市
+				null
 			}
-			else -> context.alert(error.message.orEmpty())
+			error.message!!.contains("404") -> {
+				// 上报 Server 逻辑, 这部分超市
+				null
+			}
+			else -> error.message
+		}
+	}
+
+	fun show(context: Context?) {
+		displayMessage?.apply {
+			context?.runOnUiThread { alert(this@apply) }
 		}
 	}
 }

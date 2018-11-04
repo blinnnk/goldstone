@@ -76,29 +76,28 @@ class PasswordSettingsPresenter(
 		when {
 			// 删除多链钱包下的所有地址对应的数据
 			type.isBIP44() -> {
+				val allAddresses = listOf(
+					wallet.ethAddresses,
+					wallet.etcAddresses,
+					wallet.bchAddresses,
+					wallet.ltcAddresses,
+					wallet.btcAddresses,
+					wallet.btcSeriesTestAddresses,
+					wallet.eosAddresses
+				)
 				object : ConcurrentAsyncCombine() {
-					override var asyncCount = 4
-					override fun concurrentJobs() {
-						listOf(
-							wallet.ethAddresses,
-							wallet.etcAddresses,
-							wallet.bchAddresses,
-							wallet.ltcAddresses,
-							wallet.btcAddresses,
-							wallet.btcSeriesTestAddresses,
-							wallet.eosAddresses
-						).forEach { addresses ->
-							addresses.forEach { pair ->
-								updateKeystorePassword(
-									pair.address,
-									oldPassword,
-									password,
-									passwordHint,
-									// 不是合规的 `ETH` 地址就是 `BTC` 系列地址
-									!Address(pair.address).isValid()
-								) {
-									completeMark()
-								}
+					override var asyncCount = allAddresses.size
+					override fun doChildTask(index: Int) {
+						allAddresses[index].forEach { pair ->
+							updateKeystorePassword(
+								pair.address,
+								oldPassword,
+								password,
+								passwordHint,
+								// 不是合规的 `ETH` 地址就是 `BTC` 系列地址
+								!Address(pair.address).isValid()
+							) {
+								completeMark()
 							}
 						}
 					}

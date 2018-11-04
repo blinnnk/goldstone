@@ -16,5 +16,4 @@ object CountryCode {
 		Currency.getInstance(Resources.getSystem().configuration.locale).currencyCode!!
 	val currentCountry = Resources.getSystem().configuration.locale.country!!
 	val currentLanguageSymbol = Resources.getSystem().configuration.locale.language!!
-
 }

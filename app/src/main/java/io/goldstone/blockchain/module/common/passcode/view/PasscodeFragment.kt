@@ -14,6 +14,8 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.passcode.presenter.PasscodePresenter
@@ -108,6 +110,13 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 					}
 				}
 			}
+		}
+	}
+
+	companion object {
+		fun show(fragment: Fragment) {
+			if (fragment.activity?.supportFragmentManager?.findFragmentByTag(FragmentTag.pinCode).isNull())
+				fragment.activity?.addFragment<PasscodeFragment>(ContainerID.main, FragmentTag.pinCode)
 		}
 	}
 }

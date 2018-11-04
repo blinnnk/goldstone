@@ -189,12 +189,10 @@ data class MyTokenTable(
 						ownerName,
 						contract.getChainURL()
 					) { amount, error ->
-						if (!amount.isNull() && error.isNone()) {
-							val balance = amount!!.toEthCount()
+						if (amount != null && error.isNone()) {
+							val balance = amount.toEthCount()
 							hold(balance, RequestError.None)
-						} else {
-							hold(null, error)
-						}
+						} else hold(null, error)
 					}
 
 				contract.isBTC() ->
@@ -213,17 +211,14 @@ data class MyTokenTable(
 							} else hold(
 								null,
 								RequestError.RPCResult(
-									"1. Get litecoin balance from GoldStone has error\n" +
+									"\n1. Get litecoin balance from GoldStone has error\n" +
 										"2. Then get balance from Chain.so has error too"
 								)
 							)
 						}
 					}
 
-				contract.isBCH() ->
-					BitcoinCashApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance, error)
-					}
+				contract.isBCH() -> BitcoinCashApi.getBalance(ownerName, false, hold)
 
 				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 				// 网络请求在这额外校验一次.
@@ -250,8 +245,8 @@ data class MyTokenTable(
 						ownerName,
 						SharedChain.getCurrentETH()
 					) { amount, error ->
-						if (!amount.isNull() && error.isNone()) {
-							val balance = CryptoUtils.toCountByDecimal(amount!!, token?.decimals.orZero())
+						if (amount != null && error.isNone()) {
+							val balance = CryptoUtils.toCountByDecimal(amount, token?.decimals.orZero())
 							hold(balance, RequestError.None)
 						} else hold(null, error)
 					}

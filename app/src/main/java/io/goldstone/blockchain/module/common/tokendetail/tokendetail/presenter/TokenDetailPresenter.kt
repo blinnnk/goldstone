@@ -405,23 +405,21 @@ class TokenDetailPresenter(
 		var balance = todayBalance
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount: Int = maxCount
-			override fun concurrentJobs() {
-				(0 until maxCount).forEach { index ->
-					val currentMills =
-						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
-					(balance - filter {
-						it.timeStamp.toMillisecond() in index.daysAgoInMills() .. currentMills
-					}.sumByDouble {
-						if (it.isFee) {
-							it.minerFee.substringBefore(" ").toDouble() * -1
-						} else {
-							it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
-						}
-					}).let {
-						balance = it.toBigDecimal().toDouble()
-						balances += DateBalance((index + 1).daysAgoInMills(), balance)
-						completeMark()
+			override fun doChildTask(index: Int) {
+				val currentMills =
+					if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
+				(balance - filter {
+					it.timeStamp.toMillisecond() in index.daysAgoInMills() .. currentMills
+				}.sumByDouble {
+					if (it.isFee) {
+						it.minerFee.substringBefore(" ").toDouble() * -1
+					} else {
+						it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
 					}
+				}).let {
+					balance = it.toBigDecimal().toDouble()
+					balances += DateBalance((index + 1).daysAgoInMills(), balance)
+					completeMark()
 				}
 			}
 

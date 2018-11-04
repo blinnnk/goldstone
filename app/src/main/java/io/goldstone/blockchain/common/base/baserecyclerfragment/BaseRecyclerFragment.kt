@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.Overl
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
@@ -295,6 +297,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
 	open fun removeLoadingView() {
 		topMiniLoading.visibility = View.GONE
+	}
+
+	@UiThread
+	fun showError(error: Throwable) {
+		ErrorDisplayManager(error).show(context)
 	}
 
 	fun getOverlayHeader(): OverlayHeaderLayout? {

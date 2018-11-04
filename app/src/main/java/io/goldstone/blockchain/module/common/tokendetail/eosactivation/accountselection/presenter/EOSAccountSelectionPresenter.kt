@@ -88,19 +88,15 @@ class EOSAccountSelectionPresenter(
 					}
 				} else object : ConcurrentAsyncCombine() {
 					override var asyncCount: Int = notInLocalAccount.size
-					override fun concurrentJobs() {
-						notInLocalAccount.forEach { account ->
-							// 本地为空的话从网络获取数据
-							EOSAPI.getAccountInfo(
-								EOSAccount(account.name)
-							) { eosAccount, error ->
-								if (!eosAccount.isNull() && error.isNone()) {
-									actors.addAll(getAccountActorByPublicKey(eosAccount!!, account.name))
-									// 插入数据库
-									EOSAccountTable.preventDuplicateInsert(eosAccount)
-								}
-								completeMark()
+					override fun doChildTask(index: Int) {
+						// 本地为空的话从网络获取数据
+						EOSAPI.getAccountInfo(EOSAccount(notInLocalAccount[index].name)) { eosAccount, error ->
+							if (eosAccount != null && error.isNone()) {
+								actors.addAll(getAccountActorByPublicKey(eosAccount, notInLocalAccount[index].name))
+								// 插入数据库
+								EOSAccountTable.preventDuplicateInsert(eosAccount)
 							}
+							completeMark()
 						}
 					}
 

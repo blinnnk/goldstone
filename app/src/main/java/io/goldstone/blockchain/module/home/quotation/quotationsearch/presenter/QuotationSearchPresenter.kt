@@ -12,7 +12,10 @@ import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -151,8 +154,8 @@ class QuotationSearchPresenter(
 		fragment.showLoadingView()
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
-			if (!searchList.isNull() && error.isNone()) {
-				if (searchList!!.isEmpty()) {
+			if (searchList != null && error.isNone()) {
+				if (searchList.isEmpty()) {
 					fragment.context?.runOnUiThread { fragment.removeLoadingView() }
 					return@getMarketSearchList
 				}
@@ -161,19 +164,15 @@ class QuotationSearchPresenter(
 						selectedIds.split(",").map { it.toIntOrNull().orZero() }
 					)
 				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
-				localTargetMarketData.isEmpty() isTrue {
+				// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
+				if (localTargetMarketData.isEmpty()) {
 					fragment.completeQuotationTable(searchList)
-				} otherwise {
-					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
-					searchList.forEachOrEnd { item, isEnd ->
-						item.isSelecting = localTargetMarketData.any { it.pair == item.pair }
-						if (isEnd) {
-							fragment.completeQuotationTable(searchList)
-						}
-					}
+				} else searchList.forEachOrEnd { item, isEnd ->
+					item.isSelecting = localTargetMarketData.any { it.pair == item.pair }
+					if (isEnd) fragment.completeQuotationTable(searchList)
 				}
 			} else GoldStoneAPI.context.runOnUiThread {
-				fragment.context.alert(error.message)
+				fragment.showError(error)
 				fragment.removeLoadingView()
 			}
 
