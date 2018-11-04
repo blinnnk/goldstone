@@ -93,25 +93,21 @@ object GoldStoneAPI {
 			val allNode = GoldStoneDataBase.database.chainNodeDao().getAll()
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = allNode.size
-				override fun concurrentJobs() {
-					allNode.forEach { node ->
-						allDefaultTokens +=
-							try {
-								gson.fromJson<List<DefaultTokenTable>>(
-									JSONObject(defaultTokens).safeGet(node.chainID),
-									collectionType
-								)
-							} catch (error: Exception) {
-								listOf<DefaultTokenTable>()
-							}
-						completeMark()
-					}
+				override val completeInUIThread: Boolean = false
+				override fun doChildTask(index: Int) {
+					allDefaultTokens +=
+						try {
+							gson.fromJson<List<DefaultTokenTable>>(
+								JSONObject(defaultTokens).safeGet(allNode[index].chainID),
+								collectionType
+							)
+						} catch (error: Exception) {
+							listOf<DefaultTokenTable>()
+						}
+					completeMark()
 				}
 
-				override fun getResultInMainThread(): Boolean = false
-				override fun mergeCallBack() {
-					hold(allDefaultTokens, RequestError.None)
-				}
+				override fun mergeCallBack() = hold(allDefaultTokens, RequestError.None)
 			}.start()
 		}
 	}
@@ -426,7 +422,7 @@ object GoldStoneAPI {
 	fun getUnreadCount(
 		deviceID: String,
 		time: Long,
-		@WorkerThread hold: (unreadCount: String?, error: RequestError) -> Unit
+		@WorkerThread hold: (unreadCount: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest(
 			RequestBody.create(
@@ -440,8 +436,8 @@ object GoldStoneAPI {
 			APIPath.getUnreadCount(APIPath.currentUrl),
 			true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(JSONObject(result).safeGet("count"), error)
+			if (result != null && error.isNone()) {
+				hold(JSONObject(result).safeGet("count").toIntOrNull(), error)
 			} else hold(null, error)
 		}
 	}

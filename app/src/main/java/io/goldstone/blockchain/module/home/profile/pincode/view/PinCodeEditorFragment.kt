@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.BorderSize
@@ -21,6 +22,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.pincode.presenter.PinCodeEditorPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
@@ -43,43 +45,41 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					presenter.showPinCodeFragment()
-				}
 
-				initSwitchCell()
+			if (SharedValue.getPincodeDisplayStatus())
+				PasscodeFragment.show(this@PinCodeEditorFragment)
 
-				textView {
-					text = PincodeText.description
-					textSize = fontSize(15)
-					textColor = GrayScale.midGray
-					typeface = GoldStoneFont.medium(context)
-					gravity = Gravity.CENTER
-					layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
-					y += 20.uiPX()
-				}
+			initSwitchCell()
 
-				newPinCode.apply {
-					title = PincodeText.pincode
-					setPinCodeInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-				}.into(this)
-
-				repeatPinCode.apply {
-					title = PincodeText.repeat
-					setPinCodeInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-				}.into(this)
-
-				confirmButton.apply {
-					text = CommonText.confirm
-					setBlueStyle()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
-				}.click {
-					presenter.resetPinCode(newPinCode, repeatPinCode, switch)
-				}.into(this)
+			textView {
+				text = PincodeText.description
+				textSize = fontSize(15)
+				textColor = GrayScale.midGray
+				typeface = GoldStoneFont.medium(context)
+				gravity = Gravity.CENTER
+				layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
+				y += 20.uiPX()
 			}
+
+			newPinCode.apply {
+				title = PincodeText.pincode
+				setPinCodeInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
+			}.into(this)
+
+			repeatPinCode.apply {
+				title = PincodeText.repeat
+				setPinCodeInput()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+			}.into(this)
+
+			confirmButton.apply {
+				text = CommonText.confirm
+				setBlueStyle()
+				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+			}.click {
+				presenter.resetPinCode(newPinCode, repeatPinCode, switch)
+			}.into(this)
 		}
 	}
 

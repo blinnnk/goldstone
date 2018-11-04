@@ -57,10 +57,7 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		footer.into(wrapper)
 		footer.apply {

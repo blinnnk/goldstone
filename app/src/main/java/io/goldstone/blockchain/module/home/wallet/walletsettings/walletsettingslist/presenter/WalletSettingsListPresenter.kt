@@ -115,16 +115,14 @@ class WalletSettingsListPresenter(
 	private fun Context.deleteWalletData(willDeleteWalletID: Int, addresses: List<Bip44Address>, password: String) {
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount = addresses.size
-			override fun concurrentJobs() {
-				addresses.forEach { pair ->
-					deleteRoutineWallet(
-						willDeleteWalletID,
-						pair.address,
-						password,
-						pair.getChainType()
-					) {
-						completeMark()
-					}
+			override fun doChildTask(index: Int) {
+				deleteRoutineWallet(
+					willDeleteWalletID,
+					addresses[index].address,
+					password,
+					addresses[index].getChainType()
+				) {
+					completeMark()
 				}
 			}
 
@@ -145,11 +143,9 @@ class WalletSettingsListPresenter(
 	) {
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount = addresses.size
-			override fun concurrentJobs() {
-				addresses.forEach { account ->
-					deleteAllLocalDataByAddress(account.address, account.getChainType())
-					completeMark()
-				}
+			override fun doChildTask(index: Int) {
+				deleteAllLocalDataByAddress(addresses[index].address, addresses[index].getChainType())
+				completeMark()
 			}
 
 			override fun mergeCallBack() {

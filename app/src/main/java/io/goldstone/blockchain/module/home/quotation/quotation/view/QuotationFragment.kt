@@ -34,19 +34,13 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
-
-		slideHeader.apply {
-			addTokenButton.apply {
-				onClick {
-					presenter.showQuotationManagement()
-					preventDuplicateClicks()
-				}
+		slideHeader.addTokenButton.apply {
+			onClick {
+				presenter.showQuotationManagement()
+				preventDuplicateClicks()
 			}
 		}
 	}
@@ -58,10 +52,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
 
-	override fun observingRecyclerViewVerticalOffset(
-		offset: Int,
-		range: Int
-	) {
+	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true

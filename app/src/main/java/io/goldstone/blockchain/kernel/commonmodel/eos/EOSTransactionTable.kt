@@ -18,7 +18,6 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.uiThread
 import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger

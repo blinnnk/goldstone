@@ -3,7 +3,6 @@
 package io.goldstone.blockchain.kernel.network
 
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.AesCrypto
 
 /**

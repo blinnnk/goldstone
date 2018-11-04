@@ -1,11 +1,11 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PorterDuff
-import android.view.*
+import android.view.Gravity
+import android.view.View
 import android.widget.*
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addCorner
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R

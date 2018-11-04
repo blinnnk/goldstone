@@ -11,7 +11,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.blinnnk.util.SoftKeyboard
-import com.blinnnk.util.getParentFragment
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -23,7 +22,6 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.qrcode.view.ScanCaptureActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.support.v4.toast
 import java.io.File
 import java.io.FileOutputStream

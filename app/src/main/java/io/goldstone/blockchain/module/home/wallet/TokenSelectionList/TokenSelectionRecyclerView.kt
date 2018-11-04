@@ -20,7 +20,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.wrapContent
 
 /**
  * @date 2018/6/7 3:29 AM
@@ -33,7 +32,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 	}
 
-	fun setAdapter(data: ArrayList<WalletDetailCellModel>, isShowAddressList: Boolean) {
+	fun setAdapter(data: ArrayList<WalletDetailCellModel>, isShowAddressList: Boolean): TokenSelectionRecyclerView {
 		adapter = TokenSelectionAdapter(data) {
 			model?.let { token ->
 				onClick {
@@ -44,6 +43,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 				}
 			}
 		}
+		return this
 	}
 
 	companion object {

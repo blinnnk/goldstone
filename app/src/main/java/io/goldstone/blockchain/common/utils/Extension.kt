@@ -8,9 +8,8 @@ import android.content.res.ColorStateList
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
-import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.EditText
-import android.widget.RadioButton
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
@@ -47,7 +46,6 @@ fun <T : View> T.click(callback: (T) -> Unit): T {
 }
 
 fun Fragment.getMainActivity() = activity as? MainActivity
-
 fun Context.getMainActivity() = this as? MainActivity
 
 fun Context?.alert(message: String) {
@@ -136,7 +134,7 @@ fun JSONArray.toList(): List<JSONObject> {
 
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
 
-fun RadioButton.isDefaultStyle() {
+fun CompoundButton.isDefaultStyle() {
 	buttonTintList = ColorStateList(
 		arrayOf(
 			intArrayOf(-R.attr.state_checked), //disabled
@@ -147,13 +145,3 @@ fun RadioButton.isDefaultStyle() {
 	)
 }
 
-fun CheckBox.isDefaultStyle() {
-	buttonTintList = ColorStateList(
-		arrayOf(
-			intArrayOf(-R.attr.state_checked), //disabled
-			intArrayOf(R.attr.state_checked) //enabled
-		),
-		// disabled - enabled
-		intArrayOf(GrayScale.midGray, Spectrum.blue)
-	)
-}

@@ -77,10 +77,9 @@ object SharesPreference {
 	const val currentID = "currentID"
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
 	const val isNotchScreen = "isNotchScreen"
-	const val isEncryptERCNodeRequest = "isEncryptERCNodeRequest"
-	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"
+	const val needToShowPincode = "needToShowPincode"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

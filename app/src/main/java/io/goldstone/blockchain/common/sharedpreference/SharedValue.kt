@@ -39,4 +39,13 @@ object SharedValue {
 			SharesPreference.isTestEnvironment,
 			isTest
 		)
+
+	fun getPincodeDisplayStatus(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.needToShowPincode)
+
+	fun updatePincodeDisplayStatus(status: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.needToShowPincode,
+			status
+		)
 }

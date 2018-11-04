@@ -4,7 +4,8 @@ import android.content.Context
 import android.widget.LinearLayout
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.value.ElementID
-import org.jetbrains.anko.*
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date: 2018/8/29.

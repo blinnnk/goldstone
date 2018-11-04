@@ -48,14 +48,12 @@ class TokenManagementListPresenter(
 			MyTokenTable.getMyTokens { myTokens ->
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount: Int = defaultTokens.size
-					override fun concurrentJobs() {
-						defaultTokens.forEach { default ->
-							default.isUsed = !myTokens.find {
-								default.contract.equals(it.contract, true) &&
-									default.symbol.equals(it.symbol, true)
-							}.isNull()
-							completeMark()
-						}
+					override fun doChildTask(index: Int) {
+						defaultTokens[index].isUsed = !myTokens.find {
+							defaultTokens[index].contract.equals(it.contract, true) &&
+								defaultTokens[index].symbol.equals(it.symbol, true)
+						}.isNull()
+						completeMark()
 					}
 
 					override fun mergeCallBack() {
