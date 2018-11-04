@@ -39,43 +39,36 @@ abstract class SilentUpdater {
 		val account = SharedAddress.getCurrentEOSAccount()
 		if (!account.isValid(false)) return
 		EOSAPI.getEOSTokenList(SharedChain.getEOSCurrent().chainID, account) { tokenList, error ->
-			if (!tokenList.isNull() && error.isNone()) {
-				// 拉取潜在资产的 `Icon Url`
-				GoldStoneAPI.getIconURL(tokenList!!) { tokenIcons, getIconError ->
-					val myTokenDao = GoldStoneDataBase.database.myTokenDao()
-					if (!tokenIcons.isNull() && getIconError.isNone()) {
-						tokenList.forEach { contract ->
-							// 插入 `DefaultToken`
-							DefaultTokenTable(
-								contract.contract.orEmpty(),
-								contract.symbol,
-								contract.decimal.orElse(4),
-								ChainID.EOS, // 这个接口只服务主网下的 `Token`
-								tokenIcons!!.getByTokenContract(contract.orEmpty())?.url.orEmpty(),
-								true
-							).preventDuplicateInsert()
-							val targetToken = myTokenDao.getTokenByContractAndAddress(
-								contract.contract.orEmpty(),
-								contract.symbol,
-								account.accountName,
-								ChainID.EOS.id
-							)
-							// 有可能用户本地已经插入并且被用户手动关闭了, 所以只有本地不存在的时候才插入
-							// 插入 `MyTokenTable`
-							if (targetToken.isNull()) myTokenDao.insert(
-								MyTokenTable(
-									0,
-									account.accountName,
-									SharedAddress.getCurrentEOS(),
-									contract.symbol,
-									0.0,
-									contract.contract.orEmpty(),
-									ChainID.EOS.id,
-									false
-								)
-							)
-						}
-					}
+			// 拉取潜在资产的 `Icon Url`
+			if (tokenList != null && error.isNone()) GoldStoneAPI.getIconURL(tokenList) { tokenIcons, getIconError ->
+				val myTokenDao = GoldStoneDataBase.database.myTokenDao()
+				if (tokenIcons != null && getIconError.isNone()) tokenList.forEach { contract ->
+					//  这个接口只服务主网下的 `Token` 插入 `DefaultToken`
+					DefaultTokenTable(
+						contract,
+						tokenIcons.get(contract.orEmpty())?.url.orEmpty()
+					).preventDuplicateInsert()
+
+					val targetToken = myTokenDao.getTokenByContractAndAddress(
+						contract.contract.orEmpty(),
+						contract.symbol,
+						account.accountName,
+						ChainID.EOS.id
+					)
+					// 有可能用户本地已经插入并且被用户手动关闭了, 所以只有本地不存在的时候才插入
+					// 插入 `MyTokenTable`
+					if (targetToken.isNull()) myTokenDao.insert(
+						MyTokenTable(
+							0,
+							account.accountName,
+							SharedAddress.getCurrentEOS(),
+							contract.symbol,
+							0.0,
+							contract.contract.orEmpty(),
+							ChainID.EOS.id,
+							false
+						)
+					)
 				}
 			}
 		}
@@ -85,15 +78,15 @@ abstract class SilentUpdater {
 	private fun updateUnknownDefaultToken() {
 		GoldStoneDataBase.database.defaultTokenDao().getAllTokens().filter {
 			ChainID(it.chainID).isETHMain() && it.name.isEmpty()
-		}.forEach {
-			it.updateTokenNameFromChain()
+		}.forEach { default ->
+			default.updateTokenNameFromChain()
 		}
 	}
 
 	private fun updateRAMUnitPrice() {
 		EOSResourceUtil.getRAMPrice(EOSUnit.KB, false) { priceInEOS, error ->
-			if (!priceInEOS.isNull() && error.isNone()) {
-				SharedValue.updateRAMUnitPrice(priceInEOS!!)
+			if (priceInEOS != null && error.isNone()) {
+				SharedValue.updateRAMUnitPrice(priceInEOS)
 			}
 		}
 	}
@@ -101,8 +94,8 @@ abstract class SilentUpdater {
 	private fun updateCPUUnitPrice() {
 		if (SharedAddress.getCurrentEOSAccount().isValid()) {
 			EOSResourceUtil.getCPUPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
-				if (!priceInEOS.isNull() && error.isNone()) {
-					SharedValue.updateCPUUnitPrice(priceInEOS!!)
+				if (priceInEOS != null && error.isNone()) {
+					SharedValue.updateCPUUnitPrice(priceInEOS)
 				}
 			}
 		}
@@ -111,8 +104,8 @@ abstract class SilentUpdater {
 	private fun updateNETUnitPrice() {
 		if (SharedAddress.getCurrentEOSAccount().isValid()) {
 			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
-				if (!priceInEOS.isNull() && error.isNone()) {
-					SharedValue.updateNETUnitPrice(priceInEOS!!)
+				if (priceInEOS != null && error.isNone()) {
+					SharedValue.updateNETUnitPrice(priceInEOS)
 				}
 			}
 		}
@@ -122,7 +115,7 @@ abstract class SilentUpdater {
 		// 拉取网络数据, 更新本地的选中状态后覆盖本地数据库 TODO 需要增加 MD5 校验减少网络请求
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
 			val nodeDao = GoldStoneDataBase.database.chainNodeDao()
-			if (!serverNodes.isNull() && error.isNone() && serverNodes!!.isNotEmpty()) {
+			if (serverNodes != null && error.isNone() && serverNodes.isNotEmpty()) {
 				val localNodes = nodeDao.getAll()
 				serverNodes.map { node ->
 					node.apply {
@@ -158,7 +151,7 @@ abstract class SilentUpdater {
 				// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
 				myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
 					// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
-					// 线程开启太多的内存溢出. 限制没 500ms 检查一个 Symbol 的价格
+					// 线程开启太多的内存溢出. 限制每 `500ms` 检查一个 `Symbol` 的价格
 					delay(500)
 					withContext(CommonPool, CoroutineStart.LAZY) {
 						EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol, null))
@@ -169,23 +162,24 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateLocalDefaultTokens() {
+		val defaultDao =
+			GoldStoneDataBase.database.defaultTokenDao()
 		GoldStoneAPI.getDefaultTokens { serverTokens, error ->
-			if (!serverTokens.isNull() && !serverTokens!!.isEmpty() && error.isNone()) {
-				val localTokens =
-					GoldStoneDataBase.database.defaultTokenDao().getAllTokens()
+			if (serverTokens != null && serverTokens.isNotEmpty() && error.isNone()) {
+				val localTokens = defaultDao.getAllTokens()
 				// 开一个线程更新图片
 				launch {
 					updateLocalTokenIcon(serverTokens, localTokens)
 				}
 				// 移除掉一样的数据
-				serverTokens.filterNot { server ->
-					localTokens.any { local ->
-						local.chainID.equals(server.chainID, true)
-							&& local.contract.equals(server.contract, true)
+				defaultDao.insertAll(
+					serverTokens.filterNot { server ->
+						localTokens.any { local ->
+							local.chainID.equals(server.chainID, true)
+								&& local.contract.equals(server.contract, true)
+						}
 					}
-				}.apply {
-					GoldStoneDataBase.database.defaultTokenDao().insertAll(this)
-				}
+				)
 			}
 		}
 	}
@@ -209,15 +203,17 @@ abstract class SilentUpdater {
 			}
 		}.apply {
 			if (isEmpty()) return
+			val defaultDao =
+				GoldStoneDataBase.database.defaultTokenDao()
 			forEach { server ->
-				GoldStoneDataBase.database.defaultTokenDao().apply {
-					getTokenByContract(server.contract, server.symbol, server.chainID)?.let {
-						update(it.apply {
+				defaultDao.getToken(server.contract, server.symbol, server.chainID)?.apply {
+					defaultDao.update(
+						apply {
 							iconUrl = server.iconUrl
 							isDefault = server.isDefault
 							forceShow = server.forceShow
-						})
-					}
+						}
+					)
 				}
 			}
 		}

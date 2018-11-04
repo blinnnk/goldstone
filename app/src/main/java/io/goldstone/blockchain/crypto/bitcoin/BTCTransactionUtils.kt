@@ -105,7 +105,9 @@ object BTCSeriesTransactionUtils {
 		val ecKey = privateKey.key
 		var money = 0L
 		val utxos = arrayListOf<UTXO>()
-		unspentModel.forEach {
+		// 第三方 `API` 的 `Unspent` 可能带有未确认的交易, 这里排除掉 `Confirmation` 为 `0` 的部分
+		// 防止发起双花交易
+		unspentModel.filter { it.confirmations > 0 }.forEach {
 			// 当消费列表某几个 `item` 的值加起来大于实际转账金额+手续费,
 			// 就跳出循环, 这个时候就得到了合符条件的 `utxos` 数组
 			if (money >= (sendValue + fee)) return@forEach

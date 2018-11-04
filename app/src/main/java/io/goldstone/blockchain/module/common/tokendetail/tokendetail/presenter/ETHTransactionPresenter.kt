@@ -4,7 +4,6 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
@@ -31,7 +30,7 @@ fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>)
 	val blockNumber = localData.maxBy {
 		it.blockNumber
 	}?.blockNumber ?: "0"
-	fragment.showLoadingView(LoadingText.transactionData)
+	fragment.showLoadingView()
 	getTokenTransactions(blockNumber) {
 		fragment.removeLoadingView()
 		loadDataFromDatabaseOrElse()

@@ -6,7 +6,6 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -55,7 +54,7 @@ fun TransactionDetailPresenter.getETHERC20OrETCTransaction(transaction: Notifica
 		if (localTransaction.isNull()) {
 			// 如果本地没有数据从链上查询所有需要的数据
 			fragment.apply {
-				showLoadingView(LoadingText.transactionData)
+				showLoadingView()
 				updateByNotificationHash(transaction) {
 					removeLoadingView()
 				}
@@ -128,46 +127,36 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	}
 }
 
-fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
-	info: NotificationTransactionInfo
-) {
-	BTCSeriesTransactionTable.getTransactionsByHash(
-		currentHash,
-		info.isReceived
-	) { localTransaction ->
-		if (localTransaction.isNull() || localTransaction?.blockNumber?.toIntOrNull().isNull()) {
-			fragment.apply {
-				showLoadingView(LoadingText.transactionData)
-				when {
-					CoinSymbol(info.symbol).isBTC() ->
-						updateBTCTransactionByNotificationHash(info) {
-							removeLoadingView()
-						}
-					CoinSymbol(info.symbol).isLTC() ->
-						updateLTCTransactionByNotificationHash(info) {
-							removeLoadingView()
-						}
-					CoinSymbol(info.symbol).isBCH() -> {
-						updateBCHTransactionByNotificationHash(info) {
-							removeLoadingView()
-						}
+fun TransactionDetailPresenter.getBitcoinSeriesTransaction(info: NotificationTransactionInfo) {
+	BTCSeriesTransactionTable.getTransactionsByHash(currentHash, info.isReceived) { localTransaction ->
+		if (localTransaction != null && localTransaction.blockNumber.toIntOrNull() != null) {
+			fragment.asyncData = generateModels(TransactionListModel(localTransaction)).toArrayList()
+			val headerData = TransactionHeaderModel(
+				notificationData?.value ?: localTransaction.value.toDouble(),
+				if (localTransaction.isReceive) localTransaction.fromAddress else localTransaction.to,
+				localTransaction.symbol,
+				false,
+				localTransaction.isReceive,
+				false
+			)
+			updateHeaderValue(headerData)
+			headerModel = headerData
+		} else {
+			fragment.showLoadingView()
+			when {
+				CoinSymbol(info.symbol).isBTC() ->
+					updateBTCTransactionByNotificationHash(info) {
+						fragment.removeLoadingView()
+					}
+				CoinSymbol(info.symbol).isLTC() ->
+					updateLTCTransactionByNotificationHash(info) {
+						fragment.removeLoadingView()
+					}
+				CoinSymbol(info.symbol).isBCH() -> {
+					updateBCHTransactionByNotificationHash(info) {
+						fragment.removeLoadingView()
 					}
 				}
-			}
-		} else {
-			// 本地有数据直接展示本地数据
-			localTransaction?.apply {
-				fragment.asyncData = generateModels(TransactionListModel(this)).toArrayList()
-				val headerData = TransactionHeaderModel(
-					notificationData?.value ?: value.toDouble(),
-					if (isReceive) fromAddress else to,
-					symbol,
-					false,
-					isReceive,
-					false
-				)
-				updateHeaderValue(headerData)
-				headerModel = headerData
 			}
 		}
 	}
@@ -212,8 +201,8 @@ fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
 		info.fromAddress,
 		ChainID(info.chainID).getThirdPartyURL()
 	) { receipt, error ->
-		if (receipt.isNull() || error.isNone()) return@getTransactionByHash
-		receipt!!.apply {
+		if (receipt == null || error.hasError()) return@getTransactionByHash
+		receipt.apply {
 			// 通过 `Notification` 获取确实信息
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()

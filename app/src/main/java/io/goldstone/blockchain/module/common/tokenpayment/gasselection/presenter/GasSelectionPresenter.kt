@@ -182,29 +182,28 @@ class GasSelectionPresenter(
 			// 点击取消按钮
 			{ callback(GoldStoneError.None) }
 		) {
-			if (prepareBTCSeriesModel == null) {
+			if (getToken()?.contract.isBTCSeries() && prepareBTCSeriesModel == null) {
 				callback(GoldStoneError("Empty PrepareBTCSeriesModel Data"))
 				return@showAlertView
 			}
-			val tokenContract = getToken()?.contract ?: return@showAlertView
 			val password = it?.text.toString()
-			transfer(tokenContract.getAddress().orEmpty(), tokenContract.getChainType(), password, callback)
+			val tokenContract = getToken()?.contract ?: return@showAlertView
 			when {
-				getToken()?.contract.isBTC() -> transferBTC(
+				tokenContract.isBTC() -> transferBTC(
 					prepareBTCSeriesModel!!,
 					AddressUtils.getCurrentBTCAddress(),
 					ChainType.BTC,
 					password,
 					callback
 				)
-				getToken()?.contract.isLTC() -> transferLTC(
+				tokenContract.isLTC() -> transferLTC(
 					prepareBTCSeriesModel!!,
 					AddressUtils.getCurrentLTCAddress(),
 					if (SharedValue.isTestEnvironment()) ChainType.BTC else ChainType.LTC,
 					password,
 					callback
 				)
-				getToken()?.contract.isBCH() -> transferBCH(
+				tokenContract.isBCH() -> transferBCH(
 					prepareBTCSeriesModel!!,
 					AddressUtils.getCurrentBCHAddress(),
 					ChainType.BCH,
@@ -212,7 +211,7 @@ class GasSelectionPresenter(
 					callback
 				)
 
-				getToken()?.contract.isETC() -> transfer(
+				tokenContract.isETC() -> transfer(
 					SharedAddress.getCurrentETC(),
 					ChainType.ETC,
 					password,

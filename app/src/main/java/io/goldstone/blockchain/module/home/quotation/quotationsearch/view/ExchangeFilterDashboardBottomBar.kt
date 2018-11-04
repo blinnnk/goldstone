@@ -31,10 +31,7 @@ class ExchangeFilterDashboardBottomBar(context: Context) : LinearLayout(context)
 	val confirmButton by lazy {
 		RoundButton(context).apply {
 			text = CommonText.confirm
-			setBlueStyle()
-			val buttonWidth = OverlaySize.maxWidth - 50.uiPX()
-			val buttonHeight = 40.uiPX()
-			layoutParams = LinearLayout.LayoutParams(buttonWidth, buttonHeight)
+			setBlueStyle(6.uiPX(), OverlaySize.maxWidth - 135.uiPX())
 			onClick { confirmButtonClickEvent?.run() }
 		}
 	}

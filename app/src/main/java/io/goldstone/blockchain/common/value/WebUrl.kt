@@ -41,8 +41,8 @@ object WebUrl {
 	val backUpServer = "https://goldstone-api1.naonaola.com"
 	const
 	val backUpSocket = "wss://goldstone-api1.naonaola.com/ws"
-	const val normalServer = "https://api3.goldstone.io"
-	const val normalSocket = "wss://api3.goldstone.io/ws"
+	const val normalServer = "https://api1.goldstone.io"
+	const val normalSocket = "wss://api1.goldstone.io/ws"
 
 	// BTC Transaction Data API From `blockChain.info`
 	const val btcMain = "https://insight.bitpay.com"

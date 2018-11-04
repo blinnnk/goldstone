@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -29,7 +28,7 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 		)
 		headerModel = headerData
 		currentHash = transactionHash
-		fragment.showLoadingView(LoadingText.loadingDataFromChain)
+		fragment.showLoadingView()
 		when {
 			contract.isBTCSeries() -> dataFromList?.let {
 				fragment.asyncData = generateModels(it).toArrayList()

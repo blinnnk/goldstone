@@ -6,7 +6,6 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
@@ -40,7 +39,7 @@ class TokenSearchPresenter(
 		if (SharedWallet.getCurrentWalletType().isBTCSeries()) {
 			navigation?.showSearchButton(false)
 		} else {
-			fragment.showLoadingView(LoadingText.searchingToken)
+			fragment.showLoadingView()
 			MyTokenTable.getMyTokens(false) { myTokens ->
 				navigation?.searchInputListener({}) { inputContent ->
 					getSearchResult(inputContent, myTokens)

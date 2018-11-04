@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
@@ -54,36 +53,33 @@ fun GasSelectionPresenter.transferLTC(
 		password
 	) { privateKey, error ->
 		if (privateKey != null && error.isNone()) prepareBTCSeriesModel.apply model@{
-			val fee = gasUsedGasFee?.toSatoshi()!!
+			val fee = gasUsedGasFee?.toSatoshi() ?: 0L
 			LitecoinApi.getUnspentListByAddress(fromAddress) { unspents, unspentError ->
-				if (unspents != null && error.isNone()) {
-					BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
-						value,
-						fee,
-						toAddress,
-						changeAddress,
-						unspents,
-						privateKey,
-						SharedValue.isTestEnvironment()
-					).let { signedModel ->
-						BTCSeriesJsonRPC.sendRawTransaction(
-							SharedChain.getLTCCurrent(),
-							signedModel.signedMessage
-						) { hash, error ->
-							if (!hash.isNullOrEmpty() && error.isNone()) {
-								// 插入 `Pending` 数据到本地数据库
-								insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, hash!!)
-								// 跳转到章党详情界面
-								GoldStoneAPI.context.runOnUiThread {
-									goToTransactionDetailFragment(
-										rootFragment,
-										fragment,
-										prepareReceiptModelFromBTCSeries(this@model, fee, hash)
-									)
-									callback(error)
-								}
-							} else callback(error)
-						}
+				if (unspents != null && error.isNone()) BTCSeriesTransactionUtils.generateLTCSignedRawTransaction(
+					value,
+					fee,
+					toAddress,
+					changeAddress,
+					unspents,
+					privateKey,
+					SharedValue.isTestEnvironment()
+				).let { signedModel ->
+					BTCSeriesJsonRPC.sendRawTransaction(
+						SharedChain.getLTCCurrent(),
+						signedModel.signedMessage
+					) { hash, error ->
+						if (!hash.isNullOrEmpty() && error.isNone()) {
+							// 插入 `Pending` 数据到本地数据库
+							insertBTCSeriesPendingDataDatabase(this, fee, signedModel.messageSize, hash!!)
+							// 跳转到章党详情界面
+							GoldStoneAPI.context.runOnUiThread {
+								goToTransactionDetailFragment(
+									rootFragment,
+									fragment,
+									prepareReceiptModelFromBTCSeries(this@model, fee, hash)
+								)
+							}
+						} else callback(error)
 					}
 				} else callback(unspentError)
 			}

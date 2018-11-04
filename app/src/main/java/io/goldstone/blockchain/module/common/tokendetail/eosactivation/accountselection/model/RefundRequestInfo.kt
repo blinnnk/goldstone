@@ -8,9 +8,9 @@ import com.blinnnk.extension.suffix
 import com.blinnnk.util.HoneyDateUtil
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.language.DateAndTimeText
+import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -46,11 +46,15 @@ data class RefundRequestInfo(
 		return cpuCount + netCount
 	}
 
+	/**
+	 * 释放的时间是首次操作 3 天后归还资源, 这里的计算就是当时的时间加上 3 天的毫秒数
+	 * 另外这里需要注意的是 `UTC` 时间的换算
+	 */
 	fun getRefundDescription(): String {
 		val totalRefundsEOS = getTotalRefundEOSCount().orZero()
 		val expirationTimeStamp =
 			if (totalRefundsEOS == 0.0) 0L
-			else EOSUtils.getUTCTimeStamp(requestTime) + 3.daysAgoInMills() - System.currentTimeMillis()
+			else EOSUtils.getUTCTimeStamp(requestTime)  + 86400000 * 3 - TimeUtils.getUtcTime(System.currentTimeMillis())
 		val expirationDate =
 			if (expirationTimeStamp == 0L) ""
 			else HoneyDateUtil.getSinceTime(expirationTimeStamp.orElse(0), DateAndTimeText.getDateText(), false)

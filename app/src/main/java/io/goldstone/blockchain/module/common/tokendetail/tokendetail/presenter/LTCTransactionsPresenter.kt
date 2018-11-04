@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -20,7 +19,7 @@ import org.jetbrains.anko.runOnUiThread
 // 因为翻页机制利用了 Insight 的特殊接口 `from/to` 所以没有额外增加
 // `BlockInfo` 的备份接口
 fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
-	fragment.showLoadingView(LoadingText.transactionData)
+	fragment.showLoadingView()
 	val address = AddressUtils.getCurrentLTCAddress()
 	LitecoinApi.getTransactionCount(address) { transactionCount, error ->
 		if (transactionCount.isNull() || error.hasError()) return@getTransactionCount

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -17,7 +16,7 @@ import org.jetbrains.anko.runOnUiThread
  */
 
 fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
-	fragment.showLoadingView(LoadingText.transactionData)
+	fragment.showLoadingView()
 	val address = AddressUtils.getCurrentBCHAddress()
 	BitcoinCashApi.getTransactionCount(address) { transactionCount, error ->
 		if (transactionCount.isNull() || error.hasError()) return@getTransactionCount

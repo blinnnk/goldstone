@@ -6,7 +6,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -143,7 +142,7 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
-		fragment.showLoadingView(LoadingText.tokenData)
+		fragment.showLoadingView()
 		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData ->
 			// 检查是否有网络
 			if (!NetworkUtil.hasNetwork(fragment.context)) return@loadDataFromDatabaseOrElse

@@ -98,7 +98,7 @@ data class MyTokenTable(
 					val existingAccount = getByOwnerName(name, chainID)
 					if (pendingAccount.isNull() && existingAccount.isEmpty()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(
+							GoldStoneDataBase.database.defaultTokenDao().getToken(
 								TokenContract.EOS.contract!!,
 								CoinSymbol.EOS.symbol!!,
 								SharedChain.getEOSCurrent().chainID.id
