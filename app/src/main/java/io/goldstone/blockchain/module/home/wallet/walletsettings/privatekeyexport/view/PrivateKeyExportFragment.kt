@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -22,6 +21,8 @@ import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -40,6 +41,9 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyExportPresenter(this)
+
+	private val address by lazy { arguments?.getString(ArgumentKey.address) }
+	private val chainType by lazy { arguments?.getInt(ArgumentKey.chainType)?.let { ChainType(it) } }
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
@@ -66,9 +70,14 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				setBlueStyle(15.uiPX())
 			}.click { it ->
 				it.showLoadingStatus()
-				presenter.getPrivateKey(passwordInput.text.toString()) { privateKey, error ->
-					if (!privateKey.isNull() && error.isNone()) {
-						privateKeyTextView.text = privateKey!!
+				PrivateKeyExportPresenter.getPrivateKey(
+					context,
+					address.orEmpty(),
+					chainType!!,
+					passwordInput.text.toString()
+				) { privateKey, error ->
+					if (privateKey != null && error.isNone()) {
+						privateKeyTextView.text = privateKey
 					} else context.alert(error.message)
 					it.showLoadingStatus(false)
 				}

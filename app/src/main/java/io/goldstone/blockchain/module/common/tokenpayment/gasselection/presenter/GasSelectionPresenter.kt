@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -199,7 +198,7 @@ class GasSelectionPresenter(
 				tokenContract.isLTC() -> transferLTC(
 					prepareBTCSeriesModel!!,
 					AddressUtils.getCurrentLTCAddress(),
-					if (SharedValue.isTestEnvironment()) ChainType.BTC else ChainType.LTC,
+					ChainType.LTC,
 					password,
 					callback
 				)

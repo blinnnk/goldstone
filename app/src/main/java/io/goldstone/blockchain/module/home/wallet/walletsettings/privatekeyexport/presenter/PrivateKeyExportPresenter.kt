@@ -8,7 +8,6 @@ import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.exportBase58PrivateKey
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -30,19 +29,6 @@ import org.bitcoinj.params.TestNet3Params
 class PrivateKeyExportPresenter(
 	override val fragment: PrivateKeyExportFragment
 ) : BasePresenter<PrivateKeyExportFragment>() {
-
-	private val address by lazy {
-		fragment.arguments?.getString(ArgumentKey.address)
-	}
-	private val chainType by lazy {
-		fragment.arguments?.getInt(ArgumentKey.chainType)?.let { ChainType(it) }
-	}
-
-	fun getPrivateKey(password: String, hold: (privateKey: String?, error: AccountError) -> Unit) {
-		fragment.context?.apply {
-			getPrivateKey(this, address!!, chainType!!, password, hold)
-		}
-	}
 
 	companion object {
 		fun getPrivateKey(
@@ -73,7 +59,11 @@ class PrivateKeyExportPresenter(
 					getBTCPrivateKeyByAddress(address, password, true, hold)
 				chainType.isEOS() ->
 					getBTCPrivateKeyByAddress(address, password, false, hold)
-				chainType.isLTC() -> exportLTCBase58PrivateKey(address, password, hold)
+				chainType.isLTC() -> {
+					if (SharedValue.isTestEnvironment())
+						getBTCPrivateKeyByAddress(address, password, true, hold)
+					else exportLTCBase58PrivateKey(address, password, hold)
+				}
 				else -> getETHSeriesPrivateKeyByAddress(address, password, hold)
 			}
 		}
@@ -117,8 +107,12 @@ class PrivateKeyExportPresenter(
 							if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
 						ECKey.fromPrivate(privateKeyInteger!!).getPrivateKeyAsWiF(net)
 					}
-					chainType.isLTC() ->
-						ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(LitecoinNetParams())
+					chainType.isLTC() -> {
+						// 测试网的私钥同一是 BTC TestNet 的格式
+						if (SharedValue.isTestEnvironment()) ECKey.fromPrivate(privateKeyInteger!!)
+							.getPrivateKeyAsWiF(TestNet3Params.get())
+						else ECKey.fromPrivate(privateKeyInteger).getPrivateKeyAsWiF(LitecoinNetParams())
+					}
 					chainType.isEOS() ->
 						EOSWalletUtils.generateKeyPairByPrivateKey(privateKeyInteger!!).privateKey
 					chainType.isETC() || chainType.isETH() ->
