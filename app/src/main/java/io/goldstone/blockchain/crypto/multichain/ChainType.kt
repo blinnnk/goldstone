@@ -19,6 +19,8 @@ import java.io.Serializable
  */
 class ChainType(val id: Int) : Serializable {
 
+	fun isBTCSeries() = isBTC() || isLTC() || isBCH()
+
 	fun getChainURL(): ChainURL {
 		return when (id) {
 			ChainType.ETH.id -> SharedChain.getCurrentETH()

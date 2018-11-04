@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.kernel.network.bitcoin
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
@@ -43,11 +42,12 @@ object BTCSeriesJsonRPC {
 			)
 		).let { it ->
 			RequisitionUtil.callChainBy(it, chainURL) { result, error ->
-				val fee =
-					if (isSmartFee) JSONObject(result!!).safeGet("feerate").toDoubleOrNull()
-					else result!!.toDoubleOrNull()
-				if (!result.isNull() && error.isNone()) hold(fee, error)
-				else hold(null, error)
+				if (result != null && error.isNone()) {
+					val fee =
+						if (isSmartFee) JSONObject(result).safeGet("feerate").toDoubleOrNull()
+						else result.toDoubleOrNull()
+					hold(fee, error)
+				} else hold(null, error)
 			}
 		}
 	}

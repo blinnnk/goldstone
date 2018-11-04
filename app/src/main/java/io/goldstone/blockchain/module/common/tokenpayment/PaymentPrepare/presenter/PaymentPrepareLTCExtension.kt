@@ -77,12 +77,12 @@ private fun PaymentPreparePresenter.generateLTCPaymentModel(
 
 		// 签名测速总的签名后的信息的 `Size`
 		LitecoinApi.getUnspentListByAddress(myAddress) { unspents, error ->
-			if (unspents.isNull() || error.hasError()) {
+			if (unspents == null || error.hasError()) {
 				GoldStoneAPI.context.runOnUiThread { hold(null, error) }
 				return@getUnspentListByAddress
 			}
 			// 如果余额不足或者出错这里会返回空的数组
-			if (unspents!!.isEmpty()) {
+			if (unspents.isEmpty()) {
 				GoldStoneAPI.context.runOnUiThread {
 					hold(null, TransferError.BalanceIsNotEnough)
 				}
