@@ -3,13 +3,9 @@ package io.goldstone.blockchain.module.entrance.starting.presenter
 import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
-import com.blinnnk.extension.addFragment
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -69,7 +65,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				}
 			}
 		}
-		
+
 		fun insertLocalTokens(context: Context, @WorkerThread callback: () -> Unit) {
 			context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list).map {
 				DefaultTokenTable(it)
@@ -78,7 +74,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				callback()
 			}
 		}
-		
+
 		fun insertLocalMarketList(context: Context, callback: () -> Unit) {
 			context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list)
 				.forEachOrEnd { market, isEnd ->
@@ -99,7 +95,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		}
 
 		fun getAndUpdateExchangeTables(
-			 @WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error :RequestError) -> Unit
+			@WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error: RequestError) -> Unit
 		) {
 			AppConfigTable.getAppConfig {
 				GoldStoneAPI.getMarketList(
@@ -118,11 +114,11 @@ class StartingPresenter(override val fragment: StartingFragment) :
 				}
 			}
 		}
-		
+
 		private fun updateExchangeTables(serverTableList: ArrayList<ExchangeTable>, md5: String) {
 			val exchangeDao = GoldStoneDataBase.database.exchangeTableDao()
 			val localData = exchangeDao.getAll()
-			if (localData.isEmpty() ) exchangeDao.insertAll(serverTableList)
+			if (localData.isEmpty()) exchangeDao.insertAll(serverTableList)
 			else exchangeDao.apply {
 				deleteAll()
 				insertAll(
@@ -154,20 +150,21 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					}
 				}.apply {
 					if (isEmpty()) return@doAsync
+					val defaultTokenDao =
+						GoldStoneDataBase.database.defaultTokenDao()
 					forEach { server ->
-						GoldStoneDataBase.database.defaultTokenDao().apply {
-							getTokenByContract(server.contract, server.symbol, server.chainID)?.let {
-								update(it.apply {
-									iconUrl = server.iconUrl
-									isDefault = server.isDefault
-									forceShow = server.forceShow
-								})
-							}
+						defaultTokenDao.getToken(server.contract, server.symbol, server.chainID)?.let {
+							defaultTokenDao.update(it.apply {
+								iconUrl = server.iconUrl
+								isDefault = server.isDefault
+								forceShow = server.forceShow
+							})
 						}
 					}
 				}
 			}
 		}
+
 		fun insertLocalCurrency(context: Context, @WorkerThread callback: () -> Unit) {
 			context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
 				SupportCurrencyTable(it).apply {

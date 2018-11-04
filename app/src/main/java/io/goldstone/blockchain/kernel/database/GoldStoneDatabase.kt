@@ -81,7 +81,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun chainNodeDao(): ChainNodeDao
 
 	companion object {
-		const val databaseVersion = 8
+		const val databaseVersion = 9
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

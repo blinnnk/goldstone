@@ -31,7 +31,9 @@ import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestUnCr
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.*
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -236,7 +238,7 @@ object GoldStoneAPI {
 			} else hold(null, error)
 		}
 	}
-	
+
 	@JvmStatic
 	fun getChainNodes(
 		@WorkerThread hold: (content: List<ChainNodeTable>?, error: RequestError) -> Unit
@@ -264,7 +266,7 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
-	
+
 	@JvmStatic
 	fun getMarketList(
 		md5: String,
@@ -291,10 +293,10 @@ object GoldStoneAPI {
 			} else {
 				hold(null, null, error)
 			}
-			
+
 		}
 	}
-	
+
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
 		address: String,
@@ -459,14 +461,16 @@ object GoldStoneAPI {
 			true
 		) { result, error ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不用 `Gson`
-			val jsonArray = JSONArray(result?.firstOrNull().orEmpty())
-			if (jsonArray.length() == 0) {
-				hold(arrayListOf(), error)
-			} else {
-				val notifications =
-					jsonArray.toList().map { NotificationTable(it) }.toArrayList()
-				hold(notifications, error)
-			}
+			if (result != null && error.isNone()) {
+				val jsonArray = JSONArray(result.firstOrNull().orEmpty())
+				if (jsonArray.length() == 0) {
+					hold(arrayListOf(), error)
+				} else {
+					val notifications =
+						jsonArray.toList().map { NotificationTable(it) }.toArrayList()
+					hold(notifications, error)
+				}
+			} else hold(null, error)
 		}
 	}
 

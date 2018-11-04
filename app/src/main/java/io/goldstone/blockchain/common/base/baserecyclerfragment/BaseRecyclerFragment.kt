@@ -289,7 +289,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	/**
 	 * `Inside loadingView` 非阻碍式的 `Loading`
 	 */
-	open fun showLoadingView(content: String) {
+	open fun showLoadingView() {
 		topMiniLoading.visibility = View.VISIBLE
 	}
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -58,7 +57,7 @@ class NotificationListPresenter(
 
 	private var hasLoadFromServer = false
 	private fun getDataFromDatabase() {
-		fragment.showLoadingView(LoadingText.notificationData)
+		fragment.showLoadingView()
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTime }?.createTime
 			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
@@ -73,9 +72,9 @@ class NotificationListPresenter(
 
 	private fun updateDataFromServer(requestTime: Long) {
 		GoldStoneAPI.getNotificationList(requestTime) { notificationList, error ->
-			if (!notificationList.isNull() && error.isNone()) {
+			if (notificationList != null && error.isNone()) {
 				hasLoadFromServer = true
-				if (notificationList!!.isNotEmpty()) {
+				if (notificationList.isNotEmpty()) {
 					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)
 					fragment.context?.runOnUiThread {
 						getDataFromDatabase()

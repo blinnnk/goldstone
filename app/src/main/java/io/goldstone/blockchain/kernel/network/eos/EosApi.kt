@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -293,13 +294,14 @@ object EOSAPI {
 	}
 
 	fun getRecycledBandWidthList(
-		accountName: String,
+		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
-		@WorkerThread hold: (data: List<RefundRequestInfo>?, error: RequestError) -> Unit
+		@WorkerThread hold: (data: List<RefundRequestInfo>?, error: GoldStoneError) -> Unit
 	) {
-		RequisitionUtil.post(
+		if (!account.isValid(false)) hold(null, AccountError.InvalidAccountName)
+		else RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", accountName),
+				Pair("scope", account.accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "refunds"),
 				Pair("json", true)
@@ -580,7 +582,7 @@ object EOSAPI {
 					EOSAPI.getPriceByPair(pair!!) { priceInEOS, pairError ->
 						if (!priceInEOS.isNull() && pairError.isNone()) {
 							val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-							val eosToken = defaultDao.getTokenByContract(
+							val eosToken = defaultDao.getToken(
 								TokenContract.EOS.contract!!,
 								TokenContract.EOS.symbol,
 								EOSChain.Main.id

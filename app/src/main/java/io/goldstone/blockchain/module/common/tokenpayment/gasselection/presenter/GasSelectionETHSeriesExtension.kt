@@ -4,7 +4,6 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
@@ -13,7 +12,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
-import io.goldstone.blockchain.crypto.keystore.getPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -29,6 +27,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasS
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -114,22 +113,18 @@ private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
 	if (getToken()?.contract.isETC()) SharedAddress.getCurrentETC()
 	else SharedAddress.getCurrentEthereum()
 
-private fun GasSelectionPresenter.getCurrentETHORETCPrivateKey(
+fun GasSelectionPresenter.transfer(
+	address: String,
+	chainType: ChainType,
 	password: String,
-	@WorkerThread hold: (privateKey: String?, error: AccountError) -> Unit
+	@WorkerThread callback: (GoldStoneError) -> Unit
 ) {
-	// 获取当前账户的私钥
-	fragment.context?.getPrivateKey(
-		getETHERC20OrETCAddress(),
-		password,
-		false,
-		false,
-		hold
-	)
-}
-
-fun GasSelectionPresenter.transfer(password: String, @UiThread callback: (GoldStoneError) -> Unit) {
-	getCurrentETHORETCPrivateKey(password) { privateKey, error ->
+	PrivateKeyExportPresenter.getPrivateKey(
+		fragment.context!!,
+		address,
+		chainType,
+		password
+	) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) prepareModel?.apply model@{
 			// 更新 `prepareModel`  的 `gasPrice` 的值
 			this.gasPrice = currentMinerType.getSelectedGasPrice()
@@ -152,7 +147,7 @@ fun GasSelectionPresenter.transfer(password: String, @UiThread callback: (GoldSt
 			) { taxHash, error ->
 				// API 错误的时候
 				if (taxHash.isNullOrEmpty() || error.hasError()) {
-					GoldStoneAPI.context.runOnUiThread { callback(error) }
+					callback(error)
 					return@sendRawTransaction
 				}
 				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
@@ -171,10 +166,9 @@ fun GasSelectionPresenter.transfer(password: String, @UiThread callback: (GoldSt
 						fragment,
 						prepareReceiptModel(this@model, countWithDecimal, taxHash)
 					)
-					callback(RequestError.None)
 				}
 			}
-		} else GoldStoneAPI.context.runOnUiThread { callback(error) }
+		} else callback(error)
 	}
 }
 

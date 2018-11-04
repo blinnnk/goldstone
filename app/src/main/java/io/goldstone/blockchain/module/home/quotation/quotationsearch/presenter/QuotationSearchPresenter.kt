@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
@@ -149,7 +148,7 @@ class QuotationSearchPresenter(
 	}
 
 	private fun searchTokenBy(symbol: String) {
-		fragment.showLoadingView(LoadingText.searchingQuotation)
+		fragment.showLoadingView()
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
 			if (!searchList.isNull() && error.isNone()) {

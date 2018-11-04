@@ -30,7 +30,7 @@ class TokenSelectionRecyclerView(context: Context) : BaseRecyclerView(context) {
 
 	init {
 		backgroundColor = Color.RED
-		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 	}
 
 	fun setAdapter(data: ArrayList<WalletDetailCellModel>, isShowAddressList: Boolean) {

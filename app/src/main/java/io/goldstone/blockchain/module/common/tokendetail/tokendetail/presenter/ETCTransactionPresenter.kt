@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
@@ -20,7 +19,7 @@ import org.jetbrains.anko.runOnUiThread
  */
 
 fun TokenDetailPresenter.loadETCChainData(localData: List<TransactionListModel>) {
-	fragment.showLoadingView(LoadingText.transactionData)
+	fragment.showLoadingView()
 	getETCTransactionsFromChain(localData) {
 		fragment.removeLoadingView()
 		loadDataFromDatabaseOrElse()

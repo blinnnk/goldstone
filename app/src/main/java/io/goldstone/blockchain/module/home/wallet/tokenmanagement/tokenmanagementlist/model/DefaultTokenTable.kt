@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -170,6 +171,26 @@ data class DefaultTokenTable(
 		chainID.id
 	)
 
+	// 服务插入 `EOS` 主网 `Token` 的构造函数
+	constructor(
+		contract: TokenContract,
+		iconUrl: String
+	) : this(
+		0,
+		"",
+		contract.contract.orEmpty(),
+		iconUrl,
+		contract.symbol,
+		0,
+		0.0,
+		"",
+		contract.decimal.orElse(CryptoValue.eosDecimal),
+		"",
+		true,
+		0,
+		ChainID.EOS.id
+	)
+
 	infix fun insertThen(callback: () -> Unit) {
 		doAsync {
 			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
@@ -180,7 +201,7 @@ data class DefaultTokenTable(
 	@WorkerThread
 	fun preventDuplicateInsert() {
 		GoldStoneDataBase.database.defaultTokenDao().apply {
-			if (getTokenByContract(contract, symbol, chainID).isNull()) {
+			if (getToken(contract, symbol, chainID).isNull()) {
 				insert(this@DefaultTokenTable)
 			}
 		}
@@ -205,12 +226,8 @@ data class DefaultTokenTable(
 	}
 
 	fun updateTokenNameFromChain() {
-		GoldStoneEthCall.getTokenName(
-			contract,
-			SharedChain.getCurrentETH()
-		) { result, _ ->
-			val name = if (result.isNullOrEmpty()) symbol else result!!
-			DefaultTokenTable.updateTokenName(TokenContract(this), name)
+		GoldStoneEthCall.getTokenName(contract, SharedChain.getCurrentETH()) { result, _ ->
+			DefaultTokenTable.updateTokenName(TokenContract(this), result ?: symbol)
 		}
 	}
 
@@ -228,21 +245,21 @@ data class DefaultTokenTable(
 			} then (hold)
 		}
 
-		fun getTokenByContractFromAllChains(contract: String, hold: (DefaultTokenTable?) -> Unit) {
+		fun getTokenFromAllChains(contract: String, symbol: String, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractFromAllChains(contract)
+				GoldStoneDataBase.database.defaultTokenDao().getTokenFromAllChains(contract, symbol)
 			} then { hold(it.firstOrNull()) }
 		}
 
-		fun getTokenByContractAndChainID(contract: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
+		fun getToken(contract: String, symbol: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenByContractAndChainID(contract, chainID.id)
+				GoldStoneDataBase.database.defaultTokenDao().getToken(contract, symbol, chainID.id)
 			} then (hold)
 		}
 
 		fun getCurrentChainToken(contract: TokenContract, hold: (DefaultTokenTable?) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
+				GoldStoneDataBase.database.defaultTokenDao().getToken(contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			} then (hold)
 		}
 
@@ -252,7 +269,7 @@ data class DefaultTokenTable(
 		) {
 			doAsync {
 				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-				defaultDao.getTokenByContractAndChainID(data.contract.contract.orEmpty(), data.chainID).let { targetTokens ->
+				defaultDao.getToken(data.contract.contract.orEmpty(), data.symbol, data.chainID).let { targetTokens ->
 					if (targetTokens.isNull()) {
 						defaultDao.insert(DefaultTokenTable(data))
 						callback()
@@ -312,13 +329,10 @@ interface DefaultTokenDao {
 	fun getDefaultTokens(currentChainIDs: List<String> = Current.chainIDs(), isDefault: Boolean = true): List<DefaultTokenTable>
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
-	fun getTokenByContract(contract: String, symbol: String, chainID: String): DefaultTokenTable?
+	fun getToken(contract: String, symbol: String, chainID: String): DefaultTokenTable?
 
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract")
-	fun getTokenByContractFromAllChains(contract: String): List<DefaultTokenTable>
-
-	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND chainID LIKE :chainID")
-	fun getTokenByContractAndChainID(contract: String, chainID: String): DefaultTokenTable?
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol")
+	fun getTokenFromAllChains(contract: String, symbol: String): List<DefaultTokenTable>
 
 	@Insert
 	fun insert(token: DefaultTokenTable)

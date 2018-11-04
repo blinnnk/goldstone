@@ -26,6 +26,7 @@ import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -222,8 +223,9 @@ class AddressManagerPresenter(
 						val ethNodes =
 							GoldStoneDataBase.database.chainNodeDao().getETHNodes().distinctBy { it.chainID }
 						ethNodes.forEach {
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.ethContract,
+								CoinSymbol.eth,
 								address!!,
 								it.chainID
 							)
@@ -266,8 +268,9 @@ class AddressManagerPresenter(
 						val etcNodes =
 							GoldStoneDataBase.database.chainNodeDao().getETCNodes().distinctBy { it.chainID }
 						etcNodes.forEach {
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.etcContract,
+								CoinSymbol.etc,
 								address!!,
 								it.chainID
 							)
@@ -319,8 +322,9 @@ class AddressManagerPresenter(
 							val eosNodes =
 								GoldStoneDataBase.database.chainNodeDao().getEOSNodes().distinctBy { it.chainID }
 							eosNodes.forEach {
-								insertNewAddressToMyToken(
+								insertNewToMyToken(
 									TokenContract.eosContract,
+									CoinSymbol.eos,
 									eosKeyPair.address,
 									it.chainID
 								)
@@ -372,8 +376,9 @@ class AddressManagerPresenter(
 								false
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.btcContract,
+								CoinSymbol.pureBTCSymbol,
 								address,
 								ChainID.btcMain
 							)
@@ -423,20 +428,23 @@ class AddressManagerPresenter(
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 							// `BTCTest` 是 `BTCSeries` 公用的地址
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.btcContract,
+								CoinSymbol.pureBTCSymbol,
 								address,
 								ChainID.btcTest
 							)
 							// 插入 LTC 账号
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.ltcContract,
+								CoinSymbol.ltc,
 								address,
 								ChainID.ltcTest
 							)
 							// 插入 BCH 账号
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.bchContract,
+								CoinSymbol.bch,
 								address,
 								ChainID.bchTest
 							)
@@ -485,8 +493,9 @@ class AddressManagerPresenter(
 								false
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.bchContract,
+								CoinSymbol.bch,
 								bchKeyPair.address,
 								ChainID.bchMain
 							)
@@ -535,8 +544,9 @@ class AddressManagerPresenter(
 								password
 							)
 							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							insertNewAddressToMyToken(
+							insertNewToMyToken(
 								TokenContract.ltcContract,
+								CoinSymbol.ltc,
 								ltcKeyPair.address,
 								ChainID.ltcMain
 							)
@@ -578,8 +588,8 @@ class AddressManagerPresenter(
 			}
 		}
 
-		private fun insertNewAddressToMyToken(contract: String, address: String, chainID: String) {
-			DefaultTokenTable.getTokenByContractFromAllChains(contract) { it ->
+		private fun insertNewToMyToken(contract: String, symbol: String, address: String, chainID: String) {
+			DefaultTokenTable.getTokenFromAllChains(contract, symbol) { it ->
 				it?.let {
 					MyTokenTable(it.apply { this.chainID = chainID }, address).preventDuplicateInsert()
 				}
