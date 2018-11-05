@@ -19,7 +19,6 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAda
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -32,22 +31,24 @@ class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
 
-	private var updateChartTimes: Int? = null
 	private var hasInitSocket = false
+	private var hasCheckedPairDate = false
+	private val invalidDatePairs = JsonArray()
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
 		QuotationSelectionTable.getAll { selections ->
-			/** 记录可能需要更新的 `Line Chart` 最大个数 */
-			if (updateChartTimes.isNull()) updateChartTimes = selections.size
 			selections.asSequence().map { selection ->
 				var linechart = listOf<ChartPoint>()
-				if (selection.lineChartDay.isNotEmpty()) {
+				if (selection.lineChartDay.isNotEmpty())
 					linechart = convertDataToChartData(selection.lineChartDay)
-				}
 				// 如果有网络的情况下检查 `LineData` 是否有效
-				if (NetworkUtil.hasNetwork(fragment.context)) {
-					linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
+				if (
+					NetworkUtil.hasNetwork(fragment.context) &&
+					linechart.isNotEmpty() &&
+					!hasCheckedPairDate
+				) {
+					linechart.filterInvalidDatePair(selection.pair)
 				}
 				QuotationModel(
 					selection,
@@ -57,9 +58,13 @@ class QuotationPresenter(
 				)
 			}.sortedByDescending {
 				it.orderID
-			}.toList().let { it ->
+			}.toList().let { quotations ->
+				if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
+					updateData()
+					hasCheckedPairDate = true
+				}
 				// 更新 `UI`
-				diffAndUpdateAdapterData<QuotationAdapter>(it.toArrayList())
+				diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
 				// 设定 `Socket` 并执行
 				if (currentSocket.isNull()) setSocket {
 					hasInitSocket = true
@@ -91,24 +96,23 @@ class QuotationPresenter(
 		currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$jsonArray}")
 	}
 
-	private fun List<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
-		if (isEmpty()) return
-		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
-		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
-		if (maxDate + 1L < 1.daysAgoInMills()) {
-			val parameter = JsonArray().apply { add(pair) }
-			GoldStoneAPI.getCurrencyLineChartData(parameter) { newChart, error ->
-				if (newChart != null && error.isNone()) {
-					// 更新数据库的数据
-					val quotationDao =
-						GoldStoneDataBase.database.quotationSelectionDao()
-					quotationDao.updateDayLineChartByPair(pair, newChart.firstOrNull()?.pointList?.toString().orEmpty())
-					/** 防止服务器数据出错或不足, 可能导致的死循环 */
-					if (updateChartTimes.orZero() > 0) GoldStoneAPI.context.runOnUiThread {
-						updateData()
-						updateChartTimes = updateChartTimes.orZero() - 1
-					}
-				} else LogUtil.error("checkTimeStampIfNeedUpdateBy", error)
+
+	private fun List<ChartPoint>.filterInvalidDatePair(pair: String) {
+		/** 服务端传入的最近的时间会做 `减1` 处理, 从服务器获取的事件是昨天的事件. */
+		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull() ?: 0L
+		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
+	}
+
+	private fun updateInvalidDatePair(pairList: JsonArray, callback: () -> Unit) {
+		GoldStoneAPI.getCurrencyLineChartData(pairList) { newChart, error ->
+			if (newChart != null && newChart.isNotEmpty() && error.isNone()) {
+				// 更新数据库的数据
+				val quotationDao =
+					GoldStoneDataBase.database.quotationSelectionDao()
+				newChart.forEachIndexed { index, model ->
+					quotationDao.updateDayLineChartByPair(pairList.get(index).asString, model.pointList.toString())
+				}
+				callback()
 			}
 		}
 	}
