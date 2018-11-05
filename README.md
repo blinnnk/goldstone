@@ -29,7 +29,7 @@
 Copyright (C) 2018 Pʀᴏᴅᴜᴄᴇ Bʏ Vɪsɪᴏɴ Cᴏʀᴇ Cʀᴏᴘ.
 ────────────────────────────────────────────────────────────────────────────────────
 ```
-<image src="https://www.goldstone.io/common/images/icon.png" height="100" width="100"></image>
+<image src="http://gs.goldstone.io/resources/images/logo.svg" height="100" width="100"></image>
 ___
 GoldStone uses a decentralized way to send transactions and keep assets secure. Private keys, keystore and mnemonics are managed locally, and never leave your phone.
 

@@ -37,8 +37,9 @@ abstract class SilentUpdater {
 
 	private fun checkAvailableEOSTokenList() {
 		val account = SharedAddress.getCurrentEOSAccount()
+		val chainID = SharedChain.getEOSCurrent().chainID
 		if (!account.isValid(false)) return
-		EOSAPI.getEOSTokenList(SharedChain.getEOSCurrent().chainID, account) { tokenList, error ->
+		EOSAPI.getEOSTokenList(chainID, account) { tokenList, error ->
 			// 拉取潜在资产的 `Icon Url`
 			if (tokenList != null && error.isNone()) GoldStoneAPI.getIconURL(tokenList) { tokenIcons, getIconError ->
 				val myTokenDao = GoldStoneDataBase.database.myTokenDao()
@@ -53,7 +54,7 @@ abstract class SilentUpdater {
 						contract.contract.orEmpty(),
 						contract.symbol,
 						account.accountName,
-						ChainID.EOS.id
+						chainID.id
 					)
 					// 有可能用户本地已经插入并且被用户手动关闭了, 所以只有本地不存在的时候才插入
 					// 插入 `MyTokenTable`
@@ -65,7 +66,7 @@ abstract class SilentUpdater {
 							contract.symbol,
 							0.0,
 							contract.contract.orEmpty(),
-							ChainID.EOS.id,
+							chainID.id,
 							false
 						)
 					)

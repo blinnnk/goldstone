@@ -19,11 +19,11 @@ fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView()
 	val address = AddressUtils.getCurrentBCHAddress()
 	BitcoinCashApi.getTransactionCount(address) { transactionCount, error ->
-		if (transactionCount.isNull() || error.hasError()) return@getTransactionCount
+		if (transactionCount == null || error.hasError()) return@getTransactionCount
 		loadBCHTransactionsFromChain(
 			address,
 			localDataMaxIndex,
-			transactionCount!!
+			transactionCount
 		) {
 			fragment.context?.runOnUiThread {
 				fragment.removeLoadingView()
