@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.*
@@ -9,6 +8,7 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.runOnUiThread
 
@@ -65,18 +65,20 @@ fun TransactionDetailPresenter.updateDataFromTransactionList() {
 
 private fun TransactionDetailPresenter.getETHERC20OrETCMemo(headerData: TransactionHeaderModel) {
 	dataFromList?.apply {
-		TransactionTable.getMemoByHashAndReceiveStatus(
-			currentHash,
-			isReceived,
+		// 首先更新带入的数据
+		val models = generateModels(this).toArrayList()
+		updateHeaderValue(headerData)
+		val chainURL =
 			if (contract.isETC()) SharedChain.getETCCurrent()
 			else SharedChain.getCurrentETH()
-		) { memo, error ->
-			if (!memo.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
+		fragment.asyncData = models
+		// 异步检查 Memo 是否需要更新
+		TransactionTable.getMemoByHashAndReceiveStatus(currentHash, isReceived, chainURL) { memo, error ->
+			if (!memo.isNullOrBlank() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
 				fragment.removeLoadingView()
-				fragment.asyncData = generateModels(this@apply).toArrayList().apply {
-					this[1].info = memo!!
-				}
-				updateHeaderValue(headerData)
+				fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(
+					models.apply { this[1].info = memo!! }
+				)
 			}
 		}
 	}

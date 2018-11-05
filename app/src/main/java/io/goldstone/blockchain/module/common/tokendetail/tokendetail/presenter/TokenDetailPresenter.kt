@@ -143,7 +143,7 @@ class TokenDetailPresenter(
 
 	private fun prepareTokenDetailData() {
 		fragment.showLoadingView()
-		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData ->
+		loadDataFromDatabaseOrElse { ethSeriesLocalData, localBTCSeriesData ->
 			// 检查是否有网络
 			if (!NetworkUtil.hasNetwork(fragment.context)) return@loadDataFromDatabaseOrElse
 			// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
@@ -155,8 +155,8 @@ class TokenDetailPresenter(
 					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
 				}
 
-				!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
-					fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
+				ethSeriesLocalData != null || ethSeriesLocalData?.isEmpty() == false -> {
+					fragment.loadDataFromChain(ethSeriesLocalData, 0)
 				}
 			}
 		}
