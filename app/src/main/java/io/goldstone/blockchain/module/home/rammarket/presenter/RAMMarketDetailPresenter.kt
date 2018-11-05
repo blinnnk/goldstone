@@ -23,7 +23,7 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: 头部的price展示presenter
  */
-class RAMPMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
+class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
  : BasePresenter<RAMMarketDetailFragment>() {
 	var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	var recentTransactionModel: RecentTransactionModel? = null

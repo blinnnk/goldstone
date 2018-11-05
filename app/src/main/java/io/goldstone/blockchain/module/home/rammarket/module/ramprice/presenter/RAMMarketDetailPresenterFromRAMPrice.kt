@@ -12,7 +12,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.model.RAMTradeRoomData
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
-import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPMarketDetailPresenter
+import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigDecimal
@@ -23,7 +23,7 @@ import java.math.BigDecimal
  * @description:
  */
 
-fun RAMPMarketDetailPresenter.saveCandleDataToDatabase() {
+fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
 	doAsync {
 		val localData = GoldStoneDataBase.database.ramPriceDao().getData()
 		val minuteJson = candleDataMap[EOSRAMChartType.Minute.info]?.let {
@@ -53,7 +53,7 @@ fun RAMPMarketDetailPresenter.saveCandleDataToDatabase() {
 	}
 }
 
-fun RAMPMarketDetailPresenter.getChartDataFromDatebase(callback: () -> Unit) {
+fun RAMMarketDetailPresenter.getChartDataFromDatebase(callback: () -> Unit) {
 	val type = object : TypeToken<ArrayList<CandleChartModel>>() {}.type
 	doAsync {
 		GoldStoneDataBase.database.ramPriceDao().getData()?.apply {
@@ -80,7 +80,7 @@ fun RAMPMarketDetailPresenter.getChartDataFromDatebase(callback: () -> Unit) {
 	}
 }
 
-fun RAMPMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) {
+fun RAMMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) {
 	if (candleDataMap.isEmpty()) {
 		getChartDataFromDatebase {
 			updateChartDataFromNet(ramChartType)
@@ -93,7 +93,7 @@ fun RAMPMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType)
 	
 }
 
-fun RAMPMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartType) {
+fun RAMMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartType) {
 	val period = ramChartType.info
 	val dateType = ramChartType.dateType
 	var size = 0
@@ -154,7 +154,7 @@ fun RAMPMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTy
 	}
 }
 
-fun RAMPMarketDetailPresenter.updateTodayPriceUI() {
+fun RAMMarketDetailPresenter.updateTodayPriceUI() {
 	RAMTradeRoomData.ramInformationModel?.let {
 		fragment.setTodayPrice(
 			BigDecimal("${it.openPrice.orZero()}").toPlainString(),
@@ -165,7 +165,7 @@ fun RAMPMarketDetailPresenter.updateTodayPriceUI() {
 	
 }
 
-fun RAMPMarketDetailPresenter.updateCurrentPriceUI() {
+fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 	RAMTradeRoomData.ramInformationModel?.let { ramInformationModel ->
 		ramInformationModel.currentPrice?.let { current ->
 			ramInformationModel.HighPrice?.let { high ->
@@ -207,7 +207,7 @@ fun calculatePricePercent() {
 
 
 @SuppressLint("SetTextI18n")
-fun RAMPMarketDetailPresenter.getTodayPrice() {
+fun RAMMarketDetailPresenter.getTodayPrice() {
 	GoldStoneAPI.getEOSRAMTodayPrice { model, error ->
 		if (!model.isNull() && error.isNone()) {
 			RAMTradeRoomData.ramInformationModel?.apply {

@@ -9,22 +9,19 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.updateRAMCandleData
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPMarketDetailPresenter
+import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import java.math.BigDecimal
 
 /**
  * @date: 2018/10/29.
  * @author: yanglihai
  * @description: price信息，包含蜡烛走势图
  */
-class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
+class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	override val pageTitle: String = EOSRAMExchangeText.ramExchange
 	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
 	private val priceChartWithMenuLayout by lazy {
@@ -33,7 +30,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMPMarketDetailPresenter>() {
 		}
 	}
 	private val tradingView by lazy { TradingView(context!!) }
-	override val presenter: RAMPMarketDetailPresenter = RAMPMarketDetailPresenter(this)
+	override val presenter: RAMMarketDetailPresenter = RAMMarketDetailPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)

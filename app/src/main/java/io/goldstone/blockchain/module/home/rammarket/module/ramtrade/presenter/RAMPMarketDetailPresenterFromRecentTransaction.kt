@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
-import io.goldstone.blockchain.module.home.rammarket.presenter.RAMPMarketDetailPresenter
+import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import org.jetbrains.anko.*
 
 /**
@@ -13,7 +13,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
-fun RAMPMarketDetailPresenter.recentTransactions() {
+fun RAMMarketDetailPresenter.recentTransactions() {
 	doAsync {
 		GoldStoneAPI.getEOSRAMRecentTransactions { data, error ->
 			if (!data.isNull() && error.isNone()) {
@@ -33,7 +33,7 @@ fun RAMPMarketDetailPresenter.recentTransactions() {
 }
 
 
-fun RAMPMarketDetailPresenter.setAcountInfoFromDatabase() {
+fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
 	val account = SharedAddress.getCurrentEOSAccount()
 	EOSAccountTable.getAccountByName(account.accountName) { localData ->
 		localData?.apply {
