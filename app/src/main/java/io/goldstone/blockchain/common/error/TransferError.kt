@@ -34,6 +34,8 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val UnavailableAccountName = AccountError(ErrorText.eosNameResultUnavailable)
 		@JvmStatic
+		val InactivatedAccountName = AccountError(ErrorText.inactivatedAccountName)
+		@JvmStatic
 		val EmptyName = AccountError(ErrorText.emptyName)
 		@JvmStatic
 		val EmptyRepeatPassword = AccountError(ErrorText.emptyRepeatPassword)

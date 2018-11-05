@@ -274,4 +274,15 @@ object ErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "該用戶名已經被別人註冊`"
 		else -> ""
 	}
+
+	@JvmField
+	val inactivatedAccountName = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This account name has not been activated yet"
+		HoneyLanguage.Chinese.code -> "This account name has not been activated yet"
+		HoneyLanguage.Japanese.code -> "This account name has not been activated yet"
+		HoneyLanguage.Korean.code -> "This account name has not been activated yet"
+		HoneyLanguage.Russian.code -> "This account name has not been activated yet"
+		HoneyLanguage.TraditionalChinese.code -> "This account name has not been activated yet"
+		else -> ""
+	}
 }

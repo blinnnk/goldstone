@@ -9,19 +9,28 @@ import org.jetbrains.anko.runOnUiThread
  * @date  2018/10/19
  */
 class ErrorDisplayManager(error: Throwable) {
-	var displayMessage: String? = null
+	private var displayMessage: String? = null
 
 	init {
-		displayMessage = when {
-			error.message!!.contains("Timeout", true) -> {
-				// 上报 Server 逻辑, 这部分超市
-				null
+		val errorMessage = error.message
+		if (errorMessage != null) {
+			displayMessage = when {
+				errorMessage.contains("Timeout", true) ||
+					errorMessage.contains("Time out", true) -> {
+					// 上报 Server 逻辑, 这部分超市
+					null
+				}
+				errorMessage.contains("404") -> {
+					// 上报 Server 逻辑, 这部分超市
+					null
+				}
+				errorMessage.contains("failed to connect", true) -> {
+					// 上报 Server 逻辑, 这部分超市
+					LogUtil.error(this::class.java.simpleName, Throwable("GoldStone ERROR: *************** $errorMessage ***************"))
+					null
+				}
+				else -> error.message
 			}
-			error.message!!.contains("404") -> {
-				// 上报 Server 逻辑, 这部分超市
-				null
-			}
-			else -> error.message
 		}
 	}
 

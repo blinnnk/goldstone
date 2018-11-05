@@ -431,10 +431,10 @@ data class WalletTable(
 
 		fun getAllEOSAccountNames(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then { it ->
-				hold(it.map { it.currentEOSAccountName.getCurrent() })
-			}
+				val allWallets =
+					GoldStoneDataBase.database.walletDao().getAllWallets()
+				allWallets.map { it.currentEOSAccountName.getCurrent() }
+			} then (hold)
 		}
 
 		fun getAllBCHAddresses(hold: List<String>.() -> Unit) {

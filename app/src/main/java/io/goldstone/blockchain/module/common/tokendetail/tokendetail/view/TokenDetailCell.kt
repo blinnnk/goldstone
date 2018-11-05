@@ -12,5 +12,4 @@ class TokenDetailCell(context: Context) : TransactionListCell(context) {
   init {
 
   }
-
 }
