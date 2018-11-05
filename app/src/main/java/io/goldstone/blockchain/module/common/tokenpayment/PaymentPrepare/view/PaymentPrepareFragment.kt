@@ -175,17 +175,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		return changeAddress
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		if (memoInputView.isNull()) {
-			getParentFragment<TokenDetailOverlayFragment>()?.let {
-				presenter.backEvent(it)
+			getParentFragment<TokenDetailOverlayFragment>()?.apply {
+				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
-		} else {
-			removeMemoInputView()
-		}
+		} else removeMemoInputView()
 	}
 
 	private fun LinearLayout.showMemoCell() {

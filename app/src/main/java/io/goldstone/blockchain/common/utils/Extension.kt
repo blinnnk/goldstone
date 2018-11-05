@@ -5,6 +5,7 @@ package io.goldstone.blockchain.common.utils
 import android.R
 import android.content.Context
 import android.content.res.ColorStateList
+import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
@@ -143,5 +144,10 @@ fun CompoundButton.isDefaultStyle() {
 		// disabled - enabled
 		intArrayOf(GrayScale.midGray, Spectrum.blue)
 	)
+}
+
+@UiThread
+fun Fragment.safeShowError(error: Throwable) {
+	ErrorDisplayManager(error).show(context)
 }
 

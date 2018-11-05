@@ -7,7 +7,6 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.*
 import io.goldstone.blockchain.common.language.LoadingText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -22,7 +21,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.Pa
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -43,7 +41,7 @@ class PaymentPreparePresenter(
 		// 根据入口不同决定是否显示关闭按钮
 		rootFragment?.apply {
 			if (isFromQuickTransfer) {
-				overlayView.header.showCloseButton(false)
+				overlayView.header.showCloseButton(false) {}
 			}
 		}
 	}
@@ -82,17 +80,10 @@ class PaymentPreparePresenter(
 		}
 	}
 
-	fun backEvent(fragment: TokenDetailOverlayFragment) {
-		fragment.apply {
-			headerTitle = TokenDetailText.address
-			presenter.popFragmentFrom<PaymentPrepareFragment>()
-		}
-	}
-
 	override fun onFragmentShowFromHidden() {
 		rootFragment?.apply {
-			overlayView.header.backButton.onClick {
-				backEvent(this@apply)
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
 		}
 	}

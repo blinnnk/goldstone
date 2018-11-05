@@ -61,7 +61,7 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 					showBackButton(hasBackButton) {
 						presenter.popFragmentFrom<T>()
 					}
-					showCloseButton(!hasBackButton)
+					showCloseButton(!hasBackButton) {}
 				}
 			}
 		}

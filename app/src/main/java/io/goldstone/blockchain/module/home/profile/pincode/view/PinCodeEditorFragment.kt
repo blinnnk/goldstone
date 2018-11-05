@@ -6,7 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -21,7 +24,6 @@ import io.goldstone.blockchain.common.value.BorderSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.pincode.presenter.PinCodeEditorPresenter
@@ -98,19 +100,15 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 				lparams(matchParent, matchParent)
 			}
 
-			AppConfigTable.getAppConfig { config ->
-				switch.apply {
-					setAlignParentRight()
-					isChecked = config?.showPincode.orFalse()
-				}.click { switch ->
-					// 点击后根据更新的数据库情况显示开关状态
-					presenter.setShowPinCodeStatus(switch.isChecked) {
-						AppConfigTable.getAppConfig {
-							switch.isChecked = it?.showPincode.orFalse()
-						}
-					}
-				}.into(this)
-			}
+			switch.apply {
+				setAlignParentRight()
+				isChecked = SharedValue.getPincodeDisplayStatus()
+			}.click { switch ->
+				// 点击后根据更新的数据库情况显示开关状态
+				presenter.setPinCodeDisplayStatus(switch.isChecked) {
+					switch.isChecked = it
+				}
+			}.into(this)
 			// 分割线
 			View(context).apply {
 				lparams {
@@ -123,10 +121,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()
 		}

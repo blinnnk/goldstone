@@ -80,7 +80,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		parentFragment?.let {
 			if (it is BaseOverlayFragment<*>) {
-				it.showAddButton(false)
+				it.showAddButton(false) {}
 			}
 		}
 	}

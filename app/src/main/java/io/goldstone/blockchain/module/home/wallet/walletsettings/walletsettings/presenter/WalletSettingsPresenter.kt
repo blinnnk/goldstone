@@ -21,6 +21,7 @@ import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListCardCell
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.view.HintFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -75,9 +76,10 @@ class WalletSettingsPresenter(
 					addView(header)
 				} else {
 					overlayView.header.apply {
-						showBackButton(false)
-						showCloseButton(true)
-						showAddButton(false)
+						showCloseButton(true) {
+							presenter.removeSelfFromActivity()
+						}
+						showAddButton(false) {}
 					}
 					header?.visibility = View.VISIBLE
 				}
@@ -153,14 +155,14 @@ class WalletSettingsPresenter(
 			header.showBackButton(true) {
 				showWalletSettingListFragment()
 			}
-			header.showCloseButton(false)
+			header.showCloseButton(false) {}
 		}
 	}
 
 	fun showCurrentWalletInfo() {
 		fragment.header?.apply {
 			walletInfo.apply {
-				title.text = SharedWallet.getCurrentName()
+				title.text = WalletListCardCell.getFixedTitleLength(SharedWallet.getCurrentName())
 				WalletTable.getWalletAddressCount { count ->
 					val description = if (count == 1) "" else WalletSettingsText.containsBTCTest
 					subtitle.text = WalletSettingsText.addressCountSubtitle(count, description)

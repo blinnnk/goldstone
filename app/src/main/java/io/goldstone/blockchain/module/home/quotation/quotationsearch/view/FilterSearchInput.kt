@@ -30,7 +30,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			visibility = View.GONE
 		}
 	}
-	
+
 	val editText by lazy {
 		EditText(context).apply {
 			hint = EmptyText.searchInput
@@ -44,7 +44,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			background = null
 		}
 	}
-	
+
 	private val cancelButton by lazy {
 		TextView(context).apply {
 			text = CommonText.cancel
@@ -55,47 +55,40 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			gravity = Gravity.CENTER
 		}
 	}
-	
+
 	init {
 		id = ElementID.searchInput
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		leftPadding = 20.uiPX()
 		rightPadding = 20.uiPX()
-		
+
 		linearLayout {
 			gravity = Gravity.CENTER_VERTICAL
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX()).apply {
 				gravity = Gravity.CENTER_VERTICAL
 			}
 			leftPadding = 10.uiPX()
-			
 			addCorner(CornerSize.default.toInt(), Spectrum.white)
-			
 			addView(filterIcon)
 			addView(editText)
 		}
 		addView(cancelButton)
-		
 	}
-	
+
 	fun showFilterImage(visible: Boolean) {
-		filterIcon.visibility = if(visible) View.VISIBLE else View.GONE
+		filterIcon.visibility = if (visible) View.VISIBLE else View.GONE
 	}
-	
+
 	fun setCancelClick(callback: () -> Unit) {
 		cancelButton.click { callback() }
 	}
-	
+
 	fun setFilterClickEvent(callback: () -> Unit) {
 		filterIcon.click { callback() }
 	}
-	
+
 	fun setFiltered(hasFiltered: Boolean) {
-		if (hasFiltered) {
-			filterIcon.setColorFilter(GrayScale.black)
-		} else {
-			filterIcon.setColorFilter(GrayScale.lightGray)
-		}
+		filterIcon.setColorFilter(if (hasFiltered) GrayScale.black else GrayScale.lightGray)
 	}
-	
+
 }

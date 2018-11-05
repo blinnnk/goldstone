@@ -339,8 +339,8 @@ class GasSelectionPresenter(
 					putSerializable(ArgumentKey.transactionDetail, receiptModel)
 				}
 				overlayView.header.apply {
-					showBackButton(false)
-					showCloseButton(true)
+					showBackButton(false) {}
+					showCloseButton(true) { presenter.removeSelfFromActivity() }
 				}
 				headerTitle = TokenDetailText.transferDetail
 			}

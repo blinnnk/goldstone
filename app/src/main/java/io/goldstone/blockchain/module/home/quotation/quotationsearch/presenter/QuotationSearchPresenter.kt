@@ -12,10 +12,7 @@ import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -44,16 +41,14 @@ class QuotationSearchPresenter(
 		fragment.asyncData = arrayListOf()
 	}
 
-	private var hasNetWork = true
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			overlayView.header.getFilterSearchInput().showFilterImage(true)
-			overlayView.header.searchInputListener({
-				// 在 `Input` focus 的时候就进行网络判断, 移除在输入的时候监听的不严谨提示.
-				if (it) hasNetWork = NetworkUtil.hasNetworkWithAlert(context)
-			}) {
-				hasNetWork isTrue { searchTokenBy(it) }
+			overlayView.header.searchInputListener(
+				{ NetworkUtil.hasNetworkWithAlert(context) }
+			) {
+				if (NetworkUtil.hasNetwork(context)) searchTokenBy(it)
 			}
 			overlayView.header.setSearchFilterClickEvent {
 				showExchangeDashboard()
@@ -172,7 +167,7 @@ class QuotationSearchPresenter(
 					if (isEnd) fragment.completeQuotationTable(searchList)
 				}
 			} else GoldStoneAPI.context.runOnUiThread {
-				fragment.showError(error)
+				fragment.safeShowError(error)
 				fragment.removeLoadingView()
 			}
 

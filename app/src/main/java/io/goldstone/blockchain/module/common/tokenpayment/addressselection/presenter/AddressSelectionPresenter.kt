@@ -4,6 +4,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QRText
@@ -11,6 +12,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.multichain.*
@@ -24,7 +26,6 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -92,16 +93,14 @@ class AddressSelectionPresenter(
 	fun showPaymentPrepareFragment(toAddress: String, count: Double = 0.0) {
 		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
 		fun showAlertIfLocalExistThisAddress(localAddresses: List<String>) {
-			localAddresses.any { it.equals(toAddress, true) } isTrue {
+			if (localAddresses.any { it.equals(toAddress, true) }) {
 				alert(
 					TokenDetailText.transferToLocalWalletAlertDescription,
 					TokenDetailText.transferToLocalWalletAlertTitle
 				) {
 					goToPaymentPrepareFragment(toAddress, count)
 				}
-			} otherwise {
-				goToPaymentPrepareFragment(toAddress, count)
-			}
+			} else goToPaymentPrepareFragment(toAddress, count)
 		}
 		// 检查地址是否合规
 		val addressType =
@@ -118,7 +117,7 @@ class AddressSelectionPresenter(
 
 			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
 				!token?.contract.isEOSSeries() ->
-					fragment.context.alert("this is not a valid eos account name")
+					fragment.safeShowError(AccountError.InvalidAccountName)
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {
 					showAlertIfLocalExistThisAddress(this)
@@ -235,12 +234,8 @@ class AddressSelectionPresenter(
 				putDouble(ArgumentKey.paymentCount, count)
 				putSerializable(ArgumentKey.tokenModel, token)
 			}
-			overlayView.header.apply {
-				backButton.onClick {
-					headerTitle = TokenDetailText.address
-					presenter.popFragmentFrom<PaymentPrepareFragment>()
-					showCloseButton(false)
-				}
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
 			headerTitle = TokenDetailText.transferDetail
 		}
@@ -255,7 +250,7 @@ class AddressSelectionPresenter(
 				header.showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
-				header.showCloseButton(false)
+				header.showCloseButton(false) {}
 			}
 		}
 	}

@@ -53,11 +53,11 @@ data class EOSAccountInfo(
 	}
 }
 
-fun List<EOSAccountInfo>.currentPublicKeyHasActivated(): Boolean {
+fun List<EOSAccountInfo>.currentPublicKeyIsActivated(): Boolean {
 	return !find { it.hasActivated() }.isNull()
 }
 
-fun List<EOSAccountInfo>.hasActivatedOrWatchOnlyEOSAccount(): Boolean {
+fun List<EOSAccountInfo>.hasActivatedOrWatchOnly(): Boolean {
 	return !find { it.isActivatedOrWatchOnlyEOSAccount() }.isNull()
 }
 

@@ -205,7 +205,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun hideAddButton() {
-		getParentFragment<WalletSettingsFragment>()?.showAddButton(false)
+		getParentFragment<WalletSettingsFragment>()?.showAddButton(false) {}
 	}
 
 	private fun setMultiChainAddresses(wallet: WalletTable) {

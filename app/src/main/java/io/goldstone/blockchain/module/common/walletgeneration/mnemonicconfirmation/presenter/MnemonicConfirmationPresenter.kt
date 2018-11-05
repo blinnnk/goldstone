@@ -20,7 +20,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.v
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 22/03/2018 11:40 PM
@@ -47,7 +46,7 @@ class MnemonicConfirmationPresenter(
 		// 如果在窗前钱包的界面用户点击了关闭按钮那么直接切换钱包
 		if (fragment.activity is MainActivity) {
 			fragment.getParentFragment<WalletGenerationFragment> {
-				overlayView.header.closeButton.onClick {
+				overlayView.header.showCloseButton(true) {
 					activity?.jump<SplashActivity>()
 				}
 			}
@@ -93,7 +92,7 @@ class MnemonicConfirmationPresenter(
 		fragment.parentFragment.apply {
 			fun BaseOverlayFragment<*>.resetEvent() {
 				headerTitle = CreateWalletText.mnemonicConfirmation
-				overlayView.header.showCloseButton(false)
+				overlayView.header.showCloseButton(false) {}
 				overlayView.header.showBackButton(true) {
 					presenter.popFragmentFrom<MnemonicConfirmationFragment>()
 				}

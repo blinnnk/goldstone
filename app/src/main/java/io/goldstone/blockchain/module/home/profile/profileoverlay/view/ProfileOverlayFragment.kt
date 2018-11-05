@@ -11,7 +11,7 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.presenter.Prof
  * @author KaySaith
  */
 class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
-	
+
 	val title by lazy {
 		arguments?.getString(ArgumentKey.profileTitle)
 	}
@@ -19,9 +19,10 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
 		arguments?.getSerializable(ArgumentKey.addressModel) as? ContactModel
 	}
 	override val presenter = ProfileOverlayPresenter(this)
-	
+
 	override fun ViewGroup.initView() {
 		headerTitle = title.orEmpty()
 		presenter.showTargetFragmentByTitle(title.orEmpty())
 	}
+
 }

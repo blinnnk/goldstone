@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.model
 
 import android.arch.persistence.room.*
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
@@ -10,6 +9,11 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
@@ -92,22 +96,35 @@ data class QuotationSelectionTable(
 			}
 		}
 
-		fun getAll(@UiThread hold: (List<QuotationSelectionTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.quotationSelectionDao().getAll()
-			} then (hold)
+		fun getAll(
+			isUIThread: Boolean = true,
+			hold: (List<QuotationSelectionTable>
+			) -> Unit) = launch {
+			withContext(CommonPool, CoroutineStart.LAZY) {
+				val allQuotation =
+					GoldStoneDataBase.database.quotationSelectionDao().getAll()
+				if (isUIThread) withContext(UI) {
+					hold(allQuotation)
+				} else hold(allQuotation)
+			}
 		}
 
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.quotationSelectionDao().updateOrderIDByPair(fromPair, newOrderID)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+			launch {
+				withContext(CommonPool, CoroutineStart.LAZY) {
+					GoldStoneDataBase.database.quotationSelectionDao()
+						.updateOrderIDByPair(fromPair, newOrderID)
+					withContext(UI) {
+						callback()
+					}
+				}
 			}
 		}
 
 		fun updateLineChartDataBy(pair: String, lineChart: String, callback: () -> Unit) {
 			load {
-				GoldStoneDataBase.database.quotationSelectionDao().updateDayLineChartByPair(pair, lineChart)
+				GoldStoneDataBase.database.quotationSelectionDao()
+					.updateDayLineChartByPair(pair, lineChart)
 			} then {
 				callback()
 			}

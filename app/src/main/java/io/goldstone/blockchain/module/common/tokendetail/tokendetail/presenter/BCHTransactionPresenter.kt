@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -50,12 +49,12 @@ private fun loadBCHTransactionsFromChain(
 		pageInfo.from,
 		pageInfo.to
 	) { transactions, error ->
-		if (transactionCount.isNull() || error.hasError()) {
+		if (transactions == null || error.hasError()) {
 			callback(false)
 			return@getTransactions
 		}
 		// Calculate All Inputs to get transfer value
-		callback(transactions!!.asSequence().mapIndexed { index, item ->
+		callback(transactions.asSequence().mapIndexed { index, item ->
 			// 转换数据格式
 			BTCSeriesTransactionTable(
 				item,
@@ -69,13 +68,11 @@ private fun loadBCHTransactionsFromChain(
 			// 插入转账数据到数据库
 			BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
 			// 同样的账单插入一份燃气费的数据
-			if (!it.isReceive) {
-				BTCSeriesTransactionTable.preventRepeatedInsert(
-					it.hash,
-					true,
-					it.apply { isFee = true }
-				)
-			}
+			if (!it.isReceive) BTCSeriesTransactionTable.preventRepeatedInsert(
+				it.hash,
+				true,
+				it.apply { isFee = true }
+			)
 			TransactionListModel(it)
 		}.toList().isNotEmpty())
 	}

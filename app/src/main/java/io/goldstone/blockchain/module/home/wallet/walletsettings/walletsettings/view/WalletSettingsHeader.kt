@@ -22,16 +22,16 @@ import org.jetbrains.anko.verticalLayout
  * @author KaySaith
  */
 class WalletSettingsHeader(context: Context) : LinearLayout(context) {
-	
+
 	val walletInfo = TwoLineTitles(context)
 	val avatarImage = ImageView(context)
-	
+
 	init {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
 		y += 10.uiPX()
 		x += PaddingSize.device
 		gravity = Gravity.CENTER_VERTICAL
-		
+
 		verticalLayout {
 			addCorner(AvatarSize.big, Spectrum.white)
 			gravity = Gravity.START
@@ -49,15 +49,12 @@ class WalletSettingsHeader(context: Context) : LinearLayout(context) {
 				}
 				.into(this)
 		}
-		
-		walletInfo
-			.apply {
-				setBigWhiteStyle()
-				subtitle.gravity = Gravity.CENTER_HORIZONTAL
-			}
-			.into(this)
-		
-		
+
+		walletInfo.apply {
+			setBigWhiteStyle()
+			subtitle.gravity = Gravity.CENTER_HORIZONTAL
+		}.into(this)
+
 		walletInfo.setMargins<LinearLayout.LayoutParams> {
 			leftMargin = 10.uiPX()
 		}

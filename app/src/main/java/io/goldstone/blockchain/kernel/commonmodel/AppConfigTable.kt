@@ -11,6 +11,8 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -73,13 +75,13 @@ data class AppConfigTable(
 				GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
 			}
 		}
-		
+
 		fun updateExchangeListMD5(md5: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().apply {
 					getAppConfig()?.let {
 						update(it.apply { this.exchangeListMD5 = md5 })
-						
+
 					}
 				}
 			}
@@ -107,21 +109,13 @@ data class AppConfigTable(
 			}
 		}
 
-		fun setShowPinCodeStatus(status: Boolean, callback: () -> Unit) {
-			AppConfigTable.getAppConfig { it ->
-				it?.let {
-					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(
-							it.apply {
-								showPincode = status
-								if (!status) pincode = null
-							}
-						)
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
-				}
+		fun setShowPinCodeStatus(status: Boolean, callback: (status: Boolean) -> Unit) {
+			load {
+				val configDao = GoldStoneDataBase.database.appConfigDao()
+				configDao.updateShowPincodeStatus(status)
+			} then {
+				// 更新成功
+				callback(status)
 			}
 		}
 
@@ -188,6 +182,9 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
 	fun updatePincode(pinCode: Int)
+
+	@Query("UPDATE appConfig SET showPincode = :status WHERE id = 1")
+	fun updateShowPincodeStatus(status: Boolean)
 
 	@Query("UPDATE appConfig SET language = :code WHERE id = 1")
 	fun updateLanguageCode(code: Int)

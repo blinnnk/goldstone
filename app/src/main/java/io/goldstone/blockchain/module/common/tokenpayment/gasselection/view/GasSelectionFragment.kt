@@ -16,8 +16,8 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WebUrl
@@ -77,9 +77,11 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 							showLoadingStatus()
 							presenter.confirmTransfer { error ->
 								resetMinerType()
-								if (error.hasError()) runOnUiThread {
-									if (error is AccountError) setCanUseStyle(false)
-									this@GasSelectionFragment.context.alert(error.message)
+								runOnUiThread {
+									if (error.hasError()) {
+										if (error is AccountError) setCanUseStyle(false)
+										safeShowError(error)
+									}
 									showLoadingStatus(false, Spectrum.white, CommonText.next)
 								}
 							}

@@ -80,6 +80,7 @@ object SharesPreference {
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"
 	const val needToShowPincode = "needToShowPincode"
+	const val accountCheckedStatus = "accountCheckedStatus"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

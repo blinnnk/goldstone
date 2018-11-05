@@ -75,7 +75,7 @@ class WalletDetailPresenter(
 					// 更新内存的数据
 					detailModels = chainModels
 					updateUIByData(chainModels)
-					if (error.hasError()) fragment.showError(error)
+					if (error.hasError()) fragment.safeShowError(error)
 				}
 			} else fragment.removeMiniLoadingView()
 		}
@@ -141,22 +141,23 @@ class WalletDetailPresenter(
 	}
 
 	fun updateUnreadCount() {
-		if (!NetworkUtil.hasNetwork()) return
+		if (!NetworkUtil.hasNetwork(fragment.context)) return
 		val goldStoneID = SharedWallet.getGoldStoneID()
 		NotificationTable.getAllNotifications { notifications ->
 			/**
 			 * 时间戳, 如果本地一条通知记录都没有, 那么传入设备创建的时间, 就是 `GoldStone ID` 的最后 `13` 位
 			 * 如果本地有数据获取最后一条的创建时间作为请求时间
 			 */
-			val time = if (notifications.isEmpty()) goldStoneID.substring(
-				goldStoneID.length - System.currentTimeMillis().toString().length,
-				goldStoneID.length
-			).toLong()
-			else notifications.maxBy { it.createTime }?.createTime.orElse(0)
+			val time =
+				if (notifications.isEmpty()) goldStoneID.substring(
+					goldStoneID.length - System.currentTimeMillis().toString().length,
+					goldStoneID.length
+				).toLong()
+				else notifications.maxBy { it.createTime }?.createTime ?: 0L
 			GoldStoneAPI.getUnreadCount(goldStoneID, time) { unreadCount, error ->
 				if (error.isNone() && unreadCount != null) fragment.context?.runOnUiThread {
 					fragment.setUnreadCount(unreadCount)
-				} else fragment.showError(error)
+				} else fragment.safeShowError(error)
 			}
 		}
 	}

@@ -59,17 +59,17 @@ class AddressManagerPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		setBackEvent()
-		if (SharedWallet.getCurrentWalletType().isBIP44()) fragment.showCreatorDashboard()
+		if (SharedWallet.getCurrentWalletType().isBIP44())
+			fragment.showCreatorDashboard()
 	}
 
 	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
 		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
 			EOSAPI.getAccountNameByPublicKey(key
 			) { accountNames, error ->
-				if (!accountNames.isNull() && error.isNone()) {
+				if (accountNames != null && error.isNone()) {
 					val description =
-						if (accountNames!!.isNotEmpty())
-							WalletSettingsText.activatedPublicKey
+						if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey
 						else WalletSettingsText.unactivatedPublicKey
 					fragment.context?.runOnUiThread {
 						cell.showDescriptionTitle(description)
@@ -86,7 +86,7 @@ class AddressManagerPresenter(
 				showBackButton(true) {
 					presenter.showWalletSettingListFragment()
 				}
-				showCloseButton(false)
+				showCloseButton(false) {}
 			}
 		}
 	}
@@ -181,7 +181,7 @@ class AddressManagerPresenter(
 		fun showQRCodeFragment(addressModel: ContactModel, walletSettingsFragment: WalletSettingsFragment) {
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
-				showAddButton(false)
+				showAddButton(false) {}
 				AddressManagerFragment.removeDashboard(context)
 				presenter.showTargetFragment<QRCodeFragment>(
 					Bundle().apply { putSerializable(ArgumentKey.addressModel, addressModel) }
@@ -192,7 +192,7 @@ class AddressManagerPresenter(
 		fun showKeystoreExportFragment(address: String, walletSettingsFragment: WalletSettingsFragment) {
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
-				showAddButton(false)
+				showAddButton(false) {}
 				if (!SharedWallet.isWatchOnlyWallet()) {
 					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(

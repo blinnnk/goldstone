@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel.eos
 
 import android.arch.persistence.room.*
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getTargetObject
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
@@ -111,12 +112,13 @@ data class EOSTransactionTable(
 					contract.symbol,
 					chainID.id
 				)
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread  {
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
 					hold(data)
 				} else hold(data)
 			}
 		}
 
+		@WorkerThread
 		fun getRangeData(
 			account: EOSAccount,
 			start: Int,
@@ -126,24 +128,22 @@ data class EOSTransactionTable(
 			isMainThread: Boolean = true,
 			hold: (List<EOSTransactionTable>) -> Unit
 		) {
-			doAsync {
-				// `Server` 返回的 数据 `Memo` 中会带有不确定的 `SqlLite` 不支持的特殊符号,
-				// 这里用 `Try Catch` 兼容一下
-				val data = try {
-					GoldStoneDataBase.database.eosTransactionDao().getDataByRange(
-						account.accountName,
-						start,
-						end,
-						symbol,
-						codeName
-					)
-				} catch (error: Exception) {
-					listOf<EOSTransactionTable>()
-				}
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread  {
-					hold(data)
-				} else hold(data)
+			// `Server` 返回的 数据 `Memo` 中会带有不确定的 `SqlLite` 不支持的特殊符号,
+			// 这里用 `Try Catch` 兼容一下
+			val data = try {
+				GoldStoneDataBase.database.eosTransactionDao().getDataByRange(
+					account.accountName,
+					start,
+					end,
+					symbol,
+					codeName
+				)
+			} catch (error: Exception) {
+				listOf<EOSTransactionTable>()
 			}
+			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+				hold(data)
+			} else hold(data)
 		}
 	}
 }
