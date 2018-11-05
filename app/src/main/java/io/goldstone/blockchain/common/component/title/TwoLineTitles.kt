@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.common.component.title
 
+import android.animation.ArgbEvaluator
 import android.content.Context
 import android.graphics.Typeface
 import android.view.Gravity
@@ -13,6 +14,9 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
+import android.animation.ObjectAnimator
+import android.widget.GridLayout
+
 
 /**
  * @date 23/03/2018 11:32 PM
@@ -92,7 +96,10 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 	}
 
 	fun setColorStyle(color: Int) {
-		title.textColor = color
+		val colorAnim =
+			ObjectAnimator.ofInt(title, "textColor", GrayScale.whiteGray, color)
+		colorAnim.setEvaluator(ArgbEvaluator())
+		colorAnim.start()
 		subtitle.textColor = color
 	}
 
