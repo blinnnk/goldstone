@@ -32,8 +32,10 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
+import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter.Companion.updateAccountInformation
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter.Companion.updateShareContentFromServer
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.doAsync
 
@@ -130,14 +132,16 @@ class SplashActivity : AppCompatActivity() {
 					}
 				}
 				initDefaultMarketByNetWork()
-				
+
 				// Init Node List
 				initNodeList {
 					prepareNodeInfo {
 						// Check network to get default toke list
 						initDefaultToken {
 							prepareYingYongBaoInReviewStatus {
-								hasAccountThenLogin()
+								updateAccountInformation(activity) {
+									jump<MainActivity>()
+								}
 							}
 						}
 					}

@@ -40,6 +40,11 @@ class TokenManagementListPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
+		fragment.getParentFragment<TokenManagementFragment> {
+			overlayView.header.showCloseButton(true) {
+				presenter.removeSelfFromActivity()
+			}
+		}
 	}
 
 	// 在异步线程更新数据

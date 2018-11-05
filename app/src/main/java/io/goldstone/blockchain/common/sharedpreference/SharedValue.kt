@@ -48,4 +48,13 @@ object SharedValue {
 			SharesPreference.needToShowPincode,
 			status
 		)
+
+	fun getAccountCheckedStatus(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.accountCheckedStatus)
+
+	fun updateAccountCheckedStatus(status: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.accountCheckedStatus,
+			status
+		)
 }

@@ -22,7 +22,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, TransactionListModel>() {
 	// 首页的 `cell` 点击进入详情界面传入的 `Symbol`
 	val token by lazy { (parentFragment as? TokenDetailCenterFragment)?.token }
-	var currentMenu: String? = null
+	var currentMenu = CommonText.all
 	override val pageTitle: String get() = token?.symbol.orEmpty()
 	private val footer by lazy { TokenDetailFooter(context!!) }
 	override val presenter = TokenDetailPresenter(this)

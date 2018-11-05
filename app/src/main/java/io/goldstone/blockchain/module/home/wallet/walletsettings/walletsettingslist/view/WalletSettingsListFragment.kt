@@ -17,7 +17,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 class WalletSettingsListFragment :
 	BaseRecyclerFragment<WalletSettingsListPresenter, WalletSettingsListModel>() {
 
-	override val pageTitle: String = "Wallet Settings"
+	override val pageTitle: String = WalletSettingsText.walletSettings
 	override val presenter = WalletSettingsListPresenter(this)
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?
