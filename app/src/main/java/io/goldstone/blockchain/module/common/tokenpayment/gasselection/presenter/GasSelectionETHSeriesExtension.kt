@@ -3,7 +3,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
@@ -22,7 +25,6 @@ import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter.Companion.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
@@ -125,7 +127,7 @@ fun GasSelectionPresenter.transfer(
 		chainType,
 		password
 	) { privateKey, error ->
-		if (!privateKey.isNull() && error.isNone()) prepareModel?.apply model@{
+		if (privateKey != null && error.isNone()) prepareModel?.apply model@{
 			// 更新 `prepareModel`  的 `gasPrice` 的值
 			this.gasPrice = currentMinerType.getSelectedGasPrice()
 			// Generate Transaction Model
@@ -139,20 +141,17 @@ fun GasSelectionPresenter.transfer(
 				else countWithDecimal
 				input = inputData.hexToByteArray().toList()
 			}
-			val signedHex = raw.sign(privateKey!!)
+			val signedHex = raw.sign(privateKey)
 			// 发起 `sendRawTransaction` 请求
-			GoldStoneEthCall.sendRawTransaction(
-				signedHex,
-				getToken()?.contract?.getChainURL()!!
-			) { taxHash, error ->
+			GoldStoneEthCall.sendRawTransaction(signedHex, getToken()?.contract?.getChainURL()!!) { taxHash, hashError ->
 				// API 错误的时候
-				if (taxHash.isNullOrEmpty() || error.hasError()) {
+				if (taxHash == null || taxHash.isEmpty() || error.hasError()) {
 					callback(error)
 					return@sendRawTransaction
 				}
 				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 				// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-				if (taxHash!!.isValidTaxHash()) insertPendingDataToTransactionTable(
+				if (taxHash.isValidTaxHash()) insertPendingDataToTransactionTable(
 					toWalletAddress,
 					countWithDecimal,
 					this@model,
@@ -161,12 +160,12 @@ fun GasSelectionPresenter.transfer(
 				)
 				// 主线程跳转到账目详情界面
 				fragment.context?.runOnUiThread {
-					goToTransactionDetailFragment(
-						rootFragment,
+					rootFragment?.goToTransactionDetailFragment(
 						fragment,
 						prepareReceiptModel(this@model, countWithDecimal, taxHash)
 					)
 				}
+				callback(hashError)
 			}
 		} else callback(error)
 	}

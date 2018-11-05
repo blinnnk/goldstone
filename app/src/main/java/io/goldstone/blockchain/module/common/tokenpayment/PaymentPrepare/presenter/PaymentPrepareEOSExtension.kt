@@ -15,7 +15,7 @@ import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.crypto.utils.toAmount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.goToTransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import org.jetbrains.anko.doAsync
 
@@ -53,11 +53,7 @@ private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
 	callback: (GoldStoneError) -> Unit
 ) {
 	val receiptModel = ReceiptModel(info, response, getToken()!!)
-	GasSelectionPresenter.goToTransactionDetailFragment(
-		rootFragment,
-		fragment,
-		receiptModel
-	)
+	rootFragment?.goToTransactionDetailFragment(fragment, receiptModel)
 	// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
 	doAsync {
 		EOSTransactionTable.getMaxDataIndexTable(

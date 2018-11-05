@@ -26,6 +26,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
 import org.jetbrains.anko.runOnUiThread
 
@@ -51,6 +52,7 @@ class WalletSettingsListPresenter(
 	override fun updateData() {
 		val balanceText =
 			SharedWallet.getCurrentBalance().formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
+		fragment.asyncData = arrayListOf()
 		WalletTable.getCurrentWallet {
 			arrayListOf(
 				WalletSettingsListModel(WalletSettingsText.viewAddresses),
@@ -65,10 +67,8 @@ class WalletSettingsListPresenter(
 				WalletSettingsListModel(WalletSettingsText.delete)
 			).let {
 				// 如果已经备份了助记词就不再显示提示条目
-				if (hasBackUpMnemonic) {
-					it.removeAt(it.lastIndex - 1)
-				}
-				fragment.asyncData = it
+				if (hasBackUpMnemonic) it.removeAt(it.lastIndex - 1)
+				diffAndUpdateSingleCellAdapterData<WalletSettingsListAdapter>(it)
 			}
 		}
 	}

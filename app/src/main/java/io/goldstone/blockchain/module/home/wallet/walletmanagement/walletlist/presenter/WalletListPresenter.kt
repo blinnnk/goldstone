@@ -12,6 +12,7 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListAdapter
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
@@ -24,10 +25,13 @@ class WalletListPresenter(
 ) : BaseRecyclerPresenter<WalletListFragment, WalletListModel>() {
 
 	override fun updateData() {
+		fragment.asyncData = arrayListOf()
 		WalletTable.getAll {
-			fragment.asyncData = mapTo(arrayListOf()) { wallet ->
-				WalletListModel(wallet, wallet.getWalletType().type.orEmpty())
-			}
+			diffAndUpdateAdapterData<WalletListAdapter>(
+				mapTo(arrayListOf()) { wallet ->
+					WalletListModel(wallet, wallet.getWalletType().type.orEmpty())
+				}
+			)
 		}
 	}
 

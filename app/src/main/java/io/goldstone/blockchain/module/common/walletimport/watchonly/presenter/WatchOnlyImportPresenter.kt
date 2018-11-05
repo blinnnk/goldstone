@@ -205,7 +205,7 @@ class WatchOnlyImportPresenter(
 					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
 					EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSMainnet().getURL()) { info, error ->
-						if (!info.isNull() || error.isNone()) {
+						if (info != null && error.isNone()) {
 							eosMainnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
 							SharedChain.updateEOSCurrent(
@@ -214,7 +214,7 @@ class WatchOnlyImportPresenter(
 							SharedValue.updateIsTestEnvironment(false)
 							GoldStoneAPI.context.runOnUiThread { callback(error) }
 						} else GoldStoneAPI.context.runOnUiThread {
-							callback(AccountError.InvalidAccountName)
+							callback(AccountError.InactivatedAccountName)
 						}
 					}
 				}

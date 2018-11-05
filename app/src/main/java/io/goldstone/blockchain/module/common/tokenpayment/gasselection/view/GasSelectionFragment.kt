@@ -117,17 +117,14 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 		spendingCell.setSubtitle(value)
 	}
 
-	fun resetMinerType() {
+	private fun resetMinerType() {
 		MinerFeeType.Custom.value = 0
 		presenter.currentMinerType = MinerFeeType.Recommend
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
-		getParentFragment<TokenDetailOverlayFragment>()?.let {
-			presenter.backEvent(it)
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			presenter.popFragmentFrom<GasSelectionFragment>()
 		}
 	}
 }

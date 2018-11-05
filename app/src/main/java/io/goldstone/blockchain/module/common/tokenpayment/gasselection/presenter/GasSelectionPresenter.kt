@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -175,7 +174,7 @@ class GasSelectionPresenter(
 
 	fun showConfirmAttentionView(@WorkerThread callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
-			TransactionText.confirmTransactionTitle.toUpperCase(),
+			TransactionText.confirmTransactionTitle,
 			TransactionText.confirmTransaction,
 			true,
 			// 点击取消按钮
@@ -221,7 +220,7 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun insertBTCSeriesPendingDataDatabase(
+	fun insertBTCSeriesPendingData(
 		raw: PaymentBTCSeriesModel,
 		fee: Long,
 		size: Int,
@@ -264,7 +263,7 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun prepareReceiptModelFromBTCSeries(
+	fun generateReceipt(
 		raw: PaymentBTCSeriesModel,
 		fee: Long,
 		taxHash: String
@@ -309,41 +308,27 @@ class GasSelectionPresenter(
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
-				backEvent(this@apply)
+				presenter.popFragmentFrom<GasSelectionFragment>()
 			}
 		}
 	}
+}
 
-	fun backEvent(fragment: TokenDetailOverlayFragment) {
-		fragment.apply {
-			headerTitle = TokenDetailText.paymentValue
-			presenter.popFragmentFrom<GasSelectionFragment>()
-		}
+/**
+ * 转账开始后跳转到转账监听界面
+ */
+fun <T : Fragment> TokenDetailOverlayFragment.goToTransactionDetailFragment(
+	currentFragment: T,
+	receiptModel: ReceiptModel
+) {
+	// 准备跳转到下一个界面
+	// 如果有键盘收起键盘
+	activity?.apply { SoftKeyboard.hide(this) }
+	removeChildFragment(currentFragment)
+	addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
+		putSerializable(ArgumentKey.transactionDetail, receiptModel)
 	}
-
-	companion object {
-		/**
-		 * 转账开始后跳转到转账监听界面
-		 */
-		fun <T : Fragment> goToTransactionDetailFragment(
-			fragment: TokenDetailOverlayFragment?,
-			currentFragment: T,
-			receiptModel: ReceiptModel
-		) {
-			// 准备跳转到下一个界面
-			fragment?.apply {
-				// 如果有键盘收起键盘
-				activity?.apply { SoftKeyboard.hide(this) }
-				removeChildFragment(currentFragment)
-				addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
-					putSerializable(ArgumentKey.transactionDetail, receiptModel)
-				}
-				overlayView.header.apply {
-					showBackButton(false) {}
-					showCloseButton(true) { presenter.removeSelfFromActivity() }
-				}
-				headerTitle = TokenDetailText.transferDetail
-			}
-		}
+	overlayView.header.apply {
+		showCloseButton(true) { presenter.removeSelfFromActivity() }
 	}
 }
