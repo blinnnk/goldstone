@@ -244,4 +244,24 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
+	val transactionAccount = when(currentLanguage) {
+		HoneyLanguage.English.code -> "account/timing"
+		HoneyLanguage.Chinese.code -> "account/timing"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val transactionAmount =  when(currentLanguage) {
+		HoneyLanguage.English.code -> "transactionAmount"
+		HoneyLanguage.Chinese.code -> "transactionAmount"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
 }

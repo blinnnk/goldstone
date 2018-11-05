@@ -605,6 +605,7 @@ object EOSAPI {
 	fun getGlobalInformation(
 		@WorkerThread hold: (EOSGolbalModel?, RequestError) -> Unit
 	) {
+		
 		RequestBody.create(
 			GoldStoneEthCall.contentType,
 			ParameterUtil.prepareObjectContent(

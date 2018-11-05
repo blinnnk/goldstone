@@ -39,6 +39,10 @@ object APIPath {
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
 	val eosRAMLatestTrading: (header: String) -> String = { "$it/eosram/lastestTxListContainsSellAndBuy" }
+	val eosRAMOccupyRank: (header: String) -> String =  { "$it/eosram/holderRank" }
+	val eosRAMBIgTransactions: (header: String, mode: Int) -> String = { header, mode ->
+		"$header/eosram/lastestTxList?mode=$mode"
+	}
 	val getEOSTokenList: (
 		header: String,
 		chainID: String,

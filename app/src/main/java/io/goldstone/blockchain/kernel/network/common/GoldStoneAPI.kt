@@ -34,7 +34,9 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.model.RAMRankModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -577,6 +579,36 @@ object GoldStoneAPI {
 			hold(Gson().fromJson(firstOrNull().orEmpty(), type), RequestError.None)
 		}
 	
+	}
+	
+	fun getBigTransactions(mode: Int, hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit) {
+		requestData<TradingInfoModel>(
+			APIPath.eosRAMBIgTransactions(APIPath.currentUrl, mode),
+			"tx_list",
+			justGetData = false,
+			errorCallback = {
+				hold(null, it)
+			},
+			isEncrypt = true
+		) {
+			hold(this, RequestError.None)
+		}
+		
+	}
+	
+	fun getRAMOccupyRank( hold: (data: List<RAMRankModel>?, error: RequestError) -> Unit) {
+		requestData<RAMRankModel>(
+			APIPath.eosRAMOccupyRank(APIPath.currentUrl),
+			"rank",
+			justGetData = false,
+			errorCallback = {
+				hold(null, it)
+			},
+			isEncrypt = true
+		) {
+			hold(this, RequestError.None)
+		}
+		
 	}
 	
 }

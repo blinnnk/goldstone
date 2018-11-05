@@ -11,6 +11,7 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.updateRAMCandleData
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view.QuotationViewPager
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
@@ -25,11 +26,13 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	override val pageTitle: String = EOSRAMExchangeText.ramExchange
 	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
 	private val priceChartWithMenuLayout by lazy {
-		PriceChartWithMenuLayout(context!!) {
+		RAMPriceChartAndMenuView(context!!) {
 			presenter.updateRAMCandleData(it)
 		}
 	}
 	private val tradingView by lazy { TradingView(context!!) }
+	private val quotationViewParent by lazy { QuotationViewPager(this) }
+	
 	override val presenter: RAMMarketDetailPresenter = RAMMarketDetailPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
@@ -40,6 +43,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 				addView(ramPriceView)
 				addView(priceChartWithMenuLayout)
 				addView(tradingView)
+				addView(quotationViewParent)
 				
 			}
 		}

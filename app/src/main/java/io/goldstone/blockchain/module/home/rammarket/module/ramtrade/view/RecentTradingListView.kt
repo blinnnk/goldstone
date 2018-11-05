@@ -21,7 +21,7 @@ class RecentTradingListView(context: Context): RecyclerView(context) {
 	}
 	
 	fun setData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
-		adapter = RecentTradingAdapter(context, buyList, sellList)
+		adapter = RecentTradingAdapter(buyList, sellList)
 	}
 	
 }

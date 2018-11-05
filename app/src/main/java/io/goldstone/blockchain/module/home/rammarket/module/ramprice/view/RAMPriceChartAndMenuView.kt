@@ -15,7 +15,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
  * @author: yanglihai
  * @description:
  */
-class PriceChartWithMenuLayout(
+class RAMPriceChartAndMenuView(
 	context: Context,
 	private val hold: (EOSRAMChartType) -> Unit): LinearLayout(context) {
 	

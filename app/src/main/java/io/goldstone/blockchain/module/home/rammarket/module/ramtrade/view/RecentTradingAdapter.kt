@@ -22,7 +22,6 @@ import org.jetbrains.anko.*
  * @description:
  */
 class RecentTradingAdapter(
-	private val context: Context,
 	private val buyList: List<TradingInfoModel>,
 	private val sellList: List<TradingInfoModel>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -31,9 +30,9 @@ class RecentTradingAdapter(
 		parent: ViewGroup,
 		viewType: Int
 	) = if (viewType == 0) {
-		TradingTitleHolder(TitleView(context))
+		TradingTitleHolder(TitleView(parent.context))
 	} else {
-		TradingHolder(TradingItemView(context))
+		TradingHolder(TradingCell(parent.context))
 	}
 	
 	
@@ -53,7 +52,7 @@ class RecentTradingAdapter(
 				title.textColor = if (position == 0) Spectrum.green else Spectrum.lightRed
 			}
 		} else if (holder is TradingHolder) {
-			(holder.itemView as? TradingItemView)?.apply {
+			(holder.itemView as? TradingCell)?.apply {
 				if (position <= buyList.size ) {
 					val model = buyList[position - 1]
 					val maxValue = buyList.maxBy { it.quantity }?.quantity?:0.toDouble()
@@ -95,9 +94,9 @@ class TitleView(context: Context) : RelativeLayout(context) {
 	}
 }
 
-class TradingItemView(context: Context) : RelativeLayout(context) {
+class TradingCell(context: Context) : RelativeLayout(context) {
 	private val viewWidth = ScreenSize.Width - ScreenSize.Width/2 - 20.uiPX()
-	val name: TextView
+	private val name: TextView
 	private val transactionAmount: TextView
 	private val backgroundView: View
 	var percent: Float = 0f
@@ -124,9 +123,9 @@ class TradingItemView(context: Context) : RelativeLayout(context) {
 		}
 	}
 	
-	fun setData(account: String, quantity: Double, maxValue:Double, backgroundColor: Int) {
+	fun setData(accountName: String, quantity: Double, maxValue:Double, backgroundColor: Int) {
 		percent = if (maxValue == 0.toDouble()) 0f else (quantity / maxValue).toFloat()
-		name.text = account
+		name.text = accountName
 		transactionAmount.text = if (quantity > 10000) (quantity/ 1000f).formatCount(1) + "k" else quantity.formatCount(1)
 		backgroundView.setMargins<RelativeLayout.LayoutParams> {
 			leftMargin = (viewWidth * (1 - percent)).toInt()
