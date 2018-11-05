@@ -27,7 +27,8 @@ import org.jetbrains.anko.textColor
  */
 class QuotationCell(context: Context) : LinearLayout(context) {
 
-	private var previousPrice = 0.0
+	// 判断标价是否需要刷新价格及 `LineChart` 的标记
+	private var previousPrice: Double? = null
 	var model: QuotationModel by observing(QuotationModel()) {
 		val price = if (model.price == ValueTag.emptyPrice) model.price
 		else model.price.toDoubleOrNull()?.toBigDecimal()?.toPlainString()
@@ -38,7 +39,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		tokenPrice.title.text = CustomTargetTextStyle(
 			model.quoteSymbol.toUpperCase(),
 			model.quoteSymbol.toUpperCase() + " " + price,
-			GrayScale.midGray, 13.uiPX(),
+			GrayScale.midGray,
+			13.uiPX(),
 			false,
 			false
 		)
