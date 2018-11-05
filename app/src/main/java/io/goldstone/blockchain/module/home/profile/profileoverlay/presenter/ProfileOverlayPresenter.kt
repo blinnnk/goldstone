@@ -107,7 +107,7 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showWatchWalletImportFragment() {
-		fragment.overlayView.header.showAddButton(false)
+		fragment.overlayView.header.showAddButton(false) {}
 		showTargetFragment<WatchOnlyImportFragment>()
 	}
 

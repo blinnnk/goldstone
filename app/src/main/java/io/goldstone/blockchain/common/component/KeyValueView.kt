@@ -25,6 +25,7 @@ class KeyValueView(context: Context) : TextView(context) {
 	init {
 		addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
+		minHeight = 80.uiPX()
 		maxLines = 8
 		movementMethod = ScrollingMovementMethod()
 		padding = 20.uiPX()

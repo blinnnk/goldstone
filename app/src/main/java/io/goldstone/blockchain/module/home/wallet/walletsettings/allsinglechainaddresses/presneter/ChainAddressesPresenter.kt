@@ -38,7 +38,7 @@ class ChainAddressesPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showCloseButton(false)
+			overlayView.header.showCloseButton(false) {}
 			overlayView.header.showBackButton(true) {
 				headerTitle = WalletSettingsText.viewAddresses
 				presenter.popFragmentFrom<ChainAddressesFragment>()

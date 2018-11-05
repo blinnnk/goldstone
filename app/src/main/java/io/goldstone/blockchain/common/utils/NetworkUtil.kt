@@ -7,9 +7,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
@@ -34,9 +31,9 @@ object NetworkUtil {
 		return status
 	}
 
-	fun hasNetwork(context: Context? = null): Boolean {
-		val cm = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
-		val activeNetwork = cm?.activeNetworkInfo
+	fun hasNetwork(context: Context?): Boolean {
+		val connection = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+		val activeNetwork = connection?.activeNetworkInfo
 		return activeNetwork != null && activeNetwork.isConnectedOrConnecting
 	}
 }
@@ -45,28 +42,19 @@ object NetworkUtil {
 class ConnectionChangeReceiver : BroadcastReceiver() {
 
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
-	override fun onReceive(
-		context: Context,
-		intent: Intent
-	) {
-		NetworkUtil.hasNetwork(context) isTrue {
-			AppConfigTable.getAppConfig {
-				it?.isRegisteredAddresses?.isFalse {
-					WalletTable.getCurrentWallet {
-						XinGePushReceiver.registerAddressesForPush(this)
-					}
+	override fun onReceive(context: Context, intent: Intent) {
+		if (NetworkUtil.hasNetwork(context)) AppConfigTable.getAppConfig {
+			if (it?.isRegisteredAddresses == false) {
+				WalletTable.getCurrentWallet {
+					XinGePushReceiver.registerAddressesForPush(this)
 				}
 			}
-		} otherwise {
-			GoldStoneDialog.show(context) {
-				showOnlyConfirmButton {
-					GoldStoneDialog.remove(context)
-				}
-				setImage(R.drawable.network_browken_banner)
-				setContent(
-					DialogText.networkTitle, DialogText.networkDescription
-				)
+		} else GoldStoneDialog.show(context) {
+			showOnlyConfirmButton {
+				GoldStoneDialog.remove(context)
 			}
+			setImage(R.drawable.network_browken_banner)
+			setContent(DialogText.networkTitle, DialogText.networkDescription)
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -19,6 +20,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAda
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -37,7 +39,7 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		QuotationSelectionTable.getAll { selections ->
+		QuotationSelectionTable.getAll(false) { selections ->
 			selections.asSequence().map { selection ->
 				var linechart = listOf<ChartPoint>()
 				if (selection.lineChartDay.isNotEmpty())
@@ -60,16 +62,20 @@ class QuotationPresenter(
 				it.orderID
 			}.toList().let { quotations ->
 				if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
-					updateData()
+					fragment.context?.runOnUiThread {
+						updateData()
+					}
 					hasCheckedPairDate = true
 				}
-				// 更新 `UI`
-				diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
-				// 设定 `Socket` 并执行
-				if (currentSocket.isNull()) setSocket {
-					hasInitSocket = true
-					currentSocket?.runSocket()
-				} else subscribeSocket()
+				fragment.context?.runOnUiThread {
+					// 更新 `UI`
+					diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
+					// 设定 `Socket` 并执行
+					if (currentSocket.isNull()) setSocket {
+						hasInitSocket = true
+						currentSocket?.runSocket()
+					} else subscribeSocket()
+				}
 			}
 		}
 	}
@@ -103,7 +109,10 @@ class QuotationPresenter(
 		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
 	}
 
-	private fun updateInvalidDatePair(pairList: JsonArray, callback: () -> Unit) {
+	private fun updateInvalidDatePair(
+		pairList: JsonArray,
+		@WorkerThread callback: () -> Unit
+	) {
 		GoldStoneAPI.getCurrencyLineChartData(pairList) { newChart, error ->
 			if (newChart != null && newChart.isNotEmpty() && error.isNone()) {
 				// 更新数据库的数据
@@ -119,13 +128,14 @@ class QuotationPresenter(
 
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: (GoldStoneWebSocket?) -> Unit) {
-		fragment.asyncData?.isEmpty()?.isTrue { return }
+		if (fragment.asyncData?.size ?: 0 == 0) return
 		getPriceInfoBySocket(
 			fragment.asyncData?.map { it.pair },
 			{
 				currentSocket = it
 				callback(it)
-			}) { model, isDisconnected ->
+			}
+		) { model, isDisconnected ->
 			fragment.updateAdapterDataSet(model, isDisconnected)
 		}
 	}
@@ -154,10 +164,7 @@ class QuotationPresenter(
 
 	fun showQuotationManagement() {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-			putString(
-				ArgumentKey.quotationOverlayTitle,
-				QuotationText.management
-			)
+			putString(ArgumentKey.quotationOverlayTitle, QuotationText.management)
 		}
 	}
 
@@ -175,7 +182,7 @@ class QuotationPresenter(
 		return (0 until maxIndexOfData).map {
 			ChartPoint(jsonArray.getJSONObject(it))
 		}.sortedBy {
-			it.label.toLong()
+			it.label.toLongOrNull() ?: 0L
 		}
 	}
 

@@ -75,9 +75,9 @@ class WalletSettingsPresenter(
 					addView(header)
 				} else {
 					overlayView.header.apply {
-						showBackButton(false)
-						showCloseButton(true)
-						showAddButton(false)
+						showBackButton(false) {}
+						showCloseButton(true) { presenter.removeSelfFromActivity() }
+						showAddButton(false) {}
 					}
 					header?.visibility = View.VISIBLE
 				}
@@ -153,7 +153,7 @@ class WalletSettingsPresenter(
 			header.showBackButton(true) {
 				showWalletSettingListFragment()
 			}
-			header.showCloseButton(false)
+			header.showCloseButton(false) {}
 		}
 	}
 

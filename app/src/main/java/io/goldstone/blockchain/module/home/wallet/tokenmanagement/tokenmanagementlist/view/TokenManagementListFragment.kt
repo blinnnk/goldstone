@@ -63,14 +63,14 @@ class TokenManagementListFragment :
 		if (SharedWallet.getCurrentWalletType().isBTCSeries() || SharedWallet.getCurrentWalletType().isEOSSeries()) {
 			showAttentionView()
 			getParentFragment<TokenManagementFragment> {
-				overlayView.header.showSearchButton(false)
+				overlayView.header.showSearchButton(false) {}
 			}
 		}
 	}
 
 	private fun showAttentionView() {
 		recyclerView.visibility = View.GONE
-		if (attentionView.isNull()) {
+		if (attentionView == null) {
 			attentionView = AttentionTextView(context!!)
 			attentionView?.apply {
 				isCenter()

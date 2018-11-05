@@ -60,10 +60,7 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		activity?.apply { SoftKeyboard.hide(this) }
 	}

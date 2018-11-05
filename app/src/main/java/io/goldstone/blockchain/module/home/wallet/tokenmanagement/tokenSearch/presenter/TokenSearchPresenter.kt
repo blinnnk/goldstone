@@ -8,7 +8,8 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
@@ -36,13 +37,14 @@ class TokenSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		val navigation = fragment.getOverlayHeader()
-		if (SharedWallet.getCurrentWalletType().isBTCSeries()) {
-			navigation?.showSearchButton(false)
-		} else {
+		if (SharedWallet.getCurrentWalletType().isBTCSeries())
+			navigation?.showSearchButton(false) {}
+		else {
 			fragment.showLoadingView()
 			MyTokenTable.getMyTokens(false) { myTokens ->
-				navigation?.searchInputListener({}) { inputContent ->
-					getSearchResult(inputContent, myTokens)
+				navigation?.searchInputListener { inputContent ->
+					if (NetworkUtil.hasNetwork(fragment.context))
+						getSearchResult(inputContent, myTokens)
 				}
 			}
 		}
@@ -51,15 +53,15 @@ class TokenSearchPresenter(
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
 			GoldStoneAPI.context.runOnUiThread {
-				if (!result.isNull() && error.isNone()) {
+				if (result != null && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
-						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.filterNot {
-							TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries()
-						}.toArrayList())
-					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.toArrayList())
+						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(
+							result.filterNot { TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries() }.toArrayList()
+						)
+					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.toArrayList())
 					fragment.removeLoadingView()
-				} else fragment.showError(error)
+				} else fragment.safeShowError(error)
 			}
 		}
 	}
@@ -69,7 +71,7 @@ class TokenSearchPresenter(
 			TokenContract(searchToken.contract, searchToken.symbol, searchToken.decimals)
 		) { localToken ->
 			// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
-			if (!localToken.isNull()) localToken!!.updateDefaultStatus(
+			if (localToken != null) localToken.updateDefaultStatus(
 				TokenContract(localToken.contract, localToken.symbol, localToken.decimals),
 				isChecked,
 				searchToken.name,

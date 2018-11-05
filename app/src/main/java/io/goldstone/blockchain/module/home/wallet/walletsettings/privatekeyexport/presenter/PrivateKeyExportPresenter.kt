@@ -38,14 +38,12 @@ class PrivateKeyExportPresenter(
 			password: String,
 			@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			if (password.isEmpty())
-				hold(null, AccountError.WrongPassword)
+			if (password.isEmpty()) hold(null, AccountError.WrongPassword)
 			else WalletTable.getWalletType { walletType, wallet ->
 				if (walletType.isMultiChain()) {
 					context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
 				} else context.getPrivateKeyByAddress(address, chainType, password, hold)
 			}
-			(context as? Activity)?.apply { SoftKeyboard.hide(this) }
 		}
 
 		private fun Context.getPrivateKeyByAddress(
@@ -60,6 +58,7 @@ class PrivateKeyExportPresenter(
 				chainType.isEOS() ->
 					getBTCPrivateKeyByAddress(address, password, false, hold)
 				chainType.isLTC() -> {
+					// 测试网的 `LTC` 使用的是 `BTCTestSeries` 格式
 					if (SharedValue.isTestEnvironment())
 						getBTCPrivateKeyByAddress(address, password, true, hold)
 					else exportLTCBase58PrivateKey(address, password, hold)
@@ -118,7 +117,9 @@ class PrivateKeyExportPresenter(
 					chainType.isETC() || chainType.isETH() ->
 						privateKeyInteger!!.toString(16)
 					else -> null
-				}, AccountError.None) else hold(null, error)
+				},
+					error
+				) else hold(null, error)
 			}
 		}
 	}

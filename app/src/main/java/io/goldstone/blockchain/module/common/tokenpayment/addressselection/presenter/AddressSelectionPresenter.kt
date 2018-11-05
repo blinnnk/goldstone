@@ -24,7 +24,6 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -235,12 +234,8 @@ class AddressSelectionPresenter(
 				putDouble(ArgumentKey.paymentCount, count)
 				putSerializable(ArgumentKey.tokenModel, token)
 			}
-			overlayView.header.apply {
-				backButton.onClick {
-					headerTitle = TokenDetailText.address
-					presenter.popFragmentFrom<PaymentPrepareFragment>()
-					showCloseButton(false)
-				}
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
 			headerTitle = TokenDetailText.transferDetail
 		}
@@ -255,7 +250,7 @@ class AddressSelectionPresenter(
 				header.showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
-				header.showCloseButton(false)
+				header.showCloseButton(false) {}
 			}
 		}
 	}

@@ -37,7 +37,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		getParentFragment<TokenManagementFragment> {
 			headerTitle = TokenManagementText.addToken
 			presenter.popFragmentFrom<TokenSearchFragment>()
-			overlayView.header.showSearchInput(false)
+			overlayView.header.showSearchInput(false) {}
 		}
 	}
 }
