@@ -55,11 +55,11 @@ class RecentTradingAdapter(
 			(holder.itemView as? TradingCell)?.apply {
 				if (position <= buyList.size ) {
 					val model = buyList[position - 1]
-					val maxValue = buyList.maxBy { it.quantity }?.quantity?:0.toDouble()
+					val maxValue = buyList.maxBy { it.quantity }?.quantity ?: 0.0
 					setData(model.account, model.quantity, maxValue, Color.parseColor("#0F1CC881"))
 				} else {
 					val model = sellList[position - buyList.size - 2]
-					val maxValue = sellList.maxBy { it.quantity }?.quantity?:0.toDouble()
+					val maxValue = sellList.maxBy { it.quantity }?.quantity ?: 0.0
 					setData(model.account, model.quantity, maxValue, Color.parseColor("#0FFF6464"))
 				}
 			}
@@ -124,9 +124,9 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 	}
 	
 	fun setData(accountName: String, quantity: Double, maxValue:Double, backgroundColor: Int) {
-		percent = if (maxValue == 0.toDouble()) 0f else (quantity / maxValue).toFloat()
+		percent = if (maxValue == 0.0) 0f else (quantity / maxValue).toFloat()
 		name.text = accountName
-		transactionAmount.text = if (quantity > 10000) (quantity/ 1000f).formatCount(1) + "k" else quantity.formatCount(1)
+		transactionAmount.text = if (quantity > 10000) (quantity / 1000f).formatCount(1) + "k" else quantity.formatCount(1)
 		backgroundView.setMargins<RelativeLayout.LayoutParams> {
 			leftMargin = (viewWidth * (1 - percent)).toInt()
 		}

@@ -50,11 +50,11 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 		
 	}
 	
-	fun setCurrentPriceAndPercent(price: String, percent: Float) {
+	fun setCurrentPriceAndPercent(price: String, percent: Double) {
 		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.toDouble().formatCount(3)} EOS/KB)"
 		ramPriceView.currentPriceView.currentPrice.text = price
 		ramPriceView.currentPriceView.trendcyPercent.apply {
-			val trendBigDecimal = percent.toDouble().formatCount(3)
+			val trendBigDecimal = percent.formatCount(3)
 			if (percent > 0) {
 				text = "+$trendBigDecimal%"
 				textColor = Spectrum.green

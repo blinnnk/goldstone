@@ -615,20 +615,23 @@ object EOSAPI {
 				Pair("json", "true")
 			)
 		).let {
-			RequisitionUtil.postRequest(
+			RequisitionUtil.postRequest<EOSGolbalModel>(
 				it,
+				"rows",
 				EOSUrl.getTableRows(),
+				false,
 				{
 					hold(null, it)
 				},
 				false
 			) {
-				val globalInformation = JSONObject(it).getJSONArray("rows").get(0) as? JSONObject
-				globalInformation?.apply {
-					val model = Gson().fromJson(globalInformation.toString(), EOSGolbalModel::class.java)
-					hold(model, RequestError.None)
+				if (it.isEmpty()) {
+					hold(null, RequestError.RPCResult("parse globalInformation failed"))
+				} else {
+					hold(it[0], RequestError.None)
 				}
 			}
+			
 		}
 	}
 

@@ -27,6 +27,7 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
  : BasePresenter<RAMMarketDetailFragment>() {
 	var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	var recentTransactionModel: RecentTransactionModel? = null
+	var ramInformationModel: RAMInformationModel = RAMInformationModel()
 	private val ramPriceSocket by lazy {
 		object : GoldStoneWebSocket("{\"t\": \"unsub_eos_ram_service\"}") {
 			override fun onOpened() {
@@ -48,8 +49,8 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 		if (type == "eos_ram_price") {
 			// 返回的价格信息
 			val price = content.getString("price")
-			val current = BigDecimal(price.isEmptyThen("0")).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP).toFloat()
-			RAMTradeRoomData.ramInformationModel?.currentPrice = current
+			val current = BigDecimal.valueOf(price.toDoubleOrNull().orElse(0.0)).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP)
+			ramInformationModel.currentPrice = current.toDouble()
 			GoldStoneAPI.context.runOnUiThread {
 				updateCurrentPriceUI()
 			}
@@ -75,18 +76,6 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 		super.onFragmentCreate()
 		fragment.context?.apply {
 			setAcountInfoFromDatabase()
-			RAMTradeRoomData.ramInformationModel.isNull {
-				RAMTradeRoomData.ramInformationModel = RAMInformationModel(
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null,
-					null
-				)
-			}
 		}
 	}
 	

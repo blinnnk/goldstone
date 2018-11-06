@@ -1,12 +1,9 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.presenter
 
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.home.rammarket.model.RAMTradeRoomData
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.view.BigTransactionFragment
-import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.view.BigTransactionsAdapter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.*
 
@@ -27,10 +24,9 @@ class BigTransactionPresenter(override val fragment: BigTransactionFragment)
 	private fun getBigTransactions() {
 		doAsync {
 			GoldStoneAPI.getBigTransactions(1) { data, error ->
-				if (!data.isNull() && error.isNone()) {
-					RAMTradeRoomData.bigOrderList = data?.toArrayList()
+				if (data != null && error.isNone()) {
 					GoldStoneAPI.context.runOnUiThread {
-						fragment.setRecyclerViewAdapter(fragment.recyclerView, RAMTradeRoomData.bigOrderList?: arrayListOf())
+						fragment.setRecyclerViewAdapter(fragment.recyclerView, data.toArrayList())
 					}
 				} else {
 					GoldStoneAPI.context.runOnUiThread {

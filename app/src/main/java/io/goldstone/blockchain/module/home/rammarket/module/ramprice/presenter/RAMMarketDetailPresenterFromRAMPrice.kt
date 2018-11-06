@@ -6,11 +6,11 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
-import io.goldstone.blockchain.module.home.rammarket.model.RAMTradeRoomData
+import io.goldstone.blockchain.module.home.rammarket.model.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import org.jetbrains.anko.doAsync
@@ -53,27 +53,21 @@ fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
 	}
 }
 
-fun RAMMarketDetailPresenter.getChartDataFromDatebase(callback: () -> Unit) {
+fun RAMMarketDetailPresenter.getChartDataFromDatabase(dataType: String, callback: () -> Unit) {
 	val type = object : TypeToken<ArrayList<CandleChartModel>>() {}.type
 	doAsync {
 		GoldStoneDataBase.database.ramPriceDao().getData()?.apply {
-			minuteData?.let { jsonString ->
-				candleDataMap.put(
-					EOSRAMChartType.Minute.info,
-					Gson().fromJson(jsonString, type)
-				)
-			}
-			hourData?.let { jsonString ->
-				candleDataMap.put(
-					EOSRAMChartType.Hour.info,
-					Gson().fromJson(jsonString, type)
-				)
-			}
-			dayData?.let { jsonString ->
-				candleDataMap.put(
-					EOSRAMChartType.Day.info,
-					Gson().fromJson(jsonString, type)
-				)
+			candleDataMap[dataType] = when(dataType) {
+				EOSRAMChartType.Minute.info -> {
+					if (minuteData == null) arrayListOf() else Gson().fromJson(minuteData, type)
+				}
+				EOSRAMChartType.Hour.info -> {
+					if (hourData == null) arrayListOf() else Gson().fromJson(hourData, type)
+				}
+				EOSRAMChartType.Day.info -> {
+					if (dayData == null) arrayListOf() else Gson().fromJson(dayData, type)
+				}
+				else -> arrayListOf()
 			}
 		}
 		callback()
@@ -81,8 +75,8 @@ fun RAMMarketDetailPresenter.getChartDataFromDatebase(callback: () -> Unit) {
 }
 
 fun RAMMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) {
-	if (candleDataMap.isEmpty()) {
-		getChartDataFromDatebase {
+	if (candleDataMap.isEmpty() || candleDataMap[ramChartType.info].isNull()) {
+		getChartDataFromDatabase(ramChartType.info) {
 			updateChartDataFromNet(ramChartType)
 		}
 	} else {
@@ -155,37 +149,30 @@ fun RAMMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTyp
 }
 
 fun RAMMarketDetailPresenter.updateTodayPriceUI() {
-	RAMTradeRoomData.ramInformationModel?.let {
+	ramInformationModel.let {
 		fragment.setTodayPrice(
-			BigDecimal("${it.openPrice.orZero()}").toPlainString(),
-			BigDecimal("${it.HighPrice.orZero()}").toPlainString(),
-			BigDecimal("${it.lowPrice.orZero()}").toPlainString()
+			it.openPrice.formatCount(8),
+			it.HighPrice.formatCount(8),
+			it.lowPrice.formatCount(8)
 		)
 	}
 	
 }
 
 fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
-	RAMTradeRoomData.ramInformationModel?.let { ramInformationModel ->
-		ramInformationModel.currentPrice?.let { current ->
-			ramInformationModel.HighPrice?.let { high ->
-				if (current > high) {
-					ramInformationModel.HighPrice = current
-					updateTodayPriceUI()
-				}
-			}
-			ramInformationModel.lowPrice?.let { low ->
-				if (current < low) {
-					ramInformationModel.lowPrice = current
-					updateTodayPriceUI()
-				}
-			}
-			calculatePricePercent()
-			fragment.setCurrentPriceAndPercent(
-				BigDecimal("$current").toPlainString(),
-				ramInformationModel.pricePercent.orZero()
-			)
+	ramInformationModel.let { infoModel ->
+		if (infoModel.currentPrice > infoModel.HighPrice) {
+			infoModel.HighPrice = infoModel.currentPrice
 		}
+		if (infoModel.currentPrice < infoModel.lowPrice) {
+			infoModel.lowPrice = infoModel.currentPrice
+		}
+		updateTodayPriceUI()
+		calculatePricePercent()
+		fragment.setCurrentPriceAndPercent(
+			BigDecimal("${infoModel.currentPrice}").toPlainString(),
+			infoModel.pricePercent
+		)
 		
 	}
 	
@@ -193,49 +180,39 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 
 
 // 计算百分比
-fun calculatePricePercent() {
-	RAMTradeRoomData.ramInformationModel?.let { ramInformationModel ->
-		ramInformationModel.openPrice?.let { open ->
-			ramInformationModel.currentPrice?.let { current ->
-				var trend = (current - open) / open
-				trend *= 100f
-				ramInformationModel.pricePercent = trend
-			}
-		}
-	}
+fun RAMMarketDetailPresenter.calculatePricePercent() {
+	var trend = (ramInformationModel.currentPrice - ramInformationModel.openPrice) / ramInformationModel.openPrice
+	trend *= 100f
+	ramInformationModel.pricePercent = trend
 }
 
 
 @SuppressLint("SetTextI18n")
 fun RAMMarketDetailPresenter.getTodayPrice() {
 	GoldStoneAPI.getEOSRAMTodayPrice { model, error ->
-		if (!model.isNull() && error.isNone()) {
-			RAMTradeRoomData.ramInformationModel?.apply {
-				openPrice = model!!.open.toFloat()
-				HighPrice = model.high.toFloat()
-				lowPrice = model.low.toFloat()
+		if (model != null && error.isNone()) {
+			ramInformationModel.apply {
+				openPrice = model.open.toDoubleOrZero()
+				HighPrice = model.high.toDoubleOrZero()
+				lowPrice = model.low.toDoubleOrZero()
 			}
 		} else {
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.context.alert(error.message)
-				RAMTradeRoomData.ramInformationModel?.let {
+//				fragment.safeShowError(error)
 					// 出错了可能长连接已经断了， 需要在此给当前价格赋值
-					if (!it.currentPrice.isNull() && !it.pricePercent.isNull()) {
-						fragment.setCurrentPriceAndPercent(
-							BigDecimal("${it.currentPrice}").toPlainString(),
-							it.pricePercent!!
-						)
-					}
-				}
+				fragment.setCurrentPriceAndPercent(
+					BigDecimal.valueOf(ramInformationModel.currentPrice).toPlainString(),
+					ramInformationModel.pricePercent
+				)
+				
 			}
 		}
 		GoldStoneAPI.context.runOnUiThread {
 			updateTodayPriceUI()
 		}
-		
 	}
 }
-
 
 
 
