@@ -35,7 +35,7 @@ fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
 		val dayJson = candleDataMap[EOSRAMChartType.Day.info]?.let {
 			Gson().toJson(it)
 		}
-		if (localData.isNull()) {
+		if (localData == null) {
 			GoldStoneDataBase.database.ramPriceDao().insert(
 				RAMPriceTable(
 					0,
@@ -45,9 +45,9 @@ fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
 				)
 			)
 		} else {
-			localData!!.minuteData = minuteJson
-			localData.hourData = hourJson
-			localData.dayData = dayJson
+			if (minuteJson != null && minuteJson.isNotEmpty()) localData.minuteData = minuteJson
+			if (hourJson != null && hourJson.isNotEmpty()) localData.hourData = hourJson
+			if (dayJson != null && dayJson.isNotEmpty()) localData.dayData = dayJson
 			GoldStoneDataBase.database.ramPriceDao().update(localData)
 		}
 	}
