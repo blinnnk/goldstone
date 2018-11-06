@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
  * @description: eos global 信息model
  */
 
-class EOSGolbalModel {
+class EOSGlobalModel {
 	@SerializedName("max_block_net_usage")
 	var maxBlockNetUsage: Long = 0
 	@SerializedName("target_block_net_usage_pct")

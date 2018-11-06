@@ -264,4 +264,28 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
+	val totalRAM: (amount: String) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "$it TOTAL"
+			HoneyLanguage.Chinese.code -> "$it total"
+			HoneyLanguage.Japanese.code -> ""
+			HoneyLanguage.Korean.code -> ""
+			HoneyLanguage.Russian.code -> ""
+			HoneyLanguage.TraditionalChinese.code -> ""
+			else -> ""
+		}
+	}
+	
+	val ramAvailable: (amount: String) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "$it AVAILABLE"
+			HoneyLanguage.Chinese.code -> "$it available"
+			HoneyLanguage.Japanese.code -> ""
+			HoneyLanguage.Korean.code -> ""
+			HoneyLanguage.Russian.code -> ""
+			HoneyLanguage.TraditionalChinese.code -> ""
+			else -> ""
+		}
+	}
+	
 }

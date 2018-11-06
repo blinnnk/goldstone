@@ -117,4 +117,9 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 		val width = measuredWidth - marginSize * 2
 		progressValueView.updateWidthAnimation((width * percent).toInt())
 	}
+	
+	fun setValues(leftValue: String, rightValue: String) {
+		leftValueView.text = leftValue
+		rightValueView.text = rightValue
+	}
 }

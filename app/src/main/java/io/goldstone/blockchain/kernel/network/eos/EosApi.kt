@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.network.eos
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
-import com.google.gson.Gson
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
@@ -603,7 +602,7 @@ object EOSAPI {
 	}
 	
 	fun getGlobalInformation(
-		@WorkerThread hold: (EOSGolbalModel?, RequestError) -> Unit
+		@WorkerThread hold: (EOSGlobalModel?, RequestError) -> Unit
 	) {
 		
 		RequestBody.create(
@@ -615,7 +614,7 @@ object EOSAPI {
 				Pair("json", "true")
 			)
 		).let {
-			RequisitionUtil.postRequest<EOSGolbalModel>(
+			RequisitionUtil.postRequest<EOSGlobalModel>(
 				it,
 				"rows",
 				EOSUrl.getTableRows(),
