@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
+import com.github.mikephil.charting.data.PieEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.chart.pie.PieChartView
@@ -27,10 +28,7 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	
 	val pieChart by lazy {
 		PieChartView(context!!).apply {
-			layoutParams = ViewGroup.LayoutParams(
-				matchParent,
-				250.uiPX()
-			)
+			layoutParams = ViewGroup.LayoutParams(matchParent, 250.uiPX())
 		}
 	}
 	
@@ -74,11 +72,8 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
-			
 			addView(rules)
-			
 			addView(pieChart)
-			
 			linearLayout {
 				verticalLayout {
 					addView(ramPercentChartIn)
@@ -124,6 +119,37 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 			})
 		}
+	}
+	
+	fun updateChartData(maxValue: Float,
+		buyValues: Array<Float>,
+		buyColors: Array<Int>,
+		sellValues: Array<Float>,
+		sellColors: Array<Int>
+	) {
+			ramPercentChartIn.setDataAndColors(
+				buyValues,
+				buyColors,
+				maxValue
+			)
+			ramPercentChartOut.setDataAndColors(
+				sellValues,
+				sellColors,
+				maxValue
+			)
+		
+		buyValues.let {
+			val buyValue = it[0] + it[1] + it[2]
+			buy.text = buyValue.toString()
+		}
+		sellValues.let {
+			val saleValue =  it[0] + it[1] + it[2]
+			sell.text = saleValue.toString()
+		}
+	}
+	
+	fun updatePieChartData(entries: ArrayList<PieEntry>, colors: List<Int>) {
+		pieChart.resetData(entries, colors)
 	}
 	
 }

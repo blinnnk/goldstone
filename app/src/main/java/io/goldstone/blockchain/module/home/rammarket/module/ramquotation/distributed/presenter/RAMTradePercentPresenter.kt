@@ -82,66 +82,39 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 			GoldStoneAPI.context.runOnUiThread {
 				updateUI()
 			}
-
 		}
 	}
 	
 	private fun updateUI() {
 		if (tradeDistributeList.isEmpty()) return
-		fragment.pieChart.updatePieChartUI()
-		updateChartUI()
-		setOrderDescriptions()
-	}
-	
-	
-	// 饼状图
-	private fun PieChartView.updatePieChartUI() {
-		resetData(
+		fragment.updatePieChartData(
 			tradeDistributeList.map {
 				PieEntry(it, "")
 			}.toArrayList(),
 			(buyColors + saleColors).toList()
 		)
+		updateChartUI()
 	}
+	
 	
 	// 柱状图
 	private fun updateChartUI() {
 		val maxValue = tradeDistributeList.max()
-		
-		fragment.apply {
-			ramPercentChartIn.setDataAndColors(
+		fragment.updateChartData(
+			maxValue!!,
 				arrayOf(
 					tradeDistributeList[0],
 					tradeDistributeList[1],
 					tradeDistributeList[2]
 				),
 				buyColors,
-				maxValue!!
-			)
-			ramPercentChartOut.setDataAndColors(
 				arrayOf(
 					tradeDistributeList[3],
 					tradeDistributeList[4],
 					tradeDistributeList[5]
 				),
-				saleColors,
-				maxValue
-			)
-		}
-	}
-	
-	// 下边的描述信息
-	private fun setOrderDescriptions() {
-		fragment.apply {
-			tradeDistributeList.let {
-				val buyValue = it[0] + it[1] + it[2]
-				buy.text = buyValue.toString()
-				
-				val saleValue = it[3] + it[4] + it[5]
-				sell.text = saleValue.toString()
-			}
-			
-		}
+				saleColors)
+		
 	}
 	
 }

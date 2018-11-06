@@ -288,4 +288,81 @@ object EOSRAMExchangeText {
 		}
 	}
 	
+	val chainRAMBalance = when(currentLanguage) {
+		HoneyLanguage.English.code -> "chain RAM balance"
+		HoneyLanguage.Chinese.code -> "chain RAM balance"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val chainRAMTotal = when(currentLanguage) {
+		HoneyLanguage.English.code -> "chain RAM total"
+		HoneyLanguage.Chinese.code -> "chain RAM total"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	
+	val eosForRAM = when(currentLanguage) {
+		HoneyLanguage.English.code -> "EOS for RAM"
+		HoneyLanguage.Chinese.code -> "EOS for RAM"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val chainRAMData = when(currentLanguage) {
+		HoneyLanguage.English.code -> "chain RAM data"
+		HoneyLanguage.Chinese.code -> "chain RAM data"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val bigTransactions = when(currentLanguage) {
+		HoneyLanguage.English.code -> "big transactions"
+		HoneyLanguage.Chinese.code -> "big transactions"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val occupyBig = when(currentLanguage) {
+		HoneyLanguage.English.code -> "occupy big"
+		HoneyLanguage.Chinese.code -> "occupy big"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val ramStatistics = when(currentLanguage) {
+		HoneyLanguage.English.code -> "ram statistics"
+		HoneyLanguage.Chinese.code -> "ram statistics"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val tradeStruct = when(currentLanguage) {
+		HoneyLanguage.English.code -> "trade struct"
+		HoneyLanguage.Chinese.code -> "trade struct"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
 }
