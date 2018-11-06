@@ -50,7 +50,7 @@ class PieChartView(context: Context) : PieChart(context) {
 		setTransparentCircleColor(Color.WHITE)
 		setTransparentCircleAlpha(0)
 		
-		holeRadius = 60f
+		holeRadius = 66f // 决定中间圆心的大小
 		transparentCircleRadius = 61f
 		
 		setDrawCenterText(true)
@@ -60,12 +60,11 @@ class PieChartView(context: Context) : PieChart(context) {
 		isRotationEnabled = true
 		isHighlightPerTapEnabled = true
 		
-		val l = legend
-		l.verticalAlignment = Legend.LegendVerticalAlignment.TOP
-		l.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-		l.orientation = Legend.LegendOrientation.VERTICAL
-		l.setDrawInside(false)
-		l.isEnabled = false
+		legend.verticalAlignment = Legend.LegendVerticalAlignment.TOP
+		legend.horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
+		legend.orientation = Legend.LegendOrientation.VERTICAL
+		legend.setDrawInside(false)
+		legend.isEnabled = false
 		
 		// entry label styling
 		setEntryLabelColor(Color.WHITE)

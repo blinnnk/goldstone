@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 
@@ -20,28 +21,34 @@ class RAMPercentChartView(context: Context) : View(context) {
 	
 	private val maxBodyHeight = 100.uiPX()
 	
-	private val itemWidth = ScreenSize.Width.toFloat() / 2 / 5
+	private val itemWidth = (ScreenSize.Width - 40.uiPX()).toFloat() / 2 / 10
 	
-	private val itemSpace = itemWidth * 2 / 4
+	private val itemSpace = itemWidth * 7 / 4
 	
 	private val textSpace = 5.uiPX()
 	
-	private val valueTextSize = fontSize(46)
+	private val valueTextSize = fontSize(42)
 	
 	private val labelTextSize = fontSize(48)
 	
 	private val bodyPaint = Paint()
 	
-	private val textPaint = Paint().apply {
-		color = Color.BLACK
-		textSize = valueTextSize
-		isAntiAlias = true
+	private val textPaint by lazy {
+		Paint().apply {
+			color = Color.BLACK
+			textSize = valueTextSize
+			typeface = GoldStoneFont.book(context)
+			isAntiAlias = true
+		}
 	}
 	
-	private val labelPaint = Paint().apply {
-		color = GrayScale.black
-		textSize = labelTextSize
-		isAntiAlias = true
+	private val labelPaint by lazy {
+		Paint().apply {
+			color = GrayScale.midGray
+			typeface = GoldStoneFont.book(context)
+			textSize = labelTextSize
+			isAntiAlias = true
+		}
 	}
 	
 	private var maxValue = 0f
@@ -86,6 +93,7 @@ class RAMPercentChartView(context: Context) : View(context) {
 				textRect
 			)
 			bodyPaint.color = bodyColors[index]
+			textPaint.color = bodyColors[index]
 			val bodyLeft = itemWidth * index + itemSpace * (index + 1)
 			val bodyTop = ((maxValue - value) / maxValue) * maxBodyHeight
 			canvas.drawRect(

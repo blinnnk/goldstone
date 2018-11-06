@@ -9,6 +9,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.chart.pie.PieChartView
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.presenter.RAMTradePercentPresenter
 import org.jetbrains.anko.*
@@ -28,7 +29,7 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 		PieChartView(context!!).apply {
 			layoutParams = ViewGroup.LayoutParams(
 				matchParent,
-				200.uiPX()
+				250.uiPX()
 			)
 		}
 	}
@@ -43,15 +44,8 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	
 	val buy by lazy {
 		TextView(context!!).apply {
-			textColor = Spectrum.blue
+			textColor = Spectrum.green
 			textSize = fontSize(15)
-			layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 10.uiPX()
-					bottomMargin = 10.uiPX()
-				}
-				gravity = Gravity.CENTER_HORIZONTAL
-			}
 		}
 	}
 	
@@ -59,52 +53,75 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 		TextView(context!!).apply {
 			textColor = Spectrum.red
 			textSize = fontSize(15)
-			layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 10.uiPX()
-					bottomMargin = 10.uiPX()
-				}
-				gravity = Gravity.CENTER_HORIZONTAL
-			}
 		}
 	}
 	
 	val rules by lazy {
 		TextView(context!!).apply {
-			textColor = GrayScale.gray
+			textColor = GrayScale.midGray
 			textSize = fontSize(12)
+			typeface = GoldStoneFont.book(context)
 			text = EOSRAMExchangeText.ramOrderRules
 			layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 10.uiPX()
-					bottomMargin = 10.uiPX()
-				}
 				gravity = Gravity.CENTER_HORIZONTAL
+			}
+			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 16.uiPX()
+				bottomMargin = 30.uiPX()
 			}
 		}
 	}
 	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			
+			addView(rules)
+			
 			addView(pieChart)
 			
 			linearLayout {
 				verticalLayout {
 					addView(ramPercentChartIn)
-					addView(buy)
+					linearLayout {
+						layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
+							setMargins<LinearLayout.LayoutParams> {
+								topMargin = 10.uiPX()
+								bottomMargin = 10.uiPX()
+							}
+							gravity = Gravity.CENTER_HORIZONTAL
+						}
+						textView {
+							textColor = GrayScale.black
+							textSize = fontSize(12)
+							typeface = GoldStoneFont.book(context)
+							text = EOSRAMExchangeText.buy("    ")
+						}
+						addView(buy)
+					}
 				}
 				verticalLayout {
 					addView(ramPercentChartOut)
-					addView(sell)
+					linearLayout {
+						layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
+							setMargins<LinearLayout.LayoutParams> {
+								topMargin = 10.uiPX()
+								bottomMargin = 10.uiPX()
+							}
+							gravity = Gravity.CENTER_HORIZONTAL
+						}
+						textView {
+							textColor = GrayScale.black
+							textSize = fontSize(12)
+							typeface = GoldStoneFont.book(context)
+							text = EOSRAMExchangeText.sell("    ")
+						}
+						addView(sell)
+					}
 				}
 				
 			}
-			addView(rules)
 			addView(View(context).apply {
-				layoutParams = LinearLayout.LayoutParams(
-					matchParent,
-					100.uiPX()
-				)
+				layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 			})
 		}
 	}

@@ -608,6 +608,22 @@ object GoldStoneAPI {
 		) {
 			hold(this, RequestError.None)
 		}
+	}
+	
+	
+	fun getEOSRAMTradeDistributed(
+		hold: (ArrayList<Float>?, RequestError) -> Unit
+	) {
+		requestData<Float>(
+			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
+			"data",
+			errorCallback = {
+				hold(null, it)
+			},
+			isEncrypt = true
+		) {
+			hold(this.toArrayList(), RequestError.None)
+		}
 		
 	}
 	

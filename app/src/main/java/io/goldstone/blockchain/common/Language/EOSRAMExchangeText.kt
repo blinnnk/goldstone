@@ -90,8 +90,8 @@ object EOSRAMExchangeText {
 	}
 	
 	val bigOrder = when(currentLanguage) {
-		HoneyLanguage.English.code -> "big order"
-		HoneyLanguage.Chinese.code -> "big order"
+		HoneyLanguage.English.code -> "big"
+		HoneyLanguage.Chinese.code -> "big"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -100,8 +100,8 @@ object EOSRAMExchangeText {
 	}
 	
 	val middleOrder = when(currentLanguage) {
-		HoneyLanguage.English.code -> "middle order"
-		HoneyLanguage.Chinese.code -> "middle order"
+		HoneyLanguage.English.code -> "middle"
+		HoneyLanguage.Chinese.code -> "middle"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
@@ -110,8 +110,8 @@ object EOSRAMExchangeText {
 	}
 	
 	val smallOrder = when(currentLanguage) {
-		HoneyLanguage.English.code -> "small order"
-		HoneyLanguage.Chinese.code -> "small order"
+		HoneyLanguage.English.code -> "small"
+		HoneyLanguage.Chinese.code -> "small"
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""

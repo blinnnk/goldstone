@@ -11,8 +11,10 @@ import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.chart.pie.PieChartView
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.view.RAMTradePercentFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date: 2018/9/25.
@@ -26,14 +28,14 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 	private val tradePercentKey = "eosRAMTradeDistribute"
 	
 	private val buyColors = arrayOf(
-		Color.parseColor("#1874CD"),
-		Color.parseColor("#1E90FF"),
-		Color.parseColor("#00B2EE")
+		Spectrum.green,
+		Spectrum.lightGreen,
+		Color.parseColor("#86E5BF")
 	)
 	
 	private val saleColors = arrayOf(
-		Color.parseColor("#EE3B3B"),
-		Color.parseColor("#EE6A50"),
+		Color.parseColor("#E14848"),
+		Spectrum.lightRed,
 		Color.parseColor("#EE6AA7")
 	)
 	
@@ -68,20 +70,20 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 	}
 	
 	private fun getTradeData() {
-//		GoldStoneAPI.getEOSRAMTradeData {data, error ->
-//			if (error.isNone()){
-//				data?.let {
-//					if (it.size == 6) {
-//						tradeDistributeList.clear()
-//						tradeDistributeList.addAll(it)
-//					}
-//				}
-//			}
-//			GoldStoneAPI.context.runOnUiThread {
-//				updateUI()
-//			}
-//
-//		}
+		GoldStoneAPI.getEOSRAMTradeDistributed {data, error ->
+			if (error.isNone()){
+				data?.let {
+					if (it.size == 6) {
+						tradeDistributeList.clear()
+						tradeDistributeList.addAll(it)
+					}
+				}
+			}
+			GoldStoneAPI.context.runOnUiThread {
+				updateUI()
+			}
+
+		}
 	}
 	
 	private fun updateUI() {
@@ -133,10 +135,10 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 		fragment.apply {
 			tradeDistributeList.let {
 				val buyValue = it[0] + it[1] + it[2]
-				buy.text = EOSRAMExchangeText.buy(buyValue.toString())
+				buy.text = buyValue.toString()
 				
 				val saleValue = it[3] + it[4] + it[5]
-				sell.text = EOSRAMExchangeText.sell(saleValue.toString())
+				sell.text = saleValue.toString()
 			}
 			
 		}
