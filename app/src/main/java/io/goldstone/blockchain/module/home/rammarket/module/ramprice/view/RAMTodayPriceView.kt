@@ -27,7 +27,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 		orientation = LinearLayout.VERTICAL
 		layoutParams = LayoutParams(viewWidth, wrapContent)
 		linearLayout {
-			topPadding = 16.uiPX()
+			topPadding = 10.uiPX()
 			bottomPadding = 16.uiPX()
 			startPrice = textView {
 				gravity = Gravity.START
@@ -36,7 +36,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.heavy(context)
 				singleLine = true
-			}.lparams(viewWidth/3, wrapContent)
+			}.lparams(viewWidth / 3, wrapContent)
 			highPrice = textView {
 				gravity = Gravity.CENTER
 				text = EOSRAMExchangeText.highPrice("")
@@ -44,7 +44,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.heavy(context)
 				singleLine = true
-			}.lparams(viewWidth/3, wrapContent)
+			}.lparams(viewWidth / 3, wrapContent)
 			lowPrice = textView {
 				gravity = Gravity.END
 				text = EOSRAMExchangeText.lowPrice("")
@@ -52,7 +52,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.heavy(context)
 				singleLine = true
-			}.lparams(viewWidth/3, wrapContent)
+			}.lparams(viewWidth / 3, wrapContent)
 		}
 		
 		view {

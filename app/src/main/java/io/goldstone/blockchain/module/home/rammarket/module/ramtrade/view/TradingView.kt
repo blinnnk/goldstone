@@ -20,14 +20,15 @@ class TradingView(context: Context): LinearLayout(context) {
 	
 	init {
 		orientation = LinearLayout.VERTICAL
-		leftPadding = 10.uiPX()
-		rightPadding = 10.uiPX()
+		leftPadding = 20.uiPX()
+		rightPadding = 20.uiPX()
 		view {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
 			backgroundColor = GrayScale.lightGray
 			setMargins<LinearLayout.LayoutParams> {
 				topMargin = 16.uiPX()
 				bottomMargin = 16.uiPX()
+				
 			}
 		}
 	  linearLayout {
@@ -35,8 +36,11 @@ class TradingView(context: Context): LinearLayout(context) {
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, wrapContent)
 			}.into(this)
 			recentTradingListView.apply {
-				layoutParams = LinearLayout.LayoutParams(matchParent, 282.uiPX())
-				setMargins<LinearLayout.LayoutParams> { topMargin = 6.uiPX() }
+				layoutParams = LinearLayout.LayoutParams(matchParent, 332.uiPX())
+				setMargins<LinearLayout.LayoutParams> {
+					topMargin = 6.uiPX()
+					leftMargin = 15.uiPX()
+				}
 			}.into(this)
 		}
 	}

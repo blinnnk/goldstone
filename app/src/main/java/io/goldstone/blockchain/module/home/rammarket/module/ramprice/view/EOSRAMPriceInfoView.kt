@@ -20,7 +20,6 @@ class EOSRAMPriceInfoView(context: Context) : LinearLayout(context) {
 		layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
 		leftPadding = 20.uiPX()
 		rightPadding = 20.uiPX()
-		topPadding = 20.uiPX()
 		currentPriceView = CurrentPriceView(context)
 		todayPriceView = RAMTodayPriceView(context)
 		addView(currentPriceView)

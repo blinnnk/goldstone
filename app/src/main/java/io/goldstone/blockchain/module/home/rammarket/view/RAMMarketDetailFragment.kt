@@ -25,7 +25,7 @@ import org.jetbrains.anko.*
 class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	override val pageTitle: String = EOSRAMExchangeText.ramExchange
 	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
-	private val priceChartWithMenuLayout by lazy {
+	private val priceMenuCandleChart by lazy {
 		RAMPriceChartAndMenuView(context!!) {
 			presenter.updateRAMCandleData(it)
 		}
@@ -41,10 +41,9 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL
 				addView(ramPriceView)
-				addView(priceChartWithMenuLayout)
+				addView(priceMenuCandleChart)
 				addView(tradingView)
 				addView(quotationViewParent)
-				
 			}
 		}
 		
@@ -77,7 +76,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	}
 	
 	fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
-		priceChartWithMenuLayout.candleChart.resetData(dateType, data.mapIndexed { index, entry ->
+		priceMenuCandleChart.candleChart.resetData(dateType, data.mapIndexed { index, entry ->
 			CandleEntry(
 				index.toFloat(),
 				entry.high.toFloat(),

@@ -27,7 +27,7 @@ class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
 	override val pageTitle: String = ""
 	private val globalRAMCard by lazy {
 		GrayCardView(context!!).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 110.uiPX())
+			layoutParams = LinearLayout.LayoutParams(com.blinnnk.uikit.ScreenSize.Width - 40.uiPX(), 110.uiPX())
 		}
 	}
 	private val ramAssetCell by lazy {
@@ -57,6 +57,8 @@ class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
 	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			leftPadding = 20.uiPX()
+			rightPadding = 20.uiPX()
 			topPadding = 16.uiPX()
 			gravity = Gravity.CENTER_HORIZONTAL
 			globalRAMCard.apply {

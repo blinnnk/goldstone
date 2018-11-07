@@ -1,12 +1,17 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.view
 
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -19,22 +24,28 @@ class BigTransactionsHeaderView(context: Context): RelativeLayout(context) {
 	init {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
 		gravity = Gravity.CENTER_VERTICAL
+		backgroundColor = Color.parseColor("#02000000")
 		
 	  textView {
 			text = EOSRAMExchangeText.transactionAccount
 			leftPadding = 7.uiPX()
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.book(context)
+			textSize = fontSize(11)
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
+				centerVertically()
+			}
 		}
 		textView {
 			text = EOSRAMExchangeText.transactionAmount
-			leftPadding = 7.uiPX()
-			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent).apply {
+			rightPadding = 7.uiPX()
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.book(context)
+			textSize = fontSize(11)
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				alignParentRight()
+				centerVertically()
 			}
-		}
-		
-		view {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 1.uiPX())
-			setAlignParentBottom()
 		}
 		
 	}

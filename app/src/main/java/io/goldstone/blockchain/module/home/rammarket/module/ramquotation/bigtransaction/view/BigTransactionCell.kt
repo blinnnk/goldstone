@@ -6,11 +6,13 @@ import android.view.ViewGroup
 import android.widget.*
 import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.*
 
@@ -28,14 +30,19 @@ class BigTransactionCell(context: Context): RelativeLayout(context) {
 	var model: TradingInfoModel by observing(TradingInfoModel("", 0.toDouble(), "", 0, 0, 0.toDouble())) {
 		accountName.text = model.account
 		timing.text = TimeUtils.formatDate(model.time)
-		amount.text = model.quantity.toString() + " EOS"
-		price.text = "≈ ${model.price} EOS/KB"
-		amount.textColor = if (model.type == 0) Spectrum.lightRed else Spectrum.green
+		amount.text = if (model.type == 0)  "+${model.quantity} EOS" else "-${model.quantity} EOS"
+		amount.textColor = if (model.type == 0) Spectrum.green else Spectrum.lightRed
+		price.text = "≈ ${model.price.formatCount(4)} EOS/KB"
 	}
 	
 	init {
-		gravity = Gravity.CENTER_VERTICAL
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
+		
+		view {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 1.uiPX())
+			backgroundColor = GrayScale.lightGray
+		}
+		
 		verticalLayout {
 			leftPadding = 7.uiPX()
 			accountName = textView {
@@ -48,31 +55,31 @@ class BigTransactionCell(context: Context): RelativeLayout(context) {
 				typeface = GoldStoneFont.heavy(context)
 				textSize = fontSize(12)
 			}
+			
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
+				centerVertically()
+			}
 		}
 		
 		verticalLayout {
 			rightPadding = 7.uiPX()
-			gravity = Gravity.END
-			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent).apply {
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.Width / 2, wrapContent).apply {
 				alignParentRight()
+				centerVertically()
 			}
 			amount = textView {
 				textColor = Spectrum.green
 				typeface = GoldStoneFont.black(context)
 				textSize = fontSize(13)
-			}
+				gravity = Gravity.END
+			}.lparams(matchParent, wrapContent)
 			price = textView {
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.heavy(context)
 				textSize = fontSize(12)
-			}
+				gravity = Gravity.END
+			}.lparams(matchParent, wrapContent)
 		}
-		
-		view {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 1.uiPX())
-			setAlignParentBottom()
-		}
-		
 	}
 	
 }

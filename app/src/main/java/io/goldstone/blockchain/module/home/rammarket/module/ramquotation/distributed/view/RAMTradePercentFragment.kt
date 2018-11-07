@@ -26,35 +26,35 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	
 	override val presenter: RAMTradePercentPresenter = RAMTradePercentPresenter(this)
 	
-	val pieChart by lazy {
+	private val pieChart by lazy {
 		PieChartView(context!!).apply {
 			layoutParams = ViewGroup.LayoutParams(matchParent, 250.uiPX())
 		}
 	}
 	
-	val ramPercentChartIn by lazy {
+	private val ramPercentChartIn by lazy {
 		RAMPercentChartView(context!!)
 	}
 	
-	val ramPercentChartOut by lazy {
+	private val ramPercentChartOut by lazy {
 		RAMPercentChartView(context!!)
 	}
 	
-	val buy by lazy {
+	private val buy by lazy {
 		TextView(context!!).apply {
 			textColor = Spectrum.green
 			textSize = fontSize(15)
 		}
 	}
 	
-	val sell by lazy {
+	private val sell by lazy {
 		TextView(context!!).apply {
 			textColor = Spectrum.red
 			textSize = fontSize(15)
 		}
 	}
 	
-	val rules by lazy {
+	private val rules by lazy {
 		TextView(context!!).apply {
 			textColor = GrayScale.midGray
 			textSize = fontSize(12)
@@ -72,6 +72,8 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
+			leftPadding = 20.uiPX()
+			rightPadding = 20.uiPX()
 			addView(rules)
 			addView(pieChart)
 			linearLayout {

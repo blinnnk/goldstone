@@ -23,36 +23,37 @@ class CurrentPriceView(context: Context) : LinearLayout(context) {
 	
 	init {
 		orientation = LinearLayout.VERTICAL
+		topPadding = 20.uiPX()
+		textView {
+			text = EOSRAMExchangeText.currentPrice
+			textSize = fontSize(10)
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.heavy(context)
+		}
+		linearLayout {
+			topPadding = 7.uiPX()
+			lparams(matchParent, wrapContent)
+			currentPrice = textView {
+				text = "--"
+				textSize = fontSize(26)
+				typeface = GoldStoneFont.black(context)
+				textColor  = GrayScale.black
+				singleLine = true
+			}
 			textView {
-				text = EOSRAMExchangeText.currentPrice
+				leftPadding = 10.uiPX()
+				text = "EOS/KB"
 				textSize = fontSize(10)
-				textColor = GrayScale.midGray
+				textColor = GrayScale.black
+				typeface = GoldStoneFont.book(context)
+			}
+			trendcyPercent = textView {
+				gravity = Gravity.END
+				textSize = fontSize(13)
 				typeface = GoldStoneFont.heavy(context)
-			}
-			linearLayout {
-				topPadding = 13.uiPX()
-				lparams(matchParent, wrapContent)
-				currentPrice = textView {
-					text = "--"
-					textSize = fontSize(26)
-					typeface = GoldStoneFont.black(context)
-					textColor  = GrayScale.black
-					singleLine = true
-				}
-				textView {
-					leftPadding = 10.uiPX()
-					text = "EOS/KB"
-					textSize = fontSize(10)
-					textColor = GrayScale.black
-					typeface = GoldStoneFont.book(context)
-				}
-				trendcyPercent = textView {
-					gravity = Gravity.END
-					textSize = fontSize(13)
-					typeface = GoldStoneFont.heavy(context)
-					text = ""
-					singleLine = true
-				}.lparams(matchParent, wrapContent)
-			}
+				text = ""
+				singleLine = true
+			}.lparams(matchParent, wrapContent)
+		}
 	}
 }
