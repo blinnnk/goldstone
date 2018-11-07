@@ -28,6 +28,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestData
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestUnCryptoData
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -290,39 +291,6 @@ object GoldStoneAPI {
 				hold(null, null, error)
 			}
 
-		}
-	}
-
-	fun getERC20TokenIncomingTransaction(
-		startBlock: String = "0",
-		address: String,
-		@WorkerThread hold: (erc20Transactions: List<ERC20TransactionModel>?, error: RequestError) -> Unit
-	) {
-		requestUnCryptoData(
-			EtherScanApi.getTokenIncomingTransaction(address, startBlock),
-			"result",
-			false,
-			hold
-		)
-	}
-
-	/**
-	 * 从 `EtherScan` 获取指定钱包地址的 `TransactionList`
-	 */
-	@JvmStatic
-	fun getTransactionListByAddress(
-		startBlock: String = "0",
-		address: String,
-		@WorkerThread hold: (transactions: List<TransactionTable>?, error: RequestError) -> Unit
-	) {
-		requestUnCryptoData<TransactionTable>(
-			EtherScanApi.transactions(address, startBlock),
-			"result",
-			false
-		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(result?.map { TransactionTable(it) }, error)
-			} else hold(null, error)
 		}
 	}
 

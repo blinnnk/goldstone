@@ -13,6 +13,7 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toUnitValue
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -24,6 +25,11 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -46,33 +52,36 @@ fun TransactionDetailPresenter.updateDataFromNotification() {
 	}
 }
 
-fun TransactionDetailPresenter.getETHERC20OrETCTransaction(transaction: NotificationTransactionInfo) {
-	TransactionTable.getByHashAndReceivedStatus(
-		transaction.hash,
-		transaction.isReceived
-	) { localTransaction ->
-		if (localTransaction.isNull()) {
+fun TransactionDetailPresenter.getETHERC20OrETCTransaction(notification: NotificationTransactionInfo) {
+	launch {
+		withContext(CommonPool, CoroutineStart.LAZY) {
+			val transactionDao = GoldStoneDataBase.database.transactionDao()
 			// 如果本地没有数据从链上查询所有需要的数据
-			fragment.apply {
-				showLoadingView()
-				updateByNotificationHash(transaction) {
-					removeLoadingView()
-				}
-			}
-		} else {
-			// 本地有数据直接展示本地数据
-			localTransaction?.apply {
-				fragment.asyncData = generateModels(TransactionListModel(this)).toArrayList()
-				val headerData = TransactionHeaderModel(
-					notificationData?.value ?: value.toDouble(),
-					if (isReceive) fromAddress else tokenReceiveAddress ?: to,
-					symbol,
-					false,
-					isReceive,
-					hasError == "1"
+			val transaction =
+				transactionDao.getByTaxHashAndReceivedStatus(
+					notification.hash,
+					notification.isReceived,
+					false
 				)
-				updateHeaderValue(headerData)
-				headerModel = headerData
+			withContext(UI) {
+				transaction?.apply {
+					fragment.asyncData = generateModels(TransactionListModel(this)).toArrayList()
+					val headerData = TransactionHeaderModel(
+						notificationData?.value ?: value.toDouble(),
+						if (isReceive) fromAddress else to,
+						symbol,
+						false,
+						isReceive,
+						hasError == "1"
+					)
+					updateHeaderValue(headerData)
+					headerModel = headerData
+				} ?: fragment.apply {
+					showLoadingView()
+					updateByNotificationHash(notification) {
+						removeLoadingView()
+					}
+				}
 			}
 		}
 	}
@@ -103,9 +112,7 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 		currentHash,
 		ChainID(info.chainID).getChainURL()!!
 	) { receipt, error ->
-		if (receipt.isNull() || error.hasError()) GoldStoneAPI.context.runOnUiThread {
-			callback(error)
-		} else receipt!!.apply {
+		if (receipt != null && error.hasError()) receipt.apply {
 			// 通过 `Notification` 获取确实信息
 			this.recordOwnerAddress = if (info.isReceived) info.toAddress else info.fromAddress
 			this.symbol = notificationData?.symbol.orEmpty()
@@ -116,13 +123,15 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 				TokenContract(receipt.contractAddress, receipt.symbol, null).isERC20Token()
 			)
 			this.fromAddress = info.fromAddress
-		}.toAsyncData().let {
+		}.let {
 			fragment.context?.runOnUiThread {
-				if (fragment.asyncData.isNull()) fragment.asyncData = it
-				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
+				if (fragment.asyncData.isNull()) fragment.asyncData = it.toAsyncData()
+				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it.toAsyncData())
 				updateHeaderFromNotification(info)
 				callback(RequestError.None)
 			}
+		} else GoldStoneAPI.context.runOnUiThread {
+			callback(error)
 		}
 	}
 }

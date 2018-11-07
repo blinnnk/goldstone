@@ -13,4 +13,13 @@ data class TransactionHeaderModel(
 	val isPending: Boolean,
 	val isReceive: Boolean = false,
 	val isError: Boolean = false
-): Serializable
+) : Serializable {
+	constructor(data: TransactionHeaderModel, count: Double, symbol: String) : this(
+		count,
+		data.address,
+		symbol,
+		data.isPending,
+		data.isReceive,
+		data.isError
+	)
+}

@@ -81,6 +81,7 @@ object SharesPreference {
 	const val yingYongBaoInReview = "yingYongBaoInReview"
 	const val needToShowPincode = "needToShowPincode"
 	const val accountCheckedStatus = "accountCheckedStatus"
+	const val developerMode = "developerMode"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

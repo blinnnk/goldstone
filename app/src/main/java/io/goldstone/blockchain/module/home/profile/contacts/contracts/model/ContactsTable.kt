@@ -59,9 +59,9 @@ data class ContactTable(
 
 		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.contactDao().getAllContacts()
+				GoldStoneDataBase.database.contactDao().getAllContacts().toArrayList()
 			} then {
-				callback(it.toArrayList())
+				callback(it)
 			}
 		}
 
@@ -120,6 +120,15 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 			}
 		}
 	}
+}
+
+fun List<ContactTable>.getContactName(address: String): String {
+	// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
+	return find {
+		it.ethSeriesAddress.equals(address, true)
+			|| it.btcSeriesTestnetAddress.contains(address, true)
+			|| it.btcMainnetAddress.contains(address, true)
+	}?.name ?: address
 }
 
 @Dao

@@ -30,7 +30,7 @@ import org.jetbrains.anko.textColor
 class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 
 	private val addressTextView = TextView(context)
-	private val copyButton = ImageView(context).apply {
+	private val addButton = ImageView(context).apply {
 		layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
 		imageResource = R.drawable.add_contact_icon
 		setColorFilter(GrayScale.lightGray)
@@ -51,7 +51,7 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
 			setPadding(10.uiPX(), 0, 10.uiPX(), 0)
 		}.into(this)
-		copyButton.into(this)
+		addButton.into(this)
 	}
 
 	fun setAddress(address: String) {
@@ -65,6 +65,6 @@ class TransactionAddressCell(context: Context) : RelativeLayout(context) {
 	}
 
 	fun getButton(): ImageView {
-		return copyButton
+		return addButton
 	}
 }

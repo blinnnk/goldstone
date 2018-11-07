@@ -80,6 +80,12 @@ class TransactionDetailPresenter(
 		}
 	}
 
+	fun updateMemo(memo: String) {
+		fragment.recyclerView.getItemAtAdapterPosition<TransactionInfoCell>(2) {
+			it.setContent(memo)
+		}
+	}
+
 	fun runBackEventBy(parent: Fragment) {
 		when (parent) {
 			is TokenDetailOverlayFragment ->

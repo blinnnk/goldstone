@@ -137,7 +137,7 @@ fun GasSelectionPresenter.transfer(
 				gasPrice = currentMinerType.getSelectedGasPrice()
 				gasLimit = BigInteger.valueOf(prepareGasLimit(currentMinerType.getSelectedGasPrice().toLong()))
 				to = Address(toAddress)
-				value = if (CryptoUtils.isERC20TransferByInputCode(inputData)) BigInteger.valueOf(0)
+				value = if (CryptoUtils.isERC20Transfer(inputData)) BigInteger.valueOf(0)
 				else countWithDecimal
 				input = inputData.hexToByteArray().toList()
 			}
@@ -145,27 +145,24 @@ fun GasSelectionPresenter.transfer(
 			// 发起 `sendRawTransaction` 请求
 			GoldStoneEthCall.sendRawTransaction(signedHex, getToken()?.contract?.getChainURL()!!) { taxHash, hashError ->
 				// API 错误的时候
-				if (taxHash == null || taxHash.isEmpty() || error.hasError()) {
-					callback(error)
-					return@sendRawTransaction
-				}
-				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
-				// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-				if (taxHash.isValidTaxHash()) insertPendingDataToTransactionTable(
-					toWalletAddress,
-					countWithDecimal,
-					this@model,
-					taxHash,
-					prepareModel?.memo ?: TransactionText.noMemo
-				)
-				// 主线程跳转到账目详情界面
-				fragment.context?.runOnUiThread {
-					rootFragment?.goToTransactionDetailFragment(
-						fragment,
-						prepareReceiptModel(this@model, countWithDecimal, taxHash)
+				if (taxHash?.isNotEmpty() == true && error.hasError()) {
+					// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
+					// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
+					if (taxHash.isValidTaxHash()) insertPendingDataToTransactionTable(
+						countWithDecimal,
+						this@model,
+						taxHash,
+						prepareModel?.memo ?: TransactionText.noMemo
 					)
-				}
-				callback(hashError)
+					// 主线程跳转到账目详情界面
+					fragment.context?.runOnUiThread {
+						rootFragment?.goToTransactionDetailFragment(
+							fragment,
+							prepareReceiptModel(this@model, countWithDecimal, taxHash)
+						)
+					}
+					callback(hashError)
+				} else callback(hashError)
 			}
 		} else callback(error)
 	}
@@ -220,35 +217,43 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 fun GasSelectionPresenter.getUnitSymbol() = getToken()?.contract.getSymbol().symbol.orEmpty()
 
 private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
-	toWalletAddress: String,
 	value: BigInteger,
 	raw: PaymentPrepareModel,
 	taxHash: String,
 	memoData: String
 ) {
 	fragment.getParentFragment<TokenDetailOverlayFragment> {
-		TransactionTable().apply {
-			isReceive = false
-			symbol = token?.symbol.orEmpty()
-			timeStamp =
-				(System.currentTimeMillis() / 1000).toString() // 以太坊返回的是 second, 本地的是 mills 在这里转化一下
-			fromAddress = getETHERC20OrETCAddress()
-			this.value = CryptoUtils.toCountByDecimal(value, token!!.decimal).formatCount()
-			hash = taxHash
-			gasPrice = currentMinerType.getSelectedGasPrice().toString()
-			gasUsed = raw.gasLimit.toString()
-			isPending = true
-			recordOwnerAddress = getETHERC20OrETCAddress()
-			tokenReceiveAddress = toWalletAddress
-			isERC20Token = token!!.symbol == CoinSymbol.eth
-			nonce = raw.nonce.toString()
-			to = raw.toWalletAddress
-			input = raw.inputData
-			contractAddress = token?.contract?.contract.orEmpty()
-			chainID = TokenContract(contractAddress, symbol, null).getCurrentChainID().id
-			memo = memoData
+		TransactionTable(
+			blockNumber = "",
+			// 以太坊返回的是 second, 本地的是 mills 在这里转化一下
+			timeStamp = (System.currentTimeMillis() / 1000).toString(),
+			hash = taxHash,
+			nonce = raw.nonce.toString(),
+			blockHash = "",
+			transactionIndex = "",
+			fromAddress = getETHERC20OrETCAddress(),
+			to = raw.toWalletAddress,
+			value = value.toString(),
+			count = CryptoUtils.toCountByDecimal(value, token?.decimal.orZero()),
+			gas = "",
+			gasPrice = currentMinerType.getSelectedGasPrice().toString(),
+			hasError = "0",
+			txReceiptStatus = "1",
+			input = raw.inputData,
+			contractAddress = token?.contract?.contract.orEmpty(),
+			cumulativeGasUsed = "",
+			gasUsed = raw.gasLimit.toString(),
+			confirmations = "0",
+			isReceive = false,
+			isERC20Token = token?.symbol == CoinSymbol.eth,
+			symbol = token?.symbol.orEmpty(),
+			recordOwnerAddress = getETHERC20OrETCAddress(),
+			isPending = true,
+			memo = memoData,
+			chainID = token?.chainID.orEmpty(),
+			isFee = false,
 			minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
-		}.let {
+		).let {
 			GoldStoneDataBase.database.transactionDao().insert(it)
 			GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })
 		}

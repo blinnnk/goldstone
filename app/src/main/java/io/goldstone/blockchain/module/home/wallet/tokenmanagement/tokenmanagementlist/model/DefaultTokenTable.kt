@@ -18,6 +18,7 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
@@ -154,6 +155,7 @@ data class DefaultTokenTable(
 		decimals: Int,
 		chainID: ChainID,
 		iconUrl: String,
+		tokenName: String = "",
 		isDefault: Boolean = true
 	) : this(
 		0,
@@ -163,7 +165,7 @@ data class DefaultTokenTable(
 		symbol,
 		0,
 		0.0,
-		"",
+		tokenName,
 		decimals,
 		"",
 		isDefault,
@@ -189,6 +191,26 @@ data class DefaultTokenTable(
 		true,
 		0,
 		ChainID.EOS.id
+	)
+
+	// 服务插入 `EOS` 主网 `Token` 的构造函数
+	constructor(
+		erc20: ERC20TransactionModel,
+		chainID: ChainID
+	) : this(
+		0,
+		"",
+		erc20.contract,
+		"",
+		erc20.tokenSymbol,
+		0,
+		0.0,
+		erc20.tokenName,
+		erc20.tokenDecimal.toIntOrZero(),
+		"",
+		true,
+		0,
+		chainID.id
 	)
 
 	infix fun insertThen(callback: () -> Unit) {
@@ -334,6 +356,9 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
 	fun getToken(contract: String, symbol: String, chainID: String): DefaultTokenTable?
+
+	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun getERC20Token(contract: String, chainID: String): DefaultTokenTable?
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol")
 	fun getTokenFromAllChains(contract: String, symbol: String): List<DefaultTokenTable>

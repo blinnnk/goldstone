@@ -15,11 +15,11 @@ import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.common.EtherScanApi
-import io.goldstone.blockchain.kernel.network.common.EtherScanApi.bitcoinCashTransactionDetail
-import io.goldstone.blockchain.kernel.network.common.EtherScanApi.bitcoinTransactionDetail
-import io.goldstone.blockchain.kernel.network.common.EtherScanApi.eosTransactionDetail
-import io.goldstone.blockchain.kernel.network.common.EtherScanApi.litecoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.bitcoinCashTransactionDetail
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.bitcoinTransactionDetail
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.eosTransactionDetail
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.litecoinTransactionDetail
 import org.json.JSONArray
 import java.io.Serializable
 import java.math.BigInteger
@@ -47,7 +47,6 @@ data class TransactionListModel(
 	val value: String,
 	val hasError: Boolean,
 	var contract: TokenContract,
-	var isFailed: Boolean,
 	var pageID: Long,
 	var isFee: Boolean = false
 ) : Serializable {
@@ -73,21 +72,19 @@ data class TransactionListModel(
 		data.transactionData.quantity.substringBeforeLast(" "),
 		false,
 		TokenContract(data.codeName, data.symbol, null),
-		false,
 		data.serverID,
 		false
 	)
 
 	constructor(data: TransactionTable) : this(
-		if (data.isReceive) data.fromAddress
-		else data.tokenReceiveAddress.orEmpty(),
+		if (data.isReceive) data.fromAddress else data.to,
 		data.fromAddress,
 		generateAddressInfo(data), // 副标题的生成
-		data.value.toDouble(), // 转账个数
+		data.count, // 转账个数
 		data.symbol,
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp), // 拼接时间
-		data.tokenReceiveAddress.orEmpty(),
+		data.to,
 		data.blockNumber,
 		data.hash,
 		data.memo,
@@ -98,7 +95,6 @@ data class TransactionListModel(
 		data.value,
 		data.hasError == "1",
 		TokenContract(data.contractAddress, data.symbol, null),
-		data.isFailed,
 		0L, // TODO
 		data.isFee
 	)
@@ -130,7 +126,6 @@ data class TransactionListModel(
 		data.value.toDouble().toString(),
 		false,
 		CoinSymbol(data.symbol).getContract().orEmpty(),
-		false,
 		data.dataIndex.toLong(), // TODO
 		data.isFee
 	)
@@ -145,11 +140,7 @@ data class TransactionListModel(
 			return HoneyDateUtil.getSinceTime(
 				data.timeStamp.toMillisecond(),
 				DateAndTimeText.getDateText()
-			) + descriptionText(
-				data.isReceive,
-				data.tokenReceiveAddress.orEmpty(),
-				data.fromAddress
-			).scaleTo(32)
+			) + descriptionText(data.isReceive, data.to, data.fromAddress).scaleTo(32)
 		}
 
 		fun generateAddressInfo(data: EOSTransactionTable): String {
@@ -214,11 +205,9 @@ data class TransactionListModel(
 
 val getMemoFromInputCode: (inputCode: String, isERC20: Boolean) -> String = { input, isERC20 ->
 	if (!isERC20) {
-		if (input.equals(SolidityCode.ethTransfer, true)) {
+		if (input.equals(SolidityCode.ethTransfer, true))
 			TransactionText.noMemo
-		} else {
-			input.toUpperCase().toStringFromHex()
-		}
+		else input.toUpperCase().toStringFromHex()
 	} else {
 		if (input.length > 138) {
 			input.substring(138, input.length).toUpperCase().toStringFromHex()

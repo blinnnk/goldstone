@@ -228,6 +228,6 @@ private fun TransactionDetailPresenter.updateDataWhenFailed() {
 	val transactionDao = GoldStoneDataBase.database.transactionDao()
 	val transaction = transactionDao.getTransactionByTaxHash(currentHash)
 	transaction.find { it.hash == currentHash }?.let {
-		transactionDao.update(it.apply { isFailed = true })
+		transactionDao.update(it.apply { hasError = "1" })
 	}
 }

@@ -24,7 +24,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 	var model: TransactionListModel? by observing(null) {
 		model?.let {
 			icon.apply {
-				if (it.hasError || it.isFailed) {
+				if (it.hasError) {
 					// 失败或错误的样式
 					src = R.drawable.error_icon
 					iconColor = Spectrum.red

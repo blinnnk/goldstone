@@ -57,4 +57,13 @@ object SharedValue {
 			SharesPreference.accountCheckedStatus,
 			status
 		)
+
+	fun getDeveloperModeStatus(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.developerMode)
+
+	fun updateDeveloperModeStatus(status: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.developerMode,
+			status
+		)
 }

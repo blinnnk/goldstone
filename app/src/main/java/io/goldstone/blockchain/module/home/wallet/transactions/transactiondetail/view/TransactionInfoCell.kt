@@ -31,18 +31,22 @@ class TransactionInfoCell(context: Context) : CardTitleCell(context) {
 			model.description.equals(CommonText.from, true)
 			|| model.description.equals(CommonText.to, true)
 		) {
-			TransactionListModel.convertMultiToOrFromAddresses(model.info).let { addresses ->
-				addresses.forEach {
+			if (!model.info.contains("[")) setContent(model.info)
+			// 多个地址的情况是 比特币系列的地址
+			else {
+				val addresses =
+					TransactionListModel.convertMultiToOrFromAddresses(model.info)
+				addresses.forEachIndexed { index, address ->
 					TransactionAddressCell(context).apply {
-						setAddress(it)
+						id = index
+						setAddress(address)
 						addressCells += this
-					}.into(getContainer())
+					}.into(container)
 				}
 			}
 		} else {
 			val content = when {
-				model.info.isEmpty() && model.description.equals(TransactionText.memo, true) ->
-					TransactionText.noMemo
+				model.info.isEmpty() && model.description.equals(TransactionText.memo, true) -> TransactionText.noMemo
 				model.info.isEmpty() -> CommonText.waiting
 				model.description.equals(TransactionText.url, true) -> model.info.setUnderline()
 				else -> model.info
