@@ -16,6 +16,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Tradi
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import org.jetbrains.anko.*
+import java.math.BigDecimal
 
 /**
  * @date: 2018/10/29.
@@ -53,7 +54,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.toDouble().formatCount(3)} EOS/KB)"
 		ramPriceView.currentPriceView.currentPrice.text = price
 		ramPriceView.currentPriceView.trendcyPercent.apply {
-			val trendBigDecimal = percent.formatCount(3)
+			val trendBigDecimal = BigDecimal(percent).divide(BigDecimal(1), 3, BigDecimal.ROUND_HALF_UP)
 			if (percent > 0) {
 				text = "+$trendBigDecimal%"
 				textColor = Spectrum.green
