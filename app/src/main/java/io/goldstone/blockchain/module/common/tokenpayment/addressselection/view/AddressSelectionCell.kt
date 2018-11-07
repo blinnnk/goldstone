@@ -30,5 +30,4 @@ class AddressSelectionCell(context: Context) : ContactsCell(context) {
 			x = ScreenSize.widthWithPadding - 30.uiPX().toFloat()
 		}.into(this)
 	}
-
 }

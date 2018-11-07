@@ -5,11 +5,12 @@ package io.goldstone.blockchain.common.utils
 import android.R
 import android.content.Context
 import android.content.res.ColorStateList
+import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.EditText
-import android.widget.RadioButton
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
@@ -25,7 +26,7 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger
@@ -46,7 +47,6 @@ fun <T : View> T.click(callback: (T) -> Unit): T {
 }
 
 fun Fragment.getMainActivity() = activity as? MainActivity
-
 fun Context.getMainActivity() = this as? MainActivity
 
 fun Context?.alert(message: String) {
@@ -94,11 +94,6 @@ fun <T : Iterable<String>> T.toJsonArray(): JsonArray {
 	return stringArray
 }
 
-fun String.showAfterColonContent(): String {
-	return if (contains(":")) toString().substringAfter(":")
-	else this
-}
-
 fun BigInteger.convertToDiskUnit(): String {
 	val convertValue = ("$this".length / 3.0).toInt()
 	val diskUnit = when (convertValue) {
@@ -140,7 +135,7 @@ fun JSONArray.toList(): List<JSONObject> {
 
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
 
-fun RadioButton.isDefaultStyle() {
+fun CompoundButton.isDefaultStyle() {
 	buttonTintList = ColorStateList(
 		arrayOf(
 			intArrayOf(-R.attr.state_checked), //disabled
@@ -150,3 +145,9 @@ fun RadioButton.isDefaultStyle() {
 		intArrayOf(GrayScale.midGray, Spectrum.blue)
 	)
 }
+
+@UiThread
+fun Fragment.safeShowError(error: Throwable) {
+	ErrorDisplayManager(error).show(context)
+}
+

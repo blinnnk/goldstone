@@ -4,6 +4,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QRText
@@ -11,11 +12,15 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
@@ -24,7 +29,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -91,17 +96,15 @@ class AddressSelectionPresenter(
 
 	fun showPaymentPrepareFragment(toAddress: String, count: Double = 0.0) {
 		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
-		fun showAlertIfLocalExistThisAddress(localAddresses: List<String>) {
-			localAddresses.any { it.equals(toAddress, true) } isTrue {
+		fun showExistedAlertAndGo(localAddresses: List<String>) {
+			if (localAddresses.any { it.equals(toAddress, true) }) {
 				alert(
 					TokenDetailText.transferToLocalWalletAlertDescription,
 					TokenDetailText.transferToLocalWalletAlertTitle
 				) {
 					goToPaymentPrepareFragment(toAddress, count)
 				}
-			} otherwise {
-				goToPaymentPrepareFragment(toAddress, count)
-			}
+			} else goToPaymentPrepareFragment(toAddress, count)
 		}
 		// 检查地址是否合规
 		val addressType =
@@ -112,16 +115,20 @@ class AddressSelectionPresenter(
 				token?.contract.isBTCSeries() || token?.contract.isEOSSeries() ->
 					fragment.context.alert("this is not a valid bitcoin address")
 				else -> WalletTable.getAllETHAndERCAddresses {
-					showAlertIfLocalExistThisAddress(this)
+					showExistedAlertAndGo(this)
 				}
 			}
 
 			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
 				!token?.contract.isEOSSeries() ->
-					fragment.context.alert("this is not a valid eos account name")
+					fragment.safeShowError(AccountError.InvalidAccountName)
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
-				else -> WalletTable.getAllEOSAccountNames {
-					showAlertIfLocalExistThisAddress(this)
+				else -> EOSAPI.getAccountInfo(EOSAccount(toAddress)) { info, error ->
+					GoldStoneAPI.context.runOnUiThread {
+						if (info != null && error.isNone()) WalletTable.getAllEOSAccountNames {
+							showExistedAlertAndGo(this)
+						} else fragment.safeShowError(AccountError.InactivatedAccountName)
+					}
 				}
 			}
 
@@ -130,7 +137,7 @@ class AddressSelectionPresenter(
 					"This is a invalid address type for ${CoinSymbol.ltc}, Please check it again"
 				)
 				else -> WalletTable.getAllLTCAddresses {
-					showAlertIfLocalExistThisAddress(this)
+					showExistedAlertAndGo(this)
 				}
 			}
 
@@ -139,7 +146,7 @@ class AddressSelectionPresenter(
 					"This is a invalid address type for ${CoinSymbol.bch}, Please check it again"
 				)
 				else -> WalletTable.getAllBCHAddresses {
-					showAlertIfLocalExistThisAddress(this)
+					showExistedAlertAndGo(this)
 				}
 			}
 
@@ -151,7 +158,7 @@ class AddressSelectionPresenter(
 					"This is a invalid address type for ${CoinSymbol.btc()}, Please check it again"
 				)
 				else -> WalletTable.getAllBTCMainnetAddresses {
-					showAlertIfLocalExistThisAddress(this)
+					showExistedAlertAndGo(this)
 				}
 			}
 
@@ -163,7 +170,7 @@ class AddressSelectionPresenter(
 					"This is a invalid address type for Testnet, Please check it again"
 				)
 				else -> WalletTable.getAllBTCSeriesTestnetAddresses {
-					showAlertIfLocalExistThisAddress(this)
+					showExistedAlertAndGo(this)
 				}
 			}
 		}
@@ -235,12 +242,8 @@ class AddressSelectionPresenter(
 				putDouble(ArgumentKey.paymentCount, count)
 				putSerializable(ArgumentKey.tokenModel, token)
 			}
-			overlayView.header.apply {
-				backButton.onClick {
-					headerTitle = TokenDetailText.address
-					presenter.popFragmentFrom<PaymentPrepareFragment>()
-					showCloseButton(false)
-				}
+			overlayView.header.showBackButton(true) {
+				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
 			headerTitle = TokenDetailText.transferDetail
 		}
@@ -250,10 +253,12 @@ class AddressSelectionPresenter(
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			val header = overlayView.header
 			if (!isFromQuickTransfer) {
-				overlayView.header.showBackButton(true) {
+				header.showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
+				header.showCloseButton(false) {}
 			}
 		}
 	}

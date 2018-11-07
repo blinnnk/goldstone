@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.os.Bundle
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -11,8 +13,8 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.AlertText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -143,7 +145,7 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(callback: (GoldStoneError) -> Unit) {
+	fun confirmTransfer(@UiThread callback: (GoldStoneError) -> Unit) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
@@ -170,31 +172,55 @@ class GasSelectionPresenter(
 		return isValid
 	}
 
-	fun showConfirmAttentionView(callback: (GoldStoneError) -> Unit) {
+	fun showConfirmAttentionView(@WorkerThread callback: (GoldStoneError) -> Unit) {
 		fragment.context?.showAlertView(
-			TransactionText.confirmTransactionTitle.toUpperCase(),
+			TransactionText.confirmTransactionTitle,
 			TransactionText.confirmTransaction,
 			true,
 			// 点击取消按钮
 			{ callback(GoldStoneError.None) }
 		) {
+			if (getToken()?.contract.isBTCSeries() && prepareBTCSeriesModel == null) {
+				callback(GoldStoneError("Empty PrepareBTCSeriesModel Data"))
+				return@showAlertView
+			}
 			val password = it?.text.toString()
+			val tokenContract = getToken()?.contract ?: return@showAlertView
 			when {
-				getToken()?.contract.isBTC() -> prepareBTCSeriesModel?.apply {
-					transferBTC(this, password, callback)
-				}
-				getToken()?.contract.isLTC() -> prepareBTCSeriesModel?.apply {
-					transferLTC(this, password, callback)
-				}
-				getToken()?.contract.isBCH() -> prepareBTCSeriesModel?.apply {
-					transferBCH(this, password, callback)
-				}
-				else -> transfer(password, callback)
+				tokenContract.isBTC() -> transferBTC(
+					prepareBTCSeriesModel!!,
+					AddressUtils.getCurrentBTCAddress(),
+					ChainType.BTC,
+					password,
+					callback
+				)
+				tokenContract.isLTC() -> transferLTC(
+					prepareBTCSeriesModel!!,
+					AddressUtils.getCurrentLTCAddress(),
+					ChainType.LTC,
+					password,
+					callback
+				)
+				tokenContract.isBCH() -> transferBCH(
+					prepareBTCSeriesModel!!,
+					AddressUtils.getCurrentBCHAddress(),
+					ChainType.BCH,
+					password,
+					callback
+				)
+
+				tokenContract.isETC() -> transfer(
+					SharedAddress.getCurrentETC(),
+					ChainType.ETC,
+					password,
+					callback
+				)
+				else -> transfer(SharedAddress.getCurrentEthereum(), ChainType.ETH, password, callback)
 			}
 		}
 	}
 
-	fun insertBTCSeriesPendingDataDatabase(
+	fun insertBTCSeriesPendingData(
 		raw: PaymentBTCSeriesModel,
 		fee: Long,
 		size: Int,
@@ -237,7 +263,7 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun prepareReceiptModelFromBTCSeries(
+	fun generateReceipt(
 		raw: PaymentBTCSeriesModel,
 		fee: Long,
 		taxHash: String
@@ -282,41 +308,27 @@ class GasSelectionPresenter(
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {
 			overlayView.header.showBackButton(true) {
-				backEvent(this@apply)
+				presenter.popFragmentFrom<GasSelectionFragment>()
 			}
 		}
 	}
+}
 
-	fun backEvent(fragment: TokenDetailOverlayFragment) {
-		fragment.apply {
-			headerTitle = TokenDetailText.paymentValue
-			presenter.popFragmentFrom<GasSelectionFragment>()
-		}
+/**
+ * 转账开始后跳转到转账监听界面
+ */
+fun <T : Fragment> TokenDetailOverlayFragment.goToTransactionDetailFragment(
+	currentFragment: T,
+	receiptModel: ReceiptModel
+) {
+	// 准备跳转到下一个界面
+	// 如果有键盘收起键盘
+	activity?.apply { SoftKeyboard.hide(this) }
+	removeChildFragment(currentFragment)
+	addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
+		putSerializable(ArgumentKey.transactionDetail, receiptModel)
 	}
-
-	companion object {
-		/**
-		 * 转账开始后跳转到转账监听界面
-		 */
-		fun <T : Fragment> goToTransactionDetailFragment(
-			fragment: TokenDetailOverlayFragment?,
-			currentFragment: T,
-			receiptModel: ReceiptModel
-		) {
-			// 准备跳转到下一个界面
-			fragment?.apply {
-				// 如果有键盘收起键盘
-				activity?.apply { SoftKeyboard.hide(this) }
-				removeChildFragment(currentFragment)
-				addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
-					putSerializable(ArgumentKey.transactionDetail, receiptModel)
-				}
-				overlayView.header.apply {
-					showBackButton(false)
-					showCloseButton(true)
-				}
-				headerTitle = TokenDetailText.transferDetail
-			}
-		}
+	overlayView.header.apply {
+		showCloseButton(true) { presenter.removeSelfFromActivity() }
 	}
 }

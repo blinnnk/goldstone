@@ -27,17 +27,20 @@ import org.jetbrains.anko.textColor
  */
 class QuotationCell(context: Context) : LinearLayout(context) {
 
+	// 判断标价是否需要刷新价格及 `LineChart` 的标记
+	private var previousPrice: Double? = null
 	var model: QuotationModel by observing(QuotationModel()) {
-		val price =
-			if (model.price == ValueTag.emptyPrice) model.price
-			else model.price.toDoubleOrNull()?.toBigDecimal()?.toPlainString()
-
+		val price = if (model.price == ValueTag.emptyPrice) model.price
+		else model.price.toDoubleOrNull()?.toBigDecimal()?.toPlainString()
+		// 如果价格没有变动就不用乡下执行了
+		if (price?.toDoubleOrNull().orZero() == previousPrice) return@observing
 		tokenInfo.title.text = model.pairDisplay.toUpperCase()
 		tokenInfo.subtitle.text = model.name
 		tokenPrice.title.text = CustomTargetTextStyle(
 			model.quoteSymbol.toUpperCase(),
 			model.quoteSymbol.toUpperCase() + " " + price,
-			GrayScale.midGray, 13.uiPX(),
+			GrayScale.midGray,
+			13.uiPX(),
 			false,
 			false
 		)
@@ -46,6 +49,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		when {
 			model.isDisconnected -> {
 				tokenPrice.setColorStyle(GrayScale.midGray)
+				lineChart.setChartColorAndShadowResource(GrayScale.lightGray, R.drawable.fade_gray)
 			}
 
 			model.percent.toDouble() < 0 -> {
@@ -66,6 +70,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		)
 
 		exchangeName.text = model.exchangeName
+		previousPrice = price?.toDoubleOrNull().orZero()
 	}
 	private val tokenInfo by lazy {
 		TwoLineTitles(context).apply {

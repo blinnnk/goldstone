@@ -49,7 +49,7 @@ fun Context.exportBase58PrivateKey(
 	isCompress: Boolean = true,
 	@UiThread hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
-	getPrivateKey(walletAddress, password, true) { privateKey, error ->
+	getPrivateKey(walletAddress, password, true, true) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) {
 			val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
 			hold(ECKey.fromPrivate(privateKey!!.toBigInteger(16), isCompress).getPrivateKeyAsWiF(net), AccountError.None)

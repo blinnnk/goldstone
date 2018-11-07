@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
@@ -31,13 +32,12 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 
 	var model: WalletListModel by observing(WalletListModel()) {
 		val currentType = if (model.isWatchOnly) WalletText.watchOnly else model.type
-		nameInfo.title.text = model.addressName
+		nameInfo.title.text = getFixedTitleLength(model.addressName)
 		nameInfo.subtitle.text = model.subtitle.scaleTo(28)
 		walletInfo.title.text = currentType
 		walletInfo.subtitle.text = WalletType(model.type).getDisplayName()
 		balanceInfo.title.text = model.balance.formatCurrency()
 		balanceInfo.subtitle.text = (WalletText.totalAssets + " (${SharedWallet.getCurrencyCode()})").toUpperCase()
-		avatar.glideImage("")
 		avatar.glideImage(UnlimitedAvatar(model.id, context).getBitmap())
 		val colorSize = WalletColor.getAll().size
 		container.addCorner(
@@ -125,6 +125,16 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 				y -= 15.uiPX()
 			}
 				.into(this)
+		}
+	}
+
+	companion object {
+		fun getFixedTitleLength(name: String): String {
+			return object : FixTextLength() {
+				override var text = name
+				override val maxWidth = ScreenSize.overlayContentWidth - AvatarSize.big - 20.uiPX().toFloat()
+				override val textSize: Float = 24.uiPX().toFloat()
+			}.getFixString()
 		}
 	}
 }

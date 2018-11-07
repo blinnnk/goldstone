@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 26/03/2018 8:56 PM
@@ -34,19 +34,13 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
-
-		slideHeader.apply {
-			addTokenButton.apply {
-				onClick {
-					presenter.showQuotationManagement()
-					preventDuplicateClicks()
-				}
+		slideHeader.addTokenButton.apply {
+			onClick {
+				presenter.showQuotationManagement()
+				preventDuplicateClicks()
 			}
 		}
 	}
@@ -58,10 +52,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	private var isShow = false
 	private val headerHeight = 50.uiPX()
 
-	override fun observingRecyclerViewVerticalOffset(
-		offset: Int,
-		range: Int
-	) {
+	override fun observingRecyclerViewVerticalOffset(offset: Int, range: Int) {
 		if (offset >= headerHeight && !isShow) {
 			slideHeader.onHeaderShowedStyle()
 			isShow = true

@@ -32,7 +32,7 @@ import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFra
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 26/03/2018 12:56 AM
@@ -107,7 +107,7 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showWatchWalletImportFragment() {
-		fragment.overlayView.header.showAddButton(false)
+		fragment.overlayView.header.showAddButton(false) {}
 		showTargetFragment<WatchOnlyImportFragment>()
 	}
 

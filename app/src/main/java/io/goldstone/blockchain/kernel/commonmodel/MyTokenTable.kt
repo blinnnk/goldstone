@@ -42,7 +42,8 @@ data class MyTokenTable(
 	var symbol: String,
 	var balance: Double, // 含有精度的余额 eg: `1.02` BTC
 	var contract: String,
-	var chainID: String
+	var chainID: String,
+	var isClosed: Boolean // 用户手动关闭的 `Token` 用来防止 `Server` 给出 `EOS` 潜在资产的重复添加
 ) {
 
 	constructor(
@@ -55,7 +56,8 @@ data class MyTokenTable(
 		data.symbol,
 		0.0,
 		data.contract,
-		data.chainID
+		data.chainID,
+		false
 	)
 
 	constructor(
@@ -69,16 +71,18 @@ data class MyTokenTable(
 		data.symbol,
 		0.0,
 		data.contract,
-		data.chainID
+		data.chainID,
+		false
 	)
 
 	fun preventDuplicateInsert() {
 		doAsync {
 			// 防止重复添加
-			GoldStoneDataBase.database.myTokenDao().apply {
-				if (getTokenByContractAndAddress(contract, symbol, ownerName, chainID).isNull()) {
-					insert(this@MyTokenTable)
-				}
+			val myTokenDao = GoldStoneDataBase.database.myTokenDao()
+			val targetToken =
+				myTokenDao.getTokenByContractAndAddress(contract, symbol, ownerName, chainID)
+			if (targetToken == null) {
+				myTokenDao.insert(this@MyTokenTable)
 			}
 		}
 	}
@@ -94,7 +98,7 @@ data class MyTokenTable(
 					val existingAccount = getByOwnerName(name, chainID)
 					if (pendingAccount.isNull() && existingAccount.isEmpty()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao().getTokenByContract(
+							GoldStoneDataBase.database.defaultTokenDao().getToken(
 								TokenContract.EOS.contract!!,
 								CoinSymbol.EOS.symbol!!,
 								SharedChain.getEOSCurrent().chainID.id
@@ -134,14 +138,6 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getTokensByAddress(
-			addresses: List<String>,
-			@UiThread hold: (List<MyTokenTable>) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses)
-			} then (hold)
-		}
 
 		fun getTokenBalance(
 			contract: TokenContract,
@@ -157,20 +153,28 @@ data class MyTokenTable(
 		}
 
 		@WorkerThread
-		fun addNew(contract: TokenContract, chainID: String) {
+		fun addNewOrOpen(contract: TokenContract, chainID: String) {
 			val currentAddress = contract.getAddress(false)
 			val accountName =
 				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
+			val myTokenDao = GoldStoneDataBase.database.myTokenDao()
+			val targetToken = myTokenDao.getTokenByContractAndAddress(
+				contract.contract.orEmpty(),
+				contract.symbol,
+				accountName,
+				chainID
+			)
 			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-			MyTokenTable(
+			if (targetToken.isNull()) myTokenDao.insert(MyTokenTable(
 				0,
 				accountName,
 				currentAddress,
 				contract.symbol,
 				0.0,
 				contract.contract.orEmpty(),
-				chainID
-			).preventDuplicateInsert()
+				chainID,
+				false
+			)) else myTokenDao.update(targetToken!!.apply { isClosed = false })
 		}
 
 		fun getBalanceByContract(
@@ -185,8 +189,8 @@ data class MyTokenTable(
 						ownerName,
 						contract.getChainURL()
 					) { amount, error ->
-						if (!amount.isNull() && error.isNone()) {
-							val balance = amount!!.toEthCount()
+						if (amount != null && error.isNone()) {
+							val balance = amount.toEthCount()
 							hold(balance, RequestError.None)
 						} else hold(null, error)
 					}
@@ -196,14 +200,25 @@ data class MyTokenTable(
 						hold(balance?.toBTC(), error)
 					}
 				contract.isLTC() ->
+					// 首先从 GoldStone LTC Insight 拉取 Balance 如果遇到错误那么切换到
+					// Chain.So 拉取 Balance 如果还有错误就报错
 					LitecoinApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance?.toLTC(), error)
+						if (balance != null && error.isNone()) {
+							hold(balance.toLTC(), error)
+						} else LitecoinApi.getBalanceFromChainSo(ownerName) { chainSoBalance, chainSoError ->
+							if (chainSoBalance != null && chainSoError.isNone()) {
+								hold(chainSoBalance, chainSoError)
+							} else hold(
+								null,
+								RequestError.RPCResult(
+									"\n1. Get litecoin balance from GoldStone has error\n" +
+										"2. Then get balance from Chain.so has error too"
+								)
+							)
+						}
 					}
 
-				contract.isBCH() ->
-					BitcoinCashApi.getBalance(ownerName, false) { balance, error ->
-						hold(balance, error)
-					}
+				contract.isBCH() -> BitcoinCashApi.getBalance(ownerName, false, hold)
 
 				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 				// 网络请求在这额外校验一次.
@@ -230,8 +245,8 @@ data class MyTokenTable(
 						ownerName,
 						SharedChain.getCurrentETH()
 					) { amount, error ->
-						if (!amount.isNull() && error.isNone()) {
-							val balance = CryptoUtils.toCountByDecimal(amount!!, token?.decimals.orZero())
+						if (amount != null && error.isNone()) {
+							val balance = CryptoUtils.toCountByDecimal(amount, token?.decimals.orZero())
 							hold(balance, RequestError.None)
 						} else hold(null, error)
 					}
@@ -253,8 +268,8 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens WHERE contract LIKE :contract AND symbol LIKE :symbol AND (ownerName = :ownerName OR ownerAddress = :ownerName) AND chainID Like :chainID ")
 	fun getTokenByContractAndAddress(contract: String, symbol: String, ownerName: String, chainID: String): MyTokenTable?
 
-	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
-	fun getTokensByAddress(addresses: List<String>, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
+	@Query("SELECT * FROM myTokens WHERE ownerName IN (:addresses)  AND isClosed = :isClose AND chainID IN (:currentChainIDS) ORDER BY balance DESC ")
+	fun getTokensByAddress(addresses: List<String>, isClose: Boolean = false, currentChainIDS: List<String> = Current.chainIDs()): List<MyTokenTable>
 
 	@Query("SELECT * FROM myTokens WHERE ownerAddress LIKE :walletAddress")
 	fun getAll(walletAddress: String): List<MyTokenTable>
@@ -283,6 +298,9 @@ interface MyTokenDao {
 
 	@Query("DELETE FROM myTokens  WHERE ownerName LIKE :address AND contract LIKE :contract AND symbol = :symbol")
 	fun deleteByContractAndAddress(contract: String, symbol: String, address: String)
+
+	@Query("UPDATE myTokens SET isClosed = :isClose  WHERE ownerName LIKE :address AND contract LIKE :contract AND symbol = :symbol AND chainID = :chainID")
+	fun updateCloseStatus(contract: String, symbol: String, address: String, chainID: String, isClose: Boolean)
 
 	@Insert
 	fun insert(token: MyTokenTable)

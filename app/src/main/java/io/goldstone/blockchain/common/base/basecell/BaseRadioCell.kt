@@ -25,7 +25,12 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 	var checkedStatus: Boolean by observing(false) {
 		radioButton.isChecked = checkedStatus
 	}
-	protected val title = TextView(context)
+	protected val title = TextView(context).apply {
+		x = 50.uiPX().toFloat()
+		textSize = fontSize(15)
+		textColor = GrayScale.black
+		typeface = GoldStoneFont.medium(context)
+	}
 	private var radioButton: RadioButton
 	protected var icon: ImageView? = null
 
@@ -33,22 +38,20 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		hasArrow = false
 		setGrayStyle()
 		setHorizontalPadding()
-		this.addView(title.apply {
-			textSize = fontSize(15)
-			textColor = GrayScale.black
-			typeface = GoldStoneFont.medium(context)
-		})
-
+		this.addView(title)
 		title.setCenterInVertical()
-
 		radioButton = radioButton().apply {
 			isDefaultStyle()
 			isClickable = false
 			setAlignParentRight()
 			setCenterInVertical()
 		}
-
 		layoutParams.height = 50.uiPX()
+	}
+
+	override fun onAttachedToWindow() {
+		super.onAttachedToWindow()
+		if (icon.isNull()) title.x = 0f
 	}
 
 	fun setSwitchStatusBy(isSelected: Boolean) {
@@ -56,7 +59,6 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 	}
 
 	fun showIcon(image: Int, color: Int = GrayScale.whiteGray) {
-		title.x = 50.uiPX().toFloat()
 		if (icon.isNull()) {
 			icon = ImageView(context).apply {
 				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())

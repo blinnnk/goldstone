@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListCardCell
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import org.jetbrains.anko.textColor
 
@@ -28,7 +29,7 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
 				description.text = model.description.setBold().setItalic()
 			}
 
-			else -> description.text = model.description
+			else -> description.text = WalletListCardCell.getFixedTitleLength(model.description.toString())
 		}
 	}
 	private val title = TextView(context)

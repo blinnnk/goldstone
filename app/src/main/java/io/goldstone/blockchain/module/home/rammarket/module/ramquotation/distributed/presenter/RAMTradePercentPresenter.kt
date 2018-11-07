@@ -75,7 +75,7 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 				data?.let {
 					if (it.size == 6) {
 						tradeDistributeList.clear()
-						tradeDistributeList.addAll(it)
+						tradeDistributeList.addAll(it.toArrayList())
 					}
 				}
 			}

@@ -25,17 +25,18 @@ abstract class BTCSeriesTransactionStatusObserver {
 		doAsync {
 			BTCSeriesJsonRPC.getConfirmations(
 				chainURL,
-				hash,
-				{
+				hash
+			) { confirmationCount, error ->
+				if (error.hasError()) {
 					// 出错失败最大重试次数设定
 					if (maxRetryTimes <= 0) removeObserver() else maxRetryTimes -= 1
+					return@getConfirmations
 				}
-			) {
-				if (it.isNull()) {
+				if (confirmationCount.isNull()) {
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
 				} else {
-					val hasConfirmed = it!! > targetInterval
+					val hasConfirmed = confirmationCount!! > targetInterval
 					if (hasConfirmed) {
 						removeObserver()
 					} else {
@@ -43,7 +44,7 @@ abstract class BTCSeriesTransactionStatusObserver {
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
 					}
-					getStatus(hasConfirmed, it)
+					getStatus(hasConfirmed, confirmationCount)
 				}
 			}
 		}

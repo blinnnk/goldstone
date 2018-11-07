@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.*
@@ -9,6 +11,8 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
@@ -16,7 +20,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAda
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
+import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -29,22 +33,24 @@ class QuotationPresenter(
 	override val fragment: QuotationFragment
 ) : BaseRecyclerPresenter<QuotationFragment, QuotationModel>() {
 
-	private var updateChartTimes: Int? = null
 	private var hasInitSocket = false
+	private var hasCheckedPairDate = false
+	private val invalidDatePairs = JsonArray()
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		QuotationSelectionTable.getMySelections { selections ->
-			/** 记录可能需要更新的 `Line Chart` 最大个数 */
-			if (updateChartTimes.isNull()) updateChartTimes = selections.size
+		QuotationSelectionTable.getAll(false) { selections ->
 			selections.asSequence().map { selection ->
 				var linechart = listOf<ChartPoint>()
-				if (selection.lineChartDay.isNotEmpty()) {
+				if (selection.lineChartDay.isNotEmpty())
 					linechart = convertDataToChartData(selection.lineChartDay)
-				}
 				// 如果有网络的情况下检查 `LineData` 是否有效
-				if (NetworkUtil.hasNetwork(fragment.context)) {
-					linechart.checkTimeStampIfNeedUpdateBy(selection.pair)
+				if (
+					NetworkUtil.hasNetwork(fragment.context) &&
+					linechart.isNotEmpty() &&
+					!hasCheckedPairDate
+				) {
+					linechart.filterInvalidDatePair(selection.pair)
 				}
 				QuotationModel(
 					selection,
@@ -54,14 +60,22 @@ class QuotationPresenter(
 				)
 			}.sortedByDescending {
 				it.orderID
-			}.toList().let { it ->
-				// 更新 `UI`
-				diffAndUpdateAdapterData<QuotationAdapter>(it.toArrayList())
-				// 设定 `Socket` 并执行
-				if (currentSocket.isNull()) setSocket {
-					hasInitSocket = true
-					currentSocket?.runSocket()
-				} else subscribeSocket()
+			}.toList().let { quotations ->
+				if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
+					fragment.context?.runOnUiThread {
+						updateData()
+					}
+					hasCheckedPairDate = true
+				}
+				fragment.context?.runOnUiThread {
+					// 更新 `UI`
+					diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
+					// 设定 `Socket` 并执行
+					if (currentSocket.isNull()) setSocket {
+						hasInitSocket = true
+						currentSocket?.runSocket()
+					} else subscribeSocket()
+				}
 			}
 		}
 	}
@@ -88,34 +102,40 @@ class QuotationPresenter(
 		currentSocket?.sendMessage("{\"t\":\"sub_tick\", \"pair_list\":$jsonArray}")
 	}
 
-	private fun List<ChartPoint>.checkTimeStampIfNeedUpdateBy(pair: String) {
-		if (isEmpty()) return
-		/** 服务端传入的最近的时间会做减1处理, 从服务器获取的事件是昨天的事件. */
-		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull().orElse(0L)
-		if (maxDate + 1L < 1.daysAgoInMills()) {
-			QuotationSearchPresenter.getLineChartDataByPair(pair) { newChart, error ->
-				if (!newChart.isNull() && error.isNone()) {
-					QuotationSelectionTable.updateLineChartDataBy(pair, newChart!!) {
-						/** 防止服务器数据出错或不足, 可能导致的死循环 */
-						if (updateChartTimes.orZero() > 0) {
-							updateData()
-							updateChartTimes = updateChartTimes.orZero() - 1
-						}
-					}
-				} else fragment.context.alert(error.message)
+
+	private fun List<ChartPoint>.filterInvalidDatePair(pair: String) {
+		/** 服务端传入的最近的时间会做 `减1` 处理, 从服务器获取的事件是昨天的事件. */
+		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull() ?: 0L
+		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
+	}
+
+	private fun updateInvalidDatePair(
+		pairList: JsonArray,
+		@WorkerThread callback: () -> Unit
+	) {
+		GoldStoneAPI.getCurrencyLineChartData(pairList) { newChart, error ->
+			if (newChart != null && newChart.isNotEmpty() && error.isNone()) {
+				// 更新数据库的数据
+				val quotationDao =
+					GoldStoneDataBase.database.quotationSelectionDao()
+				newChart.forEachIndexed { index, model ->
+					quotationDao.updateDayLineChartByPair(pairList.get(index).asString, model.pointList.toString())
+				}
+				callback()
 			}
 		}
 	}
 
 	private var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: (GoldStoneWebSocket?) -> Unit) {
-		fragment.asyncData?.isEmpty()?.isTrue { return }
+		if (fragment.asyncData?.size ?: 0 == 0) return
 		getPriceInfoBySocket(
 			fragment.asyncData?.map { it.pair },
 			{
 				currentSocket = it
 				callback(it)
-			}) { model, isDisconnected ->
+			}
+		) { model, isDisconnected ->
 			fragment.updateAdapterDataSet(model, isDisconnected)
 		}
 	}
@@ -144,10 +164,7 @@ class QuotationPresenter(
 
 	fun showQuotationManagement() {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
-			putString(
-				ArgumentKey.quotationOverlayTitle,
-				QuotationText.management
-			)
+			putString(ArgumentKey.quotationOverlayTitle, QuotationText.management)
 		}
 	}
 
@@ -165,7 +182,7 @@ class QuotationPresenter(
 		return (0 until maxIndexOfData).map {
 			ChartPoint(jsonArray.getJSONObject(it))
 		}.sortedBy {
-			it.label.toLong()
+			it.label.toLongOrNull() ?: 0L
 		}
 	}
 

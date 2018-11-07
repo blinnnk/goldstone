@@ -17,15 +17,15 @@ object WebUrl {
 	}
 	const val header = "https://www.goldstone.io"
 	@JvmStatic
-	val privacy = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/privacy"
+	val privacy = "$header/#privacyPolicy"
 	@JvmStatic
-	val terms = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/termAndConditions"
+	val terms = "$header/#term"
 	@JvmStatic
 	val support = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/support"
 	@JvmStatic
 	val helpCenter = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/helpCenter"
 	@JvmStatic
-	val aboutUs = "$header/${webLanguage(SharedWallet.getCurrentLanguageCode())}/aboutUs"
+	val aboutUs = "$header/#aboutUs"
 	@JvmStatic
 	var whatIsKeystore = "$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/keystore"
 	@JvmStatic

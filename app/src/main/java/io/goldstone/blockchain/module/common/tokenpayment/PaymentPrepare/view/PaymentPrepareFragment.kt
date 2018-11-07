@@ -36,7 +36,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.present
 import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import kotlin.apply
 
 /**
@@ -175,17 +175,12 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		return changeAddress
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		if (memoInputView.isNull()) {
-			getParentFragment<TokenDetailOverlayFragment>()?.let {
-				presenter.backEvent(it)
+			getParentFragment<TokenDetailOverlayFragment>()?.apply {
+				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
-		} else {
-			removeMemoInputView()
-		}
+		} else removeMemoInputView()
 	}
 
 	private fun LinearLayout.showMemoCell() {

@@ -2,16 +2,13 @@ package io.goldstone.blockchain.module.home.profile.pincode.presenter
 
 import android.widget.EditText
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PincodeText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 
 /**
@@ -21,22 +18,19 @@ import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFra
 class PinCodeEditorPresenter(
 	override val fragment: PinCodeEditorFragment
 ) : BasePresenter<PinCodeEditorFragment>() {
-	
-	fun setShowPinCodeStatus(status: Boolean, callback: () -> Unit = {}) {
-		AppConfigTable.apply {
-			getAppConfig {
-				if (it?.pincode.isNull()) {
-					fragment.context?.alert(PincodeText.turnOnAttention)
-					callback()
-					return@getAppConfig
-				}
-				setShowPinCodeStatus(status) {
-					callback()
-				}
+
+	fun setPinCodeDisplayStatus(status: Boolean, callback: (isShow: Boolean) -> Unit) {
+		AppConfigTable.getAppConfig { config ->
+			if (config?.pincode == null) {
+				fragment.context?.alert(PincodeText.turnOnAttention)
+				callback(false)
+			} else AppConfigTable.setShowPinCodeStatus(status) {
+				callback(it)
+				SharedValue.updatePincodeDisplayStatus(it)
 			}
 		}
 	}
-	
+
 	fun resetPinCode(
 		newPinCode: EditText,
 		repeatPinCode: EditText,
@@ -46,25 +40,23 @@ class PinCodeEditorPresenter(
 			fragment.context?.alert(PincodeText.countAlert)
 			return
 		}
-		
+
 		if (newPinCode.text.length > Count.pinCode || repeatPinCode.text.length > Count.pinCode) {
 			fragment.context?.alert(PincodeText.countAlert)
 			return
 		}
-		
+
 		if (newPinCode.text.toString() != repeatPinCode.text.toString()) {
 			fragment.context?.alert(PincodeText.verifyAlert)
 			return
 		}
-		
+
 		AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
 			fragment.context?.alert(CommonText.succeed)
-			setShowPinCodeStatus(true)
-			switch.isChecked = true
+			setPinCodeDisplayStatus(true) {
+				switch.isChecked = it
+				SharedValue.updatePincodeDisplayStatus(it)
+			}
 		}
-	}
-	
-	fun showPinCodeFragment() {
-		fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 	}
 }

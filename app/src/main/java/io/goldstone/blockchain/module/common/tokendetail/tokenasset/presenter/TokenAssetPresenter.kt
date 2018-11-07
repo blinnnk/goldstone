@@ -142,8 +142,8 @@ class TokenAssetPresenter(
 
 	private fun EOSAccountTable.updateUIValue() {
 		fragment.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
-		if (refundInfo.isNull()) fragment.setEOSRefunds("0.0")
-		else refundInfo!!.getRefundDescription().let { fragment.setEOSRefunds(it) }
+		if (refundInfo == null) fragment.setEOSRefunds("0.0")
+		else refundInfo.getRefundDescription().let { fragment.setEOSRefunds(it) }
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used
 		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos

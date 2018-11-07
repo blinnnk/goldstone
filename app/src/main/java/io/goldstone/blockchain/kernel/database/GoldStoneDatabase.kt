@@ -14,6 +14,8 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.Token
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeDao
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceDao
@@ -43,6 +45,7 @@ import java.math.BigInteger
 		(SupportCurrencyTable::class),
 		(BTCSeriesTransactionTable::class),
 		(EOSTransactionTable::class),
+		(ExchangeTable::class),
 		(EOSAccountTable::class),
 		(ChainNodeTable::class),
 		(RAMPriceTable::class)
@@ -77,6 +80,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun quotationSelectionDao(): QuotationSelectionDao
 	abstract fun currencyDao(): SupportCurrencyDao
 	abstract fun btcSeriesTransactionDao(): BTCSeriesTransactionDao
+	abstract fun exchangeTableDao(): ExchangeDao
 	abstract fun eosTransactionDao(): EOSTransactionDao
 	abstract fun eosAccountDao(): EOSAccountDao
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
@@ -84,7 +88,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun ramPriceDao(): RAMPriceDao
 
 	companion object {
-		const val databaseVersion = 8
+		const val databaseVersion = 9
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

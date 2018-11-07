@@ -16,7 +16,7 @@ import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.verticalLayout
 
 /**

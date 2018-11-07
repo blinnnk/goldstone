@@ -31,6 +31,7 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSSeries(): Boolean {
 		return isEOS() || isEOSTest()
 	}
+
 	fun isETHSeries(): Boolean {
 		return isETHMain() || isRopsten() || isRinkeby() || isKovan()
 	}
@@ -75,8 +76,8 @@ class ChainID(val id: String) : Serializable {
 		return when (id) {
 			btcMain -> WebUrl.btcMain
 			btcTest -> WebUrl.btcTest
-			ltcMain -> WebUrl.ltcMain
-			ltcTest -> WebUrl.ltcTest
+			ltcMain -> WebUrl.ltcGoldStone
+			ltcTest -> WebUrl.ltcTestGoldStone
 			bchMain -> WebUrl.bchMain
 			bchTest -> WebUrl.bchTest
 			else -> ""

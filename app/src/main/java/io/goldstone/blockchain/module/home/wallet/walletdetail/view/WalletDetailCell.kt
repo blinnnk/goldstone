@@ -37,19 +37,17 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		model?.apply {
 			if (iconUrl.isBlank()) {
 				icon.image.imageResource = R.drawable.default_token
-			} else {
-				when (symbol) {
-					CoinSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
-					CoinSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
-					CoinSymbol.ltc -> icon.image.imageResource = R.drawable.ltc_icon
-					CoinSymbol.bch -> icon.image.imageResource = R.drawable.bch_icon
-					CoinSymbol.eos -> icon.image.imageResource = R.drawable.eos_icon
-					CoinSymbol.btc() ->
-						icon.image.imageResource =
-							if (SharedWallet.getYingYongBaoInReviewStatus()) R.drawable.default_token
-							else R.drawable.btc_icon
-					else -> icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
-				}
+			} else when (symbol) {
+				CoinSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
+				CoinSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
+				CoinSymbol.ltc -> icon.image.imageResource = R.drawable.ltc_icon
+				CoinSymbol.bch -> icon.image.imageResource = R.drawable.bch_icon
+				CoinSymbol.eos -> icon.image.imageResource = R.drawable.eos_icon
+				CoinSymbol.btc() ->
+					icon.image.imageResource =
+						if (SharedWallet.getYingYongBaoInReviewStatus()) R.drawable.default_token
+						else R.drawable.btc_icon
+				else -> icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
 			// 部分 `Token` 没有 `Name` 这里就直接显示 `Symbol`
@@ -62,7 +60,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			} else {
 				clearStatusButton()
 				valueInfo.title.text = count.formatCount()
-				valueInfo.subtitle.text = "≈ " + currency.formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
+				val money = if (currency == 0.0) count * price else currency
+				valueInfo.subtitle.text = "≈ " + money.formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
 			}
 		}
 	}

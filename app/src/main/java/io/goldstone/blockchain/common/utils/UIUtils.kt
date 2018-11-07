@@ -24,6 +24,8 @@ import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.text.SimpleDateFormat
+import java.util.*
+
 
 /**
  * @date 21/03/2018 9:07 PM
@@ -119,6 +121,22 @@ object TimeUtils {
 	fun formatMdHmDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
+	}
+
+	@SuppressLint("SimpleDateFormat")
+	fun getUtcTime(time: Long): Long {
+		val calendar = Calendar.getInstance()
+		calendar.timeInMillis = time
+		val timezone = calendar.timeZone
+		var offset = timezone.rawOffset
+		if (timezone.inDaylightTime(Date())) {
+			offset += timezone.dstSavings
+		}
+		val offsetHours = offset / 1000 / 60 / 60
+		val offsetMinutes = offset / 1000 / 60 % 60
+		calendar.add(Calendar.HOUR_OF_DAY, -offsetHours)
+		calendar.add(Calendar.MINUTE, -offsetMinutes)
+		return calendar.time.time
 	}
 }
 

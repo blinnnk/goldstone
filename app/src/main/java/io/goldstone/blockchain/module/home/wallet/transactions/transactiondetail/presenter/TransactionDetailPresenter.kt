@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.language.NotificationText
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -34,7 +33,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionInfoCell
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 27/03/2018 3:27 AM
@@ -62,9 +61,7 @@ class TransactionDetailPresenter(
 
 	override fun updateData() {
 		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
-		updateDataFromTransactionList {
-			if (!it.isNone()) fragment.context.alert(it.message)
-		}
+		updateDataFromTransactionList()
 		/** 这个是转账完毕后进入的初始数据 */
 		updateDataFromTransfer()
 		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
@@ -160,9 +157,7 @@ class TransactionDetailPresenter(
 	}
 
 	// 根据传入转账信息类型, 来生成对应的更新界面的数据
-	fun generateModels(
-		receipt: Any? = null
-	): List<TransactionDetailModel> {
+	fun generateModels(receipt: Any? = null): List<TransactionDetailModel> {
 		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
 		val timStamp =
 			data?.timestamp
@@ -269,12 +264,10 @@ class TransactionDetailPresenter(
 
 	private fun TransactionDetailFragment.setBackEventByParentFragment() {
 		parentFragment?.let { parent ->
-			if (parent is BaseOverlayFragment<*>) {
-				parent.headerTitle = TransactionText.detail
-				parent.overlayView.header.backButton.onClick {
+			if (parent is BaseOverlayFragment<*>)
+				parent.overlayView.header.showBackButton(true) {
 					runBackEventBy(parent)
 				}
-			}
 		}
 	}
 }

@@ -6,11 +6,8 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toUnitValue
@@ -18,6 +15,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
@@ -56,7 +54,7 @@ fun TransactionDetailPresenter.getETHERC20OrETCTransaction(transaction: Notifica
 		if (localTransaction.isNull()) {
 			// 如果本地没有数据从链上查询所有需要的数据
 			fragment.apply {
-				showLoadingView(LoadingText.transactionData)
+				showLoadingView()
 				updateByNotificationHash(transaction) {
 					removeLoadingView()
 				}
@@ -103,11 +101,12 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 ) {
 	GoldStoneEthCall.getTransactionByHash(
 		currentHash,
-		ChainID(info.chainID).getChainURL()!!,
-		errorCallback = callback
-	) { receipt ->
-		// 通过 `Notification` 获取确实信息
-		receipt.apply {
+		ChainID(info.chainID).getChainURL()!!
+	) { receipt, error ->
+		if (receipt.isNull() || error.hasError()) GoldStoneAPI.context.runOnUiThread {
+			callback(error)
+		} else receipt!!.apply {
+			// 通过 `Notification` 获取确实信息
 			this.recordOwnerAddress = if (info.isReceived) info.toAddress else info.fromAddress
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
@@ -128,46 +127,36 @@ fun TransactionDetailPresenter.updateByNotificationHash(
 	}
 }
 
-fun TransactionDetailPresenter.getBitcoinSeriesTransaction(
-	info: NotificationTransactionInfo
-) {
-	BTCSeriesTransactionTable.getTransactionsByHash(
-		currentHash,
-		info.isReceived
-	) { localTransaction ->
-		if (localTransaction.isNull() || localTransaction?.blockNumber?.toIntOrNull().isNull()) {
-			fragment.apply {
-				showLoadingView(LoadingText.transactionData)
-				when {
-					CoinSymbol(info.symbol).isBTC() ->
-						updateBTCTransactionByNotificationHash(info) {
-							removeLoadingView()
-						}
-					CoinSymbol(info.symbol).isLTC() ->
-						updateLTCTransactionByNotificationHash(info) {
-							removeLoadingView()
-						}
-					CoinSymbol(info.symbol).isBCH() -> {
-						updateBCHTransactionByNotificationHash(info) {
-							removeLoadingView()
-						}
+fun TransactionDetailPresenter.getBitcoinSeriesTransaction(info: NotificationTransactionInfo) {
+	BTCSeriesTransactionTable.getTransactionsByHash(currentHash, info.isReceived) { localTransaction ->
+		if (localTransaction != null && localTransaction.blockNumber.toIntOrNull() != null) {
+			fragment.asyncData = generateModels(TransactionListModel(localTransaction)).toArrayList()
+			val headerData = TransactionHeaderModel(
+				notificationData?.value ?: localTransaction.value.toDouble(),
+				if (localTransaction.isReceive) localTransaction.fromAddress else localTransaction.to,
+				localTransaction.symbol,
+				false,
+				localTransaction.isReceive,
+				false
+			)
+			updateHeaderValue(headerData)
+			headerModel = headerData
+		} else {
+			fragment.showLoadingView()
+			when {
+				CoinSymbol(info.symbol).isBTC() ->
+					updateBTCTransactionByNotificationHash(info) {
+						fragment.removeLoadingView()
+					}
+				CoinSymbol(info.symbol).isLTC() ->
+					updateLTCTransactionByNotificationHash(info) {
+						fragment.removeLoadingView()
+					}
+				CoinSymbol(info.symbol).isBCH() -> {
+					updateBCHTransactionByNotificationHash(info) {
+						fragment.removeLoadingView()
 					}
 				}
-			}
-		} else {
-			// 本地有数据直接展示本地数据
-			localTransaction?.apply {
-				fragment.asyncData = generateModels(TransactionListModel(this)).toArrayList()
-				val headerData = TransactionHeaderModel(
-					notificationData?.value ?: value.toDouble(),
-					if (isReceive) fromAddress else to,
-					symbol,
-					false,
-					isReceive,
-					false
-				)
-				updateHeaderValue(headerData)
-				headerModel = headerData
 			}
 		}
 	}
@@ -205,23 +194,20 @@ fun TransactionDetailPresenter.updateBTCTransactionByNotificationHash(
 
 fun TransactionDetailPresenter.updateLTCTransactionByNotificationHash(
 	info: NotificationTransactionInfo,
-	callback: () -> Unit
+	@UiThread callback: () -> Unit
 ) {
 	LitecoinApi.getTransactionByHash(
 		currentHash,
 		info.fromAddress,
-		ChainID(info.chainID).getThirdPartyURL(),
-		{
-			LogUtil.error("updateBTCTransactionByNotificationHash", it)
-			fragment.context?.alert(it.toString())
-		}
-	) { receipt ->
-		// 通过 `Notification` 获取确实信息
-		receipt?.apply {
+		ChainID(info.chainID).getThirdPartyURL()
+	) { receipt, error ->
+		if (receipt == null || error.hasError()) return@getTransactionByHash
+		receipt.apply {
+			// 通过 `Notification` 获取确实信息
 			this.symbol = notificationData?.symbol.orEmpty()
 			this.timeStamp = info.timeStamp.toString()
 			this.isReceive = info.isReceived
-		}?.toAsyncData()?.let {
+		}.toAsyncData().let {
 			fragment.context?.runOnUiThread {
 				if (fragment.asyncData.isNull()) fragment.asyncData = it
 				else fragment.presenter.diffAndUpdateAdapterData<TransactionDetailAdapter>(it)
@@ -241,7 +227,7 @@ fun TransactionDetailPresenter.updateBCHTransactionByNotificationHash(
 		info.fromAddress,
 		ChainID(info.chainID).getThirdPartyURL()
 	) { receipt, error ->
-		if (receipt.isNull() && error.hasError()) return@getTransactionByHash
+		if (receipt.isNull() || error.hasError()) return@getTransactionByHash
 		// 通过 `Notification` 获取确实信息
 		receipt?.apply {
 			this.symbol = notificationData?.symbol.orEmpty()

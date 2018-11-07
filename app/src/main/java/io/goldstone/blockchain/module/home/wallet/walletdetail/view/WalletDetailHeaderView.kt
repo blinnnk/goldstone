@@ -53,6 +53,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 			currentAccount.info.subtitle.text = address
 			balanceTitle.text = totalBalance.toDouble().formatCurrency()
+			balanceSubtitle.text = WalletSlideHeader.setBalanceInfo()
 		}
 	}
 	val addTokenButton by lazy { RoundButtonWithIcon(context) }
@@ -61,6 +62,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	private var progressBar: ProgressBar? = null
 	private val balanceTitle by lazy { TextView(context) }
 	private val sectionHeaderHeight = 25.uiPX()
+	private lateinit var balanceSubtitle: TextView
 	val sendButton by lazy { StoneButton(context) }
 	val depositButton by lazy { StoneButton(context) }
 
@@ -94,7 +96,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.into(this)
 
-			textView(WalletSlideHeader.setBalanceInfo()) {
+			balanceSubtitle = textView {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
 				textColor = Spectrum.opacity5White
@@ -119,9 +121,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				leftMargin = 15.uiPX()
 			}
 
-			depositButton.apply {
-				text = CommonText.deposit
-			}.into(this)
+			depositButton.apply { text = CommonText.deposit }.into(this)
 			depositButton.setMargins<RelativeLayout.LayoutParams> {
 				rightMargin = 15.uiPX()
 			}

@@ -9,7 +9,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 @SuppressLint("ViewConstructor")
 /**
  * @date: 2018/11/1.

@@ -16,6 +16,10 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.uiThread
@@ -50,9 +54,11 @@ data class AppConfigTable(
 
 	companion object {
 		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
-			load {
-				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			} then (hold)
+			launch {
+				val config =
+					withContext(CommonPool) { GoldStoneDataBase.database.appConfigDao().getAppConfig() }
+				withContext(UI) { hold(config) }
+			}
 		}
 
 		fun updatePinCode(newPinCode: Int, callback: () -> Unit) {
@@ -67,6 +73,17 @@ data class AppConfigTable(
 		fun updatePushToken(token: String) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
+			}
+		}
+
+		fun updateExchangeListMD5(md5: String) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig()?.let {
+						update(it.apply { this.exchangeListMD5 = md5 })
+
+					}
+				}
 			}
 		}
 
@@ -92,36 +109,19 @@ data class AppConfigTable(
 			}
 		}
 
-		fun setShowPinCodeStatus(status: Boolean, callback: () -> Unit) {
-			AppConfigTable.getAppConfig { it ->
-				it?.let {
-					doAsync {
-						GoldStoneDataBase.database.appConfigDao().update(
-							it.apply {
-								showPincode = status
-								if (!status) pincode = null
-							}
-						)
-						GoldStoneAPI.context.runOnUiThread {
-							callback()
-						}
-					}
-				}
+		fun setShowPinCodeStatus(status: Boolean, callback: (status: Boolean) -> Unit) {
+			load {
+				val configDao = GoldStoneDataBase.database.appConfigDao()
+				configDao.updateShowPincodeStatus(status)
+			} then {
+				// 更新成功
+				callback(status)
 			}
 		}
 
 		fun updateLanguage(code: Int, callback: () -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.appConfigDao().updateLanguageCode(code)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
-			}
-		}
-
-		fun updateChainStatus(isMainnet: Boolean, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateChainStatus(isMainnet)
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
 				}
@@ -139,7 +139,6 @@ data class AppConfigTable(
 		fun insertAppConfig(@WorkerThread callback: (AppConfigTable) -> Unit) {
 			val goldStoneID =
 				Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID) + System.currentTimeMillis()
-
 			val config = AppConfigTable(
 				0,
 				goldStoneID = goldStoneID,
@@ -183,6 +182,9 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
 	fun updatePincode(pinCode: Int)
+
+	@Query("UPDATE appConfig SET showPincode = :status WHERE id = 1")
+	fun updateShowPincodeStatus(status: Boolean)
 
 	@Query("UPDATE appConfig SET language = :code WHERE id = 1")
 	fun updateLanguageCode(code: Int)

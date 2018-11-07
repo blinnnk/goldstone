@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
+import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import java.io.Serializable
@@ -35,6 +36,12 @@ data class TokenContract(
 		token.contract,
 		token.symbol,
 		token.decimal
+	)
+
+	constructor(data: QuotationModel?) : this(
+		data?.contract.orEmpty(),
+		data?.symbol.orEmpty(),
+		null
 	)
 
 	fun getChainURL(): ChainURL {
@@ -137,19 +144,7 @@ fun TokenContract?.getChainType(): ChainType {
 
 // 这个方法是用来获取链 `Symbol` 用的, 所以 `Token` 的 `Symbol` 都对应到链的核心 `Symbol`
 fun TokenContract?.getSymbol(): CoinSymbol {
-	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> CoinSymbol.ETC
-		this?.contract.equals(TokenContract.btcContract, true) -> CoinSymbol.BTC
-		this?.contract.equals(TokenContract.ltcContract, true) -> CoinSymbol.LTC
-		this?.contract.equals(TokenContract.bchContract, true) -> CoinSymbol.BCH
-		this.isEOSSeries() -> CoinSymbol.EOS
-		this?.contract.equals(TokenContract.ethContract, true) -> CoinSymbol.ETH
-		/** 以下两个通常用作燃气费的基础手续费的显示 `Symbol` */
-		// 因为 `Ethereum` 的子合约地址的数量, 顾做 `Else` 判断
-		this?.contract?.length == CryptoValue.contractAddressLength -> CoinSymbol.ETH
-		// `EOS` 的 `Contract` 是 对应的 `CodeName` 例如 `eosio.token`
-		else -> CoinSymbol.EOS
-	}
+	return CoinSymbol(this?.symbol.orEmpty())
 }
 
 fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {

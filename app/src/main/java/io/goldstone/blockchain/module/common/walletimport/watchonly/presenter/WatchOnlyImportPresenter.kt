@@ -24,12 +24,14 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/03/2018 2:16 AM
@@ -58,33 +60,51 @@ class WatchOnlyImportPresenter(
 	) {
 		// 默认去除所有的空格
 		val address = addressInput.text.toString().replace(" ", "")
+		var chainID: ChainID? = null
 		when (addressType) {
-			AddressType.ETHSeries.value ->
+			AddressType.ETHSeries.value -> {
+				chainID = SharedChain.getETCCurrent().chainID
 				if (!Address(address).isValid()) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
-			AddressType.BTC.value ->
+			}
+			AddressType.BTC.value -> {
+				chainID = SharedChain.getBTCCurrent().chainID
 				if (!BTCUtils.isValidMainnetAddress(address)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
-			AddressType.LTC.value ->
+			}
+			AddressType.LTC.value -> {
+				chainID = SharedChain.getLTCCurrent().chainID
 				if (!LTCWalletUtils.isValidAddress(address)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
-			AddressType.EOS.value, AddressType.EOSJungle.value ->
+			}
+			AddressType.EOS.value -> {
+				chainID = ChainID.EOS
 				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
+			}
+			AddressType.EOSJungle.value -> {
+				chainID = ChainID.EOSTest
+				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
+					callback(AccountError.InvalidAddress)
+					return
+				}
+			}
 
-			AddressType.BCH.value ->
+			AddressType.BCH.value -> {
+				chainID = SharedChain.getBCHCurrent().chainID
 				if (!BCHWalletUtils.isValidAddress(address)) {
 					callback(AccountError.InvalidAddress)
 					return
 				}
+			}
 			else -> if (!BTCUtils.isValidTestnetAddress(address)) {
 				callback(AccountError.InvalidAddress)
 				return
@@ -92,46 +112,45 @@ class WatchOnlyImportPresenter(
 		}
 		val name = if (nameInput.text.toString().isEmpty()) nameInput.hint.toString()
 		else nameInput.text.toString()
-
 		// 通过用导入的地址查找钱包的行为判断是否已经存在此钱包地址
-		WalletTable.getWalletByAddress(address) { it ->
-			if (it.isNull()) {
-				// 准备对应的地址
-				setAddressByChainType(address, addressType) {
-					if (it.isNone()) WalletTable(
-						name,
-						currentETHSeriesAddress,
-						currentBTCTestAddress,
-						currentBTCAddress,
-						currentETCAddress,
-						currentLTCAddress,
-						currentBCHAddress,
-						// 如果用户只导入 `AccountName` 那么会把名字存成 `Address` 以对接切换钱包的逻辑
-						currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName,
-						EOSDefaultAllChainName(eosMainnetAccountName, eosTestnetAccountName),
-						if (eosMainnetAccountName.isEmpty() && eosTestnetAccountName.isEmpty()) listOf()
-						else listOf(
-							EOSAccountInfo(eosMainnetAccountName, ChainID.EOS.id),
-							EOSAccountInfo(eosTestnetAccountName, ChainID.EOSTest.id)
+		WalletTable.existAddressOrAccountName(address, chainID) { existed ->
+			// 准备对应的地址
+			if (!existed) setAddressByChainType(address, addressType) {
+				if (it.isNone()) WalletTable(
+					name,
+					currentETHSeriesAddress,
+					currentBTCTestAddress,
+					currentBTCAddress,
+					currentETCAddress,
+					currentLTCAddress,
+					currentBCHAddress,
+					// 如果用户只导入 `AccountName` 那么会把名字存成 `Address` 以对接切换钱包的逻辑
+					currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName,
+					EOSDefaultAllChainName(eosMainnetAccountName, eosTestnetAccountName),
+					if (eosMainnetAccountName.isEmpty() && eosTestnetAccountName.isEmpty()) listOf()
+					else listOf(
+						EOSAccountInfo(eosMainnetAccountName, ChainID.EOS.id),
+						EOSAccountInfo(eosTestnetAccountName, ChainID.EOSTest.id)
+					)
+				).insertWallet { thisWallet ->
+					CreateWalletPresenter.generateMyTokenInfo(
+						ChainAddresses(
+							Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
+							Bip44Address(currentETCAddress, ChainType.ETC.id),
+							Bip44Address(currentBTCAddress, ChainType.BTC.id),
+							Bip44Address(currentBTCTestAddress, ChainType.AllTest.id),
+							Bip44Address(currentLTCAddress, ChainType.LTC.id),
+							Bip44Address(currentBCHAddress, ChainType.BCH.id),
+							Bip44Address(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS.id)
 						)
-					).insertWallet { thisWallet ->
-						CreateWalletPresenter.generateMyTokenInfo(
-							ChainAddresses(
-								Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
-								Bip44Address(currentETCAddress, ChainType.ETC.id),
-								Bip44Address(currentBTCAddress, ChainType.BTC.id),
-								Bip44Address(currentBTCTestAddress, ChainType.AllTest.id),
-								Bip44Address(currentLTCAddress, ChainType.LTC.id),
-								Bip44Address(currentBCHAddress, ChainType.BCH.id),
-								Bip44Address(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS.id)
-							)
-						) { error ->
-							if (error.isNone()) thisWallet.registerPushByAddress(callback)
-							else callback(error)
-						}
-					} else callback(it)
-				}
-			} else callback(AccountError.ExistAddress)
+					) { error ->
+						if (error.isNone()) thisWallet.registerPushByAddress(callback)
+						else callback(error)
+					}
+				} else callback(it)
+			} else GoldStoneAPI.context.runOnUiThread {
+				callback(AccountError.ExistAddress)
+			}
 		}
 	}
 
@@ -156,7 +175,7 @@ class WatchOnlyImportPresenter(
 	private fun setAddressByChainType(
 		address: String,
 		addressType: String,
-		callback: (GoldStoneError) -> Unit
+		@UiThread callback: (GoldStoneError) -> Unit
 	) {
 		when (addressType) {
 			AddressType.ETHSeries.value -> {
@@ -185,19 +204,18 @@ class WatchOnlyImportPresenter(
 					SharedValue.updateIsTestEnvironment(false)
 					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
-					EOSAPI.getAccountInfo(
-						EOSAccount(address),
-						SharedChain.getEOSMainnet().chainID.id
-					) { info, error ->
-						if (!info.isNull() || error.isNone()) {
+					EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSMainnet().getURL()) { info, error ->
+						if (info != null && error.isNone()) {
 							eosMainnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
 							SharedChain.updateEOSCurrent(
-								ChainURL(GoldStoneDataBase.database.chainNodeDao().getCurrentEOSNode())
+								ChainURL(GoldStoneDataBase.database.chainNodeDao().getMainnetEOSNode())
 							)
 							SharedValue.updateIsTestEnvironment(false)
-							callback(error)
-						} else callback(AccountError.InvalidAccountName)
+							GoldStoneAPI.context.runOnUiThread { callback(error) }
+						} else GoldStoneAPI.context.runOnUiThread {
+							callback(AccountError.InactivatedAccountName)
+						}
 					}
 				}
 			}
@@ -207,19 +225,18 @@ class WatchOnlyImportPresenter(
 					SharedValue.updateIsTestEnvironment(true)
 					callback(GoldStoneError.None)
 				} else if (EOSAccount(address).isValid(false)) {
-					EOSAPI.getAccountInfo(
-						EOSAccount(address),
-						SharedChain.getEOSTestnet().chainID.id
-					) { info, error ->
+					EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSTestnet().getURL()) { info, error ->
 						if (!info.isNull() || error.isNone()) {
 							eosTestnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
 							SharedChain.updateEOSCurrent(
-								ChainURL(GoldStoneDataBase.database.chainNodeDao().getCurrentEOSNode())
+								ChainURL(GoldStoneDataBase.database.chainNodeDao().getTestnetEOSNode())
 							)
 							SharedValue.updateIsTestEnvironment(true)
-							callback(error)
-						} else callback(AccountError.InvalidAccountName)
+							GoldStoneAPI.context.runOnUiThread { callback(error) }
+						} else GoldStoneAPI.context.runOnUiThread {
+							callback(AccountError.InvalidAccountName)
+						}
 					}
 				}
 			}

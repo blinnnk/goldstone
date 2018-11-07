@@ -6,7 +6,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -65,9 +64,11 @@ class TokenDetailPresenter(
 
 	override fun loadMore() {
 		// 目前的翻页逻辑比较复杂, 暂时不支持分类 `Sort` 后的分页, 只在总类目下支持分页
-		if (fragment.currentMenu.isNull() || fragment.currentMenu == CommonText.all) {
+		if (fragment.currentMenu == CommonText.all) {
 			super.loadMore()
-			flipEOSPageData()
+			flipEOSPageData {
+				showBottomLoading(false)
+			}
 		}
 	}
 
@@ -143,8 +144,8 @@ class TokenDetailPresenter(
 	}
 
 	private fun prepareTokenDetailData() {
-		fragment.showLoadingView(LoadingText.tokenData)
-		loadDataFromDatabaseOrElse { ethETHSeriesLocalData, localBTCSeriesData ->
+		fragment.showLoadingView()
+		loadDataFromDatabaseOrElse { ethSeriesLocalData, localBTCSeriesData ->
 			// 检查是否有网络
 			if (!NetworkUtil.hasNetwork(fragment.context)) return@loadDataFromDatabaseOrElse
 			// `BTCSeries` 的拉取账单及更新账单需要使用 `localDataMaxIndex`
@@ -156,8 +157,8 @@ class TokenDetailPresenter(
 					fragment.loadDataFromChain(listOf(), localDataMaxIndex)
 				}
 
-				!ethETHSeriesLocalData.isNull() || !ethETHSeriesLocalData?.isEmpty().orFalse() -> {
-					fragment.loadDataFromChain(ethETHSeriesLocalData!!, 0)
+				ethSeriesLocalData != null || ethSeriesLocalData?.isEmpty() == false -> {
+					fragment.loadDataFromChain(ethSeriesLocalData, 0)
 				}
 			}
 		}
@@ -267,7 +268,7 @@ class TokenDetailPresenter(
 			codeName,
 			token?.symbol.orEmpty()
 		) { count, error ->
-			if (!count.isNull() && error.isNone()) {
+			if (count != null && error.isNone()) {
 				totalCount = count
 				currentMaxCount = count
 				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
@@ -321,10 +322,7 @@ class TokenDetailPresenter(
 		}
 	}
 
-	private fun TokenDetailFragment.updatePageBy(
-		data: List<TransactionListModel>,
-		ownerName: String
-	) {
+	private fun TokenDetailFragment.updatePageBy(data: List<TransactionListModel>, ownerName: String) {
 		allData = data
 		checkAddressNameInContacts(data) {
 			// 防止用户在加载数据过程中切换到别的 `Tab` 这里复位一下
@@ -373,9 +371,9 @@ class TokenDetailPresenter(
 	) {
 		// 首先更新此刻最新的余额数据到今天的数据
 		MyTokenTable.getTokenBalance(contract, ownerName) { todayBalance ->
-			if (todayBalance.isNull()) return@getTokenBalance
+			if (todayBalance == null) return@getTokenBalance
 			// 计算过去7天的所有余额
-			generateHistoryBalance(todayBalance.orZero()) { history ->
+			generateHistoryBalance(todayBalance) { history ->
 				load {
 					history.forEach { data ->
 						TokenBalanceTable.insertOrUpdate(
@@ -385,11 +383,13 @@ class TokenDetailPresenter(
 							data.balance
 						)
 					}
-				} then { _ ->
+				} then {
 					// 更新数据完毕后在主线程从新从数据库获取数据
-					TokenBalanceTable.getBalanceByContract(contract.contract.orEmpty(), ownerName) {
-						callback(it)
-					}
+					TokenBalanceTable.getBalanceByContract(
+						contract.contract.orEmpty(),
+						ownerName,
+						callback
+					)
 				}
 			}
 		}
@@ -406,23 +406,21 @@ class TokenDetailPresenter(
 		var balance = todayBalance
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount: Int = maxCount
-			override fun concurrentJobs() {
-				(0 until maxCount).forEach { index ->
-					val currentMills =
-						if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
-					(balance - filter {
-						it.timeStamp.toMillisecond() in index.daysAgoInMills() .. currentMills
-					}.sumByDouble {
-						if (it.isFee) {
-							it.minerFee.substringBefore(" ").toDouble() * -1
-						} else {
-							it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
-						}
-					}).let {
-						balance = it.toBigDecimal().toDouble()
-						balances += DateBalance((index + 1).daysAgoInMills(), balance)
-						completeMark()
+			override fun doChildTask(index: Int) {
+				val currentMills =
+					if (index == 0) System.currentTimeMillis() else (index - 1).daysAgoInMills()
+				(balance - filter {
+					it.timeStamp.toMillisecond() in index.daysAgoInMills() .. currentMills
+				}.sumByDouble {
+					if (it.isFee) {
+						it.minerFee.substringBefore(" ").toDouble() * -1
+					} else {
+						it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
 					}
+				}).let {
+					balance = it.toBigDecimal().toDouble()
+					balances += DateBalance((index + 1).daysAgoInMills(), balance)
+					completeMark()
 				}
 			}
 

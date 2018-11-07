@@ -16,7 +16,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 25/03/2018 5:11 PM
@@ -43,7 +43,7 @@ class TokenManagementListFragment :
 					data.contract.equals(default.contract, true)
 				}?.isUsed = switch.isChecked
 				// 更新数据库
-				TokenManagementListPresenter.insertOrDeleteMyToken(switch.isChecked, default)
+				TokenManagementListPresenter.addOrCloseMyToken(switch.isChecked, default)
 				switch.isClickable = true
 			}
 		}
@@ -63,14 +63,14 @@ class TokenManagementListFragment :
 		if (SharedWallet.getCurrentWalletType().isBTCSeries() || SharedWallet.getCurrentWalletType().isEOSSeries()) {
 			showAttentionView()
 			getParentFragment<TokenManagementFragment> {
-				overlayView.header.showSearchButton(false)
+				overlayView.header.showSearchButton(false) {}
 			}
 		}
 	}
 
 	private fun showAttentionView() {
 		recyclerView.visibility = View.GONE
-		if (attentionView.isNull()) {
+		if (attentionView == null) {
 			attentionView = AttentionTextView(context!!)
 			attentionView?.apply {
 				isCenter()

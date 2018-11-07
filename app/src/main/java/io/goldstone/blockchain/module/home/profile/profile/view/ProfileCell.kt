@@ -21,7 +21,7 @@ import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.rightPadding
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
 

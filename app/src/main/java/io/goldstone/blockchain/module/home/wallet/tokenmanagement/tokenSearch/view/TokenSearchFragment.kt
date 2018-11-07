@@ -9,7 +9,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 27/03/2018 11:22 AM
@@ -37,7 +37,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 		getParentFragment<TokenManagementFragment> {
 			headerTitle = TokenManagementText.addToken
 			presenter.popFragmentFrom<TokenSearchFragment>()
-			overlayView.header.showSearchInput(false)
+			overlayView.header.showSearchInput(false) {}
 		}
 	}
 }

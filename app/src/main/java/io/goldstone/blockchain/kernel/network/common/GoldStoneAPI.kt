@@ -3,8 +3,8 @@ package io.goldstone.blockchain.kernel.network.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.TinyNumberUtils
@@ -31,6 +31,7 @@ import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestUnCr
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
@@ -69,18 +70,23 @@ object GoldStoneAPI {
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
 	 */
 	@JvmStatic
-	fun getDefaultTokens(@WorkerThread hold: (default: List<DefaultTokenTable>?, error: RequestError) -> Unit) {
+	fun getDefaultTokens(
+		@WorkerThread hold: (default: List<DefaultTokenTable>?, error: RequestError) -> Unit
+	) {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
 		val config = GoldStoneDataBase.database.appConfigDao().getAppConfig()
 		requestData<String>(
 			APIPath.defaultTokenList(APIPath.currentUrl, config?.defaultCoinListMD5.orEmpty()),
 			"",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
+		) { result, error ->
+			if (result.isNull() || error.hasError()) {
+				hold(null, error)
+				return@requestData
+			}
 			// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
-			val data = JSONObject(firstOrNull().orEmpty())
+			val data = JSONObject(result?.firstOrNull().orEmpty())
 			val defaultTokens = data.safeGet("data")
 			// MD5 值存入数据库
 			val md5 = data.safeGet("md5")
@@ -91,25 +97,21 @@ object GoldStoneAPI {
 			val allNode = GoldStoneDataBase.database.chainNodeDao().getAll()
 			object : ConcurrentAsyncCombine() {
 				override var asyncCount = allNode.size
-				override fun concurrentJobs() {
-					allNode.forEach { node ->
-						allDefaultTokens +=
-							try {
-								gson.fromJson<List<DefaultTokenTable>>(
-									JSONObject(defaultTokens).safeGet(node.chainID),
-									collectionType
-								)
-							} catch (error: Exception) {
-								listOf<DefaultTokenTable>()
-							}
-						completeMark()
-					}
+				override val completeInUIThread: Boolean = false
+				override fun doChildTask(index: Int) {
+					allDefaultTokens +=
+						try {
+							gson.fromJson<List<DefaultTokenTable>>(
+								JSONObject(defaultTokens).safeGet(allNode[index].chainID),
+								collectionType
+							)
+						} catch (error: Exception) {
+							listOf<DefaultTokenTable>()
+						}
+					completeMark()
 				}
 
-				override fun getResultInMainThread(): Boolean = false
-				override fun mergeCallBack() {
-					hold(allDefaultTokens, RequestError.None)
-				}
+				override fun mergeCallBack() = hold(allDefaultTokens, RequestError.None)
 			}.start()
 		}
 	}
@@ -117,9 +119,9 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getTokenInfoBySymbolFromServer(
 		symbolsOrContract: String,
-		@WorkerThread hold: (tokens: ArrayList<TokenSearchModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (tokens: List<TokenSearchModel>?, error: RequestError) -> Unit
 	) {
-		requestData<TokenSearchModel>(
+		requestData(
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
@@ -127,11 +129,9 @@ object GoldStoneAPI {
 			),
 			"list",
 			false,
-			{ hold(null, it) },
-			isEncrypt = true
-		) {
-			hold(toArrayList(), RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	@JvmStatic
@@ -139,9 +139,9 @@ object GoldStoneAPI {
 		chainID: ChainID,
 		address: String,
 		startBlock: String,
-		hold: (transactions: ArrayList<ETCTransactionModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (transactions: List<ETCTransactionModel>?, error: RequestError) -> Unit
 	) {
-		requestData<ETCTransactionModel>(
+		requestData(
 			APIPath.getETCTransactions(
 				APIPath.currentUrl,
 				chainID.id,
@@ -150,34 +150,32 @@ object GoldStoneAPI {
 			),
 			"list",
 			false,
-			{ hold(null, it) },
-			isEncrypt = true
-		) {
-			hold(toArrayList(), RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	@JvmStatic
-	fun getNewVersionOrElse(hold: (versionData: VersionModel?, error: RequestError) -> Unit) {
+	fun getNewVersionOrElse(
+		@WorkerThread hold: (versionData: VersionModel?, error: RequestError) -> Unit
+	) {
 		requestData<String>(
 			APIPath.getNewVersion(APIPath.currentUrl),
 			"",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			val data = JSONObject(this[0])
-			val hasNewVersion =
-				if (this[0].contains("has_new_version"))
-					TinyNumberUtils.isTrue(data.safeGet("has_new_version"))
-				else false
-			context.runOnUiThread {
-				if (hasNewVersion) {
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val content = result?.firstOrNull().orEmpty()
+				val data = JSONObject(content)
+				val hasNewVersion =
+					if (content.contains("has_new_version"))
+						TinyNumberUtils.isTrue(data.safeGet("has_new_version"))
+					else false
+				if (hasNewVersion)
 					hold(VersionModel(JSONObject(data.safeGet("data"))), RequestError.None)
-				} else {
-					hold(null, RequestError.RPCResult("empty result"))
-				}
-			}
+				else hold(null, RequestError.RPCResult("empty result"))
+			} else hold(null, error)
 		}
 	}
 
@@ -190,10 +188,10 @@ object GoldStoneAPI {
 			APIPath.getCurrencyRate(APIPath.currentUrl) + symbols,
 			"rate",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			firstOrNull().isNotNull { hold(firstOrNull()?.toDoubleOrNull().orZero(), RequestError.None) }
+		) { result, error ->
+			val rate = result?.firstOrNull()?.toDoubleOrNull()
+			hold(rate, error)
 		}
 	}
 
@@ -206,10 +204,11 @@ object GoldStoneAPI {
 			APIPath.terms(APIPath.currentUrl) + md5,
 			"",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			hold(JSONObject(this[0]).safeGet("result"), RequestError.None)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result!!.firstOrNull()).safeGet("result"), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -217,74 +216,98 @@ object GoldStoneAPI {
 	fun getConfigList(
 		@WorkerThread hold: (configs: List<ServerConfigModel>?, error: RequestError) -> Unit
 	) {
-		requestData<ServerConfigModel>(
+		requestData(
 			APIPath.getConfigList(APIPath.currentUrl),
 			"list",
 			false,
-			{ hold(null, it) },
-			isEncrypt = true
-		) {
-			hold(this, RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	@JvmStatic
-	fun getShareContent(hold: (content: ShareContentModel?, error: RequestError) -> Unit) {
+	fun getShareContent(@WorkerThread hold: (content: ShareContentModel?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
 			false,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			firstOrNull().isNotNull {
-				hold(ShareContentModel(JSONObject(this[0])), RequestError.None)
-			}
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(ShareContentModel(JSONObject(result!!.firstOrNull().orEmpty())), error)
+			} else hold(null, error)
 		}
 	}
 
 	@JvmStatic
-	fun getChainNodes(hold: (content: List<ChainNodeTable>?, error: RequestError) -> Unit) {
-		requestData<ChainNodeTable>(
+	fun getChainNodes(
+		@WorkerThread hold: (content: List<ChainNodeTable>?, error: RequestError) -> Unit
+	) {
+		requestData(
 			APIPath.getChainNodes(APIPath.currentUrl),
 			"data",
 			false,
-			{ hold(null, it) },
-			isEncrypt = true
-		) {
-			hold(this, RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	@JvmStatic
 	fun getMarketSearchList(
 		pair: String,
-		@WorkerThread hold: (markets: List<QuotationSelectionTable>?, error: RequestError) -> Unit
+		marketIds: String,
+		@WorkerThread hold: (quotationTableList: List<QuotationSelectionTable>?, error: RequestError) -> Unit
 	) {
-		requestData<QuotationSelectionTable>(
-			APIPath.marketSearch(APIPath.currentUrl) + pair,
+		requestData(
+			APIPath.marketSearch(APIPath.currentUrl, pair, marketIds),
 			"pair_list",
 			false,
-			{ hold(null, it) },
+			isEncrypt = true,
+			hold = hold
+		)
+	}
+
+	@JvmStatic
+	fun getMarketList(
+		md5: String,
+		@WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, newMd5: String?, error: RequestError) -> Unit) {
+		requestData<String>(
+			APIPath.marketList(APIPath.currentUrl, md5),
+			"",
+			true,
 			isEncrypt = true
-		) {
-			hold(this, RequestError.None)
+		) { list, error ->
+			if (error.isNone() && !list.isNull()) {
+				try {
+					val data = JSONObject(list!!.firstOrNull())
+					val exchangeTables = data.safeGet("list")
+					val newMd5 = data.safeGet("md5")
+					val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
+					val exchangeTableList =
+						if (exchangeTables.isEmpty()) arrayListOf<ExchangeTable>()
+						else Gson().fromJson(exchangeTables, collectionType)
+					hold(exchangeTableList, newMd5, RequestError.None)
+				} catch (error: Exception) {
+					hold(null, null, RequestError.ResolveDataError(error))
+				}
+			} else {
+				hold(null, null, error)
+			}
+
 		}
 	}
 
 	fun getERC20TokenIncomingTransaction(
 		startBlock: String = "0",
 		address: String,
-		hold: (erc20Transactions: List<ERC20TransactionModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (erc20Transactions: List<ERC20TransactionModel>?, error: RequestError) -> Unit
 	) {
-		requestUnCryptoData<ERC20TransactionModel>(
+		requestUnCryptoData(
 			EtherScanApi.getTokenIncomingTransaction(address, startBlock),
 			"result",
 			false,
-			{ hold(null, it) }
-		) {
-			hold(this, RequestError.None)
-		}
+			hold
+		)
 	}
 
 	/**
@@ -294,31 +317,30 @@ object GoldStoneAPI {
 	fun getTransactionListByAddress(
 		startBlock: String = "0",
 		address: String,
-		hold: (transactions: List<TransactionTable>?, error: RequestError) -> Unit
+		@WorkerThread hold: (transactions: List<TransactionTable>?, error: RequestError) -> Unit
 	) {
 		requestUnCryptoData<TransactionTable>(
 			EtherScanApi.transactions(address, startBlock),
 			"result",
-			false,
-			{ hold(null, it) }
-		) {
-			hold(map { TransactionTable(it) }, RequestError.None)
+			false
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(result?.map { TransactionTable(it) }, error)
+			} else hold(null, error)
 		}
 	}
 
 	fun getIconURL(
 		contractList: List<TokenContract>,
-		hold: (data: List<TokenIcon>?, error: GoldStoneError) -> Unit
+		@WorkerThread hold: (data: List<TokenIcon>?, error: GoldStoneError) -> Unit
 	) {
-		RequisitionUtil.post<TokenIcon>(
+		RequisitionUtil.post(
 			AesCrypto.encrypt(contractList.generateObject()).orEmpty(),
 			APIPath.getIconURL(APIPath.currentUrl),
 			"token_list",
-			{ hold(null, it) },
-			true
-		) {
-			hold(it, RequestError.None)
-		}
+			true,
+			hold
+		)
 	}
 
 	fun registerDevice(
@@ -328,8 +350,7 @@ object GoldStoneAPI {
 		isChina: Int,
 		isAndroid: Int,
 		country: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (String) -> Unit
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest(
 			RequestBody.create(
@@ -345,35 +366,32 @@ object GoldStoneAPI {
 				)
 			),
 			APIPath.registerDevice(APIPath.currentUrl),
-			errorCallback,
-			true
-		) {
-			hold(it)
-		}
+			true,
+			hold
+		)
 	}
 
 	fun unregisterDevice(
 		targetGoldStoneID: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (Boolean) -> Unit
+		@WorkerThread hold: (isRegistered: Boolean?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.unregeisterDevice(APIPath.currentUrl),
 			"code",
 			true,
-			errorCallback,
 			isEncrypt = true,
 			targetGoldStoneID = targetGoldStoneID,
 			maxConnectTime = 5
-		) {
-			if (this.isNotEmpty()) hold(this[0] == "0")
-			else hold(false)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(result!!.firstOrNull() == "0", error)
+			} else hold(null, error)
 		}
 	}
 
 	fun getCurrencyLineChartData(
 		pairList: JsonArray,
-		hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<QuotationSelectionLineChartModel>(
 			RequestBody.create(
@@ -382,17 +400,17 @@ object GoldStoneAPI {
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-			errorCallback = { hold(null, it) },
 			isEncrypt = true
-		) {
-			hold(it, RequestError.None)
+		) { result, error ->
+			if (result != null && error.isNone()) {
+				hold(result, error)
+			} else hold(null, error)
 		}
 	}
 
 	fun registerWalletAddresses(
 		content: String,
-		errorCallback: (RequestError) -> Unit,
-		hold: (String) -> Unit
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest(
 			RequestBody.create(
@@ -400,7 +418,6 @@ object GoldStoneAPI {
 				content
 			),
 			APIPath.updateAddresses(APIPath.currentUrl),
-			errorCallback,
 			true,
 			hold
 		)
@@ -409,7 +426,7 @@ object GoldStoneAPI {
 	fun getUnreadCount(
 		deviceID: String,
 		time: Long,
-		hold: (unreadCount: String?, error: RequestError) -> Unit
+		@WorkerThread hold: (unreadCount: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest(
 			RequestBody.create(
@@ -421,10 +438,11 @@ object GoldStoneAPI {
 				)
 			),
 			APIPath.getUnreadCount(APIPath.currentUrl),
-			{ hold(null, it) },
 			true
-		) {
-			hold(JSONObject(it).safeGet("count"), RequestError.None)
+		) { result, error ->
+			if (result != null && error.isNone()) {
+				hold(JSONObject(result).safeGet("count").toIntOrNull(), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -440,18 +458,19 @@ object GoldStoneAPI {
 			"message_list",
 			APIPath.getNotification(APIPath.currentUrl),
 			true,
-			{ hold(null, it) },
 			true
-		) { it ->
+		) { result, error ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不用 `Gson`
-			val jsonArray = JSONArray(it.firstOrNull().orEmpty())
-			if (jsonArray.length() == 0) {
-				hold(arrayListOf(), RequestError.None)
-			} else {
-				val notifications =
-					jsonArray.toList().map { NotificationTable(it) }.toArrayList()
-				hold(notifications, RequestError.None)
-			}
+			if (result != null && error.isNone()) {
+				val jsonArray = JSONArray(result.firstOrNull().orEmpty())
+				if (jsonArray.length() == 0) {
+					hold(arrayListOf(), error)
+				} else {
+					val notifications =
+						jsonArray.toList().map { NotificationTable(it) }.toArrayList()
+					hold(notifications, error)
+				}
+			} else hold(null, error)
 		}
 	}
 
@@ -467,14 +486,13 @@ object GoldStoneAPI {
 			),
 			"price_list",
 			APIPath.getPriceByAddress(APIPath.currentUrl),
-			errorCallback = { hold(null, it) },
 			isEncrypt = true
-		) {
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(it, RequestError.None)
-			} else {
-				hold(it, RequestError.None)
-			}
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(result, error)
+				} else hold(result, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -482,16 +500,14 @@ object GoldStoneAPI {
 		pair: String,
 		period: String,
 		size: Int,
-		hold: (candleChart: ArrayList<CandleChartModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (candleChart: List<CandleChartModel>?, error: RequestError) -> Unit
 	) {
-		requestData<CandleChartModel>(
+		requestData(
 			APIPath.getQuotationCurrencyCandleChart(APIPath.currentUrl, pair, period, size),
 			"ticks",
-			errorCallback = { hold(null, it) },
-			isEncrypt = true
-		) {
-			hold(this.toArrayList(), RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	fun getQuotationCurrencyInfo(
@@ -502,47 +518,45 @@ object GoldStoneAPI {
 			APIPath.getQuotationCurrencyInfo(APIPath.currentUrl, pair),
 			"",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			hold(JSONObject(firstOrNull().orEmpty()), RequestError.None)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result!!.firstOrNull().orEmpty()), error)
+			} else hold(null, error)
 		}
 	}
 
 	fun getTokenInfoFromMarket(
 		symbol: String,
 		chainID: ChainID,
-		hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
+		@WorkerThread hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
 			APIPath.getCoinInfo(APIPath.currentUrl) + symbol,
 			"",
 			true,
-			{ hold(null, it) },
 			isEncrypt = true
-		) {
-			hold(
-				CoinInfoModel(JSONObject(firstOrNull().orEmpty()), symbol, chainID),
-				RequestError.None
-			)
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(
+					CoinInfoModel(JSONObject(result!!.firstOrNull().orEmpty()), symbol, chainID),
+					error
+				)
+			} else hold(null, error)
 		}
 	}
 	
 	fun getEOSRAMPriceTrendCandle(
 		period: String,
 		size: Int,
-		hold: (candleData: ArrayList<CandleChartModel>?, error: RequestError) -> Unit
+		hold: (candleData: List<CandleChartModel>?, error: RequestError) -> Unit
 	) {
-		requestData<CandleChartModel>(
+		requestData(
 			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, period, size),
 			"ticks",
-			errorCallback = {
-				hold(null, it)
-			},
-			isEncrypt = true
-		) {
-			hold(this.toArrayList(), RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 		
 	}
 	
@@ -552,15 +566,12 @@ object GoldStoneAPI {
 		requestData<CandleChartModel>(
 			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
 			"ticks",
-			errorCallback = {
-				hold(null, it)
-			},
 			isEncrypt = true
-		) {
-			if (isNotEmpty()) {
-				hold(this[0], RequestError.None)
+		) { data, error ->
+			if ( data!= null && data.isNotEmpty()) {
+				hold(data[0], error)
 			} else {
-				hold(null, RequestError.NullResponse("no values for ticks"))
+				hold(null, error)
 			}
 		}
 	}
@@ -570,60 +581,49 @@ object GoldStoneAPI {
 			APIPath.eosRAMLatestTrading(APIPath.currentUrl),
 			"",
 			justGetData = true,
-			errorCallback = {
-				hold(null, it)
-			},
 			isEncrypt = true
-		) {
+		) { data, error ->
 			val type = object : TypeToken<RecentTransactionModel>() {}.type
-			hold(Gson().fromJson(firstOrNull().orEmpty(), type), RequestError.None)
+			if (data != null && data.isNotEmpty()) {
+				hold(Gson().fromJson(data[0], type), RequestError.None)
+			} else {
+				hold(null, error)
+			}
 		}
 	
 	}
 	
 	fun getBigTransactions(mode: Int, hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit) {
-		requestData<TradingInfoModel>(
+		requestData(
 			APIPath.eosRAMBIgTransactions(APIPath.currentUrl, mode),
 			"tx_list",
 			justGetData = false,
-			errorCallback = {
-				hold(null, it)
-			},
-			isEncrypt = true
-		) {
-			hold(this, RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 		
 	}
 	
 	fun getRAMOccupyRank( hold: (data: List<RAMRankModel>?, error: RequestError) -> Unit) {
-		requestData<RAMRankModel>(
+		requestData(
 			APIPath.eosRAMOccupyRank(APIPath.currentUrl),
 			"rank",
 			justGetData = false,
-			errorCallback = {
-				hold(null, it)
-			},
-			isEncrypt = true
-		) {
-			hold(this, RequestError.None)
-		}
+			isEncrypt = true,
+				hold = hold
+		)
 	}
 	
 	
 	fun getEOSRAMTradeDistributed(
-		hold: (ArrayList<Float>?, RequestError) -> Unit
+		hold: (List<Float>?, RequestError) -> Unit
 	) {
-		requestData<Float>(
+		requestData(
 			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
 			"data",
-			errorCallback = {
-				hold(null, it)
-			},
-			isEncrypt = true
-		) {
-			hold(this.toArrayList(), RequestError.None)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 		
 	}
 	

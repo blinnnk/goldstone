@@ -1,0 +1,27 @@
+[
+	{
+		"market_id": 0,
+		"market": "Huobi Pro",
+		"icon": "http://hunger.blinnnk.com/20180829huobi.jpg"
+	},
+	{
+		"market_id": 1,
+		"market": "Binance",
+		"icon": "http://hunger.blinnnk.com/20180829binance.jpg"
+	},
+	{
+		"market_id": 3,
+		"market": "OKEX",
+		"icon": "http://hunger.blinnnk.com/20180829okex.jpg"
+	},
+	{
+		"market_id": 4,
+		"market": "Bitfinex",
+		"icon": "http://hunger.blinnnk.com/20180829bitfinex.jpg"
+	},
+	{
+		"market_id": 8,
+		"market": "Coinbase",
+		"icon": "http://hunger.blinnnk.com/20180829coinbasepro.jpg"
+	}
+]

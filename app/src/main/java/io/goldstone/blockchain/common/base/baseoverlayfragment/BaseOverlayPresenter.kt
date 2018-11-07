@@ -42,8 +42,8 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 				if (last() is R) removeChildFragment(last())
 				// 组内只有一个 `Fragment` 的时候销毁掉回退按钮
 				if (size == 2 || viewPagerSize > 0) overlayView.header.apply {
-					showBackButton(false)
-					showCloseButton(true)
+					showBackButton(false) {}
+					showCloseButton(true) { presenter.removeSelfFromActivity() }
 				}
 
 				when {
@@ -96,7 +96,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			showBackButton(true) {
 				popFragmentFrom<T>(viewPagerSize)
 			}
-			showCloseButton(false)
+			showCloseButton(false) {}
 		}
 	}
 

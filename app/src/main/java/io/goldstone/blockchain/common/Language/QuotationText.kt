@@ -109,6 +109,16 @@ object QuotationText {
 		else -> ""
 	}
 	@JvmField
+	val exchangeList = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Select An Exchange"
+		HoneyLanguage.Chinese.code -> "Select An Exchange"
+		HoneyLanguage.Japanese.code -> "Select An Exchange"
+		HoneyLanguage.Korean.code -> "Select An Exchange"
+		HoneyLanguage.Russian.code -> "Select An Exchange"
+		HoneyLanguage.TraditionalChinese.code -> "Select An Exchange"
+		else -> ""
+	}
+	@JvmField
 	val tokenInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Information"
 		HoneyLanguage.Chinese.code -> "Token 信息"
@@ -236,6 +246,40 @@ object QuotationText {
 		HoneyLanguage.Korean.code -> "주요 시장의 거래 쌍에서 관심있는\n 토큰을 검색하고 추가하면 실시간\n 가격 동향을 볼 수 있습니다."
 		HoneyLanguage.Russian.code -> "Найдите и добавьте диаграмму\n цен на токены в\n реальном времени из бирж."
 		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢"
+		else -> ""
+	}
+	@JvmField
+	val searchExchangesNames: (exchangeNames: String) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "$it etc."
+			HoneyLanguage.Chinese.code -> "$it etc."
+			HoneyLanguage.Japanese.code -> "$it etc."
+			HoneyLanguage.Korean.code -> "$it etc."
+			HoneyLanguage.Russian.code -> "$it etc."
+			HoneyLanguage.TraditionalChinese.code -> "$it etc."
+			else -> ""
+		}
+	}
+	@JvmField
+	val searchFilterTextDescription: (exchangeNames: String) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "Show $it search result"
+			HoneyLanguage.Chinese.code -> "Show $it search result"
+			HoneyLanguage.Japanese.code -> "Show $it search result"
+			HoneyLanguage.Korean.code -> "Show $it search result"
+			HoneyLanguage.Russian.code -> "Show $it search result"
+			HoneyLanguage.TraditionalChinese.code -> "Show $it search result"
+			else -> ""
+		}
+	}
+	@JvmField
+	val selectAll = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Check All"
+		HoneyLanguage.Chinese.code ->  "Check All"
+		HoneyLanguage.Japanese.code ->  "Check All"
+		HoneyLanguage.Korean.code ->  "Check All"
+		HoneyLanguage.Russian.code -> "Check All"
+		HoneyLanguage.TraditionalChinese.code ->  "Check All"
 		else -> ""
 	}
 }

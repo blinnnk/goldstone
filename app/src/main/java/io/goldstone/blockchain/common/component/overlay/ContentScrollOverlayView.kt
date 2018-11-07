@@ -1,13 +1,11 @@
 package io.goldstone.blockchain.common.component.overlay
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
@@ -20,23 +18,28 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
-import org.jetbrains.anko.sdk25.coroutines.onLayoutChange
+import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onLayoutChange
 
 /**
  * @date 2018/6/5 1:50 AM
  * @author KaySaith
  */
-open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) {
-	
+@SuppressLint("ViewConstructor")
+open class ContentScrollOverlayView(
+	context: Context,
+	isAddingRecyclerView: Boolean = false
+) : RelativeLayout(context) {
+
 	var recoveryBackEvent: Runnable? = null
 	private var container: RelativeLayout
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
 	private lateinit var closeButton: ImageView
-	private val maxWidth = 300.uiPX()
+	private lateinit var scrollViewContent: ScrollView
+
 	private val headerHeight = 50.uiPX()
-	
+
 	init {
 		isClickable = true
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
@@ -45,9 +48,10 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 		// 主容器
 		container = relativeLayout {
 			alpha = 0f
-			lparams(maxWidth, wrapContent)
-			minimumHeight = 400.uiPX()
+			lparams(OverlaySize.maxWidth, wrapContent)
+			minimumHeight = 360.uiPX()
 			verticalLayout {
+				id = ElementID.overlayContainer
 				// Header
 				relativeLayout {
 					backgroundColor = GrayScale.whiteGray
@@ -71,19 +75,21 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 					}
 					closeButton.setAlignParentRight()
 				}
-				scrollView {
-					lparams(matchParent, wrapContent)
+
+				if (isAddingRecyclerView) contentLayout = verticalLayout {
+					id = ContainerID.contentOverlay
+					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+				} else scrollViewContent = scrollView {
 					contentLayout = verticalLayout {
 						id = ContainerID.contentOverlay
-						bottomPadding = 15.uiPX()
 						layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					}
 				}
-				// 设定最大高度
-				onLayoutChange { _, _, top, _, bottom, _, _, _, _ ->
-					if (bottom - top > ScreenSize.fullHeight * 0.9) {
-						layoutParams.height = (ScreenSize.fullHeight * 0.9).toInt()
-					}
+			}
+			// 设定最大高度
+			onLayoutChange { _, _, top, _, bottom, _, _, _, _ ->
+				if (bottom - top > ScreenSize.fullHeight * 0.9) {
+					layoutParams.height = (ScreenSize.fullHeight * 0.9).toInt()
 				}
 			}
 			addCorner(CornerSize.small.toInt(), Spectrum.white)
@@ -91,7 +97,7 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 		container.updateAlphaAnimation(1f)
 		container.setCenterInParent()
 	}
-	
+
 	fun setContentPadding(
 		left: Int = 20.uiPX(),
 		top: Int = 10.uiPX(),
@@ -100,11 +106,11 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 	) {
 		contentLayout.setPadding(left, top, right, bottom)
 	}
-	
+
 	fun setTitle(text: String) {
 		titleView.text = text
 	}
-	
+
 	open fun remove() {
 		(parent as? ViewGroup)?.apply {
 			findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)?.let {
@@ -112,8 +118,13 @@ open class ContentScrollOverlayView(context: Context) : RelativeLayout(context) 
 			}
 		}
 	}
-	
+
 	fun addContent(hold: ViewGroup.() -> Unit) {
 		hold(contentLayout)
+	}
+
+	fun getOverlay(paddingBottomSize: Int, hold: RelativeLayout.() -> Unit) {
+		hold(container)
+		contentLayout.bottomPadding = paddingBottomSize
 	}
 }

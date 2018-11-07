@@ -17,7 +17,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccu
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.view.RAMStatisticsFragment
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.onPageChangeListener
 import org.jetbrains.anko.support.v4.viewPager
 import java.util.*

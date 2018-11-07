@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
@@ -28,15 +29,16 @@ object BTCSeriesApiUtils {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"items",
-			true,
-			{ hold(null, it) }
-		) {
-			val jsonArray = JSONArray(this[0])
-			var data = listOf<JSONObject>()
-			(0 until jsonArray.length()).forEach {
-				data += JSONObject(jsonArray[it].toString())
-			}
-			hold(data, RequestError.None)
+			true
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				val jsonArray = JSONArray(result!!.firstOrNull())
+				var data = listOf<JSONObject>()
+				(0 until jsonArray.length()).forEach {
+					data += JSONObject(jsonArray[it].toString())
+				}
+				hold(data, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -47,10 +49,11 @@ object BTCSeriesApiUtils {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"totalItems",
-			true,
-			{ hold(null, it) }
-		) {
-			hold(this.firstOrNull()?.toIntOrNull().orZero(), RequestError.None)
+			true
+		) { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				hold(data!!.firstOrNull()?.toIntOrNull(), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -62,12 +65,14 @@ object BTCSeriesApiUtils {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
-			true,
-			{ hold(null, it) }
-		) {
-			val result = firstOrNull()?.toLongOrNull()
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, RequestError.None) }
-			else hold(result, RequestError.None)
+			true
+		) { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				val result = data!!.firstOrNull()?.toLongOrNull()
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result, error) }
+				else hold(result, error)
+			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(null, error) }
+			else hold(null, error)
 		}
 	}
 
@@ -80,10 +85,11 @@ object BTCSeriesApiUtils {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			address,
-			true,
-			{ hold(null, it) }
-		) {
-			if (isNotEmpty()) hold(Amount(JSONObject(first()).safeGet("final_balance").toLong()), RequestError.None)
+			true
+		) { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				hold(Amount(JSONObject(data!!.firstOrNull()).safeGet("final_balance").toLong()), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -95,13 +101,14 @@ object BTCSeriesApiUtils {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
-			true,
-			{ hold(null, it) }
-		) {
-			val balance = firstOrNull()?.toDoubleOrNull() ?: 0.0
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(balance, RequestError.None)
-			} else hold(balance, RequestError.None)
+			true
+		) { data, error ->
+			if (!data.isNull() && error.isNone()) {
+				val balance = data!!.firstOrNull()?.toDoubleOrNull().orZero()
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
+					hold(balance, error)
+				} else hold(balance, error)
+			} else hold(null, error)
 		}
 	}
 
@@ -112,12 +119,11 @@ object BTCSeriesApiUtils {
 		RequisitionUtil.requestUnCryptoData<String>(
 			api,
 			"",
-			true,
-			{ hold(null, it) }
-		) {
-			if (isNotEmpty()) {
-				hold(JSONObject(first()), RequestError.None)
-			} else hold(null, RequestError.RPCResult("Empty Result"))
+			true
+		) { result, error ->
+			if (!result.isNull() && error.isNone()) {
+				hold(JSONObject(result!!.firstOrNull()), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -125,14 +131,12 @@ object BTCSeriesApiUtils {
 		api: String,
 		hold: (unspentList: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.requestUnCryptoData<UnspentModel>(
+		RequisitionUtil.requestUnCryptoData(
 			api,
 			"",
 			false,
-			{ hold(null, it) }
-		) {
-			hold(if (isNotEmpty()) this else listOf(), RequestError.None)
-		}
+			hold
+		)
 	}
 
 	// `Insight` 接口挂掉的时候向 `BlockInfo` 发起请求
@@ -140,14 +144,12 @@ object BTCSeriesApiUtils {
 		api: String,
 		hold: (unspents: List<BlockInfoUnspentModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.requestUnCryptoData<BlockInfoUnspentModel>(
+		RequisitionUtil.requestUnCryptoData(
 			api,
 			"unspent_outputs",
 			false,
-			{ hold(null, it) }
-		) {
-			hold(if (isNotEmpty()) this else listOf(), RequestError.None)
-		}
+			hold
+		)
 	}
 
 	fun getPageInfo(transactionCount: Int, localDataMaxIndex: Int): PageInfo {

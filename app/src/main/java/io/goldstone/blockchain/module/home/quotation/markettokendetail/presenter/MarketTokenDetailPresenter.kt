@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import android.support.v4.content.ContextCompat.startActivity
 import android.text.format.DateUtils
 import android.view.ViewGroup
@@ -14,9 +15,13 @@ import com.blinnnk.util.getParentFragment
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
@@ -34,7 +39,10 @@ import io.goldstone.blockchain.module.home.quotation.quotation.presenter.Quotati
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import org.jetbrains.anko.*
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
 import org.json.JSONObject
 
 /**
@@ -65,43 +73,35 @@ class MarketTokenDetailPresenter(
 			else -> ""
 		}
 		val dateType: Int = when (period) {
-			MarketTokenDetailChartType.WEEK.info -> DateUtils.FORMAT_NUMERIC_DATE
-			MarketTokenDetailChartType.DAY.info -> DateUtils.FORMAT_NUMERIC_DATE
+			MarketTokenDetailChartType.WEEK.info,
+			MarketTokenDetailChartType.DAY.info,
 			MarketTokenDetailChartType.MONTH.info -> DateUtils.FORMAT_NUMERIC_DATE
 			MarketTokenDetailChartType.Hour.info -> DateUtils.FORMAT_SHOW_TIME
 			else -> 1000
 		}
 
-		fragment.currencyInfo?.apply {
-			QuotationSelectionTable.getSelectionByPair(pair) { selectionTable ->
-				val data: String? = when (period) {
-					MarketTokenDetailChartType.WEEK.info -> selectionTable.lineChartWeek
-					MarketTokenDetailChartType.DAY.info -> selectionTable.lineChartDay
-					MarketTokenDetailChartType.MONTH.info -> selectionTable.lineChartMonth
-					else -> selectionTable.lineChartHour
-				}
-				if (data.isNullOrBlank()) {
-					// 更新网络数据
-					chartView.updateCandleChartDataBy(pair, period, dateType)
-					// 本地数据库如果没有数据就跳出逻辑
-					return@getSelectionByPair
-				} else {
-					// 本地数据库有数据的话判断是否是有效的数据
-					val candleData = CandleChartModel.convertData(data!!)
-					val databaseTime = candleData.maxBy { it.time }?.time?.toLongOrNull().orElse(0)
-					// 校验数据库的数据时间是否有效，是否需要更新
-					if (NetworkUtil.hasNetwork(fragment.context)) checkDatabaseTimeIsValidBy(period, databaseTime) {
-						isTrue {
-							// 合规就更新本地数据库的数据
-							chartView.updateCandleChartUI(candleData, dateType)
-						} otherwise {
-							// 不合规就更新网络数据
-							chartView.updateCandleChartDataBy(pair, period, dateType)
-						}
-					} else {
-						// 没有网络就越过检查数据过期的方法直接显示数据库数据
-						chartView.updateCandleChartUI(candleData, dateType)
-					}
+		val pair = fragment.currencyInfo?.pair ?: return
+		QuotationSelectionTable.getSelectionByPair(pair) { selectionTable ->
+			val data = when (period) {
+				MarketTokenDetailChartType.WEEK.info -> selectionTable.lineChartWeek
+				MarketTokenDetailChartType.DAY.info -> selectionTable.lineChartDay
+				MarketTokenDetailChartType.MONTH.info -> selectionTable.lineChartMonth
+				else -> selectionTable.lineChartHour
+			}
+			// 更新网络数据
+			if (data.isNullOrBlank() && NetworkUtil.hasNetwork(fragment.context)) {
+				fragment.showLoadingView()
+				chartView.updateCandleChartDataBy(pair, period, dateType)
+			} else if (data != null) {
+				// 本地数据库有数据的话判断是否是有效的数据
+				val candleData = CandleChartModel.convertData(data)
+				val databaseTime = candleData.maxBy { it.time }?.time?.toLongOrNull().orElse(0)
+				// 校验数据库的数据时间是否有效，是否需要更新
+				checkDatabaseTimeIsValidBy(period, databaseTime) {
+					chartView.updateCandleChartUI(candleData, dateType)
+					// 不合规且有网络环境就更新网络数据
+					if (!this && NetworkUtil.hasNetwork(fragment.context))
+						chartView.updateCandleChartDataBy(pair, period, dateType)
 				}
 			}
 		}
@@ -115,8 +115,10 @@ class MarketTokenDetailPresenter(
 				setTitle(QuotationText.tokenDescription)
 				setContentPadding()
 				addContent {
-					DefaultTokenTable.getTokenByContractFromAllChains(
-						fragment.currencyInfo?.contract.orEmpty()
+					DefaultTokenTable.getToken(
+						fragment.currencyInfo?.contract.orEmpty(),
+						fragment.currencyInfo?.symbol.orEmpty(),
+						TokenContract(fragment.currencyInfo).getMainnetChainID()
 					) {
 						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
 						val content =
@@ -127,7 +129,7 @@ class MarketTokenDetailPresenter(
 							textColor = GrayScale.gray
 							textSize = fontSize(14)
 							typeface = GoldStoneFont.medium(context)
-							layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+							layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 						}
 					}
 				}
@@ -170,14 +172,12 @@ class MarketTokenDetailPresenter(
 					|| tokenData.description.firstOrNull()?.toString()?.toIntOrNull() != SharedWallet.getCurrentLanguageCode()
 				) {
 					// 本地没有数据的话从服务端拉取 `Coin Information`
-					NetworkUtil.hasNetworkWithAlert(fragment.context) isTrue {
-						loadCoinInfoFromServer(info) {
-							val data = TokenInformationModel(it, info.symbol)
-							tokenInformation.model = data
-							tokenInfo.setTokenDescription(it.description)
-							tokenInfoLink.model = data
-							tokenSocialMedia.model = data
-						}
+					if (NetworkUtil.hasNetwork(fragment.context)) loadCoinInfoFromServer(info) {
+						val data = TokenInformationModel(it, info.symbol)
+						tokenInformation.model = data
+						tokenInfo.setTokenDescription(it.description)
+						tokenInfoLink.model = data
+						tokenSocialMedia.model = data
 					}
 				} else {
 					tokenInfo.setTokenDescription(tokenData.description)
@@ -188,19 +188,15 @@ class MarketTokenDetailPresenter(
 				priceHistory.model = priceData
 			}
 			// 检查是否有网络
-			if (!NetworkUtil.hasNetwork(fragment.context)) return
 			// 更新行情价目网络数据, 更新界面并更新数据库
-			getCurrencyInfoFromServer(info) { priceData ->
-				if (priceData.isNull()) {
-					// 容错, 当 `Server` 返回空数据的时候跳出逻辑
-					return@getCurrencyInfoFromServer
-				}
+			if (NetworkUtil.hasNetwork(fragment.context)) getCurrencyInfoFromServer(info) { priceData, error ->
+				// 容错, 当 `Server` 返回空数据的时候跳出逻辑
+				if (priceData.isNull() || error.hasError()) return@getCurrencyInfoFromServer
 				priceHistory.model = priceData
-				QuotationSelectionTable.getSelectionByPair(info.pair) { selectionTable ->
-					doAsync {
-						GoldStoneDataBase.database.quotationSelectionDao()
-							.update(QuotationSelectionTable.updatePrice(selectionTable, priceData))
-					}
+				val quotationDao =
+					GoldStoneDataBase.database.quotationSelectionDao()
+				priceData?.apply {
+					quotationDao.updatePriceInfo(dayHighest, dayLow, totalHighest, totalLow, info.pair)
 				}
 			}
 		}
@@ -213,18 +209,11 @@ class MarketTokenDetailPresenter(
 	) {
 		// 请求的数据条目数量
 		val size = DataValue.candleChartCount
-		fragment.getMainActivity()?.showLoadingView()
-		GoldStoneAPI.getQuotationCurrencyCandleChart(
-			pair,
-			period,
-			size
-		) { candleData, error ->
-			if (!candleData.isNull() && error.isNone()) {
-				candleData!!.updateLocalCandleChartData(period, pair)
+		GoldStoneAPI.getQuotationCurrencyCandleChart(pair, period, size) { candleData, error ->
+			if (candleData != null && error.isNone()) {
+				candleData.updateLocalCandleChartData(period, pair)
 				updateCandleChartUI(candleData, dateType)
-			} else {
-				updateCandleChartUI(arrayListOf(), dateType)
-			}
+			} else updateCandleChartUI(arrayListOf(), dateType)
 		}
 	}
 
@@ -248,40 +237,35 @@ class MarketTokenDetailPresenter(
 		}
 	}
 
-	private fun MarketTokenCandleChart.updateCandleChartUI(
-		data: List<CandleChartModel>,
-		dateType: Int
-	) {
-		fragment.context?.apply {
-			runOnUiThread {
-				fragment.getMainActivity()?.removeLoadingView()
-				// 服务器抓取的数据返回有一定概率返回错误格式数据
-				data.isEmpty() isFalse {
-					try {
-						resetData(
-							dateType,
-							data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
-								CandleEntry(
-									index.toFloat(),
-									entry.high.toFloat(),
-									entry.low.toFloat(),
-									entry.open.toFloat(),
-									entry.close.toFloat(),
-									entry.time)
-							}.toList()
-						)
-					} catch (error: Exception) {
-						LogUtil.error("updateChartUI", error)
-						return@runOnUiThread
-					}
+	private fun MarketTokenCandleChart.updateCandleChartUI(data: List<CandleChartModel>, dateType: Int) {
+		GoldStoneAPI.context.runOnUiThread {
+			fragment.removeLoadingView()
+			// 服务器抓取的数据返回有一定概率返回错误格式数据
+			data.isEmpty() isFalse {
+				try {
+					resetData(
+						dateType,
+						data.asSequence().sortedBy { it.time.toLong() }.mapIndexed { index, entry ->
+							CandleEntry(
+								index.toFloat(),
+								entry.high.toFloat(),
+								entry.low.toFloat(),
+								entry.open.toFloat(),
+								entry.close.toFloat(),
+								entry.time)
+						}.toList()
+					)
+				} catch (error: Exception) {
+					return@runOnUiThread
 				}
-
 			}
 		}
 	}
 
 	private fun List<CandleChartModel>.updateLocalCandleChartData(period: String, pair: String) {
-		map { JSONObject("{\"open\":\"${it.open}\",\"close\":\"${it.close}\",\"high\":\"${it.high}\",\"low\":\"${it.low}\",\"time\":${it.time}}") }.let {
+		map {
+			JSONObject("{\"open\":\"${it.open}\",\"close\":\"${it.close}\",\"high\":\"${it.high}\",\"low\":\"${it.low}\",\"time\":${it.time}}")
+		}.let {
 			when (period) {
 				MarketTokenDetailChartType.WEEK.info ->
 					QuotationSelectionTable.updateLineChartWeekBy(pair, it.toString()) {}
@@ -291,34 +275,27 @@ class MarketTokenDetailPresenter(
 					QuotationSelectionTable.updateLineChartMontyBy(pair, it.toString()) {}
 				MarketTokenDetailChartType.Hour.info ->
 					QuotationSelectionTable.updateLineChartHourBy(pair, it.toString()) {}
-
 			}
 		}
 	}
 
 	private fun getCurrencyInfoFromServer(
 		info: QuotationModel,
-		@UiThread hold: (PriceHistoryModel?) -> Unit
+		@WorkerThread hold: (priceInfo: PriceHistoryModel?, error: RequestError) -> Unit
 	) {
-		GoldStoneAPI.getQuotationCurrencyInfo(info.pair
-		) { serverData, error ->
-			if (!serverData.isNull() && error.isNone()) {
-				val priceData = PriceHistoryModel(serverData!!, info.quoteSymbol)
-				fragment.context?.runOnUiThread {
-					hold(priceData)
-				}
-			} else hold(null)
+		GoldStoneAPI.getQuotationCurrencyInfo(info.pair) { serverData, error ->
+			if (serverData != null && error.isNone()) {
+				val priceData = PriceHistoryModel(serverData, info.quoteSymbol)
+				hold(priceData, error)
+			} else hold(null, error)
 		}
 	}
 
 	private fun getCurrencyInfoFromDatabase(
 		info: QuotationModel,
-		hold: (
-			tokenData: TokenInformationModel,
-			priceData: PriceHistoryModel
-		) -> Unit
+		hold: (tokenData: TokenInformationModel, priceData: PriceHistoryModel) -> Unit
 	) {
-		DefaultTokenTable.getTokenByContractFromAllChains(info.contract) { default ->
+		DefaultTokenTable.getTokenFromAllChains(info.contract, info.symbol) { default ->
 			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
 				val tokenData =
 					if (default.isNull()) TokenInformationModel()
@@ -336,7 +313,7 @@ class MarketTokenDetailPresenter(
 		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(info.symbol, chainID) { coinInfo, error ->
 			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo!!) {
-				DefaultTokenTable.getTokenByContractAndChainID(info.contract, chainID) {
+				DefaultTokenTable.getToken(info.contract, info.symbol, chainID) {
 					it?.let(hold)
 				}
 			}

@@ -8,7 +8,7 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.presenter.WalletSettingsListPresenter
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 25/03/2018 10:15 PM
@@ -17,7 +17,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class WalletSettingsListFragment :
 	BaseRecyclerFragment<WalletSettingsListPresenter, WalletSettingsListModel>() {
 
-	override val pageTitle: String = "Wallet Settings"
+	override val pageTitle: String = WalletSettingsText.walletSettings
 	override val presenter = WalletSettingsListPresenter(this)
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletSettingsListModel>?

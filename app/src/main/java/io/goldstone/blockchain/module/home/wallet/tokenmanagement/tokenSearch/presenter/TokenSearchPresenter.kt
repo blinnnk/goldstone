@@ -6,10 +6,10 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
@@ -37,13 +37,14 @@ class TokenSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		val navigation = fragment.getOverlayHeader()
-		if (SharedWallet.getCurrentWalletType().isBTCSeries()) {
-			navigation?.showSearchButton(false)
-		} else {
-			fragment.showLoadingView(LoadingText.searchingToken)
+		if (SharedWallet.getCurrentWalletType().isBTCSeries())
+			navigation?.showSearchButton(false) {}
+		else {
+			fragment.showLoadingView()
 			MyTokenTable.getMyTokens(false) { myTokens ->
-				navigation?.searchInputListener({}) { inputContent ->
-					getSearchResult(inputContent, myTokens)
+				navigation?.searchInputListener { inputContent ->
+					if (NetworkUtil.hasNetwork(fragment.context))
+						getSearchResult(inputContent, myTokens)
 				}
 			}
 		}
@@ -52,15 +53,15 @@ class TokenSearchPresenter(
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
 			GoldStoneAPI.context.runOnUiThread {
-				if (!result.isNull() && error.isNone()) {
+				if (result != null && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
-						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.filterNot {
-							TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries()
-						}.toArrayList())
-					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result!!.toArrayList())
+						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(
+							result.filterNot { TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries() }.toArrayList()
+						)
+					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.toArrayList())
 					fragment.removeLoadingView()
-				} else fragment.context.alert(error.message)
+				} else fragment.safeShowError(error)
 			}
 		}
 	}
@@ -70,16 +71,16 @@ class TokenSearchPresenter(
 			TokenContract(searchToken.contract, searchToken.symbol, searchToken.decimals)
 		) { localToken ->
 			// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
-			if (!localToken.isNull()) localToken!!.updateDefaultStatus(
+			if (localToken != null) localToken.updateDefaultStatus(
 				TokenContract(localToken.contract, localToken.symbol, localToken.decimals),
 				isChecked,
 				searchToken.name,
 				searchToken.iconUrl
 			) {
-				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, localToken)
+				TokenManagementListPresenter.addOrCloseMyToken(isChecked, localToken)
 				callback()
 			} else searchToken.apply { isDefault = isChecked } insertThen {
-				TokenManagementListPresenter.insertOrDeleteMyToken(isChecked, searchToken)
+				TokenManagementListPresenter.addOrCloseMyToken(isChecked, searchToken)
 				callback()
 			}
 		}
@@ -91,14 +92,15 @@ class TokenSearchPresenter(
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
 		GoldStoneAPI.getTokenInfoBySymbolFromServer(content) { result, error ->
-			if (!result.isNull() && error.isNone()) {
+			if (result != null && result.isNotEmpty() && error.isNone()) {
 				// 从服务器请求目标结果
 				hold(
-					result!!.map { serverToken ->
+					result.map { serverToken ->
 						// 更新使用中的按钮状态
 						DefaultTokenTable(serverToken).apply {
 							val status = any {
-								it.contract.equals(serverToken.contract, true)
+								it.contract.equals(serverToken.contract, true) &&
+									it.symbol.equals(serverToken.symbol, true)
 							}
 							isDefault = status
 							isUsed = status
@@ -122,10 +124,9 @@ class TokenSearchPresenter(
 	) {
 		GoldStoneEthCall.getTokenInfoByContractAddress(
 			contract,
-			{ fragment.context?.alert(it.message) },
 			SharedChain.getCurrentETH()
-		) { symbol, name, decimal ->
-			if (symbol.isEmpty() || name.isEmpty())
+		) { symbol, name, decimal, error ->
+			if (symbol.isNullOrEmpty() || name.isNullOrEmpty() || decimal.isNull() || error.hasError())
 				hold(arrayListOf(), RequestError.NullResponse("empty symbol and name"))
 			else {
 				val status = myTokens.any {
@@ -138,11 +139,11 @@ class TokenSearchPresenter(
 							"",
 							contract,
 							"",
-							symbol,
+							symbol!!,
 							TinyNumber.False.value,
 							0.0,
-							name,
-							decimal,
+							name!!,
+							decimal!!,
 							null,
 							status,
 							0,

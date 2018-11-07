@@ -6,7 +6,6 @@ import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.databaseinterface.RoomModel
 import org.json.JSONArray
 import org.json.JSONObject
@@ -54,11 +53,11 @@ data class EOSAccountInfo(
 	}
 }
 
-fun List<EOSAccountInfo>.currentPublicKeyHasActivated(): Boolean {
+fun List<EOSAccountInfo>.currentPublicKeyIsActivated(): Boolean {
 	return !find { it.hasActivated() }.isNull()
 }
 
-fun List<EOSAccountInfo>.hasActivatedOrWatchOnlyEOSAccount(): Boolean {
+fun List<EOSAccountInfo>.hasActivatedOrWatchOnly(): Boolean {
 	return !find { it.isActivatedOrWatchOnlyEOSAccount() }.isNull()
 }
 

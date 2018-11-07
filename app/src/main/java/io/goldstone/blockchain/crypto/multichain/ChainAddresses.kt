@@ -29,6 +29,10 @@ data class ChainAddresses(
 		Bip44Address()
 	)
 
+	fun getAllAddresses(): List<String> {
+		return listOf(eth.address, etc.address, btc.address, btcSeriesTest.address, ltc.address, bch.address, eos.address)
+	}
+
 	companion object {
 		@JvmStatic
 		val isBTCSeries: (address: String) -> Boolean = {

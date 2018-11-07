@@ -120,7 +120,8 @@ fun RAMMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTyp
 			}
 		}
 	} else {
-		GoldStoneAPI.getEOSRAMPriceTrendCandle(period, size) { candleData, error ->
+		GoldStoneAPI.getEOSRAMPriceTrendCandle(period, size) { data, error ->
+			val candleData = data?.toArrayList()
 			if (candleData != null && error.isNone()) {
 				// 更新 `UI` 界面
 				candleDataMap[period].let { localList ->
@@ -143,7 +144,7 @@ fun RAMMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTyp
 			} else {
 				GoldStoneAPI.context.runOnUiThread {
 					// Show the error exception to user
-					fragment.context.alert(error.toString().showAfterColonContent())
+					fragment.context.alert(error.message)
 					candleDataMap[period]?.apply {
 						fragment.updateCandleChartUI(dateType, this)
 					}

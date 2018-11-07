@@ -23,8 +23,7 @@ class WalletDetailAdapter(
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
 
-	override fun generateCell(context: Context) =
-		WalletDetailCell(context)
+	override fun generateCell(context: Context) = WalletDetailCell(context)
 
 	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context): View {

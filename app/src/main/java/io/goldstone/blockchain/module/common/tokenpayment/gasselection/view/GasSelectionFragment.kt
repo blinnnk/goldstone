@@ -16,8 +16,8 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WebUrl
@@ -27,7 +27,8 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.support.v4.runOnUiThread
 
 /**
  * @date 2018/5/16 3:53 PM
@@ -72,15 +73,17 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 						}
 					}
 					getConfirmButton {
-						onClick { _ ->
+						onClick {
 							showLoadingStatus()
-							presenter.confirmTransfer {
-								if (it.hasError()) {
-									if (it is AccountError) setCanUseStyle(false)
-									this@GasSelectionFragment.context.alert(it.message)
-								}
+							presenter.confirmTransfer { error ->
 								resetMinerType()
-								showLoadingStatus(false, Spectrum.white, CommonText.next)
+								runOnUiThread {
+									if (error.hasError()) {
+										if (error is AccountError) setCanUseStyle(false)
+										safeShowError(error)
+									}
+									showLoadingStatus(false, Spectrum.white, CommonText.next)
+								}
 							}
 						}
 					}
@@ -114,17 +117,14 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 		spendingCell.setSubtitle(value)
 	}
 
-	fun resetMinerType() {
+	private fun resetMinerType() {
 		MinerFeeType.Custom.value = 0
 		presenter.currentMinerType = MinerFeeType.Recommend
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
-		getParentFragment<TokenDetailOverlayFragment>()?.let {
-			presenter.backEvent(it)
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			presenter.popFragmentFrom<GasSelectionFragment>()
 		}
 	}
 }

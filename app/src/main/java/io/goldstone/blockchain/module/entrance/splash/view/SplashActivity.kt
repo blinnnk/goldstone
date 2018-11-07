@@ -32,8 +32,10 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
+import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter.Companion.updateAccountInformation
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter.Companion.updateShareContentFromServer
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.doAsync
 
@@ -68,6 +70,7 @@ class SplashActivity : AppCompatActivity() {
 		}
 	}
 
+	@WorkerThread
 	private fun prepareYingYongBaoInReviewStatus(callback: (GoldStoneError) -> Unit) {
 		// 如果不是 `YingYongBao` 渠道跳过
 		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {
@@ -100,6 +103,7 @@ class SplashActivity : AppCompatActivity() {
 	private fun prepareData(allWallet: List<WalletTable>) {
 		// WorkThread
 		prepareAppConfig config@{
+			SharedValue.updatePincodeDisplayStatus(showPincode)
 			// 如果本地的钱包数量不为空那么才开始注册设备
 			if (allWallet.isNotEmpty()) {
 				registerDeviceForPush()
@@ -110,29 +114,34 @@ class SplashActivity : AppCompatActivity() {
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
 				supportFragmentManager.fragments.find { it is StartingFragment }.isNull {
 					// UI 切回主线程
-					runOnUiThread {
-						addFragment<StartingFragment>(it.id)
-					}
+					runOnUiThread { addFragment<StartingFragment>(it.id) }
 				}
 			}
 			// 错开动画时间再执行数据请求
 			// Add currency data from local JSON file
 			presenter.apply {
 				initSupportCurrencyList {
-					// 更新分享的文案内容
-					updateShareContentFromServer()
-					// 更新用户条款如果有必要
-					updateAgreement()
-					// Insert support currency list from local json
-					updateCurrencyRateFromServer(this@config)
+					// 网络判断是否执行更新网络上数据的方法
+					if (NetworkUtil.hasNetwork(activity)) {
+						// 更新分享的文案内容
+						updateShareContentFromServer()
+						// 更新用户条款如果有必要
+						updateAgreement()
+						// Insert support currency list from local json
+						updateCurrencyRateFromServer(this@config)
+					}
 				}
+				initDefaultMarketByNetWork()
+
 				// Init Node List
 				initNodeList {
 					prepareNodeInfo {
 						// Check network to get default toke list
 						initDefaultToken {
 							prepareYingYongBaoInReviewStatus {
-								hasAccountThenLogin()
+								updateAccountInformation(activity) {
+									jump<MainActivity>()
+								}
 							}
 						}
 					}
@@ -152,6 +161,8 @@ class SplashActivity : AppCompatActivity() {
 	@WorkerThread
 	private fun prepareNodeInfo(callback: () -> Unit) {
 		val chainDao = GoldStoneDataBase.database.chainNodeDao()
+		val eosTest = chainDao.getTestnetEOSNode()
+		val eosMain = chainDao.getMainnetEOSNode()
 		val localNode = if (SharedValue.isTestEnvironment()) {
 			chainDao.getTestnet()
 		} else chainDao.getMainnet()
@@ -163,11 +174,8 @@ class SplashActivity : AppCompatActivity() {
 				ChainType(it.chainType).isBCH() -> SharedChain.updateBCHCurrent(ChainURL(it))
 				ChainType(it.chainType).isEOS() -> {
 					SharedChain.updateEOSCurrent(ChainURL(it))
-					if (SharedValue.isTestEnvironment()) {
-						SharedChain.updateEOSTestnet(ChainURL(it))
-					} else {
-						SharedChain.updateEOSMainnet(ChainURL(it))
-					}
+					SharedChain.updateEOSTestnet(ChainURL(eosTest))
+					SharedChain.updateEOSMainnet(ChainURL(eosMain))
 				}
 				ChainType(it.chainType).isETC() -> SharedChain.updateETCCurrent(ChainURL(it))
 			}

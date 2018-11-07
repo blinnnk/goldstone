@@ -4,6 +4,7 @@ import android.arch.persistence.room.*
 import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.R
@@ -237,9 +238,9 @@ data class WalletTable(
 			Pair(WalletType.ethSeries, currentETHSeriesAddress),
 			Pair(WalletType.ltcOnly, currentLTCAddress),
 			Pair(WalletType.bchOnly, currentBCHAddress),
-			Pair(WalletType.eosOnly, currentEOSAddress),
 			Pair(WalletType.eosMainnetOnly, currentEOSAccountName.main),
-			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle)
+			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle),
+			Pair(WalletType.eosOnly, currentEOSAddress)
 		).filter {
 			it.second.isNotEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
 		}
@@ -252,7 +253,7 @@ data class WalletTable(
 		}
 	}
 
-	fun insertWallet(callback: (wallet: WalletTable) -> Unit) {
+	fun insertWallet(@UiThread callback: (wallet: WalletTable) -> Unit) {
 		load {
 			GoldStoneDataBase.database.walletDao().apply {
 				findWhichIsUsing(true)?.let { update(it.apply { isUsing = false }) }
@@ -430,10 +431,10 @@ data class WalletTable(
 
 		fun getAllEOSAccountNames(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
-			} then { it ->
-				hold(it.map { it.currentEOSAccountName.getCurrent() })
-			}
+				val allWallets =
+					GoldStoneDataBase.database.walletDao().getAllWallets()
+				allWallets.map { it.currentEOSAccountName.getCurrent() }
+			} then (hold)
 		}
 
 		fun getAllBCHAddresses(hold: List<String>.() -> Unit) {
@@ -454,11 +455,11 @@ data class WalletTable(
 
 		fun getCurrentWallet(isMainThread: Boolean = true, hold: WalletTable.() -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.apply {
-					balance = SharedWallet.getCurrentBalance()
-					if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
-					else hold(this)
-				}
+				val walletDao = GoldStoneDataBase.database.walletDao()
+				val currentWallet = walletDao.findWhichIsUsing(true) ?: return@doAsync
+				walletDao.update(currentWallet.apply { balance = SharedWallet.getCurrentBalance() })
+				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(currentWallet) }
+				else hold(currentWallet)
 			}
 		}
 
@@ -576,6 +577,19 @@ data class WalletTable(
 
 		fun getWalletByAddress(address: String, hold: (WalletTable?) -> Unit) {
 			load { GoldStoneDataBase.database.walletDao().getWalletByAddress(address) } then (hold)
+		}
+
+		@WorkerThread
+		fun existAddressOrAccountName(address: String, chainID: ChainID?, hold: (isExisted: Boolean) -> Unit) {
+			doAsync {
+				val walletDao = GoldStoneDataBase.database.walletDao()
+				val isExisted = if (EOSAccount(address).isValid(false)) {
+					walletDao.getAllWallets().map { it.eosAccountNames }.flatten().any {
+						it.name.equals(address, true) && it.chainID.equals(chainID?.id, true)
+					}
+				} else !walletDao.getWalletByAddress(address).isNull()
+				hold(isExisted)
+			}
 		}
 
 		fun isAvailableWallet(

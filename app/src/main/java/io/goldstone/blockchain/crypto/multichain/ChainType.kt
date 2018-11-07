@@ -5,10 +5,11 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 
 
@@ -17,6 +18,8 @@ import java.io.Serializable
  * @date  2018/09/17
  */
 class ChainType(val id: Int) : Serializable {
+
+	fun isBTCSeries() = isBTC() || isLTC() || isBCH()
 
 	fun getChainURL(): ChainURL {
 		return when (id) {
@@ -98,8 +101,8 @@ class ChainType(val id: Int) : Serializable {
 			}
 			currentWallet?.apply {
 				walletDao.update(this)
-				uiThread {
-					callback(this)
+				GoldStoneAPI.context.runOnUiThread {
+					callback(this@apply)
 				}
 			}
 		}

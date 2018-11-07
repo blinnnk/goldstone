@@ -13,7 +13,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter.T
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 27/03/2018 3:20 PM
@@ -22,7 +22,7 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, TransactionListModel>() {
 	// 首页的 `cell` 点击进入详情界面传入的 `Symbol`
 	val token by lazy { (parentFragment as? TokenDetailCenterFragment)?.token }
-	var currentMenu: String? = null
+	var currentMenu = CommonText.all
 	override val pageTitle: String get() = token?.symbol.orEmpty()
 	private val footer by lazy { TokenDetailFooter(context!!) }
 	override val presenter = TokenDetailPresenter(this)
@@ -57,10 +57,7 @@ class TokenDetailFragment : BaseRecyclerFragment<TokenDetailPresenter, Transacti
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		footer.into(wrapper)
 		footer.apply {

@@ -20,7 +20,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.verticalLayout
 
 /**
@@ -77,9 +77,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				menu.selected(MarketTokenDetailChartType.Hour.code)
 				candleChart.into(this)
 				// 默认加载小时的图标数据
-				presenter.updateChartByMenu(
-					candleChart, MarketTokenDetailChartType.Hour.code
-				)
+				presenter.updateChartByMenu(candleChart, MarketTokenDetailChartType.Hour.code)
 
 				currentPriceInfo.apply {
 					setMargins<LinearLayout.LayoutParams> {

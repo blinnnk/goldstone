@@ -38,6 +38,7 @@ object ArgumentKey {
 	const val defaultEOSAccountName = "defaultEOSAccountName"
 	const val contact = "contact"
 	const val eosAccountRegister = "eosAccountRegister"
+	const val contactID = "contactID"
 }
 
 object IntentKey {
@@ -76,10 +77,10 @@ object SharesPreference {
 	const val currentID = "currentID"
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
 	const val isNotchScreen = "isNotchScreen"
-	const val isEncryptERCNodeRequest = "isEncryptERCNodeRequest"
-	const val isEncryptETCNodeRequest = "isEncryptETCNodeRequest"
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"
+	const val needToShowPincode = "needToShowPincode"
+	const val accountCheckedStatus = "accountCheckedStatus"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

@@ -23,7 +23,7 @@ data class TokenIcon(
 	)
 }
 
-fun List<TokenIcon>.getByTokenContract(contract: TokenContract): TokenIcon? {
+fun List<TokenIcon>.get(contract: TokenContract): TokenIcon? {
 	return find {
 		it.symbol.equals(contract.symbol, true) && it.contract.equals(contract.contract, true)
 	}

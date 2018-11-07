@@ -47,93 +47,87 @@ object GenerateMultiChainWallet {
 	) {
 		val addresses = ChainAddresses()
 		object : ConcurrentAsyncCombine() {
-			override var asyncCount: Int = DefaultPath.allPaths().size
-			override fun concurrentJobs() {
+			val paths = DefaultPath.allPaths()
+			override var asyncCount: Int = paths.size
+			override val delayTime: Long? = 100
+			override fun doChildTask(index: Int) {
 				context.apply {
-					// Ethereum
-					getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress ->
-						addresses.eth = Bip44Address(ethAddress, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
-						completeMark()
-					}
-					// Ethereum Classic
-					getEthereumWalletByMnemonic(
-						mnemonic,
-						path.etcPath,
-						password
-					) { etcAddress ->
-						addresses.etc = Bip44Address(etcAddress, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
-						completeMark()
-					}
-					// Bitcoin
-					BTCWalletUtils.getBitcoinWalletByMnemonic(
-						mnemonic,
-						path.btcPath
-					) { btcAddress, base58Privatekey ->
-						// 存入 `Btc PrivateKey` 到 `KeyStore`
-						context.storeBase58PrivateKey(
-							base58Privatekey,
-							btcAddress,
-							password,
-							false
-						)
-						addresses.btc = Bip44Address(btcAddress, getAddressIndexFromPath(path.btcPath), ChainType.BTC.id)
-						completeMark()
-					}
-					BTCWalletUtils.getBitcoinWalletByMnemonic(
-						mnemonic,
-						path.testPath
-					) { btcSeriesTestAddress, btcTestBase58Privatekey ->
-						// 存入 `BtcTest PrivateKey` 到 `KeyStore`
-						context.storeBase58PrivateKey(
-							btcTestBase58Privatekey,
-							btcSeriesTestAddress,
-							password,
-							true
-						)
-						addresses.btcSeriesTest = Bip44Address(btcSeriesTestAddress, getAddressIndexFromPath(path.testPath), ChainType.AllTest.id)
-						completeMark()
-					}
-					// Litecoin
-					LTCWalletUtils.generateBase58Keypair(
-						mnemonic,
-						path.ltcPath
-					).let { ltcKeyPair ->
-						context.storeLTCBase58PrivateKey(
-							ltcKeyPair.privateKey,
-							ltcKeyPair.address,
+					when (paths[index]) {
+						// Ethereum
+						DefaultPath.ethPath -> getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress, _ ->
+							addresses.eth = Bip44Address(ethAddress!!, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
+							completeMark()
+						}
+						// Ethereum Classic
+						DefaultPath.etcPath -> getEthereumWalletByMnemonic(
+							mnemonic,
+							path.etcPath,
 							password
-						)
-						addresses.ltc = Bip44Address(ltcKeyPair.address, getAddressIndexFromPath(path.ltcPath), ChainType.LTC.id)
-						completeMark()
-					}
-					// Bitcoin Cash
-					BCHWalletUtils.generateBCHKeyPair(
-						mnemonic,
-						path.bchPath
-					).let { bchKeyPair ->
-						context.storeBase58PrivateKey(
-							bchKeyPair.privateKey,
-							bchKeyPair.address,
-							password,
-							false
-						)
-						addresses.bch = Bip44Address(bchKeyPair.address, getAddressIndexFromPath(path.bchPath), ChainType.BCH.id)
-						completeMark()
-					}
-					// Bitcoin Cash
-					EOSWalletUtils.generateKeyPair(
-						mnemonic,
-						path.bchPath
-					).let { eosKeyPair ->
-						// `EOS` 的 `Prefix` 使用的 是 `Bitcoin` 的 `Mainnet Prefix` 所以无论是否是测试网这里的 `isTestnet` 都传 `False`
-						context.storeBase58PrivateKey(
-							eosKeyPair.privateKey,
-							eosKeyPair.address,
-							password,
-							false
-						)
-						addresses.eos = Bip44Address(eosKeyPair.address, getAddressIndexFromPath(path.eosPath), ChainType.EOS.id)
-						completeMark()
+						) { etcAddress, _ ->
+							addresses.etc = Bip44Address(etcAddress!!, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
+							completeMark()
+						}
+						// Bitcoin
+						DefaultPath.btcPath -> BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path.btcPath) { btcAddress, base58Privatekey ->
+							// 存入 `Btc PrivateKey` 到 `KeyStore`
+							context.storeBase58PrivateKey(
+								base58Privatekey,
+								btcAddress,
+								password,
+								false
+							)
+							addresses.btc = Bip44Address(btcAddress, getAddressIndexFromPath(path.btcPath), ChainType.BTC.id)
+							completeMark()
+						}
+						// BTC Test
+						DefaultPath.testPath ->
+							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path.testPath) { btcSeriesTestAddress, btcTestBase58Privatekey ->
+								// 存入 `BtcTest PrivateKey` 到 `KeyStore`
+								context.storeBase58PrivateKey(
+									btcTestBase58Privatekey,
+									btcSeriesTestAddress,
+									password,
+									true
+								)
+								addresses.btcSeriesTest = Bip44Address(btcSeriesTestAddress, getAddressIndexFromPath(path.testPath), ChainType.AllTest.id)
+								completeMark()
+							}
+						// Litecoin
+						DefaultPath.ltcPath -> LTCWalletUtils.generateBase58Keypair(mnemonic, path.ltcPath).let { ltcKeyPair ->
+							context.storeLTCBase58PrivateKey(
+								ltcKeyPair.privateKey,
+								ltcKeyPair.address,
+								password
+							)
+							addresses.ltc = Bip44Address(ltcKeyPair.address, getAddressIndexFromPath(path.ltcPath), ChainType.LTC.id)
+							completeMark()
+						}
+						// Bitcoin Cash
+						DefaultPath.bchPath -> BCHWalletUtils.generateBCHKeyPair(mnemonic, path.bchPath).let { bchKeyPair ->
+							context.storeBase58PrivateKey(
+								bchKeyPair.privateKey,
+								bchKeyPair.address,
+								password,
+								false
+							)
+							addresses.bch = Bip44Address(bchKeyPair.address, getAddressIndexFromPath(path.bchPath), ChainType.BCH.id)
+							completeMark()
+						}
+						// Bitcoin Cash
+						DefaultPath.eosPath -> EOSWalletUtils.generateKeyPair(
+							mnemonic,
+							path.bchPath
+						).let { eosKeyPair ->
+							// `EOS` 的 `Prefix` 使用的 是 `Bitcoin` 的 `Mainnet Prefix` 所以无论是否是测试网这里的 `isTestnet` 都传 `False`
+							context.storeBase58PrivateKey(
+								eosKeyPair.privateKey,
+								eosKeyPair.address,
+								password,
+								false
+							)
+							addresses.eos = Bip44Address(eosKeyPair.address, getAddressIndexFromPath(path.eosPath), ChainType.EOS.id)
+							completeMark()
+						}
 					}
 				}
 			}

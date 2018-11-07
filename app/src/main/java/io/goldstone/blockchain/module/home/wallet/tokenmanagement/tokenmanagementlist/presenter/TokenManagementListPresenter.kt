@@ -40,6 +40,11 @@ class TokenManagementListPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		updateData()
+		fragment.getParentFragment<TokenManagementFragment> {
+			overlayView.header.showCloseButton(true) {
+				presenter.removeSelfFromActivity()
+			}
+		}
 	}
 
 	// 在异步线程更新数据
@@ -48,14 +53,12 @@ class TokenManagementListPresenter(
 			MyTokenTable.getMyTokens { myTokens ->
 				object : ConcurrentAsyncCombine() {
 					override var asyncCount: Int = defaultTokens.size
-					override fun concurrentJobs() {
-						defaultTokens.forEach { default ->
-							default.isUsed = !myTokens.find {
-								default.contract.equals(it.contract, true) &&
-									default.symbol.equals(it.symbol, true)
-							}.isNull()
-							completeMark()
-						}
+					override fun doChildTask(index: Int) {
+						defaultTokens[index].isUsed = !myTokens.find {
+							defaultTokens[index].contract.equals(it.contract, true) &&
+								defaultTokens[index].symbol.equals(it.symbol, true)
+						}.isNull()
+						completeMark()
 					}
 
 					override fun mergeCallBack() {
@@ -77,16 +80,17 @@ class TokenManagementListPresenter(
 	}
 
 	companion object {
-		fun insertOrDeleteMyToken(isChecked: Boolean, token: DefaultTokenTable) {
+		fun addOrCloseMyToken(isChecked: Boolean, token: DefaultTokenTable) {
 			doAsync {
 				// once it is checked then insert this symbol into `MyTokenTable` database
-				if (isChecked) MyTokenTable.addNew(TokenContract(token), token.chainID)
-				else GoldStoneDataBase.database.myTokenDao()
-					.deleteByContractAndAddress(
-						token.contract,
-						token.symbol,
-						TokenContract(token).getAddress()
-					)
+				if (isChecked) MyTokenTable.addNewOrOpen(TokenContract(token), token.chainID)
+				else GoldStoneDataBase.database.myTokenDao().updateCloseStatus(
+					token.contract,
+					token.symbol,
+					TokenContract(token).getAddress(),
+					token.chainID,
+					true
+				)
 			}
 		}
 	}

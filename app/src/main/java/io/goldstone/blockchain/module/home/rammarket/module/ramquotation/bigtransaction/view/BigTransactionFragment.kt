@@ -10,7 +10,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtran
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.rightPadding
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date: 2018/11/5.

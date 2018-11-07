@@ -1,11 +1,8 @@
 package io.goldstone.blockchain.common.utils
 
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 11/04/2018 3:28 AM
@@ -44,32 +41,45 @@ abstract class SequentialTask {
 	abstract fun thirdJob()
 }
 
+// 使用协程和观察者模式实现封装的并发线程方法
 abstract class ConcurrentAsyncCombine {
 
 	abstract var asyncCount: Int
+	open val completeInUIThread: Boolean = true
+	// 当并发线程非常多的时候可以设置 DelayTime 减缓线程压力
+	open val delayTime: Long? = null
 	private var finishedCount: Int by observing(0) {
 		if (finishedCount == asyncCount) {
-			if (getResultInMainThread()) {
-				GoldStoneAPI.context.runOnUiThread { mergeCallBack() }
-			} else {
-				doAsync { mergeCallBack() }
+			launch {
+				if (completeInUIThread) withContext(UI) {
+					mergeCallBack()
+				} else withContext(CommonPool, CoroutineStart.LAZY) {
+					mergeCallBack()
+				}
 			}
 		}
 	}
 
-	abstract fun concurrentJobs()
+	open fun doChildTask(index: Int) {}
 
 	open fun completeMark() {
 		finishedCount += 1
 	}
 
-	open fun getResultInMainThread(): Boolean = true
-
 	fun start() {
-		doAsync { concurrentJobs() }
-		if (asyncCount == 0) {
-			if (getResultInMainThread()) GoldStoneAPI.context.runOnUiThread { mergeCallBack() }
-			else doAsync { mergeCallBack() }
+		launch {
+			withContext(CommonPool, CoroutineStart.LAZY) {
+				if (asyncCount == 0) {
+					if (completeInUIThread) withContext(UI) {
+						mergeCallBack()
+					} else mergeCallBack()
+				} else {
+					for (index in 0 until asyncCount) {
+						delayTime?.let { delay(it) }
+						doChildTask(index)
+					}
+				}
+			}
 		}
 	}
 

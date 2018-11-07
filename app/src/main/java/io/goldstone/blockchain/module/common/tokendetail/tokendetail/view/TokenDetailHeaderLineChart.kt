@@ -2,7 +2,11 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
 import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.utils.MPPointF
+import io.goldstone.blockchain.common.component.chart.BaseMarkerView
 import io.goldstone.blockchain.common.component.chart.line.LineChart
+import io.goldstone.blockchain.common.language.WalletSettingsText
 
 /**
  * @date: 2018/8/23.
@@ -32,7 +36,15 @@ class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 			dataRows.forEach {
 				it.y = 0.1f
 			}
-			marker = null
+			marker = object: BaseMarkerView(context) {
+				override fun getChartWidth(): Int = this@TokenDetailHeaderLineChart.width
+				override fun getChartHeight(): Int = this@TokenDetailHeaderLineChart.height
+				override fun getOffset(): MPPointF = MPPointF((-width / 2).toFloat(), -height.toFloat())
+				override fun refreshContent(entry: Entry, highlight: Highlight) {
+					textViewContent.text = "${WalletSettingsText.balance}：0"
+					super.refreshContent(entry, highlight)
+				}
+			}
 		} else {
 			var distance = (maxValue - minValue) / 2f
 			if (distance == 0f) {
