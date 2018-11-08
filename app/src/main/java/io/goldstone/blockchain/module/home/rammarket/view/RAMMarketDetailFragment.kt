@@ -45,6 +45,23 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 				addView(priceMenuCandleChart)
 				addView(tradingView)
 				addView(quotationViewParent)
+				tradingView.tradingDashboardView.ramEditText.apply {
+					afterTextChanged = Runnable {
+						if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
+							val ram = text.toString().trim().toFloat() * presenter.ramInformationModel.currentPrice
+							tradingView.tradingDashboardView.eosEditText.setText(ram.formatCount(3))
+						}
+					}
+				}
+				
+				tradingView.tradingDashboardView.eosEditText.apply {
+					afterTextChanged = Runnable {
+						if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
+							val ram = text.toString().trim().toFloat() / presenter.ramInformationModel.currentPrice
+							tradingView.tradingDashboardView.ramEditText.setText(ram.formatCount(3))
+						}
+					}
+				}
 			}
 		}
 		

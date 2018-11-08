@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
+import android.text.InputFilter
+import android.text.method.DigitsKeyListener
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -24,7 +26,7 @@ import org.jetbrains.anko.*
 class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  ButtonMenu
 	val ramEditText by lazy { RAMPriceRoundInputView(context, "KB") }
-	private val eosEditText by lazy { RAMPriceRoundInputView(context, "EOS") }
+	val eosEditText by lazy { RAMPriceRoundInputView(context, "EOS") }
 	val ramBalance by lazy { TextView(context) }
 	val eosBalance by lazy { TextView(context) }
 	private val confirmButton by lazy { RoundButton(context) }
@@ -57,6 +59,9 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			title = EOSRAMExchangeText.ram
 			hint = EOSRAMExchangeText.enterCountHint
 			singleLine = true
+			keyListener = DigitsKeyListener.getInstance("1234567890.")
+			filters = arrayOf(InputFilter.LengthFilter(10))
+			
 		}.into(this)
 		
 		ramBalance.apply {
@@ -73,6 +78,8 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
 			singleLine = true
+			keyListener = DigitsKeyListener.getInstance("1234567890.")
+			filters = arrayOf(InputFilter.LengthFilter(10))
 		}.into(this)
 		
 		eosBalance.apply {
