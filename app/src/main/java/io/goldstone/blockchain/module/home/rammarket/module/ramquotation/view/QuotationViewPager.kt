@@ -55,7 +55,7 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 		
 		addView(menuBar)
 		view {
-			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 1)
 			setMargins<LinearLayout.LayoutParams> {
 				rightMargin = 20.uiPX()
 				leftMargin = 20.uiPX()

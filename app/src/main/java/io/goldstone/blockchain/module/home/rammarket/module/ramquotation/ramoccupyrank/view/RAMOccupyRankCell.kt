@@ -66,7 +66,7 @@ class RAMOccupyRankCell(context: Context): RelativeLayout(context) {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
 		
 		view {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 1.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 1)
 			backgroundColor = GrayScale.lightGray
 		}
 		

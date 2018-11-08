@@ -29,7 +29,7 @@ class BigTransactionCell(context: Context): RelativeLayout(context) {
 	
 	var model: TradingInfoModel by observing(TradingInfoModel("", 0.toDouble(), "", 0, 0, 0.toDouble())) {
 		accountName.text = model.account
-		timing.text = TimeUtils.formatDate(model.time)
+		timing.text = TimeUtils.formatYMdHmDate(model.time * 1000)
 		amount.text = if (model.type == 0)  "+${model.quantity} EOS" else "-${model.quantity} EOS"
 		amount.textColor = if (model.type == 0) Spectrum.green else Spectrum.lightRed
 		price.text = "≈ ${model.price.formatCount(4)} EOS/KB"
@@ -39,7 +39,7 @@ class BigTransactionCell(context: Context): RelativeLayout(context) {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
 		
 		view {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 1.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 1)
 			backgroundColor = GrayScale.lightGray
 		}
 		

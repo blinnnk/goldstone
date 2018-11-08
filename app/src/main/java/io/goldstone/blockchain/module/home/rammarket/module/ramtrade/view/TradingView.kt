@@ -23,7 +23,7 @@ class TradingView(context: Context): LinearLayout(context) {
 		leftPadding = 20.uiPX()
 		rightPadding = 20.uiPX()
 		view {
-			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 1)
 			backgroundColor = GrayScale.lightGray
 			setMargins<LinearLayout.LayoutParams> {
 				topMargin = 16.uiPX()

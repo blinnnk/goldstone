@@ -57,7 +57,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 		
 		view {
 			backgroundColor = GrayScale.lightGray
-			layoutParams = LinearLayout.LayoutParams(matchParent, 1.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 1)
 		}
 	}
 }
