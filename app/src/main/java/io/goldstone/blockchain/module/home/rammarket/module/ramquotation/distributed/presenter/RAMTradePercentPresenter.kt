@@ -30,13 +30,13 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 	private val buyColors = arrayOf(
 		Spectrum.green,
 		Spectrum.lightGreen,
-		Color.parseColor("#86E5BF")
+		Color.parseColor("#FF55F6B6")
 	)
 	
 	private val saleColors = arrayOf(
 		Color.parseColor("#E14848"),
 		Spectrum.lightRed,
-		Color.parseColor("#EE6AA7")
+		Color.parseColor("#FFAAAA")
 	)
 	
 	override fun onFragmentCreate() {

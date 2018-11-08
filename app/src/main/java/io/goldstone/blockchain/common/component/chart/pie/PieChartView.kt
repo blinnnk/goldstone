@@ -7,6 +7,8 @@ import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.PercentFormatter
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.GrayScale
 import kotlin.collections.ArrayList
 
 /**
@@ -42,7 +44,9 @@ class PieChartView(context: Context) : PieChart(context) {
 		dragDecelerationFrictionCoef = 0.95f
 		
 		centerText = EOSRAMExchangeText.transactionDistribute
-		setCenterTextSize(18f)
+		setCenterTextTypeface(GoldStoneFont.heavy(context))
+		setCenterTextColor(GrayScale.midGray)
+		setCenterTextSize(11f)
 		
 		isDrawHoleEnabled = true
 		setHoleColor(Color.TRANSPARENT)
@@ -50,7 +54,7 @@ class PieChartView(context: Context) : PieChart(context) {
 		setTransparentCircleColor(Color.WHITE)
 		setTransparentCircleAlpha(0)
 		
-		holeRadius = 66f // 决定中间圆心的大小
+		holeRadius = 64f // 决定中间圆心的大小
 		transparentCircleRadius = 61f
 		
 		setDrawCenterText(true)

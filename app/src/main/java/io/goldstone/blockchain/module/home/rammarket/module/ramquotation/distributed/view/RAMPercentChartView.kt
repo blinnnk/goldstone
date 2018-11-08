@@ -21,9 +21,9 @@ class RAMPercentChartView(context: Context) : View(context) {
 	
 	private val maxBodyHeight = 100.uiPX()
 	
-	private val itemWidth = (ScreenSize.Width - 40.uiPX()).toFloat() / 2 / 10
+	private val itemWidth = (ScreenSize.Width - 40.uiPX()).toFloat() / 2 / 8
 	
-	private val itemSpace = itemWidth * 7 / 4
+	private val itemSpace = itemWidth * 5 / 4
 	
 	private val textSpace = 5.uiPX()
 	
@@ -73,7 +73,7 @@ class RAMPercentChartView(context: Context) : View(context) {
 	
 	init {
 		layoutParams = ViewGroup.LayoutParams(
-			ScreenSize.Width / 2,
+			(ScreenSize.Width - 40.uiPX()) / 2,
 			(maxBodyHeight + valueTextSize + labelTextSize + textSpace * 2).toInt()
 		)
 	}

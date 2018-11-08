@@ -85,20 +85,21 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		
 		linearLayout {
 			topPadding = 26.uiPX()
+			gravity = Gravity.CENTER_VERTICAL
 			imageView {
-				imageResource = R.drawable.back
-			}.lparams(15.uiPX(), 15.uiPX())
+				imageResource = R.drawable.trading_discipline
+				setColorFilter(Spectrum.deepBlue)
+			}.lparams(30.uiPX(), 30.uiPX())
 			textView {
 				textColor = Spectrum.blue
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.black(context)
 				text = EOSRAMExchangeText.transactionHistory
-				gravity = Gravity.CENTER_VERTICAL
 			}
 		}
 		
 		confirmButton.apply {
-			setBlueStyle(width = ScreenSize.Width / 2 - 40.uiPX())
+			setBlueStyle(width = ScreenSize.Width / 2 - 10.uiPX())
 			text = EOSRAMExchangeText.confirmToTrade
 			(layoutParams as? LinearLayout.LayoutParams)?.apply {
 				gravity = Gravity.CENTER_HORIZONTAL
