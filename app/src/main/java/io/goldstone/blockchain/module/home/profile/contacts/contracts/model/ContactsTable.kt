@@ -59,9 +59,9 @@ data class ContactTable(
 
 		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.contactDao().getAllContacts()
+				GoldStoneDataBase.database.contactDao().getAllContacts().toArrayList()
 			} then {
-				callback(it.toArrayList())
+				callback(it)
 			}
 		}
 
@@ -73,14 +73,31 @@ data class ContactTable(
 			}
 		}
 
-		fun deleteContactByID(
-			id: Int,
-			callback: () -> Unit
-		) {
+		fun deleteContactByID(id: Int, callback: () -> Unit) {
 			load {
 				GoldStoneDataBase.database.contactDao().deleteByID(id)
 			} then { callback() }
 		}
+
+		fun getAllContactAddresses(hold: (all: List<String>) -> Unit) {
+			load {
+				val all =
+					GoldStoneDataBase.database.contactDao().getAllContacts()
+				all.map {
+					listOf(
+						it.bchAddress,
+						it.ltcAddress,
+						it.btcSeriesTestnetAddress,
+						it.btcMainnetAddress,
+						it.eosJungle,
+						it.eosAddress,
+						it.etcAddress,
+						it.ethSeriesAddress
+					)
+				}.flatten()
+			} then (hold)
+		}
+
 	}
 }
 
@@ -120,6 +137,15 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 			}
 		}
 	}
+}
+
+fun List<ContactTable>.getContactName(address: String): String {
+	// `BTC` 的 `toAddress` 可能是多地址, 所以采用了包含关系判断.
+	return find {
+		it.ethSeriesAddress.equals(address, true)
+			|| it.btcSeriesTestnetAddress.contains(address, true)
+			|| it.btcMainnetAddress.contains(address, true)
+	}?.name ?: address
 }
 
 @Dao

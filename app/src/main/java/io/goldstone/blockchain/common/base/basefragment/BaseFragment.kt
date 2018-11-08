@@ -11,7 +11,6 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
@@ -141,17 +140,12 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : Fragment()
 		}
 	}
 
-	fun getOverlayHeader(): OverlayHeaderLayout? {
-		val parent = parentFragment
-		return (parent as? BaseOverlayFragment<*>)?.overlayView?.header
-	}
-
 	fun getParentContainer(): OverlayView? {
 		val parent = parentFragment
 		return when {
-			parent is BaseOverlayFragment<*> -> parent.overlayView
+			parent is BaseOverlayFragment<*> -> parent.getContainer()
 			parent?.parentFragment is BaseOverlayFragment<*> ->
-				(parent.parentFragment as? BaseOverlayFragment<*>)?.overlayView
+				(parent.parentFragment as? BaseOverlayFragment<*>)?.getContainer()
 			else -> null
 		}
 	}

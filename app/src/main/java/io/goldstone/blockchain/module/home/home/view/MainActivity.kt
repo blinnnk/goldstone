@@ -21,10 +21,10 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -39,8 +39,9 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		// 增加防止截屏事件拦截
-		window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+		// 如果不是开发者模式禁止任何截屏行为
+		if (!SharedValue.getDeveloperModeStatus())
+			window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 		val application = application as GoldStoneApp
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()

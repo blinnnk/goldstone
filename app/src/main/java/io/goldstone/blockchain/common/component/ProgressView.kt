@@ -63,8 +63,6 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, progressViewHeight + 45.uiPX())
-		leftPadding = marginSize
-		rightPadding = marginSize
 		subtitle.setAlignParentRight()
 		progressTotalValueView = relativeLayout {
 			lparams {
@@ -93,28 +91,46 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 		this.subtitle.text = subtitle
 	}
 
+	fun removeTitles() {
+		removeView(title)
+		removeView(subtitle)
+	}
+
 	private var leftValue = BigInteger.ZERO
 	@SuppressLint("SetTextI18n")
-	fun setLeftValue(value: BigInteger, description: String, isTime: Boolean = false) {
+	fun setLeftValue(value: BigInteger, description: String, type: ProcessType) {
 		leftValue = value
-		val convertedValue = if (isTime) value.convertToTimeUnit() else value.convertToDiskUnit()
+		val convertedValue = when (type) {
+			ProcessType.Time -> value.convertToTimeUnit()
+			ProcessType.Disk -> value.convertToDiskUnit()
+			else -> value.toString()
+		}
 		leftValueView.text = "$convertedValue $description"
 		setProgressValue()
 	}
 
 	private var rightValue = BigInteger.ZERO
 	@SuppressLint("SetTextI18n")
-	fun setRightValue(value: BigInteger, description: String, isTime: Boolean = false) {
+	fun setRightValue(value: BigInteger, description: String, type: ProcessType) {
 		rightValue = value
-		val convertedValue = if (isTime) value.convertToTimeUnit() else value.convertToDiskUnit()
+		val convertedValue = when (type) {
+			ProcessType.Time -> value.convertToTimeUnit()
+			ProcessType.Disk -> value.convertToDiskUnit()
+			else -> value.toString()
+		}
 		rightValueView.text = "$convertedValue $description"
 		setProgressValue()
 	}
 
+
 	private fun setProgressValue() {
 		val percent: Double = if (rightValue == BigInteger.ZERO) 0.0 else leftValue.toDouble() / rightValue.toDouble()
 		progressValueView.measure(0, 0)
-		val width = measuredWidth - marginSize * 2
+		val width = measuredWidth
 		progressValueView.updateWidthAnimation((width * percent).toInt())
 	}
+}
+
+enum class ProcessType {
+	Time, Disk, Value
 }

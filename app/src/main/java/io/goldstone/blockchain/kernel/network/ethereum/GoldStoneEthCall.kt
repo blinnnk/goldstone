@@ -12,13 +12,11 @@ import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.ethereum.EthereumMethod
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
-import io.goldstone.blockchain.crypto.multichain.isETC
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.crypto.utils.hexToDecimal
-import io.goldstone.blockchain.crypto.utils.toAscii
-import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
-import io.goldstone.blockchain.crypto.utils.toIntFromHex
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.callChainBy
 import okhttp3.MediaType
@@ -82,7 +80,7 @@ object GoldStoneEthCall {
 	fun getInputCodeByHash(
 		hash: String,
 		chainURL: ChainURL,
-		holdValue: (inputCode: String?, error: RequestError) -> Unit
+		hold: (inputCode: String?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -98,7 +96,9 @@ object GoldStoneEthCall {
 			),
 			chainURL
 		) { result, error ->
-			holdValue(JSONObject(result).safeGet("input"), error)
+			if (result != null && error.isNone()) {
+				hold(JSONObject(result).safeGet("input"), error)
+			} else hold(null, error)
 		}
 	}
 
@@ -127,9 +127,9 @@ object GoldStoneEthCall {
 	}
 
 	@JvmStatic
-	fun getBlockNumber(
+	fun getBlockCount(
 		chainURL: ChainURL,
-		holdValue: (blockNumber: Int?, error: RequestError) -> Unit
+		@WorkerThread hold: (blockCount: Int?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -145,7 +145,7 @@ object GoldStoneEthCall {
 			),
 			chainURL
 		) { result, error ->
-			holdValue(result?.hexToDecimal()?.toInt(), error)
+			hold(result?.hexToDecimal()?.toInt(), error)
 		}
 	}
 
@@ -197,10 +197,30 @@ object GoldStoneEthCall {
 			),
 			chainURL
 		) { result, error ->
-			if (!result.isNullOrEmpty() && error.isNone()) {
-				val data = result!!.toJsonObject()
+			// 生成的 TransactionTable 需要 Decimal
+			val defaultToken = GoldStoneDataBase.database.defaultTokenDao()
+			if (result?.isNotEmpty() == true && error.isNone()) {
+				val data = result.toJsonObject()
+				// 如果没有被块收录循环检测
 				if (data.safeGet("blockNumber").isNullValue()) unfinishedCallback()
-				else hold(TransactionTable(data, chainURL.chainType.isETC(), chainURL.chainID.id), error)
+				else {
+					// 已经被收录的准备对应的数据
+					val inputData = data.safeGet("input")
+					if (!CryptoUtils.isERC20Transfer(inputData)) {
+						hold(TransactionTable(data, CryptoValue.ethDecimal, chainURL.chainID), error)
+					} else {
+						val contractAddress = data.safeGet("to")
+						val targetToken =
+							defaultToken.getERC20Token(contractAddress, chainURL.chainID.id)
+						if (targetToken != null) {
+							hold(TransactionTable(data, targetToken.decimals, chainURL.chainID), error)
+						} else GoldStoneEthCall.getTokenDecimal(contractAddress, chainURL) { decimal, decimalError ->
+							if (decimal != null && decimalError.isNone()) {
+								hold(TransactionTable(data, decimal, chainURL.chainID), error)
+							} else hold(null, decimalError)
+						}
+					}
+				}
 			} else hold(null, error)
 		}
 	}

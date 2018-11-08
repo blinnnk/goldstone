@@ -7,9 +7,12 @@ import com.blinnnk.extension.into
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
+import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.rightPadding
 import org.jetbrains.anko.wrapContent
 
 /**
@@ -25,6 +28,8 @@ class ChainAddressesCell(context: Context) : LinearLayout(context) {
 	val cell = GraySquareCellWithButtons(context)
 
 	init {
+		leftPadding = PaddingSize.device
+		rightPadding = PaddingSize.device
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)

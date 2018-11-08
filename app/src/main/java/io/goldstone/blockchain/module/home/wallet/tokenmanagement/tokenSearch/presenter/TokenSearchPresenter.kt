@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.TinyNumber
@@ -18,6 +19,7 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
 import org.jetbrains.anko.runOnUiThread
@@ -36,15 +38,16 @@ class TokenSearchPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		val navigation = fragment.getOverlayHeader()
-		if (SharedWallet.getCurrentWalletType().isBTCSeries())
-			navigation?.showSearchButton(false) {}
-		else {
-			fragment.showLoadingView()
-			MyTokenTable.getMyTokens(false) { myTokens ->
-				navigation?.searchInputListener { inputContent ->
-					if (NetworkUtil.hasNetwork(fragment.context))
-						getSearchResult(inputContent, myTokens)
+		fragment.getParentFragment<TokenManagementFragment> {
+			if (SharedWallet.getCurrentWalletType().isBTCSeries())
+				showSearchButton(false) {}
+			else {
+				fragment.showLoadingView()
+				MyTokenTable.getMyTokens(false) { myTokens ->
+					searchInputListener { inputContent ->
+						if (NetworkUtil.hasNetwork(fragment.context))
+							getSearchResult(inputContent, myTokens)
+					}
 				}
 			}
 		}

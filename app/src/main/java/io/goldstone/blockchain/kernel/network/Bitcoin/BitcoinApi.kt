@@ -42,7 +42,7 @@ object BitcoinApi {
 		}
 	}
 
-	fun getBTCTransactions(
+	fun getTransactions(
 		address: String,
 		from: Int,
 		to: Int,
@@ -96,20 +96,18 @@ object BitcoinApi {
 		hold: (transition: BTCSeriesTransactionTable?, error: RequestError) -> Unit
 	) {
 		BTCSeriesApiUtils.getTransactionByHash(BitcoinUrl.getTransactionByHash(targetNet, hash)) { transactions, error ->
-			if (!transactions.isNull() && error.isNone()) {
-				hold(
-					BTCSeriesTransactionTable(
-						transactions!!,
-						// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 `DataIndex` 随便设置即可
-						0,
-						address,
-						CoinSymbol.pureBTCSymbol,
-						false,
-						ChainType.BTC.id
-					),
-					error
-				)
-			} else hold(null, error)
+			if (!transactions.isNull() && error.isNone()) hold(
+				BTCSeriesTransactionTable(
+					transactions!!,
+					// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 `DataIndex` 随便设置即可
+					0,
+					address,
+					CoinSymbol.pureBTCSymbol,
+					false,
+					ChainType.BTC.id
+				),
+				error
+			) else hold(null, error)
 		}
 	}
 }

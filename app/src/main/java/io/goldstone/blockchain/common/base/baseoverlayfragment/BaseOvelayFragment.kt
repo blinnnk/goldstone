@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.RelativeLayout
 import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.setMargins
@@ -14,10 +15,12 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.setTransparentStatusBar
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
@@ -39,7 +42,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	open var headerTitle: String by observing("") {
 		overlayView.header.setTitle(headerTitle)
 	}
-	lateinit var overlayView: OverlayView
+	private lateinit var overlayView: OverlayView
 	/**
 	 * 通过对 `Runnable` 的变化监控, 重新定制控件的 `Header`
 	 */
@@ -55,9 +58,66 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		}
 	}
 
+	fun getContainer(): OverlayView = overlayView
+
+	fun getSearchContent(): String = overlayView.header.getSearchContent()
+
+	fun showBackButton(isShow: Boolean, action: ImageView.() -> Unit) {
+		overlayView.header.showBackButton(isShow, action)
+	}
+
+	fun showCloseButton(isShow: Boolean, action: () -> Unit) {
+		overlayView.header.showCloseButton(isShow, action)
+	}
+
+	fun showSearchButton(isShow: Boolean, setClickEvent: () -> Unit) {
+		overlayView.header.showSearchButton(isShow, setClickEvent)
+	}
+
+	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit) {
+		overlayView.header.showSearchInput(isShow, cancelEvent)
+	}
+
+	fun showAddButton(status: Boolean, isLeft: Boolean = true, clickEvent: () -> Unit) {
+		overlayView.header.showAddButton(status, isLeft, clickEvent)
+	}
+
+	fun setTitle(title: String) {
+		overlayView.header.setTitle(title)
+	}
+
+	fun showTitle(status: Boolean) {
+		overlayView.header.showTitle(status)
+	}
+
+	fun showFilterImage(status: Boolean) {
+		overlayView.header.showFilterImage(status)
+	}
+
+	fun showScanButton(
+		isShow: Boolean,
+		isLeft: Boolean = false,
+		action: () -> Unit
+	) {
+		overlayView.header.showScanButton(isShow, isLeft, action)
+	}
+
+	fun resetFilterStatus(filtered: Boolean) {
+		overlayView.header.resetFilterStatus(filtered)
+	}
+
+	fun setFilterEvent(action: () -> Unit) {
+		overlayView.header.setFilterEvent(action)
+	}
+
+	fun searchInputListener(isFocus: (Boolean) -> Unit = {}, action: (String) -> Unit) {
+		overlayView.header.searchInputListener(isFocus, action)
+	}
+
 	// 这个是用来还原 `Header` 的边界方法, 当自定义 `Header` 后还原的操作
 	fun recoveryOverlayHeader() {
 		overlayView.apply {
+			header.removeView(header.findViewById<TwoLineTitles>(ElementID.customHeader))
 			header.showTitle(true)
 			header.layoutParams.height = HomeSize.headerHeight
 			contentLayout.setMargins<RelativeLayout.LayoutParams> {
@@ -104,10 +164,6 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		presenter.onFragmentViewCreated()
 		showHomeFragment(false)
 		hideTabBarToAvoidOverdraw()
-	}
-
-	fun showAddButton(status: Boolean, isLeft: Boolean = true, clickEvent: () -> Unit) {
-		overlayView.header.showAddButton(status, isLeft, clickEvent)
 	}
 
 	private fun showHomeFragment(isShow: Boolean) {

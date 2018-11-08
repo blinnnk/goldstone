@@ -17,6 +17,16 @@ object TransactionText {
 		else -> ""
 	}
 	@JvmField
+	val confirmations = when (currentLanguage) {
+		HoneyLanguage.English.code -> "CONFIRMATIONS"
+		HoneyLanguage.Chinese.code -> "CONFIRMATIONS"
+		HoneyLanguage.Japanese.code -> "CONFIRMATIONS"
+		HoneyLanguage.Korean.code -> "CONFIRMATIONS"
+		HoneyLanguage.Russian.code -> "История CONFIRMATIONS"
+		HoneyLanguage.TraditionalChinese.code -> "CONFIRMATIONS"
+		else -> ""
+	}
+	@JvmField
 	val detail = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transaction Details"
 		HoneyLanguage.Chinese.code -> "交易详情"
@@ -98,7 +108,7 @@ object TransactionText {
 	}
 	@JvmField
 	val memo = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Memo"
+		HoneyLanguage.English.code -> "MEMO"
 		HoneyLanguage.Chinese.code -> "备注"
 		HoneyLanguage.Japanese.code -> "備考"
 		HoneyLanguage.Korean.code -> "비고"
@@ -108,7 +118,7 @@ object TransactionText {
 	}
 	@JvmField
 	val transactionHash = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Transaction Hash"
+		HoneyLanguage.English.code -> "TRANSACTION HASH"
 		HoneyLanguage.Chinese.code -> "交易编号(Hash)"
 		HoneyLanguage.Japanese.code -> "取引番号(Hash)"
 		HoneyLanguage.Korean.code -> "거래Hash"
@@ -118,7 +128,7 @@ object TransactionText {
 	}
 	@JvmField
 	val blockNumber = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Block Height"
+		HoneyLanguage.English.code -> "BLOCK HEIGHT"
 		HoneyLanguage.Chinese.code -> "区块高度"
 		HoneyLanguage.Japanese.code -> "ブロック高さ"
 		HoneyLanguage.Korean.code -> "블록 높이"
@@ -140,9 +150,21 @@ object TransactionText {
 		else -> ""
 	}
 
+
+	@JvmField
+	val process = when (currentLanguage) {
+		HoneyLanguage.English.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.Chinese.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.Japanese.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.Korean.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.Russian.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.TraditionalChinese.code -> "CONFIRMATION PROCESS"
+		else -> ""
+	}
+
 	@JvmField
 	val transactionDate = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Transaction Date"
+		HoneyLanguage.English.code -> "TRANSACTION DATE"
 		HoneyLanguage.Chinese.code -> "交易日期"
 		HoneyLanguage.Japanese.code -> "取引期日"
 		HoneyLanguage.Korean.code -> "거래일자"
@@ -260,40 +282,15 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "至"
 		else -> ""
 	}
-	@JvmField
-	val confirmedBlocks: (IntervalCount: Int) -> String = {
-		when (currentLanguage) {
-			HoneyLanguage.English.code -> "$it blocks have confirmed"
-			HoneyLanguage.Chinese.code -> "$it 个区块已经确认了本次转账"
-			HoneyLanguage.Japanese.code -> "$it つのブロックが今回の振込を確認されました"
-			HoneyLanguage.Korean.code -> "$it 블록에서이 양도가 확인되었습니다"
-			HoneyLanguage.Russian.code -> "$it блоков подтвердили данный перевод"
-			HoneyLanguage.TraditionalChinese.code -> "$it 個區塊已經確認了本次轉賬"
-			else -> ""
-		}
-	}
 
 	@JvmField
-	val irreversibleConfirmedBlocks: (IntervalCount: Int) -> String = {
-		when (currentLanguage) {
-			HoneyLanguage.English.code -> if (it == 1) {"Will become irreversible after $it block"} else {"Will become irreversible after $it blocks"}
-			HoneyLanguage.Chinese.code -> "将在$it 个区块后变为不可逆状态"
-			HoneyLanguage.Japanese.code -> "$it ブロック後に元に戻せません"
-			HoneyLanguage.Korean.code -> "$it 차단 후 돌이킬 수 없게 될 것입니다"
-			HoneyLanguage.Russian.code -> if (it == 1) {"$it блок должны быть необратимыми"} else {"$it блока должны быть необратимыми"}
-			HoneyLanguage.TraditionalChinese.code -> "將在$it 個區塊后變為不可逆狀態"
-			else -> ""
-		}
-	}
-
-	@JvmField
-	val irreversibleBlockConfirmed = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This transaction is irreversible"
-		HoneyLanguage.Chinese.code -> "本次转账确认为不可逆状态"
-		HoneyLanguage.Japanese.code -> "この取引は不可逆的です"
-		HoneyLanguage.Korean.code -> "이 거래는 되돌릴 수 없습니다."
-		HoneyLanguage.Russian.code -> "Эта транзакция необратима"
-		HoneyLanguage.TraditionalChinese.code -> "本次轉賬確認為不可逆狀態"
+	val irreversible = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Irreversible"
+		HoneyLanguage.Chinese.code -> "Irreversible"
+		HoneyLanguage.Japanese.code -> "Irreversible"
+		HoneyLanguage.Korean.code -> "Irreversible"
+		HoneyLanguage.Russian.code -> "Irreversible"
+		HoneyLanguage.TraditionalChinese.code -> "Irreversible"
 		else -> ""
 	}
 }

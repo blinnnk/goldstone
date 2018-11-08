@@ -8,9 +8,10 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
@@ -47,7 +48,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 						if (SharedAddress.getCurrentEOSAccount().isValid()) {
 							presenter.showTargetFragment(model.title)
 							preventDuplicateClicks()
-						} else this@apply.context.alert("Current EOS Wallet Is Inactivation or you haven't set default account name")
+						} else safeShowError(AccountError.InactivatedAccountName)
 					}
 					else -> onClick {
 						presenter.showTargetFragment(model.title)

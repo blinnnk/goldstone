@@ -2,7 +2,6 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
@@ -24,13 +23,11 @@ import org.json.JSONObject
  * @date 2018/7/26 11:20 PM
  * @author KaySaith
  */
-@Entity(tableName = "bitcoinTransactionList")
+@Entity(tableName = "bitcoinTransactionList", primaryKeys = ["hash", "recordAddress", "isFee"])
 data class BTCSeriesTransactionTable(
-	@PrimaryKey(autoGenerate = true)
-	val id: Int,
 	val dataIndex: Int, // 复杂的翻页机制需要和服务器映射的抽象角标
 	var symbol: String,
-	var blockNumber: String,
+	var blockNumber: Int,
 	var transactionIndex: Int,
 	var timeStamp: String,
 	val hash: String,
@@ -38,7 +35,7 @@ data class BTCSeriesTransactionTable(
 	val to: String,
 	var recordAddress: String,
 	var isReceive: Boolean,
-	val value: String,
+	val value: String, // Double 0.5
 	val fee: String,
 	var size: String,
 	var confirmations: Int,
@@ -55,10 +52,9 @@ data class BTCSeriesTransactionTable(
 		isFee: Boolean,
 		chainType: Int
 	) : this(
-		0,
 		dataIndex,
 		symbol,
-		data.safeGet("blockheight"),
+		data.safeGet("blockheight").toIntOrNull() ?: -1,
 		0,
 		data.safeGet("time"),
 		data.safeGet("txid"),
@@ -87,8 +83,7 @@ data class BTCSeriesTransactionTable(
 							.encodeCashAddressByLegacy(toAddress)
 							.substringAfter(":")
 					else {
-						if (toAddress.contains(":"))
-							toAddress.substringAfter(":")
+						if (toAddress.contains(":")) toAddress.substringAfter(":")
 						else toAddress
 					}
 				} else {
@@ -187,54 +182,6 @@ data class BTCSeriesTransactionTable(
 			} then (hold)
 		}
 
-		fun getTransactionsByHash(
-			hash: String,
-			isReceive: Boolean,
-			hold: (BTCSeriesTransactionTable?) -> Unit
-		) {
-			load {
-				GoldStoneDataBase
-					.database
-					.btcSeriesTransactionDao()
-					.getDataByHash(hash, isReceive)
-			} then (hold)
-		}
-
-		fun updateLocalDataByHash(
-			hash: String,
-			newData: BTCSeriesTransactionTable,
-			isFee: Boolean,
-			isPending: Boolean
-		) {
-			GoldStoneDataBase
-				.database
-				.btcSeriesTransactionDao()
-				.apply {
-					getTransactionByHash(hash, isFee, newData.recordAddress)
-						?.let {
-							update(it.apply {
-								blockNumber = newData.blockNumber
-								transactionIndex = newData.transactionIndex
-								timeStamp = newData.timeStamp
-								size = newData.size
-								this.isPending = isPending
-							})
-						}
-				}
-		}
-
-		fun preventRepeatedInsert(
-			hash: String,
-			isFee: Boolean,
-			transaction: BTCSeriesTransactionTable
-		) {
-			GoldStoneDataBase.database.btcSeriesTransactionDao().apply {
-				if (getTransactionByHash(hash, isFee, transaction.recordAddress).isNull()) {
-					insert(transaction)
-				}
-			}
-		}
-
 		fun deleteByAddress(address: String, chainType: ChainType) {
 			doAsync {
 				// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
@@ -256,23 +203,23 @@ interface BTCSeriesTransactionDao {
 	@Query("SELECT * FROM bitcoinTransactionList")
 	fun getAll(): List<BTCSeriesTransactionTable>
 
+	@Query("UPDATE bitcoinTransactionList SET blockNumber = :blockNumber, isPending = :isPending WHERE hash LIKE :hash AND recordAddress LIKE :recordAddress")
+	fun updateBlockNumber(blockNumber: Int, hash: String, recordAddress: String, isPending: Boolean)
+
 	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType ORDER BY timeStamp DESC")
 	fun getDataByAddressAndChainType(address: String, chainType: Int): List<BTCSeriesTransactionTable>
 
 	@Query("DELETE FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType")
 	fun deleteDataByAddressAndChainType(address: String, chainType: Int)
 
-	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND isReceive LIKE :isReceive")
-	fun getDataByHash(hash: String, isReceive: Boolean): BTCSeriesTransactionTable?
+	@Query("SELECT * FROM bitcoinTransactionList WHERE hash = :hash AND isReceive = :isReceive AND isFee = :isFee")
+	fun getDataByHash(hash: String, isReceive: Boolean, isFee: Boolean): BTCSeriesTransactionTable?
 
-	@Query("SELECT * FROM bitcoinTransactionList WHERE hash LIKE :hash AND recordAddress LIKE :recordAddress AND isFee LIKE :isFee")
-	fun getTransactionByHash(hash: String, isFee: Boolean, recordAddress: String): BTCSeriesTransactionTable?
-
-	@Query("UPDATE bitcoinTransactionList SET isPending = :isPending WHERE hash LIKE :hash")
-	fun updatePendingStatus(hash: String, isPending: Boolean = false)
-
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: BTCSeriesTransactionTable)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	fun insertAll(tables: List<BTCSeriesTransactionTable>)
 
 	@Update
 	fun update(table: BTCSeriesTransactionTable)

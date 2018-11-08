@@ -74,6 +74,7 @@ dependencies {
   implementation 'com.github.bumptech.glide:glide:4.8.0'
   annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
   // Recycler View
+  implementation 'com.android.support:cardview-v7:28.0.0'
   implementation 'com.android.support:recyclerview-v7:28.0.0'
   // Kotlin
   implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
@@ -104,11 +105,11 @@ dependencies {
   implementation 'com.google.zxing:core:3.3.3'
   // XinGe Push
   implementation 'com.tencent.xinge:xinge:3.2.6-release'
-  implementation'com.tencent.jg:jg:1.1'
+  implementation 'com.tencent.jg:jg:1.1'
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   implementation 'com.tencent.mid:mid:4.0.6-release'
   // Google Analytics
-  implementation 'com.google.android.gms:play-services-analytics:16.0.4'
+  implementation 'com.google.android.gms:play-services-analytics:16.0.5'
   // Wave Animation
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
   // MPAndroidChart

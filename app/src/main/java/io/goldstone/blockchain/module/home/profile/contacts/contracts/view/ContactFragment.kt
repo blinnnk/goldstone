@@ -102,10 +102,10 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		val parent = parentFragment
 		if (parent is TokenDetailOverlayFragment) {
 			val dashboard =
-				parent.overlayView.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
+				parent.getContainer().findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
 			// 判断是否打开通讯录来更改回退栈
 			if (!dashboard.isNull()) {
-				parent.overlayView.removeView(dashboard)
+				parent.getContainer().removeView(dashboard)
 				parent.removeChildFragment(this)
 			} else super.setBackEvent(mainActivity)
 		} else super.setBackEvent(mainActivity)

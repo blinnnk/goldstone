@@ -35,10 +35,6 @@ object CryptoUtils {
 		return value.toDouble() / Math.pow(10.0, decimal.toDouble())
 	}
 
-	fun toCountByDecimal(value: Double, decimal: Int = CryptoValue.ethDecimal): Double {
-		return value / Math.pow(10.0, decimal.toDouble())
-	}
-
 	fun toTargetUnit(
 		value: BigInteger,
 		decimal: Double,
@@ -47,7 +43,7 @@ object CryptoUtils {
 		return value.toDouble() / Math.pow(hexadecimal, decimal)
 	}
 
-	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean = true): String {
+	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean): String {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
 			"0"
 		} else if (!isHex) {
@@ -79,12 +75,7 @@ object CryptoUtils {
 		}
 	}
 
-	fun isERC20Transfer(inputData: String): Boolean {
-		// 有一部分 `token income` 数据是从 e`vent log` 获取，这个值 `logIndex` 可以做判断
-		return inputData.length >= 138 && isTransferInputCode(inputData)
-	}
-
-	fun isERC20TransferByInputCode(inputCode: String, hold: () -> Unit = {}): Boolean {
+	fun isERC20Transfer(inputCode: String, hold: () -> Unit = {}): Boolean {
 		return if (inputCode.length >= 138 && isTransferInputCode(inputCode)
 		) {
 			hold()

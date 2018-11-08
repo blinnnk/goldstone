@@ -46,7 +46,7 @@ class MnemonicConfirmationPresenter(
 		// 如果在窗前钱包的界面用户点击了关闭按钮那么直接切换钱包
 		if (fragment.activity is MainActivity) {
 			fragment.getParentFragment<WalletGenerationFragment> {
-				overlayView.header.showCloseButton(true) {
+				showCloseButton(true) {
 					activity?.jump<SplashActivity>()
 				}
 			}
@@ -92,8 +92,8 @@ class MnemonicConfirmationPresenter(
 		fragment.parentFragment.apply {
 			fun BaseOverlayFragment<*>.resetEvent() {
 				headerTitle = CreateWalletText.mnemonicConfirmation
-				overlayView.header.showCloseButton(false) {}
-				overlayView.header.showBackButton(true) {
+				showCloseButton(false) {}
+				showBackButton(true) {
 					presenter.popFragmentFrom<MnemonicConfirmationFragment>()
 				}
 			}

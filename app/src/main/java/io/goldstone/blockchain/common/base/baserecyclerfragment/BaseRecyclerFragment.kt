@@ -16,7 +16,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
@@ -295,11 +294,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
 	open fun removeLoadingView() {
 		topMiniLoading.visibility = View.GONE
-	}
-
-	fun getOverlayHeader(): OverlayHeaderLayout? {
-		val parent = parentFragment
-		return (parent as? BaseOverlayFragment<*>)?.overlayView?.header
 	}
 
 	open fun showEmptyView() {

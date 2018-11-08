@@ -1,6 +1,7 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
+package io.goldstone.blockchain.kernel.commonmodel
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 /**
  * @date 2018/6/25 6:34 PM
@@ -34,7 +35,7 @@ data class ETCTransactionModel(
 	@SerializedName("transactionIndex")
 	var transactionIndex: String,
 	var isFee: Boolean = false
-) {
+): Serializable {
 	constructor() : this(
 		"",
 		"",

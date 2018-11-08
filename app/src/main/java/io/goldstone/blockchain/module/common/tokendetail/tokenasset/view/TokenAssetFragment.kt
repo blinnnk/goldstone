@@ -16,6 +16,7 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
+import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.SessionTitleView
@@ -174,28 +175,30 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		netTotal: BigInteger,
 		netWeight: String
 	) {
-		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available)
-		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total)
+		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available, ProcessType.Disk)
+		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total, ProcessType.Disk)
 		ramAssetCell.setSubtitle(ramEOSCount)
 		cpuAssetCell.setSubtitle(cpuWeight)
 		cpuAssetCell.setLeftValue(
 			cpuAvailable,
 			TokenDetailText.available,
-			true
+			ProcessType.Time
 		)
 		cpuAssetCell.setRightValue(
 			cpuTotal,
 			TokenDetailText.total,
-			true
+			ProcessType.Time
 		)
 		netAssetCell.setSubtitle(netWeight)
 		netAssetCell.setLeftValue(
 			netAvailable,
-			TokenDetailText.available
+			TokenDetailText.available,
+			ProcessType.Disk
 		)
 		netAssetCell.setRightValue(
 			netTotal,
-			TokenDetailText.total
+			TokenDetailText.total,
+			ProcessType.Disk
 		)
 	}
 

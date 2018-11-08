@@ -19,7 +19,9 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.rightPadding
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.verticalLayout
 
@@ -41,6 +43,8 @@ class AddressesListView(
 
 	private val cellLayout = verticalLayout {
 		lparams(matchParent, matchParent)
+		leftPadding = PaddingSize.device
+		rightPadding = PaddingSize.device
 	}
 	var checkAllEvent: Runnable? = null
 	var currentWallet: WalletTable? = null

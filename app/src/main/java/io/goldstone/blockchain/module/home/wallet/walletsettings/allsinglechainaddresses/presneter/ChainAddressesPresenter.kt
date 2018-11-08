@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -38,9 +37,8 @@ class ChainAddressesPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showCloseButton(false) {}
-			overlayView.header.showBackButton(true) {
-				headerTitle = WalletSettingsText.viewAddresses
+			showCloseButton(false) {}
+			showBackButton(true) {
 				presenter.popFragmentFrom<ChainAddressesFragment>()
 			}
 			updateAddAddressEvent {

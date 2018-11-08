@@ -24,7 +24,7 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 		when (title) {
 			QuotationText.management -> {
 				presenter.showQuotationManagementFragment()
-				overlayView.header.showSearchButton(true) {
+				showSearchButton(true) {
 					presenter.showQuotationSearchFragment()
 				}
 			}

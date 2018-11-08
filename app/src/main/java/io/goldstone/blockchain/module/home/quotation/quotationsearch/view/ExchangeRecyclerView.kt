@@ -14,7 +14,7 @@ import org.jetbrains.anko.wrapContent
  */
 class ExchangeRecyclerView(context: Context) : BaseRecyclerView(context) {
 	init {
-		id = ElementID.recycleriew
+		id = ElementID.recyclerView
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 	}
 }

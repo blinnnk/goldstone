@@ -99,6 +99,11 @@ fun TokenContract?.isETH(): Boolean {
 	return this?.contract.equals(TokenContract.ethContract, true)
 }
 
+fun TokenContract?.isETHSeries(): Boolean {
+	return isETH() || isETC() || isERC20Token()
+}
+
+
 fun TokenContract?.isBTC(): Boolean {
 	return this?.contract.equals(TokenContract.btcContract, true)
 }
@@ -117,7 +122,7 @@ fun TokenContract?.isETC(): Boolean {
 
 // 在 `Ethereum` 或 `Ethereum Classic` 的链下使用
 fun TokenContract?.isERC20Token(): Boolean {
-	return (!isETH() && !isETC() && !isBTC() && !isBCH() && !isLTC() && !isEOSToken())
+	return (!isETH() && !isETC() && !isBTC() && !isBCH() && !isLTC() && !isEOSToken() && !isEOS())
 }
 
 fun TokenContract?.isEOSToken(): Boolean {

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.os.Bundle
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -19,8 +20,8 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
@@ -32,6 +33,10 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -89,7 +94,7 @@ class TokenDetailPresenter(
 	}
 
 	fun showOnlyFailedData() {
-		allData?.filter { it.isFailed || it.hasError }?.let {
+		allData?.filter { it.hasError }?.let {
 			diffAndUpdateAdapterData<TokenDetailAdapter>(it.toArrayList())
 			if (it.isEmpty()) showBottomLoading(false)
 		}
@@ -204,7 +209,7 @@ class TokenDetailPresenter(
 	}
 
 	fun loadDataFromDatabaseOrElse(
-		callback: (
+		@UiThread callback: (
 			localETHSeriesData: List<TransactionListModel>?,
 			localBTCSeriesData: List<BTCSeriesTransactionTable>?
 		) -> Unit = { _, _ -> }
@@ -285,17 +290,27 @@ class TokenDetailPresenter(
 
 	private fun getETHSeriesData(
 		address: String,
-		callback: (List<TransactionListModel>) -> Unit
+		@WorkerThread callback: (List<TransactionListModel>) -> Unit
 	) {
-		TransactionTable.getByAddressAndContract(
-			address,
-			fragment.token?.contract!!
-		) { transactions ->
-			transactions.isNotEmpty() isTrue {
-				fragment.updatePageBy(transactions, address)
-				fragment.removeLoadingView()
+		if (token == null) return
+		launch {
+			withContext(CommonPool, CoroutineStart.LAZY) {
+				val transactionDao =
+					GoldStoneDataBase.database.transactionDao()
+				val transactions =
+					if (token?.contract.isETH()) transactionDao.getETHAndAllFee(
+						address,
+						token!!.contract.contract.orEmpty(),
+						token!!.chainID
+					) else transactionDao.getByAddressAndContract(
+						address,
+						token!!.contract.contract.orEmpty(),
+						token!!.chainID
+					)
+				val listModel = transactions.map { TransactionListModel(it) }
+				fragment.updatePageBy(listModel, address)
+				callback(listModel)
 			}
-			callback(transactions)
 		}
 	}
 
@@ -415,7 +430,7 @@ class TokenDetailPresenter(
 					if (it.isFee) {
 						it.minerFee.substringBefore(" ").toDouble() * -1
 					} else {
-						it.value.toDouble() * modulusByReceiveStatus(it.isReceived)
+						it.count * modulusByReceiveStatus(it.isReceived)
 					}
 				}).let {
 					balance = it.toBigDecimal().toDouble()
