@@ -480,7 +480,6 @@ object EOSAPI {
 	) {
 		getTransactionJSONObjectByTxID(txID) { data, error ->
 			if (data != null && error.isNone()) {
-				hold(data.safeGet("block_num").toIntOrNull(), error)
 			} else hold(null, error)
 		}
 	}

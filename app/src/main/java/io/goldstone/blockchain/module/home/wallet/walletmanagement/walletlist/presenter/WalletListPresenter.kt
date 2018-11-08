@@ -131,12 +131,12 @@ class WalletListPresenter(
 
 	override fun onFragmentShowFromHidden() {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.showWalletSettingListFragment()
 			}
 		}
 		fragment.getParentFragment<ProfileOverlayFragment> {
-			overlayView.header.showAddButton(true) {
+			showAddButton(true) {
 				presenter.showWalletAddingMethodDashboard()
 			}
 		}

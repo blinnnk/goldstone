@@ -23,12 +23,9 @@ import io.goldstone.blockchain.crypto.multichain.TokenIcon
 import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestData
-import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestUnCryptoData
-import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -39,8 +36,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
+import io.goldstone.blockchain.kernel.commonmodel.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
 import okhttp3.RequestBody

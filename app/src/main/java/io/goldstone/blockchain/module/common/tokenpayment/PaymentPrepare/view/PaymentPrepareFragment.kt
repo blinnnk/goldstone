@@ -120,9 +120,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 				titles.into(this)
 				titles.setCenterInParent()
 			} else {
-				overlayView.header.apply {
-					removeView(findViewById<TwoLineTitles>(ElementID.customHeader))
-				}
 				recoveryOverlayHeader()
 			}
 
@@ -335,7 +332,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private fun resetBackButtonEvent() {
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				if (memoInputView.isNull()) {
 					presenter.popFragmentFrom<PaymentPrepareFragment>()
 				} else {

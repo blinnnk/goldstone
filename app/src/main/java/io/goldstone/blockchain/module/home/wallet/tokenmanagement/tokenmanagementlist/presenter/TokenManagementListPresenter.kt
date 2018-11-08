@@ -41,7 +41,7 @@ class TokenManagementListPresenter(
 		super.onFragmentShowFromHidden()
 		updateData()
 		fragment.getParentFragment<TokenManagementFragment> {
-			overlayView.header.showCloseButton(true) {
+			showCloseButton(true) {
 				presenter.removeSelfFromActivity()
 			}
 		}

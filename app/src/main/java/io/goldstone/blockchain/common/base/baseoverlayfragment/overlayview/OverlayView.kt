@@ -48,5 +48,4 @@ class OverlayView(context: Context) : RelativeLayout(context) {
 		// 背景防止点击的 `mask` 颜色动画
 		updateColorAnimation(Color.TRANSPARENT, GrayScale.Opacity2Black)
 	}
-
 }

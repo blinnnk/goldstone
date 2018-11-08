@@ -1,279 +1,341 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
-import android.os.Bundle
-import android.support.v4.app.Fragment
-import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import android.support.annotation.WorkerThread
+import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.NotificationText
-import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.language.TransactionText
-import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.toMillisecond
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.crypto.utils.toBTCCount
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
-import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
-import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
-import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailHeaderView
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionInfoCell
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.contract.TransactionDetailContract
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.*
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.BTCSeriesTransactionObserver
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.EOSTransactionObserver
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.ETHSeriesTransactionObserver
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.getCurrentConfirmationNumber
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.updateERC20FeeInfo
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.sdk27.coroutines.onClick
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
+import org.jetbrains.anko.doAsync
+
 
 /**
- * @date 27/03/2018 3:27 AM
  * @author KaySaith
- * @description
- * 这个界面由三个入场景公用, 分别是账单列表，转账完成和通知中心进入, `fragment` 承担了多重身份
- * 固再次需要注意.
+ * @date  2018/11/07
  */
 class TransactionDetailPresenter(
-	override val fragment: TransactionDetailFragment
-) : BaseRecyclerPresenter<TransactionDetailFragment, TransactionDetailModel>() {
+	val data: TransactionSealedModel,
+	val detailView: TransactionDetailContract.GSView
+) : TransactionDetailContract.GSPresenter {
 
-	internal val data by lazy {
-		fragment.arguments?.get(ArgumentKey.transactionDetail) as? ReceiptModel
-	}
-	internal val dataFromList by lazy {
-		fragment.arguments?.get(ArgumentKey.transactionFromList) as? TransactionListModel
-	}
-	internal val notificationData by lazy {
-		fragment.arguments?.get(ArgumentKey.notificationTransaction) as? NotificationTransactionInfo
-	}
-	internal var count = 0.0
-	internal var currentHash = ""
-	internal var headerModel: TransactionHeaderModel? = null
-
-	override fun updateData() {
-		/** 这个是从账目列表进入的详情, `Transaction List`, `TokenDetail` */
-		updateDataFromTransactionList()
-		/** 这个是转账完毕后进入的初始数据 */
-		updateDataFromTransfer()
-		/** 这个是从通知中心进入的, 通知中心的显示是现查账. */
-		updateDataFromNotification()
+	override fun start() {
+		detailView.showLoading(true)
+		setTransactionInformation()
 	}
 
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		fragment.setBackEventByParentFragment()
-	}
-
-	// 更新头部数字的工具
-	fun updateHeaderValue(headerModel: TransactionHeaderModel) {
-		fragment.recyclerView.getItemAtAdapterPosition<TransactionDetailHeaderView>(0) {
-			it.setIconStyle(headerModel)
+	private fun setTransactionInformation() {
+		// Pending 更新数块的逻辑
+		if (data.isPending) {
+			observerPendingTransaction()
+			detailView.showProgress(TransactionProgressModel(data.confirmations))
+			detailView.showLoading(false)
+		} else detailView.showProgress(null)
+		// 显示账单的基础信息
+		detailView.showHeaderData(TransactionHeaderModel(data))
+		showTransactionInfo(data.blockNumber, data.confirmations)
+		detailView.showTransactionAddresses(
+			TransactionDetailModel(data.fromAddress, CommonText.from.toUpperCase()),
+			TransactionDetailModel(data.toAddress, CommonText.to.toUpperCase())
+		)
+		// 显示账单的 Memo 信息, 注意只有 ETHSeries 的账单存在拉取链上信息逻辑
+		if (data.contract.isETHSeries() && !isFromNotification()) {
+			if (data.memo.isEmpty()) {
+				detailView.showMemo(TransactionDetailModel("Getting Memo From Chain", TransactionText.memo))
+				getAndShowChainMemo()
+			} else {
+				// `EOS` 系列的 `Memo` 和 `ETHSeries` 获取不一样
+				val memo = data.memo isEmptyThen TransactionText.noMemo
+				detailView.showMemo(TransactionDetailModel(memo, TransactionText.memo))
+				detailView.showLoading(false)
+			}
 		}
-	}
 
-	fun updateMemo(memo: String) {
-		fragment.recyclerView.getItemAtAdapterPosition<TransactionInfoCell>(2) {
-			it.setContent(memo)
-		}
-	}
+		// `BlockNumber` 为 `-1` 意味着还没有被收录, 所以不存在 `ConfirmationCount`
+		if (data.blockNumber > 0) updateConfirmationNumber()
+		// isPending 为 False 并且 Confirmation 为 -1 的情况意味当前来自与 Notification
+		if (isFromNotification()) updateTransactionFromNotification()
 
-	fun runBackEventBy(parent: Fragment) {
-		when (parent) {
-			is TokenDetailOverlayFragment ->
-				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
-
-			is NotificationFragment -> {
-				parent.headerTitle = NotificationText.notification
-				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
+		/**
+		 *  这个检查应对的情况是, 从 `EtherScan` 拉取的 `ETH` 账单存在 `ERC20` 的 `Token` 转账信息,
+		 * 这个信息没有 `Symbol` 和 `ContractAddress` 以及 `Decimal`, 如果用户拉取了, 在没有拉取
+		 * `ERC20` 账单之前进入了这样的燃气费信息的时候, 需要拉取对应的 `ERC20` 的基本信息
+		 */
+		if (data.isFee && data.count == 0.0 && data.contract.isETHSeries()) {
+			updateERC20FeeInfo(data) { symbol, count, error ->
+				if (error.isNone()) launch(UI) {
+					detailView.showHeaderData(TransactionHeaderModel(data, symbol!!, count!!))
+				} else detailView.showErrorAlert(error)
 			}
 		}
 	}
 
-	fun getUnitSymbol(): String {
-		val symbol = notificationData?.symbol ?: data?.token?.symbol ?: dataFromList?.symbol
-		return when {
-			ChainID(notificationData?.chainID.orEmpty()).isEOS() -> CoinSymbol.EOS.symbol.orEmpty()
-			data?.token?.contract.isEOSToken() -> CoinSymbol.EOS.symbol.orEmpty()
-			else -> CoinSymbol(symbol).getChainSymbol().symbol.orEmpty()
+	private fun updateConfirmationNumber() {
+		when {
+			data.contract.isBTC() || data.contract.isBCH() ->
+				updateBTCSeriesTransaction(false, data.contract.getChainURL().chainID)
+			data.contract.isLTC() ->
+				updateLTCTransaction(true, data.contract.getChainURL().chainID)
+			data.contract.isETHSeries() -> updateETHSeriesConfirmationCount()
+			data.contract.isEOSSeries() -> {
+				detailView.showLoading(false)
+			}
 		}
 	}
 
-	fun showAddContactsButton(cell: TransactionInfoCell) {
-		TransactionListModel.convertMultiToOrFromAddresses(cell.model.info).forEachIndexed { index, address ->
-			ContactTable.hasContacts(address) { exist ->
-				if (exist) return@hasContacts
-				cell.showAddContactButton(index) {
-					onClick {
-						fragment.parentFragment?.apply {
-							when (this) {
-								is TokenDetailOverlayFragment -> presenter.removeSelfFromActivity()
-								is NotificationFragment -> presenter.removeSelfFromActivity()
-							}
-						}
-						fragment.getMainActivity()?.apply {
-							addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-								putString(ArgumentKey.profileTitle, ProfileText.contactsInput)
-								putSerializable(ArgumentKey.addressModel, ContactModel(address, getUnitSymbol()))
-							}
-						}
-						preventDuplicateClicks()
-					}
+	private fun observerPendingTransaction() {
+		when {
+			data.contract.isBTCSeries() -> btcSeriesObserver.start()
+			data.contract.isEOS() -> eosObserver.start()
+			data.contract.isETHSeries() -> ethSeriesObserver.start()
+		}
+	}
+
+	override fun removeObserver() {
+		btcSeriesObserver.removeObserver()
+		ethSeriesObserver.removeObserver()
+		eosObserver.removeObserver()
+	}
+
+	private fun onTransferred(blockNumber: Int, totalCount: Int, isFailed: Boolean) {
+		when {
+			data.contract.isBTCSeries() -> onBTCSeriesTransferred(blockNumber)
+			data.contract.isETHSeries() -> onETHSeriesTransferred(blockNumber, isFailed)
+			data.contract.isEOSSeries() -> onEOSSeriesTransferred(blockNumber)
+		}
+		if (data.contract.isEOSSeries())
+			detailView.showProgress(TransactionProgressModel(totalCount, totalCount.toLong()))
+		else detailView.showProgress(TransactionProgressModel(totalCount))
+		showTransactionInfo(blockNumber, totalCount)
+		detailView.updateTokenDetailList()
+		when (data) {
+			is TransactionListModel ->
+				detailView.showHeaderData(TransactionHeaderModel(data, false, isFailed))
+			is ReceiptModel ->
+				detailView.showHeaderData(TransactionHeaderModel(data, false, isFailed))
+		}
+	}
+
+	private fun updateTransactionFromNotification() {
+		when {
+			// 从通知来的消息, 可能来自与任何支持的链, 这里需要解出 `Notification` 里面带入的 `ChainID` 作为参数
+			data.contract.isBTC() || data.contract.isBCH() -> data.chainID?.let {
+				updateBTCSeriesTransaction(true, it)
+			}
+			data.contract.isLTC() -> data.chainID?.let {
+				updateLTCTransaction(true, it)
+			}
+			data.contract.isETHSeries() ->
+				getAndShowETHSeriesTransactionFromNotification()
+			data.contract.isEOSSeries() -> {
+				// 目前不支持 `EOS` 的 `Notification`
+			}
+		}
+	}
+
+	private val btcSeriesObserver = object : BTCSeriesTransactionObserver() {
+		override val chainURL = data.contract.getChainURL()
+		override val hash = data.hash
+		override fun getStatus(confirmed: Boolean, blockInterval: Int, blockNumber: Int) {
+			if (confirmed) onTransferred(blockNumber, 6, false)
+			else detailView.showProgress(TransactionProgressModel(blockInterval))
+		}
+	}
+
+	private val ethSeriesObserver = object : ETHSeriesTransactionObserver() {
+		override val chainID: String = data.contract.getCurrentChainID().id
+		override val transactionHash = data.hash
+		override fun getStatus(
+			confirmed: Boolean,
+			blockInterval: Int,
+			blockNumber: Int,
+			hasError: Boolean
+		) {
+			if (confirmed || hasError) onTransferred(blockNumber, 6, hasError)
+			else detailView.showProgress(TransactionProgressModel(blockInterval))
+		}
+	}
+
+	private val eosObserver = object : EOSTransactionObserver() {
+		override val hash = data.hash
+		@WorkerThread
+		override fun getStatus(
+			confirmed: Boolean,
+			blockNumber: Int,
+			confirmedCount: Int,
+			totalCount: Int
+		) {
+			if (confirmed) onTransferred(blockNumber, totalCount, false)
+			else detailView.showProgress(TransactionProgressModel(confirmedCount, totalCount.toLong()))
+		}
+	}
+
+	private fun onBTCSeriesTransferred(blockNumber: Int) {
+		// 交易过程中发生错误
+		doAsync {
+			val transactionDao =
+				GoldStoneDataBase.database.btcSeriesTransactionDao()
+			transactionDao.updateBlockNumber(
+				blockNumber,
+				data.hash,
+				data.fromAddress,
+				false
+			)
+		}
+	}
+
+	private fun onETHSeriesTransferred(blockNumber: Int, isFailed: Boolean) {
+		// 交易过程中发生错误
+		doAsync {
+			val transactionDao =
+				GoldStoneDataBase.database.transactionDao()
+			if (isFailed) transactionDao.updateErrorStatus(
+				TinyNumber.True.value.toString(),
+				data.hash,
+				data.fromAddress
+			) else transactionDao.updateBlockNumber(
+				blockNumber,
+				data.hash,
+				data.fromAddress,
+				false
+			)
+		}
+	}
+
+	private fun onEOSSeriesTransferred(blockNumber: Int) {
+		// 交易过程中发生错误
+		doAsync {
+			val transactionDao =
+				GoldStoneDataBase.database.eosTransactionDao()
+			// Update Database BlockNumber
+			transactionDao.updateBlockNumberByTxID(data.hash, blockNumber, false)
+			// 根据服务器计算 `ServerID` 的规则更新本地数 `PendingData` 数据
+			EOSAPI.getTransactionServerID(
+				blockNumber,
+				data.hash,
+				SharedAddress.getCurrentEOSAccount()
+			) {
+				if (it != null) transactionDao.updatePendingDataByTxID(data.hash, it)
+			}
+		}
+	}
+
+	private fun getAndShowChainMemo() = ETHSeriesTransactionUtils.getMemoFromChain(
+		data.hash,
+		data.isReceive,
+		data.isFee,
+		data.contract.getChainURL()
+	) { memo, error ->
+		launch {
+			withContext(UI) {
+				detailView.showLoading(false)
+				if (memo != null && error.isNone())
+					detailView.showMemo(TransactionDetailModel(memo, TransactionText.memo))
+				else detailView.showErrorAlert(error)
+			}
+		}
+	}
+
+	private fun showTransactionInfo(blockNumber: Int, confirmations: Int) {
+		val blockNumberText =
+			if (blockNumber == -1) TransactionText.pendingBlockConfirmation
+			else "$blockNumber "
+		val confirmationsText = when {
+			confirmations == -1 -> TransactionText.pendingBlockConfirmation
+			data.contract.isEOSSeries() -> TransactionText.irreversible
+			else -> "$confirmations "
+		}
+		detailView.showTransactionInformation(
+			TransactionDetailModel(data.hash, TransactionText.transactionHash),
+			TransactionDetailModel(blockNumberText, TransactionText.blockNumber),
+			TransactionDetailModel(confirmationsText, TransactionText.confirmations),
+			TransactionDetailModel(data.date, TransactionText.transactionDate)
+		)
+	}
+
+	private fun getAndShowETHSeriesTransactionFromNotification() {
+		ETHSeriesTransactionUtils.getTransactionByHash(
+			data.hash,
+			data.isReceive,
+			data.chainID?.getChainURL()!!
+		) { data, error ->
+			if (data != null && error.isNone()) {
+				showTransactionInfo(data.blockNumber, data.confirmations)
+				if (data.memo.isEmpty()) getAndShowChainMemo()
+				else {
+					detailView.showMemo(TransactionDetailModel(data.memo, TransactionText.memo))
+					detailView.showLoading(false)
 				}
+			} else detailView.showErrorAlert(error)
+		}
+	}
+
+	private fun updateBTCSeriesTransaction(checkLocal: Boolean, chainID: ChainID) {
+		BTCSeriesTransactionUtils.getTransaction(
+			data.hash,
+			data.isReceive,
+			if (data.isReceive) data.toAddress else data.fromAddress,
+			chainID.getThirdPartyURL(),
+			checkLocal
+		) { transaction, error ->
+			if (transaction != null && error.isNone()) launch(UI) {
+				showTransactionInfo(transaction.blockNumber, transaction.confirmations)
+			} else detailView.showErrorAlert(error)
+			launch(UI) {
+				detailView.showLoading(false)
 			}
 		}
 	}
 
-	fun showTransactionWebFragment() {
-		val symbol = dataFromList?.symbol ?: data?.token?.symbol ?: notificationData?.symbol
-		val fromAddress = dataFromList?.fromAddress ?: data?.fromAddress
-		?: notificationData?.fromAddress.orEmpty()
-		fragment.parentFragment.apply {
-			val webTitle =
-				when {
-					CoinSymbol(symbol).isETC() -> TransactionText.gasTracker
-					CoinSymbol(symbol).isBTCSeries() || CoinSymbol(symbol).isEOS() ->
-						TransactionText.transactionWeb
-					else -> TransactionText.etherScanTransaction
-				}
-			val argument = Bundle().apply {
-				putString(
-					ArgumentKey.webViewUrl,
-					TransactionListModel.generateTransactionURL(
-						currentHash,
-						symbol,
-						EOSAccount(fromAddress).isValid(false)
-					)
-				)
-				putString(ArgumentKey.webViewName, webTitle)
-			}
-			when (this) {
-				is TokenDetailOverlayFragment -> presenter.showTargetFragment<WebViewFragment>(argument)
-				is NotificationFragment -> presenter.showTargetFragment<WebViewFragment>(argument)
-			}
+	private fun updateLTCTransaction(checkLocal: Boolean, chainID: ChainID) {
+		LTCTransactionUtils.getTransaction(
+			data.hash,
+			data.isReceive,
+			if (data.isReceive) data.toAddress else data.fromAddress,
+			chainID.getThirdPartyURL(),
+			checkLocal
+		) { transaction, error ->
+			if (transaction != null && error.isNone()) launch(UI) {
+				showTransactionInfo(transaction.blockNumber, transaction.confirmations)
+			} else detailView.showErrorAlert(error)
+			detailView.showLoading(false)
 		}
 	}
 
-	// 根据传入转账信息类型, 来生成对应的更新界面的数据
-	fun generateModels(receipt: Any? = null): List<TransactionDetailModel> {
-		// 从转账界面跳转进来的界面判断燃气费是否是 `BTC`
-		val timStamp =
-			data?.timestamp
-				?: dataFromList?.timeStamp?.toLongOrNull()
-				?: notificationData?.timeStamp.orElse(0L)
-		val date = TimeUtils.formatDate(timStamp.toMillisecond())
-		val memo =
-			if (data?.memo.isNull()) TransactionText.noMemo
-			else data?.memo
-		val fromAddress = data?.fromAddress
-			?: dataFromList?.fromAddress
-			?: notificationData?.fromAddress
-		val symbol = data?.token?.symbol
-			?: dataFromList?.symbol
-			?: notificationData?.symbol.orEmpty()
-		val receiptData = when (receipt) {
-			is TransactionListModel -> {
-				arrayListOf(
-					receipt.minerFee,
-					receipt.memo,
-					receipt.fromAddress,
-					receipt.toAddress,
-					receipt.transactionHash,
-					receipt.blockNumber,
-					receipt.date,
-					receipt.url
-				)
-			}
-
-			is TransactionTable -> {
-				arrayListOf(
-					formattedMinerFee(),
-					memo,
-					if (receipt.isReceive) receipt.to
-					else fromAddress,
-					if (receipt.isReceive) fromAddress
-					else receipt.to,
-					currentHash,
-					receipt.blockNumber,
-					date,
-					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol, false)
-				)
-			}
-
-			is BTCSeriesTransactionTable -> {
-				arrayListOf(
-					"${receipt.fee.toBigDecimal().toPlainString()} ${receipt.symbol}",
-					memo,
-					receipt.fromAddress,
-					TransactionListModel.formatToAddress(receipt.to),
-					currentHash,
-					receipt.blockNumber,
-					TimeUtils.formatDate(receipt.timeStamp.toMillisecond()),
-					TransactionListModel.generateTransactionURL(currentHash, receipt.symbol, false)
-				)
-			}
-
-			else -> {
-				arrayListOf(
-					formattedMinerFee(),
-					memo,
-					fromAddress,
-					data?.toAddress.orEmpty(),
-					currentHash,
-					TransactionText.pendingBlockConfirmation,
-					date,
-					TransactionListModel.generateTransactionURL(
-						currentHash,
-						symbol,
-						EOSAccount(fromAddress.orEmpty()).isValid(false)
-					)
-				)
-			}
-		}
-		arrayListOf(
-			TransactionText.minerFee,
-			TransactionText.memo,
-			CommonText.from,
-			CommonText.to,
-			TransactionText.transactionHash,
-			TransactionText.blockNumber,
-			TransactionText.transactionDate,
-			TransactionText.url
-		).mapIndexed { index, it ->
-			TransactionDetailModel(receiptData[index].toString(), it)
-		}.let { models ->
-			return if (CoinSymbol(getUnitSymbol()).isBTCSeries()) {
-				// 如果是 `比特币` 账单不显示 `Memo`
-				models.filterNot {
-					it.description.equals(TransactionText.memo, true)
-				}
-			} else models
-		}
+	private fun isFromNotification(): Boolean {
+		return !data.isPending && data.confirmations == -1
 	}
 
-	private fun formattedMinerFee(): String? {
-		val dataMinerFee =
-			if (CoinSymbol(data?.token?.symbol).isBTCSeries())
-				data?.minerFee?.toDouble()?.toBTCCount()?.toBigDecimal()?.toPlainString()
-			else data?.minerFee
-		return if (data.isNull()) dataFromList?.minerFee
-		else "$dataMinerFee ${getUnitSymbol()}"
-	}
-
-	private fun TransactionDetailFragment.setBackEventByParentFragment() {
-		parentFragment?.let { parent ->
-			if (parent is BaseOverlayFragment<*>)
-				parent.overlayView.header.showBackButton(true) {
-					runBackEventBy(parent)
-				}
-		}
+	private fun updateETHSeriesConfirmationCount() = getCurrentConfirmationNumber(
+		data.blockNumber,
+		data.contract.getChainURL()
+	) { confirmationCount, error ->
+		if (confirmationCount != null && error.isNone()) {
+			val transactionDao =
+				GoldStoneDataBase.database.transactionDao()
+			transactionDao.updateConfirmationCount(
+				confirmationCount,
+				data.hash,
+				data.fromAddress,
+				data.isPending
+			)
+			launch(UI) {
+				showTransactionInfo(data.blockNumber, confirmationCount)
+			}
+		} else detailView.showErrorAlert(error)
 	}
 }
+

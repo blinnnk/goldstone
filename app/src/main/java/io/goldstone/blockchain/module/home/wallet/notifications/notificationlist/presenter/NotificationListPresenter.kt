@@ -11,8 +11,8 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -36,7 +36,7 @@ class NotificationListPresenter(
 		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateUnreadCount()
 	}
 
-	fun showTransactionListDetailFragment(transactionInfo: NotificationTransactionInfo) {
+	fun showTransactionDetailFragment(transactionInfo: NotificationModel) {
 		fragment.getParentFragment<NotificationFragment>()?.apply {
 			presenter.showTargetFragment<TransactionDetailFragment>(
 				Bundle().apply {

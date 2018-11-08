@@ -242,10 +242,9 @@ class AddressSelectionPresenter(
 				putDouble(ArgumentKey.paymentCount, count)
 				putSerializable(ArgumentKey.tokenModel, token)
 			}
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
-			headerTitle = TokenDetailText.transferDetail
 		}
 	}
 
@@ -253,12 +252,11 @@ class AddressSelectionPresenter(
 		super.onFragmentShowFromHidden()
 		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			val header = overlayView.header
 			if (!isFromQuickTransfer) {
-				header.showBackButton(true) {
+				showBackButton(true) {
 					presenter.popFragmentFrom<AddressSelectionFragment>()
 				}
-				header.showCloseButton(false) {}
+				showCloseButton(false) {}
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.utils
 
 import android.content.Context
+import android.support.annotation.UiThread
 import org.jetbrains.anko.runOnUiThread
 
 
@@ -34,6 +35,7 @@ class ErrorDisplayManager(error: Throwable) {
 		}
 	}
 
+	@UiThread
 	fun show(context: Context?) {
 		displayMessage?.apply {
 			context?.runOnUiThread { alert(this@apply) }

@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
+import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import java.io.Serializable
 import java.math.BigInteger
 
 /**
@@ -12,15 +14,32 @@ import java.math.BigInteger
  * @author KaySaith
  */
 data class ReceiptModel(
-	val fromAddress: String,
-	val toAddress: String,
+	override val fromAddress: String,
+	override val toAddress: String,
 	val minerFee: String,
-	val value: BigInteger,
+	override val value: BigInteger,
 	val token: WalletDetailCellModel,
 	val taxHash: String,
 	val timestamp: Long,
-	val memo: String? = null
-) : Serializable {
+	override val memo: String
+) : TransactionSealedModel(
+	true,
+	taxHash,
+	token.symbol,
+	fromAddress,
+	toAddress,
+	CryptoUtils.toCountByDecimal(value, token.decimal),
+	value,
+	false,
+	token.contract,
+	false,
+	false,
+	-1,
+	TimeUtils.formatDate(timestamp.toMillisecond()),
+	-1,
+	memo,
+	null
+) {
 	constructor(
 		info: EOSTransactionInfo,
 		response: EOSResponse,

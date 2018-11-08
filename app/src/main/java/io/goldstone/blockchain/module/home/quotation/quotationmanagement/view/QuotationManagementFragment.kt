@@ -47,13 +47,12 @@ class QuotationManagementFragment :
 		presenter.checkAndUpdateQuotationData()
 		// 从下一个界面返回的时候更新这个界面的 `UI` 数据
 		getParentFragment<QuotationOverlayFragment> {
-			if (hidden) {
-				overlayView.header.showSearchButton(false) {}
-			} else {
-				overlayView.header.showSearchButton(true) {
+			if (hidden) showSearchButton(false) {}
+			else {
+				showSearchButton(true) {
 					presenter.showQuotationSearchFragment()
 				}
-				overlayView.header.showCloseButton(true) {
+				showCloseButton(true) {
 					presenter.removeSelfFromActivity()
 				}
 			}

@@ -6,6 +6,7 @@ import android.widget.CheckBox
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
+import com.blinnnk.util.getParentFragment
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
@@ -44,13 +45,13 @@ class QuotationSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.getFilterSearchInput().showFilterImage(true)
-			overlayView.header.searchInputListener(
+			showFilterImage(true)
+			searchInputListener(
 				{ NetworkUtil.hasNetworkWithAlert(context) }
 			) {
 				if (NetworkUtil.hasNetwork(context)) searchTokenBy(it)
 			}
-			overlayView.header.setSearchFilterClickEvent {
+			setFilterEvent {
 				showExchangeDashboard()
 			}
 		}
@@ -89,9 +90,8 @@ class QuotationSearchPresenter(
 		if (selectedIds.isNotEmpty()) {
 			selectedIds = selectedIds.substringBeforeLast(',')
 		}
-		fragment.getParentFragment<QuotationOverlayFragment> {
-			overlayView.header.resetFilterStatus(selectedIds.isNotEmpty())
-		}
+		fragment.getParentFragment<QuotationOverlayFragment>()
+			?.resetFilterStatus(selectedIds.isNotEmpty())
 		hold(selectedNames)
 	}
 
@@ -242,7 +242,7 @@ class QuotationSearchPresenter(
 
 	private fun updateResultAfterConditionChanged() {
 		fragment.getParentFragment<QuotationOverlayFragment> {
-			val textForSearch = overlayView.header.getFilterSearchInput().editText.text.toString()
+			val textForSearch = getSearchContent()
 			if (NetworkUtil.hasNetworkWithAlert(context) && textForSearch.isNotEmpty()) {
 				searchTokenBy(textForSearch)
 			}

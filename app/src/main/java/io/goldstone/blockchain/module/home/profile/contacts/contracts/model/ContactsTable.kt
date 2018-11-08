@@ -73,14 +73,31 @@ data class ContactTable(
 			}
 		}
 
-		fun deleteContactByID(
-			id: Int,
-			callback: () -> Unit
-		) {
+		fun deleteContactByID(id: Int, callback: () -> Unit) {
 			load {
 				GoldStoneDataBase.database.contactDao().deleteByID(id)
 			} then { callback() }
 		}
+
+		fun getAllContactAddresses(hold: (all: List<String>) -> Unit) {
+			load {
+				val all =
+					GoldStoneDataBase.database.contactDao().getAllContacts()
+				all.map {
+					listOf(
+						it.bchAddress,
+						it.ltcAddress,
+						it.btcSeriesTestnetAddress,
+						it.btcMainnetAddress,
+						it.eosJungle,
+						it.eosAddress,
+						it.etcAddress,
+						it.ethSeriesAddress
+					)
+				}.flatten()
+			} then (hold)
+		}
+
 	}
 }
 

@@ -13,13 +13,17 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.C
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
-import org.jetbrains.anko.*
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 2018/7/16 9:54 PM
@@ -44,8 +48,8 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 	}
 
 	init {
-		topPadding = 10.uiPX()
 		orientation = VERTICAL
+		setPadding(PaddingSize.device, 10.uiPX(), PaddingSize.device, PaddingSize.device)
 		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		defaultTitle.text = WalletSettingsText.defaultAddress

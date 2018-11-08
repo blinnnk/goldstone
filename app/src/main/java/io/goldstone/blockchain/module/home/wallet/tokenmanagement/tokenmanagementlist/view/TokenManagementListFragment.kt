@@ -63,7 +63,7 @@ class TokenManagementListFragment :
 		if (SharedWallet.getCurrentWalletType().isBTCSeries() || SharedWallet.getCurrentWalletType().isEOSSeries()) {
 			showAttentionView()
 			getParentFragment<TokenManagementFragment> {
-				overlayView.header.showSearchButton(false) {}
+				showSearchButton(false) {}
 			}
 		}
 	}

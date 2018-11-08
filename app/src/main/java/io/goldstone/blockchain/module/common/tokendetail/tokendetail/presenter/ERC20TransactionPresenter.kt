@@ -23,7 +23,7 @@ import org.jetbrains.anko.uiThread
 fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListModel>) {
 	fragment.showLoadingView()
 	doAsync {
-		val startBlockNumber = localERCData.maxBy { it.blockNumber }?.blockNumber ?: "0"
+		val startBlockNumber = localERCData.maxBy { it.blockNumber }?.blockNumber ?: 0
 		// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
 		updateTargetLocalERC20Transactions(startBlockNumber) {
 			// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
@@ -35,14 +35,14 @@ fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListMode
 }
 
 fun TokenDetailPresenter.updateTargetLocalERC20Transactions(
-	startBlock: String,
+	startBlock: Int,
 	@WorkerThread callback: (RequestError) -> Unit
 ) {
 	RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
 		EtherScanApi.getTargetTokenTransactions(
 			SharedAddress.getCurrentEthereum(),
 			token?.contract?.contract.orEmpty(),
-			startBlock
+			"$startBlock"
 		),
 		"result"
 	) { transactions, error ->

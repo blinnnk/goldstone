@@ -34,12 +34,12 @@ object ElementID {
 	const val baseFragmentContainer = 2020
 	const val bottomLoading = 2021
 	const val checkBox = 2022
-	const val recycleriew = 2023
+	const val recyclerView = 2023
 	const val overlayContainer = 2024
 	const val topMiniLoading = 2025
+	const val cardLayout = 2026
 }
 
 object ViewPagerID {
-	const val walletImport = 3001
 	const val transactions = 3002
 }

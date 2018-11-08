@@ -73,7 +73,6 @@ class ProfileOverlayPresenter(
 
 	private fun showWalletListFragment() {
 		fragment.apply {
-			headerTitle = WalletText.wallet
 			showAddButton(true, true) {
 				showWalletAddingMethodDashboard()
 			}
@@ -88,7 +87,7 @@ class ProfileOverlayPresenter(
 			Pair(R.drawable.watch_only_icon, ImportWalletText.importWatchWallet)
 		)
 		var mini: MiniOverlay? = null
-		fragment.overlayView.apply {
+		fragment.getContainer().apply {
 			mini = MiniOverlay(context) { cell, title ->
 				cell.onClick {
 					when (title) {
@@ -107,7 +106,7 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showWatchWalletImportFragment() {
-		fragment.overlayView.header.showAddButton(false) {}
+		fragment.showAddButton(false) {}
 		showTargetFragment<WatchOnlyImportFragment>()
 	}
 

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
+package io.goldstone.blockchain.kernel.commonmodel
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

@@ -98,13 +98,15 @@ object PaddingSize {
 	val device = 15.uiPX()
 	@JvmField
 	val content = 10.uiPX()
+	@JvmField
+	val overlay = 15.uiPX()
 }
 
 object CornerSize {
 	@JvmField
 	val small = 3.uiPX().toFloat()
 	@JvmField
-	val normal = 7.uiPX().toFloat()
+	val normal = 6.uiPX().toFloat()
 	@JvmField
 	val default = 10.uiPX().toFloat()
 	@JvmField
@@ -121,6 +123,8 @@ object BorderSize {
 }
 
 object ScreenSize {
+	@JvmStatic
+	val card = Resources.getSystem().displayMetrics.widthPixels - 10.uiPX() * 2
 	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 	@JvmStatic
@@ -140,7 +144,7 @@ object CommonCellSize {
 
 object TransactionSize {
 	@JvmField
-	val headerView = 200.uiPX()
+	val headerView = 240.uiPX()
 }
 
 object HomeSize {

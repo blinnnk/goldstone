@@ -127,9 +127,9 @@ object GoldStoneEthCall {
 	}
 
 	@JvmStatic
-	fun getBlockNumber(
+	fun getBlockCount(
 		chainURL: ChainURL,
-		holdValue: (blockNumber: Int?, error: RequestError) -> Unit
+		@WorkerThread hold: (blockCount: Int?, error: RequestError) -> Unit
 	) {
 		callChainBy(
 			RequestBody.create(
@@ -145,7 +145,7 @@ object GoldStoneEthCall {
 			),
 			chainURL
 		) { result, error ->
-			holdValue(result?.hexToDecimal()?.toInt(), error)
+			hold(result?.hexToDecimal()?.toInt(), error)
 		}
 	}
 

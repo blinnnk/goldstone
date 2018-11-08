@@ -7,5 +7,10 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 data class TransactionDetailModel(
 	var info: String = "",
-	var description: String = ""
+	val description: String = ""
+)
+
+data class TransactionProgressModel(
+	val confirmed: Int = 0,
+	val totalCount: Long = 6
 )

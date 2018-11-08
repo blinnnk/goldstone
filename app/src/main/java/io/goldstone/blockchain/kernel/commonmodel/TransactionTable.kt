@@ -2,11 +2,9 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
-import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
-import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.load
@@ -15,18 +13,14 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToDecimal
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ETHTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger
@@ -184,7 +178,12 @@ data class TransactionTable(
 		data.safeGet("from"),
 		data.safeGet("to"),
 		data.safeGet("value").toDecimalFromHex(),
-		CryptoUtils.toCountByDecimal(BigInteger(data.safeGet("value").toDecimalFromHex()), decimal),
+		if (CryptoUtils.isERC20Transfer(data.safeGet("input"))) {
+			val amount = CryptoUtils.getTransferInfoFromInputData(data.safeGet("input"))?.amount
+			if (amount != null) CryptoUtils.toCountByDecimal(amount, decimal) else 0.0
+		} else {
+			CryptoUtils.toCountByDecimal(BigInteger(data.safeGet("value").toDecimalFromHex()), decimal)
+		},
 		data.safeGet("gas").toDecimalFromHex(),
 		data.safeGet("gasPrice").toDecimalFromHex(),
 		"0",
@@ -209,7 +208,7 @@ data class TransactionTable(
 		if (chainID.isETCSeries()) SharedAddress.getCurrentETC()
 		else SharedAddress.getCurrentEthereum(),
 		isPending = false,
-		memo = "",
+		memo = getMemoFromInputCode(data.safeGet("input")),
 		chainID = chainID.id,
 		isFee = false,
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice"), true)
@@ -266,37 +265,6 @@ data class TransactionTable(
 				hold(data.map { TransactionListModel(it) })
 			}
 		}
-
-		fun getMemoByHashAndReceiveStatus(
-			hash: String,
-			isReceive: Boolean,
-			isFee: Boolean,
-			chainURL: ChainURL,
-			@WorkerThread hold: (memo: String?, error: RequestError) -> Unit
-		) {
-			doAsync {
-				val transactionDao = GoldStoneDataBase.database.transactionDao()
-				val transaction =
-					transactionDao.getByTaxHashAndReceivedStatus(hash, isReceive, isFee) ?: return@doAsync
-				if (transaction.memo.isNotEmpty()) {
-					hold(transaction.memo, RequestError.None)
-				} else GoldStoneEthCall.getInputCodeByHash(hash, chainURL) { inputCode, error ->
-					if (inputCode != null && error.isNone()) {
-						val isErc20Token = CryptoUtils.isERC20Transfer(inputCode)
-						val memo = getMemoFromInputCode(inputCode, isErc20Token)
-						// 如果数据库有这条数据那么更新 `Memo` 和 `Input`
-						transactionDao.update(
-							transaction.apply {
-								this.input = inputCode
-								this.memo = memo
-							}
-						)
-						transactionDao.updateFeeMemo(hash, memo)
-						hold(memo, error)
-					} else hold(null, error)
-				}
-			}
-		}
 	}
 }
 
@@ -308,6 +276,18 @@ interface TransactionDao {
 
 	@Query("UPDATE transactionList SET symbol =:symbol, count = :count WHERE hash = :txHash AND isFee = :isFee")
 	fun updateFeeInfo(symbol: String, count: Double, txHash: String, isFee: Boolean = true)
+
+	@Query("UPDATE transactionList SET hasError =:hasError, isPending = :isPending WHERE hash = :txHash AND fromAddress = :fromAddress")
+	fun updateErrorStatus(hasError: String, txHash: String, fromAddress: String, isPending: Boolean = false)
+
+	@Query("UPDATE transactionList SET blockNumber =:blockNumber, isPending = :isPending WHERE hash = :txHash AND fromAddress = :fromAddress")
+	fun updateBlockNumber(blockNumber: Int, txHash: String, fromAddress: String, isPending: Boolean)
+
+	@Query("UPDATE transactionList SET confirmations = :confirmationCount, isPending = :isPending WHERE hash = :txHash AND fromAddress = :fromAddress")
+	fun updateConfirmationCount(confirmationCount: Int, txHash: String, fromAddress: String, isPending: Boolean)
+
+	@Query("UPDATE transactionList SET input =:input, memo = :memo WHERE hash = :hash AND isReceive = :isReceive AND isFee = :isFee")
+	fun updateInputCodeAndMemo(input: String, memo: String, hash: String, isReceive: Boolean, isFee: Boolean)
 
 	@Query("UPDATE transactionList SET memo =:memo WHERE hash = :txHash AND isFee = :isFee")
 	fun updateFeeMemo(txHash: String, memo: String, isFee: Boolean = true)
@@ -321,9 +301,6 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE hash = :taxHash")
-	fun getTransactionByTaxHash(taxHash: String): List<TransactionTable>
-
 	@Query("SELECT * FROM transactionList WHERE hash = :taxHash AND isReceive = :isReceive AND isFee = :isFee")
 	fun getByTaxHashAndReceivedStatus(taxHash: String, isReceive: Boolean, isFee: Boolean): TransactionTable?
 
@@ -333,7 +310,7 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND (contractAddress LIKE :contract OR isFee = :isFee) ORDER BY timeStamp DESC")
 	fun getETHAndAllFee(walletAddress: String, contract: String, chainID: String, isFee: Boolean = true): List<TransactionTable>
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(token: TransactionTable)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

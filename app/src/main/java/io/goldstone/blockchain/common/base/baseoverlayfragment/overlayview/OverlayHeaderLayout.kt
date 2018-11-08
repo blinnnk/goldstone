@@ -80,8 +80,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		title.visibility = if (status) View.VISIBLE else View.GONE
 	}
 
-	fun getFilterSearchInput(): FilterSearchInput = searchInput
-
 	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
 
@@ -101,6 +99,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		paint.color = GrayScale.lightGray
 		paint.isAntiAlias = true
 		paint.style = Paint.Style.FILL
+	}
+
+	fun showFilterImage(status: Boolean) {
+		searchInput.showFilterImage(status)
 	}
 
 	fun showCloseButton(isShow: Boolean, clickEvent: () -> Unit) {
@@ -168,8 +170,8 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		else removeView(currentButton)
 	}
 
-	fun setSearchFilterClickEvent(callback: () -> Unit) {
-		searchInput.setFilterClickEvent(callback)
+	fun setFilterEvent(action: () -> Unit) {
+		searchInput.setFilterClickEvent(action)
 	}
 
 	fun searchInputListener(isFocus: (Boolean) -> Unit = {}, action: (String) -> Unit) {
@@ -238,31 +240,8 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-}
 
-class HeaderIcon(context: Context) : ImageView(context) {
-
-	private val iconSize = 30.uiPX()
-
-	init {
-		setColorFilter(GrayScale.lightGray)
-		scaleType = ImageView.ScaleType.CENTER_INSIDE
-		addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
-	}
-
-	fun setLeftPosition() {
-		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-			topMargin = 18.uiPX()
-			leftMargin = 15.uiPX()
-			alignParentLeft()
-		}
-	}
-
-	fun setRightPosition() {
-		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-			topMargin = 18.uiPX()
-			rightMargin = 15.uiPX()
-			alignParentRight()
-		}
+	fun getSearchContent(): String {
+		return searchInput.editText.text.toString()
 	}
 }

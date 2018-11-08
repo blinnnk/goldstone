@@ -38,7 +38,7 @@ class QuotationOverlayPresenter(
 
 	fun showQuotationSearchFragment() {
 		showTargetFragment<QuotationSearchFragment>()
-		fragment.overlayView.header.apply {
+		fragment.apply {
 			showBackButton(false) {}
 			showSearchInput {
 				popFragmentFrom<QuotationSearchFragment>()

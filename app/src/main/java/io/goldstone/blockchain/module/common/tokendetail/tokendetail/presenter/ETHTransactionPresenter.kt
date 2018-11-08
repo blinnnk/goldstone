@@ -22,7 +22,7 @@ import org.jetbrains.anko.runOnUiThread
  */
 
 fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>) {
-	val blockNumber = localData.maxBy { it.blockNumber.toInt() }?.blockNumber ?: "0"
+	val blockNumber = localData.maxBy { it.blockNumber }?.blockNumber ?: 0
 	fragment.showLoadingView()
 	updateLocalETHTransactions(blockNumber) {
 		if (it.isNone()) loadDataFromDatabaseOrElse()
@@ -45,11 +45,11 @@ fun checkAddressNameInContacts(
 }
 
 fun updateLocalETHTransactions(
-	startBlock: String,
+	startBlock: Int,
 	@WorkerThread callback: (RequestError) -> Unit
 ) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
-		EtherScanApi.transactions(SharedAddress.getCurrentEthereum(), startBlock),
+		EtherScanApi.transactions(SharedAddress.getCurrentEthereum(), "$startBlock"),
 		"result"
 	) { transactions, error ->
 		if (transactions != null && error.isNone()) {
@@ -57,7 +57,13 @@ fun updateLocalETHTransactions(
 				GoldStoneDataBase.database.transactionDao()
 			// onConflict InsertAll 利用 RoomDatabase 进行双主键做重复判断 
 			// 覆盖或新增到本地 TransactionTable 数据库里
-			transactionDao.insertAll(transactions.map { TransactionTable(it) })
+			transactionDao.insertAll(
+				transactions.asSequence().map {
+					TransactionTable(it)
+				}.filterNot {
+					it.fromAddress.isEmpty() || it.to.isEmpty()
+				}.toList()
+			)
 			// `Copy` 账单中的 `ETH` 转账账单并标记为 `Fee`
 			transactions.asSequence().filter {
 				!CryptoUtils.isERC20Transfer(it.input)

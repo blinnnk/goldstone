@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component.button
 
 import android.content.Context
+import android.view.Gravity
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -44,7 +45,6 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 			typeface = GoldStoneFont.heavy(context)
 			textColor = Spectrum.blue
 			layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
-			x = icon.layoutParams.width.toFloat() + 10.uiPX()
 		}.into(this)
 		title.setCenterInVertical()
 		arrowIcon.apply {
@@ -58,11 +58,18 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 		arrowIcon.setAlignParentRight()
 	}
 
-	fun setTitle(text: String) {
+	fun setTitle(text: String, isLeft: Boolean = true) {
+		if (isLeft) {
+			title.x = icon.layoutParams.width.toFloat() + 10.uiPX()
+		} else {
+			title.x -= 50.uiPX()
+			title.gravity = Gravity.END
+		}
 		title.text = text
 	}
 
-	fun <T>setIcon(image: T) {
+
+	fun <T> setIcon(image: T) {
 		icon.glideImage(image)
 	}
 }

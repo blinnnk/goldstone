@@ -60,7 +60,7 @@ class TokenAssetPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		getAccountTransactionCount()
-		val info = TokenInfoPresenter.getDetailButtonInfo(tokenInfo, currentAddress)
+		val info = TokenInfoPresenter.getDetailButtonInfo(tokenInfo?.contract, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName = CoinSymbol.eos suffix TokenDetailText.chainType
 		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {

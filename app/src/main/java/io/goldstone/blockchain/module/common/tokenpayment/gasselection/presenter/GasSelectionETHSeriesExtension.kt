@@ -21,7 +21,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall.sendRawTransaction
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
@@ -143,12 +143,12 @@ fun GasSelectionPresenter.transfer(
 			}
 			val signedHex = raw.sign(privateKey)
 			// 发起 `sendRawTransaction` 请求
-			GoldStoneEthCall.sendRawTransaction(signedHex, getToken()?.contract?.getChainURL()!!) { taxHash, hashError ->
+			sendRawTransaction(signedHex, getToken()?.contract?.getChainURL()!!) { taxHash, hashError ->
 				// API 错误的时候
-				if (taxHash?.isNotEmpty() == true && error.hasError()) {
+				if (taxHash?.isNotEmpty() == true && error.isNone()) {
 					// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 					// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
-					if (taxHash.isValidTaxHash()) insertPendingDataToTransactionTable(
+					if (taxHash.isValidTaxHash()) insertPendingDataToDatabase(
 						countWithDecimal,
 						this@model,
 						taxHash,
@@ -181,7 +181,7 @@ private fun GasSelectionPresenter.prepareReceiptModel(
 		getToken()!!,
 		taxHash,
 		System.currentTimeMillis(),
-		prepareModel?.memo
+		prepareModel?.memo.orEmpty()
 	)
 }
 
@@ -216,7 +216,7 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 
 fun GasSelectionPresenter.getUnitSymbol() = getToken()?.contract.getSymbol().symbol.orEmpty()
 
-private fun GasSelectionPresenter.insertPendingDataToTransactionTable(
+private fun GasSelectionPresenter.insertPendingDataToDatabase(
 	value: BigInteger,
 	raw: PaymentPrepareModel,
 	taxHash: String,

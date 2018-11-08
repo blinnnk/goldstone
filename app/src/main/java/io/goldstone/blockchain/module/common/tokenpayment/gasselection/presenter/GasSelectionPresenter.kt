@@ -229,10 +229,9 @@ class GasSelectionPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment> {
 			val myAddress = AddressUtils.getCurrentBTCAddress()
 			BTCSeriesTransactionTable(
-				0,
 				0, // TODO 插入 Pending Data 应该是 localMaxDataIndex + 1
 				getToken()?.symbol.orEmpty(),
-				"Waiting",
+				-1,
 				0,
 				System.currentTimeMillis().toString(),
 				taxHash,
@@ -243,22 +242,20 @@ class GasSelectionPresenter(
 				raw.value.toBTCCount().formatCount(),
 				fee.toBTCCount().formatCount(),
 				size.toString(),
-				0,
+				-1,
 				false,
 				true,
 				ChainType.getChainTypeBySymbol(getToken()?.symbol).id
 			).apply {
+				val transactionDao =
+					GoldStoneDataBase.database.btcSeriesTransactionDao()
 				// 插入 PendingData
-				GoldStoneDataBase.database
-					.btcSeriesTransactionDao()
-					.insert(this)
+				transactionDao.insert(this)
 				// 插入 FeeData
-				GoldStoneDataBase.database
-					.btcSeriesTransactionDao()
-					.insert(this.apply {
-						isPending = false
-						isFee = true
-					})
+				transactionDao.insert(this.apply {
+					isPending = false
+					isFee = true
+				})
 			}
 		}
 	}
@@ -276,7 +273,7 @@ class GasSelectionPresenter(
 			getToken()!!,
 			taxHash,
 			System.currentTimeMillis(),
-			prepareModel?.memo
+			prepareModel?.memo.orEmpty()
 		)
 	}
 
@@ -307,7 +304,7 @@ class GasSelectionPresenter(
 	override fun onFragmentShowFromHidden() {
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.popFragmentFrom<GasSelectionFragment>()
 			}
 		}
@@ -328,7 +325,5 @@ fun <T : Fragment> TokenDetailOverlayFragment.goToTransactionDetailFragment(
 	addFragmentAndSetArgument<TransactionDetailFragment>(ContainerID.content) {
 		putSerializable(ArgumentKey.transactionDetail, receiptModel)
 	}
-	overlayView.header.apply {
-		showCloseButton(true) { presenter.removeSelfFromActivity() }
-	}
+	showCloseButton(true) { presenter.removeSelfFromActivity() }
 }

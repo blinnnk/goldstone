@@ -41,7 +41,7 @@ class PaymentPreparePresenter(
 		// 根据入口不同决定是否显示关闭按钮
 		rootFragment?.apply {
 			if (isFromQuickTransfer) {
-				overlayView.header.showCloseButton(false) {}
+				showCloseButton(false) {}
 			}
 		}
 	}
@@ -82,7 +82,7 @@ class PaymentPreparePresenter(
 
 	override fun onFragmentShowFromHidden() {
 		rootFragment?.apply {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.popFragmentFrom<PaymentPrepareFragment>()
 			}
 		}
