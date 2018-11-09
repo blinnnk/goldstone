@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.RAMTransactionSearchFragment
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 
 /**
@@ -8,6 +9,7 @@ import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragme
  * @author: yanglihai
  * @description:
  */
-class RAMMarketPresenter(override val fragment: RAMMarketOverlayFragment) : BaseOverlayPresenter<RAMMarketOverlayFragment>() {
+class RAMMarketPresenter(override val fragment: RAMMarketOverlayFragment)
+	: BaseOverlayPresenter<RAMMarketOverlayFragment>() {
 
 }

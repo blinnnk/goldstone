@@ -198,6 +198,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		})
 	}
+	
+	fun setSearchText(text: String) {
+		searchInput.editText.setText(text)
+	}
 
 	fun showSearchButton(isShow: Boolean, setClickEvent: () -> Unit) {
 		if (isShow) searchButton.click {

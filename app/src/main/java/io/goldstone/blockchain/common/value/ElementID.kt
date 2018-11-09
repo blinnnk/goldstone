@@ -38,9 +38,11 @@ object ElementID {
 	const val overlayContainer = 2024
 	const val topMiniLoading = 2025
 	const val checkBox = 2026
+	
 }
 
 object ViewPagerID {
 	const val walletImport = 3001
 	const val transactions = 3002
+	const val ramMarket = 3003
 }

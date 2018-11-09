@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.view
 
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -23,6 +24,7 @@ class RAMOccupyRankHeaderView(context: Context): RelativeLayout(context) {
 	init {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
 		gravity = Gravity.CENTER_VERTICAL
+		backgroundColor = Color.parseColor("#05000000")
 		
 	  textView {
 			text = EOSRAMExchangeText.transactionAccount

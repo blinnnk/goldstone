@@ -1,13 +1,16 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.view
 
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.toArrayList
+import android.os.Bundle
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.presenter.BigTransactionPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.RAMTransactionSearchFragment
+import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
+import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.rightPadding
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -33,7 +36,18 @@ class BigTransactionFragment : BaseRecyclerFragment<BigTransactionPresenter, Tra
 		
 		recyclerView.adapter = BigTransactionsAdapter(asyncData.orEmptyArray().toArrayList()) {
 			onClick {
-			
+				getParentFragment<RAMMarketDetailFragment> {
+					getParentFragment<RAMMarketOverlayFragment> {
+						presenter.showTargetFragment<RAMTransactionSearchFragment>(Bundle().apply { putString("account", model.account) })
+						overlayView.header.apply {
+							showBackButton(false) { }
+							showSearchInput {
+								presenter.popFragmentFrom<RAMTransactionSearchFragment>()
+							}
+						}
+						
+					}
+				}
 			}
 		}
 	}

@@ -624,7 +624,20 @@ object GoldStoneAPI {
 			isEncrypt = true,
 			hold = hold
 		)
-		
+	}
+	
+	fun getEOSRAMTransactionsByAccount(
+		account: String,
+		endID: Int,
+		hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.eosRAMTransactionsOfAccount(APIPath.currentUrl, account, endID, 20),
+			"tx_list",
+			justGetData = false,
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 	
 }

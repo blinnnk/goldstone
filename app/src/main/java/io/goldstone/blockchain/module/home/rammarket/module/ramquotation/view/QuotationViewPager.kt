@@ -63,7 +63,7 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 			backgroundColor = GrayScale.lightGray
 		}
 		viewPager {
-			id = ElementID.contentScrollview
+			id = ViewPagerID.ramMarket
 			offscreenPageLimit = 4
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 			adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)

@@ -53,6 +53,13 @@ object APIPath {
 	val eosRAMBIgTransactions: (header: String, mode: Int) -> String = { header, mode ->
 		"$header/eosram/lastestTxList?mode=$mode"
 	}
+	val eosRAMTransactionsOfAccount: (
+		header: String,
+		account: String,
+		endID: Int,
+		size: Int) -> String = { header, account, endID, size ->
+		"$header/eosram/txListByAccount?account=$account&end=$endID&size=$size"
+	}
 	val getEOSTokenList: (
 		header: String,
 		chainID: String,

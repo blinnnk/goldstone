@@ -11,7 +11,6 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.component.button.ButtonMenu
-import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.utils.*
@@ -33,7 +32,6 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	
 	init {
 	  orientation = LinearLayout.VERTICAL
-		
 		menu = ButtonMenu(context)
 		menu.layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, 32.uiPX())
 		menu.setMargins<LinearLayout.LayoutParams> {

@@ -365,4 +365,34 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
+	val timing = when(currentLanguage) {
+		HoneyLanguage.English.code -> "timing"
+		HoneyLanguage.Chinese.code -> "timing"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val user = when(currentLanguage) {
+		HoneyLanguage.English.code -> "user"
+		HoneyLanguage.Chinese.code -> "user"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val tradingAmount = when(currentLanguage) {
+		HoneyLanguage.English.code -> "trading amount"
+		HoneyLanguage.Chinese.code -> "trading amount"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
 }

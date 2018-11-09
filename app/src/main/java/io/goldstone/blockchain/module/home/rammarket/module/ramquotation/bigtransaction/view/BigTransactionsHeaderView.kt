@@ -24,7 +24,7 @@ class BigTransactionsHeaderView(context: Context): RelativeLayout(context) {
 	init {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
 		gravity = Gravity.CENTER_VERTICAL
-		backgroundColor = Color.parseColor("#02000000")
+		backgroundColor = Color.parseColor("#05000000")
 		
 	  textView {
 			text = EOSRAMExchangeText.transactionAccount
