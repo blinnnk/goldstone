@@ -187,7 +187,9 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 
 // 计算百分比
 fun RAMMarketDetailPresenter.calculatePricePercent() {
-	var trend = (ramInformationModel.currentPrice - ramInformationModel.openPrice) / ramInformationModel.openPrice
+	if (ramInformationModel.openPrice == 0.0) return
+	var trend = BigDecimal((ramInformationModel.currentPrice - ramInformationModel.openPrice)).divide(
+		BigDecimal(ramInformationModel.openPrice), 8, BigDecimal.ROUND_HALF_UP).toDouble()
 	trend *= 100f
 	ramInformationModel.pricePercent = trend
 }
