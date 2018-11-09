@@ -63,7 +63,6 @@ class TokenSocialMedia(
 			rowCount = 1
 			columnCount = 3
 			y -= 10.uiPX()
-			x += PaddingSize.device
 		}
 		container.setAlignParentBottom()
 	}

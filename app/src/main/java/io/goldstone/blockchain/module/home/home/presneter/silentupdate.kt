@@ -5,9 +5,11 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.Connectivity
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -16,9 +18,13 @@ import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
+import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.CoroutineStart
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.withContext
 
 /**
  * @author KaySaith
@@ -31,7 +37,7 @@ abstract class SilentUpdater {
 				// 是 WIFI 的情况下, 才执行静默更新
 				if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
 					updateLocalDefaultTokens()
-					updateUnknownDefaultToken()
+					updateERCDefaultTokenInfo()
 					updateRAMUnitPrice()
 					updateMyTokenCurrencyPrice()
 					updateCPUUnitPrice()
@@ -55,9 +61,7 @@ abstract class SilentUpdater {
 		val maxBlockNumber =
 			allTransactions.filterNot {
 				it.symbol.equals(CoinSymbol.eth, true)
-			}.maxBy {
-				it.blockNumber
-			}?.blockNumber
+			}.maxBy { it.blockNumber }?.blockNumber
 		getERC20TokenTransactions(maxBlockNumber ?: "0")
 	}
 
@@ -76,14 +80,20 @@ abstract class SilentUpdater {
 				transactionDao.insertAll(transactions.map { TransactionTable(it) })
 				// 检测获取的 ERC20 本地是否有对应的 DefaultToken 记录, 如果没有插入到本地数据库
 				// 供其他场景使用
-				val chainID = SharedChain.getCurrentETH().chainID
+				val chain = SharedChain.getCurrentETH()
 				transactions.distinctBy { it.contract }.forEach { erc20 ->
-					val target = defaultDao.getToken(
-						erc20.contract,
-						erc20.tokenSymbol,
-						chainID.id
+					defaultDao.getToken(erc20.contract, erc20.tokenSymbol, chain.chainID.id)
+						?: defaultDao.insert(DefaultTokenTable(erc20, chain.chainID))
+				}
+
+				// 目前遇到 EtherScan 的 ERC20 接口仍然会返回
+				transactions.filter {
+					it.tokenSymbol.isEmpty() || it.tokenDecimal.isEmpty()
+				}.apply {
+					updateUnknownDefaultToken(
+						map { DefaultTokenTable(it, chain.chainID) },
+						chain
 					)
-					if (target.isNull()) defaultDao.insert(DefaultTokenTable(erc20, chainID))
 				}
 			}
 		}
@@ -129,13 +139,40 @@ abstract class SilentUpdater {
 		}
 	}
 
-	// 检查更新默认 `Token` 的 `Name` 信息
-	private fun updateUnknownDefaultToken() {
-		GoldStoneDataBase.database.defaultTokenDao().getAllTokens().filter {
-			ChainID(it.chainID).isETHMain() && it.name.isEmpty()
-		}.forEach { default ->
-			default.updateTokenNameFromChain()
+	private fun updateERCDefaultTokenInfo() {
+		val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+		val chain = SharedChain.getCurrentETH()
+		val unKnownDefault = defaultDao.getAllTokens().filter {
+			it.chainID == chain.chainID.id
+				&& it.name.isEmpty()
+				&& it.decimals == 0
+				&& it.symbol.isEmpty()
 		}
+		updateUnknownDefaultToken(unKnownDefault, chain)
+	}
+
+	// 检查更新默认 `Token` 的 `Name` 信息
+	private fun updateUnknownDefaultToken(unKnowData: List<DefaultTokenTable>, chainURL: ChainURL) {
+		object : ConcurrentAsyncCombine() {
+			val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+			override val delayTime: Long? = 300L
+			override var asyncCount: Int = unKnowData.size
+			override fun doChildTask(index: Int) = GoldStoneEthCall.getTokenInfoByContractAddress(
+				unKnowData[index].contract,
+				chainURL
+			) { symbol, name, decimal, error ->
+				if (error.isNone()) {
+					defaultDao.updateTokenInfo(
+						name.orEmpty(),
+						decimal ?: 0,
+						symbol.orEmpty(),
+						unKnowData[index].contract,
+						chainURL.chainID.id
+					)
+					completeMark()
+				} else completeMark()
+			}
+		}.start()
 	}
 
 	private fun updateRAMUnitPrice() {
@@ -202,17 +239,20 @@ abstract class SilentUpdater {
 					}
 				}
 			}
-			launch {
-				// 检查 EOS 的 Token 价格, 从 NewDex 提供的接口
-				myTokens.filter { ChainID(it.chainID).isEOSMain() }.forEach { token ->
-					// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
-					// 线程开启太多的内存溢出. 限制每 `500ms` 检查一个 `Symbol` 的价格
-					delay(500)
-					withContext(CommonPool, CoroutineStart.LAZY) {
-						EOSAPI.updateLocalTokenPrice(TokenContract(token.contract, token.symbol, null))
-					}
+			// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
+			// 线程开启太多的内存溢出. 限制每 `500ms` 检查一个 `Symbol` 的价格
+			object : ConcurrentAsyncCombine() {
+				val eosTokens =
+					myTokens.filter { ChainID(it.chainID).isEOSMain() }
+				override val delayTime: Long? = 500
+				override var asyncCount: Int = eosTokens.size
+				override fun doChildTask(index: Int) {
+					EOSAPI.updateLocalTokenPrice(
+						TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null)
+					)
+					completeMark()
 				}
-			}
+			}.start()
 		}
 	}
 

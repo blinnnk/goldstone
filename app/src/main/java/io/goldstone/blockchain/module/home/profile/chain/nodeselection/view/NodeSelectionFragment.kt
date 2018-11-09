@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.profile.chain.nodeselection.view
 
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.jump
@@ -52,9 +53,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		scrollView {
 			lparams(matchParent, matchParent)
 			container = verticalLayout {
+				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-				leftPadding = PaddingSize.device
-				rightPadding = PaddingSize.device
 				bottomPadding = PaddingSize.device
 				showNodeList(fromMainnetSetting.orFalse()) {
 					confirmButton.apply {

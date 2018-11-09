@@ -24,7 +24,7 @@ class WalletEditText(context: Context) : EditText(context) {
 
 	init {
 		addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, 90.uiPX())
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 90.uiPX())
 		padding = 20.uiPX()
 		hintTextColor = GrayScale.midGray
 		textSize = fontSize(15)

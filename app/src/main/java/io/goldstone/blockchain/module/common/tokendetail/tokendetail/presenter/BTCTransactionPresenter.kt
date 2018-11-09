@@ -43,7 +43,6 @@ private fun loadTransactionsFromChain(
 	if (pageInfo.to == 0) {
 		callback(false)
 	} else BitcoinApi.getTransactions(address, pageInfo.from, pageInfo.to) { transactions, error ->
-		callback(transactions?.isNotEmpty() == true)
 		// Calculate All Inputs to get transfer value
 		// 转换数据格式
 		if (transactions != null && error.isNone()) transactions.asSequence().mapIndexed { index, item ->
@@ -61,6 +60,7 @@ private fun loadTransactionsFromChain(
 			transactionDao.insertAll(all)
 			// 同样的账单插入一份燃气费的数据
 			transactionDao.insertAll(all.filterNot { it.isReceive }.map { it.apply { it.isFee = true } })
+			callback(all.isNotEmpty())
 		}
 	}
 }

@@ -24,7 +24,7 @@ class TokenDetailAdapter(
 	override fun generateFooter(context: Context) = BottomLoadingView(context).apply {
 		// 让出 覆盖在上面的 `Footer` 的高度
 		setGrayDescription()
-		addView(View(context).apply { layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX()) })
+		addView(View(context).apply { layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX()) })
 	}
 
 	override fun generateHeader(context: Context) = TokenDetailHeaderView(context).apply(holdHeader)

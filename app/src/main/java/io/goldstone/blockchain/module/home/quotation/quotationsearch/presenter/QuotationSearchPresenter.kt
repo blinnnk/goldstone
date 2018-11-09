@@ -46,9 +46,7 @@ class QuotationSearchPresenter(
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			showFilterImage(true)
-			searchInputListener(
-				{ NetworkUtil.hasNetworkWithAlert(context) }
-			) {
+			searchInputListener{
 				if (NetworkUtil.hasNetwork(context)) searchTokenBy(it)
 			}
 			setFilterEvent {

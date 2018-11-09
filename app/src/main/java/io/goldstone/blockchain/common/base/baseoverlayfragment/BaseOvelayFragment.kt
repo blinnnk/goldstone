@@ -110,8 +110,12 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		overlayView.header.setFilterEvent(action)
 	}
 
-	fun searchInputListener(isFocus: (Boolean) -> Unit = {}, action: (String) -> Unit) {
-		overlayView.header.searchInputListener(isFocus, action)
+	fun searchInputListener(action: (String) -> Unit) {
+		overlayView.header.apply {
+			searchTextChangedEvent = Runnable {
+				action(overlayView.header.getSearchContent())
+			}
+		}
 	}
 
 	// 这个是用来还原 `Header` 的边界方法, 当自定义 `Header` 后还原的操作
@@ -234,10 +238,10 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	}
 
 	private fun hideTabBarToAvoidOverdraw() {
-		getMainActivity()?.getHomeFragment()?.hideTabbarView()
+		getMainActivity()?.getHomeFragment()?.hideTabBarView()
 	}
 
 	private fun showTabBarView() {
-		getMainActivity()?.getHomeFragment()?.showTabbarView()
+		getMainActivity()?.getHomeFragment()?.showTabBarView()
 	}
 }

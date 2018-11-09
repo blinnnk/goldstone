@@ -8,6 +8,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoName
@@ -28,7 +29,7 @@ class NodeCell(context: Context) : LinearLayout(context) {
 
 	init {
 		topPadding = 10.uiPX()
-		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 		icon.apply {
 			layoutParams = LinearLayout.LayoutParams(cellHeight, cellHeight)
 			setColorFilter(GrayScale.midGray)

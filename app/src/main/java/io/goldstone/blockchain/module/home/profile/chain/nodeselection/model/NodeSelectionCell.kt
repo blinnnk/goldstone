@@ -17,9 +17,9 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.radioButton
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
@@ -50,7 +50,7 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 	private val leftPadding = 50.uiPX()
 
 	init {
-		layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 40.uiPX())
 		setWillNotDraw(false)
 		title.into(this)
 		title.x = leftPadding.toFloat()
