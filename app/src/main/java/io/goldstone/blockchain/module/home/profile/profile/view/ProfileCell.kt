@@ -46,7 +46,9 @@ class ProfileCell(context: Context) : BaseCell(context) {
 				)
 				info.textColor = GrayScale.gray
 				info.rightPadding = 10.uiPX()
-				info.onClick { upgradeEvent?.run() }
+				info.onClick {
+					upgradeEvent?.run()
+				}
 				CustomTargetTextStyle(
 					CommonText.new,
 					model.info,

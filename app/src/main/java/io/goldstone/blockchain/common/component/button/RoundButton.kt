@@ -29,7 +29,7 @@ class RoundButton(context: Context) : GSCard(context) {
 		title.text = text
 	}
 	var marginTop = 0
-	private val buttonHeight = 45.uiPX()
+	private val buttonHeight = 50.uiPX()
 
 	private lateinit var title: TextView
 	private lateinit var loadingView: ProgressBar

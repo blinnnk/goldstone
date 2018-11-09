@@ -24,10 +24,10 @@ class TokenDetailFooter(context: Context) : LinearLayout(context) {
 	init {
 		setPadding(PaddingSize.device, 8.uiPX(), 10.uiPX(), 0)
 		isClickable = true
-		layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
 		backgroundColor = Spectrum.white
 		val buttonWidth = ScreenSize.widthWithPadding / 2 - 5.uiPX()
-		val buttonHeight = 36.uiPX()
+		val buttonHeight = 46.uiPX()
 		val marginSize = 15.uiPX()
 		sendButton.apply {
 			setGreenStyle(marginSize)

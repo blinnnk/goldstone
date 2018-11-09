@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.home.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
@@ -12,6 +13,7 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.TabBarView
 import io.goldstone.blockchain.common.component.TabItem
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.kernel.receiver.VersionManager
 import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -28,6 +30,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	override val pageTitle: String = "Home"
 	private val tabBar by lazy { TabBarView(context!!) }
 	override val presenter = HomePresenter(this)
+	private val versionManager = VersionManager(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
@@ -59,6 +62,25 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.showWalletDetailFragment()
+		versionManager.checkVersion { error ->
+			if (error.isNone()) {
+				versionManager.showUpgradeDialog()
+			}
+		}
+	}
+
+	fun showUpgradeDialog() {
+		versionManager.showUpgradeDialog()
+	}
+
+	override fun onDetach() {
+		super.onDetach()
+		versionManager.removeHandler()
+	}
+
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		super.onActivityResult(requestCode, resultCode, data)
+		versionManager.onActivityResult(requestCode, resultCode)
 	}
 
 	private fun TabItem.setStyleAndClick(callback: () -> Unit) {
@@ -83,11 +105,11 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 		tabBar.settingsButton.setStyleAndClick(callback)
 	}
 
-	fun hideTabbarView() {
+	fun hideTabBarView() {
 		tabBar.alpha = 0f
 	}
 
-	fun showTabbarView() {
+	fun showTabBarView() {
 		tabBar.alpha = 1f
 	}
 }

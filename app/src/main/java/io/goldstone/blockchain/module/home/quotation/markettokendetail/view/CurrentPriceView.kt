@@ -82,7 +82,6 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 		showTopLine = true
 		priceTitles.apply {
-			x += PaddingSize.device
 			textColor = GrayScale.black
 			textSize = fontSize(24)
 			typeface = GoldStoneFont.black(context)
@@ -97,7 +96,6 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX())
 			gravity = Gravity.END or Gravity.BOTTOM
 			y -= 31.uiPX()
-			x += 15.uiPX()
 		}.into(this)
 	}
 }

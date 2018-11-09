@@ -30,12 +30,6 @@ class QuotationOverlayPresenter(
 		}
 	}
 
-	fun showMarketTokenDetailFragment(model: QuotationModel?) {
-		fragment.addFragmentAndSetArgument<MarketTokenDetailFragment>(ContainerID.content) {
-			putSerializable(ArgumentKey.quotationCurrencyDetail, model)
-		}
-	}
-
 	fun showQuotationSearchFragment() {
 		showTargetFragment<QuotationSearchFragment>()
 		fragment.apply {

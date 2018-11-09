@@ -60,7 +60,7 @@ abstract class ConcurrentAsyncCombine {
 		}
 	}
 
-	open fun doChildTask(index: Int) {}
+	abstract fun doChildTask(index: Int)
 
 	open fun completeMark() {
 		finishedCount += 1
@@ -83,7 +83,7 @@ abstract class ConcurrentAsyncCombine {
 		}
 	}
 
-	abstract fun mergeCallBack()
+	open fun mergeCallBack() {}
 }
 
 /**

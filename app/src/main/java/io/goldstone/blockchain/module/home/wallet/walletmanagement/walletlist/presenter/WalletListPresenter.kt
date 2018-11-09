@@ -27,7 +27,7 @@ class WalletListPresenter(
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		WalletTable.getAll {
-			diffAndUpdateSingleCellAdapterData<WalletListAdapter>(
+			diffAndUpdateAdapterData<WalletListAdapter>(
 				mapTo(arrayListOf()) { wallet ->
 					WalletListModel(wallet, wallet.getWalletType().type.orEmpty())
 				}

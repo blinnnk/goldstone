@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.value.ShadowSize
  * @date  2018/11/07
  */
 open class GSCard(context: Context) : CardView(context) {
+
 	init {
 		maxCardElevation = ShadowSize.Card
 		cardElevation = ShadowSize.Card

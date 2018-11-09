@@ -5,7 +5,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -16,7 +15,6 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import org.jetbrains.anko.doAsync
@@ -27,10 +25,8 @@ import org.json.JSONObject
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
-@Entity(tableName = "defaultTokens")
+@Entity(tableName = "defaultTokens", primaryKeys = ["contract", "symbol", "chainID"])
 data class DefaultTokenTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	@SerializedName("_id")
 	var serverTokenID: String,
 	@SerializedName("address")
@@ -67,7 +63,6 @@ data class DefaultTokenTable(
 
 	/** 默认的 `constructor` */
 	constructor() : this(
-		0,
 		"",
 		"",
 		"",
@@ -86,7 +81,6 @@ data class DefaultTokenTable(
 		data: TokenSearchModel,
 		isDefault: Boolean = false
 	) : this(
-		0,
 		"",
 		data.contract,
 		data.iconUrl.orEmpty(),
@@ -102,7 +96,6 @@ data class DefaultTokenTable(
 	)
 
 	constructor(localData: JSONObject) : this(
-		0,
 		"",
 		localData.safeGet("address"),
 		localData.safeGet("url"),
@@ -125,7 +118,6 @@ data class DefaultTokenTable(
 	)
 
 	constructor(data: CoinInfoModel) : this(
-		0,
 		"",
 		data.contract.contract.orEmpty(),
 		"",
@@ -158,7 +150,6 @@ data class DefaultTokenTable(
 		tokenName: String = "",
 		isDefault: Boolean = true
 	) : this(
-		0,
 		"",
 		contract,
 		iconUrl,
@@ -178,7 +169,6 @@ data class DefaultTokenTable(
 		contract: TokenContract,
 		iconUrl: String
 	) : this(
-		0,
 		"",
 		contract.contract.orEmpty(),
 		iconUrl,
@@ -198,7 +188,6 @@ data class DefaultTokenTable(
 		erc20: ERC20TransactionModel,
 		chainID: ChainID
 	) : this(
-		0,
 		"",
 		erc20.contract,
 		"",
@@ -247,19 +236,7 @@ data class DefaultTokenTable(
 		} then { callback() }
 	}
 
-	fun updateTokenNameFromChain() {
-		GoldStoneEthCall.getTokenName(contract, SharedChain.getCurrentETH()) { result, _ ->
-			DefaultTokenTable.updateTokenName(TokenContract(this), result ?: symbol)
-		}
-	}
-
 	companion object {
-
-		fun getCurrentChainTokens(hold: (List<DefaultTokenTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao().getCurrentChainTokens()
-			} then (hold)
-		}
 
 		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
@@ -326,13 +303,6 @@ data class DefaultTokenTable(
 					.updateTokenPrice(newPrice, contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
 			} then { callback() }
 		}
-
-		fun updateTokenName(contract: TokenContract, name: String) {
-			doAsync {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenName(name, contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
-			}
-		}
 	}
 }
 
@@ -345,8 +315,9 @@ interface DefaultTokenDao {
 	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
 	fun updateTokenPrice(newPrice: Double, contract: String, symbol: String, chainID: String)
 
-	@Query("UPDATE defaultTokens SET name = :newName WHERE contract LIKE :contract AND chainID LIKE :chainID AND symbol LIKE :symbol")
-	fun updateTokenName(newName: String, contract: String, symbol: String, chainID: String)
+	// ERC 20 Only
+	@Query("UPDATE defaultTokens SET name = :name, decimals = :decimals, symbol = :symbol WHERE contract LIKE :contract AND chainID LIKE :chainID")
+	fun updateTokenInfo(name: String, decimals: Int, symbol: String, contract: String, chainID: String)
 
 	@Query("SELECT * FROM defaultTokens WHERE chainID IN (:currentChainIDs)")
 	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chainIDs()): List<DefaultTokenTable>
@@ -363,10 +334,10 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol")
 	fun getTokenFromAllChains(contract: String, symbol: String): List<DefaultTokenTable>
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(token: DefaultTokenTable)
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertAll(tokens: List<DefaultTokenTable>)
 
 	@Update

@@ -28,9 +28,7 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 					presenter.showQuotationSearchFragment()
 				}
 			}
-
 			else -> presenter.showMarketTokenCenter(currencyInfo)
-			//presenter.showMarketTokenDetailFragment(currencyInfo)
 		}
 
 		headerTitle = title ?: currencyInfo?.pairDisplay.orEmpty()

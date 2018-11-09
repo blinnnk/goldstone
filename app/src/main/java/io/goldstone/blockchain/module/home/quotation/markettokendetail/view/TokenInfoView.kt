@@ -29,7 +29,6 @@ class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.medium(context)
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 105.uiPX())
-		x += PaddingSize.device
 	}
 	
 	init {

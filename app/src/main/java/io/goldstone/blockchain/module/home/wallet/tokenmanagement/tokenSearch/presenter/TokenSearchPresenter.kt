@@ -138,7 +138,6 @@ class TokenSearchPresenter(
 				hold(
 					listOf(
 						DefaultTokenTable(
-							0,
 							"",
 							contract,
 							"",
