@@ -35,7 +35,7 @@ data class ReceiptModel(
 	false,
 	false,
 	-1,
-	TimeUtils.formatDate(timestamp.toMillisecond()),
+	timestamp.toString(),
 	-1,
 	memo,
 	null

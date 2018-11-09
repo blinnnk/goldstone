@@ -300,11 +300,11 @@ class TokenDetailPresenter(
 				val transactions =
 					if (token?.contract.isETH()) transactionDao.getETHAndAllFee(
 						address,
-						token!!.contract.contract.orEmpty(),
+						token?.contract?.contract.orEmpty(),
 						token!!.chainID
-					) else transactionDao.getByAddressAndContract(
+					) else transactionDao.getDataWithFee(
 						address,
-						token!!.contract.contract.orEmpty(),
+						token?.contract?.contract.orEmpty(),
 						token!!.chainID
 					)
 				val listModel = transactions.map { TransactionListModel(it) }

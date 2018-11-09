@@ -6,7 +6,7 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -29,13 +29,14 @@ class GasEditorPresenter(
 
 	fun confirmGasCustom(gasPrice: Long, gasLimit: Long) {
 		if (gasPrice <= 0 || gasLimit <= 0) {
-			fragment.context?.alert(AlertText.gasEditorEmpty)
+			fragment.safeShowError(Throwable(AlertText.gasEditorEmpty))
 			return
 		}
 
 		if (gasLimit < fragment.getGasSize() ?: CryptoValue.ethMinGasLimit) {
-			fragment.context?.alert(
-				"${AlertText.gasLimitValue} ${fragment.getGasSize() ?: CryptoValue.ethMinGasLimit}"
+			fragment.safeShowError(
+				Throwable("${AlertText.gasLimitValue} ${fragment.getGasSize()
+					?: CryptoValue.ethMinGasLimit}")
 			)
 			return
 		}

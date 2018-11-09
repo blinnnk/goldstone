@@ -46,6 +46,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 	init {
 		orientation = VERTICAL
 		this.setWillNotDraw(false)
+		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
 		titleLayout = relativeLayout {
 			lparams(matchParent, titleHeight)

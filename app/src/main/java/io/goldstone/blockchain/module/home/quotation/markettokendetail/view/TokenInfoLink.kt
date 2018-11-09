@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.Gravity
 import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
@@ -56,6 +57,9 @@ class TokenInfoLink(
 		setTitle(QuotationText.tokenInfoLink)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		verticalLayout {
+			lparams(matchParent, matchParent)
+			gravity = Gravity.CENTER_HORIZONTAL
+
 			website.into(this)
 			whitePaper.into(this)
 			

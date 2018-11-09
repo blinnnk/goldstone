@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Paint
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,12 +10,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -115,8 +111,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		} else if (isShow) {
 			closeButton.click { clickEvent() }
 			showBackButton(false) {}
-		}
-		else removeView(currentButton)
+		} else removeView(currentButton)
 	}
 
 	fun showScanButton(

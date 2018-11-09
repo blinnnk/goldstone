@@ -34,7 +34,7 @@ data class NotificationModel(
 	false,
 	false,
 	-1,
-	TimeUtils.formatDate(timeStamp.toMillisecond()),
+	timeStamp.toString(), // 通知中心的通知时间作为 transactionTime 记录在本地数据库
 	-1,
 	"",
 	chainID

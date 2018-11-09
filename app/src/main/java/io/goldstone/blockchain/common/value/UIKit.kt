@@ -43,6 +43,8 @@ object Spectrum {
 	@JvmField
 	val deepBlue = Color.parseColor("#FF17446B")
 	@JvmField
+	val blackBlue = Color.parseColor("#FF084A65")
+	@JvmField
 	val lightBlue = Color.parseColor("#FF2882D2")
 	@JvmField
 	val grayBlue = Color.parseColor("#FFA0BBD3")
@@ -85,6 +87,8 @@ object WalletColor {
 object ShadowSize {
 	@JvmField
 	val Header = 3.uiPX().toFloat()
+	@JvmField
+	val Card = 3.uiPX().toFloat()
 	@JvmField
 	val Cell = 5.uiPX().toFloat()
 	@JvmField

@@ -24,7 +24,6 @@ import java.math.BigInteger
  */
 class TransactionProgressCardView(context: Context) : GSCard(context) {
 	private val paddingSize = 5.uiPX()
-
 	private lateinit var progress: ProgressView
 	var model: TransactionProgressModel by observing(TransactionProgressModel()) {
 		progress.setRightValue(BigInteger.valueOf(model.totalCount), TransactionText.irreversible, ProcessType.Value)

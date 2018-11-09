@@ -38,7 +38,7 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 70.uiPX())
-		addView(cellContainer)
+		container.addView(cellContainer)
 		cellContainer.addView(info)
 		info.setCenterInVertical()
 		cellContainer.apply {

@@ -55,6 +55,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		scrollView {
 			lparams(matchParent, matchParent)
 			verticalLayout {
+				lparams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL
 				menu.apply {
 					setMargins<LinearLayout.LayoutParams> {

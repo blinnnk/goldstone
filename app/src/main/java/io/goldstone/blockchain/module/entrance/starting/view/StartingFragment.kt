@@ -84,16 +84,12 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 
 						importButton.apply {
 							text = ImportWalletText.importWallet.toUpperCase()
-							marginTop = PaddingSize.content
 							setDarkStyle()
 						}.click {
-							NetworkUtil.hasNetworkWithAlert(
-								context, AlertText.importWalletNetwork
-							)
 							presenter.showImportWalletFragment()
 						}.into(this)
 					}.lparams {
-						height = (ScreenSize.Height * 0.135).toInt() + importButton.layoutParams.height * 2
+						height = (ScreenSize.Height * 0.1).toInt() + importButton.layoutParams.height * 2
 						alignParentBottom()
 						width = matchParent
 					}

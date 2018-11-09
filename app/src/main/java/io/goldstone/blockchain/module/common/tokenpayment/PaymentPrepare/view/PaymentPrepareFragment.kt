@@ -252,9 +252,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private fun LinearLayout.showAccountInfo() {
 		TopBottomLineCell(context).apply {
 			layoutParams =
-				LinearLayout.LayoutParams(matchParent, 150.uiPX()).apply {
-					topMargin = 10.uiPX()
-				}
+				LinearLayout.LayoutParams(matchParent, 150.uiPX()).apply { topMargin = 10.uiPX() }
 			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.accountInfo)
 

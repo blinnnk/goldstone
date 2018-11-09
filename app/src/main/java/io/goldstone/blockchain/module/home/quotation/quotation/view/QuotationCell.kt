@@ -11,14 +11,14 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.margin
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.textColor
+import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 @SuppressLint("SetTextI18n")
 /**
@@ -109,30 +109,42 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override fun lineLabelCount(): Int = 5
 	}
 
+	private var cardView: GSCard
+
 	init {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, 180.uiPX())
+		cardView = GSCard(context).apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
+			relativeLayout {
+				layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 170.uiPX())
+				addCorner(CornerSize.default.toInt(), Spectrum.white)
 
-		relativeLayout {
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 170.uiPX())
-			addCorner(CornerSize.default.toInt(), Spectrum.white)
+				addView(tokenInfo)
+				addView(tokenPrice)
 
-			addView(tokenInfo)
-			addView(tokenPrice)
+				addView(exchangeName)
 
-			addView(exchangeName)
+				tokenPrice.setAlignParentRight()
 
-			tokenPrice.setAlignParentRight()
+				lineChart.apply {
+					id = ElementID.chartView
+					layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
+					setMargins<RelativeLayout.LayoutParams> {
+						margin = 10.uiPX()
+					}
+					y = 45.uiPX().toFloat()
+				}.into(this)
+			}
+		}
+		cardView.into(this)
+	}
 
-			lineChart.apply {
-				id = ElementID.chartView
-				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
-				setMargins<RelativeLayout.LayoutParams> {
-					margin = 10.uiPX()
-				}
-				y = 45.uiPX().toFloat()
-			}.into(this)
+	fun setClickEvent(action: () -> Unit) {
+		cardView.onClick {
+			action()
+			cardView.preventDuplicateClicks()
 		}
 	}
 }
