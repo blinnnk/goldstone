@@ -154,8 +154,8 @@ interface EOSTransactionDao {
 	@Query("UPDATE eosTransactions SET cupUsage = :cpuUsage, netUsage = :netUsage WHERE txID LIKE :txID")
 	fun updateBandWidthAndStatusByTxID(txID: String, cpuUsage: BigInteger, netUsage: BigInteger)
 
-	@Query("UPDATE eosTransactions SET blockNumber = :blockNumber WHERE txID LIKE :txID")
-	fun updateBlockNumberByTxID(txID: String, blockNumber: Int)
+	@Query("UPDATE eosTransactions SET blockNumber = :blockNumber, isPending = :isPending WHERE txID LIKE :txID")
+	fun updateBlockNumberByTxID(txID: String, blockNumber: Int, isPending: Boolean)
 
 	@Query("UPDATE eosTransactions SET isPending = :pendingStatus, serverID = :serverID WHERE txID LIKE :txID")
 	fun updatePendingDataByTxID(txID: String, serverID: Long, pendingStatus: Boolean = false)

@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Paint
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,12 +10,9 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.AnimationDuration
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -80,8 +76,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		title.visibility = if (status) View.VISIBLE else View.GONE
 	}
 
-	fun getFilterSearchInput(): FilterSearchInput = searchInput
-
 	private val headerHeight = HomeSize.headerHeight
 	private val paint = Paint()
 
@@ -103,6 +97,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		paint.style = Paint.Style.FILL
 	}
 
+	fun showFilterImage(status: Boolean) {
+		searchInput.showFilterImage(status)
+	}
+
 	fun showCloseButton(isShow: Boolean, clickEvent: () -> Unit) {
 		val currentButton = findViewById<ImageView>(ElementID.closeButton)
 		if (currentButton == null) {
@@ -113,8 +111,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		} else if (isShow) {
 			closeButton.click { clickEvent() }
 			showBackButton(false) {}
-		}
-		else removeView(currentButton)
+		} else removeView(currentButton)
 	}
 
 	fun showScanButton(
@@ -168,8 +165,8 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		else removeView(currentButton)
 	}
 
-	fun setSearchFilterClickEvent(callback: () -> Unit) {
-		searchInput.setFilterClickEvent(callback)
+	fun setFilterEvent(action: () -> Unit) {
+		searchInput.setFilterClickEvent(action)
 	}
 
 	fun searchInputListener(isFocus: (Boolean) -> Unit = {}, action: (String) -> Unit) {
@@ -242,31 +239,8 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
-}
 
-class HeaderIcon(context: Context) : ImageView(context) {
-
-	private val iconSize = 30.uiPX()
-
-	init {
-		setColorFilter(GrayScale.lightGray)
-		scaleType = ImageView.ScaleType.CENTER_INSIDE
-		addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
-	}
-
-	fun setLeftPosition() {
-		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-			topMargin = 18.uiPX()
-			leftMargin = 15.uiPX()
-			alignParentLeft()
-		}
-	}
-
-	fun setRightPosition() {
-		layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize).apply {
-			topMargin = 18.uiPX()
-			rightMargin = 15.uiPX()
-			alignParentRight()
-		}
+	fun getSearchContent(): String {
+		return searchInput.editText.text.toString()
 	}
 }

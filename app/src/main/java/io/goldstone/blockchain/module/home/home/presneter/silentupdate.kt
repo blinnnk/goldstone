@@ -5,14 +5,19 @@ import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.Connectivity
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
+import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import kotlinx.coroutines.experimental.*
 
 /**
@@ -23,14 +28,63 @@ abstract class SilentUpdater {
 	fun star() {
 		launch {
 			withContext(CommonPool, CoroutineStart.LAZY) {
-				updateLocalDefaultTokens()
-				updateUnknownDefaultToken()
-				updateRAMUnitPrice()
-				updateMyTokenCurrencyPrice()
-				updateCPUUnitPrice()
-				updateNETUnitPrice()
-				checkAvailableEOSTokenList()
-				updateNodeData()
+				// 是 WIFI 的情况下, 才执行静默更新
+				if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
+					updateLocalDefaultTokens()
+					updateUnknownDefaultToken()
+					updateRAMUnitPrice()
+					updateMyTokenCurrencyPrice()
+					updateCPUUnitPrice()
+					updateNETUnitPrice()
+					checkAvailableEOSTokenList()
+					updateNodeData()
+					checkAvailableERC20TokenList()
+				}
+			}
+		}
+	}
+
+	private fun checkAvailableERC20TokenList() {
+		val transactionDao =
+			GoldStoneDataBase.database.transactionDao()
+		val allTransactions =
+			transactionDao.getTransactionsByAddress(
+				SharedAddress.getCurrentEthereum(),
+				SharedChain.getCurrentETH().chainID.id
+			)
+		val maxBlockNumber =
+			allTransactions.filterNot {
+				it.symbol.equals(CoinSymbol.eth, true)
+			}.maxBy {
+				it.blockNumber
+			}?.blockNumber
+		getERC20TokenTransactions(maxBlockNumber ?: "0")
+	}
+
+	private fun getERC20TokenTransactions(startBlock: String) {
+		RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
+			EtherScanApi.getTokenTransactions(SharedAddress.getCurrentEthereum(), startBlock),
+			"result"
+		) { transactions, error ->
+			if (transactions?.isNotEmpty() == true && error.isNone()) {
+				val defaultDao =
+					GoldStoneDataBase.database.defaultTokenDao()
+				val transactionDao =
+					GoldStoneDataBase.database.transactionDao()
+				// onConflict InsertAll 利用 RoomDatabase 进行双主键做重复判断 
+				// 覆盖或新增到本地 TransactionTable 数据库里
+				transactionDao.insertAll(transactions.map { TransactionTable(it) })
+				// 检测获取的 ERC20 本地是否有对应的 DefaultToken 记录, 如果没有插入到本地数据库
+				// 供其他场景使用
+				val chainID = SharedChain.getCurrentETH().chainID
+				transactions.distinctBy { it.contract }.forEach { erc20 ->
+					val target = defaultDao.getToken(
+						erc20.contract,
+						erc20.tokenSymbol,
+						chainID.id
+					)
+					if (target.isNull()) defaultDao.insert(DefaultTokenTable(erc20, chainID))
+				}
 			}
 		}
 	}

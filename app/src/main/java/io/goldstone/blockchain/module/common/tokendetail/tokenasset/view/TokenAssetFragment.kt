@@ -16,6 +16,7 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
+import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.SessionTitleView
@@ -47,7 +48,9 @@ import java.math.BigInteger
 class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInterface {
 
 	override val pageTitle: String = "Asset"
-	private val tokenInfoView by lazy { TokenInfoView(context!!) }
+	private val tokenInfoView by lazy {
+		TokenInfoView(context!!)
+	}
 	private val balanceCell by lazy {
 		GraySquareCell(context!!).apply {
 			setTitle(TokenDetailText.balance)
@@ -101,7 +104,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 
 	private val assetCard by lazy {
 		GrayCardView(context!!).apply {
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 255.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 255.uiPX())
 		}
 	}
 
@@ -174,28 +177,30 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 		netTotal: BigInteger,
 		netWeight: String
 	) {
-		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available)
-		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total)
+		ramAssetCell.setLeftValue(ramAvailable, TokenDetailText.available, ProcessType.Disk)
+		ramAssetCell.setRightValue(ramTotal, TokenDetailText.total, ProcessType.Disk)
 		ramAssetCell.setSubtitle(ramEOSCount)
 		cpuAssetCell.setSubtitle(cpuWeight)
 		cpuAssetCell.setLeftValue(
 			cpuAvailable,
 			TokenDetailText.available,
-			true
+			ProcessType.Time
 		)
 		cpuAssetCell.setRightValue(
 			cpuTotal,
 			TokenDetailText.total,
-			true
+			ProcessType.Time
 		)
 		netAssetCell.setSubtitle(netWeight)
 		netAssetCell.setLeftValue(
 			netAvailable,
-			TokenDetailText.available
+			TokenDetailText.available,
+			ProcessType.Disk
 		)
 		netAssetCell.setRightValue(
 			netTotal,
-			TokenDetailText.total
+			TokenDetailText.total,
+			ProcessType.Disk
 		)
 	}
 
@@ -218,11 +223,12 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 
 	private fun ViewGroup.showAssetDashboard() {
 		SessionTitleView(context).setTitle(TokenDetailText.resources).into(this)
-		assetCard.apply {
+		assetCard.into(this)
+		assetCard.addContent {
 			addView(ramAssetCell)
 			addView(cpuAssetCell)
 			addView(netAssetCell)
-		}.into(this)
+		}
 	}
 
 	private fun ViewGroup.generateMethodCards() {
@@ -238,8 +244,8 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 	private fun ViewGroup.generateCardView(info: Pair<Int, String>) {
 		val cardWidth = (ScreenSize.widthWithPadding) / 3
 		GrayCardView(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(cardWidth, 130.uiPX())
-			getContainer().apply {
+			layoutParams = RelativeLayout.LayoutParams(cardWidth, 135.uiPX())
+			container.apply {
 				onClick {
 					if (SharedWallet.isWatchOnlyWallet())
 						this@TokenAssetFragment.context.alert(AlertText.watchOnly)
@@ -250,7 +256,7 @@ class TokenAssetFragment : BaseFragment<TokenAssetPresenter>(), TokenInfoViewInt
 					setColorFilter(GrayScale.gray)
 					scaleType = ImageView.ScaleType.CENTER_INSIDE
 					imageResource = info.first
-					layoutParams = RelativeLayout.LayoutParams(cardWidth, 80.uiPX())
+					layoutParams = RelativeLayout.LayoutParams(cardWidth, 75.uiPX())
 				}
 				textView(info.second) {
 					textSize = fontSize(11)

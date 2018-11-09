@@ -6,14 +6,13 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.ImportMethodText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.ShadowSize
-import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.*
 
 
@@ -21,7 +20,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  * @date  2018/09/06
  */
-class WalletImportMethodCell(context: Context) : RelativeLayout(context) {
+class WalletImportMethodCell(context: Context) : GSCard(context) {
 
 	private val titles = TwoLineTitles(context).apply {
 		setBigWhiteStyle(18)
@@ -44,25 +43,17 @@ class WalletImportMethodCell(context: Context) : RelativeLayout(context) {
 	}
 
 	init {
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 120.uiPX())
+		setCardBackgroundColor(Spectrum.blue)
+		setContentPadding(20.uiPX(), 0, 20.uiPX(), 0)
+		layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 110.uiPX())
 		relativeLayout {
-			addCorner(CornerSize.normal.toInt(), Spectrum.blue)
 			titles.into(this)
 			arrowIcon.into(this)
 			arrowIcon.apply {
 				setAlignParentRight()
 				setCenterInVertical()
 			}
-			elevation = ShadowSize.Cell
-			val paddingSize = 15.uiPX()
-			lparams {
-				width = ScreenSize.widthWithPadding
-				height = 110.uiPX()
-				leftPadding = paddingSize
-				rightPadding = paddingSize
-				y -= 5.uiPX()
-				centerInParent()
-			}
+			lparams(matchParent, matchParent)
 			typeIcon.into(this)
 			typeIcon.setAlignParentBottom()
 			typeIcon.y += 45.uiPX()

@@ -44,6 +44,7 @@ object NetworkUtil {
 	}
 }
 
+
 @Suppress("DEPRECATION")
 class ConnectionChangeReceiver : BroadcastReceiver() {
 

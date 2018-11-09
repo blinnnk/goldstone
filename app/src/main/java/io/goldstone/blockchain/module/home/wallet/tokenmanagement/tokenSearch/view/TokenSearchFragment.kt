@@ -35,9 +35,8 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenManagementFragment> {
-			headerTitle = TokenManagementText.addToken
 			presenter.popFragmentFrom<TokenSearchFragment>()
-			overlayView.header.showSearchInput(false) {}
+			showSearchInput(false) {}
 		}
 	}
 }

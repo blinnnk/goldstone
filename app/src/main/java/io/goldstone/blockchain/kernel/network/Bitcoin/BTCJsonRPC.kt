@@ -94,13 +94,32 @@ object BTCSeriesJsonRPC {
 				1
 			)
 		).let { it ->
-			RequisitionUtil.callChainBy(
-				it,
-				chainURL
-			) { result, error ->
-				val confirmations = JSONObject(result).safeGet("confirmations").toIntOrNull()
-				// Return Transaction hash
-				hold(confirmations, error)
+			RequisitionUtil.callChainBy(it, chainURL) { result, error ->
+				if (result != null && error.isNone()) {
+					val confirmations = JSONObject(result).safeGet("confirmations").toIntOrNull()
+					hold(confirmations, error)
+				} else hold(null, error)
+			}
+		}
+	}
+
+	fun getBlockCount(
+		chainURL: ChainURL,
+		hold: (blockCount: Int?, error: RequestError) -> Unit
+	) {
+		RequestBody.create(
+			GoldStoneEthCall.contentType,
+			ParameterUtil.prepareJsonRPC(
+				chainURL.isEncrypt,
+				BitcoinMethod.Getblockcount.method,
+				null,
+				false,
+				false,
+				null
+			)
+		).let { it ->
+			RequisitionUtil.callChainBy(it, chainURL) { result, error ->
+				hold(result?.toLong()?.toInt(), error)
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
-import java.io.Serializable
+import io.goldstone.blockchain.crypto.utils.CryptoUtils
 
 /**
  * @date 2018/6/6 4:37 PM
@@ -13,4 +13,32 @@ data class TransactionHeaderModel(
 	val isPending: Boolean,
 	val isReceive: Boolean = false,
 	val isError: Boolean = false
-): Serializable
+)  {
+
+	constructor(data: TransactionSealedModel, isPending: Boolean? = null, isError: Boolean? = null) : this(
+		data.count,
+		if (data.isReceive) data.fromAddress else data.toAddress,
+		data.symbol,
+		isPending ?: data.isPending,
+		data.isReceive,
+		isError ?: data.hasError
+	)
+
+	constructor(data: TransactionSealedModel, symbol: String, count: Double) : this(
+		count,
+		if (data.isReceive) data.fromAddress else data.toAddress,
+		symbol,
+		data.isPending,
+		data.isReceive,
+		data.hasError
+	)
+
+	constructor(data: ReceiptModel, isPending: Boolean? = null, isError: Boolean? = null) : this(
+		CryptoUtils.toCountByDecimal(data.value, data.token.decimal),
+		data.toAddress,
+		data.token.symbol,
+		isPending ?: true,
+		false,
+		isError ?: false
+	)
+}

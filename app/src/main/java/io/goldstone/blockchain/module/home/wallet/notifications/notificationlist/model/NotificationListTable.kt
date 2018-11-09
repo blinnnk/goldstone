@@ -10,9 +10,9 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONObject
-import java.io.Serializable
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -67,10 +67,10 @@ data class NotificationTable(
 			}
 		}
 
-		fun getChainID(extra: String): String {
+		fun getChainID(extra: String): ChainID? {
 			return if (extra.isNotEmpty()) {
-				JSONObject(extra).safeGet("chainid")
-			} else ""
+				ChainID(JSONObject(extra).safeGet("chainid"))
+			} else null
 		}
 
 		fun getFromAddress(extra: String): String {
@@ -133,17 +133,6 @@ interface NotificationDao {
 	@Update
 	fun update(notification: NotificationTable)
 }
-
-data class NotificationTransactionInfo(
-	val hash: String,
-	val chainID: String,
-	val isReceived: Boolean,
-	val symbol: String,
-	val value: Double,
-	val timeStamp: Long,
-	val toAddress: String,
-	val fromAddress: String
-) : Serializable
 
 data class ExtraTransactionModel(
 	@SerializedName("value")

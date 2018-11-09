@@ -1,11 +1,12 @@
-package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
+package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer
 
 import android.os.Handler
 import android.os.Looper
-import android.support.annotation.WorkerThread
+import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 /**
@@ -27,7 +28,7 @@ abstract class EOSTransactionObserver {
 			// 首先获取线上的最近的不可逆的区块
 			if (transactionBlockNumber.isNull()) {
 				EOSAPI.getBlockNumberByTxID(hash) { blockNumber, error ->
-					if (!blockNumber.isNull() && error.isNone()) {
+					if (blockNumber != null && error.isNone()) {
 						transactionBlockNumber = blockNumber
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
@@ -42,12 +43,12 @@ abstract class EOSTransactionObserver {
 					}
 				}
 			} else EOSAPI.getChainInfo { chainInfo, error ->
-				if (!chainInfo.isNull() && error.isNone()) {
+				if (chainInfo != null && error.isNone()) {
 					if (totalConfirmedCount.isNull()) {
-						totalConfirmedCount = transactionBlockNumber!! - chainInfo!!.lastIrreversibleBlockNumber
+						totalConfirmedCount = transactionBlockNumber!! - chainInfo.lastIrreversibleBlockNumber
 					}
 					// 如果当前转账信息大于最近一个不可逆的区块那么就确认完毕了
-					val hasConfirmed = chainInfo!!.lastIrreversibleBlockNumber > transactionBlockNumber!!
+					val hasConfirmed = chainInfo.lastIrreversibleBlockNumber > transactionBlockNumber!!
 					if (hasConfirmed) {
 						removeObserver()
 					} else {
@@ -56,7 +57,9 @@ abstract class EOSTransactionObserver {
 						handler.postDelayed(reDo, retryTime)
 					}
 					val confirmedCount = totalConfirmedCount!! - (transactionBlockNumber!! - chainInfo.lastIrreversibleBlockNumber)
-					getStatus(hasConfirmed, transactionBlockNumber!!, confirmedCount, totalConfirmedCount!!)
+					uiThread {
+						getStatus(hasConfirmed, transactionBlockNumber!!, confirmedCount, totalConfirmedCount!!)
+					}
 				} else {
 					// 出错失败最大重试次数设定
 					if (maxRetryTimes <= 0) removeObserver()
@@ -66,10 +69,10 @@ abstract class EOSTransactionObserver {
 		}
 	}
 
-	@WorkerThread
+	@UiThread
 	abstract fun getStatus(confirmed: Boolean, blockNumber: Int, confirmedCount: Int, totalCount: Int)
 
-	private fun removeObserver() = handler.removeCallbacks(reDo)
+	fun removeObserver() = handler.removeCallbacks(reDo)
 	fun start() = checkStatusByTransaction()
 
 	private val reDo: Runnable = Runnable {

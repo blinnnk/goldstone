@@ -5,18 +5,16 @@ import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.animation.updateColorAnimation
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.HoneyColor
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
-import io.goldstone.blockchain.common.component.button.RoundIcon
+import io.goldstone.blockchain.common.component.button.RoundShadowIcon
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -36,35 +34,28 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 	private val info = TwoLineTitles(context)
 	private val gradientView = GradientView(context)
-	private val icon = RoundIcon(context)
-	private var pendingIcon: ProgressBar? = null
+	private val statusIcon = RoundShadowIcon(context)
 	private val conformationBar by lazy { TextView(context) }
 
 	init {
-		bottomPadding = 10.uiPX()
+		layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		gradientView.apply {
 			setStyle(GradientType.Tree, TransactionSize.headerView)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
-
 		verticalLayout {
 			lparams {
-				width = (ScreenSize.Width * 0.8).toInt()
+				width = matchParent
 				height = wrapContent
-				topMargin = 35.uiPX()
+				topMargin = 50.uiPX()
 			}
 			gravity = Gravity.CENTER_HORIZONTAL
-			icon.apply {
-				y += 5.uiPX()
-				iconSize = 60.uiPX()
-				setColorFilter(GrayScale.Opacity2Black)
-				elevation = 10.uiPX().toFloat()
-			}.into(this)
-
+			statusIcon.into(this)
 			info.apply {
-				layoutParams = LinearLayout.LayoutParams(matchParent, 70.uiPX())
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent).apply {
+					topMargin = 20.uiPX()
+				}
 				isCenter = true
-				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				setWildStyle()
 			}.into(this)
 		}.setCenterInHorizontal()
@@ -82,27 +73,6 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 	}
 
 	@SuppressLint("SetTextI18n")
-	fun updateConformationBar(confirmedCount: Int, latestIrreversibleCount: Int) {
-		conformationBar.visibility = View.VISIBLE
-		conformationBar.text = "$confirmedCount / ${TransactionText.confirmedBlocks(latestIrreversibleCount)}"
-		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
-	}
-
-	@SuppressLint("SetTextI18n")
-	fun updateEOSConformationBar(confirmedCount: Int, latestIrreversibleCount: Int) {
-		conformationBar.visibility = View.VISIBLE
-		conformationBar.text = "$confirmedCount / ${TransactionText.irreversibleConfirmedBlocks(latestIrreversibleCount)}"
-		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
-	}
-
-	@SuppressLint("SetTextI18n")
-	fun updateEOSConformationBarFinished() {
-		conformationBar.visibility = View.VISIBLE
-		conformationBar.text = TransactionText.irreversibleBlockConfirmed
-		conformationBar.updateColorAnimation(Spectrum.green, GrayScale.Opacity5Black)
-	}
-
-	@SuppressLint("SetTextI18n")
 	fun setIconStyle(
 		headerModel: TransactionHeaderModel
 	) {
@@ -116,44 +86,24 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		info.subtitle.text = headerModel.address
 
 		if (headerModel.isError) {
-			icon.iconColor = Spectrum.lightRed
-			icon.src = R.drawable.error_icon
-			showPendingIcon(false)
+			statusIcon.iconColor = Spectrum.lightRed
+			statusIcon.src = R.drawable.error_icon
+			statusIcon.showPendingIcon(false)
 			return
 		}
 
 		if (headerModel.isPending) {
-			icon.iconColor = Spectrum.lightRed
-			showPendingIcon()
+			statusIcon.iconColor = Spectrum.lightRed
+			statusIcon.showPendingIcon()
 		} else {
-			showPendingIcon(false)
+			statusIcon.showPendingIcon(false)
 			if (!headerModel.isReceive) {
-				icon.iconColor = Spectrum.DarkYellow
-				icon.src = R.drawable.send_icon
-				icon.setColorFilter(GrayScale.Opacity5Black)
+				statusIcon.iconColor = Spectrum.DarkYellow
+				statusIcon.src = R.drawable.send_icon
+				statusIcon.setColorFilter(GrayScale.Opacity5Black)
 			} else {
-				icon.iconColor = Spectrum.green
-				icon.src = R.drawable.receive_icon
-			}
-		}
-	}
-
-	private fun showPendingIcon(status: Boolean = true) {
-		pendingIcon isNotNull {
-			if (!status) removeView(pendingIcon)
-		} otherwise {
-			if (status) {
-				pendingIcon =
-					ProgressBar(this.context, null, android.R.attr.progressBarStyleInverse).apply {
-						indeterminateDrawable.setColorFilter(
-							HoneyColor.HoneyWhite,
-							android.graphics.PorterDuff.Mode.MULTIPLY
-						)
-						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
-						y += 45.uiPX()
-					}
-				addView(pendingIcon)
-				pendingIcon?.setCenterInHorizontal()
+				statusIcon.iconColor = Spectrum.green
+				statusIcon.src = R.drawable.receive_icon
 			}
 		}
 	}

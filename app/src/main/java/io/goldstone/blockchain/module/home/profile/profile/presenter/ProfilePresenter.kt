@@ -29,10 +29,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
@@ -44,6 +41,7 @@ import io.goldstone.blockchain.module.home.profile.profile.view.ProgressLoadingD
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.uiThread
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -173,17 +171,27 @@ class ProfilePresenter(
 			progressLoadingDialog.show()
 			return
 		}
-		fragment.context?.let {
-			GoldStoneDialog.show(it) {
+		fragment.context?.apply {
+			if (currentChannel == ApkChannel.Google) {
+				showGooglePlayStore()
+			} else GoldStoneDialog.show(this) {
 				showButtons(CommonText.upgrade) {
 					downloadNewVersion {
-						GoldStoneDialog.remove(it)
+						GoldStoneDialog.remove(this@apply)
 						showDownloadProgress()
 					}
 				}
 				setContent(newVersionName, newVersionDescription)
 				setImage(R.drawable.version_banner)
 			}
+		}
+	}
+
+	private fun Context.showGooglePlayStore() {
+		try {
+			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+		} catch (error: android.content.ActivityNotFoundException) {
+			startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
 		}
 	}
 
@@ -305,10 +313,8 @@ class ProfilePresenter(
 			}
 
 			val progress = (bytesAndStatus[0].toFloat()) / (bytesAndStatus[1].toFloat()) * 100
-			fragment.context?.apply {
-				runOnUiThread {
-					onProgressUpdate(bytesAndStatus[2], progress.toInt())
-				}
+			fragment.context?.runOnUiThread {
+				onProgressUpdate(bytesAndStatus[2], progress.toInt())
 			}
 		}
 	}
@@ -317,16 +323,16 @@ class ProfilePresenter(
 		fragment.context?.let { context ->
 			GoldStoneAPI.getNewVersionOrElse { versionModel, error ->
 				if (error.isNone()) {
-					version = if (versionModel.isNull()) {
+					version = if (versionModel == null) {
 						SystemUtils.getVersionName(context)
 					} else {
-						newVersionDescription = versionModel?.description.orEmpty()
-						newVersionName = versionModel?.versionName.orEmpty()
-						newVersionUrl = versionModel?.url.orEmpty()
-						versionModel?.versionName + " " + CommonText.new
+						newVersionDescription = versionModel.description.orEmpty()
+						newVersionName = versionModel.versionName.orEmpty()
+						newVersionUrl = versionModel.url.orEmpty()
+						versionModel.versionName + " " + CommonText.new
 					}
 					fragment.asyncData?.apply {
-						last().info = version
+						lastOrNull()?.info = version
 						fragment.recyclerView.adapter?.notifyItemChanged(lastIndex)
 					}
 				}
@@ -340,7 +346,7 @@ class ProfilePresenter(
 		}.start {
 			doAsync {
 				downloadId = download(newVersionUrl, newVersionName, newVersionDescription)
-				fragment.context?.runOnUiThread { callback() }
+				uiThread { callback() }
 			}
 		}
 	}
@@ -402,6 +408,7 @@ class ProfilePresenter(
 		clickTimes -= 1
 		if (clickTimes <= 0 && !hasShownGoldStoneID) {
 			hasShownGoldStoneID = true
+			SharedValue.updateDeveloperModeStatus(true)
 			AppConfigTable.getAppConfig {
 				it?.apply {
 					fragment.context.alert(goldStoneID)

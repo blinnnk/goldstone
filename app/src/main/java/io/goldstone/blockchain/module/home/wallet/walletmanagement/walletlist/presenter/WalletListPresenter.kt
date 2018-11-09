@@ -27,7 +27,7 @@ class WalletListPresenter(
 	override fun updateData() {
 		fragment.asyncData = arrayListOf()
 		WalletTable.getAll {
-			diffAndUpdateAdapterData<WalletListAdapter>(
+			diffAndUpdateSingleCellAdapterData<WalletListAdapter>(
 				mapTo(arrayListOf()) { wallet ->
 					WalletListModel(wallet, wallet.getWalletType().type.orEmpty())
 				}
@@ -131,12 +131,12 @@ class WalletListPresenter(
 
 	override fun onFragmentShowFromHidden() {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.showWalletSettingListFragment()
 			}
 		}
 		fragment.getParentFragment<ProfileOverlayFragment> {
-			overlayView.header.showAddButton(true) {
+			showAddButton(true) {
 				presenter.showWalletAddingMethodDashboard()
 			}
 		}

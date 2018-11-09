@@ -1,18 +1,15 @@
 package io.goldstone.blockchain.common.base.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
-import android.view.ViewGroup
-import android.widget.RelativeLayout
-import com.blinnnk.extension.addCircleBorder
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.setCenterInParent
-import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.value.CornerSize
+import android.widget.LinearLayout
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 
 
 /**
@@ -20,34 +17,21 @@ import org.jetbrains.anko.verticalLayout
  * @date  2018/09/10
  */
 
-open class GrayCardView(context: Context) : RelativeLayout(context) {
+@SuppressLint("ViewConstructor")
+open class GrayCardView(context: Context) : GSCard(context) {
 
-	protected var container = verticalLayout {
-		setCenterInParent()
-		topPadding = 5.uiPX()
+	var container = verticalLayout {
 		gravity = Gravity.CENTER_HORIZONTAL
-		addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
-		elevation = 4f
-		lparams {
-			width = matchParent
-			height = matchParent
-			setMargins(4.uiPX(), 2.uiPX(), 4.uiPX(), 4.uiPX())
-		}
+		lparams(matchParent, wrapContent)
 	}
 
-	// 为了阴影内嵌了 双层 `RelativeLayout` 所以这里重写默认的 `addView` 方法
-	fun addView(childView: ViewGroup) {
-		container.addView(childView)
+	init {
+	  this.setCardBackgroundColor(GrayScale.whiteGray)
+		this.setContentPadding(PaddingSize.content, PaddingSize.content, PaddingSize.content, PaddingSize.content)
 	}
 
-	fun getContainer(): ViewGroup = container
-
-	override fun setBackgroundColor(color: Int) {
-		container.addCorner(CornerSize.small.toInt(), color)
-	}
-
-	fun setBorder(borderColor: Int) {
-		container.addCircleBorder(CornerSize.small.toInt(), 1, borderColor)
+	fun addContent(hold: LinearLayout.() -> Unit) {
+		hold(container)
 	}
 
 }

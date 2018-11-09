@@ -7,13 +7,15 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.*
+import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
@@ -23,7 +25,7 @@ import org.jetbrains.anko.*
  * @date 25/04/2018 8:56 AM
  * @author KaySaith
  */
-open class GraySquareCell(context: Context) : RelativeLayout(context) {
+open class GraySquareCell(context: Context) : GSCard(context) {
 
 	protected val title = TextView(context).apply {
 		textSize = fontSize(12)
@@ -52,25 +54,23 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-
 	private var container: RelativeLayout
-	private val shadowSize = 3
 
 	init {
+		this.setCardBackgroundColor(GrayScale.whiteGray)
 		// 低端机型导致的 SetMargin 不识别, 顾此采用夹层方式实现 `Margin` 的阴影
 		container = relativeLayout {
-			lparams(ScreenSize.widthWithPadding - shadowSize * 2, 45.uiPX())
-			setCenterInParent()
-			addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
-			elevation = 3f
-			addView(View(context).apply {
-				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
-				backgroundColor = GrayScale.midGray
-			})
+			lparams(matchParent, matchParent)
+			addView(
+				View(context).apply {
+					layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
+					backgroundColor = GrayScale.midGray
+				}
+			)
 			addView(title)
 			addView(subtitle)
 		}
-		layoutParams = RelativeLayout.LayoutParams(matchParent, 51.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 52.uiPX())
 	}
 
 	fun <T : CharSequence> setTitle(text: T) {
@@ -95,10 +95,7 @@ open class GraySquareCell(context: Context) : RelativeLayout(context) {
 			)
 	}
 
-	fun setPriceSubtitle(
-		text: String,
-		currency: String
-	) {
+	fun setPriceSubtitle(text: String, currency: String) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.text =
 			CustomTargetTextStyle(currency, "$text  $currency", GrayScale.black, 8.uiPX(), true, false)

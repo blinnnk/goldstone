@@ -8,6 +8,7 @@ import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
@@ -136,7 +137,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			getParentFragment<TokenDetailOverlayFragment>()
 		overlayFragment?.presenter?.popFragmentFrom<BaseTradingFragment>()
 	}
-	
+
 	fun setProcessUsage(weight: String, available: BigInteger, total: BigInteger, priceEOS: Double) {
 		val title = when (tradingType) {
 			TradingType.CPU -> TokenDetailText.cpu
@@ -148,15 +149,15 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			TradingType.NET -> "EOS/Bytes/Day"
 			TradingType.RAM -> "KB/EOS"
 		}
-		val isTime = when (tradingType) {
-			TradingType.CPU -> true
-			else -> false
+		val processType = when (tradingType) {
+			TradingType.CPU -> ProcessType.Time
+			else -> ProcessType.Disk
 		}
 		val formattedPriceEOS = "≈ " + priceEOS.formatCount(4)
 		delegateTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
 		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
-		incomeTradingCard.setProcessValue(title, weight, available, total, isTime)
-		expendTradingCard.setProcessValue(title, weight, available, total, isTime)
+		incomeTradingCard.setProcessValue(title, weight, available, total, processType)
+		expendTradingCard.setProcessValue(title, weight, available, total, processType)
 	}
 
 	fun getInputValue(stakeType: StakeType): Pair<EOSAccount, Double> {

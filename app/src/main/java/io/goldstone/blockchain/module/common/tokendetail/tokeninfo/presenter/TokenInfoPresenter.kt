@@ -32,7 +32,6 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
-import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import org.bitcoinj.core.Address
 import org.bitcoinj.params.MainNetParams
@@ -58,7 +57,7 @@ class TokenInfoPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		val info = getDetailButtonInfo(tokenInfo, currentAddress)
+		val info = getDetailButtonInfo(tokenInfo?.contract, currentAddress)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName =
 			CryptoName.getChainNameByContract(tokenInfo?.contract).toUpperCase() + " " + TokenDetailText.chainType
@@ -130,10 +129,16 @@ class TokenInfoPresenter(
 			tokenInfo?.contract.isETC() -> TransactionTable.getETCTransactions(currentAddress) { transactions ->
 				fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
 				// 分别查询 `接收的总值` 和 `支出的总值`
-				val totalReceiveValue =
-					transactions.asSequence().filter { it.isReceived }.sumByDouble { it.value.toDoubleOrNull().orZero() }
-				val totalSentValue =
-					transactions.asSequence().filter { !it.isReceived && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
+				val totalReceiveValue = transactions.asSequence().filter {
+					it.isReceived
+				}.sumByDouble {
+					it.count
+				}
+				val totalSentValue = transactions.asSequence().filter {
+					!it.isReceived && !it.isFee
+				}.sumByDouble {
+					it.count
+				}
 				setTotalValue(totalReceiveValue, totalSentValue)
 				// 获取最近一笔交易的时间显示最后活跃时间
 				val latestDate =
@@ -184,11 +189,15 @@ class TokenInfoPresenter(
 					val totalReceiveValue =
 						transactions.asSequence().filter {
 							it.isReceived && it.symbol.equals(tokenInfo?.symbol, true)
-						}.sumByDouble { it.value.toDoubleOrNull().orZero() }
+						}.sumByDouble {
+							it.count
+						}
 					val totalSentValue =
 						transactions.asSequence().filter {
 							!it.isReceived && !it.isFee && it.symbol.equals(tokenInfo?.symbol, true)
-						}.sumByDouble { it.value.toDoubleOrNull().orZero() }
+						}.sumByDouble {
+							it.count
+						}
 					setTotalValue(totalReceiveValue, totalSentValue)
 					// 获取最近一笔交易的时间显示最后活跃时间
 					val latestDate =
@@ -238,24 +247,28 @@ class TokenInfoPresenter(
 	}
 
 	companion object {
-		fun getDetailButtonInfo(tokenInfo: WalletDetailCellModel?, currentAddress: String): Pair<Int, String> {
-			val icon = when {
-				tokenInfo?.contract.isBTC() -> R.drawable.blocktrail_icon
-				tokenInfo?.contract.isLTC() -> R.drawable.blockcypher_icon
-				tokenInfo?.contract.isBCH() -> R.drawable.blocktrail_icon
-				tokenInfo?.contract.isEOSSeries() -> R.drawable.bloks_io_icon
-				tokenInfo?.contract.isETC() -> R.drawable.gastracker_icon
+
+		fun getExplorerIcon(contract: TokenContract?): Int {
+			return when {
+				contract.isBTC() -> R.drawable.blocktrail_icon
+				contract.isLTC() -> R.drawable.blockcypher_icon
+				contract.isBCH() -> R.drawable.blocktrail_icon
+				contract.isEOSSeries() -> R.drawable.bloks_io_icon
+				contract.isETC() -> R.drawable.gastracker_icon
 				else -> R.drawable.etherscan_icon
 			}
+		}
+
+		fun getDetailButtonInfo(contract: TokenContract?, currentAddress: String): Pair<Int, String> {
 			val url = when {
-				tokenInfo?.contract.isBTC() -> ChainURL.btcAddressDetail(currentAddress)
-				tokenInfo?.contract.isLTC() -> ChainURL.ltcAddressDetail(currentAddress)
-				tokenInfo?.contract.isBCH() -> ChainURL.bchAddressDetail(currentAddress)
-				tokenInfo?.contract.isEOSSeries() -> ChainURL.eosAddressDetail(currentAddress)
-				tokenInfo?.contract.isETC() -> ChainURL.etcAddressDetail(currentAddress)
+				contract.isBTC() -> ChainURL.btcAddressDetail(currentAddress)
+				contract.isLTC() -> ChainURL.ltcAddressDetail(currentAddress)
+				contract.isBCH() -> ChainURL.bchAddressDetail(currentAddress)
+				contract.isEOSSeries() -> ChainURL.eosAddressDetail(currentAddress)
+				contract.isETC() -> ChainURL.etcAddressDetail(currentAddress)
 				else -> ChainURL.ethAddressDetail(currentAddress)
 			}
-			return Pair(icon, url)
+			return Pair(getExplorerIcon(contract), url)
 		}
 
 		fun showThirdPartyAddressDetail(fragment: TokenDetailOverlayFragment?, url: String) {

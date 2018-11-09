@@ -89,9 +89,8 @@ class QuotationSearchFragment :
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<QuotationOverlayFragment> {
-			headerTitle = QuotationText.management
 			presenter.popFragmentFrom<QuotationSearchFragment>()
-			overlayView.header.showSearchInput(false) {}
+			showSearchInput(false) {}
 		}
 	}
 

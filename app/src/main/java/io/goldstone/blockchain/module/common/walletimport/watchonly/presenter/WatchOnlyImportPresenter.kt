@@ -253,7 +253,7 @@ class WatchOnlyImportPresenter(
 		setRootChildFragmentBackEvent<ProfileOverlayFragment>(fragment)
 		// 深度回退站恢复
 		fragment.getParentFragment<ProfileOverlayFragment> {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.popFragmentFrom<WatchOnlyImportFragment>()
 			}
 		}

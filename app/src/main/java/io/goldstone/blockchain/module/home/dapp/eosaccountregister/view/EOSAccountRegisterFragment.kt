@@ -20,10 +20,7 @@ import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.MutablePair
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSValue
@@ -54,7 +51,11 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	private val resourceCoast by lazy { GraySquareCell(context!!) }
 	private val gridSessionTitle by lazy { ColumnSectionTitle(context!!) }
 	private var assignResources =
-		listOf(MutablePair("RAM (Bytes)", "4096"), MutablePair("CPU (EOS)", "0.1"), MutablePair("NET (EOS)", "0.1"))
+		listOf(
+			MutablePair("RAM (Bytes)", "4096"),
+			MutablePair("CPU (EOS)", "0.1"),
+			MutablePair("NET (EOS)", "0.1")
+		)
 
 	override val presenter = EOSAccountRegisterPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
@@ -109,7 +110,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 						assignResources[1].right.toDouble(),
 						assignResources[1].right.toDouble()
 					) {
-						if (!it.isNone()) context.alert(it.message)
+						if (it.hasError()) safeShowError(it)
 						button.showLoadingStatus(false)
 					}
 				}.into(this)

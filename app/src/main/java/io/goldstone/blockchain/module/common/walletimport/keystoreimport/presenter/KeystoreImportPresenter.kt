@@ -58,7 +58,7 @@ class KeystoreImportPresenter(
 		setRootChildFragmentBackEvent<WalletImportFragment>(fragment)
 		// 深度回退站恢复
 		fragment.getParentFragment<WalletImportFragment> {
-			overlayView.header.showBackButton(true) {
+			showBackButton(true) {
 				presenter.popFragmentFrom<KeystoreImportFragment>()
 			}
 		}

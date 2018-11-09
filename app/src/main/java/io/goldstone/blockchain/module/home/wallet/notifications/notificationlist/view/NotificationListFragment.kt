@@ -9,8 +9,8 @@ import io.goldstone.blockchain.common.language.NotificationText
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
-import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTransactionInfo
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter.NotificationListPresenter
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
@@ -29,7 +29,7 @@ class NotificationListFragment :
 		asyncData: ArrayList<NotificationTable>?
 	) {
 		recyclerView.adapter = NotificationListAdapter(asyncData.orEmptyArray()) {
-			onClick { _ ->
+			onClick {
 				model?.apply {
 					if (type == 1) {
 						presenter.showWebFragment(title, actionContent)
@@ -41,15 +41,15 @@ class NotificationListFragment :
 							fromAddress =
 								NotificationTable.getBTCTransactionData(extra.orEmpty(), true)[0].address
 							toAddress =
-								NotificationTable.getBTCTransactionData(extra.orEmpty(), false)
-									.map { it.address }
-									.toString()
+								NotificationTable.getBTCTransactionData(extra.orEmpty(), false).map { extra ->
+									extra.address
+								}.toString()
 						} else {
 							fromAddress = NotificationTable.getFromAddress(extra.orEmpty())
 							toAddress = NotificationTable.getToAddress(extra.orEmpty())
 						}
-						presenter.showTransactionListDetailFragment(
-							NotificationTransactionInfo(
+						presenter.showTransactionDetailFragment(
+							NotificationModel(
 								actionContent,
 								NotificationTable.getChainID(extra.orEmpty()),
 								NotificationTable.getReceiveStatus(extra.orEmpty()).orFalse(),

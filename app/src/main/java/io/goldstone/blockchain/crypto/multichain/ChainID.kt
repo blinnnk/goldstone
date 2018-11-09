@@ -11,6 +11,7 @@ import java.io.Serializable
  * @author KaySaith
  */
 class ChainID(val id: String) : Serializable {
+
 	fun isETHMain(): Boolean = ethMain.equals(id, true)
 	fun isRopsten(): Boolean = ropsten.equals(id, true)
 	fun isRinkeby(): Boolean = rinkeby.equals(id, true)
@@ -26,7 +27,6 @@ class ChainID(val id: String) : Serializable {
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 	fun isEOS(): Boolean = isEOSMain() || isEOSTest()
-
 
 	fun isEOSSeries(): Boolean {
 		return isEOS() || isEOSTest()
@@ -48,14 +48,14 @@ class ChainID(val id: String) : Serializable {
 		return isRinkeby() || isRopsten() || isKovan() || isBTCTest() || isBCHTest() || isLTCTest() || isEOSTest() || isETCTest()
 	}
 
-	fun getContract(): String? {
+	fun getContract(): TokenContract? {
 		return when (id) {
-			etcMain, etcTest -> TokenContract.etcContract
-			btcTest, btcMain -> TokenContract.btcContract
-			ltcMain, ltcTest -> TokenContract.ltcContract
-			bchMain, bchTest -> TokenContract.bchContract
-			eosMain, eosTest -> TokenContract.eosContract
-			ethMain, ropsten, rinkeby, kovan -> TokenContract.ethContract
+			etcMain, etcTest -> TokenContract.ETC
+			btcTest, btcMain -> TokenContract.BTC
+			ltcMain, ltcTest -> TokenContract.LTC
+			bchMain, bchTest -> TokenContract.BCH
+			eosMain, eosTest -> TokenContract.EOS
+			ethMain, ropsten, rinkeby, kovan -> TokenContract.ETH
 			else -> null
 		}
 	}

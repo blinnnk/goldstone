@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model
 
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.crypto.utils.toAddressFromCode
 import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
+import java.io.Serializable
 
 /**
  * @date 15/04/2018 1:13 AM
@@ -10,45 +10,64 @@ import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
  */
 
 data class ERC20TransactionModel(
-	@SerializedName("address")
-	val contract: String,
-	@SerializedName("topics")
-	private val topics: ArrayList<String>,
-	val from: String = topics[1],
-	val to: String = topics[2],
-	@SerializedName("data")
-	val value: String,
 	@SerializedName("blockNumber")
 	val blockNumber: String,
 	@SerializedName("timeStamp")
 	val timeStamp: String,
+	@SerializedName("hash")
+	val transactionHash: String,
+	@SerializedName("nonce")
+	val nonce: String,
+	@SerializedName("blockHash")
+	val blockHash: String,
+	@SerializedName("from")
+	var from: String,
+	@SerializedName("contractAddress")
+	val contract: String,
+	@SerializedName("to")
+	var to: String,
+	@SerializedName("value")
+	val value: String,
+	@SerializedName("tokenName")
+	var tokenName: String,
+	@SerializedName("tokenSymbol")
+	var tokenSymbol: String,
+	@SerializedName("tokenDecimal")
+	var tokenDecimal: String,
+	@SerializedName("transactionIndex")
+	val transactionIndex: String,
+	@SerializedName("gas")
+	val gas: String,
 	@SerializedName("gasPrice")
 	val gasPrice: String,
 	@SerializedName("gasUsed")
 	val gasUsed: String,
-	@SerializedName("logIndex")
-	val logIndex: String,
-	@SerializedName("transactionHash")
-	val transactionHash: String,
-	@SerializedName("transactionIndex")
-	val transactionIndex: String,
-	val isReceive: Boolean,
-	var symbol: String
-) {
-	constructor(data: ERC20TransactionModel) : this(
-		data.contract,
-		data.topics,
-		data.topics[1].toAddressFromCode(), // fromAddress
-		data.topics[2].toAddressFromCode(), // toAddress
-		data.value.toDecimalFromHex(),
-		data.blockNumber.toDecimalFromHex(),
-		data.timeStamp.toDecimalFromHex(),
-		data.gasPrice.toDecimalFromHex(),
-		data.gasUsed.toDecimalFromHex(),
-		data.logIndex.toDecimalFromHex(),
-		data.transactionHash,
-		data.transactionIndex.toDecimalFromHex(),
-		true,
+	@SerializedName("cumulativeGasUsed")
+	val cumulativeGasUsed: String,
+	@SerializedName("input")
+	var input: String,
+	@SerializedName("confirmations")
+	var confirmations: String
+): Serializable {
+	constructor() : this(
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
 		""
 	)
 }

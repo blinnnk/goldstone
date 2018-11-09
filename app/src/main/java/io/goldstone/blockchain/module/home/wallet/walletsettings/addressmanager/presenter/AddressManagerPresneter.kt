@@ -82,12 +82,10 @@ class AddressManagerPresenter(
 
 	fun setBackEvent() {
 		fragment.getParentFragment<WalletSettingsFragment>()?.apply {
-			overlayView.header.apply {
-				showBackButton(true) {
-					presenter.showWalletSettingListFragment()
-				}
-				showCloseButton(false) {}
+			showBackButton(true) {
+				presenter.showWalletSettingListFragment()
 			}
+			showCloseButton(false) {}
 		}
 	}
 

@@ -4,9 +4,9 @@ import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
 import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -42,20 +42,11 @@ private fun loadBCHTransactionsFromChain(
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) {
 		callback(false)
-		return
-	}
-	BitcoinCashApi.getTransactions(
-		address,
-		pageInfo.from,
-		pageInfo.to
-	) { transactions, error ->
-		if (transactions == null || error.hasError()) {
-			callback(false)
-			return@getTransactions
-		}
+	} else BitcoinCashApi.getTransactions(address, pageInfo.from, pageInfo.to) { transactions, error ->
+		callback(transactions?.isNotEmpty() == true)
 		// Calculate All Inputs to get transfer value
-		callback(transactions.asSequence().mapIndexed { index, item ->
-			// 转换数据格式
+		// 转换数据格式
+		if (transactions != null && error.isNone()) transactions.asSequence().mapIndexed { index, item ->
 			BTCSeriesTransactionTable(
 				item,
 				pageInfo.maxDataIndex + index + 1,
@@ -64,16 +55,12 @@ private fun loadBCHTransactionsFromChain(
 				false,
 				ChainType.BCH.id
 			)
-		}.map {
-			// 插入转账数据到数据库
-			BTCSeriesTransactionTable.preventRepeatedInsert(it.hash, false, it)
+		}.toList().let { all ->
+			val transactionDao =
+				GoldStoneDataBase.database.btcSeriesTransactionDao()
+			transactionDao.insertAll(all)
 			// 同样的账单插入一份燃气费的数据
-			if (!it.isReceive) BTCSeriesTransactionTable.preventRepeatedInsert(
-				it.hash,
-				true,
-				it.apply { isFee = true }
-			)
-			TransactionListModel(it)
-		}.toList().isNotEmpty())
+			transactionDao.insertAll(all.filterNot { it.isReceive }.map { it.apply { it.isFee = true } })
+		}
 	}
 }

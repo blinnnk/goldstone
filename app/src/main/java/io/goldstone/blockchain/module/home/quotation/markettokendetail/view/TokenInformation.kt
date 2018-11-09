@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.content.Context
+import android.view.Gravity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
@@ -45,6 +46,8 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 		setTitle(QuotationText.tokenInformation)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 250.uiPX())
 		verticalLayout {
+			lparams(matchParent, matchParent)
+			gravity = Gravity.CENTER_HORIZONTAL
 			rank.into(this)
 			availableSupply.into(this)
 			marketCap.into(this)

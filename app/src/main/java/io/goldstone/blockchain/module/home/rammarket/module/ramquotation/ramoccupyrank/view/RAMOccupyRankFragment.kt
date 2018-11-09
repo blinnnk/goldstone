@@ -39,7 +39,7 @@ class RAMOccupyRankFragment : BaseRecyclerFragment<RAMOccupyRankPresenter, RAMRa
 				getParentFragment<RAMMarketDetailFragment> {
 					getParentFragment<RAMMarketOverlayFragment> {
 						presenter.showTargetFragment<RAMTransactionSearchFragment>(Bundle().apply { putString("account", model.account) })
-						overlayView.header.apply {
+						getOverlayHeader().apply {
 							showBackButton(false) { }
 							showSearchInput {
 								presenter.popFragmentFrom<RAMTransactionSearchFragment>()

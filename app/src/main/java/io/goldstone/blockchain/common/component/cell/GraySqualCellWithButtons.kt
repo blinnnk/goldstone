@@ -3,21 +3,27 @@ package io.goldstone.blockchain.common.component.cell
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
+import android.support.v7.widget.CardView
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.extension.*
+import com.blinnnk.extension.measureTextWidth
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Default
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Normal
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
@@ -25,7 +31,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  * @date 2018/7/11 1:20 AM
  * @author KaySaith
  */
-open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context) {
+open class GraySquareCellWithButtons(context: Context) : CardView(context) {
 
 	private var cellHeight = 45.uiPX()
 	protected val title = TextView(context).apply {
@@ -66,6 +72,18 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
 		}
 	}
+
+	private val addButton by lazy {
+		ImageView(context).apply {
+			visibility = View.GONE
+			imageResource = R.drawable.add_contact_icon
+			scaleType = ImageView.ScaleType.CENTER_INSIDE
+			setColorFilter(GrayScale.midGray)
+			layoutParams = RelativeLayout.LayoutParams(cellHeight, matchParent)
+			addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.green, RippleMode.Round)
+		}
+	}
+
 	val moreButton by lazy {
 		ImageView(context).apply {
 			imageResource = R.drawable.more_icon
@@ -76,13 +94,10 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 		}
 	}
 	private lateinit var lineView: View
-	private var container: RelativeLayout
 
 	init {
-		container = relativeLayout {
-			lparams(ScreenSize.widthWithPadding, cellHeight)
-			setCenterInParent()
-			addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
+		relativeLayout {
+			lparams(matchParent, cellHeight)
 			lineView = View(context).apply {
 				layoutParams = RelativeLayout.LayoutParams(6.uiPX(), matchParent)
 			}
@@ -95,8 +110,16 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 			copyButton.x -= 30.uiPX()
 			addView(moreButton)
 			moreButton.setAlignParentRight()
+			addView(addButton)
+			addButton.setAlignParentRight()
 		}
-		layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight + 7.uiPX())
+		layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
+		this.setCardBackgroundColor(GrayScale.whiteGray)
+		maxCardElevation = 6f
+		cardElevation = 6f
+		preventCornerOverlap = false
+		radius = CornerSize.normal
+		useCompatPadding = true
 	}
 
 	fun <T : CharSequence> setTitle(text: T) {
@@ -106,7 +129,22 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 		description.leftPadding = paddingSize
 	}
 
+	fun showCopyAndAddButton(copyAction: () -> Unit, addAction: () -> Unit) {
+		moreButton.visibility = View.GONE
+		addButton.visibility = View.VISIBLE
+		addButton.onClick {
+			addAction()
+			addButton.preventDuplicateClicks()
+		}
+		copyButton.onClick {
+			copyAction()
+			copyButton.preventDuplicateClicks()
+		}
+		updateStyle(Normal, true)
+	}
+
 	fun showOnlyCopyButton(action: () -> Unit) {
+		addButton.visibility = View.GONE
 		moreButton.visibility = View.GONE
 		copyButton.x += 30.uiPX()
 		copyButton.onClick {
@@ -130,18 +168,15 @@ open class GraySquareCellWithButtons(context: Context) : RelativeLayout(context)
 	}
 
 	fun updateStyle(type: CellType = Normal, isGrayTitle: Boolean = false) {
-		container.elevation = 4f
 		title.textColor = if (isGrayTitle) GrayScale.gray else GrayScale.black
 		moreButton.setColorFilter(GrayScale.gray)
 		copyButton.setColorFilter(GrayScale.gray)
+		addButton.setColorFilter(GrayScale.gray)
 		when (type) {
 			Normal -> lineView.backgroundColor = GrayScale.midGray
 			Default -> lineView.backgroundColor = Spectrum.blue
 		}
 	}
-
-	fun getTitle(): String = title.text.toString()
-	fun getSubtitle(): String = subtitle.text.toString()
 
 	companion object {
 		enum class CellType {

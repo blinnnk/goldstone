@@ -19,12 +19,10 @@ class TokenManagementPresenter(
 	fun showTokenManagementFragment() {
 		fragment.apply {
 			addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content)
-			overlayView.header.apply {
-				showSearchButton(true) {
-					showTokenSearchFragment()
-					showSearchInput {
-						popFragmentFrom<TokenSearchFragment>()
-					}
+			showSearchButton(true) {
+				showTokenSearchFragment()
+				showSearchInput {
+					popFragmentFrom<TokenSearchFragment>()
 				}
 			}
 		}

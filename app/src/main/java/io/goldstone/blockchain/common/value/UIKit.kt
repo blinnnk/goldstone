@@ -43,6 +43,8 @@ object Spectrum {
 	@JvmField
 	val deepBlue = Color.parseColor("#FF17446B")
 	@JvmField
+	val blackBlue = Color.parseColor("#FF084A65")
+	@JvmField
 	val lightBlue = Color.parseColor("#FF2882D2")
 	@JvmField
 	val grayBlue = Color.parseColor("#FFA0BBD3")
@@ -86,6 +88,8 @@ object ShadowSize {
 	@JvmField
 	val Header = 3.uiPX().toFloat()
 	@JvmField
+	val Card = 3.uiPX().toFloat()
+	@JvmField
 	val Cell = 5.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
@@ -98,13 +102,15 @@ object PaddingSize {
 	val device = 15.uiPX()
 	@JvmField
 	val content = 10.uiPX()
+	@JvmField
+	val overlay = 15.uiPX()
 }
 
 object CornerSize {
 	@JvmField
 	val small = 3.uiPX().toFloat()
 	@JvmField
-	val normal = 7.uiPX().toFloat()
+	val normal = 6.uiPX().toFloat()
 	@JvmField
 	val default = 10.uiPX().toFloat()
 	@JvmField
@@ -121,6 +127,8 @@ object BorderSize {
 }
 
 object ScreenSize {
+	@JvmStatic
+	val card = Resources.getSystem().displayMetrics.widthPixels - 10.uiPX() * 2
 	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 	@JvmStatic
@@ -140,7 +148,7 @@ object CommonCellSize {
 
 object TransactionSize {
 	@JvmField
-	val headerView = 200.uiPX()
+	val headerView = 240.uiPX()
 }
 
 object HomeSize {

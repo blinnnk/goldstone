@@ -30,7 +30,7 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 class ProfileCell(context: Context) : BaseCell(context) {
-	
+
 	var upgradeEvent: Runnable? = null
 	var model: ProfileModel by observing(ProfileModel()) {
 		icon.src = model.icon
@@ -51,7 +51,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 					CommonText.new,
 					model.info,
 					Spectrum.red,
-					12.uiPX(),
+					11.uiPX(),
 					false,
 					false
 				)
@@ -66,7 +66,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 	private val icon by lazy { SquareIcon(context) }
 	private val title by lazy { TextView(context) }
 	private val info by lazy { TextView(context) }
-	
+
 	init {
 		setHorizontalPadding()
 		icon.into(this)
@@ -76,7 +76,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 			typeface = GoldStoneFont.heavy(context)
 			x += CommonCellSize.iconPadding
 		}.into(this)
-		
+
 		info.apply {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, 30.uiPX())
 			leftPadding = 10.uiPX()
@@ -85,7 +85,7 @@ class ProfileCell(context: Context) : BaseCell(context) {
 			gravity = Gravity.CENTER_VERTICAL
 			x -= CommonCellSize.rightPadding
 		}.into(this)
-		
+
 		title.setCenterInVertical()
 		icon.setCenterInVertical()
 		info.apply {

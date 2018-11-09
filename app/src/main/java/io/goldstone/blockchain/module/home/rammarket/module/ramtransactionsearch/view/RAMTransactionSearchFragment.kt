@@ -47,7 +47,7 @@ class RAMTransactionSearchFragment:
 		getParentFragment<RAMMarketOverlayFragment> {
 			headerTitle = QuotationText.management
 			presenter.popFragmentFrom<RAMTransactionSearchFragment>()
-			overlayView.header.showSearchInput(false) {}
+			getOverlayHeader().showSearchInput(false) {}
 		}
 	}
 }

@@ -39,7 +39,7 @@ class BigTransactionFragment : BaseRecyclerFragment<BigTransactionPresenter, Tra
 				getParentFragment<RAMMarketDetailFragment> {
 					getParentFragment<RAMMarketOverlayFragment> {
 						presenter.showTargetFragment<RAMTransactionSearchFragment>(Bundle().apply { putString("account", model.account) })
-						overlayView.header.apply {
+						getSearchContent().apply {
 							showBackButton(false) { }
 							showSearchInput {
 								presenter.popFragmentFrom<RAMTransactionSearchFragment>()

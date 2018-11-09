@@ -73,7 +73,7 @@ open class RoundInput(context: Context) : EditText(context) {
 
 		this.setWillNotDraw(false)
 
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 		this.setPadding(35.uiPX(), 20.uiPX(), 35.uiPX(), 20.uiPX())
 		backgroundTintMode = PorterDuff.Mode.CLEAR
 		textColor = GrayScale.black
@@ -222,7 +222,7 @@ open class RoundInput(context: Context) : EditText(context) {
 
 	fun setPasswordInput(show: Boolean = false) {
 		inputType =
-			if (show == false) InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+			if (!show) InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
 			else InputType.TYPE_CLASS_TEXT
 	}
 

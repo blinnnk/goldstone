@@ -10,6 +10,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.WalletText
@@ -22,6 +23,7 @@ import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import me.itangqi.waveloadingview.WaveLoadingView
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.util.*
 
 /**
@@ -40,11 +42,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 		balanceInfo.subtitle.text = (WalletText.totalAssets + " (${SharedWallet.getCurrencyCode()})").toUpperCase()
 		avatar.glideImage(UnlimitedAvatar(model.id, context).getBitmap())
 		val colorSize = WalletColor.getAll().size
-		container.addCorner(
-			CornerSize.normal.toInt(),
-			WalletColor.getAll()[model.id % colorSize]
-		)
-		container.elevation = 5.uiPX().toFloat()
+		container.setCardBackgroundColor(WalletColor.getAll()[model.id % colorSize])
 	}
 	private val waveView by lazy { WaveLoadingView(context) }
 	private val subtitleSize = 12
@@ -52,82 +50,78 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 		setBigWhiteStyle(24, subtitleSize)
 	}
 	private val walletInfo = TwoLineTitles(context).apply {
-		setBigWhiteStyle(18, subtitleSize)
+		setBigWhiteStyle(16, subtitleSize)
 	}
 	private val balanceInfo = TwoLineTitles(context).apply {
-		setBigWhiteStyle(18, subtitleSize)
+		setBigWhiteStyle(16, subtitleSize)
 		isFloatRight = true
 	}
 	private val avatar = ImageView(context)
-	private var container: RelativeLayout
+	private var container: GSCard
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 175.uiPX())
-		container = relativeLayout {
-			lparams {
-				width = ScreenSize.widthWithPadding
-				height = 160.uiPX()
-				setMargins(
-					ShadowSize.default.toInt(),
-					5.uiPX(),
-					ShadowSize.default.toInt(),
-					ShadowSize.default.toInt()
-				)
-				centerHorizontally()
-			}
-			waveView.apply {
-				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-				setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
-				progressValue = 35
-				waveColor = Color.BLACK
-				setAnimDuration((36000 * (1 + Random().nextDouble())).toLong())
-				setAmplitudeRatio(50)
-				startAnimation()
-				alpha = 0.1f
-			}.into(this)
-			verticalLayout {
-				addCorner(AvatarSize.middle, Spectrum.white)
-				gravity = Gravity.START
-				lparams {
-					width = AvatarSize.middle
-					height = AvatarSize.middle
-					margin = 10.uiPX()
-					elevation = 10.uiPX().toFloat()
-					x -= 10.uiPX()
-					y += 10.uiPX()
-				}
-				avatar.apply {
-					scaleX = 1.01f
-					scaleY = 1.01f
-					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+		container = GSCard(context)
+		container.into(this)
+		container.apply {
+			resetCardElevation(ShadowSize.default)
+			relativeLayout {
+				lparams(matchParent, matchParent)
+				waveView.apply {
+					layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+					setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
+					progressValue = 35
+					waveColor = Color.BLACK
+					setAnimDuration((36000 * (1 + Random().nextDouble())).toLong())
+					setAmplitudeRatio(50)
+					startAnimation()
+					alpha = 0.1f
 				}.into(this)
-			}.setAlignParentRight()
-			nameInfo
-				.apply {
+				verticalLayout {
+					addCorner(AvatarSize.middle, Spectrum.white)
+					gravity = Gravity.START
+					lparams {
+						width = AvatarSize.middle
+						height = AvatarSize.middle
+						margin = 10.uiPX()
+						elevation = 10.uiPX().toFloat()
+						x -= 10.uiPX()
+						y += 10.uiPX()
+					}
+					avatar.apply {
+						scaleX = 1.01f
+						scaleY = 1.01f
+						layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+					}.into(this)
+				}.setAlignParentRight()
+				nameInfo.apply {
 					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 					x += 20.uiPX()
 					y += 15.uiPX()
-				}
-				.into(this)
-			walletInfo
-				.apply {
+				}.into(this)
+				walletInfo.apply {
 					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 					x += 20.uiPX()
 					y -= 15.uiPX()
 					setAlignParentBottom()
-				}
-				.into(this)
-			balanceInfo.apply {
-				layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
-				setAlignParentBottom()
-				setAlignParentRight()
-				x -= 20.uiPX()
-				y -= 15.uiPX()
+				}.into(this)
+				balanceInfo.apply {
+					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
+					setAlignParentBottom()
+					setAlignParentRight()
+					x -= 20.uiPX()
+					y -= 15.uiPX()
+				}.into(this)
 			}
-				.into(this)
 		}
 	}
 
+	fun setClickEvent(action: () -> Unit) {
+		container.onClick {
+			action()
+			container.preventDuplicateClicks()
+		}
+	}
 	companion object {
 		fun getFixedTitleLength(name: String): String {
 			return object : FixTextLength() {

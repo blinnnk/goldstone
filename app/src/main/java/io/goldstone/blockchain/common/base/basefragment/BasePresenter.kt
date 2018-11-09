@@ -65,12 +65,10 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 				addFragmentAndSetArgument<T>(ContainerID.content) {
 					arguments?.let { putAll(it) }
 				}
-				overlayView.header.apply {
-					showBackButton(hasBackButton) {
-						presenter.popFragmentFrom<T>()
-					}
-					showCloseButton(!hasBackButton) {}
+				showBackButton(hasBackButton) {
+					presenter.popFragmentFrom<T>()
 				}
+				showCloseButton(!hasBackButton) {}
 			}
 		}
 	}

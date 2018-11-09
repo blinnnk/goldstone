@@ -9,6 +9,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.view.GrayCardView
+import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.SpaceSplitLine
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -105,7 +106,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-		getContainer().apply {
+		container.apply {
 			bottomPadding = 10.uiPX()
 			processCell.into(this)
 			SpaceSplitLine(context).apply {
@@ -134,18 +135,18 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		}
 	}
 
-	fun setProcessValue(type: String, subtitle: String, leftValue: BigInteger, rightValue: BigInteger, isTime: Boolean) {
+	fun setProcessValue(type: String, subtitle: String, leftValue: BigInteger, rightValue: BigInteger, processType: ProcessType) {
 		processCell.setTitle(type)
 		processCell.setSubtitle(subtitle)
 		processCell.setLeftValue(
 			leftValue,
 			TokenDetailText.available,
-			isTime
+			processType
 		)
 		processCell.setRightValue(
 			rightValue,
 			TokenDetailText.total,
-			isTime
+			processType
 		)
 	}
 

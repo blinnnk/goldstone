@@ -27,10 +27,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		asyncData: ArrayList<QuotationModel>?
 	) {
 		recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
-			onClick {
-				presenter.showMarketTokenDetailFragment(model)
-				preventDuplicateClicks()
-			}
+			setClickEvent { presenter.showMarketTokenDetailFragment(model) }
 		}
 	}
 
