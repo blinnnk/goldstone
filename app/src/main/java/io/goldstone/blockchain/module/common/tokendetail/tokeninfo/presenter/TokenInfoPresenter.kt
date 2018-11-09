@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter
 
 import android.os.Bundle
-import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.getParentFragment
@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
@@ -21,18 +22,18 @@ import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.ChainURL
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
-import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
+import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
-import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.bitcoinj.core.Address
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
@@ -96,16 +97,15 @@ class TokenInfoPresenter(
 	fun showTransactionInfo() {
 		val chainType = tokenInfo?.contract.getChainType().id
 		when {
-			tokenInfo?.contract.isBTCSeries() -> BTCSeriesTransactionTable
-				.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
+			tokenInfo?.contract.isBTCSeries() ->
+				BTCSeriesTransactionTable.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
 					if (transactions.isEmpty()) getBTCSeriesTransactionCount { count, error ->
-						if (!count.isNull() && error.isNone())
-							fragment.showTransactionCount(count)
-						else if (error.hasError()) fragment.context.alert(error.message)
-						// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
-						if (count == 0) {
-							setTotalValue(0.0, 0.0)
+						launch(UI) {
+							if (count != null && error.isNone()) fragment.showTransactionCount(count)
+							else if (error.hasError()) fragment.safeShowError(error)
+							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
+							if (count == 0) setTotalValue(0.0, 0.0)
 						}
 					} else {
 						// 去除燃气费的部分剩下的计算为交易数量
@@ -169,7 +169,7 @@ class TokenInfoPresenter(
 			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->
 				if (transactions.isEmpty()) {
 					// 本地没有数据的话从链上获取 `Count`
-					GoldStoneEthCall.getUsableNonce(
+					ETHJsonRPC.getUsableNonce(
 						SharedChain.getCurrentETH(),
 						currentAddress
 					) { result, error ->
@@ -217,32 +217,19 @@ class TokenInfoPresenter(
 		fragment.showTotalValue(content(receivedValue), content(sentValue))
 	}
 
-	private fun getBTCSeriesTransactionCount(@UiThread hold: (count: Int?, error: RequestError) -> Unit) {
-		when (tokenInfo?.symbol) {
-			CoinSymbol.btc(), CoinSymbol.pureBTCSymbol ->
-				BitcoinApi.getTransactionCount(currentAddress) { count, error ->
-					GoldStoneAPI.context.runOnUiThread {
-						if (!count.isNull() && error.isNone()) hold(count, error)
-						else hold(null, error)
-					}
+	private fun getBTCSeriesTransactionCount(
+		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
+	) {
+		when {
+			tokenInfo?.contract.isBTCSeries() ->
+				InsightApi.getTransactionCount(
+					tokenInfo?.contract.getChainType(),
+					!tokenInfo?.contract.isBCH(),
+					currentAddress
+				) { count, error ->
+					hold(count, error)
 				}
-
-			CoinSymbol.bch -> BitcoinCashApi.getTransactionCount(currentAddress) { count, error ->
-				GoldStoneAPI.context.runOnUiThread {
-					if (!count.isNull() && error.isNone()) hold(count, error)
-					else hold(null, error)
-				}
-			}
-
-			CoinSymbol.ltc -> LitecoinApi.getTransactionCount(currentAddress) { count, error ->
-				GoldStoneAPI.context.runOnUiThread {
-					if (!count.isNull() && error.isNone()) hold(count, error)
-					else hold(null, error)
-				}
-			}
-			else -> GoldStoneAPI.context.runOnUiThread {
-				hold(0, RequestError.None)
-			}
+			else -> hold(0, RequestError.None)
 		}
 	}
 
@@ -261,12 +248,12 @@ class TokenInfoPresenter(
 
 		fun getDetailButtonInfo(contract: TokenContract?, currentAddress: String): Pair<Int, String> {
 			val url = when {
-				contract.isBTC() -> ChainURL.btcAddressDetail(currentAddress)
-				contract.isLTC() -> ChainURL.ltcAddressDetail(currentAddress)
-				contract.isBCH() -> ChainURL.bchAddressDetail(currentAddress)
-				contract.isEOSSeries() -> ChainURL.eosAddressDetail(currentAddress)
-				contract.isETC() -> ChainURL.etcAddressDetail(currentAddress)
-				else -> ChainURL.ethAddressDetail(currentAddress)
+				contract.isBTC() -> ChainExplorer.btcAddressDetail(currentAddress)
+				contract.isLTC() -> ChainExplorer.ltcAddressDetail(currentAddress)
+				contract.isBCH() -> ChainExplorer.bchAddressDetail(currentAddress)
+				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(currentAddress)
+				contract.isETC() -> ChainExplorer.etcAddressDetail(currentAddress)
+				else -> ChainExplorer.ethAddressDetail(currentAddress)
 			}
 			return Pair(getExplorerIcon(contract), url)
 		}

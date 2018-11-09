@@ -22,6 +22,7 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
 import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
+import io.goldstone.blockchain.kernel.commonmodel.ETCTransactionModel
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -36,11 +37,9 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -74,12 +73,12 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (result.isNull() || error.hasError()) {
+			if (result == null || error.hasError()) {
 				hold(null, error)
 				return@requestData
 			}
 			// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
-			val data = JSONObject(result?.firstOrNull().orEmpty())
+			val data = JSONObject(result.firstOrNull().orEmpty())
 			val defaultTokens = data.safeGet("data")
 			// MD5 值存入数据库
 			val md5 = data.safeGet("md5")
@@ -199,8 +198,8 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(JSONObject(result!!.firstOrNull()).safeGet("result"), error)
+			if (result != null && error.isNone()) {
+				hold(JSONObject(result.firstOrNull()).safeGet("result"), error)
 			} else hold(null, error)
 		}
 	}
@@ -226,8 +225,8 @@ object GoldStoneAPI {
 			false,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(ShareContentModel(JSONObject(result!!.firstOrNull().orEmpty())), error)
+			if (result != null && error.isNone()) {
+				hold(ShareContentModel(JSONObject(result.firstOrNull().orEmpty())), error)
 			} else hold(null, error)
 		}
 	}
@@ -270,9 +269,9 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { list, error ->
-			if (error.isNone() && !list.isNull()) {
+			if (error.isNone() && list != null) {
 				try {
-					val data = JSONObject(list!!.firstOrNull())
+					val data = JSONObject(list.firstOrNull())
 					val exchangeTables = data.safeGet("list")
 					val newMd5 = data.safeGet("md5")
 					val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
@@ -343,8 +342,8 @@ object GoldStoneAPI {
 			targetGoldStoneID = targetGoldStoneID,
 			maxConnectTime = 5
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(result!!.firstOrNull() == "0", error)
+			if (result != null && error.isNone()) {
+				hold(result.firstOrNull() == "0", error)
 			} else hold(null, error)
 		}
 	}
@@ -436,8 +435,7 @@ object GoldStoneAPI {
 
 	fun getPriceByContractAddress(
 		addressList: List<String>,
-		isMainThread: Boolean,
-		hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<TokenPriceModel>(
 			RequestBody.create(
@@ -448,10 +446,8 @@ object GoldStoneAPI {
 			APIPath.getPriceByAddress(APIPath.currentUrl),
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-					hold(result, error)
-				} else hold(result, error)
+			if (result != null && error.isNone()) {
+				hold(result, error)
 			} else hold(null, error)
 		}
 	}

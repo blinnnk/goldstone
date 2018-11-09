@@ -40,7 +40,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.TradingType
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
 import java.math.BigInteger
@@ -228,7 +228,7 @@ open class BaseTradingPresenter(
 								ramAvailable.isNull() -> hold(null, ramError)
 								ramAvailable!! < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
 								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
-								else -> PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+								else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
 							}
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
@@ -239,7 +239,7 @@ open class BaseTradingPresenter(
 						if (!balance.isNull() && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够
 							if (balance!! < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
-							else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+							else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
 						} else hold(null, balanceError)
 					}
 				}

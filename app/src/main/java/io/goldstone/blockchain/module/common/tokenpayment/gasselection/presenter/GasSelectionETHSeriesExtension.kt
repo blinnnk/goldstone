@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
@@ -20,16 +19,17 @@ import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall.sendRawTransaction
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC.sendRawTransaction
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -83,14 +83,12 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 	}
 }
 
-fun GasSelectionPresenter.prepareToTransfer(@UiThread callback: (GoldStoneError) -> Unit) {
+fun GasSelectionPresenter.prepareToTransfer(@WorkerThread callback: (GoldStoneError) -> Unit) {
 	checkBalanceIsValid(getToken()) { isEnough, error ->
-		GoldStoneAPI.context.runOnUiThread {
-			when {
-				isEnough -> showConfirmAttentionView(callback)
-				error.isNone() -> callback(TransferError.BalanceIsNotEnough)
-				else -> callback(error)
-			}
+		when {
+			isEnough -> launch(UI) { showConfirmAttentionView(callback) }
+			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+			else -> callback(error)
 		}
 	}
 }

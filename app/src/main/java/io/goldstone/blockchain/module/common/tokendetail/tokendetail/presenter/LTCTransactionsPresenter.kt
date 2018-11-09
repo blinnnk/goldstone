@@ -1,14 +1,11 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
-import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
@@ -22,12 +19,12 @@ import kotlinx.coroutines.experimental.launch
 fun TokenDetailPresenter.loadLTCChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView()
 	val address = AddressUtils.getCurrentLTCAddress()
-	LitecoinApi.getTransactionCount(address) { transactionCount, error ->
-		if (transactionCount.isNull() || error.hasError()) return@getTransactionCount
+	InsightApi.getTransactionCount(ChainType.LTC, true, address) { transactionCount, error ->
+		if (transactionCount == null || error.hasError()) return@getTransactionCount
 		loadLitecoinTransactionsFromChain(
 			address,
 			localDataMaxIndex,
-			transactionCount.orZero()
+			transactionCount
 		) {
 			launch(UI) {
 				fragment.removeLoadingView()
@@ -43,10 +40,16 @@ private fun loadLitecoinTransactionsFromChain(
 	transactionCount: Int,
 	callback: (hasData: Boolean) -> Unit
 ) {
-	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
+	val pageInfo = InsightApi.getPageInfo(transactionCount, localDataMaxIndex)
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) callback(false)
-	else LitecoinApi.getTransactions(address, pageInfo.from, pageInfo.to) { transactions, error ->
+	else InsightApi.getTransactions(
+		ChainType.LTC,
+		true,
+		address,
+		pageInfo.from,
+		pageInfo.to
+	) { transactions, error ->
 		// 转换数据格式
 		if (transactions != null && error.isNone()) transactions.asSequence().mapIndexed { index, item ->
 			BTCSeriesTransactionTable(

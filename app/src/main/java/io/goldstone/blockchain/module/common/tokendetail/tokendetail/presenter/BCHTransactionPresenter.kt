@@ -5,9 +5,9 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
-import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
-import org.jetbrains.anko.runOnUiThread
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 /**
  * @date 2018/8/15 3:02 PM
@@ -17,16 +17,14 @@ import org.jetbrains.anko.runOnUiThread
 fun TokenDetailPresenter.loadBCHChainData(localDataMaxIndex: Int) {
 	fragment.showLoadingView()
 	val address = AddressUtils.getCurrentBCHAddress()
-	BitcoinCashApi.getTransactionCount(address) { transactionCount, error ->
+	InsightApi.getTransactionCount(ChainType.BCH, false, address) { transactionCount, error ->
 		if (transactionCount == null || error.hasError()) return@getTransactionCount
 		loadBCHTransactionsFromChain(
 			address,
 			localDataMaxIndex,
 			transactionCount
 		) {
-			fragment.context?.runOnUiThread {
-				fragment.removeLoadingView()
-			}
+			launch(UI) { fragment.removeLoadingView() }
 			loadDataFromDatabaseOrElse()
 		}
 	}
@@ -38,11 +36,17 @@ private fun loadBCHTransactionsFromChain(
 	transactionCount: Int,
 	callback: (hasData: Boolean) -> Unit
 ) {
-	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
+	val pageInfo = InsightApi.getPageInfo(transactionCount, localDataMaxIndex)
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) {
 		callback(false)
-	} else BitcoinCashApi.getTransactions(address, pageInfo.from, pageInfo.to) { transactions, error ->
+	} else InsightApi.getTransactions(
+		ChainType.BCH,
+		false,
+		address,
+		pageInfo.from,
+		pageInfo.to
+	) { transactions, error ->
 		// Calculate All Inputs to get transfer value
 		// 转换数据格式
 		if (transactions != null && error.isNone()) transactions.asSequence().mapIndexed { index, item ->

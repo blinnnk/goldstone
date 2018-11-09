@@ -8,7 +8,6 @@ enum class BitcoinMethod(
 	val method: String,
 	val display: String = ""
 ) {
-
 	EstimatesmartFee("estimatesmartfee", "EstimatesmartFee"),
 	EstimateFee("estimatefee", "EstimateFee"),
 	CreateRawTransaction("createrawtransaction", "CreateRawTransaction"),

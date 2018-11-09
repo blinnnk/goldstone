@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view
+package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -30,10 +31,11 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidAddressOrElse
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.isValidLTCAddressOrElse
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.isValidAddressOrElse
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.isValidLTCAddressOrElse
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -43,7 +45,7 @@ import kotlin.apply
  * @date 2018/5/15 10:18 PM
  * @author KaySaith
  */
-class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
+class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 
 	override val pageTitle: String = TokenDetailText.transferDetail
 	val address by lazy {
@@ -65,7 +67,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
 	private lateinit var changeAddress: String
-	override val presenter = PaymentPreparePresenter(this)
+	override val presenter = PaymentDetailPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		changeAddress = rootFragment?.token?.contract.getAddress()
@@ -126,11 +128,9 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		setSymbolAndPrice()
 		setCustomHeaderTitle(true)
 		updateValueTotalPrice()
 		resetBackButtonEvent()
@@ -159,11 +159,6 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		return if (inputView.getValue().isEmpty()) 0.0 else inputView.getValue().toDouble()
 	}
 
-	fun setSymbolAndPrice(symbol: String, price: String) {
-		this.inputView.setHeaderSymbol(symbol)
-		this.price.setSubtitle(price)
-	}
-
 	fun updateChangeAddress(address: String) {
 		customChangeAddressCell.setSubtitle(address)
 	}
@@ -175,9 +170,15 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		if (memoInputView.isNull()) {
 			getParentFragment<TokenDetailOverlayFragment>()?.apply {
-				presenter.popFragmentFrom<PaymentPrepareFragment>()
+				presenter.popFragmentFrom<PaymentDetailFragment>()
 			}
 		} else removeMemoInputView()
+	}
+
+	private fun setSymbolAndPrice() {
+		val token = rootFragment?.token
+		this.inputView.setHeaderSymbol(token?.symbol.orEmpty())
+		this.price.setSubtitle(token?.price?.formatCurrency().orEmpty() suffix SharedWallet.getCurrencyCode())
 	}
 
 	private fun LinearLayout.showMemoCell() {
@@ -332,7 +333,7 @@ class PaymentPrepareFragment : BaseFragment<PaymentPreparePresenter>() {
 		rootFragment?.apply {
 			showBackButton(true) {
 				if (memoInputView.isNull()) {
-					presenter.popFragmentFrom<PaymentPrepareFragment>()
+					presenter.popFragmentFrom<PaymentDetailFragment>()
 				} else {
 					removeMemoInputView()
 				}

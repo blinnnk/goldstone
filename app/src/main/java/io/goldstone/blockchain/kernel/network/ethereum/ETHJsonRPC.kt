@@ -29,7 +29,7 @@ import java.math.BigInteger
  * @date 31/03/2018 2:44 PM
  * @author KaySaith
  */
-object GoldStoneEthCall {
+object ETHJsonRPC {
 
 	lateinit var context: Context
 	@JvmStatic
@@ -217,7 +217,7 @@ object GoldStoneEthCall {
 							defaultToken.getERC20Token(contractAddress, chainURL.chainID.id)
 						if (targetToken != null) {
 							hold(TransactionTable(data, targetToken.decimals, chainURL.chainID), error)
-						} else GoldStoneEthCall.getTokenDecimal(contractAddress, chainURL) { decimal, decimalError ->
+						} else ETHJsonRPC.getTokenDecimal(contractAddress, chainURL) { decimal, decimalError ->
 							if (decimal != null && decimalError.isNone()) {
 								hold(TransactionTable(data, decimal, chainURL.chainID), error)
 							} else hold(null, decimalError)

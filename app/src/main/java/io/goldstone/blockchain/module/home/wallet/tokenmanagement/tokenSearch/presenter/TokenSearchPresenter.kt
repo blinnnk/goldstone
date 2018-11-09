@@ -16,13 +16,14 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 /**
  * @date 27/03/2018 11:23 AM
@@ -55,7 +56,7 @@ class TokenSearchPresenter(
 
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
-			GoldStoneAPI.context.runOnUiThread {
+			launch(UI) {
 				if (result != null && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
@@ -125,7 +126,7 @@ class TokenSearchPresenter(
 		myTokens: List<MyTokenTable>,
 		hold: (data: List<DefaultTokenTable>?, error: RequestError) -> Unit
 	) {
-		GoldStoneEthCall.getTokenInfoByContractAddress(
+		ETHJsonRPC.getTokenInfoByContractAddress(
 			contract,
 			SharedChain.getCurrentETH()
 		) { symbol, name, decimal, error ->

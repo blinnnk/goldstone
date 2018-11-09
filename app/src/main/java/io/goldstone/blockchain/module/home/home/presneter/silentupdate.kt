@@ -17,8 +17,8 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import kotlinx.coroutines.experimental.CommonPool
@@ -157,7 +157,7 @@ abstract class SilentUpdater {
 			val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
 			override val delayTime: Long? = 300L
 			override var asyncCount: Int = unKnowData.size
-			override fun doChildTask(index: Int) = GoldStoneEthCall.getTokenInfoByContractAddress(
+			override fun doChildTask(index: Int) = ETHJsonRPC.getTokenInfoByContractAddress(
 				unKnowData[index].contract,
 				chainURL
 			) { symbol, name, decimal, error ->
@@ -230,11 +230,10 @@ abstract class SilentUpdater {
 					ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
 				}.map {
 					"{\"address\":\"${it.contract}\",\"symbol\":\"${it.symbol}\"}"
-				}.toList(),
-				false
+				}.toList()
 			) { newPrices, error ->
-				if (!newPrices.isNull() && error.isNone()) {
-					newPrices!!.forEach {
+				if (newPrices != null && error.isNone()) {
+					newPrices.forEach {
 						DefaultTokenTable.updateTokenPrice(TokenContract(it.contract, it.symbol, null), it.price)
 					}
 				}

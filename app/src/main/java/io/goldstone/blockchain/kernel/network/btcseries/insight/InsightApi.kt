@@ -1,19 +1,17 @@
-package io.goldstone.blockchain.kernel.network.litecoin
+package io.goldstone.blockchain.kernel.network.btcseries.insight
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.getTargetChild
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.value.DataValue
+import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.multichain.Amount
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.isBCH
+import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -22,74 +20,64 @@ import org.json.JSONObject
  * @author KaySaith
  */
 
-object LitecoinApi {
+object InsightApi {
 	fun getBalance(
+		chainType: ChainType,
+		isEncrypt: Boolean,
 		address: String,
-		isMainThread: Boolean,
-		hold: (balance: Amount<Long>?, error: RequestError) -> Unit
+		@WorkerThread hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
-			LitecoinUrl.getBalance(address),
+			InsightUrl.getBalance(chainType, address),
 			"",
 			true,
 			null,
-			true
+			isEncrypt
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val data = result?.firstOrNull()?.toLongOrNull().orElse(0L)
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(Amount(data), RequestError.None) }
-				else hold(Amount(data), RequestError.None)
-			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(null, error) }
-			else hold(null, error)
-		}
-	}
-
-	fun getBalanceFromChainSo(
-		address: String,
-		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
-	) {
-		RequisitionUtil.requestUnCryptoData<String>(
-			LitecoinUrl.getBalanceFromChainSo(address),
-			"",
-			true
-		) { result, error ->
+			// Insight BCH 的 getBalance 接口返回的是 Double 信息, BTC
+			// 和 LTC 返回的是 Satoshi
 			if (result != null && error.isNone()) {
-				val data = JSONObject(result.firstOrNull())
-				val balance = data.getTargetChild("data", "confirmed_balance").toDoubleOrNull().orZero()
-				hold(balance, error)
+				val data =
+					if (chainType.isBCH()) result.firstOrNull()?.toDoubleOrNull()?.toSatoshi() ?: 0
+					else result.firstOrNull()?.toLongOrNull() ?: 0
+				hold(Amount(data), RequestError.None)
 			} else hold(null, error)
 		}
 	}
 
-	fun getUnspentListByAddress(
+	fun getUnspents(
+		chainType: ChainType,
+		isEncrypt: Boolean,
 		address: String,
 		@WorkerThread hold: (unspentList: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData(
-			LitecoinUrl.getUnspentInfo(address),
+			InsightUrl.getUnspentInfo(chainType, address),
 			"",
 			false,
 			null,
-			true,
+			isEncrypt,
 			hold = hold
 		)
 	}
 
 	fun getTransactions(
+		chainType: ChainType,
+		isEncrypt: Boolean,
 		address: String,
 		from: Int,
 		to: Int,
 		@WorkerThread hold: (transactions: List<JSONObject>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
-			LitecoinUrl.getTransactions(address, from, to),
+			InsightUrl.getTransactions(chainType, address, from, to),
 			"items",
 			true,
 			null,
-			true
+			isEncrypt
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val jsonArray = JSONArray(result?.firstOrNull())
+			if (result != null && error.isNone()) {
+				val jsonArray = JSONArray(result.firstOrNull())
 				var data = listOf<JSONObject>()
 				(0 until jsonArray.length()).forEach {
 					data += JSONObject(jsonArray[it].toString())
@@ -100,15 +88,17 @@ object LitecoinApi {
 	}
 
 	fun getTransactionCount(
+		chainType: ChainType,
+		isEncrypt: Boolean,
 		address: String,
 		hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
-			LitecoinUrl.getTransactions(address, 999999999, 0),
+			InsightUrl.getTransactions(chainType, address, 999999999, 0),
 			"totalItems",
 			true,
 			null,
-			true
+			isEncrypt
 		) { result, error ->
 			hold(result?.firstOrNull()?.toIntOrNull(), error)
 		}
@@ -116,33 +106,42 @@ object LitecoinApi {
 
 	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
 	fun getTransactionByHash(
+		chainID: ChainID,
+		isEncrypt: Boolean,
 		hash: String,
 		address: String,
-		targetNet: String,
 		@WorkerThread hold: (transaction: BTCSeriesTransactionTable?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
-			LitecoinUrl.getTransactionByHash(targetNet, hash),
+			InsightUrl.getTransactionByHash(chainID, hash),
 			"",
 			true,
 			null,
-			true
+			isEncrypt
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val data = JSONObject(result?.firstOrNull())
+			if (result != null && error.isNone()) {
+				val data = JSONObject(result.firstOrNull())
 				hold(
 					BTCSeriesTransactionTable(
 						data,
 						// 这里拉取的数据只在通知中心展示并未插入数据库 , 所以 DataIndex 随便设置即可
 						0,
 						address,
-						CoinSymbol.LTC.symbol!!,
+						chainID.getContract().symbol,
 						false,
-						ChainType.LTC.id
+						chainID.getChainType().id
 					),
 					error
 				)
 			} else hold(null, error)
 		}
+	}
+
+	fun getPageInfo(transactionCount: Int, localDataMaxIndex: Int): PageInfo {
+		val willGetDataCount =
+			if (transactionCount - localDataMaxIndex > DataValue.pageCount) DataValue.pageCount
+			else transactionCount - localDataMaxIndex
+		// 网络接口数据默认都是从 `0` 开始拉取最新的
+		return PageInfo(0, willGetDataCount, localDataMaxIndex)
 	}
 }

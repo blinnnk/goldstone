@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
+package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNull
@@ -26,7 +26,7 @@ import org.jetbrains.anko.doAsync
  */
 
 // EOS 的 `Token` 转币只需写对 `Token` 的 `Symbol` 就可以转账成功
-fun PaymentPreparePresenter.transferEOS(
+fun PaymentDetailPresenter.transferEOS(
 	count: Double,
 	contract: TokenContract,
 	@UiThread callback: (error: GoldStoneError) -> Unit
@@ -47,7 +47,7 @@ fun PaymentPreparePresenter.transferEOS(
 	}
 }
 
-private fun PaymentPreparePresenter.insertPendingDataAndGoToTransactionDetail(
+private fun PaymentDetailPresenter.insertPendingDataAndGoToTransactionDetail(
 	info: EOSTransactionInfo,
 	response: EOSResponse,
 	callback: (GoldStoneError) -> Unit

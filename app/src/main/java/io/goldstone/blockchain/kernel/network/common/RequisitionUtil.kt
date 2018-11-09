@@ -18,7 +18,7 @@ import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -37,7 +37,7 @@ object RequisitionUtil {
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			api,
 			isEncrypt,
 			hold
@@ -52,7 +52,7 @@ object RequisitionUtil {
 		@WorkerThread noinline hold: (result: List<T>?, error: RequestError) -> Unit
 	) {
 		postRequest(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			keyName,
 			api,
 			false,
@@ -69,7 +69,7 @@ object RequisitionUtil {
 		@WorkerThread noinline holdSingle: (result: T?, error: RequestError) -> Unit
 	) {
 		postRequest<T>(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			keyName,
 			api,
 			false,
@@ -87,7 +87,7 @@ object RequisitionUtil {
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest<String>(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			keyName,
 			api,
 			true,

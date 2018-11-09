@@ -12,13 +12,15 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.contract.TransactionDetailContract
-import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.*
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionProgressModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.BTCSeriesTransactionObserver
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.EOSTransactionObserver
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.ETHSeriesTransactionObserver
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.getCurrentConfirmationNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.updateERC20FeeInfo
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
@@ -65,12 +67,10 @@ class TransactionDetailPresenter(
 				detailView.showLoading(false)
 			}
 		}
-
 		// `BlockNumber` 为 `-1` 意味着还没有被收录, 所以不存在 `ConfirmationCount`
 		if (data.blockNumber > 0) updateConfirmationNumber()
 		// isPending 为 False 并且 Confirmation 为 -1 的情况意味当前来自与 Notification
 		if (isFromNotification()) updateTransactionFromNotification()
-
 		/**
 		 *  这个检查应对的情况是, 从 `EtherScan` 拉取的 `ETH` 账单存在 `ERC20` 的 `Token` 转账信息,
 		 * 这个信息没有 `Symbol` 和 `ContractAddress` 以及 `Decimal`, 如果用户拉取了, 在没有拉取
@@ -87,14 +87,9 @@ class TransactionDetailPresenter(
 
 	private fun updateConfirmationNumber() {
 		when {
-			data.contract.isBTC() || data.contract.isBCH() ->
-				updateBTCSeriesTransaction(false, data.contract.getChainURL().chainID)
-			data.contract.isLTC() ->
-				updateLTCTransaction(true, data.contract.getChainURL().chainID)
+			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
 			data.contract.isETHSeries() -> updateETHSeriesConfirmationCount()
-			data.contract.isEOSSeries() -> {
-				detailView.showLoading(false)
-			}
+			data.contract.isEOSSeries() -> detailView.showLoading(false)
 		}
 	}
 
@@ -124,22 +119,14 @@ class TransactionDetailPresenter(
 		else detailView.showProgress(TransactionProgressModel(totalCount))
 		showTransactionInfo(blockNumber, totalCount)
 		detailView.updateTokenDetailList()
-		when (data) {
-			is TransactionListModel ->
-				detailView.showHeaderData(TransactionHeaderModel(data, false, isFailed))
-			is ReceiptModel ->
-				detailView.showHeaderData(TransactionHeaderModel(data, false, isFailed))
-		}
+		detailView.showHeaderData(TransactionHeaderModel(data, false, isFailed))
 	}
 
 	private fun updateTransactionFromNotification() {
 		when {
 			// 从通知来的消息, 可能来自与任何支持的链, 这里需要解出 `Notification` 里面带入的 `ChainID` 作为参数
-			data.contract.isBTC() || data.contract.isBCH() -> data.chainID?.let {
+			data.contract.isBTCSeries() -> data.chainID?.let {
 				updateBTCSeriesTransaction(true, it)
-			}
-			data.contract.isLTC() -> data.chainID?.let {
-				updateLTCTransaction(true, it)
 			}
 			data.contract.isETHSeries() ->
 				getAndShowETHSeriesTransactionFromNotification()
@@ -295,27 +282,10 @@ class TransactionDetailPresenter(
 
 	private fun updateBTCSeriesTransaction(checkLocal: Boolean, chainID: ChainID) {
 		BTCSeriesTransactionUtils.getTransaction(
+			chainID,
 			data.hash,
 			data.isReceive,
 			if (data.isReceive) data.toAddress else data.fromAddress,
-			chainID.getThirdPartyURL(),
-			checkLocal
-		) { transaction, error ->
-			if (transaction != null && error.isNone()) launch(UI) {
-				showTransactionInfo(transaction.blockNumber, transaction.confirmations)
-			} else detailView.showErrorAlert(error)
-			launch(UI) {
-				detailView.showLoading(false)
-			}
-		}
-	}
-
-	private fun updateLTCTransaction(checkLocal: Boolean, chainID: ChainID) {
-		LTCTransactionUtils.getTransaction(
-			data.hash,
-			data.isReceive,
-			if (data.isReceive) data.toAddress else data.fromAddress,
-			chainID.getThirdPartyURL(),
 			checkLocal
 		) { transaction, error ->
 			if (transaction != null && error.isNone()) launch(UI) {

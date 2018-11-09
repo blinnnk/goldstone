@@ -28,7 +28,7 @@ import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
 import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
@@ -47,9 +47,14 @@ object EOSAPI {
 	 * 本地转账临时插入的 Pending Data 需要填充, 服务器自定义的 ServerID 格式
 	 * unique_id = block_num * 1000000 + tx_index * 1000 + action_index
 	 */
-	fun getTransactionServerID(blockNumber: Int, txID: String, fromAccount: EOSAccount, hold: (Long?) -> Unit) {
+	fun getTransactionServerID(
+		blockNumber: Int,
+		txID: String,
+		fromAccount: EOSAccount,
+		hold: (Long?) -> Unit
+	) {
 		getBlockByNumber(blockNumber) { jsonString, error ->
-			if (!jsonString.isNull() && error.isNone()) {
+			if (jsonString != null && error.isNone()) {
 				val json = JSONObject(jsonString)
 				val blockTransactions = JSONArray(json.safeGet("transactions")).toList()
 				var txIndex: Int? = null
@@ -70,7 +75,7 @@ object EOSAPI {
 						actionIndex = index
 					}
 				}
-				if (!txIndex.isNull() && !actionIndex.isNull()) {
+				if (txIndex != null && actionIndex != null) {
 					val uniqueID = blockNumber * 1000000L + txIndex!! * 1000L + actionIndex!!
 					hold(uniqueID)
 				}
@@ -83,7 +88,7 @@ object EOSAPI {
 		@WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit
 	) {
 		RequestBody.create(
-			GoldStoneEthCall.contentType,
+			ETHJsonRPC.contentType,
 			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber))
 		).let { requestBody ->
 			val api = EOSUrl.getBlock()
@@ -102,7 +107,7 @@ object EOSAPI {
 		@WorkerThread hold: (accountInfo: EOSAccountTable?, error: GoldStoneError) -> Unit
 	) {
 		RequestBody.create(
-			GoldStoneEthCall.contentType,
+			ETHJsonRPC.contentType,
 			ParameterUtil.prepareObjectContent(Pair("account_name", account.accountName))
 		).let { requestBody ->
 			val api =
@@ -115,7 +120,7 @@ object EOSAPI {
 			) { result, error ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
-				if (!result.isNullOrEmpty() && error.isNone()) {
+				if (result?.isNotEmpty() == true && error.isNone()) {
 					hold(
 						EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent().chainID),
 						error
@@ -130,8 +135,8 @@ object EOSAPI {
 		@WorkerThread hold: (ramAvailable: BigInteger?, error: GoldStoneError) -> Unit
 	) {
 		getAccountInfo(accountName) { account, error ->
-			if (!account.isNull() && error.isNone()) {
-				val availableRAM = account!!.ramQuota - account.ramUsed
+			if (account != null && error.isNone()) {
+				val availableRAM = account.ramQuota - account.ramUsed
 				hold(availableRAM, GoldStoneError.None)
 			} else hold(null, error)
 		}
@@ -237,8 +242,8 @@ object EOSAPI {
 		@WorkerThread hold: (header: TransactionHeader?, error: GoldStoneError) -> Unit
 	) {
 		getChainInfo { chainInfo, error ->
-			if (!chainInfo.isNull() && error.isNone()) {
-				hold(TransactionHeader(chainInfo!!, expirationType), error)
+			if (chainInfo != null && error.isNone()) {
+				hold(TransactionHeader(chainInfo, expirationType), error)
 			} else hold(null, error)
 		}
 	}
@@ -379,7 +384,7 @@ object EOSAPI {
 		@WorkerThread hold: (info: EOSTokenCountInfo?, error: RequestError) -> Unit
 	) {
 		getEOSTokenCountInfo(chainid, account, codeName, symbol) { data, error ->
-			if (!data.isNullOrEmpty() && error.isNone()) {
+			if (data?.isNotEmpty() == true && error.isNone()) {
 				getTransactionCount(chainid, account, codeName, symbol) { count, totalCountError ->
 					if (!count.isNull() && totalCountError.isNone()) {
 						hold(
@@ -528,7 +533,7 @@ object EOSAPI {
 			"rows",
 			false
 		) { result, error ->
-			if (!result.isNullOrEmpty() && error.isNone()) {
+			if (result?.isNotEmpty() == true && error.isNone()) {
 				val data = JSONObject(JSONArray(result).get(0).toString())
 				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
 					hold(EOSRAMMarket(data), RequestError.None)
@@ -562,9 +567,9 @@ object EOSAPI {
 			true,
 			isEncrypt = false
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val data = result?.firstOrNull()
-				if (!data.isNull())
+			if (result != null && error.isNone()) {
+				val data = result.firstOrNull()
+				if (data != null)
 					hold(JSONObject(data).safeGet("price").toDoubleOrNull().orZero(), RequestError.None)
 				else hold(null, RequestError.RPCResult("empty result"))
 			} else hold(null, error)
@@ -573,21 +578,21 @@ object EOSAPI {
 
 	fun updateLocalTokenPrice(contract: TokenContract) {
 		EOSAPI.getPairsFromNewDex { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				val pair = data!!.find {
+			if (data != null && error.isNone()) {
+				val pair = data.find {
 					it.symbol.equals(contract.symbol, true) &&
 						it.contract.equals(contract.contract, true)
 				}?.pair
-				if (!pair.isNullOrBlank()) {
-					EOSAPI.getPriceByPair(pair!!) { priceInEOS, pairError ->
-						if (!priceInEOS.isNull() && pairError.isNone()) {
+				if (pair?.isNotEmpty() == true) {
+					EOSAPI.getPriceByPair(pair) { priceInEOS, pairError ->
+						if (priceInEOS != null && pairError.isNone()) {
 							val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
 							val eosToken = defaultDao.getToken(
-								TokenContract.EOS.contract!!,
+								TokenContract.eosContract,
 								TokenContract.EOS.symbol,
 								EOSChain.Main.id
 							)
-							val priceInUSD = priceInEOS!! * eosToken?.price.orZero()
+							val priceInUSD = priceInEOS * eosToken?.price.orZero()
 							if (priceInUSD > 0.0) {
 								defaultDao.updateTokenPrice(
 									priceInUSD,
@@ -601,8 +606,6 @@ object EOSAPI {
 				}
 			}
 		}
-
-
 	}
 
 }

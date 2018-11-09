@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model
+package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model
 
 import java.io.Serializable
 import java.math.BigInteger

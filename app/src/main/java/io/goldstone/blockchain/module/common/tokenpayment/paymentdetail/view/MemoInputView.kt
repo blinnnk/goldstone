@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view
+package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view
 
 import android.app.Activity
 import android.content.Context

@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
  * @date 2018/6/21 10:36 AM
  * @author KaySaith
  */
-object ChainURL {
+object ChainExplorer {
 
 	/** Transaction Third-Party Html View */
 	// BCH
@@ -18,7 +18,6 @@ object ChainURL {
 	private const val btcTestnetWeb = "https://www.blocktrail.com/tBTC"
 	// LTC
 	private const val ltcMainnetWeb = "https://live.blockcypher.com/ltc"
-	@JvmStatic
 	private val ltcTestnetWeb: (method: String) -> String = {
 		"https://chain.so/$it/LTCTEST/"
 	}

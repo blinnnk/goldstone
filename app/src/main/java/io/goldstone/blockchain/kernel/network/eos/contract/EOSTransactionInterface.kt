@@ -27,8 +27,8 @@ abstract class EOSTransactionInterface {
 		@UiThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		serialized { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				val signature = privateKey.sign(Sha256.from(Hex.decode(data!!.serialized))).toString()
+			if (data != null && error.isNone()) {
+				val signature = privateKey.sign(Sha256.from(Hex.decode(data.serialized))).toString()
 				EOSAPI.pushTransaction(
 					listOf(signature),
 					data.packedTX,
@@ -44,8 +44,8 @@ abstract class EOSTransactionInterface {
 		hold: (signedHash: String?, error: GoldStoneError) -> String
 	) {
 		serialized { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				hold(EOSPrivateKey(privateKey).sign(Sha256.from(Hex.decode(data!!.serialized))).toString(), GoldStoneError.None)
+			if (data != null && error.isNone()) {
+				hold(EOSPrivateKey(privateKey).sign(Sha256.from(Hex.decode(data.serialized))).toString(), GoldStoneError.None)
 			} else hold(null, error)
 		}
 	}

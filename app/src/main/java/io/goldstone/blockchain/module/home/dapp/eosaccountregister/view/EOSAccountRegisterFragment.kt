@@ -17,10 +17,12 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
-
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.MutablePair
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSValue
@@ -30,6 +32,8 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -133,11 +137,11 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	private fun setExpenditure() {
 		presenter.getEOSCurrencyAndRAMPrice { currency, ramPrice, error ->
-			if (!currency.isNull() && !ramPrice.isNull() && error.isNone()) {
-				val eosCount = assignResources[1].right.toDouble() + assignResources[2].right.toDouble() + assignResources[0].right.toIntOrZero() * ramPrice!!
-				val totalCurrency = eosCount * currency!!
+			if (currency != null && ramPrice != null && error.isNone()) launch(UI) {
+				val eosCount = assignResources[1].right.toDouble() + assignResources[2].right.toDouble() + assignResources[0].right.toIntOrZero() * ramPrice
+				val totalCurrency = eosCount * currency
 				resourceCoast.setSubtitle("≈ ${eosCount.formatCount(4)} EOS ≈ ${totalCurrency.formatCurrency()} (${SharedWallet.getCurrencyCode()})")
-			} else context.alert(error.message)
+			} else safeShowError(error)
 		}
 	}
 

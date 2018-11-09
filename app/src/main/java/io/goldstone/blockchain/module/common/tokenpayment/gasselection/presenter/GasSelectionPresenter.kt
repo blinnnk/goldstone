@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.os.Bundle
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
@@ -30,8 +29,8 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Gas
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentBTCSeriesModel
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentPrepareModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -145,19 +144,15 @@ class GasSelectionPresenter(
 		}
 	}
 
-	fun confirmTransfer(@UiThread callback: (GoldStoneError) -> Unit) {
+	fun confirmTransfer(@WorkerThread callback: (GoldStoneError) -> Unit) {
 		val token = getToken()
 		// 如果输入的 `Decimal` 不合规就提示竞购并返回
 		if (!getTransferCount().toString().checkDecimalIsValid(token)) {
 			callback(TransferError.IncorrectDecimal)
 		} else if (NetworkUtil.hasNetworkWithAlert(fragment.context)) when {
 			// 检查网络并执行转账操作
-			getToken()?.contract.isBTC() ->
-				prepareToTransferBTC(callback)
-			getToken()?.contract.isLTC() ->
-				prepareToTransferLTC(callback)
-			getToken()?.contract.isBCH() ->
-				prepareToTransferBCH(callback)
+			getToken()?.contract.isBTCSeries() ->
+				checkBTCSeriesBalance(token?.contract.getChainType(), callback)
 			else -> prepareToTransfer(callback)
 		}
 	}
@@ -187,24 +182,10 @@ class GasSelectionPresenter(
 			val password = it?.text.toString()
 			val tokenContract = getToken()?.contract ?: return@showAlertView
 			when {
-				tokenContract.isBTC() -> transferBTC(
+				tokenContract.isBTCSeries() -> transferBTCSeries(
 					prepareBTCSeriesModel!!,
-					AddressUtils.getCurrentBTCAddress(),
-					ChainType.BTC,
-					password,
-					callback
-				)
-				tokenContract.isLTC() -> transferLTC(
-					prepareBTCSeriesModel!!,
-					AddressUtils.getCurrentLTCAddress(),
-					ChainType.LTC,
-					password,
-					callback
-				)
-				tokenContract.isBCH() -> transferBCH(
-					prepareBTCSeriesModel!!,
-					AddressUtils.getCurrentBCHAddress(),
-					ChainType.BCH,
+					tokenContract.getAddress(),
+					tokenContract.getChainType(),
 					password,
 					callback
 				)

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter
+package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.os.Bundle
 import android.support.annotation.UiThread
@@ -14,9 +14,9 @@ import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentPrepareModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -24,7 +24,7 @@ import java.math.BigInteger
  * @date 2018/7/25 3:24 PM
  * @author KaySaith
  */
-fun PaymentPreparePresenter.prepareETHSeriesPaymentModel(
+fun PaymentDetailPresenter.prepareETHSeriesPaymentModel(
 	count: Double,
 	@UiThread callback: (RequestError) -> Unit
 ) {
@@ -50,13 +50,13 @@ fun PaymentPreparePresenter.prepareETHSeriesPaymentModel(
 /**
  * 查询当前账户的可用 `nonce` 以及 `symbol` 的相关信息后, 生成 `Recommend` 的 `RawTransaction`
  */
-private fun PaymentPreparePresenter.generatePaymentPrepareModel(
+private fun PaymentDetailPresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
 	chainType: ChainType,
 	@WorkerThread hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
 ) {
-	GoldStoneEthCall.getUsableNonce(
+	ETHJsonRPC.getUsableNonce(
 		chainType.getChainURL(),
 		getToken()?.contract.getAddress()
 	) { nonce, error ->
@@ -66,7 +66,7 @@ private fun PaymentPreparePresenter.generatePaymentPrepareModel(
 	}
 }
 
-private fun PaymentPreparePresenter.generateTransaction(
+private fun PaymentDetailPresenter.generateTransaction(
 	toAddress: String,
 	count: Double,
 	memo: String,
@@ -93,18 +93,18 @@ private fun PaymentPreparePresenter.generateTransaction(
 				if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
 		}
 	}
-	GoldStoneEthCall.getTransactionExecutedValue(
+	ETHJsonRPC.getTransactionExecutedValue(
 		to,
 		getToken()?.contract.getAddress(),
 		data,
 		getToken()?.contract?.getChainURL()!!
 	) { limit, error ->
-		if (!limit.isNull() && error.isNone()) {
+		if (limit != null && error.isNone()) {
 			hold(
 				PaymentPrepareModel(
 					getToken()?.contract.getAddress(),
 					nonce,
-					limit!!,
+					limit,
 					to,
 					countWithDecimal,
 					count,

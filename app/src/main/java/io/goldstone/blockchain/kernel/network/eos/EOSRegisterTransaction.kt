@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.kernel.network.eos
 
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.accountregister.ActorKey
@@ -62,10 +61,10 @@ class EOSRegisterTransaction(
 				StakeType.Delegate,
 				true
 			)
-			if (!header.isNull() && error.isNone()) {
+			if (header != null && error.isNone()) {
 				val serialization = EOSRegisterUtil.getRegisterSerializedCode(
 					chainID,
-					header!!,
+					header,
 					newAccountModel,
 					ramModel,
 					bandWidth

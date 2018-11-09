@@ -3,7 +3,7 @@ package io.goldstone.blockchain.kernel.network.ethereum
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.kernel.network.ChainURL
+import io.goldstone.blockchain.kernel.network.ChainExplorer
 
 
 /**
@@ -41,22 +41,22 @@ object EtherScanApi {
 	}
 
 	val gasTrackerHeader: (taxHash: String) -> String = {
-		"${ChainURL.etcWebHeader()}$it"
+		"${ChainExplorer.etcWebHeader()}$it"
 	}
 	val bitcoinTransactionDetail: (taxHash: String) -> String = {
-		"${ChainURL.btcWebHeader()}$it"
+		"${ChainExplorer.btcWebHeader()}$it"
 	}
 	val litecoinTransactionDetail: (taxHash: String) -> String = {
-		"${ChainURL.ltcWebHeader()}$it"
+		"${ChainExplorer.ltcWebHeader()}$it"
 	}
 	val bitcoinCashTransactionDetail: (taxHash: String) -> String = {
-		"${ChainURL.bchWebHeader()}$it"
+		"${ChainExplorer.bchWebHeader()}$it"
 	}
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(SharedChain.getCurrentETH().chainID)}$it"
 	}
 	val eosTransactionDetail: (taxHash: String) -> String = {
-		ChainURL.eosTransactionDetail(it)
+		ChainExplorer.eosTransactionDetail(it)
 	}
 
 	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->

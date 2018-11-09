@@ -22,6 +22,8 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -46,7 +48,7 @@ class QuotationSearchPresenter(
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<QuotationOverlayFragment> {
 			showFilterImage(true)
-			searchInputListener{
+			searchInputListener {
 				if (NetworkUtil.hasNetwork(context)) searchTokenBy(it)
 			}
 			setFilterEvent {
@@ -105,7 +107,6 @@ class QuotationSearchPresenter(
 					}
 				}
 			}
-
 			if (filterText.isEmpty()) {
 				fragment.removeExchangeFilterDescriptionView()
 			} else {
@@ -148,27 +149,26 @@ class QuotationSearchPresenter(
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
 			if (searchList != null && error.isNone()) {
-				if (searchList.isEmpty()) {
-					fragment.context?.runOnUiThread { fragment.removeLoadingView() }
-					return@getMarketSearchList
+				if (searchList.isEmpty()) launch(UI) {
+					fragment.removeLoadingView()
+				} else {
+					val targetData =
+						GoldStoneDataBase.database.quotationSelectionDao().getTargetMarketTables(
+							selectedIds.split(",").map { it.toIntOrZero() }
+						)
+					// 如果本地没有已经选中的直接返回搜索的数据展示在界面
+					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
+					if (targetData.isEmpty()) {
+						fragment.completeQuotationTable(searchList)
+					} else searchList.forEachOrEnd { item, isEnd ->
+						item.isSelecting = targetData.any { it.pair == item.pair }
+						if (isEnd) fragment.completeQuotationTable(searchList)
+					}
 				}
-				val localTargetMarketData =
-					GoldStoneDataBase.database.quotationSelectionDao().getTargetMarketTables(
-						selectedIds.split(",").map { it.toIntOrNull().orZero() }
-					)
-				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
-				// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
-				if (localTargetMarketData.isEmpty()) {
-					fragment.completeQuotationTable(searchList)
-				} else searchList.forEachOrEnd { item, isEnd ->
-					item.isSelecting = localTargetMarketData.any { it.pair == item.pair }
-					if (isEnd) fragment.completeQuotationTable(searchList)
-				}
-			} else GoldStoneAPI.context.runOnUiThread {
+			} else launch(UI) {
 				fragment.safeShowError(error)
 				fragment.removeLoadingView()
 			}
-
 		}
 	}
 
