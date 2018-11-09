@@ -30,7 +30,7 @@ open class TransactionSealedModel(
 	open val isFee: Boolean,
 	open val hasError: Boolean,
 	open val blockNumber: Int,
-	open val date: String,
+	open val date: String, // 如果是继承自 Notification 那么这个值会显示为 timeStamp
 	open val confirmations: Int,
 	open val memo: String,
 	// 这个字段为 `Notification` 服务的, 因为` Notification` 会接收不同的链的 `Push`

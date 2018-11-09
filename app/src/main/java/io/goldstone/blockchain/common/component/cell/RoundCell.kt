@@ -12,6 +12,7 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -21,7 +22,7 @@ import org.jetbrains.anko.*
  * @date 2018/7/12 2:29 PM
  * @author KaySaith
  */
-class RoundCell(context: Context) : LinearLayout(context) {
+class RoundCell(context: Context) : GSCard(context) {
 	
 	private val cellHeight = 40.uiPX()
 	private val titleView = TextView(context).apply {
@@ -35,7 +36,7 @@ class RoundCell(context: Context) : LinearLayout(context) {
 	private val arrowIcon = ImageView(context).apply {
 		scaleX = 0.75f
 		scaleY = 0.75f
-		setColorFilter(GrayScale.lightGray)
+		setColorFilter(GrayScale.midGray)
 		imageResource = R.drawable.arrow_icon
 		layoutParams = RelativeLayout.LayoutParams(cellHeight, cellHeight)
 	}
@@ -49,13 +50,8 @@ class RoundCell(context: Context) : LinearLayout(context) {
 	var container: RelativeLayout
 	
 	init {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-		addTouchRippleAnimation(
-			GrayScale.whiteGray,
-			Spectrum.green,
-			RippleMode.Square,
-			CornerSize.normal
-		)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
+		setCardBackgroundColor(GrayScale.whiteGray)
 		container = relativeLayout {
 			lparams(matchParent, matchParent)
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)

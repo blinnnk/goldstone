@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -52,8 +54,8 @@ class TransactionDetailPresenter(
 			TransactionDetailModel(data.toAddress, CommonText.to.toUpperCase())
 		)
 		// 显示账单的 Memo 信息, 注意只有 ETHSeries 的账单存在拉取链上信息逻辑
-		if (data.contract.isETHSeries() && !isFromNotification()) {
-			if (data.memo.isEmpty()) {
+		if (!data.contract.isBTCSeries()) {
+			if (data.memo.isEmpty() && data.contract.isETHSeries()) {
 				detailView.showMemo(TransactionDetailModel("Getting Memo From Chain", TransactionText.memo))
 				getAndShowChainMemo()
 			} else {
@@ -99,7 +101,7 @@ class TransactionDetailPresenter(
 	private fun observerPendingTransaction() {
 		when {
 			data.contract.isBTCSeries() -> btcSeriesObserver.start()
-			data.contract.isEOS() -> eosObserver.start()
+			data.contract.isEOSSeries() -> eosObserver.start()
 			data.contract.isETHSeries() -> ethSeriesObserver.start()
 		}
 	}
@@ -116,8 +118,9 @@ class TransactionDetailPresenter(
 			data.contract.isETHSeries() -> onETHSeriesTransferred(blockNumber, isFailed)
 			data.contract.isEOSSeries() -> onEOSSeriesTransferred(blockNumber)
 		}
+		// 如果是很久没看的 Pending 账单进入后会返回不可逆的负数, 其实就是已经确认的块数, 这里增加绝对值判断
 		if (data.contract.isEOSSeries())
-			detailView.showProgress(TransactionProgressModel(totalCount, totalCount.toLong()))
+			detailView.showProgress(TransactionProgressModel(Math.abs(totalCount), Math.abs(totalCount).toLong()))
 		else detailView.showProgress(TransactionProgressModel(totalCount))
 		showTransactionInfo(blockNumber, totalCount)
 		detailView.updateTokenDetailList()
@@ -258,11 +261,15 @@ class TransactionDetailPresenter(
 			data.contract.isEOSSeries() -> TransactionText.irreversible
 			else -> "$confirmations "
 		}
+		// 从通知来的时间格式因为需要存库显示, 所以这里会造成既有时间戳又有日期的情况
+		val dateText =
+			if (data.date.toLongOrNull() != null) TimeUtils.formatDate(data.date.toMillisecond())
+			else data.date
 		detailView.showTransactionInformation(
 			TransactionDetailModel(data.hash, TransactionText.transactionHash),
 			TransactionDetailModel(blockNumberText, TransactionText.blockNumber),
 			TransactionDetailModel(confirmationsText, TransactionText.confirmations),
-			TransactionDetailModel(data.date, TransactionText.transactionDate)
+			TransactionDetailModel(dateText, TransactionText.transactionDate)
 		)
 	}
 
@@ -270,14 +277,17 @@ class TransactionDetailPresenter(
 		ETHSeriesTransactionUtils.getTransactionByHash(
 			data.hash,
 			data.isReceive,
-			data.chainID?.getChainURL()!!
+			data.chainID?.getChainURL()!!,
+			data.date
 		) { data, error ->
 			if (data != null && error.isNone()) {
-				showTransactionInfo(data.blockNumber, data.confirmations)
-				if (data.memo.isEmpty()) getAndShowChainMemo()
-				else {
-					detailView.showMemo(TransactionDetailModel(data.memo, TransactionText.memo))
-					detailView.showLoading(false)
+				launch(UI) {
+					showTransactionInfo(data.blockNumber, data.confirmations)
+					if (data.memo.isEmpty()) getAndShowChainMemo()
+					else {
+						detailView.showMemo(TransactionDetailModel(data.memo, TransactionText.memo))
+						detailView.showLoading(false)
+					}
 				}
 			} else detailView.showErrorAlert(error)
 		}
@@ -311,7 +321,9 @@ class TransactionDetailPresenter(
 			if (transaction != null && error.isNone()) launch(UI) {
 				showTransactionInfo(transaction.blockNumber, transaction.confirmations)
 			} else detailView.showErrorAlert(error)
-			detailView.showLoading(false)
+			launch(UI) {
+				detailView.showLoading(false)
+			}
 		}
 	}
 

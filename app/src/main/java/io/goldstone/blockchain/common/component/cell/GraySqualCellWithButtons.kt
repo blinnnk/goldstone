@@ -11,15 +11,19 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.extension.*
+import com.blinnnk.extension.measureTextWidth
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Default
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Normal
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 

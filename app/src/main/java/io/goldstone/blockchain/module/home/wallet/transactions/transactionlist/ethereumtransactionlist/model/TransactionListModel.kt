@@ -62,7 +62,7 @@ data class TransactionListModel(
 	isFee,
 	hasError,
 	blockNumber,
-	TimeUtils.formatDate(timeStamp.toMillisecond()),
+	timeStamp,
 	confirmations,
 	memo,
 	null
@@ -101,7 +101,7 @@ data class TransactionListModel(
 		data.count, // 转账个数
 		data.symbol,
 		data.isReceive,
-		TimeUtils.formatDate(data.timeStamp), // 拼接时间
+		TimeUtils.formatDate(data.timeStamp.toLongOrZero()), // 拼接时间
 		data.to,
 		data.blockNumber.toIntOrNull() ?: -1,
 		data.hash,
@@ -133,7 +133,7 @@ data class TransactionListModel(
 		data.value.toDouble(),
 		data.symbol,
 		data.isReceive,
-		TimeUtils.formatDate(data.timeStamp), // 拼接时间
+		TimeUtils.formatDate(data.timeStamp.toLongOrZero()), // 拼接时间
 		data.to,
 		data.blockNumber,
 		data.hash,

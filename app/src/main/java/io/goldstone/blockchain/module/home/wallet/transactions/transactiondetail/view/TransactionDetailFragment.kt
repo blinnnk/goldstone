@@ -12,6 +12,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.button.RadiusButton
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.common.language.ProfileText
@@ -31,6 +32,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
@@ -51,8 +53,10 @@ import org.jetbrains.anko.support.v4.UI
  * @author KaySaith
  * @date  2018/11/07
  */
-class TransactionDetailFragment : Fragment(), TransactionDetailContract.GSView {
+class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView {
 
+
+	override val pageTitle: String get() = TransactionText.detail
 	private lateinit var headerView: TransactionDetailHeaderView
 	private lateinit var progressCard: TransactionProgressCardView
 	private lateinit var memoCard: TransactionCardView
@@ -195,18 +199,23 @@ class TransactionDetailFragment : Fragment(), TransactionDetailContract.GSView {
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (!hidden) {
-			getMainActivity()?.backEvent = Runnable { backEvent() }
 			getParentFragment<BaseOverlayFragment<*>>()?.showBackButton(true) {
 				backEvent()
 			}
 		}
 	}
 
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		backEvent()
+	}
+
 	private fun backEvent() {
+		// 如果是转账进入的那么不允许再回退到燃气设置界面了. 只允许关闭
 		val parent = parentFragment
 		when (parent) {
 			is TokenDetailOverlayFragment ->
-				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
+				if (data is ReceiptModel) parent.presenter.removeSelfFromActivity()
+				else parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 			is NotificationFragment ->
 				parent.presenter.popFragmentFrom<TransactionDetailFragment>()
 		}

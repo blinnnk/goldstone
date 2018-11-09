@@ -307,6 +307,9 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND isFee = :isFee ORDER BY timeStamp DESC")
 	fun getByAddressAndContract(walletAddress: String, contract: String, chainID: String, isFee: Boolean = false): List<TransactionTable>
 
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC")
+	fun getDataWithFee(walletAddress: String, contract: String, chainID: String): List<TransactionTable>
+
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND (contractAddress LIKE :contract OR isFee = :isFee) ORDER BY timeStamp DESC")
 	fun getETHAndAllFee(walletAddress: String, contract: String, chainID: String, isFee: Boolean = true): List<TransactionTable>
 

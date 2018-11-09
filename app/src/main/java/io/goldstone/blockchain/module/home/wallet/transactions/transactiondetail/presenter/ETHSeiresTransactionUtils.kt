@@ -16,7 +16,6 @@ import kotlinx.coroutines.experimental.CoroutineStart
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.withContext
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 
 /**
@@ -107,6 +106,7 @@ object ETHSeriesTransactionUtils {
 		hash: String,
 		isReceive: Boolean,
 		chainURL: ChainURL,
+		timestamp: String,
 		@UiThread hold: (data: TransactionSealedModel?, error: RequestError) -> Unit
 	) {
 		// 先从本地找数据, 找不到就拉取链上数据并插入本地数据库
@@ -115,13 +115,15 @@ object ETHSeriesTransactionUtils {
 				GoldStoneDataBase.database.transactionDao()
 			val targetData =
 				transactionDao.getByTaxHashAndReceivedStatus(hash, isReceive, false)
-			if (targetData != null) uiThread {
+			if (targetData != null) {
 				hold(TransactionSealedModel(targetData), RequestError.None)
 			} else GoldStoneEthCall.getTransactionByHash(hash, chainURL) { transaction, error ->
 				if (transaction != null && error.isNone()) {
-					transactionDao.insert(transaction)
-					uiThread { hold(TransactionSealedModel(transaction), error) }
-				} else uiThread { hold(null, error) }
+					val formattedData =
+						transaction.apply { this.timeStamp = timestamp }
+					transactionDao.insert(formattedData)
+					hold(TransactionSealedModel(formattedData), error)
+				} else hold(null, error)
 			}
 		}
 	}

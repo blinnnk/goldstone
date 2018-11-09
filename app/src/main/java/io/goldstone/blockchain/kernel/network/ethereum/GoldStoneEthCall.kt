@@ -176,6 +176,7 @@ object GoldStoneEthCall {
 		}
 	}
 
+	// PS 这个返回的结果是没有时间戳的
 	@JvmStatic
 	fun getTransactionByHash(
 		hash: String,
@@ -198,12 +199,14 @@ object GoldStoneEthCall {
 			chainURL
 		) { result, error ->
 			// 生成的 TransactionTable 需要 Decimal
-			val defaultToken = GoldStoneDataBase.database.defaultTokenDao()
+			val defaultToken =
+				GoldStoneDataBase.database.defaultTokenDao()
 			if (result?.isNotEmpty() == true && error.isNone()) {
 				val data = result.toJsonObject()
 				// 如果没有被块收录循环检测
-				if (data.safeGet("blockNumber").isNullValue()) unfinishedCallback()
-				else {
+				if (data.safeGet("blockNumber").isNullValue()) {
+					unfinishedCallback()
+				} else {
 					// 已经被收录的准备对应的数据
 					val inputData = data.safeGet("input")
 					if (!CryptoUtils.isERC20Transfer(inputData)) {

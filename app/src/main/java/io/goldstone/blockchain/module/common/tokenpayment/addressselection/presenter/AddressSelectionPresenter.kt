@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -19,7 +20,6 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
@@ -28,8 +28,9 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.noButton
-import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -110,10 +111,9 @@ class AddressSelectionPresenter(
 		val addressType =
 			MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())
 		when (addressType) {
-			null -> fragment.context?.alert(ImportWalletText.addressFormatAlert)
+			null -> fragment.safeShowError(Throwable(ImportWalletText.addressFormatAlert))
 			AddressType.ETHSeries -> when {
-				token?.contract.isBTCSeries() || token?.contract.isEOSSeries() ->
-					fragment.context.alert("this is not a valid bitcoin address")
+				!token?.contract.isETHSeries() -> fragment.safeShowError(Throwable(AccountError.InvalidAddress))
 				else -> WalletTable.getAllETHAndERCAddresses {
 					showExistedAlertAndGo(this)
 				}
@@ -123,12 +123,16 @@ class AddressSelectionPresenter(
 				!token?.contract.isEOSSeries() ->
 					fragment.safeShowError(AccountError.InvalidAccountName)
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
-				else -> EOSAPI.getAccountInfo(EOSAccount(toAddress)) { info, error ->
-					GoldStoneAPI.context.runOnUiThread {
-						if (info != null && error.isNone()) WalletTable.getAllEOSAccountNames {
-							showExistedAlertAndGo(this)
-						} else fragment.safeShowError(AccountError.InactivatedAccountName)
+				else -> if (NetworkUtil.hasNetwork(fragment.context)) {
+					EOSAPI.getAccountInfo(EOSAccount(toAddress)) { info, error ->
+						launch(UI) {
+							if (info != null && error.isNone()) WalletTable.getAllEOSAccountNames {
+								showExistedAlertAndGo(this)
+							} else fragment.safeShowError(AccountError.InactivatedAccountName)
+						}
 					}
+				} else WalletTable.getAllEOSAccountNames {
+					showExistedAlertAndGo(this)
 				}
 			}
 

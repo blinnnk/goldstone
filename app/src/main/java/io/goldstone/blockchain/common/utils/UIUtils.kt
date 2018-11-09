@@ -80,16 +80,6 @@ object UIUtils {
 }
 
 object TimeUtils {
-	// 将时间戳转化为界面显示的时间格式的工具
-	fun formatDate(timeStamp: String): String {
-		val stamp = if (timeStamp.contains(".")) timeStamp.substringBefore(".").toLong()
-		else timeStamp.toLong()
-		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp.toMillisecond(), DateUtils.FORMAT_SHOW_YEAR
-		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, stamp.toMillisecond(), DateUtils.FORMAT_SHOW_TIME
-		)
-	}
 
 	// 将时间戳转化为界面显示的时间格式的工具
 	fun formatDate(timeStamp: Long): String {

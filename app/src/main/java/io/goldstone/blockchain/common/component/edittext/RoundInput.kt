@@ -72,7 +72,7 @@ open class RoundInput(context: Context) : EditText(context) {
 
 		this.setWillNotDraw(false)
 
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 		this.setPadding(35.uiPX(), 20.uiPX(), 35.uiPX(), 20.uiPX())
 		backgroundTintMode = PorterDuff.Mode.CLEAR
 		textColor = GrayScale.black

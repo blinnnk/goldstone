@@ -26,7 +26,7 @@ fun <T : BaseOverlayFragment<*>> T.showContactDashboard(chainType: ChainType, ho
 					removeChildFragment(it)
 				}
 				if (this@showContactDashboard is TokenDetailOverlayFragment) {
-					setTitle(TokenDetailText.tradingRAM)
+					this@showContactDashboard.setTitle(TokenDetailText.tradingRAM)
 				}
 			}
 		}.apply {

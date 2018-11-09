@@ -106,7 +106,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-		getContainer().apply {
+		container.apply {
 			bottomPadding = 10.uiPX()
 			processCell.into(this)
 			SpaceSplitLine(context).apply {

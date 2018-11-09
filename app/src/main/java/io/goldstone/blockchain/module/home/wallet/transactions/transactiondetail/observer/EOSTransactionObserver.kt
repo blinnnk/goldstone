@@ -43,12 +43,12 @@ abstract class EOSTransactionObserver {
 					}
 				}
 			} else EOSAPI.getChainInfo { chainInfo, error ->
-				if (!chainInfo.isNull() && error.isNone()) {
+				if (chainInfo != null && error.isNone()) {
 					if (totalConfirmedCount.isNull()) {
-						totalConfirmedCount = transactionBlockNumber!! - chainInfo!!.lastIrreversibleBlockNumber
+						totalConfirmedCount = transactionBlockNumber!! - chainInfo.lastIrreversibleBlockNumber
 					}
 					// 如果当前转账信息大于最近一个不可逆的区块那么就确认完毕了
-					val hasConfirmed = chainInfo!!.lastIrreversibleBlockNumber > transactionBlockNumber!!
+					val hasConfirmed = chainInfo.lastIrreversibleBlockNumber > transactionBlockNumber!!
 					if (hasConfirmed) {
 						removeObserver()
 					} else {

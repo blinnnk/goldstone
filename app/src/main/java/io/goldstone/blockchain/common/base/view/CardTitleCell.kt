@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.common.base.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.View
@@ -20,6 +21,7 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  * @date  2018/09/22
  */
+@SuppressLint("ViewConstructor")
 open class CardTitleCell(context: Context) : GrayCardView(context) {
 
 	private val titleView = TextView(context).apply {
@@ -49,18 +51,18 @@ open class CardTitleCell(context: Context) : GrayCardView(context) {
 		setPadding(10.uiPX(), 5.uiPX(), 10.uiPX(), 0)
 	}
 
-init {
-    getContainer().apply {
+	init {
+		container.apply {
 			relativeLayout {
 				setPadding(10.uiPX(), 5.uiPX(), 10.uiPX(), 0)
 				lparams(matchParent, 25.uiPX())
 				titleView.into(this)
 				subtitleView.into(this)
 			}
-			contentTextView.into(getContainer())
-			bottomPadding = 10.uiPX()
+			contentTextView.into(container)
+			container.bottomPadding = 10.uiPX()
 		}
-}
+	}
 
 	fun setTitle(text: String) {
 		titleView.text = text

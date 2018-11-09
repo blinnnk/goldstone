@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.content.Context
+import android.view.Gravity
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.safeGet
@@ -79,6 +80,8 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 		totalPrice.setPriceTitle(DateAndTimeText.total)
 
 		verticalLayout {
+			lparams(matchParent, matchParent)
+			gravity = Gravity.CENTER_HORIZONTAL
 			dayPrice.into(this)
 			totalPrice.into(this)
 		}.setAlignParentBottom()
