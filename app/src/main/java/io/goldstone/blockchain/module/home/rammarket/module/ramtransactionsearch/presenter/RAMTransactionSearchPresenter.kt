@@ -36,7 +36,7 @@ class RAMTransactionSearchPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<RAMMarketOverlayFragment> {
-			searchInputListener({ }) {
+			searchInputListener {
 				if (NetworkUtil.hasNetwork(context))   loadFirstPage(it)
 			}
 		}

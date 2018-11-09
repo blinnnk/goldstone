@@ -162,8 +162,8 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				val content = result?.firstOrNull().orEmpty()
+			if (result != null && error.isNone()) {
+				val content = result.firstOrNull().orEmpty()
 				val data = JSONObject(content)
 				val hasNewVersion =
 					if (content.contains("has_new_version"))

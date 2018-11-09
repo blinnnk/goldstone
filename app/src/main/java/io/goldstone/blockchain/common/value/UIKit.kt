@@ -88,7 +88,7 @@ object ShadowSize {
 	@JvmField
 	val Header = 3.uiPX().toFloat()
 	@JvmField
-	val Card = 3.uiPX().toFloat()
+	val Card = 2.uiPX().toFloat()
 	@JvmField
 	val Cell = 5.uiPX().toFloat()
 	@JvmField
@@ -110,11 +110,9 @@ object CornerSize {
 	@JvmField
 	val small = 3.uiPX().toFloat()
 	@JvmField
-	val normal = 6.uiPX().toFloat()
+	val normal = 8.uiPX().toFloat()
 	@JvmField
 	val default = 10.uiPX().toFloat()
-	@JvmField
-	val middle = 15.uiPX().toFloat()
 }
 
 object BorderSize {

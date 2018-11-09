@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.profile.profile.view
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
@@ -11,6 +10,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
@@ -36,7 +36,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			item.apply {
 				if (position == asyncData?.size) {
 					upgradeEvent = Runnable {
-						presenter.showUpgradeDialog()
+						getMainActivity()?.getHomeFragment()?.showUpgradeDialog()
 					}
 				}
 				when {
@@ -83,15 +83,6 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 		mainActivity?.getHomeFragment()?.apply {
 			presenter.showWalletDetailFragment()
 		}
-	}
-
-	override fun onActivityResult(
-		requestCode: Int,
-		resultCode: Int,
-		data: Intent?
-	) {
-		super.onActivityResult(requestCode, resultCode, data)
-		presenter.onActivityResult(requestCode, resultCode)
 	}
 }
 

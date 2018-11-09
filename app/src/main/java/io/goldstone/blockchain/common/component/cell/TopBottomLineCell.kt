@@ -18,14 +18,17 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.*
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.textColor
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 25/04/2018 8:06 AM
  * @author KaySaith
  */
 open class TopBottomLineCell(context: Context) : LinearLayout(context) {
-	
+
 	private val titleHeight = 40.uiPX()
 	private val title = TextView(context).apply {
 		typeface = GoldStoneFont.medium(context)
@@ -42,7 +45,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 	}
 	var showTopLine: Boolean = false
 	private var titleLayout: RelativeLayout
-	
+
 	init {
 		orientation = VERTICAL
 		this.setWillNotDraw(false)
@@ -53,14 +56,14 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 			title.into(this)
 		}
 	}
-	
+
 	private val paint = Paint().apply {
 		isAntiAlias = true
 		color = GrayScale.midGray
 		style = Paint.Style.FILL
 	}
 	private var horizontalPaddingSize = 0f
-	
+
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		showTopLine.isTrue {
@@ -71,14 +74,13 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 			paint
 		)
 	}
-	
+
 	fun setHorizontalPadding(paddingSize: Float) {
 		horizontalPaddingSize = paddingSize
-		button.leftPadding = paddingSize.toInt()
-		title.leftPadding = paddingSize.toInt()
+		title.x = paddingSize
 		invalidate()
 	}
-	
+
 	fun setTitle(
 		text: String,
 		textSize: Float = fontSize(12),
@@ -88,7 +90,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 		title.textSize = textSize
 		title.textColor = textColor
 	}
-	
+
 	fun showButton(text: String, left: Int = 0, event: () -> Unit) {
 		button.x -= left
 		button.setAlignParentRight()
@@ -97,11 +99,11 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 			.click { event() }
 			.into(titleLayout)
 	}
-	
+
 	fun hideButton() {
 		button.visibility = View.GONE
 	}
-	
+
 	fun updateButtonTitle(text: String) {
 		button.text = text
 	}

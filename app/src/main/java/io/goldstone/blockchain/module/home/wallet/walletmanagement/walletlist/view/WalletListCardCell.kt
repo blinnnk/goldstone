@@ -61,10 +61,12 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 175.uiPX())
+		gravity = Gravity.CENTER_HORIZONTAL
 		container = GSCard(context)
 		container.into(this)
 		container.apply {
-			resetCardElevation(ShadowSize.default)
+			resetCardElevation(ShadowSize.Cell)
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, matchParent)
 			relativeLayout {
 				lparams(matchParent, matchParent)
 				waveView.apply {

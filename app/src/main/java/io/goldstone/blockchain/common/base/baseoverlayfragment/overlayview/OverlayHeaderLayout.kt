@@ -10,7 +10,8 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.util.SoftKeyboard
@@ -64,9 +65,9 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	private val searchInput by lazy {
-		FilterSearchInput(context)
-	}
+	var searchTextChangedEvent: Runnable? = null
+
+	private var searchInput: FilterSearchInput? = null
 
 	fun setTitle(title: String) {
 		this.title.text = title
@@ -98,7 +99,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	}
 
 	fun showFilterImage(status: Boolean) {
-		searchInput.showFilterImage(status)
+		searchInput?.showFilterImage(status)
 	}
 
 	fun showCloseButton(isShow: Boolean, clickEvent: () -> Unit) {
@@ -130,7 +131,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	}
 
 	fun resetFilterStatus(filtered: Boolean) {
-		searchInput.setFiltered(filtered)
+		searchInput?.setFiltered(filtered)
 	}
 
 	fun showBackButton(
@@ -166,38 +167,11 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setFilterEvent(action: () -> Unit) {
-		searchInput.setFilterClickEvent(action)
-	}
-
-	fun searchInputListener(isFocus: (Boolean) -> Unit = {}, action: (String) -> Unit) {
-		searchInput.editText.setOnFocusChangeListener { _, isChanged ->
-			isFocus(isChanged)
-		}
-		searchInput.editText.addTextChangedListener(object : TextWatcher {
-			override fun afterTextChanged(content: Editable?) {
-				if (!content.isNullOrBlank()) action(content.toString())
-			}
-
-			override fun beforeTextChanged(
-				s: CharSequence?,
-				start: Int,
-				count: Int,
-				after: Int
-			) {
-			}
-
-			override fun onTextChanged(
-				s: CharSequence?,
-				start: Int,
-				before: Int,
-				count: Int
-			) {
-			}
-		})
+		searchInput?.setFilterClickEvent(action)
 	}
 	
 	fun setSearchText(text: String) {
-		searchInput.editText.setText(text)
+		searchInput?.editText?.setText(text)
 	}
 
 	fun showSearchButton(isShow: Boolean, setClickEvent: () -> Unit) {
@@ -211,19 +185,20 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 
 	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit) {
 		showCloseButton(!isShow) {}
-		isShow.isFalse {
+		if (!isShow) {
 			title.visibility = View.VISIBLE
-			searchInput.visibility = View.GONE
-			return
-		}
-		// 复用的 `OverlayFragment Header` 首先隐藏常规 `Title`
-		title.visibility = View.GONE
-		findViewById<FilterSearchInput>(ElementID.searchInput).let {
-			it.isNull() isTrue {
-				searchInput.apply {
+			removeView(searchInput)
+			searchInput = null
+		} else {
+			title.visibility = View.GONE
+			val input =
+				findViewById<FilterSearchInput>(ElementID.searchInput)
+			if (input == null) {
+				searchInput = FilterSearchInput(context)
+				searchInput?.apply {
 					setCancelClick {
 						// 取消搜索后自动清空搜索框里面的内容
-						searchInput.editText.text.clear()
+						// editText.text.clear()
 						SoftKeyboard.hide(context as Activity)
 						// 等待键盘完全收起后在执行动作防止页面抖动
 						cancelEvent()
@@ -233,14 +208,21 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 						editText.requestFocus()
 						SoftKeyboard.show(context as Activity, editText)
 					}
-				}.into(this)
-			} otherwise {
-				it.visibility = View.VISIBLE
+
+					editText.addTextChangedListener(object : TextWatcher {
+						override fun afterTextChanged(content: Editable?) {
+							if (!content.isNullOrBlank()) searchTextChangedEvent?.run()
+						}
+
+						override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+						override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+					})
+				}?.into(this)
 			}
 		}
 	}
 
 	fun getSearchContent(): String {
-		return searchInput.editText.text.toString()
+		return searchInput?.editText?.text?.toString().orEmpty()
 	}
 }
