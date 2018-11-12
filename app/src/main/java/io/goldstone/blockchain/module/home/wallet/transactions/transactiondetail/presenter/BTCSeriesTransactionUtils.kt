@@ -6,7 +6,9 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -22,20 +24,18 @@ object BTCSeriesTransactionUtils {
 		address: String,
 		checkLocal: Boolean,
 		@WorkerThread hold: (transition: TransactionSealedModel?, error: RequestError) -> Unit
-	) {
-		doAsync {
-			val transactionDao =
-				GoldStoneDataBase.database.btcSeriesTransactionDao()
-			val transaction =
-				transactionDao.getDataByHash(hash, isReceive, false)
-			if (transaction != null && transaction.blockNumber > 0 && checkLocal)
-				hold(TransactionSealedModel(transaction), RequestError.None)
-			else InsightApi.getTransactionByHash(chainID, !chainID.isBCH(), hash, address) { data, error ->
-				if (data != null && error.isNone()) {
-					transactionDao.insert(data)
-					hold(TransactionSealedModel(data), error)
-				} else hold(null, error)
-			}
+	) = GlobalScope.launch(Dispatchers.Default) {
+		val transactionDao =
+			GoldStoneDataBase.database.btcSeriesTransactionDao()
+		val transaction =
+			transactionDao.getDataByHash(hash, isReceive, false)
+		if (transaction != null && transaction.blockNumber > 0 && checkLocal)
+			hold(TransactionSealedModel(transaction), RequestError.None)
+		else InsightApi.getTransactionByHash(chainID, !chainID.isBCH(), hash, address) { data, error ->
+			if (data != null && error.isNone()) {
+				transactionDao.insert(data)
+				hold(TransactionSealedModel(data), error)
+			} else hold(null, error)
 		}
 	}
 }

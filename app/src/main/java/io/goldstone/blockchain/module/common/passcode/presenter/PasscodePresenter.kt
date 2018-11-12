@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -39,7 +40,9 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 		var retryTimes = config.retryTimes.orZero()
 		checkPasscode(config, passcode) { isCorrect ->
 			if (isCorrect) {
-				if (retryTimes < Count.retry) resetConfig()
+				if (retryTimes < Count.retry) launchUI {
+					resetConfig()
+				}
 				fragment.removePasscodeFragment()
 			} else doAsync {
 				retryTimes -= 1

@@ -9,7 +9,9 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -43,8 +45,9 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 	) {
 		recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray()) {
 			onClick {
-				if (!chainType.isNull()) {
+				if (chainType != null) {
 					selectedAddress = this@ContactsAdapter.model.defaultAddress
+					if (selectedAddress?.isEmpty() == true) context.alert(AccountError.InvalidAddress.message)
 					clickCellEvent?.run()
 				}
 				preventDuplicateClicks()

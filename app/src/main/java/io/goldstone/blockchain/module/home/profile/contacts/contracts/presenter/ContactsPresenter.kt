@@ -56,6 +56,7 @@ class ContactPresenter(
 			ContactTable.dao.getAllContacts()
 		val formattedContacts =
 			contacts.getCurrentAddresses(ChainType(fragment.chainType.orZero()).getContract()).toArrayList()
+
 		launchUI {
 			if (contacts.isEmpty()) {
 				if (fragment.asyncData.isNull()) fragment.asyncData = formattedContacts
