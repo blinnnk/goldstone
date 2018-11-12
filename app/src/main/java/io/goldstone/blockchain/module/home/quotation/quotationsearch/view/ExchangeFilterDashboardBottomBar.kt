@@ -35,8 +35,8 @@ class ExchangeFilterDashboardBottomBar(context: Context) : LinearLayout(context)
 		}
 	}
 
-	private lateinit var textView: TextView
-	private lateinit var checkBox: CheckBox
+	private var textView: TextView
+	private var checkBox: CheckBox
 
 	private val selectedAllContainer by lazy {
 		LinearLayout(context).apply {

@@ -15,9 +15,10 @@ import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.UIUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
@@ -92,8 +93,11 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.click { button ->
 				button.showLoadingStatus()
 				presenter.importWatchOnlyWallet(currentType, addressInput, nameInput) {
-					if (!it.isNone()) context.alert(it.message) else activity?.jump<SplashActivity>()
-					button.showLoadingStatus(false)
+					if (!it.isNone()) safeShowError(it)
+					else launchUI {
+						activity?.jump<SplashActivity>()
+						button.showLoadingStatus(false)
+					}
 				}
 			}.into(this)
 

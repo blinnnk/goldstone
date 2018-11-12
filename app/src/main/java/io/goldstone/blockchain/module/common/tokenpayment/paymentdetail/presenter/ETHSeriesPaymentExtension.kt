@@ -16,7 +16,7 @@ import io.goldstone.blockchain.crypto.utils.toDataString
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
@@ -54,7 +54,7 @@ private fun PaymentDetailPresenter.generatePaymentPrepareModel(
 	count: Double,
 	memo: String,
 	chainType: ChainType,
-	@WorkerThread hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
+	@WorkerThread hold: (model: PaymentDetailModel?, error: RequestError) -> Unit
 ) {
 	ETHJsonRPC.getUsableNonce(
 		chainType.getChainURL(),
@@ -71,7 +71,7 @@ private fun PaymentDetailPresenter.generateTransaction(
 	count: Double,
 	memo: String,
 	nonce: BigInteger,
-	@WorkerThread hold: (model: PaymentPrepareModel?, error: RequestError) -> Unit
+	@WorkerThread hold: (model: PaymentDetailModel?, error: RequestError) -> Unit
 ) {
 	val countWithDecimal: BigInteger
 	val data: String
@@ -101,7 +101,7 @@ private fun PaymentDetailPresenter.generateTransaction(
 	) { limit, error ->
 		if (limit != null && error.isNone()) {
 			hold(
-				PaymentPrepareModel(
+				PaymentDetailModel(
 					getToken()?.contract.getAddress(),
 					nonce,
 					limit,

@@ -31,8 +31,9 @@ import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 
 
@@ -96,7 +97,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 
 				resourceCoast.apply {
 					if (NetworkUtil.hasNetwork(context)) presenter.getEOSCurrencyPrice { currency, error ->
-						if (currency != null && error.isNone()) launch(UI) {
+						if (currency != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 							setSubtitle("2.0 EOS ≈ ${(2 * currency).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
 						} else safeShowError(error)
 					}

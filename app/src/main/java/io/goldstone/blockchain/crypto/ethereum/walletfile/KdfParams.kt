@@ -1,17 +1,19 @@
 package io.goldstone.blockchain.crypto.ethereum.walletfile
 
+import java.io.Serializable
+
 /**
  * @date 2018/6/17 9:14 PM
  * @author KaySaith
  */
-import kotlinx.serialization.Serializable
+
 
 sealed class KdfParams {
 	abstract var dklen: Int
 	abstract var salt: String?
 }
 
-@Serializable
+
 data class Aes128CtrKdfParams(
 	var c: Int = 0,
 	var prf: String? = null,
@@ -19,14 +21,14 @@ data class Aes128CtrKdfParams(
 	override var salt: String? = null
 ) : KdfParams()
 
-@Serializable
+
 data class ScryptKdfParams(
 	var n: Int = 0,
 	var p: Int = 0,
 	var r: Int = 0,
 	override var dklen: Int = 0,
 	override var salt: String? = null
-) : KdfParams()
+) : Serializable, KdfParams()
 
 fun WalletCryptoForImport.getTypedKdfParams() = if (kdf == SCRYPT) {
 	ScryptKdfParams().apply {

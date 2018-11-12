@@ -60,7 +60,5 @@ class CurrentAccountView(context: Context) : RelativeLayout(context) {
 			setAlignParentRight()
 			setCenterInVertical()
 		}
-
 	}
-
 }

@@ -5,7 +5,6 @@ import android.arch.persistence.room.*
 import android.provider.Settings
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R.raw.terms
@@ -16,10 +15,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.uiThread
@@ -53,27 +49,20 @@ data class AppConfigTable(
 ) {
 
 	companion object {
-		fun getAppConfig(hold: (AppConfigTable?) -> Unit) {
-			launch {
-				val config =
-					withContext(CommonPool) { GoldStoneDataBase.database.appConfigDao().getAppConfig() }
-				withContext(UI) { hold(config) }
+		fun getAppConfig(thread: CoroutineDispatcher, hold: (AppConfigTable?) -> Unit) {
+			GlobalScope.launch(Dispatchers.Default) {
+				val config = GoldStoneDataBase.database.appConfigDao().getAppConfig()
+				withContext(thread) { hold(config) }
 			}
 		}
 
-		fun updatePinCode(newPinCode: Int, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updatePincode(newPinCode)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
-			}
+		fun updatePinCode(newPinCode: Int, callback: () -> Unit) = doAsync {
+			GoldStoneDataBase.database.appConfigDao().updatePincode(newPinCode)
+			uiThread { callback() }
 		}
 
-		fun updatePushToken(token: String) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
-			}
+		fun updatePushToken(token: String) = doAsync {
+			GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
 		}
 
 		fun updateExchangeListMD5(md5: String) {
@@ -93,19 +82,6 @@ data class AppConfigTable(
 				GoldStoneAPI.context.runOnUiThread {
 					callback()
 				}
-			}
-		}
-
-		fun updateRetryTimes(times: Int) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateRetryTimes(times)
-			}
-		}
-
-		fun setFrozenTime(frozenTime: Long?, callback: () -> Unit = {}) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateFrozenTime(frozenTime.orElse(0L))
-				GoldStoneAPI.context.runOnUiThread { callback() }
 			}
 		}
 

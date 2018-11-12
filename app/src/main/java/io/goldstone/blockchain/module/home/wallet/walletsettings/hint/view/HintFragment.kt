@@ -5,7 +5,10 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -22,6 +25,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.hint.presenter.HintPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
@@ -57,21 +61,15 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		WalletTable.getCurrentWallet {
+		WalletTable.getCurrent(Dispatchers.Main) {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
-			AppConfigTable.getAppConfig {
-				it?.showPincode?.isTrue {
-					getParentFragment<ProfileOverlayFragment> {
-						activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
-					}
+			AppConfigTable.getAppConfig(Dispatchers.Main) {
+				if (it?.showPincode == true) getParentFragment<ProfileOverlayFragment> {
+					activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 				}
 			}
-
 			hintInput.hint = this.hint
 		}
 	}

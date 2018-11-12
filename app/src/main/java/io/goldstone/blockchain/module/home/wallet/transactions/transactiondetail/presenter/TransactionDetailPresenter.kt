@@ -21,9 +21,9 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.ETHSeriesTransactionObserver
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.getCurrentConfirmationNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.updateERC20FeeInfo
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
 
@@ -43,28 +43,30 @@ class TransactionDetailPresenter(
 
 	private fun setTransactionInformation() {
 		// Pending 更新数块的逻辑
-		if (data.isPending) {
-			observerPendingTransaction()
-			detailView.showProgress(TransactionProgressModel(data.confirmations))
-			detailView.showLoading(false)
-		} else detailView.showProgress(null)
-		// 显示账单的基础信息
-		detailView.showHeaderData(TransactionHeaderModel(data))
-		showTransactionInfo(data.blockNumber, data.confirmations)
-		detailView.showTransactionAddresses(
-			TransactionDetailModel(data.fromAddress, CommonText.from.toUpperCase()),
-			TransactionDetailModel(data.toAddress, CommonText.to.toUpperCase())
-		)
-		// 显示账单的 Memo 信息, 注意只有 ETHSeries 的账单存在拉取链上信息逻辑
-		if (!data.contract.isBTCSeries()) {
-			if (data.memo.isEmpty() && data.contract.isETHSeries()) {
-				detailView.showMemo(TransactionDetailModel("Getting Memo From Chain", TransactionText.memo))
-				getAndShowChainMemo()
-			} else {
-				// `EOS` 系列的 `Memo` 和 `ETHSeries` 获取不一样
-				val memo = data.memo isEmptyThen TransactionText.noMemo
-				detailView.showMemo(TransactionDetailModel(memo, TransactionText.memo))
-				detailView.showLoading(false)
+		with(detailView) {
+			if (data.isPending) {
+				observerPendingTransaction()
+				showProgress(TransactionProgressModel(data.confirmations))
+				showLoading(false)
+			} else showProgress(null)
+			// 显示账单的基础信息
+			showHeaderData(TransactionHeaderModel(data))
+			showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
+			showTransactionAddresses(
+				TransactionDetailModel(data.fromAddress, CommonText.from.toUpperCase()),
+				TransactionDetailModel(data.toAddress, CommonText.to.toUpperCase())
+			)
+			// 显示账单的 Memo 信息, 注意只有 ETHSeries 的账单存在拉取链上信息逻辑
+			if (!data.contract.isBTCSeries()) {
+				if (data.memo.isEmpty() && data.contract.isETHSeries()) {
+					showMemo(TransactionDetailModel("Getting Memo From Chain", TransactionText.memo))
+					getAndShowChainMemo()
+				} else {
+					// `EOS` 系列的 `Memo` 和 `ETHSeries` 获取不一样
+					val memo = data.memo isEmptyThen TransactionText.noMemo
+					showMemo(TransactionDetailModel(memo, TransactionText.memo))
+					showLoading(false)
+				}
 			}
 		}
 		// `BlockNumber` 为 `-1` 意味着还没有被收录, 所以不存在 `ConfirmationCount`
@@ -78,7 +80,7 @@ class TransactionDetailPresenter(
 		 */
 		if (data.isFee && data.count == 0.0 && data.contract.isETHSeries()) {
 			updateERC20FeeInfo(data) { symbol, count, error ->
-				if (error.isNone()) launch(UI) {
+				if (error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 					detailView.showHeaderData(TransactionHeaderModel(data, symbol!!, count!!))
 				} else detailView.showErrorAlert(error)
 			}
@@ -114,12 +116,14 @@ class TransactionDetailPresenter(
 			data.contract.isEOSSeries() -> onEOSSeriesTransferred(blockNumber)
 		}
 		// 如果是很久没看的 Pending 账单进入后会返回不可逆的负数, 其实就是已经确认的块数, 这里增加绝对值判断
-		if (data.contract.isEOSSeries())
-			detailView.showProgress(TransactionProgressModel(Math.abs(totalCount), Math.abs(totalCount).toLong()))
-		else detailView.showProgress(TransactionProgressModel(totalCount))
-		showTransactionInfo(blockNumber, totalCount)
-		detailView.updateTokenDetailList()
-		detailView.showHeaderData(TransactionHeaderModel(data, false, isFailed))
+		with(detailView) {
+			if (data.contract.isEOSSeries())
+				showProgress(TransactionProgressModel(Math.abs(totalCount), Math.abs(totalCount).toLong()))
+			else showProgress(TransactionProgressModel(totalCount))
+			showTransactionInfo(blockNumber, totalCount, data.minerFee)
+			updateTokenDetailList()
+			showHeaderData(TransactionHeaderModel(data, false, isFailed))
+		}
 	}
 
 	private fun updateTransactionFromNotification() {
@@ -129,7 +133,7 @@ class TransactionDetailPresenter(
 				updateBTCSeriesTransaction(true, it)
 			}
 			data.contract.isETHSeries() ->
-				getAndShowETHSeriesTransactionFromNotification()
+				getAndShowETHSeriesDataFromNotification()
 			data.contract.isEOSSeries() -> {
 				// 目前不支持 `EOS` 的 `Notification`
 			}
@@ -229,17 +233,17 @@ class TransactionDetailPresenter(
 		data.isFee,
 		data.contract.getChainURL()
 	) { memo, error ->
-		launch {
-			withContext(UI) {
-				detailView.showLoading(false)
+		GlobalScope.launch(Dispatchers.Main) {
+			with(detailView) {
+				showLoading(false)
 				if (memo != null && error.isNone())
-					detailView.showMemo(TransactionDetailModel(memo, TransactionText.memo))
-				else detailView.showErrorAlert(error)
+					showMemo(TransactionDetailModel(memo, TransactionText.memo))
+				else showErrorAlert(error)
 			}
 		}
 	}
 
-	private fun showTransactionInfo(blockNumber: Int, confirmations: Int) {
+	private fun showTransactionInfo(blockNumber: Int, confirmations: Int, minerFee: String) {
 		val blockNumberText =
 			if (blockNumber == -1) TransactionText.pendingBlockConfirmation
 			else "$blockNumber "
@@ -254,13 +258,14 @@ class TransactionDetailPresenter(
 			else data.date
 		detailView.showTransactionInformation(
 			TransactionDetailModel(data.hash, TransactionText.transactionHash),
+			TransactionDetailModel(minerFee, TransactionText.minerFee),
 			TransactionDetailModel(blockNumberText, TransactionText.blockNumber),
 			TransactionDetailModel(confirmationsText, TransactionText.confirmations),
 			TransactionDetailModel(dateText, TransactionText.transactionDate)
 		)
 	}
 
-	private fun getAndShowETHSeriesTransactionFromNotification() {
+	private fun getAndShowETHSeriesDataFromNotification() {
 		ETHSeriesTransactionUtils.getTransactionByHash(
 			data.hash,
 			data.isReceive,
@@ -268,8 +273,8 @@ class TransactionDetailPresenter(
 			data.date
 		) { data, error ->
 			if (data != null && error.isNone()) {
-				launch(UI) {
-					showTransactionInfo(data.blockNumber, data.confirmations)
+				GlobalScope.launch(Dispatchers.Main) {
+					showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
 					if (data.memo.isEmpty()) getAndShowChainMemo()
 					else {
 						detailView.showMemo(TransactionDetailModel(data.memo, TransactionText.memo))
@@ -287,11 +292,11 @@ class TransactionDetailPresenter(
 			data.isReceive,
 			if (data.isReceive) data.toAddress else data.fromAddress,
 			checkLocal
-		) { transaction, error ->
-			if (transaction != null && error.isNone()) launch(UI) {
-				showTransactionInfo(transaction.blockNumber, transaction.confirmations)
+		) { data, error ->
+			if (data != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
+				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
 			} else detailView.showErrorAlert(error)
-			launch(UI) {
+			GlobalScope.launch(Dispatchers.Main) {
 				detailView.showLoading(false)
 			}
 		}
@@ -314,8 +319,8 @@ class TransactionDetailPresenter(
 				data.fromAddress,
 				data.isPending
 			)
-			launch(UI) {
-				showTransactionInfo(data.blockNumber, confirmationCount)
+			GlobalScope.launch(Dispatchers.Main) {
+				showTransactionInfo(data.blockNumber, confirmationCount, data.minerFee)
 			}
 		} else detailView.showErrorAlert(error)
 	}

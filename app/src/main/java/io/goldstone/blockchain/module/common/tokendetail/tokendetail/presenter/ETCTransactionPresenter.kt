@@ -4,12 +4,14 @@ import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 2018/8/14 5:01 PM
@@ -17,11 +19,11 @@ import kotlinx.coroutines.experimental.launch
  */
 
 fun TokenDetailPresenter.loadETCChainData(localData: List<TransactionListModel>) {
-	fragment.showLoadingView()
+	detailView.showLoading(true)
 	val blockNumber = localData.maxBy { it.blockNumber }?.blockNumber ?: 0
 	loadDataFromChain(blockNumber) {
-		launch(UI) { fragment.removeLoadingView() }
-		loadDataFromDatabaseOrElse()
+		launchUI { detailView.showLoading(false) }
+		loadLocalData()
 	}
 }
 

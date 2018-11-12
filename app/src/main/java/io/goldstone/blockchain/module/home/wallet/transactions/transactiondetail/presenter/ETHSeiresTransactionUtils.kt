@@ -11,10 +11,9 @@ import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.getMemoFromInputCode
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
 
@@ -28,42 +27,40 @@ object ETHSeriesTransactionUtils {
 		data: TransactionSealedModel,
 		callback: (symbol: String?, count: Double?, error: RequestError) -> Unit
 	) {
-		launch {
-			withContext(CommonPool, CoroutineStart.LAZY) {
-				val chainURL = SharedChain.getCurrentETH()
-				// 这种情况意味着没有燃气费的条目是 `ERC20` 的条目, 没有换算出 `Symbol` 和 `Decimal`
-				// 从而导致的 `Count` 为 `0` 的情况, 这里需要阻碍 `UI` 显示, 更新到这个数据后再允许显示下一步
-				val defaultDao =
-					GoldStoneDataBase.database.defaultTokenDao()
-				val transactionDao =
-					GoldStoneDataBase.database.transactionDao()
-				val targetToken =
-					defaultDao.getERC20Token(data.contract.contract.orEmpty(), chainURL.chainID.id)
-				// 如果本地有该条燃气费的 `DefaultToken` 信息那么直接从数据库获取信息并补全
-				// 否则就获取 `ContractAddress` 从链上查询对应的数据并补全本地信息
-				if (targetToken != null) {
-					val count =
-						CryptoUtils.toCountByDecimal(data.value, targetToken.decimals)
-					transactionDao.updateFeeInfo(targetToken.symbol, count, data.hash)
-					callback(targetToken.symbol, count, RequestError.None)
-				} else ETHJsonRPC.getTokenInfoByContractAddress(data.contract.contract.orEmpty(), chainURL) { symbol, name, decimal, error ->
-					if (error.isNone()) {
-						val count = CryptoUtils.toCountByDecimal(data.value, decimal!!)
-						transactionDao.updateFeeInfo(symbol!!, count, data.hash)
-						defaultDao.insert(
-							DefaultTokenTable(
-								data.contract.contract.orEmpty(),
-								symbol,
-								decimal,
-								chainURL.chainID,
-								"",
-								name!!,
-								true
-							)
+		GlobalScope.launch(Dispatchers.Default) {
+			val chainURL = SharedChain.getCurrentETH()
+			// 这种情况意味着没有燃气费的条目是 `ERC20` 的条目, 没有换算出 `Symbol` 和 `Decimal`
+			// 从而导致的 `Count` 为 `0` 的情况, 这里需要阻碍 `UI` 显示, 更新到这个数据后再允许显示下一步
+			val defaultDao =
+				GoldStoneDataBase.database.defaultTokenDao()
+			val transactionDao =
+				GoldStoneDataBase.database.transactionDao()
+			val targetToken =
+				defaultDao.getERC20Token(data.contract.contract.orEmpty(), chainURL.chainID.id)
+			// 如果本地有该条燃气费的 `DefaultToken` 信息那么直接从数据库获取信息并补全
+			// 否则就获取 `ContractAddress` 从链上查询对应的数据并补全本地信息
+			if (targetToken != null) {
+				val count =
+					CryptoUtils.toCountByDecimal(data.value, targetToken.decimals)
+				transactionDao.updateFeeInfo(targetToken.symbol, count, data.hash)
+				callback(targetToken.symbol, count, RequestError.None)
+			} else ETHJsonRPC.getTokenInfoByContractAddress(data.contract.contract.orEmpty(), chainURL) { symbol, name, decimal, error ->
+				if (error.isNone()) {
+					val count = CryptoUtils.toCountByDecimal(data.value, decimal!!)
+					transactionDao.updateFeeInfo(symbol!!, count, data.hash)
+					defaultDao.insert(
+						DefaultTokenTable(
+							data.contract.contract.orEmpty(),
+							symbol,
+							decimal,
+							chainURL.chainID,
+							"",
+							name!!,
+							true
 						)
-						callback(symbol, count, error)
-					} else callback(null, null, error)
-				}
+					)
+					callback(symbol, count, error)
+				} else callback(null, null, error)
 			}
 		}
 	}

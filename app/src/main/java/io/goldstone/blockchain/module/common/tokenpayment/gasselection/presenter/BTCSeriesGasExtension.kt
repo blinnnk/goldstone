@@ -17,8 +17,9 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter.Companion.getPrivateKey
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
 import java.math.BigInteger
@@ -36,10 +37,9 @@ fun GasSelectionPresenter.checkBTCSeriesBalance(
 		// 检查余额状况
 		InsightApi.getBalance(chainType, !chainType.isBCH(), fromAddress) { balance, error ->
 			if (balance != null && error.isNone()) {
-				val isEnough =
-					balance.value > value + gasUsedGasFee?.toSatoshi().orElse(0)
+				val isEnough = balance.value > value + gasUsedGasFee?.toSatoshi().orElse(0)
 				when {
-					isEnough -> launch(UI) { showConfirmAttentionView(callback) }
+					isEnough -> GlobalScope.launch(Dispatchers.Main) { showConfirmAttentionView(callback) }
 					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
 					else -> callback(error)
 				}
@@ -79,7 +79,7 @@ fun GasSelectionPresenter.transferBTCSeries(
 							// 插入 `Pending` 数据到本地数据库
 							insertBTCSeriesPendingData(this, fee, signedModel.messageSize, hash)
 							// 跳转到章党详情界面
-							launch(UI) {
+							GlobalScope.launch(Dispatchers.Main) {
 								rootFragment?.goToTransactionDetailFragment(fragment, generateReceipt(this@apply, fee, hash))
 							}
 							callback(hashError)

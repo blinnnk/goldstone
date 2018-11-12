@@ -16,6 +16,7 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import junit.framework.Assert.assertTrue
+import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,29 +46,13 @@ class GoldStoneServerUnitTest {
 	}
 
 	@Test
-	fun searchQuotationByPair() {
-		// Change any symbol value to test the result
-		val symbol = "tr"
-		GoldStoneAPI.getMarketSearchList(symbol, {
-			LogUtil.error("$position SearchQuotation", it)
-		}) {
-			LogUtil.debug("$position SearchQuotation", it.toString())
-			// it must has result with `t` value, if result is empty will be failed
-			assertTrue("Search pair quotation with `tr` is empty", it.isNotEmpty())
-		}
-	}
-
-	@Test
 	fun getShareContent() {
-		GoldStoneAPI.getShareContent(
-			{
-				LogUtil.error("$position getShareContent", it)
-			}) {
-			LogUtil.debug("$position getShareContent", it.toString())
+		GoldStoneAPI.getShareContent { content, _ ->
+			LogUtil.debug("$position getShareContent", content.toString())
 			// Share content title, content, url must not be empty
-			assertTrue("Share title is empty", it.title.isNotEmpty())
-			assertTrue("Share content is empty", it.content.isNotEmpty())
-			assertTrue("Share url is empty", it.url.isNotEmpty())
+			assertTrue("Share title is empty", content?.title?.isNotEmpty() == true)
+			assertTrue("Share content is empty", content?.content?.isNotEmpty() == true)
+			assertTrue("Share url is empty", content?.url?.isNotEmpty() == true)
 		}
 	}
 
@@ -76,38 +61,24 @@ class GoldStoneServerUnitTest {
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTime }?.createTime
 			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
-			GoldStoneAPI.getNotificationList(
-				requestTime,
-				{
-					LogUtil.error("$position getNotificationList", it)
-				}
-			) {
-				Log.d("$position + getNotificationList", it.toString())
+			GoldStoneAPI.getNotificationList(requestTime) { list, _ ->
+				Log.d("$position + getNotificationList", list.toString())
 			}
 		}
 	}
 
 	@Test
 	fun getTermsFromServer() {
-		GoldStoneAPI.getTerms(
-			"hello",
-			{
-				LogUtil.error("$position GetTermsFromServer", it)
-			}
-		) {
-			LogUtil.debug(position, it)
-			assertTrue("Terms is empty", it.isNotEmpty())
+		GoldStoneAPI.getTerms("hello") { term, _ ->
+			LogUtil.debug(position, term.orEmpty())
+			assertTrue("Terms is empty", term?.isNotEmpty() == true)
 		}
 	}
 
 	@Test
 	fun getConfigList() {
-		GoldStoneAPI.getConfigList(
-			{
-				LogUtil.error("$position GetConfigList", it)
-			}
-		) {
-			LogUtil.debug(position, it.toString())
+		GoldStoneAPI.getConfigList { list, _ ->
+			LogUtil.debug(position, list.toString())
 		}
 	}
 
@@ -120,14 +91,13 @@ class GoldStoneServerUnitTest {
 
 	@Test
 	fun getUnreadCount() {
-		AppConfigTable.getAppConfig { config ->
+		AppConfigTable.getAppConfig(Dispatchers.Default) { config ->
 			config?.apply {
 				GoldStoneAPI.getUnreadCount(
 					config.goldStoneID,
-					System.currentTimeMillis(),
-					{ LogUtil.error(position, it) }
-				) {
-					LogUtil.debug(position + "getUnreadCount", it)
+					System.currentTimeMillis()
+				) { count, _ ->
+					LogUtil.debug(position + "getUnreadCount", count.toString())
 				}
 			}
 		}
@@ -138,12 +108,9 @@ class GoldStoneServerUnitTest {
 		GoldStoneAPI.getETCTransactions(
 			ChainID.ETCTest,
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
-			"0",
-			{
-				LogUtil.error("getETCTransactions", it)
-			}
-		) {
-			LogUtil.debug("getETCTransactions", "$it")
+			"0"
+		) { transaction, _ ->
+			LogUtil.debug("getETCTransactions", "$transaction")
 		}
 	}
 }

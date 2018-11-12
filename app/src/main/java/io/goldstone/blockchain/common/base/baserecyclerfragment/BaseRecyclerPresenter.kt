@@ -44,7 +44,7 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 	open fun onFragmentResume() {}
 	open fun onFragmentHiddenChanged(isHidden: Boolean) {}
 
-	fun showBottomLoading(status: Boolean) {
+	private fun showBottomLoading(status: Boolean) {
 		fragment.recyclerView.apply {
 			val bottomIndex = adapter?.itemCount.orZero() - 1
 			getItemAtAdapterPosition<BottomLoadingView>(bottomIndex) {
@@ -81,20 +81,6 @@ abstract class BaseRecyclerPresenter<out T : BaseRecyclerFragment<BaseRecyclerPr
 					notifyDataSetChanged()
 				}
 			}
-		}
-	}
-
-	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> updateAdapterData(newData: ArrayList<D>, callback: () -> Unit = {}) {
-		fragment.getAdapter<T>()?.apply {
-			// Comparison the data, if they are different then update adapter
-			fragment.asyncData?.clear()
-			fragment.asyncData?.addAll(newData)
-			if (newData.isNotEmpty()) fragment.removeEmptyView()
-			else fragment.showEmptyView()
-			dataSet.clear()
-			dataSet.addAll(newData)
-			notifyDataSetChanged()
-			callback()
 		}
 	}
 

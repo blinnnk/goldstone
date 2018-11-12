@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model
 
-import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
@@ -36,6 +34,7 @@ data class NotificationModel(
 	-1,
 	timeStamp.toString(), // 通知中心的通知时间作为 transactionTime 记录在本地数据库
 	-1,
+	"",
 	"",
 	chainID
 )

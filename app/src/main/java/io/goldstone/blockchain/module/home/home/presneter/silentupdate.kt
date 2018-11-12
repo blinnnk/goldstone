@@ -21,10 +21,9 @@ import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @author KaySaith
@@ -32,20 +31,18 @@ import kotlinx.coroutines.experimental.withContext
  */
 abstract class SilentUpdater {
 	fun star() {
-		launch {
-			withContext(CommonPool, CoroutineStart.LAZY) {
-				// 是 WIFI 的情况下, 才执行静默更新
-				if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
-					updateLocalDefaultTokens()
-					updateERCDefaultTokenInfo()
-					updateRAMUnitPrice()
-					updateMyTokenCurrencyPrice()
-					updateCPUUnitPrice()
-					updateNETUnitPrice()
-					checkAvailableEOSTokenList()
-					updateNodeData()
-					checkAvailableERC20TokenList()
-				}
+		GlobalScope.launch(Dispatchers.Default) {
+			// 是 WIFI 的情况下, 才执行静默更新
+			if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
+				updateLocalDefaultTokens()
+				updateERCDefaultTokenInfo()
+				updateRAMUnitPrice()
+				updateMyTokenCurrencyPrice()
+				updateCPUUnitPrice()
+				updateNETUnitPrice()
+				checkAvailableEOSTokenList()
+				updateNodeData()
+				checkAvailableERC20TokenList()
 			}
 		}
 	}
@@ -60,7 +57,7 @@ abstract class SilentUpdater {
 			)
 		val maxBlockNumber =
 			allTransactions.filterNot {
-				it.symbol.equals(CoinSymbol.eth, true)
+				it.contractAddress.equals(TokenContract.etcContract, true)
 			}.maxBy { it.blockNumber }?.blockNumber
 		getERC20TokenTransactions(maxBlockNumber ?: "0")
 	}
@@ -82,7 +79,7 @@ abstract class SilentUpdater {
 				// 供其他场景使用
 				val chain = SharedChain.getCurrentETH()
 				transactions.distinctBy { it.contract }.forEach { erc20 ->
-					defaultDao.getToken(erc20.contract, erc20.tokenSymbol, chain.chainID.id)
+					defaultDao.getERC20Token(erc20.contract, chain.chainID.id)
 						?: defaultDao.insert(DefaultTokenTable(erc20, chain.chainID))
 				}
 
@@ -111,7 +108,8 @@ abstract class SilentUpdater {
 					//  这个接口只服务主网下的 `Token` 插入 `DefaultToken`
 					DefaultTokenTable(
 						contract,
-						tokenIcons.get(contract.orEmpty())?.url.orEmpty()
+						tokenIcons.get(contract.orEmpty())?.url.orEmpty(),
+						chainID
 					).preventDuplicateInsert()
 
 					val targetToken = myTokenDao.getTokenByContractAndAddress(
@@ -223,7 +221,7 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateMyTokenCurrencyPrice() {
-		MyTokenTable.getMyTokens(false) { myTokens ->
+		MyTokenTable.getMyTokens { myTokens ->
 			GoldStoneAPI.getPriceByContractAddress(
 				// `EOS` 的 `Token` 价格在下面的方法从第三方获取, 这里过滤掉 `EOS` 的 `Token`
 				myTokens.asSequence().filterNot {
@@ -262,9 +260,7 @@ abstract class SilentUpdater {
 			if (serverTokens != null && serverTokens.isNotEmpty() && error.isNone()) {
 				val localTokens = defaultDao.getAllTokens()
 				// 开一个线程更新图片
-				launch {
-					updateLocalTokenIcon(serverTokens, localTokens)
-				}
+				updateLocalTokenIcon(serverTokens, localTokens)
 				// 移除掉一样的数据
 				defaultDao.insertAll(
 					serverTokens.filterNot { server ->

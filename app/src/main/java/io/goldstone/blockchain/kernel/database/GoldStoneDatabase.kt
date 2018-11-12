@@ -19,6 +19,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Excha
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
+import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationExtraTypeConverter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -63,7 +64,8 @@ import java.math.BigInteger
 	EOSDefaultAllChainNameConverter::class,
 	EOSTransactionDataConverter::class,
 	BigintegerConverter::class,
-	ListBip44AddressConverter::class
+	ListBip44AddressConverter::class,
+	NotificationExtraTypeConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao

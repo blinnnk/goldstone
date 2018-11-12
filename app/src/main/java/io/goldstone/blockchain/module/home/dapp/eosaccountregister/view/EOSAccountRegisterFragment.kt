@@ -32,8 +32,9 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -137,7 +138,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	private fun setExpenditure() {
 		presenter.getEOSCurrencyAndRAMPrice { currency, ramPrice, error ->
-			if (currency != null && ramPrice != null && error.isNone()) launch(UI) {
+			if (currency != null && ramPrice != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 				val eosCount = assignResources[1].right.toDouble() + assignResources[2].right.toDouble() + assignResources[0].right.toIntOrZero() * ramPrice
 				val totalCurrency = eosCount * currency
 				resourceCoast.setSubtitle("≈ ${eosCount.formatCount(4)} EOS ≈ ${totalCurrency.formatCurrency()} (${SharedWallet.getCurrencyCode()})")
@@ -163,8 +164,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					if (!newValue.isNullOrEmpty()) {
 						val formattedNumber =
 							if (values[index].left.contains(TokenDetailText.ram, true))
-								"${newValue?.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
-							else "${newValue?.convertToDouble(CryptoValue.eosDecimal).orElse(EOSValue.defaultRegisterAssignBandWidth)}"
+								"${newValue.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
+							else "${newValue.convertToDouble(CryptoValue.eosDecimal).orElse(EOSValue.defaultRegisterAssignBandWidth)}"
 						// 更新界面上的值
 						gridSessionTitle.updateValues(index, formattedNumber)
 						// 更新内存里面的值

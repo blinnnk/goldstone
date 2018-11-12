@@ -22,8 +22,9 @@ import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
 
@@ -41,7 +42,7 @@ fun PaymentDetailPresenter.prepareBTCSeriesPaymentModel(
 	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
 		callback(TransferError.IncorrectDecimal)
 	else generateBTCSeriesPaymentModel(chainType, count, changeAddress) { paymentModel, error ->
-		launch(UI) {
+		GlobalScope.launch(Dispatchers.Main) {
 			if (paymentModel != null) fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(
 					Bundle().apply {

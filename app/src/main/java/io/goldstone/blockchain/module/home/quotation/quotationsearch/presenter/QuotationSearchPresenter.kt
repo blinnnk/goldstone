@@ -22,8 +22,9 @@ import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.Quota
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -149,7 +150,7 @@ class QuotationSearchPresenter(
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
 			if (searchList != null && error.isNone()) {
-				if (searchList.isEmpty()) launch(UI) {
+				if (searchList.isEmpty()) GlobalScope.launch(Dispatchers.Main) {
 					fragment.removeLoadingView()
 				} else {
 					val targetData =
@@ -165,7 +166,7 @@ class QuotationSearchPresenter(
 						if (isEnd) fragment.completeQuotationTable(searchList)
 					}
 				}
-			} else launch(UI) {
+			} else GlobalScope.launch(Dispatchers.Main) {
 				fragment.safeShowError(error)
 				fragment.removeLoadingView()
 			}

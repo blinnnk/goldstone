@@ -20,12 +20,10 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 01/04/2018 12:38 AM
@@ -111,14 +109,12 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getMyTokens(inMainThread: Boolean = true, hold: (List<MyTokenTable>) -> Unit) {
+		fun getMyTokens(@WorkerThread hold: (List<MyTokenTable>) -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
-					GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).apply {
-						if (inMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
-						else hold(this)
+				GoldStoneDataBase.database.walletDao()
+					.findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
+						GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).let(hold)
 					}
-				}
 			}
 		}
 
@@ -140,13 +136,18 @@ data class MyTokenTable(
 		fun getTokenBalance(
 			contract: TokenContract,
 			ownerName: String,
-			callback: (Double?) -> Unit
+			@UiThread callback: (Double?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(contract.contract.orEmpty(), contract.symbol, ownerName, contract.getCurrentChainID().id)
+					.getTokenByContractAndAddress(
+						contract.contract.orEmpty(),
+						contract.symbol,
+						ownerName,
+						contract.getCurrentChainID().id
+					)
 			} then { token ->
-				if (token.isNull()) callback(null) else callback(token?.balance.orZero())
+				callback(token?.balance.orZero())
 			}
 		}
 

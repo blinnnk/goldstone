@@ -119,8 +119,9 @@ object InsightApi {
 			null,
 			isEncrypt
 		) { result, error ->
-			if (result != null && error.isNone()) {
-				val data = JSONObject(result.firstOrNull())
+			val json = result?.firstOrNull()
+			if (json != null && error.isNone()) {
+				val data = JSONObject(json)
 				hold(
 					BTCSeriesTransactionTable(
 						data,

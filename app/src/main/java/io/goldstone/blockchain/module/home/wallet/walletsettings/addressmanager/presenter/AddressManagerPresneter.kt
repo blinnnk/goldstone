@@ -224,7 +224,7 @@ class AddressManagerPresenter(
 							insertNewToMyToken(
 								TokenContract.ethContract,
 								CoinSymbol.eth,
-								address!!,
+								address,
 								it.chainID
 							)
 						}
@@ -232,7 +232,7 @@ class AddressManagerPresenter(
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
-								address!!,
+								address,
 								ChainType.ETH.id,
 								1,
 								wallet.id
@@ -269,14 +269,14 @@ class AddressManagerPresenter(
 							insertNewToMyToken(
 								TokenContract.etcContract,
 								CoinSymbol.etc,
-								address!!,
+								address,
 								it.chainID
 							)
 						}
 						// 注册新增的子地址
 						XinGePushReceiver.registerSingleAddress(
 							AddressCommissionModel(
-								address!!,
+								address,
 								ChainType.ETC.id,
 								1,
 								wallet.id

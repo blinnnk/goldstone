@@ -23,17 +23,18 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
-import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.bitcoinj.core.Address
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
@@ -58,7 +59,7 @@ class TokenInfoPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		val info = getDetailButtonInfo(tokenInfo?.contract, currentAddress)
+		val info = getDetailButtonInfo(tokenInfo?.contract)
 		val code = QRCodePresenter.generateQRCode(currentAddress)
 		val chainName =
 			CryptoName.getChainNameByContract(tokenInfo?.contract).toUpperCase() + " " + TokenDetailText.chainType
@@ -101,7 +102,7 @@ class TokenInfoPresenter(
 				BTCSeriesTransactionTable.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
 					// 如果本地没有数据库那么从网络检查获取
 					if (transactions.isEmpty()) getBTCSeriesTransactionCount { count, error ->
-						launch(UI) {
+						GlobalScope.launch(Dispatchers.Main) {
 							if (count != null && error.isNone()) fragment.showTransactionCount(count)
 							else if (error.hasError()) fragment.safeShowError(error)
 							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
@@ -246,14 +247,14 @@ class TokenInfoPresenter(
 			}
 		}
 
-		fun getDetailButtonInfo(contract: TokenContract?, currentAddress: String): Pair<Int, String> {
+		fun getDetailButtonInfo(contract: TokenContract?): Pair<Int, String> {
 			val url = when {
-				contract.isBTC() -> ChainExplorer.btcAddressDetail(currentAddress)
-				contract.isLTC() -> ChainExplorer.ltcAddressDetail(currentAddress)
-				contract.isBCH() -> ChainExplorer.bchAddressDetail(currentAddress)
-				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(currentAddress)
-				contract.isETC() -> ChainExplorer.etcAddressDetail(currentAddress)
-				else -> ChainExplorer.ethAddressDetail(currentAddress)
+				contract.isBTC() -> ChainExplorer.btcAddressDetail(contract.getAddress())
+				contract.isLTC() -> ChainExplorer.ltcAddressDetail(contract.getAddress())
+				contract.isBCH() -> ChainExplorer.bchAddressDetail(contract.getAddress())
+				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(contract.getAddress())
+				contract.isETC() -> ChainExplorer.etcAddressDetail(contract.getAddress())
+				else -> ChainExplorer.ethAddressDetail(contract.getAddress())
 			}
 			return Pair(getExplorerIcon(contract), url)
 		}

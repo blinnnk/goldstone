@@ -22,8 +22,9 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.vi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 27/03/2018 11:23 AM
@@ -44,7 +45,7 @@ class TokenSearchPresenter(
 				showSearchButton(false) {}
 			else {
 				fragment.showLoadingView()
-				MyTokenTable.getMyTokens(false) { myTokens ->
+				MyTokenTable.getMyTokens { myTokens ->
 					searchInputListener { inputContent ->
 						if (NetworkUtil.hasNetwork(fragment.context))
 							getSearchResult(inputContent, myTokens)
@@ -56,7 +57,7 @@ class TokenSearchPresenter(
 
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
-			launch(UI) {
+			GlobalScope.launch(Dispatchers.Main) {
 				if (result != null && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
@@ -142,10 +143,10 @@ class TokenSearchPresenter(
 							"",
 							contract,
 							"",
-							symbol!!,
+							symbol,
 							TinyNumber.False.value,
 							0.0,
-							name!!,
+							name,
 							decimal!!,
 							null,
 							status,

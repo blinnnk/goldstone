@@ -7,7 +7,7 @@ import java.math.BigInteger
  * @date 2018/5/16 3:32 PM
  * @author KaySaith
  */
-data class PaymentPrepareModel(
+data class PaymentDetailModel(
 	val fromAddress: String,
 	val nonce: BigInteger,
 	val gasLimit: BigInteger,

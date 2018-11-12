@@ -29,18 +29,16 @@ object AddressUtils {
 		excludeWalletID: Int? = null,
 		hold: (hasExistAddress: Boolean) -> Unit
 	) {
-		doAsync {
-			val allWallets = GoldStoneDataBase.database.walletDao().getAllWallets()
-			val targetWallets =
-				if (excludeWalletID != null) allWallets.filterNot { it.id == excludeWalletID } else allWallets
-			if (targetWallets.isEmpty()) hold(false)
-			else targetWallets.map {
-				it.ethAddresses + it.btcAddresses + it.ltcAddresses + it.etcAddresses + it.btcSeriesTestAddresses + it.eosAddresses + it.bchAddresses
-			}.flatten().asSequence().map {
-				it.address
-			}.any {
-				!allAddresses.find { new -> new.equals(it, true) }.isNull()
-			}.let(hold)
-		}
+		val allWallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+		val targetWallets =
+			if (excludeWalletID != null) allWallets.filterNot { it.id == excludeWalletID } else allWallets
+		if (targetWallets.isEmpty()) hold(false)
+		else targetWallets.map {
+			it.ethAddresses + it.btcAddresses + it.ltcAddresses + it.etcAddresses + it.btcSeriesTestAddresses + it.eosAddresses + it.bchAddresses
+		}.flatten().asSequence().map {
+			it.address
+		}.any {
+			!allAddresses.find { new -> new.equals(it, true) }.isNull()
+		}.let(hold)
 	}
 }

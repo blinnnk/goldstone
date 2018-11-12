@@ -59,8 +59,7 @@ private fun PaymentDetailPresenter.insertPendingDataAndGoToTransactionDetail(
 		EOSTransactionTable.getMaxDataIndexTable(
 			info.fromAccount,
 			getToken()?.contract.orEmpty(),
-			SharedChain.getEOSCurrent().chainID,
-			false
+			SharedChain.getEOSCurrent().chainID
 		) {
 			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
 			val transaction = EOSTransactionTable(info, response, dataIndex)

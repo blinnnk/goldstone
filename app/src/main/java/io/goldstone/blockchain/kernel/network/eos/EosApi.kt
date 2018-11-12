@@ -224,7 +224,7 @@ object EOSAPI {
 				return@post
 			}
 			val response = JSONObject(result)
-			if (result!!.contains("processed")) {
+			if (result.contains("processed")) {
 				val data = JSONObject(response.safeGet("processed"))
 				val transactionID = response.safeGet("transaction_id")
 				val receipt = JSONObject(data.safeGet("receipt"))
@@ -368,7 +368,7 @@ object EOSAPI {
 			}
 			val data = result?.firstOrNull()
 			if (!data.isNullOrEmpty()) hold(
-				JSONArray(data!!).toList().map {
+				JSONArray(data).toList().map {
 					EOSTransactionTable(it, SharedAddress.getCurrentEOSAccount().accountName)
 				},
 				RequestError.None
@@ -473,7 +473,7 @@ object EOSAPI {
 		) { result, error ->
 			if (result != null && error.isNone()) {
 				val data = result.firstOrNull()
-				if (!data.isNullOrEmpty()) hold(data?.toIntOrNull(), RequestError.None)
+				if (!data.isNullOrEmpty()) hold(data.toIntOrNull(), RequestError.None)
 				else hold(null, RequestError.NullResponse("Empty or Null Result"))
 			} else hold(null, error)
 		}

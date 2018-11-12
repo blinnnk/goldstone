@@ -34,14 +34,9 @@ data class TokenBalanceTable(
 
 	companion object {
 
-		fun getBalanceByContract(
-			contract: String,
-			address: String,
-			hold: (List<TokenBalanceTable>) -> Unit
-		) {
+		fun getBalanceByContract(contract: String, address: String, hold: (List<TokenBalanceTable>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.tokenBalanceDao()
-					.getTokenBalanceByContractAndAddress(address, contract)
+				GoldStoneDataBase.database.tokenBalanceDao().getTokenBalanceByContractAndAddress(address, contract)
 			} then {
 				hold(it)
 			}
@@ -81,10 +76,7 @@ interface TokenBalanceDao {
 	fun deleteTokenBalanceByAddress(address: String)
 
 	@Query("SELECT * FROM tokenBalance WHERE contract LIKE :contract AND address LIKE :address ORDER BY date DESC")
-	fun getTokenBalanceByContractAndAddress(
-		address: String,
-		contract: String
-	): List<TokenBalanceTable>
+	fun getTokenBalanceByContractAndAddress(address: String, contract: String): List<TokenBalanceTable>
 
 	@Query("SELECT * FROM tokenBalance WHERE date LIKE :date AND address LIKE :address AND contract LIKE :contract")
 	fun getBalanceByDate(date: Long, address: String, contract: String): TokenBalanceTable?

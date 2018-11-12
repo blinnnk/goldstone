@@ -18,10 +18,8 @@ import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.UIUtils
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
@@ -140,9 +138,11 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 						agreementView.radioButton.isChecked,
 						walletNameInput.text.toString()
 					) {
-						button.showLoadingStatus(false)
-						if (!it.isNone()) context.alert(it.message)
-						else activity?.jump<SplashActivity>()
+						launchUI {
+							button.showLoadingStatus(false)
+							if (it.hasError()) safeShowError(it)
+							else activity?.jump<SplashActivity>()
+						}
 					}
 				}.into(this)
 

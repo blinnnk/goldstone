@@ -2,12 +2,13 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Query
+import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -31,17 +32,15 @@ data class MyTokenWithDefaultTable(
 	var chainID: String
 ) {
 	companion object {
-		fun getMyDefaultTokens(isMainThread: Boolean, hold: (List<WalletDetailCellModel>) -> Unit) {
-			WalletTable.getCurrentWallet(false) {
-				val addresses = getCurrentAddresses(true)
-				val eosWalletType = getEOSWalletType()
-				val data =
-					GoldStoneDataBase.database.myTokenDefaultTableDao().getData(addresses)
-				val result =
-					data.map { WalletDetailCellModel(it, eosWalletType) }
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(result) }
-				else hold(result)
-			}
+		@WorkerThread
+		fun getMyDefaultTokens(hold: (List<WalletDetailCellModel>) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
+			val wallet =
+				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true) ?: return@launch
+			val addresses = wallet.getCurrentAddresses(true)
+			val eosWalletType = wallet.getEOSWalletType()
+			val data =
+				GoldStoneDataBase.database.myTokenDefaultTableDao().getData(addresses)
+			hold(data.map { WalletDetailCellModel(it, eosWalletType) })
 		}
 	}
 }

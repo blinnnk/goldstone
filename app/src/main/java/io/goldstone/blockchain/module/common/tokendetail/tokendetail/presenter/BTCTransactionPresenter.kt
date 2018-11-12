@@ -2,35 +2,34 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.isBCH
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
 
 /**
  * @date 2018/8/14 4:59 PM
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadBTCChainData(localMaxIndex: Int) {
-	fragment.showLoadingView()
+fun TokenDetailPresenter.loadBTCSeriesData(chainType: ChainType, localMaxIndex: Int) {
+	detailView.showLoading(true)
 	val address = AddressUtils.getCurrentBTCAddress()
-	InsightApi.getTransactionCount(ChainType.BTC, true, address) { transactionCount, error ->
+	InsightApi.getTransactionCount(chainType, !chainType.isBCH(), address) { transactionCount, error ->
 		if (transactionCount != null && error.isNone()) loadTransactionsFromChain(
+			chainType,
 			address,
 			localMaxIndex,
 			// TODO 第三方 `Insight` 限制一次请求数量, 暂时这样, 下个版本做分页拉取(当前版本1.4.2)
 			if (transactionCount > 50) 50 else transactionCount
 		) {
-			launch(UI) { fragment.removeLoadingView() }
-			loadDataFromDatabaseOrElse()
+			loadLocalData()
 		}
 	}
 }
 
 private fun loadTransactionsFromChain(
+	chainType: ChainType,
 	address: String,
 	localDataMaxIndex: Int,
 	transactionCount: Int,
@@ -41,8 +40,8 @@ private fun loadTransactionsFromChain(
 	if (pageInfo.to == 0) {
 		callback(false)
 	} else InsightApi.getTransactions(
-		ChainType.BTC,
-		true,
+		chainType,
+		!chainType.isBCH(),
 		address,
 		pageInfo.from,
 		pageInfo.to
@@ -54,9 +53,9 @@ private fun loadTransactionsFromChain(
 				item,
 				pageInfo.maxDataIndex + index + 1,
 				address,
-				CoinSymbol.pureBTCSymbol,
+				chainType.getContract().symbol,
 				false,
-				ChainType.BTC.id
+				chainType.id
 			)
 		}.toList().let { all ->
 			val transactionDao =

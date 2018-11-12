@@ -30,7 +30,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
-import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
@@ -54,7 +54,7 @@ class GasSelectionPresenter(
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
 	}
 	val prepareModel by lazy {
-		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentPrepareModel
+		fragment.arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentDetailModel
 	}
 	val prepareBTCSeriesModel by lazy {
 		fragment.arguments?.getSerializable(ArgumentKey.btcSeriesPrepareModel) as? PaymentBTCSeriesModel
@@ -175,20 +175,18 @@ class GasSelectionPresenter(
 			// 点击取消按钮
 			{ callback(GoldStoneError.None) }
 		) {
-			if (getToken()?.contract.isBTCSeries() && prepareBTCSeriesModel == null) {
-				callback(GoldStoneError("Empty PrepareBTCSeriesModel Data"))
-				return@showAlertView
-			}
 			val password = it?.text.toString()
 			val tokenContract = getToken()?.contract ?: return@showAlertView
 			when {
-				tokenContract.isBTCSeries() -> transferBTCSeries(
-					prepareBTCSeriesModel!!,
-					tokenContract.getAddress(),
-					tokenContract.getChainType(),
-					password,
-					callback
-				)
+				tokenContract.isBTCSeries() -> prepareBTCSeriesModel?.apply {
+					transferBTCSeries(
+						this,
+						tokenContract.getAddress(),
+						tokenContract.getChainType(),
+						password,
+						callback
+					)
+				} ?: callback(GoldStoneError("Empty PrepareBTCSeriesModel Data"))
 
 				tokenContract.isETC() -> transfer(
 					SharedAddress.getCurrentETC(),

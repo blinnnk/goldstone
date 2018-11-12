@@ -22,10 +22,8 @@ import java.math.BigInteger
  * @author KaySaith
  * @date  2018/09/12
  */
-@Entity(tableName = "eosAccount")
+@Entity(tableName = "eosAccount", primaryKeys = ["name", "recordPublicKey", "chainID"])
 data class EOSAccountTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	val name: String,
 	val balance: String,
 	val privileged: Boolean,
@@ -56,7 +54,6 @@ data class EOSAccountTable(
 		recordPublicKey: String,
 		chainID: ChainID
 	) : this(
-		0,
 		data.safeGet("account_name"),
 		data.safeGet("core_liquid_balance"),
 		data.safeGet("privileged").toBoolean(),
@@ -77,30 +74,6 @@ data class EOSAccountTable(
 	)
 
 	companion object {
-
-		fun getAccountByName(
-			name: String,
-			getResultInUIThread: Boolean = true,
-			hold: (account: EOSAccountTable?) -> Unit
-		) {
-			doAsync {
-				val account = GoldStoneDataBase.database.eosAccountDao().getAccount(name)
-				if (getResultInUIThread) GoldStoneAPI.context.runOnUiThread { hold(account) }
-				else hold(account)
-			}
-		}
-
-		fun getAccountsByNames(
-			names: List<String>,
-			getResultInUIThread: Boolean = true,
-			hold: (accounts: List<EOSAccountTable>) -> Unit
-		) {
-			doAsync {
-				val account = GoldStoneDataBase.database.eosAccountDao().getAccounts(names)
-				if (getResultInUIThread) GoldStoneAPI.context.runOnUiThread { hold(account) }
-				else hold(account)
-			}
-		}
 
 		fun preventDuplicateInsert(account: EOSAccountTable) {
 			doAsync {
