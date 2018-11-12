@@ -7,8 +7,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.RAMTransactionSearchFragment
-import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.TransactionsOfNameAdapter
+import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.*
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
@@ -52,16 +51,19 @@ class RAMTransactionSearchPresenter(
 		doAsync {
 			GoldStoneAPI.getEOSRAMTransactionsByAccount(account, endID) { data, error ->
 				if (data != null && error.isNone()) {
+					data.forEach {
+						it.account = account
+					}
 					GoldStoneAPI.context.runOnUiThread {
-						data.forEach {
-							it.account = account
-						}
 						if (fragment.asyncData == null) {
-							diffAndUpdateAdapterData<TransactionsOfNameAdapter>(data.toArrayList())
+							fragment.setRecyclerViewAdapter(fragment.recyclerView, data.toArrayList())
 						} else {
 							if (endID == 0) fragment.asyncData!!.clear()
 							fragment.asyncData!!.addAll(data.toArrayList())
-							diffAndUpdateAdapterData<TransactionsOfNameAdapter>(fragment.asyncData!!.toArrayList())
+							fragment.getAdapter<TransactionsOfNameAdapter>()?.notifyDataSetChanged()
+						}
+						if (fragment.asyncData != null && fragment.asyncData!!.size>0) {
+							fragment.removeEmptyView()
 						}
 						data.isNotEmpty() isTrue {
 							endID = data[data.lastIndex].id

@@ -14,6 +14,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Tradi
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.recentTransactions
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.setAcountInfoFromDatabase
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
+import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.math.BigDecimal
@@ -103,6 +104,14 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		saveCandleDataToDatabase()
+	}
+	
+	override fun onFragmentShowFromHidden() {
+		fragment.getParentFragment<RAMMarketOverlayFragment> {
+			showCloseButton(true) {
+				presenter.removeSelfFromActivity()
+			}
+		}
 	}
 	
 	
