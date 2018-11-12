@@ -81,19 +81,19 @@ class GasSelectionPresenter(
 
 	fun generateGasSelections(parent: LinearLayout) {
 		val gasPrice =
-			if (CoinSymbol(getToken()?.symbol).isBTCSeries()) defaultSatoshiValue
+			if (getToken()?.symbol.isBTCSeries()) defaultSatoshiValue
 			else defaultGasPrices
 
 		gasPrice.forEachIndexed { index, miner ->
 			GasSelectionCell(parent.context).apply {
 				id = index
-				model = if (CoinSymbol(getToken()?.symbol).isBTCSeries())
+				model = if (getToken()?.symbol.isBTCSeries())
 					GasSelectionModel(
 						index,
 						miner.toString().toLong(),
 						prepareBTCSeriesModel?.signedMessageSize ?: 226,
 						currentMinerType.type,
-						getToken()?.symbol.orEmpty()
+						getToken()?.symbol?.symbol.orEmpty()
 					)
 				else
 					GasSelectionModel(
@@ -113,8 +113,8 @@ class GasSelectionPresenter(
 				}
 			}.click { it ->
 				currentMinerType = MinerFeeType.getTypeByValue(it.model.type)
-				if (CoinSymbol(getToken()?.symbol).isBTCSeries())
-					updateBTCGasSettings(getToken()?.symbol.orEmpty(), parent)
+				if (getToken()?.symbol.isBTCSeries())
+					updateBTCGasSettings(getToken()?.symbol?.symbol.orEmpty(), parent)
 				else updateGasSettings(parent)
 				getGasCurrencyPrice(it.model.count) {
 					fragment.setSpendingValue(it)
@@ -131,13 +131,13 @@ class GasSelectionPresenter(
 				Bundle().apply {
 					putLong(
 						ArgumentKey.gasSize,
-						if (CoinSymbol(getToken()?.symbol).isBTCSeries()) {
+						if (getToken()?.symbol.isBTCSeries()) {
 							prepareBTCSeriesModel?.signedMessageSize ?: 226L
 						} else prepareModel?.gasLimit?.toLong().orElse(0L)
 					)
 					putBoolean(
 						ArgumentKey.isBTCSeries,
-						CoinSymbol(getToken()?.symbol).isBTCSeries()
+						getToken()?.symbol.isBTCSeries()
 					)
 				}
 			)
@@ -209,7 +209,7 @@ class GasSelectionPresenter(
 			val myAddress = AddressUtils.getCurrentBTCAddress()
 			BTCSeriesTransactionTable(
 				0, // TODO 插入 Pending Data 应该是 localMaxDataIndex + 1
-				getToken()?.symbol.orEmpty(),
+				getToken()?.symbol?.symbol.orEmpty(),
 				-1,
 				0,
 				System.currentTimeMillis().toString(),
@@ -224,7 +224,7 @@ class GasSelectionPresenter(
 				-1,
 				false,
 				true,
-				ChainType.getChainTypeBySymbol(getToken()?.symbol).id
+				getToken()?.contract.getChainType().id
 			).apply {
 				val transactionDao =
 					GoldStoneDataBase.database.btcSeriesTransactionDao()

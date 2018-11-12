@@ -21,10 +21,8 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -38,6 +36,8 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -159,10 +159,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	override val presenter = AddressManagerPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		if (SharedWallet.getCurrentWalletType().isBIP44()) showCreatorDashboard()
+		setAddButtonEvent()
 		scrollView {
 			lparams(matchParent, matchParent)
-			verticalLayout parent@{
+			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
 				topPadding = 20.uiPX()
@@ -287,95 +287,84 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		eosAddressesView.model = wallet.eosAddresses
 	}
 
-	fun showCreatorDashboard() {
+	fun setAddButtonEvent() {
 		getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
-				getMainActivity()?.getMainContainer()?.apply {
-					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
-						val creatorDashBoard = MiniOverlay(context) { cell, title ->
-							cell.onClick {
-								context?.apply {
-									verifyMultiChainWalletPassword(this) { password, error ->
-										if (!password.isNullOrEmpty() && error.isNone()) {
-											createChildAddressByButtonTitle(title, password) { createAddressError ->
-												if (error.hasError()) safeShowError(createAddressError)
-											}
-										} else if (error.hasError()) safeShowError(error)
-									}
-								}
-								cell.preventDuplicateClicks()
-							}
-						}
-						creatorDashBoard.model =
-							this@AddressManagerFragment.presenter.getAddressCreatorMenu()
-						creatorDashBoard.into(this)
-						creatorDashBoard.setTopRight()
-					}
-				}
+				showCreatorDashboard()
 			}
 		}
 	}
 
-	private fun createChildAddressByButtonTitle(title: String, password: String, callback: (AccountError) -> Unit) {
-		context?.apply {
-			when (title) {
-				WalletSettingsText.newETHSeriesAddress ->
-					AddressManagerPresenter.createETHSeriesAddress(this, password) { addresses, error ->
-						if (!addresses.isNull() && error.isNone()) {
-							ethSeriesView.model = addresses
-						} else callback(error)
-					}
-
-				WalletSettingsText.newETCAddress ->
-					AddressManagerPresenter.createETCAddress(this, password) { addresses, error ->
-						if (!addresses.isNull() && error.isNone()) {
-							etcAddressesView.model = addresses
-						} else callback(error)
-					}
-
-				WalletSettingsText.newEOSAddress ->
-					AddressManagerPresenter.createEOSAddress(this, password) {
-						eosAddressesView.model = it
-					}
-
-				WalletSettingsText.newLTCAddress -> {
-					if (SharedValue.isTestEnvironment())
-						AddressManagerPresenter.createBTCTestAddress(this, password) { addresses, error ->
-							if (!addresses.isNull() && error.isNone()) {
-								btcAddressesView.model = addresses
-							} else callback(error)
-						} else AddressManagerPresenter.createLTCAddress(this, password) { addresses, error ->
-						if (!addresses.isNull() && error.isNone()) {
-							ltcAddressesView.model = addresses
-						} else callback(error)
+	private fun showCreatorDashboard() {
+		getMainActivity()?.getMainContainer()?.apply {
+			if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
+				val creatorDashBoard = MiniOverlay(context) { cell, title ->
+					cell.click {
+						verifyMultiChainWalletPassword(context) { password, error ->
+							if (!password.isNullOrEmpty() && error.isNone()) {
+								createChildAddressByButtonTitle(context, title, password) { addresses, createError ->
+									if (error.hasError()) safeShowError(createError)
+									else launchUI {
+										addresses?.apply {
+											updateUI(this, title)
+										}
+									}
+								}
+							} else safeShowError(error)
+						}
 					}
 				}
-
-				WalletSettingsText.newBCHAddress -> {
-					if (SharedValue.isTestEnvironment())
-						AddressManagerPresenter.createBTCTestAddress(this, password) { addresses, error ->
-							if (!addresses.isNull() && error.isNone()) {
-								btcAddressesView.model = addresses
-							} else callback(error)
-						} else AddressManagerPresenter.createBCHAddress(this, password) { addresses, error ->
-						if (!addresses.isNull() && error.isNone()) {
-							bchAddressesView.model = addresses
-						} else callback(error)
-					}
-				}
-
-				WalletSettingsText.newBTCAddress -> {
-					if (SharedValue.isTestEnvironment())
-						AddressManagerPresenter.createBTCTestAddress(this, password) { addresses, error ->
-							if (!addresses.isNull() && error.isNone()) btcAddressesView.model = addresses
-							else callback(error)
-						} else AddressManagerPresenter.createBTCAddress(this, password) { addresses, error ->
-						if (!addresses.isNull() && error.isNone()) {
-							btcAddressesView.model = addresses
-						} else callback(error)
-					}
-				}
+				creatorDashBoard.model =
+					this@AddressManagerFragment.presenter.getAddressCreatorMenu()
+				creatorDashBoard.into(this)
+				creatorDashBoard.setTopRight()
 			}
+		}
+	}
+
+	private fun createChildAddressByButtonTitle(
+		context: Context,
+		title: String,
+		password: String,
+		@WorkerThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+	) {
+		when (title) {
+			WalletSettingsText.newETHSeriesAddress ->
+				AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
+			WalletSettingsText.newETCAddress ->
+				AddressManagerPresenter.createETCAddress(context, password, hold)
+
+			WalletSettingsText.newEOSAddress ->
+				AddressManagerPresenter.createEOSAddress(context, password, hold)
+
+			WalletSettingsText.newLTCAddress -> {
+				if (SharedValue.isTestEnvironment())
+					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
+				else AddressManagerPresenter.createLTCAddress(context, password, hold)
+			}
+
+			WalletSettingsText.newBCHAddress -> {
+				if (SharedValue.isTestEnvironment())
+					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
+				else AddressManagerPresenter.createBCHAddress(context, password, hold)
+			}
+
+			WalletSettingsText.newBTCAddress -> {
+				if (SharedValue.isTestEnvironment())
+					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
+				else AddressManagerPresenter.createBTCAddress(context, password, hold)
+			}
+		}
+	}
+
+	fun updateUI(addresses: List<Bip44Address>, title: String) {
+		when (title) {
+			WalletSettingsText.newETHSeriesAddress -> ethSeriesView.model = addresses
+			WalletSettingsText.newETCAddress -> etcAddressesView.model = addresses
+			WalletSettingsText.newEOSAddress -> eosAddressesView.model = addresses
+			WalletSettingsText.newLTCAddress -> ltcAddressesView.model = addresses
+			WalletSettingsText.newBCHAddress -> bchAddressesView.model = addresses
+			WalletSettingsText.newBTCAddress -> btcAddressesView.model = addresses
 		}
 	}
 
@@ -493,16 +482,18 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				WalletSettingsText.createSubAccount,
 				WalletSettingsText.createSubAccountIntro,
 				!SharedWallet.isWatchOnlyWallet(),
-				{}
+				{ removeDashboard(context) }
 			) { passwordInput ->
-				val password = passwordInput?.text.toString()
-				context.verifyKeystorePassword(
-					password,
-					SharedAddress.getCurrentBTC(),
-					true
-				) {
-					if (it) hold(password, AccountError.None)
-					else hold(null, AccountError.WrongPassword)
+				GlobalScope.launch(Dispatchers.Default) {
+					val password = passwordInput?.text.toString()
+					context.verifyKeystorePassword(
+						password,
+						SharedAddress.getCurrentBTC(),
+						true
+					) {
+						if (it) hold(password, AccountError.None)
+						else hold(null, AccountError.WrongPassword)
+					}
 				}
 			}
 			removeDashboard(context)

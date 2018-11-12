@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
 import android.content.Context
-import com.blinnnk.extension.isNull
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSUtils
@@ -67,17 +67,9 @@ data class EOSTransactionInfo(
 		true
 	)
 
-	fun trade(context: Context?, hold: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
-		prepare(context) { privateKey, error ->
-			if (error.isNone() && !privateKey.isNull()) {
-				transfer(privateKey!!, hold)
-			} else hold(null, error)
-		}
-	}
-
-	private fun prepare(
+	fun trade(
 		context: Context?,
-		hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		BaseTradingPresenter.prepareTransaction(
 			context,
@@ -85,14 +77,17 @@ data class EOSTransactionInfo(
 			toAccount,
 			amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
 			contract,
-			false,
-			hold
-		)
+			false
+		) { privateKey, error ->
+			if (error.isNone() && privateKey != null) {
+				transfer(privateKey, hold)
+			} else hold(null, error)
+		}
 	}
 
 	private fun transfer(
 		privateKey: EOSPrivateKey,
-		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
+		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		EOSTransaction(
 			EOSAuthorization(fromAccount.accountName, EOSActor.Active),

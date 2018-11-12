@@ -36,7 +36,7 @@ data class TransactionHeaderModel(
 	constructor(data: ReceiptModel, isPending: Boolean? = null, isError: Boolean? = null) : this(
 		CryptoUtils.toCountByDecimal(data.value, data.token.decimal),
 		data.toAddress,
-		data.token.symbol,
+		data.token.symbol.symbol,
 		isPending ?: true,
 		false,
 		isError ?: false

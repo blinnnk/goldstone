@@ -77,6 +77,9 @@ data class QuotationSelectionTable(
 	)
 
 	companion object {
+		@JvmField
+		val dao =
+			GoldStoneDataBase.database.quotationSelectionDao()
 
 		@WorkerThread
 		fun insertSelection(table: QuotationSelectionTable) {
@@ -85,14 +88,6 @@ data class QuotationSelectionTable(
 			val currentID = quotationDao.getMaxOrderIDTable()?.orderID
 			val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
 			quotationDao.insert(table.apply { orderID = newOrderID })
-		}
-
-		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable) -> Unit) {
-			load {
-				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
-			} then {
-				it?.let(hold)
-			}
 		}
 
 		fun getAll(

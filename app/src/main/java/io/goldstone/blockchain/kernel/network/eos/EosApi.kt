@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.kernel.network.eos
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.AccountError
@@ -33,7 +32,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.TotalResources
-import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.EOSTokenCountInfo
+import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.model.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
 import org.jetbrains.anko.runOnUiThread
@@ -204,8 +203,7 @@ object EOSAPI {
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,
-		isMainThread: Boolean = false,
-		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
+		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
@@ -218,22 +216,19 @@ object EOSAPI {
 			false
 		) { result, error ->
 			if (result.isNullOrEmpty() || error.hasError()) {
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-					hold(null, error)
-				} else hold(null, error)
-				return@post
+				hold(null, error)
+			} else {
+				val response = JSONObject(result)
+				when {
+					result.contains("processed") -> {
+						val data = JSONObject(response.safeGet("processed"))
+						val transactionID = response.safeGet("transaction_id")
+						val receipt = JSONObject(data.safeGet("receipt"))
+						hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
+					}
+					else -> hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
+				}
 			}
-			val response = JSONObject(result)
-			if (result.contains("processed")) {
-				val data = JSONObject(response.safeGet("processed"))
-				val transactionID = response.safeGet("transaction_id")
-				val receipt = JSONObject(data.safeGet("receipt"))
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-					hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
-				} else hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
-			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
-			} else hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
 		}
 	}
 
@@ -253,7 +248,7 @@ object EOSAPI {
 		account: EOSAccount,
 		symbol: CoinSymbol,
 		tokenCodeName: String,
-		@UiThread hold: (balance: Double?, error: RequestError) -> Unit
+		@WorkerThread hold: (balance: Double?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
@@ -264,16 +259,12 @@ object EOSAPI {
 			EOSUrl.getAccountEOSBalance(),
 			false
 		) { result, error ->
-			if (result.isNullOrEmpty() || error.hasError()) {
-				GoldStoneAPI.context.runOnUiThread {
-					hold(null, error)
-				}
-				return@post
-			}
-			val balances = JSONArray(result)
-			val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
-			GoldStoneAPI.context.runOnUiThread {
+			if (!result.isNullOrEmpty() && error.isNone()) {
+				val balances = JSONArray(result)
+				val balance = if (balances.length() == 0) "" else balances.get(0).toString().substringBefore(" ")
 				hold(balance.toDoubleOrNull().orZero(), RequestError.None)
+			} else {
+				hold(null, error)
 			}
 		}
 	}
@@ -380,7 +371,7 @@ object EOSAPI {
 		chainid: ChainID,
 		account: EOSAccount,
 		codeName: String,
-		symbol: String,
+		symbol: CoinSymbol,
 		@WorkerThread hold: (info: EOSTokenCountInfo?, error: RequestError) -> Unit
 	) {
 		getEOSTokenCountInfo(chainid, account, codeName, symbol) { data, error ->
@@ -425,7 +416,7 @@ object EOSAPI {
 		chainid: ChainID,
 		account: EOSAccount,
 		codeName: String,
-		symbol: String,
+		symbol: CoinSymbol,
 		@WorkerThread hold: (info: String?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
@@ -434,7 +425,7 @@ object EOSAPI {
 				chainid.id,
 				account.accountName,
 				codeName,
-				symbol
+				symbol.symbol
 			),
 			"",
 			true,
@@ -453,7 +444,7 @@ object EOSAPI {
 		chainid: ChainID,
 		account: EOSAccount,
 		codeName: String,
-		symbol: String,
+		symbol: CoinSymbol,
 		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
@@ -465,7 +456,7 @@ object EOSAPI {
 				-1,
 				-1,
 				codeName,
-				symbol
+				symbol.symbol
 			),
 			"total_size",
 			true,

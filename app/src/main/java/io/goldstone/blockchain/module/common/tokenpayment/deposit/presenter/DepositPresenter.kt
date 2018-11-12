@@ -25,7 +25,7 @@ class DepositPresenter(
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			fragment.setInputViewDescription(token?.symbol.orEmpty())
+			fragment.setInputViewDescription(token?.symbol?.symbol.orEmpty())
 		}
 		generateQRCode()
 	}

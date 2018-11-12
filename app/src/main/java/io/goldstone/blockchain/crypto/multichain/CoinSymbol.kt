@@ -8,7 +8,7 @@ import java.io.Serializable
  * @author KaySaith
  * @date  2018/09/14
  */
-class CoinSymbol(val symbol: String?) : Serializable {
+class CoinSymbol(val symbol: String) : Serializable {
 
 	companion object {
 		const val eth = "ETH"
@@ -39,12 +39,11 @@ class CoinSymbol(val symbol: String?) : Serializable {
 			listOf(ltc, btc(), bch)
 		}
 
-		fun updateSymbolIfInReview(symbol: String, isTest: Boolean = false): String {
+		fun updateSymbolIfInReview(symbol: CoinSymbol, isTest: Boolean = false): String {
 			return if (
-				symbol.contains(CoinSymbol.pureBTCSymbol, true) &&
-				SharedWallet.getYingYongBaoInReviewStatus()
+				symbol.isBTC() && SharedWallet.getYingYongBaoInReviewStatus()
 			) "B.C." + if (isTest) " Test" else ""
-			else symbol
+			else symbol.symbol
 		}
 
 		fun updateNameIfInReview(name: String): String {
@@ -67,29 +66,12 @@ fun CoinSymbol?.isBTCSeries() = CoinSymbol.allBTCSeriesSymbol().any { it.equals(
 
 fun CoinSymbol?.getContract(): TokenContract? {
 	return when {
-		CoinSymbol(this?.symbol).isBTC() ->
-			TokenContract.BTC
-		CoinSymbol(this?.symbol).isLTC() ->
-			TokenContract.LTC
-		CoinSymbol(this?.symbol).isBCH() ->
-			TokenContract.BCH
-		CoinSymbol(this?.symbol).isETC() ->
-			TokenContract.ETC
-		CoinSymbol(this?.symbol).isETH() ->
-			TokenContract.ETH
-		CoinSymbol(this?.symbol).isEOS() ->
-			TokenContract.EOS
+		isBTC() -> TokenContract.BTC
+		isLTC() -> TokenContract.LTC
+		isBCH() -> TokenContract.BCH
+		isETC() -> TokenContract.ETC
+		isETH() -> TokenContract.ETH
+		isEOS() -> TokenContract.EOS
 		else -> null // ERC20 Token 返回 `null` OR EOS Token
-	}
-}
-
-fun CoinSymbol?.getChainSymbol(): CoinSymbol {
-	return when {
-		isETC() -> CoinSymbol.ETC
-		isBTC() -> CoinSymbol.BTC
-		isLTC() -> CoinSymbol.LTC
-		isBCH() -> CoinSymbol.BCH
-		isEOS() -> CoinSymbol.EOS
-		else -> CoinSymbol.ETH
 	}
 }

@@ -1,12 +1,10 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -15,7 +13,6 @@ import io.goldstone.blockchain.crypto.multichain.isBCH
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
-import org.jetbrains.anko.doAsync
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -74,6 +71,8 @@ data class BTCSeriesTransactionTable(
 	)
 
 	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.btcSeriesTransactionDao()
 
 		private fun isReceive(fromAddress: String, toAddress: String): Boolean {
 			val formatToAddress =
@@ -171,29 +170,16 @@ data class BTCSeriesTransactionTable(
 			return changeValue.toString()
 		}
 
-		fun getTransactionsByAddressAndChainType(
-			address: String,
-			chainType: Int,
-			@UiThread hold: (List<BTCSeriesTransactionTable>) -> Unit
-		) {
-			load {
-				GoldStoneDataBase.database.btcSeriesTransactionDao()
-					.getDataByAddressAndChainType(address, chainType)
-			} then (hold)
-		}
-
+		@WorkerThread
 		fun deleteByAddress(address: String, chainType: ChainType) {
-			doAsync {
-				// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
-				// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
-				val formattedAddress =
-					if (chainType.isBCH() && !BCHWalletUtils.isNewCashAddress(address))
-						BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
-					else address
-				GoldStoneDataBase.database.btcSeriesTransactionDao().deleteDataByAddressAndChainType(formattedAddress, chainType.id)
-			}
+			// `BCH` 的 `insight` 账单是新地址格式, 本地的测试网是公用的 `BTCTest Legacy` 格式,
+			// 删除多链钱包的时候需要额外处理一下这种情况的地址比对
+			val formattedAddress =
+				if (chainType.isBCH() && !BCHWalletUtils.isNewCashAddress(address))
+					BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
+				else address
+			dao.deleteDataByAddressAndChainType(formattedAddress, chainType.id)
 		}
-
 	}
 }
 
@@ -207,7 +193,7 @@ interface BTCSeriesTransactionDao {
 	fun updateBlockNumber(blockNumber: Int, hash: String, recordAddress: String, isPending: Boolean)
 
 	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType ORDER BY timeStamp DESC")
-	fun getDataByAddressAndChainType(address: String, chainType: Int): List<BTCSeriesTransactionTable>
+	fun getTransactions(address: String, chainType: Int): List<BTCSeriesTransactionTable>
 
 	@Query("DELETE FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType")
 	fun deleteDataByAddressAndChainType(address: String, chainType: Int)

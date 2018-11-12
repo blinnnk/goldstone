@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
-import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -25,7 +23,7 @@ data class ReceiptModel(
 ) : TransactionSealedModel(
 	true,
 	taxHash,
-	token.symbol,
+	token.symbol.symbol,
 	fromAddress,
 	toAddress,
 	CryptoUtils.toCountByDecimal(value, token.decimal),

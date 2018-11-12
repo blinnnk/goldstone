@@ -95,7 +95,6 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 		showBackButton(true) {
 			popFragmentFrom<T>(viewPagerSize)
 		}
-		showCloseButton(false) {}
 	}
 
 	fun onFragmentAttach() {

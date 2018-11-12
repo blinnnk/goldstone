@@ -23,16 +23,17 @@ import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
 /**
  * @date 01/04/2018 12:38 AM
  * @author KaySaith
  */
-@Entity(tableName = "myTokens")
+@Entity(tableName = "myTokens", primaryKeys = ["ownerName", "chainID", "symbol", "contract"])
 data class MyTokenTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	var ownerName: String, // `EOS` 的 `account name` 会复用这个值作为 `Token` 唯一标识
 	var ownerAddress: String,
 	var symbol: String,
@@ -46,7 +47,6 @@ data class MyTokenTable(
 		data: DefaultTokenTable,
 		address: String
 	) : this(
-		0,
 		address,
 		address,
 		data.symbol,
@@ -61,7 +61,6 @@ data class MyTokenTable(
 		name: String,
 		publicKey: String
 	) : this(
-		0,
 		name,
 		publicKey,
 		data.symbol,
@@ -71,19 +70,10 @@ data class MyTokenTable(
 		false
 	)
 
-	fun preventDuplicateInsert() {
-		doAsync {
-			// 防止重复添加
-			val myTokenDao = GoldStoneDataBase.database.myTokenDao()
-			val targetToken =
-				myTokenDao.getTokenByContractAndAddress(contract, symbol, ownerName, chainID)
-			if (targetToken == null) {
-				myTokenDao.insert(this@MyTokenTable)
-			}
-		}
-	}
-
 	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.myTokenDao()
+
 		fun updateOrInsertOwnerName(name: String, address: String) {
 			doAsync {
 				GoldStoneDataBase.database.myTokenDao().apply {
@@ -95,12 +85,12 @@ data class MyTokenTable(
 					if (pendingAccount.isNull() && existingAccount.isEmpty()) {
 						val defaultToken =
 							GoldStoneDataBase.database.defaultTokenDao().getToken(
-								TokenContract.EOS.contract!!,
-								CoinSymbol.EOS.symbol!!,
+								TokenContract.EOS.contract,
+								CoinSymbol.EOS.symbol,
 								SharedChain.getEOSCurrent().chainID.id
 							)
 						defaultToken?.let {
-							MyTokenTable(it, name, address).preventDuplicateInsert()
+							dao.insert(MyTokenTable(it, name, address))
 						}
 					} else if (!pendingAccount.isNull()) {
 						updatePendingAccountName(name, address, chainID)
@@ -135,15 +125,14 @@ data class MyTokenTable(
 
 		fun getTokenBalance(
 			contract: TokenContract,
-			ownerName: String,
 			@UiThread callback: (Double?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.myTokenDao()
 					.getTokenByContractAndAddress(
-						contract.contract.orEmpty(),
+						contract.contract,
 						contract.symbol,
-						ownerName,
+						contract.getAddress(true),
 						contract.getCurrentChainID().id
 					)
 			} then { token ->
@@ -156,24 +145,16 @@ data class MyTokenTable(
 			val currentAddress = contract.getAddress(false)
 			val accountName =
 				if (contract.isEOSSeries()) contract.getAddress() isEmptyThen currentAddress else currentAddress
-			val myTokenDao = GoldStoneDataBase.database.myTokenDao()
-			val targetToken = myTokenDao.getTokenByContractAndAddress(
-				contract.contract.orEmpty(),
-				contract.symbol,
-				accountName,
-				chainID
-			)
 			// 安全判断, 如果钱包里已经有这个 `Symbol` 则不添加
-			if (targetToken.isNull()) myTokenDao.insert(MyTokenTable(
-				0,
+			dao.insert(MyTokenTable(
 				accountName,
 				currentAddress,
 				contract.symbol,
 				0.0,
-				contract.contract.orEmpty(),
+				contract.contract,
 				chainID,
 				false
-			)) else myTokenDao.update(targetToken!!.apply { isClosed = false })
+			))
 		}
 
 		fun getBalanceByContract(
@@ -183,32 +164,32 @@ data class MyTokenTable(
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
-				contract.isETH() || contract.isETC() ->
-					ETHJsonRPC.getEthBalance(
-						ownerName,
-						contract.getChainURL()
-					) { amount, error ->
-						if (amount != null && error.isNone()) {
-							val balance = amount.toEthCount()
-							hold(balance, RequestError.None)
-						} else hold(null, error)
-					}
+				contract.isETH() || contract.isETC() -> ETHJsonRPC.getEthBalance(
+					ownerName,
+					contract.getChainURL()
+				) { amount, error ->
+					if (amount != null && error.isNone()) {
+						val balance = amount.toEthCount()
+						hold(balance, RequestError.None)
+					} else hold(null, error)
+				}
 
-				contract.isBTCSeries() ->
-					InsightApi.getBalance(
-						contract.getChainType(),
-						!contract.isBCH(), // 目前 BCH 的自有加密节点暂时不能使用, 这里用的第三方非加密
-						ownerName
-					) { balance, error ->
-						hold(balance?.toBTC(), error)
-					}
+				contract.isBTCSeries() -> InsightApi.getBalance(
+					contract.getChainType(),
+					!contract.isBCH(), // 目前 BCH 的自有加密节点暂时不能使用, 这里用的第三方非加密
+					ownerName
+				) { balance, error ->
+					hold(balance?.toBTC(), error)
+				}
 
 				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 				// 网络请求在这额外校验一次.
 				contract.isEOS() -> {
 					if (SharedAddress.getCurrentEOSAccount().isValid(false)) {
 						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), hold)
-					} else hold(null, RequestError.None)
+					} else GlobalScope.launch(Dispatchers.Default) {
+						hold(null, RequestError.None)
+					}
 				}
 
 				contract.isEOSToken() -> {
@@ -216,10 +197,12 @@ data class MyTokenTable(
 						EOSAPI.getAccountBalanceBySymbol(
 							SharedAddress.getCurrentEOSAccount(),
 							CoinSymbol(contract.symbol),
-							contract.contract.orEmpty(),
+							contract.contract,
 							hold
 						)
-					else hold(null, RequestError.None)
+					else GlobalScope.launch(Dispatchers.Default) {
+						hold(null, RequestError.None)
+					}
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
@@ -237,11 +220,6 @@ data class MyTokenTable(
 			}
 		}
 
-		fun updateBalanceByContract(balance: Double, address: String, contract: TokenContract) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().updateBalanceByContract(balance, contract.contract!!, contract.symbol, address)
-			}
-		}
 	}
 }
 
@@ -285,8 +263,11 @@ interface MyTokenDao {
 	@Query("UPDATE myTokens SET isClosed = :isClose  WHERE ownerName LIKE :address AND contract LIKE :contract AND symbol = :symbol AND chainID = :chainID")
 	fun updateCloseStatus(contract: String, symbol: String, address: String, chainID: String, isClose: Boolean)
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(token: MyTokenTable)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	fun insertAll(tokens: List<MyTokenTable>)
 
 	@Update
 	fun update(token: MyTokenTable)

@@ -4,6 +4,7 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toList
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
@@ -46,6 +47,9 @@ class ChainNodeTable(
 		JSONArray(data.safeGet("key_list")).toList(),
 		data.safeGet("is_default").toInt()
 	)
+	companion object {
+	  @JvmField val dao = GoldStoneDataBase.database.chainNodeDao()
+	}
 }
 
 @Dao

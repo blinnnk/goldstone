@@ -38,14 +38,14 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 				account,
 				if (startIndex < 0) 0 else startIndex,
 				currentMaxCount!!,
-				token.symbol.orEmpty(),
+				token.symbol.symbol,
 				codeName
 			) { localData ->
 				val transactionDao =
 					GoldStoneDataBase.database.eosTransactionDao()
 				if (detailView.asyncData?.isEmpty() == true) localData.map {
 					TransactionListModel(it)
-				}.prepareTokenHistoryBalance(token.contract, account.accountName) {
+				}.prepareTokenHistoryBalance(token.contract) {
 					it.updateChartAndHeaderData()
 				}
 				fun loadTargetRangeData(endID: Long, pageSize: Int) {
@@ -80,7 +80,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 							else transactionDao.getDataByDataIndex(
 								account.accountName,
 								currentMaxCount!! + 1,
-								token.symbol,
+								token.symbol.symbol,
 								codeName
 							)?.serverID ?: 0L,
 							DataValue.transactionPageCount
@@ -98,7 +98,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 							else transactionDao.getDataByDataIndex(
 								account.accountName,
 								currentMaxCount!! + 1,
-								token.symbol.orEmpty(),
+								token.symbol.symbol,
 								codeName
 							)?.serverID ?: 0L,
 							pageSize

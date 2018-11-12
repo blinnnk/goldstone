@@ -11,11 +11,11 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -28,7 +28,6 @@ import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.support.v4.runOnUiThread
 
 /**
  * @date 2018/5/16 3:53 PM
@@ -77,11 +76,8 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 							showLoadingStatus()
 							presenter.confirmTransfer { error ->
 								resetMinerType()
-								runOnUiThread {
-									if (error.hasError()) {
-										if (error is AccountError) setCanUseStyle(false)
-										safeShowError(error)
-									}
+								launchUI {
+									if (error.hasError()) safeShowError(error)
 									showLoadingStatus(false, Spectrum.white, CommonText.next)
 								}
 							}

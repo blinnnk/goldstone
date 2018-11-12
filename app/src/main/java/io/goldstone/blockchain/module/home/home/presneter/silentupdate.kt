@@ -103,7 +103,6 @@ abstract class SilentUpdater {
 		EOSAPI.getEOSTokenList(chainID, account) { tokenList, error ->
 			// 拉取潜在资产的 `Icon Url`
 			if (tokenList != null && error.isNone()) GoldStoneAPI.getIconURL(tokenList) { tokenIcons, getIconError ->
-				val myTokenDao = GoldStoneDataBase.database.myTokenDao()
 				if (tokenIcons != null && getIconError.isNone()) tokenList.forEach { contract ->
 					//  这个接口只服务主网下的 `Token` 插入 `DefaultToken`
 					DefaultTokenTable(
@@ -112,22 +111,21 @@ abstract class SilentUpdater {
 						chainID
 					).preventDuplicateInsert()
 
-					val targetToken = myTokenDao.getTokenByContractAndAddress(
-						contract.contract.orEmpty(),
+					val targetToken = MyTokenTable.dao.getTokenByContractAndAddress(
+						contract.contract,
 						contract.symbol,
 						account.accountName,
 						chainID.id
 					)
 					// 有可能用户本地已经插入并且被用户手动关闭了, 所以只有本地不存在的时候才插入
 					// 插入 `MyTokenTable`
-					if (targetToken.isNull()) myTokenDao.insert(
+					if (targetToken.isNull()) MyTokenTable.dao.insert(
 						MyTokenTable(
-							0,
 							account.accountName,
 							SharedAddress.getCurrentEOS(),
 							contract.symbol,
 							0.0,
-							contract.contract.orEmpty(),
+							contract.contract,
 							chainID.id,
 							false
 						)

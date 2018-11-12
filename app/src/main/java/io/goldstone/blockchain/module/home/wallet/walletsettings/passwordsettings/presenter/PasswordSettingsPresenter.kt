@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.crypto.ethereum.Address
@@ -23,6 +24,9 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 
@@ -41,7 +45,7 @@ class PasswordSettingsPresenter(
 		repeatPassword: String,
 		passwordHint: String,
 		callback: (GoldStoneError) -> Unit
-	) = doAsync {
+	) = GlobalScope.launch(Dispatchers.Default) {
 		if (oldPassword.isEmpty()) callback(AccountError.EmptyRepeatPassword)
 		else CreateWalletPresenter.checkInputValue(
 			"",
@@ -50,8 +54,7 @@ class PasswordSettingsPresenter(
 			true
 		) { password, _, error ->
 			if (error.hasError()) callback(error)
-			val wallet =
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)!!
+			val wallet = WalletTable.dao.findWhichIsUsing(true)!!
 			fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
 				if (isCorrect) updatePassword(
 					oldPassword,
@@ -157,7 +160,7 @@ class PasswordSettingsPresenter(
 	}
 
 	@UiThread
-	private fun autoBack() {
+	private fun autoBack() = launchUI {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			// `VIVO` 手机显示 `toast` 会出错
 			if (!getDeviceBrand().contains(DeviceName.vivo, true)) activity?.toast(CommonText.succeed)

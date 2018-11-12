@@ -65,7 +65,7 @@ class TokenAssetPresenter(
 			SharedChain.getEOSCurrent().chainID,
 			account,
 			EOSCodeName.EOSIOToken.value,
-			CoinSymbol.eos
+			CoinSymbol.EOS
 		) { latestCount, error ->
 			if (latestCount != null && error.isNone()) launchUI {
 				assetView.setTransactionCount(latestCount)

@@ -1,21 +1,14 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.model
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 
 /**
  * @date 08/04/2018 5:10 PM
  * @author KaySaith
  */
-@Entity(tableName = "tokenBalance")
+@Entity(tableName = "tokenBalance", primaryKeys = ["date", "contract", "address"])
 data class TokenBalanceTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	var contract: String,
 	var date: Long,
 	var insertTime: Long,
@@ -24,7 +17,6 @@ data class TokenBalanceTable(
 ) {
 
 	constructor(symbol: String, time: Long) : this(
-		0,
 		symbol,
 		time,
 		0L,
@@ -33,36 +25,8 @@ data class TokenBalanceTable(
 	)
 
 	companion object {
-
-		fun getBalanceByContract(contract: String, address: String, hold: (List<TokenBalanceTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.tokenBalanceDao().getTokenBalanceByContractAndAddress(address, contract)
-			} then {
-				hold(it)
-			}
-		}
-
-		fun insertOrUpdate(
-			contract: String,
-			address: String,
-			date: Long,
-			balance: Double
-		) {
-			val addTime = System.currentTimeMillis()
-			GoldStoneDataBase.database.tokenBalanceDao().apply {
-				getBalanceByDate(date, address, contract).let {
-					it.isNull() isTrue {
-						insert(TokenBalanceTable(0, contract, date, addTime, balance, address))
-					} otherwise {
-						it?.apply {
-							this.balance = balance
-							insertTime = addTime
-							update(it)
-						}
-					}
-				}
-			}
-		}
+		@JvmField
+		val dao = GoldStoneDataBase.database.tokenBalanceDao()
 	}
 }
 
@@ -81,8 +45,11 @@ interface TokenBalanceDao {
 	@Query("SELECT * FROM tokenBalance WHERE date LIKE :date AND address LIKE :address AND contract LIKE :contract")
 	fun getBalanceByDate(date: Long, address: String, contract: String): TokenBalanceTable?
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(token: TokenBalanceTable)
+
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	fun insertAll(tokens: List<TokenBalanceTable>)
 
 	@Update
 	fun update(token: TokenBalanceTable)

@@ -32,7 +32,8 @@ import org.jetbrains.anko.*
  */
 class DepositFragment : BaseFragment<DepositPresenter>() {
 
-	override val pageTitle: String get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+	override val pageTitle: String
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = DepositPresenter(this)

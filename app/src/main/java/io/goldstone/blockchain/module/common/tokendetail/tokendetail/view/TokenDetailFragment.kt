@@ -30,7 +30,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	}
 	override var currentMenu = CommonText.all
 
-	override val pageTitle: String get() = token?.symbol.orEmpty()
+	override val pageTitle: String get() = token?.symbol?.symbol.orEmpty()
 	override lateinit var presenter: TokenDetailContract.GSPresenter
 
 	private val footer by lazy { TokenDetailFooter(context!!) }

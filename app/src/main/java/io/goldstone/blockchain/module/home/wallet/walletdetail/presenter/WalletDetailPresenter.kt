@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -128,7 +129,12 @@ class WalletDetailPresenter(
 					MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
 						// 更新数据的余额信息
 						if (balance != null && error.isNone()) {
-							MyTokenTable.updateBalanceByContract(balance, ownerName, get(index).contract)
+							MyTokenTable.dao.updateBalanceByContract(
+								balance,
+								get(index).contract.contract,
+								get(index).contract.symbol,
+								ownerName
+							)
 							get(index).count = balance
 						} else balanceError = error
 						completeMark()

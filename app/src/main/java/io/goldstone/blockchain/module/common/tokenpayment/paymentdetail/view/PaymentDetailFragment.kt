@@ -23,8 +23,10 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -82,7 +84,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 
 				showAccountInfo()
 				// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
-				if (CoinSymbol(rootFragment?.token?.symbol).isBTCSeries())
+				if (rootFragment?.token?.symbol.isBTCSeries())
 					showCustomChangeAddressCell()
 				else showMemoCell()
 
@@ -94,8 +96,10 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 				}.click { button ->
 					button.showLoadingStatus()
 					presenter.goToGasEditorFragmentOrTransfer {
-						if (!it.isNone()) context.alert(it.message)
-						button.showLoadingStatus(false)
+						if (it.hasError()) safeShowError(it)
+						launchUI {
+							button.showLoadingStatus(false)
+						}
 					}
 				}.into(this)
 				// 扫描二维码进入后的样式判断
@@ -115,7 +119,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 					id = ElementID.customHeader
 					isCenter = true
 					layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
-					this.title.text = token?.symbol.orEmpty()
+					this.title.text = token?.symbol?.symbol.orEmpty()
 					this.subtitle.text = "${token?.count}" suffix token?.contract.getSymbol().symbol.orEmpty()
 					setBoldTitles()
 				}
@@ -168,16 +172,29 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		if (memoInputView.isNull()) {
-			getParentFragment<TokenDetailOverlayFragment>()?.apply {
+		backEvent()
+	}
+
+	fun backEvent() {
+		if (rootFragment?.token?.contract.isBTCSeries()) {
+			val overlay =
+				getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay)
+			if (overlay != null) getParentContainer()?.removeView(overlay)
+			else getParentFragment<TokenDetailOverlayFragment>()?.apply {
 				presenter.popFragmentFrom<PaymentDetailFragment>()
 			}
-		} else removeMemoInputView()
+		} else {
+			if (memoInputView.isNull()) {
+				getParentFragment<TokenDetailOverlayFragment>()?.apply {
+					presenter.popFragmentFrom<PaymentDetailFragment>()
+				}
+			} else removeMemoInputView()
+		}
 	}
 
 	private fun setSymbolAndPrice() {
 		val token = rootFragment?.token
-		this.inputView.setHeaderSymbol(token?.symbol.orEmpty())
+		this.inputView.setHeaderSymbol(token?.symbol?.symbol.orEmpty())
 		this.price.setSubtitle(token?.price?.formatCurrency().orEmpty() suffix SharedWallet.getCurrencyCode())
 	}
 

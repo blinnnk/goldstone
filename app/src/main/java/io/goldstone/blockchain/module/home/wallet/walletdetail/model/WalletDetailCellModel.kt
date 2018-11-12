@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.model
 
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
+import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.isEOSSeries
@@ -16,7 +17,7 @@ import java.math.BigInteger
  */
 data class WalletDetailCellModel(
 	var iconUrl: String = "",
-	var symbol: String = "",
+	var symbol: CoinSymbol,
 	var tokenName: String = "",
 	var decimal: Int = 0,
 	var count: Double = 0.0,
@@ -33,7 +34,7 @@ data class WalletDetailCellModel(
 		eosWalletType: EOSWalletType
 	) : this(
 		data.iconUrl,
-		data.symbol,
+		CoinSymbol(data.symbol),
 		data.tokenName,
 		data.decimal,
 		data.count,
@@ -51,7 +52,7 @@ data class WalletDetailCellModel(
 		eosWalletType: EOSWalletType
 	) : this(
 		data.iconUrl,
-		data.symbol,
+		CoinSymbol(data.symbol),
 		data.name,
 		data.decimals,
 		CryptoUtils.toCountByDecimal(amount, data.decimals),
@@ -69,7 +70,7 @@ data class WalletDetailCellModel(
 		eosWalletType: EOSWalletType
 	) : this(
 		data.iconUrl,
-		data.symbol,
+		CoinSymbol(data.symbol),
 		data.name,
 		data.decimals,
 		balance,

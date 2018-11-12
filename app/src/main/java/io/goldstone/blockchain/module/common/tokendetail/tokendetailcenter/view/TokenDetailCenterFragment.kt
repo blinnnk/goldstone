@@ -29,7 +29,7 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
 class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
 	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
-	override val pageTitle: String get() = token?.symbol.orEmpty()
+	override val pageTitle: String get() = token?.symbol?.symbol.orEmpty()
 	private val menuBar by lazy { ViewPagerMenu(context!!) }
 	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
 	private val menuTitles by lazy {
@@ -42,7 +42,7 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 	override fun onResume() {
 		super.onResume()
 		getParentFragment<TokenDetailOverlayFragment> {
-			headerTitle = token?.symbol.orEmpty()
+			headerTitle = token?.symbol?.symbol.orEmpty()
 		}
 	}
 

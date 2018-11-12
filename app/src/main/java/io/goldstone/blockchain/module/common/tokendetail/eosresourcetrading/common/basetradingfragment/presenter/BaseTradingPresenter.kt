@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.com
 
 import android.content.Context
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
@@ -31,7 +32,6 @@ import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSBuyRamTransaction
@@ -44,7 +44,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
 import java.math.BigInteger
 
@@ -219,7 +218,7 @@ open class BaseTradingPresenter(
 			tradingCount: Double,
 			contract: TokenContract,
 			isSellRam: Boolean = false,
-			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			// 检出用户的输入值是否合规
 			isValidInputValue(Pair(toAccount, tradingCount), isSellRam) { error ->
@@ -227,23 +226,22 @@ open class BaseTradingPresenter(
 					// 检查余额
 					if (isSellRam) EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
 						// 检查发起账户的 `RAM` 余额是否足够
-						GoldStoneAPI.context.runOnUiThread {
-							when {
-								!ramError.isNone() -> hold(null, ramError)
-								ramAvailable.isNull() -> hold(null, ramError)
-								ramAvailable!! < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
-								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
-								else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
-							}
+						when {
+							!ramError.isNone() -> hold(null, ramError)
+							ramAvailable.isNull() -> hold(null, ramError)
+							ramAvailable!! < BigInteger.valueOf(tradingCount.toLong()) ->
+								hold(null, TransferError.BalanceIsNotEnough)
+							tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
+							else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
 						CoinSymbol(contract.symbol),
-						contract.contract.orEmpty()
+						contract.contract
 					) { balance, balanceError ->
-						if (!balance.isNull() && balanceError.isNone()) {
+						if (balance != null && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够
-							if (balance!! < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
+							if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
 							else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
 						} else hold(null, balanceError)
 					}

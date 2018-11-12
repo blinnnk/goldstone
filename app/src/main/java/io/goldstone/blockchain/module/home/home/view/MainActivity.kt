@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 	private fun recoveryBackEventFromOtherApp() {
 		supportFragmentManager.fragments.last()?.let {
 			if (it is BaseOverlayFragment<*>) {
-				val child = it.childFragmentManager.fragments.last()
+				val child = it.childFragmentManager.fragments.lastOrNull()
 				if (child is BaseFragment<*>) {
 					child.recoveryBackEvent()
 				} else if (child is BaseRecyclerFragment<*, *>) {

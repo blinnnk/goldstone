@@ -151,12 +151,13 @@ class CreateWalletPresenter(
 			}
 		}
 
+		@WorkerThread
 		fun checkInputValue(
 			name: String,
 			password: String,
 			repeatPassword: String,
 			isAgree: Boolean,
-			@WorkerThread callback: (password: String?, walletName: String?, error: AccountError) -> Unit
+			callback: (password: String?, walletName: String?, error: AccountError) -> Unit
 		) {
 			if (password.isEmpty())
 				callback(null, null, AccountError.EmptyRepeatPassword)
@@ -202,41 +203,41 @@ class CreateWalletPresenter(
 						ChainID.kovan,
 						ChainID.rinkeby -> {
 							if (addresses.eth.isNotEmpty())
-								MyTokenTable(get(index), addresses.eth.address).preventDuplicateInsert()
+								MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.eth.address))
 						}
 
 						ChainID.etcMain, ChainID.etcTest -> {
 							if (addresses.etc.isNotEmpty())
-								MyTokenTable(get(index), addresses.etc.address).preventDuplicateInsert()
+								MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.etc.address))
 						}
 
 						ChainID.eosMain, ChainID.eosTest -> {
 							if (addresses.eos.isNotEmpty())
 								if (EOSWalletUtils.isValidAddress(addresses.eos.address)) {
-									MyTokenTable(get(index), addresses.eos.address).preventDuplicateInsert()
+									MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.eos.address))
 								} else if (EOSAccount(addresses.eos.address).isValid(false)) {
 									// 这种情况通常是观察钱包的特殊情况, 有 `AccountName` 没有公钥的导入情况
-									MyTokenTable(get(index), addresses.eos.address, addresses.eos.address).preventDuplicateInsert()
+									MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.eos.address, addresses.eos.address))
 								}
 						}
 
 						ChainID.btcMain -> {
 							if (addresses.btc.isNotEmpty())
-								MyTokenTable(get(index), addresses.btc.address).preventDuplicateInsert()
+								MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.btc.address))
 						}
 
 						ChainID.btcTest, ChainID.ltcTest, ChainID.bchTest -> {
 							if (addresses.btcSeriesTest.isNotEmpty())
-								MyTokenTable(get(index), addresses.btcSeriesTest.address).preventDuplicateInsert()
+								MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.btcSeriesTest.address))
 						}
 						ChainID.ltcMain -> {
 							if (addresses.ltc.isNotEmpty())
-								MyTokenTable(get(index), addresses.ltc.address).preventDuplicateInsert()
+								MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.ltc.address))
 						}
 
 						ChainID.bchMain -> {
 							if (addresses.bch.isNotEmpty())
-								MyTokenTable(get(index), addresses.bch.address).preventDuplicateInsert()
+								MyTokenTable.dao.insert(MyTokenTable(get(index), addresses.bch.address))
 						}
 					}
 					completeMark()

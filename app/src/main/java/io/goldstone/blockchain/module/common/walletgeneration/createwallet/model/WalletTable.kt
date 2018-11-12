@@ -262,7 +262,7 @@ data class WalletTable(
 
 	@WorkerThread
 	infix fun insert(callback: (wallet: WalletTable) -> Unit) {
-		GoldStoneDataBase.database.walletDao().apply {
+		WalletTable.dao.apply {
 			findWhichIsUsing(true)?.let { update(it.apply { isUsing = false }) }
 			insert(this@WalletTable)
 		}.findWhichIsUsing(true)?.let {
@@ -271,97 +271,79 @@ data class WalletTable(
 		}
 	}
 
-	// Update New Child Address
+	@WorkerThread
 	fun updateETHSeriesAddresses(
 		newAddress: Bip44Address,
 		callback: (ethSeriesAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			ethAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateETHAddress(ethAddresses)
-			GoldStoneAPI.context.runOnUiThread { callback(ethAddresses) }
-		}
+		ethAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateETHAddress(ethAddresses)
+		callback(ethAddresses)
 	}
 
+	@WorkerThread
 	fun updateETCAddresses(
 		newAddress: Bip44Address,
 		callback: (etcAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			etcAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateETCAddress(etcAddresses)
-			GoldStoneAPI.context.runOnUiThread {
-				callback(etcAddresses)
-			}
-		}
+		etcAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateETCAddress(etcAddresses)
+		callback(etcAddresses)
 	}
 
+	@WorkerThread
 	fun updateBTCAddresses(
 		newAddress: Bip44Address,
 		callback: (bitcoinAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			btcAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateBTCAddress(btcAddresses)
-			GoldStoneAPI.context.runOnUiThread {
-				callback(btcAddresses)
-			}
-		}
+		btcAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateBTCAddress(btcAddresses)
+		callback(btcAddresses)
 	}
 
+	@WorkerThread
 	fun updateBCHAddresses(
 		newAddress: Bip44Address,
 		callback: (bitcoinCashAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			bchAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateBCHAddress(bchAddresses)
-			GoldStoneAPI.context.runOnUiThread {
-				callback(bchAddresses)
-			}
-		}
+		bchAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateBCHAddress(bchAddresses)
+		callback(bchAddresses)
 	}
 
+	@WorkerThread
 	fun updateBTCSeriesTestAddresses(
 		newAddress: Bip44Address,
 		callback: (bitcoinAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			btcSeriesTestAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateBTCSeriesTestAddress(btcSeriesTestAddresses)
-			GoldStoneAPI.context.runOnUiThread {
-				callback(btcSeriesTestAddresses)
-			}
-		}
+		btcSeriesTestAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateBTCSeriesTestAddress(btcSeriesTestAddresses)
+		callback(btcSeriesTestAddresses)
 	}
 
+	@WorkerThread
 	fun updateLTCAddresses(
 		newAddress: Bip44Address,
 		callback: (litecoinAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			ltcAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateLTCAddress(ltcAddresses)
-			GoldStoneAPI.context.runOnUiThread {
-				callback(ltcAddresses)
-			}
-		}
+		ltcAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateLTCAddress(ltcAddresses)
+		callback(ltcAddresses)
 	}
 
 	fun updateEOSAddresses(
 		newAddress: Bip44Address,
 		callback: (eosAddresses: List<Bip44Address>) -> Unit
 	) {
-		doAsync {
-			eosAddresses += newAddress
-			GoldStoneDataBase.database.walletDao().updateEOSAddress(eosAddresses)
-			GoldStoneAPI.context.runOnUiThread {
-				callback(eosAddresses)
-			}
-		}
+		eosAddresses += newAddress
+		GoldStoneDataBase.database.walletDao().updateEOSAddress(eosAddresses)
+		callback(eosAddresses)
 	}
 
 	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.walletDao()
+
 		@WorkerThread
 		fun getWalletAddressCount(hold: (Int) -> Unit) = WalletTable.getCurrent(Dispatchers.Default) {
 			val currentType = SharedWallet.getCurrentWalletType()
@@ -398,7 +380,7 @@ data class WalletTable(
 			load { GoldStoneDataBase.database.walletDao().getAllWallets() } then (hold)
 		}
 
-		fun getAllETHAndERCAddresses(hold: List<String>.() -> Unit) {
+		fun getAllETHSeriesAddresses(hold: List<String>.() -> Unit) {
 			load {
 				GoldStoneDataBase.database.walletDao().getAllWallets()
 			} then { it ->
@@ -464,7 +446,7 @@ data class WalletTable(
 		}
 
 		@WorkerThread
-		fun getLatestAddressIndexByChainType(
+		fun getLatestAddressIndex(
 			chainType: ChainType,
 			hold: (wallet: WalletTable, ethAddressIndex: Int) -> Unit
 		) {

@@ -32,7 +32,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 /**
@@ -244,8 +243,8 @@ private fun GasSelectionPresenter.insertPendingDataToDatabase(
 			gasUsed = raw.gasLimit.toString(),
 			confirmations = "-1",
 			isReceive = false,
-			isERC20Token = token?.symbol == CoinSymbol.eth,
-			symbol = token?.symbol.orEmpty(),
+			isERC20Token = token?.symbol.isETH(),
+			symbol = token?.symbol?.symbol.orEmpty(),
 			recordOwnerAddress = getETHERC20OrETCAddress(),
 			isPending = true,
 			memo = memoData,

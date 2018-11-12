@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -20,30 +18,15 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>) {
-	val blockNumber = localData.maxBy { it.blockNumber }?.blockNumber ?: 0
-	detailView.showLoading(true)
+@WorkerThread
+fun TokenDetailPresenter.loadETHChainData(blockNumber: Int) {
 	updateLocalETHTransactions(blockNumber) {
 		if (it.isNone()) loadLocalData()
-		launchUI {
-			detailView.showLoading(false)
-		}
 	}
 }
 
-fun checkAddressNameInContacts(
-	transactions: List<TransactionListModel>,
-	@UiThread callback: () -> Unit
-) {
-	ContactTable.getAllContacts { contacts ->
-		transactions.forEach { transaction ->
-			transaction.addressName = contacts.getContactName(transaction.addressName)
-		}
-		callback()
-	}
-}
-
-fun updateLocalETHTransactions(startBlock: Int, @WorkerThread callback: (RequestError) -> Unit) {
+@WorkerThread
+fun updateLocalETHTransactions(startBlock: Int, callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
 		EtherScanApi.transactions(SharedAddress.getCurrentEthereum(), "$startBlock"),
 		"result"
@@ -73,5 +56,18 @@ fun updateLocalETHTransactions(startBlock: Int, @WorkerThread callback: (Request
 			callback(error)
 		} else callback(error)
 	}
+}
+
+@WorkerThread
+fun checkAddressNameInContacts(
+	transactions: List<TransactionListModel>,
+	callback: () -> Unit
+) {
+	val contacts =
+		ContactTable.dao.getAllContacts()
+	transactions.forEach { transaction ->
+		transaction.addressName = contacts.getContactName(transaction.addressName)
+	}
+	callback()
 }
 

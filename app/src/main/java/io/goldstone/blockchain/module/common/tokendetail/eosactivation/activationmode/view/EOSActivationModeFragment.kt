@@ -32,7 +32,7 @@ import org.jetbrains.anko.*
 class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 
 	override val pageTitle: String
-		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
 	private val activationByFriendButton by lazy {
 		RoundButton(context!!)
 	}

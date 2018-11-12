@@ -14,7 +14,6 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListAdapter
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 
 /**
  * @date 24/03/2018 8:50 PM
@@ -130,11 +129,6 @@ class WalletListPresenter(
 	}
 
 	override fun onFragmentShowFromHidden() {
-		fragment.getParentFragment<WalletSettingsFragment> {
-			showBackButton(true) {
-				presenter.showWalletSettingListFragment()
-			}
-		}
 		fragment.getParentFragment<ProfileOverlayFragment> {
 			showAddButton(true) {
 				presenter.showWalletAddingMethodDashboard()

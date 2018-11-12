@@ -25,6 +25,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -116,7 +117,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 						assignResources[1].right.toDouble()
 					) {
 						if (it.hasError()) safeShowError(it)
-						button.showLoadingStatus(false)
+						button.showLoadingStatus(false, Spectrum.blue, CommonText.confirm)
 					}
 				}.into(this)
 			}
