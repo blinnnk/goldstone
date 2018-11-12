@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.content.Context
-import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
+import android.support.annotation.WorkerThread
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.*
@@ -17,6 +17,9 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view.PaymentDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -73,9 +76,9 @@ class PaymentDetailPresenter(
 	}
 
 	override fun onFragmentShowFromHidden() {
-		rootFragment?.apply {
+		fragment.getParentFragment<TokenDetailOverlayFragment> {
 			showBackButton(true) {
-				presenter.popFragmentFrom<PaymentDetailFragment>()
+				fragment.backEvent()
 			}
 		}
 	}
@@ -83,8 +86,8 @@ class PaymentDetailPresenter(
 	companion object {
 		fun showGetPrivateKeyDashboard(
 			context: Context?,
-			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
-		) {
+			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+		) = GlobalScope.launch(Dispatchers.Main) {
 			context?.showAlertView(
 				TransactionText.confirmTransactionTitle.toUpperCase(),
 				TransactionText.confirmTransaction,
@@ -92,16 +95,15 @@ class PaymentDetailPresenter(
 				// User click cancel button
 				{ hold(null, AccountError.None) }
 			) { passwordInput ->
-				if (passwordInput.isNull()) return@showAlertView
-				val password = passwordInput!!.text.toString()
-				if (password.isNotEmpty()) PrivateKeyExportPresenter.getPrivateKey(
+				val password = passwordInput?.text?.toString()
+				if (password?.isNotEmpty() == true) PrivateKeyExportPresenter.getPrivateKey(
 					context,
 					SharedAddress.getCurrentEOS(),
 					ChainType.EOS,
 					password
 				) { privateKey, error ->
 					if (privateKey != null && error.isNone()) hold(EOSPrivateKey(privateKey), error)
-					else hold(null, AccountError.DecryptKeyStoreError)
+					else hold(null, AccountError.WrongPassword)
 				} else hold(null, PasswordError.InputIsEmpty)
 			}
 		}

@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -106,7 +105,6 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showWatchWalletImportFragment() {
-		fragment.showAddButton(false) {}
 		showTargetFragment<WatchOnlyImportFragment>()
 	}
 

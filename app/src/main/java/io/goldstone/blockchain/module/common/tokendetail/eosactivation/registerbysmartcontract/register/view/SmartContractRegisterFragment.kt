@@ -45,7 +45,7 @@ import org.jetbrains.anko.*
 class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresenter>() {
 
 	override val pageTitle: String
-		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
 	private val accountNameInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private var isValidAccountName = false

@@ -39,7 +39,7 @@ import org.jetbrains.anko.verticalLayout
 class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDetailPresenter>() {
 
 	override val pageTitle: String
-		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
 	private val accountName by lazy { arguments?.getString(ArgumentKey.eosAccountRegister) }
 	private val smartContractLink by lazy { TwoLineTitles(context!!) }
 	private val availableResultView by lazy { KeyValueView(context!!) }

@@ -64,14 +64,15 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 					bottomMargin = 10.uiPX()
 				}
 				setTitles(ImportWalletText.walletType, currentType)
-			}.click { _ ->
-				if (getParentContainer().isNull()) return@click
-				PrivateKeyImportFragment.showWalletTypeDashboard(
-					getParentContainer()!!,
-					currentType
-				) {
-					currentType = it
-					typeSettings.setTitles(ImportWalletText.walletType, it)
+			}.click {
+				getParentContainer()?.apply {
+					PrivateKeyImportFragment.showWalletTypeDashboard(
+						this,
+						currentType
+					) { type ->
+						currentType = type
+						typeSettings.setTitles(ImportWalletText.walletType, type)
+					}
 				}
 			}.into(this)
 
@@ -87,15 +88,14 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.into(this)
 
 			confirmButton.apply {
-				marginTop = 20.uiPX()
-				setBlueStyle()
+				setBlueStyle(20.uiPX())
 				text = CommonText.startImporting.toUpperCase()
 			}.click { button ->
 				button.showLoadingStatus()
 				presenter.importWatchOnlyWallet(currentType, addressInput, nameInput) {
-					if (!it.isNone()) safeShowError(it)
-					else launchUI {
-						activity?.jump<SplashActivity>()
+					launchUI {
+						if (it.hasError()) safeShowError(it)
+						else activity?.jump<SplashActivity>()
 						button.showLoadingStatus(false)
 					}
 				}

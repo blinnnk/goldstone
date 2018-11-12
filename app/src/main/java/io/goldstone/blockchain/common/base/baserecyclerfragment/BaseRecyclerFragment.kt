@@ -35,6 +35,11 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 		presenter.onFragmentAttach()
 	}
 
+	override fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {
+		super.afterUpdateAdapterDataSet(recyclerView)
+		presenter.afterUpdateAdapterDataSet(recyclerView)
+	}
+
 	override fun onStart() {
 		super.onStart()
 		presenter.onFragmentStart()
@@ -68,7 +73,7 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		presenter.onFragmentHiddenChanged(hidden)
-		presenter.onFragmentShowFromHidden()
+		if (!isHidden) presenter.onFragmentShowFromHidden()
 	}
 
 	override fun onDestroy() {

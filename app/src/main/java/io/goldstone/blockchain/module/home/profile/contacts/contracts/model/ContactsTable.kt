@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 
 import android.arch.persistence.room.*
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -48,28 +46,14 @@ data class ContactTable(
 	)
 
 	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.contactDao()
 
 		fun insertContact(contact: ContactTable, callback: () -> Unit = {}) {
 			load {
 				GoldStoneDataBase.database.contactDao().insert(contact)
 			} then {
 				callback()
-			}
-		}
-
-		fun getAllContacts(callback: (ArrayList<ContactTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.contactDao().getAllContacts().toArrayList()
-			} then {
-				callback(it)
-			}
-		}
-
-		fun hasContacts(address: String, hasContact: (Boolean) -> Unit) {
-			load {
-				GoldStoneDataBase.database.contactDao().getContactByAddress(address)
-			} then {
-				hasContact(!it.isNull())
 			}
 		}
 

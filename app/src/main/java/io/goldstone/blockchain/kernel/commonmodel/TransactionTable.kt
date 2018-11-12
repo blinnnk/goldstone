@@ -123,7 +123,7 @@ data class TransactionTable(
 		data.confirmations,
 		data.to == SharedAddress.getCurrentEthereum(),
 		CryptoUtils.isERC20Transfer(data.input),
-		CoinSymbol.ETH.symbol!!,
+		CoinSymbol.ETH.symbol,
 		SharedAddress.getCurrentEthereum(),
 		false,
 		"",
@@ -249,15 +249,7 @@ data class TransactionTable(
 	)
 
 	companion object {
-		// `ERC` 类型的 `Transactions` 专用
-		fun getTokenTransactions(address: String, @UiThread hold: (List<TransactionListModel>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.transactionDao().getTransactionsByAddress(address, SharedChain.getCurrentETH().chainID.id)
-			} then { it ->
-				hold(it.map { TransactionListModel(it) })
-			}
-		}
-
+		@JvmField val dao = GoldStoneDataBase.database.transactionDao()
 		fun getETCTransactions(address: String, hold: (List<TransactionListModel>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.transactionDao().getETCTransactionsByAddress(address)

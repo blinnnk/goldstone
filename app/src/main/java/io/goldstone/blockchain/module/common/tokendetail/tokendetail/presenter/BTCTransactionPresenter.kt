@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
+import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
@@ -13,7 +14,6 @@ import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
  */
 
 fun TokenDetailPresenter.loadBTCSeriesData(chainType: ChainType, localMaxIndex: Int) {
-	detailView.showLoading(true)
 	val address = AddressUtils.getCurrentBTCAddress()
 	InsightApi.getTransactionCount(chainType, !chainType.isBCH(), address) { transactionCount, error ->
 		if (transactionCount != null && error.isNone()) loadTransactionsFromChain(
@@ -28,6 +28,7 @@ fun TokenDetailPresenter.loadBTCSeriesData(chainType: ChainType, localMaxIndex: 
 	}
 }
 
+@WorkerThread
 private fun loadTransactionsFromChain(
 	chainType: ChainType,
 	address: String,

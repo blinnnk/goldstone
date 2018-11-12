@@ -59,9 +59,12 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 			} else notifyDataSetChanged()
 		}
 
+		afterUpdateAdapterDataSet(recyclerView)
 		/** 如果数据返回空的显示占位图 */
 		asyncData?.let { setEmptyViewBy(it) }
 	}
+
+	open fun afterUpdateAdapterDataSet(recyclerView: BaseRecyclerView) {}
 
 	/**
 	 * `RecyclerFragment` 的默认 `LayoutManager` 是 `LinearLayoutManager`. 提供了下面这个

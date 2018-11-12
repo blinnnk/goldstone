@@ -71,18 +71,18 @@ object MultiChainUtils {
 		}
 	}
 
-	fun isValidMultiChainAddress(address: String, symbol: String): AddressType? {
+	fun isValidMultiChainAddress(address: String, symbol: CoinSymbol): AddressType? {
 		return when {
 			Address(address).isValid() -> AddressType.ETHSeries
 			BTCUtils.isValidMainnetAddress(address)
-				&& CoinSymbol(symbol).isBTC() -> AddressType.BTC
+				&& symbol.isBTC() -> AddressType.BTC
 			BTCUtils.isValidTestnetAddress(address) -> {
 				when {
-					CoinSymbol(symbol).isBCH() -> {
+					symbol.isBCH() -> {
 						if (SharedValue.isTestEnvironment()) AddressType.BCH
 						else null
 					}
-					CoinSymbol(symbol).isLTC() -> {
+					symbol.isLTC() -> {
 						if (SharedValue.isTestEnvironment()) AddressType.LTC
 						else null
 					}

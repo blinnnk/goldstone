@@ -2,18 +2,29 @@ package io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view
 
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import com.blinnnk.extension.getGrandFather
 import com.blinnnk.extension.into
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import com.blinnnk.util.getParentFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoContract
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 
 
 /**
@@ -21,9 +32,14 @@ import org.jetbrains.anko.*
  * @date  2018/09/11
  */
 
-class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
+class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 
 	override val pageTitle: String = "Token Info"
+
+	private val token by lazy {
+		getParentFragment<TokenDetailCenterFragment>()?.token
+	}
+
 	private val tokenInfoView by lazy {
 		TokenInfoView(context!!)
 	}
@@ -68,69 +84,65 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 		}
 	}
 
-	override val presenter = TokenInfoPresenter(this)
-	override fun AnkoContext<Fragment>.initView() {
-		scrollView {
-			lparams(matchParent, matchParent)
-			verticalLayout {
-				lparams(matchParent, wrapContent)
-				gravity = Gravity.CENTER_HORIZONTAL
-				tokenInfoView.into(this)
-				SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
-				balanceCell.into(this)
-				SessionTitleView(context).setTitle(TokenDetailText.accountInformation).into(this)
-				addressCell.into(this)
-				// 只有 bitcoin series coin type 的会额外显示 `hash160` 格式的地址
-				if (presenter.isBTCSeriesCoin()) hash160Cell.into(this)
-				SessionTitleView(context).setTitle(TokenDetailText.transaction).into(this)
-				transactionCountCell.into(this)
-				totalReceiveCell.into(this)
-				totalSentCell.into(this)
-			}
-		}
-	}
+	override lateinit var presenter: TokenInfoContract.GSPresenter
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		if (NetworkUtil.hasNetwork(context)) presenter.showTransactionInfo()
-		showBalance()
-		showAddress()
+		token?.let {
+			presenter = TokenInfoPresenter(it, this)
+			presenter.start()
+		}
 	}
 
-	fun <T> showTransactionCount(count: T) {
-		transactionCountCell.setSubtitle("$count")
-	}
-
-	fun setTokenInfo(
-		qrCode: Bitmap?,
-		title: String,
-		subtitle: String,
-		icon: Int,
-		action: () -> Unit
-	) {
-		tokenInfoView.setData(qrCode, title, subtitle, icon, action)
-	}
-
-	fun updateLatestActivationDate(date: String) {
-		tokenInfoView.updateLatestActivationDate(date)
-	}
-
-
-	fun showTotalValue(received: String, sent: String) {
+	override fun showError(error: Throwable) = safeShowError(error)
+	override fun showTransactionCount(count: Int) = transactionCountCell.setSubtitle("$count")
+	override fun showActivationDate(date: String) = tokenInfoView.updateLatestActivationDate(date)
+	override fun showTotalValue(received: String, sent: String) {
 		totalReceiveCell.setSubtitle(received)
 		totalSentCell.setSubtitle(sent)
 	}
 
-	private fun showAddress() {
-		presenter.getAddress { address, hash160 ->
-			addressCell.setSubtitle(address)
-			hash160?.let { hash160Cell.setSubtitle(it) }
+	override fun showAddress(address: String, hash160: String) {
+		addressCell.setSubtitle(address)
+		hash160Cell.setSubtitle(hash160)
+	}
+
+	override fun showBalance(balance: String) = balanceCell.setSubtitle(balance)
+	override fun setTokenInfo(
+		qrCode: Bitmap?,
+		title: String,
+		subtitle: String,
+		icon: Int,
+		url: String
+	) {
+		tokenInfoView.setData(qrCode, title, subtitle, icon) {
+			TokenInfoPresenter.showThirdPartyAddressDetail(
+				getGrandFather<TokenDetailOverlayFragment>(),
+				url
+			)
 		}
 	}
 
-	private fun showBalance() {
-		presenter.getBalance {
-			balanceCell.setSubtitle(it)
-		}
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		return UI {
+			scrollView {
+				lparams(matchParent, matchParent)
+				verticalLayout {
+					lparams(matchParent, wrapContent)
+					gravity = Gravity.CENTER_HORIZONTAL
+					tokenInfoView.into(this)
+					SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
+					balanceCell.into(this)
+					SessionTitleView(context).setTitle(TokenDetailText.accountInformation).into(this)
+					addressCell.into(this)
+					// 只有 bitcoin series coin type 的会额外显示 `hash160` 格式的地址
+					if (token?.contract.isBTCSeries()) hash160Cell.into(this)
+					SessionTitleView(context).setTitle(TokenDetailText.transaction).into(this)
+					transactionCountCell.into(this)
+					totalReceiveCell.into(this)
+					totalSentCell.into(this)
+				}
+			}
+		}.view
 	}
 }

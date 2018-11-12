@@ -199,7 +199,7 @@ data class TransactionListModel(
 			}
 		}
 
-		fun generateTransactionURL(taxHash: String, symbol: String?, isEOSSeries: Boolean): String {
+		fun generateTransactionURL(taxHash: String, symbol: String, isEOSSeries: Boolean): String {
 			return when {
 				CoinSymbol(symbol).isETC() ->
 					EtherScanApi.gasTrackerHeader(taxHash)

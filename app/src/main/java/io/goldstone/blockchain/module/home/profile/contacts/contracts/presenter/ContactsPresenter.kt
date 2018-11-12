@@ -1,8 +1,12 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter
 
 import android.os.Bundle
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
@@ -11,6 +15,9 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getC
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 26/03/2018 1:36 PM
@@ -44,15 +51,17 @@ class ContactPresenter(
 		}
 	}
 
-	private fun updateAddressList() {
-		ContactTable.getAllContacts {
-			val formattedContacts =
-				it.getCurrentAddresses(ChainType(fragment.chainType.orZero()).getContract()).toArrayList()
-			it.isEmpty() isTrue {
+	private fun updateAddressList() = GlobalScope.launch(Dispatchers.Default) {
+		val contacts =
+			ContactTable.dao.getAllContacts()
+		val formattedContacts =
+			contacts.getCurrentAddresses(ChainType(fragment.chainType.orZero()).getContract()).toArrayList()
+		launchUI {
+			if (contacts.isEmpty()) {
 				if (fragment.asyncData.isNull()) fragment.asyncData = formattedContacts
 				else diffAndUpdateSingleCellAdapterData<ContactsAdapter>(formattedContacts)
-			} otherwise {
-				if (fragment.asyncData.isNull()) fragment.asyncData = it
+			} else {
+				if (fragment.asyncData.isNull()) fragment.asyncData = contacts.toArrayList()
 				else diffAndUpdateSingleCellAdapterData<ContactsAdapter>(formattedContacts)
 			}
 		}

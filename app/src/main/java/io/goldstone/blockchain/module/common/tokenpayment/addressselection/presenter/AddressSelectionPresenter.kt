@@ -1,81 +1,69 @@
 package io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter
 
-import com.blinnnk.extension.*
-import com.blinnnk.util.addFragmentAndSetArgument
-import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QRText
-import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view.PaymentDetailFragment
+import io.goldstone.blockchain.module.common.tokenpayment.addressselection.contract.AddressSelectionContract
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
-import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactsAdapter
-import org.jetbrains.anko.noButton
-import org.jetbrains.anko.support.v4.alert
-import org.jetbrains.anko.yesButton
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * @date 28/03/2018 9:24 AM
  * @author KaySaith
  */
 class AddressSelectionPresenter(
-	override val fragment: AddressSelectionFragment
-) : BaseRecyclerPresenter<AddressSelectionFragment, ContactTable>() {
+	private val token: WalletDetailCellModel,
+	private val selectionView: AddressSelectionContract.GSView
+) : AddressSelectionContract.GSPresenter {
 
-	val token by lazy {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.token
+	override fun start() {
+		selectionView.asyncData = arrayListOf()
+		setAddressList()
 	}
 
-	override fun updateData() {
-		updateAddressList {
-			fragment.updateHeaderViewStatus()
-		}
-	}
-
-	fun showPaymentPrepareFragmentByQRCode(qrCode: QRCode) {
+	override fun showPaymentDetailByQRCode(qrCode: QRCode) {
 		if (qrCode.isValid()) {
 			if (qrCode.content.contains("transfer")) {
-				if (token?.contract.isEOSSeries()) qrCode.convertEOSQRCode().let {
-					isCorrectCoinOrChainID(it) { showPaymentPrepareFragment(it.walletAddress, it.amount) }
+				if (token.contract.isEOSSeries()) qrCode.convertEOSQRCode().let {
+					isCorrectCoinOrChainID(it) { showPaymentDetail(it.walletAddress, it.amount) }
 				} else qrCode.convertERC20QRCode().let {
-					isCorrectCoinOrChainID(it) { showPaymentPrepareFragment(it.walletAddress, it.amount) }
+					isCorrectCoinOrChainID(it) { showPaymentDetail(it.walletAddress, it.amount) }
 				}
 			} else when {
-				token?.contract.isBTCSeries() -> {
+				token.contract.isBTCSeries() -> {
 					val qrModel = qrCode.convertBitcoinQRCode()
-					if (qrModel.isNull()) fragment.context.alert(QRText.invalidContract)
-					else isCorrectCoinOrChainID(qrModel!!) {
-						showPaymentPrepareFragment(qrModel.walletAddress, qrModel.amount)
+					if (qrModel == null) selectionView.showError(Throwable(QRText.invalidContract))
+					else isCorrectCoinOrChainID(qrModel) {
+						showPaymentDetail(qrModel.walletAddress, qrModel.amount)
 					}
 				}
 
-				token?.contract.isEOSSeries() -> {
+				token.contract.isEOSSeries() -> {
 					qrCode.convertEOSQRCode().let {
 						isCorrectCoinOrChainID(it) {
-							showPaymentPrepareFragment(it.walletAddress, it.amount)
+							showPaymentDetail(it.walletAddress, it.amount)
 						}
 					}
 				}
 
-				token?.contract.isETC() || token?.contract.isETH() -> {
+				token.contract.isETC() || token.contract.isETH() -> {
 					qrCode.convertETHSeriesQRCode().let {
 						isCorrectCoinOrChainID(it) {
-							showPaymentPrepareFragment(it.walletAddress, it.amount)
+							showPaymentDetail(it.walletAddress, it.amount)
 						}
 					}
 				}
@@ -83,85 +71,70 @@ class AddressSelectionPresenter(
 		} else {
 			// 如果不是 `681` 格式的 `QRCode` 那么当作纯地址进行检测
 			val addressType =
-				MultiChainUtils.isValidMultiChainAddress(qrCode.content, token?.symbol.orEmpty())
-			if (addressType.isNull() || !addressType?.symbol.equals(token?.symbol, true))
-				fragment.context.alert(QRText.invalidQRCodeAlert)
-			else showPaymentPrepareFragment(qrCode.content, 0.0)
+				MultiChainUtils.isValidMultiChainAddress(qrCode.content, token.symbol)
+			if (addressType.isNull() || !addressType?.symbol.equals(token.symbol.symbol, true))
+				selectionView.showError(Throwable(QRText.invalidQRCodeAlert))
+			else showPaymentDetail(qrCode.content, 0.0)
 		}
 	}
 
-	fun showPaymentPrepareFragment(toAddress: String, count: Double = 0.0) {
+	override fun showPaymentDetail(toAddress: String, count: Double) {
 		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
-		fun showExistedAlertAndGo(localAddresses: List<String>) {
-			if (localAddresses.any { it.equals(toAddress, true) }) {
-				alert(
-					TokenDetailText.transferToLocalWalletAlertDescription,
-					TokenDetailText.transferToLocalWalletAlertTitle
-				) {
-					goToPaymentPrepareFragment(toAddress, count)
-				}
-			} else goToPaymentPrepareFragment(toAddress, count)
-		}
 		// 检查地址是否合规
 		val addressType =
-			MultiChainUtils.isValidMultiChainAddress(toAddress, token?.symbol.orEmpty())
+			MultiChainUtils.isValidMultiChainAddress(toAddress, token.symbol)
 		when (addressType) {
-			null -> fragment.safeShowError(Throwable(ImportWalletText.addressFormatAlert))
+			null -> selectionView.showError(Throwable(ImportWalletText.addressFormatAlert))
 			AddressType.ETHSeries -> when {
-				!token?.contract.isETHSeries() -> fragment.safeShowError(Throwable(AccountError.InvalidAddress))
-				else -> WalletTable.getAllETHAndERCAddresses {
-					showExistedAlertAndGo(this)
+				!token.contract.isETHSeries() ->
+					selectionView.showError(Throwable(AccountError.InvalidAddress))
+				else -> WalletTable.getAllETHSeriesAddresses {
+					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
 			}
 
 			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
-				!token?.contract.isEOSSeries() ->
-					fragment.safeShowError(AccountError.InvalidAccountName)
+				!token.contract.isEOSSeries() ->
+					selectionView.showError(Throwable(AccountError.InvalidAccountName))
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {
-					showExistedAlertAndGo(this)
+					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
 			}
 
 			AddressType.LTC -> when {
-				!token?.contract.isLTC() -> fragment.context.alert(
-					"This is a invalid address type for ${CoinSymbol.ltc}, Please check it again"
-				)
+				!token.contract.isLTC() ->
+					selectionView.showError(Throwable("This is a invalid address type for ${CoinSymbol.ltc}, Please check it again"))
 				else -> WalletTable.getAllLTCAddresses {
-					showExistedAlertAndGo(this)
+					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
 			}
 
 			AddressType.BCH -> when {
-				!token?.contract.isBCH() -> fragment.context.alert(
-					"This is a invalid address type for ${CoinSymbol.bch}, Please check it again"
-				)
+				!token.contract.isBCH() ->
+					selectionView.showError(Throwable("This is a invalid address type for ${CoinSymbol.bch}, Please check it again"))
 				else -> WalletTable.getAllBCHAddresses {
-					showExistedAlertAndGo(this)
+					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
 			}
 
 			AddressType.BTC -> when {
-				SharedValue.isTestEnvironment() -> fragment.context.alert(
-					"this is a mainnet address, please switch your local net setting in settings first"
-				)
-				!token?.contract.isBTC() -> fragment.context.alert(
-					"This is a invalid address type for ${CoinSymbol.btc()}, Please check it again"
-				)
+				SharedValue.isTestEnvironment() ->
+					selectionView.showError(Throwable("this is a mainnet address, please switch your local net setting in settings first"))
+				!token.contract.isBTC() ->
+					selectionView.showError(Throwable("This is a invalid address type for ${CoinSymbol.btc()}, Please check it again"))
 				else -> WalletTable.getAllBTCMainnetAddresses {
-					showExistedAlertAndGo(this)
+					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
 			}
 
 			AddressType.BTCSeriesTest -> when {
-				!SharedValue.isTestEnvironment() -> fragment.context.alert(
-					"this is a testnet address, please switch your local net setting in settings first"
-				)
-				!token?.contract.isBTCSeries() -> fragment.context.alert(
-					"This is a invalid address type for Testnet, Please check it again"
-				)
+				!SharedValue.isTestEnvironment() ->
+					selectionView.showError(Throwable("this is a testnet address, please switch your local net setting in settings first"))
+				!token.contract.isBTCSeries() ->
+					selectionView.showError(Throwable("This is a invalid address type for Testnet, Please check it again"))
 				else -> WalletTable.getAllBTCSeriesTestnetAddresses {
-					showExistedAlertAndGo(this)
+					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
 			}
 		}
@@ -169,100 +142,63 @@ class AddressSelectionPresenter(
 
 	private fun isCorrectCoinOrChainID(qrModel: QRCodeModel, callback: () -> Unit) {
 		when {
-			token?.contract.isETC() -> when {
+			token.contract.isETC() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isETC() ->
-					fragment.context.alert(QRText.invalidContract)
+					selectionView.showError(Throwable(QRText.invalidContract))
 				!qrModel.chainID.equals(SharedChain.getETCCurrent().chainID.id, true) ->
-					fragment.context.alert(CommonText.wrongChainID)
+					selectionView.showError(Throwable(CommonText.wrongChainID))
 				else -> callback()
 			}
-			token?.contract.isEOSSeries() -> when {
+			token.contract.isEOSSeries() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isEOSSeries() ->
-					fragment.context.alert(QRText.invalidContract)
+					selectionView.showError(Throwable(QRText.invalidContract))
 				!qrModel.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true) ->
-					fragment.context.alert(CommonText.wrongChainID)
+					selectionView.showError(Throwable(CommonText.wrongChainID))
 				else -> callback()
 			}
 
-			token?.contract.isBTC() -> when {
+			token.contract.isBTC() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isBTC() ->
-					fragment.context.alert(QRText.invalidContract)
+					selectionView.showError(Throwable(QRText.invalidContract))
 				!qrModel.chainID.equals(SharedChain.getBTCCurrent().chainID.id, true) ->
-					fragment.context.alert(CommonText.wrongChainID)
+					selectionView.showError(Throwable(CommonText.wrongChainID))
 				else -> callback()
 			}
 
-			token?.contract.isLTC() -> when {
+			token.contract.isLTC() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isLTC() ->
-					fragment.context.alert(QRText.invalidContract)
+					selectionView.showError(Throwable(QRText.invalidContract))
 				!qrModel.chainID.equals(SharedChain.getLTCCurrent().chainID.id, true) ->
-					fragment.context.alert(CommonText.wrongChainID)
+					selectionView.showError(Throwable(CommonText.wrongChainID))
 				else -> callback()
 			}
 
-			token?.contract.isBCH() -> when {
+			token.contract.isBCH() -> when {
 				!TokenContract(qrModel.contractAddress, "", null).isBCH() ->
-					fragment.context.alert(QRText.invalidContract)
+					selectionView.showError(Throwable(QRText.invalidContract))
 				!qrModel.chainID.equals(SharedChain.getBCHCurrent().chainID.id, true) ->
-					fragment.context.alert(CommonText.wrongChainID)
+					selectionView.showError(Throwable(CommonText.wrongChainID))
 				else -> callback()
 			}
 
 			else -> when {
-				!qrModel.contractAddress.equals(token?.contract?.contract, true) ->
-					fragment.context.alert(QRText.invalidContract)
+				!qrModel.contractAddress.equals(token.contract.contract, true) ->
+					selectionView.showError(Throwable(QRText.invalidContract))
 				!qrModel.chainID.equals(SharedChain.getCurrentETH().chainID.id, true) ->
-					fragment.context.alert(CommonText.wrongChainID)
+					selectionView.showError(Throwable(CommonText.wrongChainID))
 				else -> callback()
 			}
 		}
 	}
 
-	private fun alert(title: String, subtitle: String, callback: () -> Unit) {
-		fragment.alert(title, subtitle) {
-			yesButton { callback() }
-			noButton { }
-		}.show()
-	}
-
-	private fun goToPaymentPrepareFragment(address: String, count: Double = 0.0) {
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			hideChildFragment(fragment)
-			addFragmentAndSetArgument<PaymentDetailFragment>(ContainerID.content) {
-				putString(ArgumentKey.paymentAddress, address)
-				putDouble(ArgumentKey.paymentCount, count)
-				putSerializable(ArgumentKey.tokenModel, token)
-			}
-			showBackButton(true) {
-				presenter.popFragmentFrom<PaymentDetailFragment>()
-			}
-		}
-	}
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		/** 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件 */
-		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			if (!isFromQuickTransfer) {
-				showBackButton(true) {
-					presenter.popFragmentFrom<AddressSelectionFragment>()
-				}
-				showCloseButton(false) {}
-			}
-		}
-	}
-
-	private fun updateAddressList(callback: () -> Unit) {
-		ContactTable.getAllContacts { contacts ->
-			contacts.isEmpty() isTrue {
-				fragment.asyncData = arrayListOf()
-			} otherwise {
-				// 根据当前的 `Coin Type` 来选择展示地址的哪一项
-				if (fragment.asyncData.isNullOrEmpty() && !token?.contract.isNull())
-					fragment.asyncData = contacts.getCurrentAddresses(token?.contract!!).toArrayList()
-				else diffAndUpdateSingleCellAdapterData<ContactsAdapter>(contacts)
-			}
-			callback()
+	// 根据当前的 `Coin Type` 来选择展示地址的哪一项
+	private fun setAddressList() = GlobalScope.launch(Dispatchers.Default) {
+		val contacts = ContactTable.dao.getAllContacts()
+		withContext(Dispatchers.Main) {
+			selectionView.showAddresses(
+				contacts.getCurrentAddresses(token.contract).toArrayList()
+			)
+			selectionView.updateInputStatus()
 		}
 	}
 }

@@ -239,16 +239,11 @@ data class DefaultTokenTable(
 
 	companion object {
 
+		@JvmField val dao = GoldStoneDataBase.database.defaultTokenDao()
 		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
 			} then (hold)
-		}
-
-		fun getTokenFromAllChains(contract: String, symbol: String, hold: (DefaultTokenTable?) -> Unit) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenFromAllChains(contract, symbol)
-			} then { hold(it.firstOrNull()) }
 		}
 
 		fun getToken(contract: String, symbol: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {

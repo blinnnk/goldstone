@@ -174,8 +174,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 				override val cellContent =
 					arrayListOf(
 						AddressType.ETHSeries.value,
-						CoinSymbol.updateSymbolIfInReview(AddressType.BTC.value),
-						CoinSymbol.updateSymbolIfInReview(AddressType.BTCSeriesTest.value, true),
+						CoinSymbol.updateSymbolIfInReview(CoinSymbol.BTC),
+						CoinSymbol.updateSymbolIfInReview(CoinSymbol(AddressType.BTCSeriesTest.value), true),
 						AddressType.LTC.value,
 						AddressType.BCH.value,
 						AddressType.EOS.value,

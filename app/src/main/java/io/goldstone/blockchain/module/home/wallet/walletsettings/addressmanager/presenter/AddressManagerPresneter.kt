@@ -3,18 +3,20 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.error.AccountError
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
@@ -31,7 +33,6 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
@@ -46,7 +47,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/7/11 12:44 AM
@@ -60,7 +60,7 @@ class AddressManagerPresenter(
 		super.onFragmentShowFromHidden()
 		setBackEvent()
 		if (SharedWallet.getCurrentWalletType().isBIP44())
-			fragment.showCreatorDashboard()
+			fragment.setAddButtonEvent()
 	}
 
 	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
@@ -71,10 +71,10 @@ class AddressManagerPresenter(
 					val description =
 						if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey
 						else WalletSettingsText.unactivatedPublicKey
-					fragment.context?.runOnUiThread {
+					launchUI {
 						cell.showDescriptionTitle(description)
 					}
-				} else fragment.context?.runOnUiThread {
+				} else launchUI {
 					cell.showDescriptionTitle(WalletSettingsText.activatedPublicKey)
 				}
 			}
@@ -172,7 +172,7 @@ class AddressManagerPresenter(
 							putInt(ArgumentKey.chainType, chainType.id)
 						}
 					)
-				} else context.alert(WalletText.watchOnly)
+				} else safeShowError(Throwable(WalletText.watchOnly))
 			}
 		}
 
@@ -200,110 +200,114 @@ class AddressManagerPresenter(
 			}
 		}
 
+		@WorkerThread
 		fun createETHSeriesAddress(
 			context: Context,
 			password: String,
-			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			WalletTable.getLatestAddressIndexByChainType(ChainType.ETH) { wallet, childAddressIndex ->
+			WalletTable.getLatestAddressIndex(ChainType.ETH) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
 					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address, error ->
 						if (address.isNullOrEmpty() || error.hasError()) {
-							GoldStoneAPI.context.runOnUiThread { hold(null, error) }
-							return@getEthereumWalletByMnemonic
-						}
-						// 新创建的账号插入所有对应的链的默认 `Token`
-						// 因为数据库存储的 Nodes 可能在同一个 ChainID 下存在多条, 例如 Infura Mainnet, GoldStone Mainnet
-						// 所以这里拉取回来的数据做一次去重复处理
-						val ethNodes =
-							GoldStoneDataBase.database.chainNodeDao().getETHNodes().distinctBy { it.chainID }
-						ethNodes.forEach {
-							insertNewToMyToken(
-								TokenContract.ethContract,
-								CoinSymbol.eth,
-								address,
-								it.chainID
-							)
-						}
+							hold(null, error)
+						} else {
+							// 新创建的账号插入所有对应的链的默认 `Token`
+							// 因为数据库存储的 Nodes 可能在同一个 ChainID 下存在多条, 例如 Infura Mainnet, GoldStone Mainnet
+							// 所以这里拉取回来的数据做一次去重复处理
+							val ethNodes =
+								GoldStoneDataBase.database.chainNodeDao().getETHNodes().distinctBy { it.chainID }
+							ethNodes.forEach {
+								insertNewToMyToken(
+									TokenContract.ethContract,
+									CoinSymbol.eth,
+									address,
+									it.chainID
+								)
+							}
 
-						// 注册新增的子地址
-						XinGePushReceiver.registerSingleAddress(
-							AddressCommissionModel(
-								address,
-								ChainType.ETH.id,
-								1,
-								wallet.id
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommissionModel(
+									address,
+									ChainType.ETH.id,
+									1,
+									wallet.id
+								)
 							)
-						)
-						wallet.updateETHSeriesAddresses(Bip44Address(address, newAddressIndex, ChainType.ETH.id)) {
-							hold(it, error)
+							wallet.updateETHSeriesAddresses(
+								Bip44Address(address, newAddressIndex, ChainType.ETH.id)
+							) {
+								hold(it, error)
+							}
 						}
 					}
 				}
 			}
 		}
 
+		@WorkerThread
 		fun createETCAddress(
 			context: Context,
 			password: String,
-			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			WalletTable.getLatestAddressIndexByChainType(ChainType.ETC) { wallet, childAddressIndex ->
+			WalletTable.getLatestAddressIndex(ChainType.ETC) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
 					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address, error ->
-						if (address.isNullOrEmpty() || error.hasError()) {
-							GoldStoneAPI.context.runOnUiThread { hold(null, error) }
-							return@getEthereumWalletByMnemonic
-						}
-						// 新创建的账号插入所有对应的链的默认 `Token`
-						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-						val etcNodes =
-							GoldStoneDataBase.database.chainNodeDao().getETCNodes().distinctBy { it.chainID }
-						etcNodes.forEach {
-							insertNewToMyToken(
-								TokenContract.etcContract,
-								CoinSymbol.etc,
-								address,
-								it.chainID
+						if (address.isNullOrEmpty() || error.hasError()) hold(null, error)
+						else {
+							// 新创建的账号插入所有对应的链的默认 `Token`
+							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+							val etcNodes =
+								GoldStoneDataBase.database.chainNodeDao().getETCNodes().distinctBy { it.chainID }
+							etcNodes.forEach {
+								insertNewToMyToken(
+									TokenContract.etcContract,
+									CoinSymbol.etc,
+									address,
+									it.chainID
+								)
+							}
+							// 注册新增的子地址
+							XinGePushReceiver.registerSingleAddress(
+								AddressCommissionModel(
+									address,
+									ChainType.ETC.id,
+									1,
+									wallet.id
+								)
 							)
-						}
-						// 注册新增的子地址
-						XinGePushReceiver.registerSingleAddress(
-							AddressCommissionModel(
-								address,
-								ChainType.ETC.id,
-								1,
-								wallet.id
-							)
-						)
-						wallet.updateETCAddresses(
-							Bip44Address(address, newAddressIndex, ChainType.ETC.id)
-						) {
-							hold(it, error)
+							wallet.updateETCAddresses(
+								Bip44Address(address, newAddressIndex, ChainType.ETC.id)
+							) {
+								hold(it, error)
+							}
 						}
 					}
 				}
 			}
 		}
 
+		@WorkerThread
 		fun createEOSAddress(
 			context: Context,
 			password: String,
-			@UiThread hold: (List<Bip44Address>) -> Unit
+			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentEOS(),
 				true
 			) { isCorrect ->
-				if (!isCorrect) context.runOnUiThread { alert(CommonText.wrongPassword) }
-				else WalletTable.getLatestAddressIndexByChainType(ChainType.EOS) { wallet, childAddressIndex ->
+				if (!isCorrect) hold(null, AccountError.WrongPassword)
+				else WalletTable.getLatestAddressIndex(ChainType.EOS) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -339,7 +343,7 @@ class AddressManagerPresenter(
 							wallet.updateEOSAddresses(
 								Bip44Address(eosKeyPair.address, newAddressIndex, ChainType.EOS.id)
 							) {
-								hold(it)
+								hold(it, AccountError.None)
 							}
 						}
 					}
@@ -347,17 +351,18 @@ class AddressManagerPresenter(
 			}
 		}
 
+		@WorkerThread
 		fun createBTCAddress(
 			context: Context,
 			password: String,
-			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBTC(),
 				true
 			) { isCorrect ->
-				if (isCorrect) WalletTable.getLatestAddressIndexByChainType(ChainType.BTC) { wallet, childAddressIndex ->
+				if (isCorrect) WalletTable.getLatestAddressIndex(ChainType.BTC) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -389,30 +394,30 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateBTCAddresses(Bip44Address(address, newAddressIndex, ChainType.BTC.id)) {
+							wallet.updateBTCAddresses(
+								Bip44Address(address, newAddressIndex, ChainType.BTC.id)
+							) {
 								hold(it, AccountError.None)
 							}
 						}
 					}
-				} else context.runOnUiThread {
-					hold(null, AccountError.WrongPassword)
-				}
+				} else hold(null, AccountError.WrongPassword)
 			}
 		}
 
+		@WorkerThread
 		fun createBTCTestAddress(
 			context: Context,
 			password: String,
-			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentBTCSeriesTest(),
 				true
 			) { isCorrect ->
-				if (!isCorrect) context.runOnUiThread {
-					hold(null, AccountError.WrongPassword)
-				} else WalletTable.getLatestAddressIndexByChainType(ChainType.AllTest) { wallet, childAddressIndex ->
+				if (!isCorrect) hold(null, AccountError.WrongPassword)
+				else WalletTable.getLatestAddressIndex(ChainType.AllTest) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -476,9 +481,8 @@ class AddressManagerPresenter(
 				SharedAddress.getCurrentBCH(),
 				true
 			) { isCorrect ->
-				if (!isCorrect) context.runOnUiThread {
-					hold(null, AccountError.WrongPassword)
-				} else WalletTable.getLatestAddressIndexByChainType(ChainType.BCH) { wallet, childAddressIndex ->
+				if (!isCorrect) hold(null, AccountError.WrongPassword)
+				else WalletTable.getLatestAddressIndex(ChainType.BCH) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -506,7 +510,9 @@ class AddressManagerPresenter(
 									wallet.id
 								)
 							)
-							wallet.updateBCHAddresses(Bip44Address(bchKeyPair.address, newAddressIndex, ChainType.BCH.id)) {
+							wallet.updateBCHAddresses(
+								Bip44Address(bchKeyPair.address, newAddressIndex, ChainType.BCH.id)
+							) {
 								hold(it, AccountError.None)
 							}
 						}
@@ -515,19 +521,19 @@ class AddressManagerPresenter(
 			}
 		}
 
+		@WorkerThread
 		fun createLTCAddress(
 			context: Context,
 			password: String,
-			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
 			context.verifyKeystorePassword(
 				password,
 				SharedAddress.getCurrentLTC(),
 				true
 			) { isCorrect ->
-				if (!isCorrect) context.runOnUiThread {
-					hold(null, AccountError.WrongPassword)
-				} else WalletTable.getLatestAddressIndexByChainType(ChainType.LTC) { wallet, childAddressIndex ->
+				if (!isCorrect) hold(null, AccountError.WrongPassword)
+				else WalletTable.getLatestAddressIndex(ChainType.LTC) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
 						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
 						val newAddressIndex = childAddressIndex + 1
@@ -586,11 +592,18 @@ class AddressManagerPresenter(
 			}
 		}
 
-		private fun insertNewToMyToken(contract: String, symbol: String, address: String, chainID: String) {
-			DefaultTokenTable.getTokenFromAllChains(contract, symbol) { it ->
-				it?.let {
-					MyTokenTable(it.apply { this.chainID = chainID }, address).preventDuplicateInsert()
-				}
+		private fun insertNewToMyToken(
+			contract: String,
+			symbol: String,
+			address: String,
+			chainID: String
+		) {
+			val default =
+				DefaultTokenTable.dao.getTokenFromAllChains(contract, symbol)
+			default.firstOrNull()?.let {
+				MyTokenTable.dao.insert(
+					MyTokenTable(it.apply { this.chainID = chainID }, address)
+				)
 			}
 		}
 	}

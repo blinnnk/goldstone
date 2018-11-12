@@ -1,14 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view
 
-import android.os.Bundle
-import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -27,8 +24,16 @@ class ChainAddressesFragment
 	val coinType by lazy { arguments?.getInt(ArgumentKey.coinType)?.let { ChainType(it) } }
 	override val pageTitle: String get() = coinType?.getSymbol()?.symbol.orEmpty()
 	override val presenter = ChainAddressesPresenter(this)
+
+	var headerView: ChainAddressesHeaderView? = null
+
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<Bip44Address>?) {
-		recyclerView.adapter = ChainAddressesAdapter(asyncData.orEmptyArray()) {
+		recyclerView.adapter = ChainAddressesAdapter(
+			asyncData.orEmptyArray(),
+			{
+				headerView = this
+			}
+		) {
 			cell.copyButton.onClick {
 				cell.context.clickToCopy(model?.address.orEmpty())
 			}
@@ -38,17 +43,23 @@ class ChainAddressesFragment
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-		presenter.updateAddAddressEvent {
-			if (it.hasError()) context.alert(it.message)
-		}
+	override fun onResume() {
+		super.onResume()
+		asyncData = arrayListOf()
+		presenter.setAddAddressEvent()
+		presenter.setAddresses()
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<WalletSettingsFragment> {
 			headerTitle = WalletSettingsText.viewAddresses
 			presenter.popFragmentFrom<ChainAddressesFragment>()
+		}
+	}
+
+	fun setDefaultAddress(address: Bip44Address) {
+		headerView?.setDefaultAddress(address) {
+			presenter.showMoreDashboard(this, address, false)
 		}
 	}
 }

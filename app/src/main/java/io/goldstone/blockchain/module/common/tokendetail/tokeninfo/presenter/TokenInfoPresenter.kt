@@ -4,17 +4,14 @@ import android.os.Bundle
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.HoneyDateUtil
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
@@ -24,13 +21,12 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoFragment
+import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoContract
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
+import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -38,7 +34,6 @@ import kotlinx.coroutines.launch
 import org.bitcoinj.core.Address
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
-import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -46,160 +41,81 @@ import org.jetbrains.anko.runOnUiThread
  * @date  2018/09/11
  */
 class TokenInfoPresenter(
-	override val fragment: TokenInfoFragment
-) : BasePresenter<TokenInfoFragment>() {
+	private val token: WalletDetailCellModel,
+	private val infoView: TokenInfoContract.GSView
+) : TokenInfoContract.GSPresenter {
 
-	private val tokenInfo by lazy {
-		fragment.getParentFragment<TokenDetailCenterFragment>()?.token
+	override fun start() {
+		showTokenInfo()
+		setBalance()
+		setAddress()
+		setTransactionInfo()
 	}
 
-	private val currentAddress by lazy {
-		tokenInfo?.contract.getAddress()
-	}
-
-	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
-		val info = getDetailButtonInfo(tokenInfo?.contract)
-		val code = QRCodePresenter.generateQRCode(currentAddress)
+	private fun showTokenInfo() {
+		val info = getDetailButtonInfo(token.contract)
+		val code = QRCodePresenter.generateQRCode(token.contract.getAddress())
 		val chainName =
-			CryptoName.getChainNameByContract(tokenInfo?.contract).toUpperCase() + " " + TokenDetailText.chainType
-		fragment.setTokenInfo(code, chainName, CommonText.calculating, info.first) {
-			showThirdPartyAddressDetail(fragment.getGrandFather<TokenDetailOverlayFragment>(), info.second)
+			CryptoName.getChainNameByContract(token.contract).toUpperCase() + " " + TokenDetailText.chainType
+		infoView.setTokenInfo(code, chainName, CommonText.calculating, info.first, info.second)
+	}
+
+	private fun setBalance() {
+		MyTokenTable.getTokenBalance(token.contract) {
+			infoView.showBalance("${it.orZero()}" suffix token.symbol.symbol)
 		}
 	}
 
-	fun isBTCSeriesCoin(): Boolean {
-		return CoinSymbol(tokenInfo?.symbol).isBTCSeries()
-	}
-
-	fun getBalance(hold: (String) -> Unit) {
-		MyTokenTable.getTokenBalance(tokenInfo?.contract.orEmpty(), currentAddress) {
-			hold("${it.orZero()} ${tokenInfo?.symbol}")
-		}
-	}
-
-	fun getAddress(hold: (address: String, hash160: String?) -> Unit) {
-		val net = when (tokenInfo?.symbol) {
-			CoinSymbol.bch, CoinSymbol.btc() ->
+	private fun setAddress() {
+		val net = when {
+			token.contract.isBCH() || token.contract.isBTC() ->
 				if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()
-			CoinSymbol.ltc -> if (SharedValue.isTestEnvironment()) TestNet3Params.get() else LitecoinNetParams()
+			token.contract.isLTC() -> if (SharedValue.isTestEnvironment()) TestNet3Params.get() else LitecoinNetParams()
 			else -> null
 		}
-		val hash160 =
-			if (net.isNull()) null
-			else try {
-				Address.fromBase58(net, currentAddress).hash160.toNoPrefixHexString()
-			} catch (error: Exception) {
-				null
-			}
-		hold(currentAddress, hash160)
+		val address = token.contract.getAddress()
+		val hash160 = if (net.isNull()) ""
+		else try {
+			Address.fromBase58(net, address).hash160.toNoPrefixHexString()
+		} catch (error: Exception) {
+			""
+		}
+		infoView.showAddress(address, hash160)
 	}
 
-	fun showTransactionInfo() {
-		val chainType = tokenInfo?.contract.getChainType().id
+	private fun setTransactionInfo() {
+		val address = token.contract.getAddress(true)
+		val chainType = token.contract.getChainType().id
 		when {
-			tokenInfo?.contract.isBTCSeries() ->
-				BTCSeriesTransactionTable.getTransactionsByAddressAndChainType(currentAddress, chainType) { transactions ->
-					// 如果本地没有数据库那么从网络检查获取
-					if (transactions.isEmpty()) getBTCSeriesTransactionCount { count, error ->
-						GlobalScope.launch(Dispatchers.Main) {
-							if (count != null && error.isNone()) fragment.showTransactionCount(count)
-							else if (error.hasError()) fragment.safeShowError(error)
-							// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
-							if (count == 0) setTotalValue(0.0, 0.0)
-						}
-					} else {
-						// 去除燃气费的部分剩下的计算为交易数量
-						fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
-						// 分别查询 `接收的总值` 和 `支出的总值`
-						val totalReceiveValue =
-							transactions.asSequence().filter { it.isReceive }.sumByDouble { it.value.toDoubleOrNull().orZero() }
-						val totalSentValue =
-							transactions.asSequence().filter { !it.isReceive && !it.isFee }.sumByDouble { it.value.toDoubleOrNull().orZero() }
-						setTotalValue(totalReceiveValue, totalSentValue)
-						// 获取最近一笔交易的时间显示最后活跃时间
-						val latestDate =
-							HoneyDateUtil.getSinceTime(
-								transactions.maxBy {
-									it.timeStamp.toLongOrNull() ?: 0
-								}?.timeStamp?.toMillisecond().orElse(0L)
-							)
-						fragment.updateLatestActivationDate(latestDate)
+			token.contract.isBTCSeries() -> GlobalScope.launch(Dispatchers.Default) {
+				val transactions =
+					BTCSeriesTransactionTable.dao.getTransactions(address, chainType)
+				// 如果本地没有数据库那么从网络检查获取
+				if (transactions.isEmpty()) getBTCSeriesTransactionCount { count, error ->
+					launchUI {
+						if (count != null && error.isNone()) infoView.showTransactionCount(count)
+						else infoView.showError(error)
+						// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
+						val defaultValue = "0.0" suffix token.symbol.symbol
+						if (count == 0) infoView.showTotalValue(defaultValue, defaultValue)
 					}
-				}
-			tokenInfo?.contract.isETC() -> TransactionTable.getETCTransactions(currentAddress) { transactions ->
-				fragment.showTransactionCount(transactions.filterNot { it.isFee }.size)
-				// 分别查询 `接收的总值` 和 `支出的总值`
-				val totalReceiveValue = transactions.asSequence().filter {
-					it.isReceived
-				}.sumByDouble {
-					it.count
-				}
-				val totalSentValue = transactions.asSequence().filter {
-					!it.isReceived && !it.isFee
-				}.sumByDouble {
-					it.count
-				}
-				setTotalValue(totalReceiveValue, totalSentValue)
-				// 获取最近一笔交易的时间显示最后活跃时间
-				val latestDate =
-					HoneyDateUtil.getSinceTime(
-						transactions.maxBy {
-							it.timeStamp.toLongOrNull() ?: 0
-						}?.timeStamp?.toMillisecond().orElse(0L)
-					)
-				fragment.updateLatestActivationDate(latestDate)
-			}
-
-			tokenInfo?.contract.isEOSToken() -> {
-				EOSAPI.getEOSCountInfo(
-					SharedChain.getEOSCurrent().chainID,
-					SharedAddress.getCurrentEOSAccount(),
-					tokenInfo?.contract?.contract.orEmpty(),
-					tokenInfo?.symbol.orEmpty()
-				) { info, error ->
-					GoldStoneAPI.context.runOnUiThread {
-						if (!info.isNull() && error.isNone()) {
-							fragment.showTransactionCount(info!!.totalCount)
-							fragment.showTotalValue("${info.totalReceived}", "${info.totalSent}")
-						} else if (error.hasError()) fragment.context.alert(error.message)
-					}
-				}
-			}
-
-			else -> TransactionTable.getTokenTransactions(currentAddress) { transactions ->
-				if (transactions.isEmpty()) {
-					// 本地没有数据的话从链上获取 `Count`
-					ETHJsonRPC.getUsableNonce(
-						SharedChain.getCurrentETH(),
-						currentAddress
-					) { result, error ->
-						if (!result.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
-							val convertedCount = result!!.toInt()
-							val count = if (convertedCount > 0) convertedCount + 1 else result.toInt()
-							fragment.showTransactionCount(count)
-						}
-					}
-				} else {
-					fragment.showTransactionCount(
-						transactions.filter {
-							!it.isFee && it.symbol.equals(tokenInfo?.symbol, true)
-						}.size
-					)
+				} else launchUI {
+					// 去除燃气费的部分剩下的计算为交易数量
+					infoView.showTransactionCount(transactions.filterNot { it.isFee }.size)
 					// 分别查询 `接收的总值` 和 `支出的总值`
 					val totalReceiveValue =
 						transactions.asSequence().filter {
-							it.isReceived && it.symbol.equals(tokenInfo?.symbol, true)
+							it.isReceive
 						}.sumByDouble {
-							it.count
-						}
+							it.value.toDoubleOrNull().orZero()
+						}.toString() suffix token.symbol.symbol
 					val totalSentValue =
 						transactions.asSequence().filter {
-							!it.isReceived && !it.isFee && it.symbol.equals(tokenInfo?.symbol, true)
+							!it.isReceive && !it.isFee
 						}.sumByDouble {
-							it.count
-						}
-					setTotalValue(totalReceiveValue, totalSentValue)
+							it.value.toDoubleOrNull().orZero()
+						}.toString() suffix token.symbol.symbol
+					infoView.showTotalValue(totalReceiveValue, totalSentValue)
 					// 获取最近一笔交易的时间显示最后活跃时间
 					val latestDate =
 						HoneyDateUtil.getSinceTime(
@@ -207,31 +123,100 @@ class TokenInfoPresenter(
 								it.timeStamp.toLongOrNull() ?: 0
 							}?.timeStamp?.toMillisecond().orElse(0L)
 						)
-					fragment.updateLatestActivationDate(latestDate)
+					infoView.showActivationDate(latestDate)
+				}
+			}
+			token.contract.isETC() -> TransactionTable.getETCTransactions(address) { transactions ->
+				infoView.showTransactionCount(transactions.filterNot { it.isFee }.size)
+				// 分别查询 `接收的总值` 和 `支出的总值`
+				val totalReceiveValue = transactions.asSequence().filter {
+					it.isReceived
+				}.sumByDouble {
+					it.count
+				}.toString() suffix token.symbol.symbol
+				val totalSentValue = transactions.asSequence().filter {
+					!it.isReceived && !it.isFee
+				}.sumByDouble {
+					it.count
+				}.toString() suffix token.symbol.symbol
+				infoView.showTotalValue(totalReceiveValue, totalSentValue)
+				// 获取最近一笔交易的时间显示最后活跃时间
+				val latestDate =
+					HoneyDateUtil.getSinceTime(
+						transactions.maxBy {
+							it.timeStamp.toLongOrNull() ?: 0
+						}?.timeStamp?.toMillisecond().orElse(0L)
+					)
+				infoView.showActivationDate(latestDate)
+			}
+
+			token.contract.isEOSToken() -> EOSAPI.getEOSCountInfo(
+				SharedChain.getEOSCurrent().chainID,
+				SharedAddress.getCurrentEOSAccount(),
+				token.contract.contract,
+				token.symbol
+			) { info, error ->
+				if (info != null && error.isNone()) launchUI {
+					infoView.showTransactionCount(info.totalCount)
+					infoView.showTotalValue("${info.totalReceived}", "${info.totalSent}")
+				} else infoView.showError(error)
+			}
+
+			else -> GlobalScope.launch(Dispatchers.Default) {
+				val transactions =
+					TransactionTable.dao.getTransactionsByAddress(
+						address,
+						SharedChain.getCurrentETH().chainID.id
+					)
+				if (transactions.isEmpty()) {
+					// 本地没有数据的话从链上获取 `Count`
+					ETHJsonRPC.getUsableNonce(SharedChain.getCurrentETH(), address) { result, error ->
+						if (result != null && error.isNone()) launchUI {
+							val convertedCount = result.toInt()
+							val count = if (convertedCount > 0) convertedCount + 1 else result.toInt()
+							infoView.showTransactionCount(count)
+						}
+					}
+				} else launchUI {
+					infoView.showTransactionCount(
+						transactions.filter {
+							!it.isFee && it.symbol.equals(token.symbol.symbol, true)
+						}.size
+					)
+					// 分别查询 `接收的总值` 和 `支出的总值`
+					val totalReceiveValue =
+						transactions.asSequence().filter {
+							it.isReceive && it.symbol.equals(token.symbol.symbol, true)
+						}.sumByDouble {
+							it.count
+						}.toString() suffix token.symbol.symbol
+					val totalSentValue =
+						transactions.asSequence().filter {
+							!it.isReceive && !it.isFee && it.symbol.equals(token.symbol.symbol, true)
+						}.sumByDouble {
+							it.count
+						}.toString() suffix token.symbol.symbol
+					infoView.showTotalValue(totalReceiveValue, totalSentValue)
+					// 获取最近一笔交易的时间显示最后活跃时间
+					val latestDate =
+						HoneyDateUtil.getSinceTime(
+							transactions.maxBy {
+								it.timeStamp.toLongOrNull() ?: 0
+							}?.timeStamp?.toMillisecond().orElse(0L)
+						)
+					infoView.showActivationDate(latestDate)
 				}
 			}
 		}
 	}
 
-	private fun setTotalValue(receivedValue: Double, sentValue: Double) {
-		val content: (value: Double) -> String = { "$it ${tokenInfo?.symbol}" }
-		fragment.showTotalValue(content(receivedValue), content(sentValue))
-	}
-
-	private fun getBTCSeriesTransactionCount(
-		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
-	) {
-		when {
-			tokenInfo?.contract.isBTCSeries() ->
-				InsightApi.getTransactionCount(
-					tokenInfo?.contract.getChainType(),
-					!tokenInfo?.contract.isBCH(),
-					currentAddress
-				) { count, error ->
-					hold(count, error)
-				}
-			else -> hold(0, RequestError.None)
-		}
+	private fun getBTCSeriesTransactionCount(@WorkerThread hold: (count: Int?, error: RequestError) -> Unit) {
+		InsightApi.getTransactionCount(
+			token.contract.getChainType(),
+			!token.contract.isBCH(),
+			token.contract.getAddress(),
+			hold
+		)
 	}
 
 	companion object {
