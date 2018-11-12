@@ -4,17 +4,16 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getContactName
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ETHTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/8/20 2:51 PM
@@ -23,11 +22,11 @@ import org.jetbrains.anko.runOnUiThread
 
 fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>) {
 	val blockNumber = localData.maxBy { it.blockNumber }?.blockNumber ?: 0
-	fragment.showLoadingView()
+	detailView.showLoading(true)
 	updateLocalETHTransactions(blockNumber) {
-		if (it.isNone()) loadDataFromDatabaseOrElse()
-		GoldStoneAPI.context.runOnUiThread {
-			fragment.removeLoadingView()
+		if (it.isNone()) loadLocalData()
+		launchUI {
+			detailView.showLoading(false)
 		}
 	}
 }
@@ -44,10 +43,7 @@ fun checkAddressNameInContacts(
 	}
 }
 
-fun updateLocalETHTransactions(
-	startBlock: Int,
-	@WorkerThread callback: (RequestError) -> Unit
-) {
+fun updateLocalETHTransactions(startBlock: Int, @WorkerThread callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
 		EtherScanApi.transactions(SharedAddress.getCurrentEthereum(), "$startBlock"),
 		"result"

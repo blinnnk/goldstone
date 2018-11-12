@@ -17,8 +17,7 @@ import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -37,7 +36,7 @@ object RequisitionUtil {
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			api,
 			isEncrypt,
 			hold
@@ -52,7 +51,7 @@ object RequisitionUtil {
 		@WorkerThread noinline hold: (result: List<T>?, error: RequestError) -> Unit
 	) {
 		postRequest(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			keyName,
 			api,
 			false,
@@ -69,7 +68,7 @@ object RequisitionUtil {
 		@WorkerThread noinline holdSingle: (result: T?, error: RequestError) -> Unit
 	) {
 		postRequest<T>(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			keyName,
 			api,
 			false,
@@ -87,7 +86,7 @@ object RequisitionUtil {
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest<String>(
-			RequestBody.create(GoldStoneEthCall.contentType, condition),
+			RequestBody.create(ETHJsonRPC.contentType, condition),
 			keyName,
 			api,
 			true,
@@ -204,7 +203,7 @@ object RequisitionUtil {
 						hold(null, RequestError.NullResponse(keyName))
 						GoldStoneCode.showErrorCodeReason(data)
 					} else try {
-						val dataObject = data?.toJsonObject() ?: JSONObject("")
+						val dataObject = data.toJsonObject()
 						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 						if (justGetData) {
 							hold(listOf(jsonData as T), RequestError.None)
@@ -300,22 +299,18 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		targetGoldStoneID: String = "",
 		hold: (Request) -> Unit
-	) {
-		when {
-			isEncrypt && targetGoldStoneID.isEmpty() -> AppConfigTable.getAppConfig {
-				it?.apply { hold(generateRequest(path, goldStoneID, body)) }
-			}
-			targetGoldStoneID.isNotEmpty() ->
-				hold(generateRequest(path, SharedWallet.getGoldStoneID(), body))
-			else -> hold(
-				Request.Builder()
-					.url(path)
-					.method("POST", body)
-					.header("Content-type", "application/json")
-					.build()
-			)
-
-		}
+	) = when {
+		isEncrypt && targetGoldStoneID.isEmpty() ->
+			hold(generateRequest(path, SharedWallet.getGoldStoneID(), body))
+		targetGoldStoneID.isNotEmpty() ->
+			hold(generateRequest(path, SharedWallet.getGoldStoneID(), body))
+		else -> hold(
+			Request.Builder()
+				.url(path)
+				.method("POST", body)
+				.header("Content-type", "application/json")
+				.build()
+		)
 	}
 
 	fun getCryptoGetRequest(
@@ -323,22 +318,17 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		targetGoldStoneID: String? = null,
 		hold: (Request) -> Unit
-	) {
-		when {
-			isEncrypt && targetGoldStoneID.isNullOrBlank() -> AppConfigTable.getAppConfig {
-				it?.apply { hold(generateRequest(api, goldStoneID, null)) }
-			}
-			targetGoldStoneID?.count().orZero() > 0 -> {
-				hold(generateRequest(api, SharedWallet.getGoldStoneID(), null))
-			}
-			else -> {
-				val uncryptRequest = Request.Builder()
-					.url(api)
-					.header("Content-type", "application/json")
-					.build()
-				hold(uncryptRequest)
-			}
-		}
+	) = when {
+		isEncrypt && targetGoldStoneID.isNullOrBlank() ->
+			hold(generateRequest(api, SharedWallet.getGoldStoneID(), null))
+		targetGoldStoneID?.count().orZero() > 0 ->
+			hold(generateRequest(api, SharedWallet.getGoldStoneID(), null))
+		else -> hold(
+			Request.Builder()
+				.url(api)
+				.header("Content-type", "application/json")
+				.build()
+		)
 	}
 
 	fun callChainBy(

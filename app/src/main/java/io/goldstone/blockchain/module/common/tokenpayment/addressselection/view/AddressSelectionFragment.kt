@@ -41,30 +41,28 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	private var viewHeight = 0
 	private var keyboardHeight = 0
 	private val confirmButton by lazy { generateConfirmButton() }
+	private var headerView: AddressSelectionHeaderView? = null
 	override val presenter = AddressSelectionPresenter(this)
 
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ContactTable>?
 	) {
-		recyclerView.adapter = AddressSelectionAdapter(asyncData.orEmptyArray()) {
-			onClick {
-				presenter.showPaymentPrepareFragment(model.defaultAddress)
-				preventDuplicateClicks()
-			}
+		recyclerView.adapter = AddressSelectionAdapter(
+			asyncData.orEmptyArray(),
+			{ presenter.showPaymentPrepareFragment(it.defaultAddress) }
+		) {
+			headerView = this
+			updateHeaderViewStatus()
 		}
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(confirmButton)
 		setScanButtonStatus {
 			QRCodePresenter.scanQRCode(this)
 		}
-
 		wrapper.keyboardHeightListener {
 			if (keyboardHeight != it) {
 				viewHeight = ScreenSize.heightWithOutHeader - it
@@ -93,11 +91,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	/**
 	 * 扫描二维码后接受信息用的函数
 	 */
-	override fun onActivityResult(
-		requestCode: Int,
-		resultCode: Int,
-		data: Intent?
-	) {
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
 		super.onActivityResult(requestCode, resultCode, data)
 		// `LG` 手机在 `Scan` 回到当前 `Activity` 后键盘监听不到变化. 这里强行归位确认按钮
 		confirmButton.y = ScreenSize.heightWithOutHeader - buttonHeight * 1f
@@ -109,7 +103,7 @@ class AddressSelectionFragment : BaseRecyclerFragment<AddressSelectionPresenter,
 	}
 
 	fun updateHeaderViewStatus() {
-		recyclerView.getItemAtAdapterPosition<AddressSelectionHeaderView>(0) { it ->
+		headerView?.let {
 			it.getInputStatus { _, address ->
 				if (!address.isNullOrBlank()) {
 					confirmButton.apply {

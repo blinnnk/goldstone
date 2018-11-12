@@ -32,7 +32,7 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 		typeface = GoldStoneFont.heavy(context)
 		textColor = GrayScale.gray
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-		x += 20.uiPX()
+		leftPadding = 20.uiPX()
 		gravity = Gravity.CENTER_VERTICAL
 	}
 
@@ -71,6 +71,7 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 			addView(subtitle)
 		}
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 52.uiPX())
+		resetCardElevation(5f)
 	}
 
 	fun <T : CharSequence> setTitle(text: T) {

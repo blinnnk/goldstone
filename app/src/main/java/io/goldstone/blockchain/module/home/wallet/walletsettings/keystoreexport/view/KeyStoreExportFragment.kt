@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -20,8 +19,9 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.presenter.KeystoreExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -67,10 +67,12 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			}.click { button ->
 				button.showLoadingStatus()
 				presenter.getKeystoreJSON(passwordInput.text.toString()) { keystoreFile, error ->
-					if (!keystoreFile.isNull() && error.isNone()) {
-						privateKeyTextView.text = keystoreFile!!
-					} else context.alert(error.message)
-					button.showLoadingStatus(false)
+					launchUI {
+						if (keystoreFile != null && error.isNone()) {
+							privateKeyTextView.text = keystoreFile
+						} else safeShowError(error)
+						button.showLoadingStatus(false)
+					}
 				}
 			}.into(this)
 		}

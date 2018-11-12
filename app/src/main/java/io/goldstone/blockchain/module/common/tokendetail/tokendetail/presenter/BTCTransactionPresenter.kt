@@ -2,47 +2,50 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.isBCH
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.BTCSeriesApiUtils
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
-import org.jetbrains.anko.runOnUiThread
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 
 /**
  * @date 2018/8/14 4:59 PM
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadBTCChainData(localMaxIndex: Int) {
-	fragment.showLoadingView()
+fun TokenDetailPresenter.loadBTCSeriesData(chainType: ChainType, localMaxIndex: Int) {
+	detailView.showLoading(true)
 	val address = AddressUtils.getCurrentBTCAddress()
-	BitcoinApi.getTransactionCount(address) { transactionCount, error ->
+	InsightApi.getTransactionCount(chainType, !chainType.isBCH(), address) { transactionCount, error ->
 		if (transactionCount != null && error.isNone()) loadTransactionsFromChain(
+			chainType,
 			address,
 			localMaxIndex,
 			// TODO 第三方 `Insight` 限制一次请求数量, 暂时这样, 下个版本做分页拉取(当前版本1.4.2)
 			if (transactionCount > 50) 50 else transactionCount
 		) {
-			fragment.context?.runOnUiThread {
-				fragment.removeLoadingView()
-			}
-			loadDataFromDatabaseOrElse()
+			loadLocalData()
 		}
 	}
 }
 
 private fun loadTransactionsFromChain(
+	chainType: ChainType,
 	address: String,
 	localDataMaxIndex: Int,
 	transactionCount: Int,
 	callback: (hasData: Boolean) -> Unit
 ) {
-	val pageInfo = BTCSeriesApiUtils.getPageInfo(transactionCount, localDataMaxIndex)
+	val pageInfo = InsightApi.getPageInfo(transactionCount, localDataMaxIndex)
 	// 意味着网络没有更新的数据直接返回
 	if (pageInfo.to == 0) {
 		callback(false)
-	} else BitcoinApi.getTransactions(address, pageInfo.from, pageInfo.to) { transactions, error ->
+	} else InsightApi.getTransactions(
+		chainType,
+		!chainType.isBCH(),
+		address,
+		pageInfo.from,
+		pageInfo.to
+	) { transactions, error ->
 		// Calculate All Inputs to get transfer value
 		// 转换数据格式
 		if (transactions != null && error.isNone()) transactions.asSequence().mapIndexed { index, item ->
@@ -50,9 +53,9 @@ private fun loadTransactionsFromChain(
 				item,
 				pageInfo.maxDataIndex + index + 1,
 				address,
-				CoinSymbol.pureBTCSymbol,
+				chainType.getContract().symbol,
 				false,
-				ChainType.BTC.id
+				chainType.id
 			)
 		}.toList().let { all ->
 			val transactionDao =

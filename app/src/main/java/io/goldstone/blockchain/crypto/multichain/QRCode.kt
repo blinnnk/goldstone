@@ -105,10 +105,10 @@ class QRCode(val content: String) {
 		return if (content.contains("?")) {
 			val address = content.substringBefore("?").substringAfter(":")
 			val amount = content.substringAfter("amount=").toDoubleOrNull().orZero()
-			QRCodeModel(amount, address, contract!!, chainID!!)
+			QRCodeModel(amount, address, contract, chainID)
 		} else {
 			val address = content.substringAfter(":")
-			QRCodeModel(0.0, address, contract!!, chainID!!)
+			QRCodeModel(0.0, address, contract, chainID)
 		}
 	}
 

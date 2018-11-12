@@ -33,6 +33,7 @@ open class TransactionSealedModel(
 	open val date: String, // 如果是继承自 Notification 那么这个值会显示为 timeStamp
 	open val confirmations: Int,
 	open val memo: String,
+	open val minerFee: String,
 	// 这个字段为 `Notification` 服务的, 因为` Notification` 会接收不同的链的 `Push`
 	// 而且要在不同的环境下打开不同的链的信息, 所以需要这个值作为判断
 	open val chainID: ChainID?
@@ -53,6 +54,7 @@ open class TransactionSealedModel(
 		TimeUtils.formatDate(data.timeStamp.toMillisecond()),
 		data.confirmations.toIntOrNull() ?: -1,
 		data.memo,
+		data.minerFee,
 		null
 	)
 
@@ -72,6 +74,7 @@ open class TransactionSealedModel(
 		TimeUtils.formatDate(data.timeStamp.toMillisecond()),
 		data.confirmations,
 		"",
+		data.fee,
 		null
 	)
 }

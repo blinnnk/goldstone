@@ -5,8 +5,11 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -19,7 +22,9 @@ import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFr
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import kotlinx.coroutines.Dispatchers
 
 /**ø
  * @date 27/03/2018 3:41 PM
@@ -55,26 +60,28 @@ class TokenDetailOverlayPresenter(
 	}
 
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.isAvailableWallet(
-			fragment.context!!,
-			// Click Dialog Confirm Button Event
-			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
-		) {
-			if (isFromQuickTransfer) {
-				fragment.addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
-			} else showTargetFragment<AddressSelectionFragment>()
+		if (SharedWallet.isWatchOnlyWallet()) fragment.safeShowError(Throwable(AlertText.watchOnly))
+		else WalletTable.getCurrent(Dispatchers.Main) {
+			if (!hasBackUpMnemonic) WalletDetailFragment.showMnemonicBackUpDialog(fragment.context!!) {
+				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+			} else {
+				if (isFromQuickTransfer) {
+					fragment.addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
+				} else showTargetFragment<AddressSelectionFragment>()
+			}
 		}
 	}
 
 	fun showDepositFragment(isFromQuickTransfer: Boolean = false) {
-		WalletTable.isAvailableWallet(
-			fragment.context!!,
-			// Click Dialog Confirm Button Event
-			{ TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment) }
-		) {
-			if (isFromQuickTransfer)
-				fragment.addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
-			else showTargetFragment<DepositFragment>()
+		if (SharedWallet.isWatchOnlyWallet()) fragment.safeShowError(Throwable(AlertText.watchOnly))
+		else WalletTable.getCurrent(Dispatchers.Main) {
+			if (!hasBackUpMnemonic) WalletDetailFragment.showMnemonicBackUpDialog(fragment.context!!) {
+				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+			} else {
+				if (isFromQuickTransfer)
+					fragment.addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
+				else showTargetFragment<DepositFragment>()
+			}
 		}
 	}
 

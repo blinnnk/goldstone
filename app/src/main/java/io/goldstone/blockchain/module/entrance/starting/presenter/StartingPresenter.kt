@@ -23,6 +23,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.doAsync
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -97,7 +98,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		fun getAndUpdateExchangeTables(
 			@WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error: RequestError) -> Unit
 		) {
-			AppConfigTable.getAppConfig {
+			AppConfigTable.getAppConfig(Dispatchers.Default) {
 				GoldStoneAPI.getMarketList(
 					it?.exchangeListMD5.orEmpty()
 				) { serverExchangeTables, md5, error ->

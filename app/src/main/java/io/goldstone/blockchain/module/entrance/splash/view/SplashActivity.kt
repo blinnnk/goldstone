@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.ApkChannel
@@ -85,8 +86,8 @@ class SplashActivity : AppCompatActivity() {
 		}
 		// 从服务器获取配置状态
 		GoldStoneAPI.getConfigList { serverConfigs, error ->
-			if (!serverConfigs.isNull() && error.isNone()) {
-				val isInReview = serverConfigs!!.find {
+			if (serverConfigs != null && error.isNone()) {
+				val isInReview = serverConfigs.find {
 					it.name.equals("inReview", true)
 				}?.switch?.toIntOrNull() == 1
 				if (isInReview) {
@@ -112,9 +113,10 @@ class SplashActivity : AppCompatActivity() {
 			}
 			initLaunchLanguage(language)
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
-				supportFragmentManager.fragments.find { it is StartingFragment }.isNull {
-					// UI 切回主线程
-					runOnUiThread { addFragment<StartingFragment>(it.id) }
+				if (
+					supportFragmentManager.fragments.find { it is StartingFragment }.isNull()
+				) launchUI {
+					addFragment<StartingFragment>(it.id)
 				}
 			}
 			// 错开动画时间再执行数据请求
@@ -201,21 +203,18 @@ class SplashActivity : AppCompatActivity() {
 		doAsync {
 			val config =
 				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			config.isNull() isTrue {
+			if(config == null) {
 				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
 				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 				AppConfigTable.insertAppConfig(callback)
-			} otherwise {
-				config?.isRegisteredAddresses?.isFalse {
-					/**
-					 * 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里
-					 * 检测并重新注册
-					 */
+			} else {
+				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
+				if(config.isRegisteredAddresses) {
 					val currentWallet =
 						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
-				config?.let(callback)
+				config.let(callback)
 			}
 		}
 	}

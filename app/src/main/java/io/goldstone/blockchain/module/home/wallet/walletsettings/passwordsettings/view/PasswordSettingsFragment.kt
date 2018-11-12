@@ -13,8 +13,9 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -69,14 +70,16 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 			}.click { button ->
 				button.showLoadingStatus()
-				presenter.checkInputValueThenUpdatePassword(
+				presenter.checkOrUpdatePassword(
 					oldPassword.text.toString(),
 					newPassword.text.toString(),
 					repeatPassword.text.toString(),
 					passwordHint.text.toString()
 				) {
-					button.showLoadingStatus(false)
-					if (!it.isNone()) context.alert(it.message)
+					if (it.hasError()) safeShowError(it)
+					launchUI {
+						button.showLoadingStatus(false)
+					}
 				}
 			}.into(this)
 		}

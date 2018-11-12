@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @date 23/04/2018 2:34 PM
@@ -20,7 +21,7 @@ class PinCodeEditorPresenter(
 ) : BasePresenter<PinCodeEditorFragment>() {
 
 	fun setPinCodeDisplayStatus(status: Boolean, callback: (isShow: Boolean) -> Unit) {
-		AppConfigTable.getAppConfig { config ->
+		AppConfigTable.getAppConfig(Dispatchers.Main) { config ->
 			if (config?.pincode == null) {
 				fragment.context?.alert(PincodeText.turnOnAttention)
 				callback(false)

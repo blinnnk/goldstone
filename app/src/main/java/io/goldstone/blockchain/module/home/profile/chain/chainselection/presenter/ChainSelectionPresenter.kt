@@ -11,6 +11,7 @@ import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.Ch
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @date 2018/5/11 4:26 PM
@@ -21,7 +22,7 @@ class ChainSelectionPresenter(
 ) : BaseRecyclerPresenter<ChainSelectionFragment, ChainSelectionModel>() {
 
 	override fun updateData() {
-		AppConfigTable.getAppConfig {
+		AppConfigTable.getAppConfig(Dispatchers.Main) {
 			it?.apply {
 				fragment.asyncData = arrayListOf(
 					ChainSelectionModel(

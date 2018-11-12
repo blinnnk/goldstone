@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import java.io.Serializable
 
@@ -22,11 +21,13 @@ class ChainID(val id: String) : Serializable {
 	fun isBTCTest(): Boolean = btcTest.equals(id, true)
 	fun isBCHMain(): Boolean = bchMain.equals(id, true)
 	fun isBCHTest(): Boolean = bchTest.equals(id, true)
+	fun isBCH(): Boolean = isBCHTest() || isBCHMain()
 	fun isLTCMain(): Boolean = ltcMain.equals(id, true)
 	fun isLTCTest(): Boolean = ltcTest.equals(id, true)
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
 	fun isEOSTest(): Boolean = eosTest.equals(id, true)
 	fun isEOS(): Boolean = isEOSMain() || isEOSTest()
+
 
 	fun isEOSSeries(): Boolean {
 		return isEOS() || isEOSTest()
@@ -48,7 +49,8 @@ class ChainID(val id: String) : Serializable {
 		return isRinkeby() || isRopsten() || isKovan() || isBTCTest() || isBCHTest() || isLTCTest() || isEOSTest() || isETCTest()
 	}
 
-	fun getContract(): TokenContract? {
+	@Throws
+	fun getContract(): TokenContract {
 		return when (id) {
 			etcMain, etcTest -> TokenContract.ETC
 			btcTest, btcMain -> TokenContract.BTC
@@ -56,11 +58,25 @@ class ChainID(val id: String) : Serializable {
 			bchMain, bchTest -> TokenContract.BCH
 			eosMain, eosTest -> TokenContract.EOS
 			ethMain, ropsten, rinkeby, kovan -> TokenContract.ETH
-			else -> null
+			else -> throw Throwable("Wrong Chain Token Contract")
 		}
 	}
 
-	fun getChainURL(): ChainURL? {
+	@Throws
+	fun getChainType(): ChainType {
+		return when (id) {
+			etcMain, etcTest -> ChainType.ETC
+			btcTest, btcMain -> ChainType.BTC
+			ltcMain, ltcTest -> ChainType.LTC
+			bchMain, bchTest -> ChainType.BCH
+			eosMain, eosTest -> ChainType.EOS
+			ethMain, ropsten, rinkeby, kovan -> ChainType.ETH
+			else -> throw Throwable("Wrong Chain Type")
+		}
+	}
+
+	@Throws
+	fun getChainURL(): ChainURL {
 		return when (id) {
 			etcMain, etcTest -> SharedChain.getETCCurrent()
 			btcTest, btcMain -> SharedChain.getBTCCurrent()
@@ -68,19 +84,7 @@ class ChainID(val id: String) : Serializable {
 			bchMain, bchTest -> SharedChain.getBCHCurrent()
 			eosMain, eosTest -> SharedChain.getEOSCurrent()
 			ethMain, ropsten, rinkeby, kovan -> SharedChain.getCurrentETH()
-			else -> null
-		}
-	}
-
-	fun getThirdPartyURL(): String {
-		return when (id) {
-			btcMain -> WebUrl.btcMain
-			btcTest -> WebUrl.btcTest
-			ltcMain -> WebUrl.ltcGoldStone
-			ltcTest -> WebUrl.ltcTestGoldStone
-			bchMain -> WebUrl.bchMain
-			bchTest -> WebUrl.bchTest
-			else -> ""
+			else -> throw Throwable("Wrong Chain URL")
 		}
 	}
 

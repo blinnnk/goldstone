@@ -7,7 +7,7 @@ import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.bitcoin.value.BitcoinMethod
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import okhttp3.RequestBody
 import org.json.JSONObject
 
@@ -31,7 +31,7 @@ object BTCSeriesJsonRPC {
 			if (isSmartFee) BitcoinMethod.EstimatesmartFee.method
 			else BitcoinMethod.EstimateFee.method
 		RequestBody.create(
-			GoldStoneEthCall.contentType,
+			ETHJsonRPC.contentType,
 			ParameterUtil.prepareJsonRPC(
 				chainURL.isEncrypt,
 				method,
@@ -58,7 +58,7 @@ object BTCSeriesJsonRPC {
 		@WorkerThread hold: (hash: String?, error: RequestError) -> Unit
 	) {
 		RequestBody.create(
-			GoldStoneEthCall.contentType,
+			ETHJsonRPC.contentType,
 			ParameterUtil.prepareJsonRPC(
 				chainURL.isEncrypt,
 				BitcoinMethod.SendRawTansaction.method,
@@ -83,7 +83,7 @@ object BTCSeriesJsonRPC {
 		hold: (confirmCount: Int?, error: RequestError) -> Unit
 	) {
 		RequestBody.create(
-			GoldStoneEthCall.contentType,
+			ETHJsonRPC.contentType,
 			ParameterUtil.prepareJsonRPC(
 				chainURL.isEncrypt,
 				BitcoinMethod.GetRawTransaction.method,
@@ -108,7 +108,7 @@ object BTCSeriesJsonRPC {
 		hold: (blockCount: Int?, error: RequestError) -> Unit
 	) {
 		RequestBody.create(
-			GoldStoneEthCall.contentType,
+			ETHJsonRPC.contentType,
 			ParameterUtil.prepareJsonRPC(
 				chainURL.isEncrypt,
 				BitcoinMethod.Getblockcount.method,

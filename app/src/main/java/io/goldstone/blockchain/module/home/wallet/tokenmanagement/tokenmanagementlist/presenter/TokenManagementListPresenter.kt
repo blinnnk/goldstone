@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -21,15 +20,13 @@ import org.jetbrains.anko.doAsync
  * @date 25/03/2018 5:11 PM
  * @author KaySaith
  */
-var memoryTokenData: ArrayList<DefaultTokenTable>? = null
 
 class TokenManagementListPresenter(
 	override val fragment: TokenManagementListFragment
 ) : BaseRecyclerPresenter<TokenManagementListFragment, DefaultTokenTable>() {
 
 	override fun updateData() {
-		// 首先显示内存中的数据
-		if (fragment.asyncData.isNull()) fragment.asyncData = memoryTokenData.orEmptyArray()
+		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
 		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
 		fragment.getParentFragment<TokenManagementFragment> {
@@ -62,17 +59,15 @@ class TokenManagementListPresenter(
 					}
 
 					override fun mergeCallBack() {
-						val sortedList = defaultTokens.sortedByDescending { it.weight }.toArrayList()
-						if (memoryTokenData?.getObjectMD5HexString() != sortedList.getObjectMD5HexString()) {
-							if (isETHERCAndETCOnly) sortedList.filter {
-								TokenContract(it).isETH() ||
-									TokenContract(it).isERC20Token() ||
-									TokenContract(it).isETC()
-							}.let {
-								memoryTokenData = it.toArrayList()
-							} else memoryTokenData = sortedList
-							diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(memoryTokenData.orEmptyArray())
-						} else return
+						val sortedList =
+							defaultTokens.sortedByDescending { it.weight }.toArrayList()
+						if (isETHERCAndETCOnly) sortedList.filter {
+							TokenContract(it).isETH() ||
+								TokenContract(it).isERC20Token() ||
+								TokenContract(it).isETC()
+						}.let {
+							diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(it.toArrayList())
+						} else diffAndUpdateSingleCellAdapterData<TokenManagementListAdapter>(sortedList)
 					}
 				}.start()
 			}

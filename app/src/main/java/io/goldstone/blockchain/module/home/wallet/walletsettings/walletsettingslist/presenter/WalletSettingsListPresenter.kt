@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
@@ -28,6 +29,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -53,7 +55,7 @@ class WalletSettingsListPresenter(
 		val balanceText =
 			SharedWallet.getCurrentBalance().formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
 		fragment.asyncData = arrayListOf()
-		WalletTable.getCurrentWallet {
+		WalletTable.getCurrent(Dispatchers.Main) {
 			arrayListOf(
 				WalletSettingsListModel(WalletSettingsText.viewAddresses),
 				WalletSettingsListModel(WalletSettingsText.balance, balanceText),
@@ -95,11 +97,11 @@ class WalletSettingsListPresenter(
 			if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
 			else {
 				val password = passwordInput?.text.toString()
-				WalletTable.getCurrentWallet(false) {
+				WalletTable.getCurrent(Dispatchers.Default) {
 					val type = getWalletType()
 					verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
 						if (isCorrect) {
-							runOnUiThread { getMainActivity()?.showLoadingView() }
+							launchUI { getMainActivity()?.showLoadingView() }
 							if (type.isBIP44())
 								deleteWalletData(id, getCurrentAllBip44Address(), password)
 							else deleteRootKeyWallet(id, getCurrentBip44Addresses(), password)
@@ -143,18 +145,18 @@ class WalletSettingsListPresenter(
 	) {
 		object : ConcurrentAsyncCombine() {
 			override var asyncCount = addresses.size
+			override val completeInUIThread: Boolean = false
 			override fun doChildTask(index: Int) {
 				deleteAllLocalDataByAddress(addresses[index].address, addresses[index].getChainType())
 				completeMark()
 			}
-
 			override fun mergeCallBack() {
 				deleteWalletByWalletID(walletID, password) {
 					if (it.isNone()) WalletTable.deleteCurrentWallet { wallet ->
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 						XinGePushReceiver.registerAddressesForPush(wallet, true)
-						getMainActivity()?.jump<SplashActivity>()
-					} else alert(it.message)
+						launchUI { getMainActivity()?.jump<SplashActivity>() }
+					} else launchUI { alert(it.message) }
 				}
 			}
 		}.start()

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -38,16 +39,15 @@ class EOSAccountRegisterPresenter(
 ) : BasePresenter<EOSAccountRegisterFragment>() {
 
 	fun getEOSCurrencyAndRAMPrice(
-		@UiThread hold: (currency: Double?, ramPrice: Double?, error: RequestError) -> Unit
+		@WorkerThread hold: (currency: Double?, ramPrice: Double?, error: RequestError) -> Unit
 	) {
 		GoldStoneAPI.getPriceByContractAddress(
-			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
-			true
+			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}")
 		) { currency, currencyError ->
-			if (!currency.isNull() && currencyError.isNone()) {
+			if (currency != null && currencyError.isNone()) {
 				EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { ramPriceInEOS, error ->
-					if (!ramPriceInEOS.isNull() && error.isNone()) {
-						hold(currency!!.firstOrNull()?.price.orZero(), ramPriceInEOS!!, error)
+					if (ramPriceInEOS != null && error.isNone()) {
+						hold(currency.firstOrNull()?.price.orZero(), ramPriceInEOS, error)
 					} else hold(null, null, error)
 				}
 			} else hold(null, null, currencyError)

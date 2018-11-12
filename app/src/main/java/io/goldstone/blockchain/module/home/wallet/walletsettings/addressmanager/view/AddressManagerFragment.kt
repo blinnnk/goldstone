@@ -23,6 +23,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.ScreenSize
@@ -36,6 +37,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import kotlinx.coroutines.Dispatchers
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -164,42 +166,46 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
 				topPadding = 20.uiPX()
-				// 不为空才显示 `bip44` 规则的子地址界面
-				WalletTable.getCurrentWallet {
-					currentMultiChainAddressesView.into(this@parent)
-					setMultiChainAddresses(this)
-					if (ethAddresses.isNotEmpty()) {
-						// ETHSeries List
-						ethSeriesView.into(this@parent)
-						setEthereumAddressesModel(this)
-						// ETC List
-						etcAddressesView.into(this@parent)
-						setEthereumClassicAddressesModel(this)
-						// BTC List
-						btcAddressesView.into(this@parent)
-						// `比特币` 的主网测试网地址根据环境显示不同的数据
-						// EOS List
-						eosAddressesView.into(this@parent)
-						setEOSAddressesModel(this)
-						if (!SharedValue.isTestEnvironment()) {
-							setBitcoinAddressesModel(this)
-							// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
-							// BCH List
-							bchAddressesView.into(this@parent)
-							setBitcoinCashAddressesModel(this)
-							// LTC List
-							ltcAddressesView.into(this@parent)
-							setLitecoinAddressesModel(this)
-						} else {
-							setBTCSeriesTestAddressesModel(this)
-							setBitcoinCashAddressesModel(this)
-							setLitecoinAddressesModel(this)
-						}
-					} else {
-						hideAddButton()
-						attentionView.into(this@parent)
-					}
+				showAddresses(this)
+			}
+		}
+	}
+
+	private fun showAddresses(parent: ViewGroup) {
+		// 不为空才显示 `bip44` 规则的子地址界面
+		WalletTable.getCurrent(Dispatchers.Main) {
+			currentMultiChainAddressesView.into(parent)
+			setMultiChainAddresses(this)
+			if (ethAddresses.isNotEmpty()) {
+				// ETHSeries List
+				ethSeriesView.into(parent)
+				setEthereumAddressesModel(this)
+				// ETC List
+				etcAddressesView.into(parent)
+				setEthereumClassicAddressesModel(this)
+				// BTC List
+				btcAddressesView.into(parent)
+				// `比特币` 的主网测试网地址根据环境显示不同的数据
+				// EOS List
+				eosAddressesView.into(parent)
+				setEOSAddressesModel(this)
+				if (!SharedValue.isTestEnvironment()) {
+					setBitcoinAddressesModel(this)
+					// 因为比特币系列分叉币的测试地址是公用的, 在测试环境下不额外显示分叉币的地址.
+					// BCH List
+					bchAddressesView.into(parent)
+					setBitcoinCashAddressesModel(this)
+					// LTC List
+					ltcAddressesView.into(parent)
+					setLitecoinAddressesModel(this)
+				} else {
+					setBTCSeriesTestAddressesModel(this)
+					setBitcoinCashAddressesModel(this)
+					setLitecoinAddressesModel(this)
 				}
+			} else {
+				hideAddButton()
+				attentionView.into(parent)
 			}
 		}
 	}
@@ -287,18 +293,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				getMainActivity()?.getMainContainer()?.apply {
 					if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
 						val creatorDashBoard = MiniOverlay(context) { cell, title ->
-							cell.onClick { _ ->
-								this@getParentFragment.context?.apply {
+							cell.onClick {
+								context?.apply {
 									verifyMultiChainWalletPassword(this) { password, error ->
 										if (!password.isNullOrEmpty() && error.isNone()) {
-											createChildAddressByButtonTitle(title, password!!) { createAddressError ->
-												if (error.hasError()) runOnUiThread {
-													alert(createAddressError.message)
-												}
+											createChildAddressByButtonTitle(title, password) { createAddressError ->
+												if (error.hasError()) safeShowError(createAddressError)
 											}
-										} else if (error.hasError()) runOnUiThread {
-											alert(error.message)
-										}
+										} else if (error.hasError()) safeShowError(error)
 									}
 								}
 								cell.preventDuplicateClicks()
@@ -438,7 +440,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun updateWalletDetail() {
-		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
+		getMainActivity()?.getWalletDetailFragment()?.presenter?.start()
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {

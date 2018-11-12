@@ -24,13 +24,16 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 
 
@@ -39,7 +42,7 @@ import org.jetbrains.anko.*
  * @date  2018/09/25
  */
 
-class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresenter>() {
+class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresenter>() {
 
 	override val pageTitle: String
 		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
@@ -94,9 +97,9 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 
 				resourceCoast.apply {
 					if (NetworkUtil.hasNetwork(context)) presenter.getEOSCurrencyPrice { currency, error ->
-						if (!currency.isNull() && error.isNone()) {
-							setSubtitle("2.0 EOS ≈ ${(2 * currency!!).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
-						} else context.alert(error.message)
+						if (currency != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
+							setSubtitle("2.0 EOS ≈ ${(2 * currency).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
+						} else safeShowError(error)
 					}
 					setTitle(EOSAccountText.estimatedSpentOfActiveAccount)
 					setSubtitle("2.0 EOS ${CommonText.calculating}")
@@ -115,12 +118,12 @@ class SmartContractRegisterFragment() : BaseFragment<SmartContractRegisterPresen
 								activity?.apply { SoftKeyboard.hide(this) }
 								if (!isAvailable.isNull() && error.isNone()) {
 									if (isAvailable!!) presenter.showSmartContractRegisterDetailFragment(account.accountName)
-									else context.alert(EOSAccountText.checkNameResultUnavailable)
-								} else context.alert(error.message)
+									else safeShowError(Throwable(EOSAccountText.checkNameResultUnavailable))
+								} else safeShowError(error)
 							}
 						}
-						account.accountName.isEmpty() -> context.alert(EOSAccountText.checkNameResultEmpty)
-						else -> context.alert(EOSAccountText.checkNameResultInvalid)
+						account.accountName.isEmpty() -> safeShowError(Throwable(EOSAccountText.checkNameResultEmpty))
+						else -> safeShowError(Throwable(EOSAccountText.checkNameResultInvalid))
 					}
 				}.into(this)
 			}

@@ -29,8 +29,7 @@ class SmartContractRegisterPresenter(
 
 	fun getEOSCurrencyPrice(hold: (currency: Double?, error: RequestError) -> Unit) {
 		GoldStoneAPI.getPriceByContractAddress(
-			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
-			true
+			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}")
 		) { currency, error ->
 			hold(currency?.firstOrNull()?.price, error)
 		}

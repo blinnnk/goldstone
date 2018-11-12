@@ -5,6 +5,7 @@ import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
@@ -12,8 +13,9 @@ import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 2018/8/14 5:02 PM
@@ -21,27 +23,27 @@ import org.jetbrains.anko.uiThread
  */
 
 fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListModel>) {
-	fragment.showLoadingView()
-	doAsync {
+	detailView.showLoading(true)
+	GlobalScope.launch(Dispatchers.Default) {
 		val startBlockNumber = localERCData.maxBy { it.blockNumber }?.blockNumber ?: 0
 		// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-		updateTargetLocalERC20Transactions(startBlockNumber) {
+		updateLocalERC20Transactions(startBlockNumber) {
 			// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 			// 有数据后重新执行从数据库拉取数据
-			if (it.isNone()) loadDataFromDatabaseOrElse()
-			uiThread { fragment.removeLoadingView() }
+			if (it.isNone()) loadLocalData()
+			launchUI { detailView.showLoading(false) }
 		}
 	}
 }
 
-fun TokenDetailPresenter.updateTargetLocalERC20Transactions(
+fun TokenDetailPresenter.updateLocalERC20Transactions(
 	startBlock: Int,
 	@WorkerThread callback: (RequestError) -> Unit
 ) {
 	RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
 		EtherScanApi.getTargetTokenTransactions(
 			SharedAddress.getCurrentEthereum(),
-			token?.contract?.contract.orEmpty(),
+			token.contract.contract.orEmpty(),
 			"$startBlock"
 		),
 		"result"

@@ -167,7 +167,8 @@ data class DefaultTokenTable(
 	// 服务插入 `EOS` 主网 `Token` 的构造函数
 	constructor(
 		contract: TokenContract,
-		iconUrl: String
+		iconUrl: String,
+		chainID: ChainID
 	) : this(
 		"",
 		contract.contract.orEmpty(),
@@ -180,7 +181,7 @@ data class DefaultTokenTable(
 		"",
 		true,
 		0,
-		ChainID.EOS.id
+		chainID.id
 	)
 
 	// 服务插入 `EOS` 主网 `Token` 的构造函数
@@ -311,6 +312,9 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
+
+	@Query("SELECT * FROM defaultTokens WHERE forceShow == 1")
+	fun getForceShow(): List<DefaultTokenTable>
 
 	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
 	fun updateTokenPrice(newPrice: Double, contract: String, symbol: String, chainID: String)

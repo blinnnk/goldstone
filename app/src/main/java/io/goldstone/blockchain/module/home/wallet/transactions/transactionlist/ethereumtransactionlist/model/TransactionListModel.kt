@@ -39,7 +39,7 @@ data class TransactionListModel(
 	override val blockNumber: Int,
 	val transactionHash: String,
 	override var memo: String,
-	val minerFee: String,
+	override val minerFee: String,
 	val url: String,
 	override val isPending: Boolean,
 	val timeStamp: String,
@@ -65,6 +65,7 @@ data class TransactionListModel(
 	timeStamp,
 	confirmations,
 	memo,
+	minerFee,
 	null
 ) {
 

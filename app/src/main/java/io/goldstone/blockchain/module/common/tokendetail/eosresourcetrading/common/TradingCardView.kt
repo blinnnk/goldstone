@@ -102,7 +102,7 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		}
 	}
 
-	private lateinit var radioContainer: LinearLayout
+	private var radioContainer: LinearLayout
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)

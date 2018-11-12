@@ -20,7 +20,7 @@ import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.view.PaymentPrepareFragment
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view.PaymentDetailFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
@@ -228,13 +228,13 @@ class AddressSelectionPresenter(
 	private fun goToPaymentPrepareFragment(address: String, count: Double = 0.0) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			hideChildFragment(fragment)
-			addFragmentAndSetArgument<PaymentPrepareFragment>(ContainerID.content) {
+			addFragmentAndSetArgument<PaymentDetailFragment>(ContainerID.content) {
 				putString(ArgumentKey.paymentAddress, address)
 				putDouble(ArgumentKey.paymentCount, count)
 				putSerializable(ArgumentKey.tokenModel, token)
 			}
 			showBackButton(true) {
-				presenter.popFragmentFrom<PaymentPrepareFragment>()
+				presenter.popFragmentFrom<PaymentDetailFragment>()
 			}
 		}
 	}

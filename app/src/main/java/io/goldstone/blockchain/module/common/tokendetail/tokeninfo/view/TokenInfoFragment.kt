@@ -12,7 +12,6 @@ import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoViewInterface
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
 import org.jetbrains.anko.*
 
@@ -22,7 +21,7 @@ import org.jetbrains.anko.*
  * @date  2018/09/11
  */
 
-class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInterface {
+class TokenInfoFragment : BaseFragment<TokenInfoPresenter>() {
 
 	override val pageTitle: String = "Token Info"
 	private val tokenInfoView by lazy {
@@ -102,7 +101,7 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInter
 		transactionCountCell.setSubtitle("$count")
 	}
 
-	override fun setTokenInfo(
+	fun setTokenInfo(
 		qrCode: Bitmap?,
 		title: String,
 		subtitle: String,
@@ -112,7 +111,7 @@ class TokenInfoFragment : BaseFragment<TokenInfoPresenter>(), TokenInfoViewInter
 		tokenInfoView.setData(qrCode, title, subtitle, icon, action)
 	}
 
-	override fun updateLatestActivationDate(date: String) {
+	fun updateLatestActivationDate(date: String) {
 		tokenInfoView.updateLatestActivationDate(date)
 	}
 

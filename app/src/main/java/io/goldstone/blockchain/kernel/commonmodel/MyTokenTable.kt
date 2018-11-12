@@ -19,15 +19,11 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toEthCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
-import io.goldstone.blockchain.kernel.network.bitcoincash.BitcoinCashApi
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
-import io.goldstone.blockchain.kernel.network.litecoin.LitecoinApi
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 01/04/2018 12:38 AM
@@ -113,14 +109,12 @@ data class MyTokenTable(
 			}
 		}
 
-		fun getMyTokens(inMainThread: Boolean = true, hold: (List<MyTokenTable>) -> Unit) {
+		fun getMyTokens(@WorkerThread hold: (List<MyTokenTable>) -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
-					GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).apply {
-						if (inMainThread) GoldStoneAPI.context.runOnUiThread { hold(this@apply) }
-						else hold(this)
+				GoldStoneDataBase.database.walletDao()
+					.findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
+						GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).let(hold)
 					}
-				}
 			}
 		}
 
@@ -142,13 +136,18 @@ data class MyTokenTable(
 		fun getTokenBalance(
 			contract: TokenContract,
 			ownerName: String,
-			callback: (Double?) -> Unit
+			@UiThread callback: (Double?) -> Unit
 		) {
 			load {
 				GoldStoneDataBase.database.myTokenDao()
-					.getTokenByContractAndAddress(contract.contract.orEmpty(), contract.symbol, ownerName, contract.getCurrentChainID().id)
+					.getTokenByContractAndAddress(
+						contract.contract.orEmpty(),
+						contract.symbol,
+						ownerName,
+						contract.getCurrentChainID().id
+					)
 			} then { token ->
-				if (token.isNull()) callback(null) else callback(token?.balance.orZero())
+				callback(token?.balance.orZero())
 			}
 		}
 
@@ -185,7 +184,7 @@ data class MyTokenTable(
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
 				contract.isETH() || contract.isETC() ->
-					GoldStoneEthCall.getEthBalance(
+					ETHJsonRPC.getEthBalance(
 						ownerName,
 						contract.getChainURL()
 					) { amount, error ->
@@ -195,30 +194,14 @@ data class MyTokenTable(
 						} else hold(null, error)
 					}
 
-				contract.isBTC() ->
-					BitcoinApi.getBalance(ownerName, false) { balance, error ->
+				contract.isBTCSeries() ->
+					InsightApi.getBalance(
+						contract.getChainType(),
+						!contract.isBCH(), // 目前 BCH 的自有加密节点暂时不能使用, 这里用的第三方非加密
+						ownerName
+					) { balance, error ->
 						hold(balance?.toBTC(), error)
 					}
-				contract.isLTC() ->
-					// 首先从 GoldStone LTC Insight 拉取 Balance 如果遇到错误那么切换到
-					// Chain.So 拉取 Balance 如果还有错误就报错
-					LitecoinApi.getBalance(ownerName, false) { balance, error ->
-						if (balance != null && error.isNone()) {
-							hold(balance.toLTC(), error)
-						} else LitecoinApi.getBalanceFromChainSo(ownerName) { chainSoBalance, chainSoError ->
-							if (chainSoBalance != null && chainSoError.isNone()) {
-								hold(chainSoBalance, chainSoError)
-							} else hold(
-								null,
-								RequestError.RPCResult(
-									"\n1. Get litecoin balance from GoldStone has error\n" +
-										"2. Then get balance from Chain.so has error too"
-								)
-							)
-						}
-					}
-
-				contract.isBCH() -> BitcoinCashApi.getBalance(ownerName, false, hold)
 
 				// 在激活和设置默认账号之前这个存储有可能存储了是地址, 防止无意义的
 				// 网络请求在这额外校验一次.
@@ -240,7 +223,7 @@ data class MyTokenTable(
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
-					GoldStoneEthCall.getTokenBalanceWithContract(
+					ETHJsonRPC.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
 						ownerName,
 						SharedChain.getCurrentETH()

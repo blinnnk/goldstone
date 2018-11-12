@@ -43,30 +43,6 @@ object BTCSeriesTransactionUtils {
 		)
 	}
 
-	fun generateBCHSignedRawTransaction(
-		sendValue: Long,
-		fee: Long,
-		toAddress: String,
-		changeAddress: String,
-		unspentModel: List<UnspentModel>,
-		base58Privatekey: String,
-		isTest: Boolean
-	): BTCSignedModel {
-		val net =
-			if (isTest) TestNet3Params.get()
-			else MainNetParams.get()
-		return generateSignedRawTransaction(
-			sendValue,
-			fee,
-			toAddress,
-			changeAddress,
-			unspentModel,
-			base58Privatekey,
-			net,
-			true
-		)
-	}
-
 	fun generateLTCSignedRawTransaction(
 		sendValue: Long,
 		fee: Long,
@@ -89,7 +65,7 @@ object BTCSeriesTransactionUtils {
 		)
 	}
 
-	private fun generateSignedRawTransaction(
+	fun generateSignedRawTransaction(
 		sendValue: Long,
 		fee: Long,
 		toAddress: String,

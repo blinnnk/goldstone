@@ -27,6 +27,7 @@ import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileAdapter
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import kotlinx.coroutines.Dispatchers
 
 
 /**
@@ -113,16 +114,12 @@ class ProfilePresenter(
 	}
 
 	private fun showShareChooser() {
-		val intent = Intent(Intent.ACTION_SEND)
-		fun getShareContentThenShowView(content: String) {
-			intent.putExtra(Intent.EXTRA_TEXT, content)
-			intent.type = "text/plain"
-			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
-		}
-
-		AppConfigTable.getAppConfig {
+		AppConfigTable.getAppConfig(Dispatchers.Main) {
 			it?.apply {
-				getShareContentThenShowView(shareContent)
+				val intent = Intent(Intent.ACTION_SEND)
+				intent.putExtra(Intent.EXTRA_TEXT, shareContent)
+				intent.type = "text/plain"
+				fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 			}
 		}
 	}
@@ -135,7 +132,7 @@ class ProfilePresenter(
 		if (clickTimes <= 0 && !hasShownGoldStoneID) {
 			hasShownGoldStoneID = true
 			SharedValue.updateDeveloperModeStatus(true)
-			AppConfigTable.getAppConfig {
+			AppConfigTable.getAppConfig(Dispatchers.Main) {
 				it?.apply {
 					fragment.context.alert(goldStoneID)
 					fragment.context?.clickToCopy(goldStoneID)

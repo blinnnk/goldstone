@@ -20,6 +20,8 @@ import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ClassURI
@@ -35,8 +37,7 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -164,7 +165,8 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					GoldStoneAPI.registerWalletAddresses(
 						AesCrypto.encrypt("$convertedData").orEmpty()
 					) { result, error ->
-						if (!result.isNullOrEmpty() && error.isNone() && !isRemove) updateRegisterAddressesStatus(result!!)
+						if (!result.isNullOrEmpty() && error.isNone() && !isRemove)
+							updateRegisterAddressesStatus(result)
 					}
 				} else getCurrentBip44Addresses().forEach {
 					registerSingleAddress(AddressCommissionModel(it.address, it.chainType, option, id))
@@ -173,24 +175,21 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		}
 
 		fun registerSingleAddress(model: AddressCommissionModel) {
-			listOf(model).map { prepareAddressData(it) }.let { it ->
+			listOf(model).map { prepareAddressData(it) }.let { models ->
 				GoldStoneAPI.registerWalletAddresses(
-					AesCrypto.encrypt("$it").orEmpty()
+					AesCrypto.encrypt("$models").orEmpty()
 				) { result, error ->
 					// API 错误
-					if (result.isNullOrEmpty() || error.hasError()) {
-						return@registerWalletAddresses
-					}
 					// 如果是注册地址 `option = 1` 的情况下在数据库标记注册成功与否的状态
-					if (model.option == 1) GoldStoneCode.isSuccess(result!!.toJsonObject()["code"]) { isSucceed ->
-						if (isSucceed) {
-							GoldStoneDataBase.database.appConfigDao().updateHasRegisteredAddress(true)
-							LogUtil.debug("XinGePushReceiver", "code: $it")
-						} else {
-							// 服务器返回错误的时候标记注册失败
-							GoldStoneDataBase.database.appConfigDao().updateHasRegisteredAddress(false)
+					if (!result.isNullOrEmpty() && error.isNone() && model.option == 1)
+						GoldStoneCode.isSuccess(result.toJsonObject()["code"]) { isSucceed ->
+							val configDao =
+								GoldStoneDataBase.database.appConfigDao()
+							if (isSucceed) {
+								configDao.updateHasRegisteredAddress(true)
+								LogUtil.debug("XinGePushReceiver", "code: $models")
+							} else configDao.updateHasRegisteredAddress(false)
 						}
-					}
 				}
 			}
 		}
@@ -272,35 +271,29 @@ fun Context.registerDeviceForPush() {
 }
 
 @SuppressLint("HardwareIds")
-fun Context.registerDevice(
-	token: String,
-	@UiThread callback: () -> Unit
-) {
+fun Context.registerDevice(token: String, @UiThread callback: () -> Unit) {
 	// 把 `Token` 记录在本地数据库
 	AppConfigTable.updatePushToken(token)
 	// 没有注册过就开始注册
 	val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
 	else TinyNumber.False.value
-	doAsync {
-		AppConfigTable.getAppConfig { config ->
-			config?.apply {
-				GoldStoneAPI.registerDevice(
-					HoneyLanguage.getLanguageSymbol(language).toLowerCase(),
-					token,
-					goldStoneID,
-					isChina,
-					0,
-					CountryCode.currentCountry
-				) { result, error ->
-					// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-					if (!result.isNullOrEmpty() && error.isNone()) GoldStoneCode.isSuccess(
-						JSONObject(result).safeGet("code")
-					) { isSuccessful ->
-						if (isSuccessful) {
-							saveDataToSharedPreferences(SharesPreference.registerPush, token)
-							uiThread { callback() }
-						}
-					}
+	AppConfigTable.getAppConfig(Dispatchers.Default) { config ->
+		val languageCode = config?.language ?: return@getAppConfig
+		GoldStoneAPI.registerDevice(
+			HoneyLanguage.getLanguageSymbol(languageCode).toLowerCase(),
+			token,
+			SharedWallet.getGoldStoneID(),
+			isChina,
+			0,
+			CountryCode.currentCountry
+		) { result, error ->
+			// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
+			if (!result.isNullOrEmpty() && error.isNone()) GoldStoneCode.isSuccess(
+				JSONObject(result).safeGet("code")
+			) { isSuccessful ->
+				if (isSuccessful) {
+					saveDataToSharedPreferences(SharesPreference.registerPush, token)
+					launchUI { callback() }
 				}
 			}
 		}

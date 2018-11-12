@@ -16,7 +16,7 @@ import java.math.BigInteger
 data class ReceiptModel(
 	override val fromAddress: String,
 	override val toAddress: String,
-	val minerFee: String,
+	override val minerFee: String,
 	override val value: BigInteger,
 	val token: WalletDetailCellModel,
 	val taxHash: String,
@@ -38,6 +38,7 @@ data class ReceiptModel(
 	timestamp.toString(),
 	-1,
 	memo,
+	minerFee,
 	null
 ) {
 	constructor(

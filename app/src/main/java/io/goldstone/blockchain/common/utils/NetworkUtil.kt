@@ -11,15 +11,11 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import org.jetbrains.anko.doAsync
 
 /**
  * @date 2018/5/3 3:33 PM
@@ -50,25 +46,20 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(context: Context, intent: Intent) {
-		if (NetworkUtil.hasNetwork(context)) {
+		if (NetworkUtil.hasNetwork(context)) doAsync {
 			// 如果还没有检测过账号状态那么在网络恢复的时候检测并更新钱包的资产状态
 			if (!SharedValue.getAccountCheckedStatus()) {
-				launch {
-					withContext(CommonPool, CoroutineStart.LAZY) {
-						SplashPresenter.updateAccountInformation(context) {
-							(context as? MainActivity)?.getWalletDetailFragment()
-								?.presenter?.updateData()
-						}
-					}
+				SplashPresenter.updateAccountInformation(context) {
+					(context as? MainActivity)?.getWalletDetailFragment()?.presenter?.start()
 				}
 			}
 			// 网络恢复的时候判断是否有在断网情况下创建的地址需要补充注册
-			AppConfigTable.getAppConfig {
-				if (it?.isRegisteredAddresses == false) {
-					WalletTable.getCurrentWallet {
-						XinGePushReceiver.registerAddressesForPush(this)
-					}
-				}
+			val config =
+				GoldStoneDataBase.database.appConfigDao().getAppConfig()
+			if (config?.isRegisteredAddresses == false) {
+				val wallet =
+					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+				XinGePushReceiver.registerAddressesForPush(wallet)
 			}
 		} else GoldStoneDialog.show(context) {
 			showOnlyConfirmButton {

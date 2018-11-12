@@ -6,7 +6,8 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.kernel.network.bitcoin.BitcoinApi
+import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +29,7 @@ class BitcoinUnitTest {
 	@Test
 	fun getBitcoinBalance() {
 		val address = "mh9F9Bpb9XcKmCnU6BkAe55bC8xwSqHyVw"
-		BitcoinApi.getBalance(address, false) { balance, error ->
+		InsightApi.getBalance(ChainType.BTC, true, address) { balance, error ->
 			LogUtil.debug("$position getBitcoinBalance $balance", "$error")
 		}
 	}

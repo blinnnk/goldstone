@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
 				(it as? BaseOverlayFragment<*>)?.presenter?.removeSelfFromActivity()
 			}
 			// 展示通知中心
-			presenter.showNotificationListFragment()
+			showNotificationListFragment()
 			currentIntent = null
 		}
 	}

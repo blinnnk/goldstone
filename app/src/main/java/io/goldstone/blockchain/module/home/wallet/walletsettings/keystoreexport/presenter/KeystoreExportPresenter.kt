@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -12,8 +13,7 @@ import io.goldstone.blockchain.crypto.keystore.getKeystoreFileByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
 
 /**
  * @date 06/04/2018 1:46 AM
@@ -27,16 +27,18 @@ class KeystoreExportPresenter(
 		fragment.arguments?.getString(ArgumentKey.address)
 	}
 
-	fun getKeystoreJSON(password: String, hold: (keyStoreFile: String?, error: AccountError) -> Unit) {
-		if (password.isEmpty()) {
-			hold(null, AccountError.WrongPassword)
-			return
-		}
-		fragment.activity?.apply { SoftKeyboard.hide(this) }
-		address?.let {
-			WalletTable.getWalletType { walletType, wallet ->
-				if (walletType.isMultiChain()) getKeystoreByWalletID(password, wallet.id, hold)
-				else getKeystoreByAddress(password, it, hold)
+	fun getKeystoreJSON(
+		password: String,
+		@WorkerThread hold: (keyStoreFile: String?, error: AccountError) -> Unit
+	) {
+		if (password.isEmpty()) hold(null, AccountError.WrongPassword)
+		else {
+			fragment.activity?.apply { SoftKeyboard.hide(this) }
+			address?.let {
+				WalletTable.getCurrent(Dispatchers.Default) {
+					if (getWalletType().isMultiChain()) getKeystoreByWalletID(password, id, hold)
+					else getKeystoreByAddress(password, it, hold)
+				}
 			}
 		}
 	}
@@ -58,23 +60,17 @@ class KeystoreExportPresenter(
 		address: String,
 		hold: (keystoreFile: String?, error: AccountError) -> Unit
 	) {
-		doAsync {
-			if (ChainAddresses.isBTCSeries(address) || EOSWalletUtils.isValidAddress(address)) {
-				getBTCSeriesKeystoreFile(address, password) { keystoreJSON, error ->
-					uiThread {
-						if (!keystoreJSON.isNull() && error.isNone()) {
-							hold(keystoreJSON, error)
-						} else hold(null, error)
-					}
-				}
-			} else {
-				getETHSeriesKeystoreFile(address, password) { keystoreJSON, error ->
-					uiThread {
-						if (!keystoreJSON.isNull() && error.isNone()) {
-							hold(keystoreJSON, error)
-						} else hold(null, error)
-					}
-				}
+		if (ChainAddresses.isBTCSeries(address) || EOSWalletUtils.isValidAddress(address)) {
+			getBTCSeriesKeystoreFile(address, password) { keystoreJSON, error ->
+				if (!keystoreJSON.isNull() && error.isNone()) {
+					hold(keystoreJSON, error)
+				} else hold(null, error)
+			}
+		} else {
+			getETHSeriesKeystoreFile(address, password) { keystoreJSON, error ->
+				if (!keystoreJSON.isNull() && error.isNone()) {
+					hold(keystoreJSON, error)
+				} else hold(null, error)
 			}
 		}
 	}

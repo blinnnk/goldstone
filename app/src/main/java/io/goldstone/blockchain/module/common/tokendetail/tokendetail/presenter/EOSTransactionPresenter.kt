@@ -1,54 +1,51 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.isEOSSeries
-import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @author KaySaith
  * @date  2018/10/17
  */
 
-fun TokenDetailPresenter.flipEOSPageData(@UiThread callback: () -> Unit) {
+@WorkerThread
+fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 	// 是否有合法的数据
-	if (totalCount == null || currentMaxCount == null) {
-		callback()
-	} else if (currentMaxCount!! <= 0 || fragment.asyncData?.size == totalCount) {
-		callback()    // 数据是否有效
-	} else when {
-		token?.contract.isEOSSeries() -> doAsync {
+	when {
+		token.contract.isEOSSeries() -> GlobalScope.launch(Dispatchers.Default) {
 			val account = SharedAddress.getCurrentEOSAccount()
 			val codeName =
-				if (token?.contract.isEOS()) EOSCodeName.EOSIOToken.value
-				else token?.contract?.contract.orEmpty()
+				if (token.contract.isEOS()) EOSCodeName.EOSIOToken.value
+				else token.contract.contract.orEmpty()
 			val startIndex = currentMaxCount!! - DataValue.transactionPageCount
 			EOSTransactionTable.getRangeData(
 				account,
 				if (startIndex < 0) 0 else startIndex,
 				currentMaxCount!!,
-				token?.symbol.orEmpty(),
-				codeName,
-				false
+				token.symbol.orEmpty(),
+				codeName
 			) { localData ->
-				// 显示内存的数据后异步更新数据
-				if (fragment.asyncData?.isEmpty() == true) localData.map {
+				val transactionDao =
+					GoldStoneDataBase.database.eosTransactionDao()
+				if (detailView.asyncData?.isEmpty() == true) localData.map {
 					TransactionListModel(it)
-				}.prepareTokenHistoryBalance(token?.contract!!, account.accountName) {
+				}.prepareTokenHistoryBalance(token.contract, account.accountName) {
 					it.updateChartAndHeaderData()
 				}
 				fun loadTargetRangeData(endID: Long, pageSize: Int) {
@@ -59,27 +56,19 @@ fun TokenDetailPresenter.flipEOSPageData(@UiThread callback: () -> Unit) {
 						pageSize,
 						0L,
 						endID,
-						token?.contract.orEmpty()
+						token.contract
 					) { data, error ->
-						if (data != null && data.isNotEmpty() && error.isNone()) {
-							data.forEachIndexed { index, eosTransactionTable ->
-								EOSTransactionTable.preventDuplicateInsert(
-									account,
-									eosTransactionTable.apply {
-										dataIndex = currentMaxCount!! - (index + 1)
-									}
-								)
+						if (data?.isNotEmpty() == true && error.isNone()) {
+							data.mapIndexed { index, eosTransactionTable ->
+								eosTransactionTable.apply { dataIndex = currentMaxCount!! - (index + 1) }
+							}.let {
+								transactionDao.insertAll(it)
 							}
 							flipPage(data.plus(localData), callback)
 							currentMaxCount = currentMaxCount!! - pageSize
-						} else uiThread {
-							callback()
-						}
+						} else callback()
 					}
 				}
-
-				val transactionDao =
-					GoldStoneDataBase.database.eosTransactionDao()
 				when {
 					// 本地指定范围的数据是空的条件判断
 					localData.isEmpty() -> {
@@ -91,7 +80,7 @@ fun TokenDetailPresenter.flipEOSPageData(@UiThread callback: () -> Unit) {
 							else transactionDao.getDataByDataIndex(
 								account.accountName,
 								currentMaxCount!! + 1,
-								token?.symbol.orEmpty(),
+								token.symbol,
 								codeName
 							)?.serverID ?: 0L,
 							DataValue.transactionPageCount
@@ -109,7 +98,7 @@ fun TokenDetailPresenter.flipEOSPageData(@UiThread callback: () -> Unit) {
 							else transactionDao.getDataByDataIndex(
 								account.accountName,
 								currentMaxCount!! + 1,
-								token?.symbol.orEmpty(),
+								token.symbol.orEmpty(),
 								codeName
 							)?.serverID ?: 0L,
 							pageSize
@@ -123,7 +112,7 @@ fun TokenDetailPresenter.flipEOSPageData(@UiThread callback: () -> Unit) {
 				}
 			}
 		}
-		else -> showBottomLoading(false)
+		else -> callback()
 	}
 }
 
@@ -131,20 +120,14 @@ private fun TokenDetailPresenter.flipPage(
 	data: List<EOSTransactionTable>,
 	@UiThread callback: () -> Unit
 ) {
-	fragment.asyncData?.addAll(data.map { TransactionListModel(it) })
-	fragment.getAdapter<TokenDetailAdapter>()?.dataSet = fragment.asyncData!!
-	val totalCount = fragment.asyncData?.size.orZero()
-	allData = fragment.asyncData
-	fragment.context?.runOnUiThread {
-		fragment.removeEmptyView()
-		fragment.recyclerView.adapter?.apply {
-			try {
-				val startPosition = totalCount - data.size.orZero() + 1
-				notifyItemRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
-			} catch (error: Exception) {
-				notifyDataSetChanged()
-			}
-		}
+	detailView.asyncData?.addAll(data.map { TransactionListModel(it) })
+	detailView.getDetailAdapter()?.dataSet = detailView.asyncData!!
+	val totalCount = detailView.asyncData?.size.orZero()
+	allData = detailView.asyncData
+	launchUI {
+		detailView.removeEmptyView()
+		val startPosition = totalCount - data.size.orZero() + 1
+		detailView.notifyDataRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
 		callback()
 	}
 }

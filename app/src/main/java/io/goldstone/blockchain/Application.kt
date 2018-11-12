@@ -7,7 +7,7 @@ import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 
 /**
  * @date 22/03/2018 3:02 PM
@@ -26,7 +26,7 @@ class GoldStoneApp : Application() {
 		// Create and init database
 		GoldStoneDataBase.initDatabase(applicationContext)
 		// Init ethereum utils `Context`
-		GoldStoneEthCall.context = this
+		ETHJsonRPC.context = this
 		// Init `Api` context
 		GoldStoneAPI.context = this
 	}
