@@ -29,8 +29,6 @@ class BigTransactionFragment : BaseRecyclerFragment<BigTransactionPresenter, Tra
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TradingInfoModel>?
 	) {
-		wrapper.leftPadding = 20.uiPX()
-		wrapper.rightPadding = 20.uiPX()
 		recyclerView.setHasFixedSize(true)
 		recyclerView.isNestedScrollingEnabled = false
 		

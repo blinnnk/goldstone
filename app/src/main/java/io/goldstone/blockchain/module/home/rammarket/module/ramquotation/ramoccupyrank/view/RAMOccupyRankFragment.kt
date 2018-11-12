@@ -30,8 +30,6 @@ class RAMOccupyRankFragment : BaseRecyclerFragment<RAMOccupyRankPresenter, RAMRa
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<RAMRankModel>?
 	) {
-		wrapper.leftPadding = 20.uiPX()
-		wrapper.rightPadding = 20.uiPX()
 		recyclerView.setHasFixedSize(true)
 		recyclerView.isNestedScrollingEnabled = false
 		recyclerView.adapter = RAMOccupyRankAdapter(asyncData.orEmptyArray().toArrayList()) {

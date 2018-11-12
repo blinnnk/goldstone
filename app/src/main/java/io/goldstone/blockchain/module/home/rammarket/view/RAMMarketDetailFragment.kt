@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.rammarket.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.isTrue
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -69,14 +70,13 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	
 	fun setCurrentPriceAndPercent(price: String, percent: Double) {
 		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.toDouble().formatCount(3)} EOS/KB)"
-		ramPriceView.currentPriceView.currentPrice.text = price
+		ramPriceView.currentPriceView.currentPrice.text = price.toDouble().formatCount(4)
 		ramPriceView.currentPriceView.trendcyPercent.apply {
-			val trendBigDecimal = BigDecimal(percent).divide(BigDecimal(1), 3, BigDecimal.ROUND_HALF_UP)
 			if (percent > 0) {
-				text = "+$trendBigDecimal%"
+				text = "+$percent%"
 				textColor = Spectrum.green
 			} else {
-				text = "$trendBigDecimal%"
+				text = "$percent%"
 				textColor = Spectrum.red
 			}
 		}
@@ -94,6 +94,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	}
 	
 	fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
+		data.isEmpty() isTrue { return }
 		priceMenuCandleChart.candleChart.resetData(dateType, data.mapIndexed { index, entry ->
 			CandleEntry(
 				index.toFloat(),

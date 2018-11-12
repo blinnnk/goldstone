@@ -9,6 +9,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.sdk27.coroutines.onClick
 @SuppressLint("ViewConstructor")
 /**
@@ -27,7 +28,7 @@ class RAMPriceChartAndMenuView(
 	}
 	private val menu by lazy {
 		ButtonMenu(context).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 40.uiPX(), 32.uiPX())
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - RAMMarketPadding * 2, 32.uiPX())
 		}
 	}
 	
@@ -35,8 +36,8 @@ class RAMPriceChartAndMenuView(
 	  orientation = LinearLayout.VERTICAL
 		menu.setMargins<LinearLayout.LayoutParams> {
 			topMargin = 16.uiPX()
-			leftMargin = 20.uiPX()
-			rightMargin = 20.uiPX()
+			leftMargin = RAMMarketPadding
+			rightMargin = RAMMarketPadding
 		}
 		
 		menu.titles = arrayListOf(

@@ -17,7 +17,7 @@ import org.jetbrains.anko.*
 
 /**
  * @date: 2018/11/8.
- * @author: yanglihai
+ * @author: yangLiHai
  * @description:
  */
 class TransactionOfNameCell(context: Context): RelativeLayout(context) {

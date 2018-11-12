@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 
 /**
  * @date: 2018/9/26.
@@ -21,7 +22,7 @@ class RAMPercentChartView(context: Context) : View(context) {
 	
 	private val maxBodyHeight = 100.uiPX()
 	
-	private val itemWidth = (ScreenSize.Width - 40.uiPX()).toFloat() / 2 / 8
+	private val itemWidth = (ScreenSize.Width - RAMMarketPadding * 2).toFloat() / 2 / 8
 	
 	private val itemSpace = itemWidth * 5 / 4
 	
@@ -73,7 +74,7 @@ class RAMPercentChartView(context: Context) : View(context) {
 	
 	init {
 		layoutParams = ViewGroup.LayoutParams(
-			(ScreenSize.Width - 40.uiPX()) / 2,
+			(ScreenSize.Width - RAMMarketPadding  * 2) / 2,
 			(maxBodyHeight + valueTextSize + labelTextSize + textSpace * 2).toInt()
 		)
 	}

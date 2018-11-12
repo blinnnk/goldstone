@@ -1,13 +1,15 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view
 
+import android.graphics.Color
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.base.HoneyBaseFragmentAdapter
 import com.blinnnk.base.SubFragment
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.*
 import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.value.*
@@ -29,9 +31,8 @@ import java.util.*
  */
 class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fragment.context) {
 	private val menuBar by lazy {
-		ViewPagerMenu(context, (ScreenSize.Width - 40.uiPX()) / 4).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 40.uiPX(), 45.uiPX())
-			setMargins<LinearLayout.LayoutParams> { leftMargin = 20.uiPX() }
+		ViewPagerMenu(context, ScreenSize.Width / 4).apply {
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 45.uiPX())
 			setBorderLineColor(Spectrum.green)
 			backgroundColor = Spectrum.white
 			elevation = 0f
@@ -47,7 +48,7 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 	
 	init {
 		orientation = LinearLayout.VERTICAL
-		layoutParams = LinearLayout.LayoutParams(matchParent, 605.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 590.uiPX())
 		fragmentList.add(SubFragment(BigTransactionFragment(), "bigOrder"))
 		fragmentList.add(SubFragment(RAMOccupyRankFragment(), "ramRank"))
 		fragmentList.add(SubFragment(RAMStatisticsFragment(), "ramStatistics"))
@@ -56,10 +57,6 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 		addView(menuBar)
 		view {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 1)
-			setMargins<LinearLayout.LayoutParams> {
-				rightMargin = 20.uiPX()
-				leftMargin = 20.uiPX()
-			}
 			backgroundColor = GrayScale.lightGray
 		}
 		viewPager {
@@ -70,6 +67,7 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 		}.apply {
 			// `MenuBar` 点击选中动画和内容更换
 			menuBar.setMemnuTitles(titles) { button, id ->
+				button.addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square, CornerSize.small)
 				button.onClick {
 					currentItem = id
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)

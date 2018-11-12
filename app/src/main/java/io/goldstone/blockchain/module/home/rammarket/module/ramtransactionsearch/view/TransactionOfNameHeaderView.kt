@@ -19,7 +19,7 @@ import org.jetbrains.anko.*
 
 /**
  * @date: 2018/11/8.
- * @author: yanglihai
+ * @author: yangLiHai
  * @description:
  */
 class TransactionOfNameHeaderView(context: Context): RelativeLayout(context) {

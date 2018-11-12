@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
 
 /**
@@ -18,8 +19,8 @@ class EOSRAMPriceInfoView(context: Context) : LinearLayout(context) {
 	init {
 		orientation = LinearLayout.VERTICAL
 		layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
-		leftPadding = 20.uiPX()
-		rightPadding = 20.uiPX()
+		leftPadding = RAMMarketPadding
+		rightPadding = RAMMarketPadding
 		currentPriceView = CurrentPriceView(context)
 		todayPriceView = RAMTodayPriceView(context)
 		addView(currentPriceView)

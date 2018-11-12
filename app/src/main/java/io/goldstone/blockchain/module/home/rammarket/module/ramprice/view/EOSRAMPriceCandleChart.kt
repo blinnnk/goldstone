@@ -12,6 +12,7 @@ import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.highlight.Highlight
 import io.goldstone.blockchain.common.component.chart.candle.CandleStickChart
 import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.matchParent
 
 /**
@@ -31,8 +32,8 @@ class EOSRAMPriceCandleChart(context: Context) : CandleStickChart(context) {
 	init {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 260.uiPX())
 		setMargins<LinearLayout.LayoutParams> {
-			leftMargin = 10.uiPX()
-			rightMargin = 10.uiPX()
+			leftMargin = RAMMarketPadding
+			rightMargin = RAMMarketPadding
 		}
 	}
 	override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

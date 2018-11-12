@@ -22,13 +22,12 @@ import org.jetbrains.anko.*
 class RAMOccupyRankHeaderView(context: Context): RelativeLayout(context) {
 	
 	init {
-		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
-		gravity = Gravity.CENTER_VERTICAL
+		layoutParams = ViewGroup.LayoutParams(matchParent, 38.uiPX())
 		backgroundColor = Color.parseColor("#05000000")
 		
 	  textView {
 			text = EOSRAMExchangeText.transactionAccount
-			leftPadding = 7.uiPX()
+			leftPadding = 17.uiPX()
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.book(context)
 			textSize = fontSize(11)
@@ -38,7 +37,7 @@ class RAMOccupyRankHeaderView(context: Context): RelativeLayout(context) {
 		}
 		textView {
 			text = EOSRAMExchangeText.transactionAmount
-			rightPadding = 7.uiPX()
+			rightPadding = 17.uiPX()
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.book(context)
 			textSize = fontSize(11)
@@ -46,6 +45,12 @@ class RAMOccupyRankHeaderView(context: Context): RelativeLayout(context) {
 				centerVertically()
 				alignParentRight()
 			}
+		}
+		view {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 1).apply {
+				alignParentBottom()
+			}
+			backgroundColor = GrayScale.lightGray
 		}
 		
 	}

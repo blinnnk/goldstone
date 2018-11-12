@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.chart.pie.PieChartView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.presenter.RAMTradePercentPresenter
 import org.jetbrains.anko.*
 
@@ -72,8 +73,8 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 	
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
-			leftPadding = 20.uiPX()
-			rightPadding = 20.uiPX()
+			leftPadding = RAMMarketPadding
+			rightPadding = RAMMarketPadding
 			addView(rules)
 			addView(pieChart)
 			linearLayout {

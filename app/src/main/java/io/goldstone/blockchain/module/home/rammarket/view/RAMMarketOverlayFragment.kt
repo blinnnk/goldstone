@@ -11,7 +11,7 @@ import org.jetbrains.anko.*
 
 /**
  * @date: 2018/10/29.
- * @author: yanglihai
+ * @author: yangLiHai
  * @description: 内存交易所的fragment
  */
 class RAMMarketOverlayFragment : BaseOverlayFragment<RAMMarketPresenter>() {

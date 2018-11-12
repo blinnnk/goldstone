@@ -157,9 +157,9 @@ fun RAMMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartTyp
 fun RAMMarketDetailPresenter.updateTodayPriceUI() {
 	ramInformationModel.let {
 		fragment.setTodayPrice(
-			it.openPrice.formatCount(8),
-			it.HighPrice.formatCount(8),
-			it.lowPrice.formatCount(8)
+			it.openPrice.formatCount(4),
+			it.HighPrice.formatCount(4),
+			it.lowPrice.formatCount(4)
 		)
 	}
 	
@@ -189,7 +189,7 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 fun RAMMarketDetailPresenter.calculatePricePercent() {
 	if (ramInformationModel.openPrice == 0.0) return
 	var trend = BigDecimal((ramInformationModel.currentPrice - ramInformationModel.openPrice)).divide(
-		BigDecimal(ramInformationModel.openPrice), 8, BigDecimal.ROUND_HALF_UP).toDouble()
+		BigDecimal(ramInformationModel.openPrice), 2, BigDecimal.ROUND_HALF_UP).toDouble()
 	trend *= 100f
 	ramInformationModel.pricePercent = trend
 }

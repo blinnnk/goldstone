@@ -4,8 +4,7 @@ import android.content.Context
 import android.text.InputFilter
 import android.text.method.DigitsKeyListener
 import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -15,6 +14,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
 
 /**
@@ -30,13 +30,16 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	val eosBalance by lazy { TextView(context) }
 	private val confirmButton by lazy { RoundButton(context) }
 	
+	private val dashboardWidth = ScreenSize.Width / 2 + RAMMarketPadding * 2
+	
 	init {
 	  orientation = LinearLayout.VERTICAL
+		layoutParams = LinearLayout.LayoutParams(dashboardWidth, wrapContent)
 		menu = ButtonMenu(context)
-		menu.layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, 32.uiPX())
+		menu.layoutParams = LinearLayout.LayoutParams(dashboardWidth - RAMMarketPadding * 2, 32.uiPX())
 		menu.setMargins<LinearLayout.LayoutParams> {
+			leftMargin = 10.uiPX()
 			topMargin = 16.uiPX()
-			bottomMargin = 14.uiPX()
 		}
 		menu.titles = listOf(EOSRAMExchangeText.buy(""), EOSRAMExchangeText.sell(""))
 		menu.getButton { button ->
@@ -53,7 +56,10 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		menu.into(this)
 		ramEditText.apply {
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-			setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
+			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 16.uiPX()
+				leftMargin = 5.uiPX()
+			}
 			title = EOSRAMExchangeText.ram
 			hint = EOSRAMExchangeText.enterCountHint
 			singleLine = true
@@ -74,7 +80,10 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			title = EOSRAMExchangeText.eos
 			hint = EOSRAMExchangeText.enterCountHint
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-			setMargins<LinearLayout.LayoutParams> { topMargin = 16.uiPX() }
+			setMargins<LinearLayout.LayoutParams> {
+				topMargin = 16.uiPX()
+				leftMargin = 5.uiPX()
+			}
 			singleLine = true
 			keyListener = DigitsKeyListener.getInstance("1234567890.")
 			filters = arrayOf(InputFilter.LengthFilter(10))
@@ -89,11 +98,13 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		}.into(this)
 		
 		linearLayout {
-			topPadding = 26.uiPX()
+			topPadding = 20.uiPX()
+			leftPadding = RAMMarketPadding
 			gravity = Gravity.CENTER_VERTICAL
 			imageView {
 				imageResource = R.drawable.trading_discipline
 				setColorFilter(Spectrum.deepBlue)
+				scaleType = ImageView.ScaleType.FIT_XY
 			}.lparams(30.uiPX(), 30.uiPX())
 			textView {
 				textColor = Spectrum.blue
@@ -104,13 +115,15 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		}
 		
 		confirmButton.apply {
-			setBlueStyle(width = ScreenSize.Width / 2 - 10.uiPX())
+			setBlueStyle(width = dashboardWidth - RAMMarketPadding)
 			text = EOSRAMExchangeText.confirmToTrade
 			(layoutParams as? LinearLayout.LayoutParams)?.apply {
 				gravity = Gravity.CENTER_HORIZONTAL
 			}
 			setMargins<LinearLayout.LayoutParams> {
 				topMargin = 11.uiPX()
+				leftMargin = 5.uiPX()
+				rightMargin = 5.uiPX()
 			}
 		}.into(this)
 		

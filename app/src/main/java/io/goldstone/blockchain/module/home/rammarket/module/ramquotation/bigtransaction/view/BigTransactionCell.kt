@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.formatCount
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.*
 
@@ -37,12 +38,15 @@ class BigTransactionCell(context: Context): RelativeLayout(context) {
 	
 	init {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
+		leftPadding = RAMMarketPadding
+		rightPadding = RAMMarketPadding
 		
 		view {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 1)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 1).apply {
+				alignParentBottom()
+			}
 			backgroundColor = GrayScale.lightGray
 		}
-		
 		verticalLayout {
 			leftPadding = 7.uiPX()
 			accountName = textView {

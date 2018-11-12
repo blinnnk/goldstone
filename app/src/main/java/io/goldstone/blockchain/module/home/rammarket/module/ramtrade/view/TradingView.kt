@@ -7,6 +7,7 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
 
 /**
@@ -20,21 +21,16 @@ class TradingView(context: Context): LinearLayout(context) {
 	
 	init {
 		orientation = LinearLayout.VERTICAL
-		leftPadding = 20.uiPX()
-		rightPadding = 20.uiPX()
+		rightPadding = RAMMarketPadding
 		view {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 1)
 			backgroundColor = GrayScale.lightGray
 			setMargins<LinearLayout.LayoutParams> {
 				topMargin = 16.uiPX()
-				bottomMargin = 16.uiPX()
-				
 			}
 		}
 	  linearLayout {
-			tradingDashboardView.apply {
-				layoutParams = LinearLayout.LayoutParams(ScreenSize.Width / 2, wrapContent)
-			}.into(this)
+			tradingDashboardView.into(this)
 			recentTradingListView.apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 332.uiPX())
 				setMargins<LinearLayout.LayoutParams> {

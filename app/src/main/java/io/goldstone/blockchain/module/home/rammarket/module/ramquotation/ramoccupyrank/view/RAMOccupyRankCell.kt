@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.formatCount
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.model.RAMRankModel
 import org.jetbrains.anko.*
 
@@ -64,9 +65,12 @@ class RAMOccupyRankCell(context: Context): RelativeLayout(context) {
 	
 	init {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 51.uiPX())
-		
+		leftPadding = RAMMarketPadding
+		rightPadding = RAMMarketPadding
 		view {
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 1)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 1).apply {
+				alignParentBottom()
+			}
 			backgroundColor = GrayScale.lightGray
 		}
 		
