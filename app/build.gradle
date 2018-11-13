@@ -81,7 +81,7 @@ dependencies {
   // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.8'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.2.9'
+  implementation 'com.blinnnk:honeyui:0.3.3.1'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin

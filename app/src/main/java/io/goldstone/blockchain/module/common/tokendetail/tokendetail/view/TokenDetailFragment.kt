@@ -96,6 +96,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		asyncData = arrayListOf()
 		token?.let {
 			presenter = TokenDetailPresenter(it, this)
 			presenter.start()

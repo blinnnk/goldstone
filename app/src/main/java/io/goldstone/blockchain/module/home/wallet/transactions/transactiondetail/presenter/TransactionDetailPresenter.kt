@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.suffix
 import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.language.CommonText
@@ -258,7 +259,7 @@ class TransactionDetailPresenter(
 			else data.date
 		detailView.showTransactionInformation(
 			TransactionDetailModel(data.hash, TransactionText.transactionHash),
-			TransactionDetailModel(minerFee, TransactionText.minerFee),
+			TransactionDetailModel(minerFee suffix data.symbol, TransactionText.minerFee),
 			TransactionDetailModel(blockNumberText, TransactionText.blockNumber),
 			TransactionDetailModel(confirmationsText, TransactionText.confirmations),
 			TransactionDetailModel(dateText, TransactionText.transactionDate)

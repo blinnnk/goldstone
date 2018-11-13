@@ -21,6 +21,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.presenter.EOSAccountSelectionPresenter
@@ -44,20 +45,18 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 
 	private var accountActors: List<AccountActor> by observing(listOf()) {
 		accountActors.forEachIndexed { index, actor ->
-			container.apply {
-				EOSAccountCell(context).apply {
-					id = index // for clearing radio checked status
-					if (actor.name == defaultActorName && defaultIndex.isNull()) {
-						setRadioStatus(true)
-						defaultIndex = index
-					}
-					setAccountInfo(actor.name, actor.permission.value)
-				}.click {
-					clearRadiosStatus(accountActors.size)
-					it.setRadioStatus(true)
-					defaultIndex = it.id
-				}.into(this)
-			}
+			EOSAccountCell(container.context).apply {
+				id = index // for clearing radio checked status
+				if (actor.name == defaultActorName && defaultIndex.isNull()) {
+					setRadioStatus(true)
+					defaultIndex = index
+				}
+				setAccountInfo(actor.name, actor.permission.value)
+			}.click {
+				clearRadiosStatus(accountActors.size)
+				it.setRadioStatus(true)
+				defaultIndex = it.id
+			}.into(container)
 		}
 	}
 	override val presenter = EOSAccountSelectionPresenter(this)
@@ -66,7 +65,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 		scrollView {
 			lparams(matchParent, matchParent)
 			verticalLayout {
-				lparams(matchParent, matchParent)
+				lparams(matchParent, wrapContent)
 				gravity = Gravity.CENTER_HORIZONTAL
 				attentionText.apply {
 					isCenter()
@@ -75,7 +74,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 					text = EOSAccountText.multipleAccountHint
 				}.into(this)
 				container = verticalLayout {
-					lparams(matchParent, matchParent)
+					lparams(matchParent, wrapContent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					loadingView = verticalLayout {
 						visibility = View.GONE

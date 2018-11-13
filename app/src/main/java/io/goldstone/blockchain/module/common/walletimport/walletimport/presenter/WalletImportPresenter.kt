@@ -4,6 +4,7 @@ import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -47,6 +48,7 @@ class WalletImportPresenter(
 					.getWalletByAddress(currentAddress)
 			if (allAddress == null) WalletTable(
 				0,
+				SharedWallet.getMaxWalletID() + 1,
 				name,
 				currentETHSeriesAddress = multiChainAddresses.eth.address,
 				currentETCAddress = multiChainAddresses.etc.address,

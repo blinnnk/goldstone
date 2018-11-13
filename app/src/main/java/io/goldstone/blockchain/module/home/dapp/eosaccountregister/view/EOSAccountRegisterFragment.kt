@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
+import com.blinnnk.model.MutablePair
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -19,7 +20,7 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.MutablePair
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
@@ -117,7 +118,9 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 						assignResources[1].right.toDouble()
 					) {
 						if (it.hasError()) safeShowError(it)
-						button.showLoadingStatus(false, Spectrum.blue, CommonText.confirm)
+						launchUI {
+							button.showLoadingStatus(false, Spectrum.blue, CommonText.confirm)
+						}
 					}
 				}.into(this)
 			}

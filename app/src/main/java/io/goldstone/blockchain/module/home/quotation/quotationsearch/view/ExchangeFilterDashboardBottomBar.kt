@@ -7,13 +7,13 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isDefaultStyle
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -60,7 +60,7 @@ class ExchangeFilterDashboardBottomBar(context: Context) : LinearLayout(context)
 				textSize = fontSize(12)
 			}
 			checkBox = checkBox {
-				isDefaultStyle()
+				isDefaultStyle(Spectrum.blue)
 				id = ElementID.checkBox
 				layoutParams = LinearLayout.LayoutParams(wrapContent, matchParent)
 				click { checkAllEvent?.run() }

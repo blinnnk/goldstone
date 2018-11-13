@@ -51,7 +51,6 @@ object GenerateMultiChainWallet {
 		object : ConcurrentAsyncCombine() {
 			val paths = DefaultPath.allPaths()
 			override var asyncCount: Int = paths.size
-			override val delayTime: Long? = 100
 			override val completeInUIThread: Boolean = false
 			override fun doChildTask(index: Int) {
 				context.apply {
@@ -117,10 +116,7 @@ object GenerateMultiChainWallet {
 							completeMark()
 						}
 						// Bitcoin Cash
-						DefaultPath.eosPath -> EOSWalletUtils.generateKeyPair(
-							mnemonic,
-							path.bchPath
-						).let { eosKeyPair ->
+						DefaultPath.eosPath -> EOSWalletUtils.generateKeyPair(mnemonic, path.eosPath).let { eosKeyPair ->
 							// `EOS` 的 `Prefix` 使用的 是 `Bitcoin` 的 `Mainnet Prefix` 所以无论是否是测试网这里的 `isTestnet` 都传 `False`
 							context.storeBase58PrivateKey(
 								eosKeyPair.privateKey,

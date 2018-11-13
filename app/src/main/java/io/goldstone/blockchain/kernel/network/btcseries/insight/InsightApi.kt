@@ -100,7 +100,11 @@ object InsightApi {
 			null,
 			isEncrypt
 		) { result, error ->
-			hold(result?.firstOrNull()?.toIntOrNull(), error)
+			try {
+				hold(result?.firstOrNull()?.toIntOrNull(), error)
+			} catch (error: Exception) {
+				hold(null, RequestError.None)
+			}
 		}
 	}
 

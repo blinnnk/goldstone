@@ -135,7 +135,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 					is SplashActivity -> {
 						it.findViewById<RelativeLayout>(ContainerID.splash)?.apply {
 							// 防止重复添加
-							findViewById<GoldStoneDialog>(ElementID.dialog).isNull {
+							if (findViewById<GoldStoneDialog>(ElementID.dialog).isNull()) {
 								GoldStoneDialog(context).let {
 									hold(it)
 									it.into(this)
@@ -147,7 +147,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 					else -> {
 						it.findViewById<RelativeLayout>(ContainerID.main)?.apply {
 							// 防止重复添加
-							findViewById<GoldStoneDialog>(ElementID.dialog).isNull {
+							if (findViewById<GoldStoneDialog>(ElementID.dialog).isNull()) {
 								GoldStoneDialog(context).let {
 									hold(it)
 									it.into(this)

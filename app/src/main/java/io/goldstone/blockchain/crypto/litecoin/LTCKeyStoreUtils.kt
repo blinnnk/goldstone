@@ -43,7 +43,7 @@ fun Context.exportLTCBase58PrivateKey(
 ) {
 	getPrivateKey(walletAddress, password, true) { privateKey, error ->
 		if (!privateKey.isNull() && error.isNone()) {
-			val key = LTCWalletUtils.generateWIFSecret(ECKey.fromPrivate(privateKey!!.toBigInteger(16)).privKey)
+			val key = LTCWalletUtils.generateWIFSecret(ECKey.fromPrivate(privateKey.toBigInteger(16)).privKey)
 			hold(key, AccountError.None)
 		}
 	}

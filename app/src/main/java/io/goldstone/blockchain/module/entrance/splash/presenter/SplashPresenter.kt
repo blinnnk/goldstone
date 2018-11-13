@@ -208,7 +208,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				SharedAddress.updateCurrentEOS(currentEOSAddress)
 				SharedAddress.updateCurrentEOSName(currentEOSAccountName.getCurrent())
 				SharedWallet.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				SharedWallet.updateCurrentWalletID(id)
+				SharedWallet.updateCurrentWalletID(avatarID)
 				SharedWallet.updateCurrentBalance(balance.orElse(0.0))
 				SharedWallet.updateCurrentName(name)
 				GoldStoneAPI.context.runOnUiThread { callback() }

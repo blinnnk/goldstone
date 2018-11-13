@@ -139,7 +139,7 @@ data class AppConfigTable(
 							it.safeGet("language").equals(HoneyLanguage.English.symbol, true)
 						}?.safeGet("terms").orEmpty()
 					} else {
-						return it!!.safeGet("terms")
+						return it.safeGet("terms")
 					}
 				}
 			}

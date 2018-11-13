@@ -4,6 +4,7 @@ package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.AccountError
@@ -166,7 +167,7 @@ fun Context.getPrivateKey(
 		if (keyStoreFile != null && error.isNone()) {
 			val keyPair =
 				WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
-			if (keyPair == null) hold(null, AccountError.WrongPassword)
+			if (keyPair.isNull()) hold(null, AccountError.WrongPassword)
 			else hold(keyPair.privateKey.toString(16), AccountError.None)
 		} else hold(null, error)
 	}

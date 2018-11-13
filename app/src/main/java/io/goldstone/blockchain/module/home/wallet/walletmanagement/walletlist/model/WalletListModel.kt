@@ -22,7 +22,7 @@ data class WalletListModel(
 ) {
 
 	constructor(data: WalletTable, type: String) : this(
-		data.id,
+		data.avatarID,
 		data.name,
 		data.getCurrentAddresses().first(),
 		data.getAddressDescription(),

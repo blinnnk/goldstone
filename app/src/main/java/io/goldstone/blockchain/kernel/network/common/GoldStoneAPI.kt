@@ -6,6 +6,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -15,7 +16,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
@@ -430,7 +430,7 @@ object GoldStoneAPI {
 					hold(arrayListOf(), error)
 				} else {
 					val notifications =
-						jsonArray.toList().map { NotificationTable(it) }.toArrayList()
+						jsonArray.toJSONObjectList().map { NotificationTable(it) }.toArrayList()
 					hold(notifications, error)
 				}
 			} else hold(null, error)

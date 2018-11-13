@@ -44,7 +44,6 @@ class TokenDetailPresenter(
 
 	override fun start() {
 		detailView.showLoading(true)
-		detailView.asyncData = arrayListOf()
 		updateEmptyCharData()
 		loadDataFromChain()
 	}

@@ -34,6 +34,7 @@ data class WalletTable(
 	//@PrimaryKey autoGenerate 自增
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
+	var avatarID: Int,
 	var name: String,
 	var currentETHSeriesAddress: String,
 	var currentETCAddress: String,
@@ -79,6 +80,7 @@ data class WalletTable(
 		eosAccountNames: List<EOSAccountInfo>
 	) : this(
 		0,
+		SharedWallet.getMaxWalletID() + 1,
 		walletName,
 		currentETHSeriesAddress = currentETHSeriesAddress,
 		isUsing = true,

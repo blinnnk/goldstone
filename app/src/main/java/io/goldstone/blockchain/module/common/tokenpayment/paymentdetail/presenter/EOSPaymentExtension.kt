@@ -1,11 +1,13 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -29,7 +31,7 @@ import org.jetbrains.anko.doAsync
 fun PaymentDetailPresenter.transferEOS(
 	count: Double,
 	contract: TokenContract,
-	@UiThread callback: (error: GoldStoneError) -> Unit
+	@WorkerThread callback: (error: GoldStoneError) -> Unit
 ) {
 	// 准备转账信息
 	EOSTransactionInfo(
@@ -52,19 +54,21 @@ private fun PaymentDetailPresenter.insertPendingDataAndGoToTransactionDetail(
 	response: EOSResponse,
 	callback: (GoldStoneError) -> Unit
 ) {
-	val receiptModel = ReceiptModel(info, response, getToken()!!)
-	rootFragment?.goToTransactionDetailFragment(fragment, receiptModel)
-	// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
-	doAsync {
-		EOSTransactionTable.getMaxDataIndexTable(
-			info.fromAccount,
-			getToken()?.contract.orEmpty(),
-			SharedChain.getEOSCurrent().chainID
-		) {
-			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
-			val transaction = EOSTransactionTable(info, response, dataIndex)
-			GoldStoneDataBase.database.eosTransactionDao().insert(transaction)
+	launchUI {
+		getToken()?.let {
+			val receiptModel = ReceiptModel(info, response, it)
+			rootFragment?.goToTransactionDetailFragment(fragment, receiptModel)
 		}
+	}
+	// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
+	EOSTransactionTable.getMaxDataIndexTable(
+		info.fromAccount,
+		getToken()?.contract.orEmpty(),
+		SharedChain.getEOSCurrent().chainID
+	) {
+		val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
+		val transaction = EOSTransactionTable(info, response, dataIndex)
+		GoldStoneDataBase.database.eosTransactionDao().insert(transaction)
 	}
 	callback(GoldStoneError.None)
 }

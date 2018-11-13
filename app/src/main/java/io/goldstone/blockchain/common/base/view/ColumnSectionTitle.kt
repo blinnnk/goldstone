@@ -4,10 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.GridLayout
 import android.widget.LinearLayout
+import com.blinnnk.model.MutablePair
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize

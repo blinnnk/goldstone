@@ -40,7 +40,7 @@ class EOSSellRamTransaction(
 				val serializedActionSize = "01" // 目前不支持批量给多账户购买所以 `ActionSize` 写死 `1`
 				val serializedContextFreeActions = EOSUtils.getVariableUInt(contextFreeActions.size)
 				val serializedTransactionExtension = "00"
-				val packedTX = header!!.serialize() + serializedContextFreeActions + serializedActionSize + model.serialize() + serializedTransactionExtension
+				val packedTX = header.serialize() + serializedContextFreeActions + serializedActionSize + model.serialize() + serializedTransactionExtension
 				val serializedCode = (chainID.id + packedTX).completeZero()
 				hold(EOSTransactionSerialization(packedTX, serializedCode), error)
 			} else hold(null, error)

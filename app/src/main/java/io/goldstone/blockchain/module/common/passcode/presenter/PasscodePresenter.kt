@@ -23,8 +23,8 @@ import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import kotlinx.coroutines.Dispatchers
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 23/04/2018 11:04 AM
@@ -40,11 +40,11 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 		var retryTimes = config.retryTimes.orZero()
 		checkPasscode(config, passcode) { isCorrect ->
 			if (isCorrect) {
-				if (retryTimes < Count.retry) launchUI {
+				if (retryTimes < Count.retry) GlobalScope.launch(Dispatchers.Default) {
 					resetConfig()
 				}
 				fragment.removePasscodeFragment()
-			} else doAsync {
+			} else GlobalScope.launch(Dispatchers.Default) {
 				retryTimes -= 1
 				val configDao =
 					GoldStoneDataBase.database.appConfigDao()
@@ -56,7 +56,7 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 					configDao.updateFrozenTime(frozenTime)
 					// 进入冻结状态后恢复重试次数
 					resetConfig()
-				} else uiThread {
+				} else launchUI {
 					fragment.resetHeaderStyle()
 					fragment.showFailedAttention("incorrect passcode $retryTimes retry times left")
 				}

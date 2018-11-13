@@ -72,7 +72,7 @@ class AddressSelectionPresenter(
 			// 如果不是 `681` 格式的 `QRCode` 那么当作纯地址进行检测
 			val addressType =
 				MultiChainUtils.isValidMultiChainAddress(qrCode.content, token.symbol)
-			if (addressType.isNull() || !addressType?.symbol.equals(token.symbol.symbol, true))
+			if (addressType.isNull() || !addressType.symbol.equals(token.symbol.symbol, true))
 				selectionView.showError(Throwable(QRText.invalidQRCodeAlert))
 			else showPaymentDetail(qrCode.content, 0.0)
 		}

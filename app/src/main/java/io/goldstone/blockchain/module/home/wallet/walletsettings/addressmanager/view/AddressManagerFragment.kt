@@ -159,7 +159,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	override val presenter = AddressManagerPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
-		setAddButtonEvent()
+		if (SharedWallet.getCurrentWalletType().isBIP44()) setAddButtonEvent()
 		scrollView {
 			lparams(matchParent, matchParent)
 			verticalLayout {
@@ -172,7 +172,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun showAddresses(parent: ViewGroup) {
-		// 不为空才显示 `bip44` 规则的子地址界面
 		WalletTable.getCurrent(Dispatchers.Main) {
 			currentMultiChainAddressesView.into(parent)
 			setMultiChainAddresses(this)
@@ -204,7 +203,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					setLitecoinAddressesModel(this)
 				}
 			} else {
-				hideAddButton()
 				attentionView.into(parent)
 			}
 		}

@@ -269,7 +269,7 @@ class QuotationSearchPresenter(
 				if (localData.isEmpty()) StartingPresenter.getAndUpdateExchangeTables { exchangeTables, error ->
 					//数据库没有数据，从网络获取
 					if (!exchangeTables.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
-						hold(exchangeTables!!)
+						hold(exchangeTables)
 					} else GoldStoneAPI.context.runOnUiThread {
 						hold(arrayListOf())
 					}

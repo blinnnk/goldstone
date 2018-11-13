@@ -247,7 +247,7 @@ class GasSelectionPresenter(
 		return ReceiptModel(
 			raw.fromAddress,
 			raw.toAddress,
-			fee.toString(),
+			fee.toBTCCount().toBigDecimal().toPlainString(),
 			raw.value.toBigInteger(),
 			getToken()!!,
 			taxHash,

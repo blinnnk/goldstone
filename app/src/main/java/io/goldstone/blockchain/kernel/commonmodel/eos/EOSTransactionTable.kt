@@ -94,7 +94,7 @@ data class EOSTransactionTable(
 			val data =
 				GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(
 					account.accountName,
-					contract.contract.orEmpty(),
+					contract.contract,
 					contract.symbol,
 					chainID.id
 				)
