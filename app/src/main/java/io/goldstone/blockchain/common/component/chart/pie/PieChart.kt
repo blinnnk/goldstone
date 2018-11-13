@@ -310,7 +310,7 @@ open class PieChart : PieRadarChartBase<PieData> {
   }
   
   override fun calcMinMax() {
-    calcAngles()
+		calculateAngles()
   }
   
   override fun getMarkerPosition(highlight: Highlight): FloatArray {
@@ -344,7 +344,7 @@ open class PieChart : PieRadarChartBase<PieData> {
   /**
    * calculates the needed angles for the chart slices
    */
-  private fun calcAngles() {
+  private fun calculateAngles() {
     
     val entryCount = mData.entryCount
     

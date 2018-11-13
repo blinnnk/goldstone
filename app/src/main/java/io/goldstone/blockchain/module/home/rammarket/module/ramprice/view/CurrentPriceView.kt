@@ -36,7 +36,7 @@ class CurrentPriceView(context: Context) : LinearLayout(context) {
 			currentPrice = textView {
 				text = "--"
 				textSize = fontSize(26)
-				typeface = GoldStoneFont.black(context)
+				typeface = GoldStoneFont.heavy(context)
 				textColor  = GrayScale.black
 				singleLine = true
 			}
@@ -49,7 +49,7 @@ class CurrentPriceView(context: Context) : LinearLayout(context) {
 			}
 			trendcyPercent = textView {
 				gravity = Gravity.END
-				textSize = fontSize(13)
+				textSize = fontSize(26)
 				typeface = GoldStoneFont.heavy(context)
 				text = ""
 				singleLine = true

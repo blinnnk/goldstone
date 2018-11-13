@@ -29,10 +29,11 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
 	private val priceMenuCandleChart by lazy {
 		RAMPriceChartAndMenuView(context!!) {
+			showCandleDataLoadingView()
 			presenter.updateRAMCandleData(it)
 		}
 	}
-	private val tradingView by lazy { TradingView(context!!) }
+	private val tradingView by lazy { TradingView(context!!, this) }
 	private val quotationViewParent by lazy { QuotationViewPager(this) }
 	
 	override val presenter: RAMMarketDetailPresenter = RAMMarketDetailPresenter(this)
@@ -68,8 +69,13 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 		
 	}
 	
-	fun setCurrentPriceAndPercent(price: String, percent: Double) {
-		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.toDouble().formatCount(3)} EOS/KB)"
+	fun setCurrentPriceAndPercent(price: Double, percent: Double) {
+		val formatCount = when {
+			price < 10.0 -> 4
+			price < 100.0 -> 3
+			else -> 2
+		}
+		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.formatCount(formatCount)} EOS/KB)"
 		ramPriceView.currentPriceView.currentPrice.text = price.toDouble().formatCount(4)
 		ramPriceView.currentPriceView.trendcyPercent.apply {
 			if (percent > 0) {
@@ -94,7 +100,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	}
 	
 	fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
-		data.isEmpty() isTrue { return }
+		priceMenuCandleChart.removeLoadingView()
 		priceMenuCandleChart.candleChart.resetData(dateType, data.mapIndexed { index, entry ->
 			CandleEntry(
 				index.toFloat(),
@@ -117,6 +123,9 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	fun setRAMBalance(ramBalance: String, eosBalance: String) {
 		tradingView.tradingDashboardView.ramBalance.text = EOSRAMExchangeText.ramBalanceDescription(ramBalance)
 		tradingView.tradingDashboardView.eosBalance.text = EOSRAMExchangeText.eosBalanceDescription(eosBalance)
+	}
+	private fun showCandleDataLoadingView() {
+		priceMenuCandleChart.showLoadingView()
 	}
 	
 }

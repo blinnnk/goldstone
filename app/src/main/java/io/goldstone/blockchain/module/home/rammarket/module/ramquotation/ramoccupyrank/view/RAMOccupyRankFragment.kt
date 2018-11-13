@@ -1,19 +1,13 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.view
 
-import android.os.Bundle
 import com.blinnnk.extension.*
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.model.RAMRankModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.presenter.RAMOccupyRankPresenter
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.RAMTransactionSearchFragment
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
-import org.jetbrains.anko.leftPadding
-import org.jetbrains.anko.rightPadding
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
@@ -36,14 +30,7 @@ class RAMOccupyRankFragment : BaseRecyclerFragment<RAMOccupyRankPresenter, RAMRa
 			onClick {
 				getParentFragment<RAMMarketDetailFragment> {
 					getParentFragment<RAMMarketOverlayFragment> {
-						presenter.showTargetFragment<RAMTransactionSearchFragment>(Bundle().apply { putString("account", model.account) })
-						getOverlayHeader().apply {
-							showBackButton(false) { }
-							showSearchInput {
-								presenter.popFragmentFrom<RAMTransactionSearchFragment>()
-							}
-						}
-						
+						presenter.showTransactionHistoryFragment(model.account)
 					}
 				}
 			}

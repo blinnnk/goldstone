@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date: 2018/10/31.
@@ -29,13 +30,17 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	val ramBalance by lazy { TextView(context) }
 	val eosBalance by lazy { TextView(context) }
 	private val confirmButton by lazy { RoundButton(context) }
-	
+	private var showHistoryEvent: Runnable? = null
 	private val dashboardWidth = ScreenSize.Width / 2 + RAMMarketPadding * 2
+	
+	fun setShowHistoryEvent(runnable: Runnable) {
+		showHistoryEvent = runnable
+	}
 	
 	init {
 	  orientation = LinearLayout.VERTICAL
 		layoutParams = LinearLayout.LayoutParams(dashboardWidth, wrapContent)
-		menu = ButtonMenu(context)
+		menu = TradingDashboardMenu(context)
 		menu.layoutParams = LinearLayout.LayoutParams(dashboardWidth - RAMMarketPadding * 2, 32.uiPX())
 		menu.setMargins<LinearLayout.LayoutParams> {
 			leftMargin = 10.uiPX()
@@ -46,9 +51,11 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			button.click {
 				menu.selected(button.id)
 				if (button.id == 0) {
-				
+					confirmButton.setBlueStyle(width = dashboardWidth - RAMMarketPadding)
+					confirmButton.resetConfirmParams()
 				} else {
-				
+					confirmButton.setRedStyle(width = dashboardWidth - RAMMarketPadding)
+					confirmButton.resetConfirmParams()
 				}
 			}
 		}
@@ -69,7 +76,7 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		}.into(this)
 		
 		ramBalance.apply {
-			leftPadding = 20.uiPX()
+			leftPadding = RAMMarketPadding
 			text = EOSRAMExchangeText.ramBalanceDescription("0")
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.heavy(context)
@@ -90,7 +97,7 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		}.into(this)
 		
 		eosBalance.apply {
-			leftPadding = 20.uiPX()
+			leftPadding = RAMMarketPadding
 			text = EOSRAMExchangeText.eosBalanceDescription("0")
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.heavy(context)
@@ -112,21 +119,28 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 				typeface = GoldStoneFont.black(context)
 				text = EOSRAMExchangeText.transactionHistory
 			}
+			onClick {
+				showHistoryEvent?.run()
+			}
 		}
 		
 		confirmButton.apply {
 			setBlueStyle(width = dashboardWidth - RAMMarketPadding)
 			text = EOSRAMExchangeText.confirmToTrade
-			(layoutParams as? LinearLayout.LayoutParams)?.apply {
-				gravity = Gravity.CENTER_HORIZONTAL
-			}
-			setMargins<LinearLayout.LayoutParams> {
-				topMargin = 11.uiPX()
-				leftMargin = 5.uiPX()
-				rightMargin = 5.uiPX()
-			}
+			resetConfirmParams()
 		}.into(this)
 		
+	}
+	
+	private fun RoundButton.resetConfirmParams() {
+		(layoutParams as? LinearLayout.LayoutParams)?.apply {
+			gravity = Gravity.CENTER_HORIZONTAL
+		}
+		setMargins<LinearLayout.LayoutParams> {
+			topMargin = 11.uiPX()
+			leftMargin = 5.uiPX()
+			rightMargin = 5.uiPX()
+		}
 	}
 	
 }

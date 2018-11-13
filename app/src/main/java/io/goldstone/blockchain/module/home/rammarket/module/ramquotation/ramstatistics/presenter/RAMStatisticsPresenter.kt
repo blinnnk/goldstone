@@ -50,7 +50,7 @@ class RAMStatisticsPresenter(override val fragment: RAMStatisticsFragment)
 		EOSAPI.getRAMMarket { data, error ->
 			if (data != null && error.isNone()) {
 				val divider = BigDecimal(Math.pow(1024.toDouble(), 3.toDouble()))
-				val ramBalance = BigDecimal(data.ramBalance).divide(divider, 4, BigDecimal.ROUND_HALF_UP).toPlainString()
+				val ramBalance = BigDecimal(data.ramBalance).divide(divider, 2, BigDecimal.ROUND_HALF_UP).toPlainString()
 				val ramOfEOS = data.eosBalance.formatCount(4)
 				GoldStoneAPI.context.runOnUiThread {
 					fragment.setChainRAMData(ramBalance, ramOfEOS)

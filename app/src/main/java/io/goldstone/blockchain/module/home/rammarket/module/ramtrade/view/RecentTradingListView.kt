@@ -10,7 +10,9 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Tradi
  * @author: yanglihai
  * @description:
  */
-class RecentTradingListView(context: Context): RecyclerView(context) {
+class RecentTradingListView(context: Context,
+	private val itemHold: TradingInfoModel.() -> Unit)
+	: RecyclerView(context) {
 	
 	init {
 		layoutManager = LinearLayoutManager(context)
@@ -19,7 +21,7 @@ class RecentTradingListView(context: Context): RecyclerView(context) {
 	}
 	
 	fun setData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
-		adapter = RecentTradingAdapter(buyList, sellList)
+		adapter = RecentTradingAdapter(buyList, sellList, itemHold)
 	}
 	
 }

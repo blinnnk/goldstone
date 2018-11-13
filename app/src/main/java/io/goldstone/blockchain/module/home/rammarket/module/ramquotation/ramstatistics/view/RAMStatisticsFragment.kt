@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramsta
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
@@ -11,9 +10,9 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
-import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.presenter.RAMStatisticsPresenter
 import org.jetbrains.anko.*
 
@@ -62,7 +61,12 @@ class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
 			globalRAMCard.apply {
 				addView(ramAssetCell)
 			}.into(this)
-			SessionTitleView(context).setTitle(EOSRAMExchangeText.chainRAMData).into(this)
+			textView {
+				text = EOSRAMExchangeText.chainRAMData
+				textSize = fontSize(12)
+				textColor = GrayScale.midGray
+				setPadding(15.uiPX(), 15.uiPX(), 0, 10.uiPX())
+			}
 			ramBalanceCell.into(this)
 			ramTotalCell.into(this)
 			ramOfEOSCell.into(this)

@@ -16,7 +16,7 @@ class RAMPriceRoundInputView(context: Context, private val unit: String): RoundI
 		canvas?.drawText(
 			unit,
 			width - textPaint.measureText(unit) - 25.uiPX(),
-			32.uiPX().toFloat(),
+			37.uiPX().toFloat(),
 			textPaint
 		)
 	}

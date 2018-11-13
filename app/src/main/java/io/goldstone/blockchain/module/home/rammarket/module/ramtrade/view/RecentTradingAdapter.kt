@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date: 2018/10/31.
@@ -23,7 +24,8 @@ import org.jetbrains.anko.*
  */
 class RecentTradingAdapter(
 	private val buyList: List<TradingInfoModel>,
-	private val sellList: List<TradingInfoModel>
+	private val sellList: List<TradingInfoModel>,
+	private val hold: TradingInfoModel.() -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 	
 	override fun onCreateViewHolder(
@@ -57,11 +59,19 @@ class RecentTradingAdapter(
 					val model = buyList[position - 1]
 					val maxValue = buyList.maxBy { it.quantity }?.quantity ?: 0.0
 					setData(model.account, model.quantity, maxValue, Color.parseColor("#0F1CC881"))
+					onClick {
+						hold(model)
+					}
 				} else {
 					val model = sellList[position - buyList.size - 2]
 					val maxValue = sellList.maxBy { it.quantity }?.quantity ?: 0.0
 					setData(model.account, model.quantity, maxValue, Color.parseColor("#0FFF6464"))
+					onClick {
+						hold(model)
+					}
 				}
+				
+				
 			}
 		}
 		

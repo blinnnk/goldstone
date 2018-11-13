@@ -19,6 +19,7 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Utils
 import com.github.mikephil.charting.utils.ViewPortHandler
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 
 @Suppress("DEPRECATION")
 /**
@@ -87,6 +88,7 @@ class PieChartRenderer(
 		mValuePaint.textSize = Utils.convertDpToPixel(13f)
 		mValuePaint.color = Color.WHITE
 		mValuePaint.textAlign = Paint.Align.CENTER
+		mValuePaint.typeface = GoldStoneFont.book(pieChart.context)
 		
 		paintEntryLabels = Paint(Paint.ANTI_ALIAS_FLAG)
 		paintEntryLabels.color = Color.WHITE

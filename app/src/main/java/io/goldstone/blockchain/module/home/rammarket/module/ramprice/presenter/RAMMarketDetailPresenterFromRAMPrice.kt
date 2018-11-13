@@ -176,7 +176,7 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 		updateTodayPriceUI()
 		calculatePricePercent()
 		fragment.setCurrentPriceAndPercent(
-			BigDecimal("${infoModel.currentPrice}").toPlainString(),
+			infoModel.currentPrice,
 			infoModel.pricePercent
 		)
 		
@@ -189,7 +189,7 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 fun RAMMarketDetailPresenter.calculatePricePercent() {
 	if (ramInformationModel.openPrice == 0.0) return
 	var trend = BigDecimal((ramInformationModel.currentPrice - ramInformationModel.openPrice)).divide(
-		BigDecimal(ramInformationModel.openPrice), 2, BigDecimal.ROUND_HALF_UP).toDouble()
+		BigDecimal(ramInformationModel.openPrice), 4, BigDecimal.ROUND_HALF_UP).toDouble()
 	trend *= 100f
 	ramInformationModel.pricePercent = trend
 }
@@ -210,7 +210,7 @@ fun RAMMarketDetailPresenter.getTodayPrice() {
 //				fragment.safeShowError(error)
 					// 出错了可能长连接已经断了， 需要在此给当前价格赋值
 				fragment.setCurrentPriceAndPercent(
-					BigDecimal.valueOf(ramInformationModel.currentPrice).toPlainString(),
+					ramInformationModel.currentPrice,
 					ramInformationModel.pricePercent
 				)
 				

@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
 
 /**
@@ -18,7 +19,7 @@ import org.jetbrains.anko.*
  * @description:
  */
 class RAMTodayPriceView(context: Context): LinearLayout(context) {
-	private val viewWidth = ScreenSize.Width - 40.uiPX()
+	private val viewWidth = ScreenSize.Width - RAMMarketPadding * 2
 	lateinit var startPrice: TextView
 	lateinit var highPrice: TextView
 	lateinit var lowPrice: TextView
@@ -28,7 +29,7 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 		layoutParams = LayoutParams(viewWidth, wrapContent)
 		linearLayout {
 			topPadding = 10.uiPX()
-			bottomPadding = 16.uiPX()
+			bottomPadding = 10.uiPX()
 			startPrice = textView {
 				gravity = Gravity.START
 				text = EOSRAMExchangeText.openPrice("")

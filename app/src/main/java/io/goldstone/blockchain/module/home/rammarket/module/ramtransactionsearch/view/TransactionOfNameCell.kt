@@ -60,7 +60,7 @@ class TransactionOfNameCell(context: Context): RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				centerVertically()
 			}
-			setMargins<RelativeLayout.LayoutParams> { leftMargin = 150.uiPX() }
+			setMargins<RelativeLayout.LayoutParams> { leftMargin = 135.uiPX() }
 		}
 		
 		amount = textView {

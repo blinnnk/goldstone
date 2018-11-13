@@ -2,14 +2,19 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramprice.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.ButtonMenu
+import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
+import org.jetbrains.anko.relativeLayout
 import org.jetbrains.anko.sdk27.coroutines.onClick
 @SuppressLint("ViewConstructor")
 /**
@@ -23,13 +28,16 @@ class RAMPriceChartAndMenuView(
 ): LinearLayout(context) {
 	
 	val candleChart by lazy {
-		EOSRAMPriceCandleChart(context).apply {
-		}
+		EOSRAMPriceCandleChart(context)
 	}
 	private val menu by lazy {
 		ButtonMenu(context).apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - RAMMarketPadding * 2, 32.uiPX())
 		}
+	}
+	
+	private val loadingView by lazy {
+		TopMiniLoadingView(context)
 	}
 	
 	init {
@@ -55,11 +63,28 @@ class RAMPriceChartAndMenuView(
 		menu.selected(EOSRAMChartType.Minute.code)
 		
 		addView(menu)
-		addView(candleChart)
+		relativeLayout {
+			gravity = Gravity.CENTER
+			addView(candleChart)
+			addView(loadingView.apply {
+				setMargins<RelativeLayout.LayoutParams> {
+					topMargin = 100.uiPX()
+				}
+			})
+			removeLoadingView()
+		}
+	}
+	
+	fun showLoadingView() {
+		loadingView.visibility = View.VISIBLE
+	}
+	
+	fun removeLoadingView() {
+		loadingView.visibility = View.GONE
 	}
 	
 	private fun updateCurrentData(buttonId: Int){
-		hold( when(buttonId) {
+		hold(when(buttonId) {
 			EOSRAMChartType.Minute.code -> EOSRAMChartType.Minute
 			EOSRAMChartType.Hour.code -> EOSRAMChartType.Hour
 			EOSRAMChartType.Day.code -> EOSRAMChartType.Day
