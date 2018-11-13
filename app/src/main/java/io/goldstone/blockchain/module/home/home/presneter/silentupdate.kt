@@ -209,7 +209,7 @@ abstract class SilentUpdater {
 					node.apply {
 						isUsed = localNodes.find {
 							it.url.equals(node.url, true)
-						}?.isUsed.orElse(1)
+						}?.isUsed ?: 0
 					}
 				}.let {
 					nodeDao.insertAll(it)
