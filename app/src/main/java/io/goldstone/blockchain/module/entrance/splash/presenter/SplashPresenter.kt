@@ -10,7 +10,9 @@ import com.blinnnk.extension.otherwise
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -24,7 +26,8 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 import java.io.File
 
 /**
@@ -73,7 +76,8 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	fun initNodeList(@WorkerThread callback: () -> Unit) {
-		val localNode = GoldStoneDataBase.database.chainNodeDao().getAll()
+		val localNode =
+			GoldStoneDataBase.database.chainNodeDao().getAll()
 		if (localNode.isEmpty()) {
 			StartingPresenter.insertLocalNodeList(activity, callback)
 		} else callback()
@@ -155,7 +159,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				currentWallet.getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				if (NetworkUtil.hasNetwork(context)) {
-					currentWallet.checkOrUpdateEOSAccount(callback)
+					currentWallet.checkOrUpdateEOSAccount(context, callback)
 					SharedValue.updateAccountCheckedStatus(true)
 				} else {
 					// 符合需要检测 Account 条件但是因为没有网络而跳过的情况需要标记
@@ -170,7 +174,10 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 
-		private fun WalletTable.checkOrUpdateEOSAccount(@UiThread callback: () -> Unit) {
+		private fun WalletTable.checkOrUpdateEOSAccount(
+			context: Context,
+			@UiThread callback: () -> Unit
+		) {
 			// 观察钱包的时候会把 account name 存成 address 当删除钱包检测到下一个默认钱包
 			// 刚好是 EOS 观察钱包的时候越过检查 Account Name 的缓解
 			val isEOSWatchOnly = EOSAccount(currentEOSAddress).isValid(false)
@@ -185,12 +192,16 @@ class SplashPresenter(val activity: SplashActivity) {
 							callback
 						)
 					}
-				} else GoldStoneAPI.context.runOnUiThread {
+				} else launchUI {
 					val title = "Check EOS Account Name Error"
 					val subtitle = error.message
-					alert(subtitle, title) {
-						yesButton { callback() }
-						cancelButton { callback() }
+					context.showAlertView(
+						title,
+						subtitle,
+						false,
+						{ cacheDataAndSetNetBy(this, callback) }
+					) {
+						cacheDataAndSetNetBy(this, callback)
 					}
 				}
 			}

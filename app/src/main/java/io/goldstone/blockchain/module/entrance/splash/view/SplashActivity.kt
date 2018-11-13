@@ -169,8 +169,8 @@ class SplashActivity : AppCompatActivity() {
 		val eosTest = chainDao.getTestnetEOSNode()
 		val eosMain = chainDao.getMainnetEOSNode()
 		val localNode = if (SharedValue.isTestEnvironment()) {
-			chainDao.getTestnet()
-		} else chainDao.getMainnet()
+			chainDao.getUsedTestnet()
+		} else chainDao.getUsedMainnet()
 		localNode.forEach {
 			when {
 				ChainType(it.chainType).isETH() -> SharedChain.updateCurrentETH(ChainURL(it))

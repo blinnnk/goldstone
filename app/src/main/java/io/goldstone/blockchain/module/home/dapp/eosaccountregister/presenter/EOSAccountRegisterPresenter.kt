@@ -13,7 +13,7 @@ import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
-import io.goldstone.blockchain.crypto.eos.base.showDialog
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatDecimal
@@ -58,7 +58,7 @@ class EOSAccountRegisterPresenter(
 		ramAmount: BigInteger,
 		cpuEOSCount: Double,
 		netAEOSCount: Double,
-		callback: (GoldStoneError) -> Unit
+		callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		// 首先查询 `RAM` 每 `Byte` 对应的 `EOS Count` 计算出即将分配的 `RAM` 价值的 `EOS Count`
 		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { priceInEOS, ramPriceError ->
@@ -67,7 +67,7 @@ class EOSAccountRegisterPresenter(
 				val creatorAccount = SharedAddress.getCurrentEOSAccount()
 				val totalSpent = (cpuEOSCount + netAEOSCount + ramEOSCount).formatDecimal(4)
 				checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
-					if (error.hasError()) callback(error)
+					if (error.hasError()) callback(null, error)
 					else BaseTradingPresenter.prepareTransaction(
 						fragment.context,
 						creatorAccount,
@@ -85,18 +85,11 @@ class EOSAccountRegisterPresenter(
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
 								netAEOSCount.toEOSUnit()
-							).send(privateKey) { response, error ->
-								if (response != null && error.isNone()) {
-									fragment.getParentContainer()?.apply {
-										response.showDialog(this)
-									}
-									callback(GoldStoneError.None)
-								} else callback(error)
-							}
-						} else callback(privateKeyError)
+							).send(privateKey, callback)
+						} else callback(null, privateKeyError)
 					}
 				}
-			} else callback(ramPriceError)
+			} else callback(null, ramPriceError)
 		}
 	}
 
