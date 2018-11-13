@@ -9,8 +9,8 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.radioButton
@@ -41,7 +41,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		this.addView(title)
 		title.setCenterInVertical()
 		radioButton = radioButton().apply {
-			isDefaultStyle()
+			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 			setAlignParentRight()
 			setCenterInVertical()

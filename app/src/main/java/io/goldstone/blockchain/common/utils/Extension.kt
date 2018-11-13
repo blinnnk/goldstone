@@ -123,29 +123,7 @@ fun BigInteger.convertToTimeUnit(): String {
 
 fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
 
-class MutablePair<L, R>(var left: L, var right: R)
-
-fun JSONArray.toList(): List<JSONObject> {
-	var result = listOf<JSONObject>()
-	(0 until length()).forEach {
-		result += JSONObject(get(it).toString())
-	}
-	return result
-}
-
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
-
-fun CompoundButton.isDefaultStyle() {
-	buttonTintList = ColorStateList(
-		arrayOf(
-			intArrayOf(-R.attr.state_checked), //disabled
-			intArrayOf(R.attr.state_checked) //enabled
-		),
-		// disabled - enabled
-		intArrayOf(GrayScale.midGray, Spectrum.blue)
-	)
-}
-
 @UiThread
 fun Fragment.safeShowError(error: Throwable) {
 	ErrorDisplayManager(error).show(context)

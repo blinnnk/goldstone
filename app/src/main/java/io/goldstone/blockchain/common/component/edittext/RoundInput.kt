@@ -12,16 +12,15 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.LinearLayout
+import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SafeLevel
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import org.jetbrains.anko.hintTextColor
+import io.goldstone.blockchain.common.value.ScreenSize
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onFocusChange
-import org.jetbrains.anko.singleLine
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
 
 /**
  * @date 22/03/2018 3:11 PM
@@ -210,8 +209,10 @@ open class RoundInput(context: Context) : EditText(context) {
 		}
 	}
 
-	fun setNumberInput() {
-		inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+	fun setNumberInput(hasDecimal: Boolean = true) {
+		inputType =
+			if (hasDecimal) InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+			else InputType.TYPE_CLASS_NUMBER
 	}
 
 	fun setTextInput() {
@@ -226,5 +227,27 @@ open class RoundInput(context: Context) : EditText(context) {
 
 	fun setPinCodeInput() {
 		inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+	}
+
+	private var dialogShown = false
+	fun checkNumberValue(hasDecimal: Boolean, callback: () -> Unit) {
+		fun alertOrCallback() {
+			if (!dialogShown) {
+				context.alert {
+					isCancelable = false
+					dialogShown = true
+					title = "Invalid Input value"
+					cancelButton { dialogShown = false }
+					yesButton { editableText.clear() }
+				}
+			} else {
+				callback()
+			}
+		}
+		if (hasDecimal && getContent().toDoubleOrNull().isNull()) {
+			alertOrCallback()
+		} else if (!hasDecimal && getContent().toIntOrNull().isNull()) {
+			alertOrCallback()
+		} else callback()
 	}
 }

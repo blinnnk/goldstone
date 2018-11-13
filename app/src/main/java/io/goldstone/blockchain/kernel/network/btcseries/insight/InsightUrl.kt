@@ -56,8 +56,8 @@ object InsightUrl {
 			chaiID.isBCHTest() -> WebUrl.bchTest
 			chaiID.isBTCMain() -> WebUrl.btcGoldStone
 			chaiID.isBTCTest() -> WebUrl.btcTestGoldStone
-			chaiID.isLTCMain() -> WebUrl.ltcMain
-			chaiID.isLTCTest() -> WebUrl.ltcTest
+			chaiID.isLTCMain() -> WebUrl.ltcGoldStone
+			chaiID.isLTCTest() -> WebUrl.ltcTestGoldStone
 			else -> throw Throwable("Wrong Insight API Header")
 		}
 	}

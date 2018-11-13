@@ -6,7 +6,10 @@ import android.support.annotation.WorkerThread
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
@@ -58,7 +61,7 @@ class SplashActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-		savedInstanceState.isNull {
+		if (savedInstanceState.isNull()) {
 			transparentStatus()
 			setContentView(container.apply {
 				gradientView.into(this)
@@ -203,13 +206,13 @@ class SplashActivity : AppCompatActivity() {
 		doAsync {
 			val config =
 				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			if(config == null) {
+			if (config == null) {
 				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
 				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 				AppConfigTable.insertAppConfig(callback)
 			} else {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
-				if(config.isRegisteredAddresses) {
+				if (config.isRegisteredAddresses) {
 					val currentWallet =
 						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 					XinGePushReceiver.registerAddressesForPush(currentWallet)

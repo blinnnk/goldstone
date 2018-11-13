@@ -7,14 +7,10 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.CustomTargetTextStyle
-import com.blinnnk.extension.into
-import com.blinnnk.extension.measureTextWidth
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -61,7 +57,7 @@ class AgreementView(context: Context) : RelativeLayout(context) {
 			isClickable = true
 			layoutParams = LinearLayout.LayoutParams(80.uiPX(), matchParent)
 			radioButton = radioButton {
-				isDefaultStyle()
+				isDefaultStyle(Spectrum.blue)
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				scaleX = 0.7f
 				scaleY = 0.7f

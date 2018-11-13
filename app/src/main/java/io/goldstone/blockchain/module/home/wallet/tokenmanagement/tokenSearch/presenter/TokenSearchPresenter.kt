@@ -147,7 +147,7 @@ class TokenSearchPresenter(
 							TinyNumber.False.value,
 							0.0,
 							name,
-							decimal!!,
+							decimal,
 							null,
 							status,
 							0,

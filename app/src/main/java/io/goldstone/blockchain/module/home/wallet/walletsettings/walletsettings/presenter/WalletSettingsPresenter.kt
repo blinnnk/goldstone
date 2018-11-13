@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresen
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
@@ -17,7 +18,6 @@ import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
@@ -87,21 +87,17 @@ class WalletSettingsPresenter(
 	}
 
 	private fun showHintEditorFragment() {
-		fragment.apply {
-			// 判断是否是只读钱包
-			if (!SharedWallet.isWatchOnlyWallet()) {
-				// 恢复 `Header` 样式
-				recoveryHeaderStyle()
-				// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
-				AppConfigTable.getAppConfig(Dispatchers.Main) {
-					// 如果有私密验证首先要通过 `Pin Code`
-					if (it!!.showPincode)
-						activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
-					// 加载 `Hint` 编辑界面
-					replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
-				}
-			} else context.alert(WalletText.watchOnly)
-		}
+		// 判断是否是只读钱包
+		if (!SharedWallet.isWatchOnlyWallet()) {
+			// 恢复 `Header` 样式
+			fragment.recoveryHeaderStyle()
+			// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
+			// 如果有私密验证首先要通过 `Pin Code`
+			if (SharedValue.getPincodeDisplayStatus())
+				fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
+			// 加载 `Hint` 编辑界面
+			fragment.replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
+		} else fragment.context.alert(WalletText.watchOnly)
 	}
 
 	private fun showMnemonicBackUpFragment() {
@@ -110,8 +106,7 @@ class WalletSettingsPresenter(
 				WalletTable.getCurrent(Dispatchers.Main) {
 					encryptMnemonic?.let {
 						recoveryHeaderStyle()
-						val mnemonicCode = JavaKeystoreUtil()
-							.decryptData(it)
+						val mnemonicCode = JavaKeystoreUtil().decryptData(it)
 						replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
 							putString(ArgumentKey.mnemonicCode, mnemonicCode)
 						}

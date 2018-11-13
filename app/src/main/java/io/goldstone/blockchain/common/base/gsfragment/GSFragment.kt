@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.base.gsfragment
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -32,8 +33,19 @@ abstract class GSFragment : Fragment() {
 			 * 软件为了防止重汇会在有新的窗口全屏的时候隐藏主要的 `HomeFragment` 但是隐藏操作会
 			 * 导致 `BackEvent` 在这里被重置, 这里判断在 `Parent` 为 `Null` 的时候不执行
 			 */
-			if (parentFragment != null) getMainActivity()?.apply {
-				backEvent = Runnable { setBaseBackEvent(this, parentFragment) }
+			if (!parentFragment.isNull()) {
+				when (val parentActivity = activity) {
+					is MainActivity -> {
+						parentActivity.backEvent = Runnable {
+							setBaseBackEvent(parentActivity, parentFragment)
+						}
+					}
+					is SplashActivity -> {
+						parentActivity.backEvent = Runnable {
+							setBaseBackEvent(null, parentFragment)
+						}
+					}
+				}
 			}
 		}
 	}

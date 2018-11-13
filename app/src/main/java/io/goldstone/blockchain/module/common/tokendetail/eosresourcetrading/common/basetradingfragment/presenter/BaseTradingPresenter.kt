@@ -141,16 +141,16 @@ open class BaseTradingPresenter(
 					toAccount.accountName,
 					tradingCount.toEOSUnit(),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!) { response, responseError ->
-					if (!response.isNull() && error.isNone()) completeEvent(response!!)
+				).send(privateKey) { response, responseError ->
+					if (!response.isNull() && error.isNone()) completeEvent(response)
 					else callback(responseError)
 				} else EOSSellRamTransaction(
 					chainID,
 					fromAccount.accountName,
 					BigInteger.valueOf(tradingCount.toLong()),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!) { response, ramError ->
-					if (!response.isNull() && ramError.isNone()) completeEvent(response!!)
+				).send(privateKey) { response, ramError ->
+					if (!response.isNull() && ramError.isNone()) completeEvent(response)
 					else callback(ramError)
 				}
 			} else callback(error)
@@ -182,10 +182,10 @@ open class BaseTradingPresenter(
 					stakeType,
 					fragment.isSelectedTransfer(stakeType),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!) { response, responseError ->
+				).send(privateKey) { response, responseError ->
 					// 显示成功的 `Dialog`
 					if (!response.isNull() && responseError.isNone())
-						fragment.getParentContainer()?.apply { response!!.showDialog(this) }
+						fragment.getParentContainer()?.apply { response.showDialog(this) }
 					// 清空输入框里面的值
 					fragment.clearInputValue()
 					// 更新数据库数据并且更新界面的数据
@@ -229,7 +229,7 @@ open class BaseTradingPresenter(
 						when {
 							!ramError.isNone() -> hold(null, ramError)
 							ramAvailable.isNull() -> hold(null, ramError)
-							ramAvailable!! < BigInteger.valueOf(tradingCount.toLong()) ->
+							ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
 								hold(null, TransferError.BalanceIsNotEnough)
 							tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
 							else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)

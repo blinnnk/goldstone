@@ -8,7 +8,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.toJsonArray
-import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
@@ -55,7 +54,7 @@ object EOSAPI {
 		getBlockByNumber(blockNumber) { jsonString, error ->
 			if (jsonString != null && error.isNone()) {
 				val json = JSONObject(jsonString)
-				val blockTransactions = JSONArray(json.safeGet("transactions")).toList()
+				val blockTransactions = JSONArray(json.safeGet("transactions")).toJSONObjectList()
 				var txIndex: Int? = null
 				blockTransactions.forEachIndexed { index, jsonObject ->
 					try {
@@ -64,7 +63,7 @@ object EOSAPI {
 					} catch (error: Exception) {
 					}
 				}
-				val actions = JSONArray(blockTransactions[txIndex!!].getTargetChild("trx", "transaction", "actions")).toList()
+				val actions = JSONArray(blockTransactions[txIndex!!].getTargetChild("trx", "transaction", "actions")).toJSONObjectList()
 				var actionIndex: Int? = null
 				actions.forEachIndexed { index, jsonObject ->
 					if (
@@ -357,9 +356,9 @@ object EOSAPI {
 				hold(null, error)
 				return@requestData
 			}
-			val data = result?.firstOrNull()
+			val data = result.firstOrNull()
 			if (!data.isNullOrEmpty()) hold(
-				JSONArray(data).toList().map {
+				JSONArray(data).toJSONObjectList().map {
 					EOSTransactionTable(it, SharedAddress.getCurrentEOSAccount().accountName)
 				},
 				RequestError.None

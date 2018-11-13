@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.register
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -26,10 +27,8 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.detail.presenter.SmartContractRegisterDetailPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import org.jetbrains.anko.*
 
 
 /**
@@ -72,6 +71,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 
 				SessionTitleView(context).apply { setTitle(EOSAccountText.transferTo) }.into(this)
 				GraySquareCellWithButtons(context).apply {
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 					val smartContractName = if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos"
 					setTitle(EOSAccountText.receiver)
 					setSubtitle(smartContractName)
@@ -94,6 +94,12 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 					}
 				}.into(this)
 			}
+		}
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			presenter.popFragmentFrom<SmartContractRegisterDetailFragment>()
 		}
 	}
 

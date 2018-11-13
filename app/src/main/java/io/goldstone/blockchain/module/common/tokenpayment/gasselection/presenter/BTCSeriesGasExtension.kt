@@ -7,8 +7,10 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
+import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
+import io.goldstone.blockchain.crypto.multichain.isLTC
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC.sendRawTransaction
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
@@ -39,7 +41,9 @@ fun GasSelectionPresenter.checkBTCSeriesBalance(
 			if (balance != null && error.isNone()) {
 				val isEnough = balance.value > value + gasUsedGasFee?.toSatoshi().orElse(0)
 				when {
-					isEnough -> GlobalScope.launch(Dispatchers.Main) { showConfirmAttentionView(callback) }
+					isEnough -> GlobalScope.launch(Dispatchers.Main) {
+						showConfirmAttentionView(callback)
+					}
 					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
 					else -> callback(error)
 				}
@@ -71,11 +75,15 @@ fun GasSelectionPresenter.transferBTCSeries(
 					changeAddress,
 					unspents,
 					privateKey,
-					if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get(),
-					chainType.isBCH()
+					when {
+						SharedValue.isTestEnvironment() -> TestNet3Params.get()
+						chainType.isLTC() -> LitecoinNetParams()
+						else -> MainNetParams.get()
+					},
+					chainType.isBCH() // 如果是 BCH 就采用特殊签名方式
 				).let { signedModel ->
 					sendRawTransaction(chainType.getChainURL(), signedModel.signedMessage) { hash, hashError ->
-						if (hash != null && hash.isNotEmpty() && error.isNone()) {
+						if (hash?.isNotEmpty() == true && error.isNone()) {
 							// 插入 `Pending` 数据到本地数据库
 							insertBTCSeriesPendingData(this, fee, signedModel.messageSize, hash)
 							// 跳转到章党详情界面

@@ -4,10 +4,10 @@ package io.goldstone.blockchain.crypto.bitcoincash
 
 import io.goldstone.blockchain.crypto.bip32.generateKey
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.crypto.litecoin.ChainPrefix
-import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import org.bitcoinj.core.Address
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.core.NetworkParameters
@@ -47,18 +47,22 @@ object BCHWalletUtils {
 		)
 	}
 
+	// Mainnet Checker
+	// Only support Mainnet Address
 	fun isValidAddress(address: String): Boolean {
-		return when {
-			address.length < CryptoValue.bitcoinAddressClassicLength -> false
-			address.contentEquals(":") &&
-				!address.substringAfter(":").substring(0, 1).equals("q", true) -> false
-			address.substring(0, 1).equals("q", true) &&
-				address.length < CryptoValue.bchNewAddressMinLength -> false
-			CryptoValue.isBitcoinAddressLength(address) &&
-				address.substring(0, 1).equals("m", true) -> false
-			CryptoValue.isBitcoinAddressLength(address) &&
-				address.substring(0, 1).equals("n", true) -> false
-			else -> true
+		return if (isNewCashAddress(address)) try {
+			formattedToLegacy(address, MainNetParams.get())
+			true
+		} catch (error: Exception) {
+			false
+		} else {
+			if (BTCUtils.isValidTestnetAddress(address)) false
+			else try {
+				BCHUtil.instance.encodeCashAddressByLegacy(address)
+				true
+			} catch (error: Exception) {
+				false
+			}
 		}
 	}
 

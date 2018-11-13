@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
 		setContentView(relativeLayout {
 			id = ContainerID.main
-			savedInstanceState.isNull {
+			if (savedInstanceState.isNull()) {
 				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 				addFragment<HomeFragment>(this.id, FragmentTag.home)
 			}

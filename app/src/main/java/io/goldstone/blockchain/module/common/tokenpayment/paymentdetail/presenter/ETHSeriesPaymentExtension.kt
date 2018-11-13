@@ -61,7 +61,7 @@ private fun PaymentDetailPresenter.generatePaymentPrepareModel(
 		getToken()?.contract.getAddress()
 	) { nonce, error ->
 		if (!nonce.isNull() && error.isNone()) {
-			generateTransaction(fragment.address!!, count, memo, nonce!!, hold)
+			generateTransaction(fragment.address!!, count, memo, nonce, hold)
 		} else hold(null, error)
 	}
 }

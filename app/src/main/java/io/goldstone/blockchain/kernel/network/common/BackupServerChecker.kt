@@ -48,7 +48,7 @@ object BackupServerChecker {
 			isEncrypt = true
 		) { result, error ->
 			if (!result.isNull() && error.isNone()) {
-				hold(TinyNumberUtils.isTrue(JSONObject(result!!.firstOrNull()).safeGet("inuse")), error)
+				hold(TinyNumberUtils.isTrue(JSONObject(result.firstOrNull()).safeGet("inuse")), error)
 			} else hold(null, error)
 		}
 	}

@@ -33,11 +33,11 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 			val codeName =
 				if (token.contract.isEOS()) EOSCodeName.EOSIOToken.value
 				else token.contract.contract.orEmpty()
-			val startIndex = currentMaxCount!! - DataValue.transactionPageCount
+			val startIndex = currentMaxCount ?: 0 - DataValue.transactionPageCount
 			EOSTransactionTable.getRangeData(
 				account,
 				if (startIndex < 0) 0 else startIndex,
-				currentMaxCount!!,
+				currentMaxCount ?: 0,
 				token.symbol.symbol,
 				codeName
 			) { localData ->
@@ -60,12 +60,12 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 					) { data, error ->
 						if (data?.isNotEmpty() == true && error.isNone()) {
 							data.mapIndexed { index, eosTransactionTable ->
-								eosTransactionTable.apply { dataIndex = currentMaxCount!! - (index + 1) }
+								eosTransactionTable.apply { dataIndex = currentMaxCount.orZero() - (index + 1) }
 							}.let {
 								transactionDao.insertAll(it)
 							}
 							flipPage(data.plus(localData), callback)
-							currentMaxCount = currentMaxCount!! - pageSize
+							currentMaxCount = currentMaxCount.orZero() - pageSize
 						} else callback()
 					}
 				}
@@ -79,7 +79,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 							if (currentMaxCount == totalCount) 0L
 							else transactionDao.getDataByDataIndex(
 								account.accountName,
-								currentMaxCount!! + 1,
+								currentMaxCount.orZero() + 1,
 								token.symbol.symbol,
 								codeName
 							)?.serverID ?: 0L,
@@ -97,7 +97,7 @@ fun TokenDetailPresenter.flipEOSPageData(callback: () -> Unit) {
 								localData.minBy { it.dataIndex }?.serverID ?: 0L
 							else transactionDao.getDataByDataIndex(
 								account.accountName,
-								currentMaxCount!! + 1,
+								currentMaxCount.orZero() + 1,
 								token.symbol.symbol,
 								codeName
 							)?.serverID ?: 0L,

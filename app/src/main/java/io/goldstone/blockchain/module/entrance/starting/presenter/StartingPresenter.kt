@@ -55,7 +55,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 		fun updateShareContentFromServer() {
 			GoldStoneAPI.getShareContent { shareContent, error ->
 				if (!shareContent.isNull() && error.isNone()) {
-					val shareText = if (shareContent!!.title.isEmpty() && shareContent.content.isEmpty()) {
+					val shareText = if (shareContent.title.isEmpty() && shareContent.content.isEmpty()) {
 						ProfileText.shareContent
 					} else {
 						"${shareContent.title}\n${shareContent.content}\n${shareContent.url}"
@@ -103,7 +103,7 @@ class StartingPresenter(override val fragment: StartingFragment) :
 					it?.exchangeListMD5.orEmpty()
 				) { serverExchangeTables, md5, error ->
 					if (!serverExchangeTables.isNull() && error.isNone()) {
-						if (serverExchangeTables!!.isEmpty()) {
+						if (serverExchangeTables.isEmpty()) {
 							hold(null, RequestError.RPCResult("Empty Data"))
 						} else {
 							updateExchangeTables(serverExchangeTables, md5.orEmpty())

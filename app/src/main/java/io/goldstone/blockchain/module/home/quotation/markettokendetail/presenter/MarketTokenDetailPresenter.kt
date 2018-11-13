@@ -199,7 +199,7 @@ class MarketTokenDetailPresenter(
 				priceHistory.model = priceData
 				val quotationDao =
 					GoldStoneDataBase.database.quotationSelectionDao()
-				priceData?.apply {
+				priceData.apply {
 					quotationDao.updatePriceInfo(dayHighest, dayLow, totalHighest, totalLow, info.pair)
 				}
 			}
@@ -322,7 +322,7 @@ class MarketTokenDetailPresenter(
 	) {
 		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(info.symbol, chainID) { coinInfo, error ->
-			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo!!) {
+			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
 				DefaultTokenTable.getToken(info.contract, info.symbol, chainID) {
 					it?.let(hold)
 				}

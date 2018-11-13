@@ -2,9 +2,11 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.register
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.suffix
+import com.blinnnk.model.MutablePair
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.clickToCopy
@@ -22,15 +24,16 @@ import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.MutablePair
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.detail.view.SmartContractRegisterDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -117,7 +120,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 								it.showLoadingStatus(false)
 								activity?.apply { SoftKeyboard.hide(this) }
 								if (!isAvailable.isNull() && error.isNone()) {
-									if (isAvailable!!) presenter.showSmartContractRegisterDetailFragment(account.accountName)
+									if (isAvailable) presenter.showSmartContractRegisterDetailFragment(account.accountName)
 									else safeShowError(Throwable(EOSAccountText.checkNameResultUnavailable))
 								} else safeShowError(error)
 							}
@@ -130,4 +133,9 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 		}
 	}
 
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			presenter.popFragmentFrom<SmartContractRegisterFragment>()
+		}
+	}
 }

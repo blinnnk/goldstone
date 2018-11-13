@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.RadioButton
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isDefaultStyle
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
@@ -11,8 +12,8 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import org.jetbrains.anko.radioButton
@@ -53,7 +54,7 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 			.into(this)
 
 		radioButton = radioButton {
-			isDefaultStyle()
+			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 		}.apply {
 			setAlignParentRight()

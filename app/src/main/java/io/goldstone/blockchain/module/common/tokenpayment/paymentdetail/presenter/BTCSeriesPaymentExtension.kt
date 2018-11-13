@@ -92,8 +92,11 @@ fun PaymentDetailPresenter.generateBTCSeriesPaymentModel(
 					changeAddress,
 					unspents,
 					// 测算 `MessageSize` 的默认无效私钥
-					if (SharedValue.isTestEnvironment()) CryptoValue.signedSecret
-					else CryptoValue.signedBTCMainnetSecret,
+					when {
+						SharedValue.isTestEnvironment() -> CryptoValue.signedSecret
+						chainType.isLTC() -> CryptoValue.ltcMainnetSignedSecret
+						else -> CryptoValue.signedBTCMainnetSecret
+					},
 					when {
 						SharedValue.isTestEnvironment() -> TestNet3Params.get()
 						chainType.isLTC() -> LitecoinNetParams()

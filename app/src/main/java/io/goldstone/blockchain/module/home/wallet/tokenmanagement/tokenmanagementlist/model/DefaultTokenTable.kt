@@ -274,7 +274,7 @@ data class DefaultTokenTable(
 						callback()
 					} else {
 						// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-						targetTokens?.apply {
+						targetTokens.apply {
 							exchange = data.exchange
 							website = data.website
 							marketCap = data.marketCap
@@ -284,7 +284,7 @@ data class DefaultTokenTable(
 							totalSupply = data.supply
 							startDate = data.startDate
 							description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
-						}?.let {
+						}.let {
 							defaultDao.update(it)
 							callback()
 						}

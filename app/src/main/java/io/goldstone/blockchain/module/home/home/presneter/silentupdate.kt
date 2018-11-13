@@ -2,11 +2,11 @@ package io.goldstone.blockchain.module.home.home.presneter
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.util.Connectivity
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.Connectivity
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL

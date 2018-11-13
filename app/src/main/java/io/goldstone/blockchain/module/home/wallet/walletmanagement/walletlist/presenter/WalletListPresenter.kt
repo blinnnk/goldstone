@@ -6,7 +6,9 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
@@ -34,18 +36,28 @@ class WalletListPresenter(
 		}
 	}
 
-	fun switchWallet(address: String) {
+	private fun switchWalletInDatabase(address: String, isMainnet: Boolean) {
 		WalletTable.switchCurrentWallet(address) { it ->
-			val walletType = it.getWalletType()
-			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly).let {
+			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
+			if (isMainnet) NodeSelectionPresenter.setAllMainnet {
+				SharedValue.updateIsTestEnvironment(false)
+				fragment.activity?.jump<SplashActivity>()
+			} else NodeSelectionPresenter.setAllTestnet(true) {
+				SharedValue.updateIsTestEnvironment(true)
+				fragment.activity?.jump<SplashActivity>()
 			}
+		}
+	}
+
+	fun switchWallet(address: String) {
+		load {
+			WalletTable.dao.getWalletByAddress(address)?.getWalletType()!!
+		} then { walletType ->
 			when {
 				walletType.isBTC() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Mainnet") {
-							NodeSelectionPresenter.setAllMainnet {
-								fragment.activity?.jump<SplashActivity>()
-							}
+							switchWalletInDatabase(address, true)
 						}
 					} else fragment.activity?.jump<SplashActivity>()
 				}
@@ -53,9 +65,7 @@ class WalletListPresenter(
 				walletType.isBTCTest() -> {
 					if (!SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Testnet") {
-							NodeSelectionPresenter.setAllTestnet(true) {
-								fragment.activity?.jump<SplashActivity>()
-							}
+							switchWalletInDatabase(address, false)
 						}
 					} else fragment.activity?.jump<SplashActivity>()
 				}
@@ -63,9 +73,7 @@ class WalletListPresenter(
 				walletType.isLTC() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Litecoin Mainnet") {
-							NodeSelectionPresenter.setAllMainnet {
-								fragment.activity?.jump<SplashActivity>()
-							}
+							switchWalletInDatabase(address, true)
 						}
 					} else fragment.activity?.jump<SplashActivity>()
 				}
@@ -73,9 +81,7 @@ class WalletListPresenter(
 				walletType.isBCH() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("Bitcoin Cash Mainnet") {
-							NodeSelectionPresenter.setAllMainnet {
-								fragment.activity?.jump<SplashActivity>()
-							}
+							switchWalletInDatabase(address, true)
 						}
 					} else fragment.activity?.jump<SplashActivity>()
 				}
@@ -83,9 +89,7 @@ class WalletListPresenter(
 				walletType.isEOSJungle() -> {
 					if (!SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("EOS Jungle Testnet") {
-							NodeSelectionPresenter.setAllTestnet(true) {
-								fragment.activity?.jump<SplashActivity>()
-							}
+							switchWalletInDatabase(address, false)
 						}
 					} else fragment.activity?.jump<SplashActivity>()
 				}
@@ -93,23 +97,15 @@ class WalletListPresenter(
 				walletType.isEOSMainnet() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showConfirmationAlertView("EOS Mainnet Testnet") {
-							NodeSelectionPresenter.setAllMainnet {
-								fragment.activity?.jump<SplashActivity>()
-							}
+							switchWalletInDatabase(address, true)
 						}
 					} else fragment.activity?.jump<SplashActivity>()
 				}
 
-				walletType.isBIP44() -> {
-					if (SharedValue.isTestEnvironment()) {
-						NodeSelectionPresenter.setAllTestnet(true) {
-							fragment.activity?.jump<SplashActivity>()
-						}
-					} else {
-						NodeSelectionPresenter.setAllMainnet(true) {
-							fragment.activity?.jump<SplashActivity>()
-						}
-					}
+				walletType.isBIP44() || walletType.isMultiChain() -> {
+					if (SharedValue.isTestEnvironment())
+						switchWalletInDatabase(address, false)
+					else switchWalletInDatabase(address, true)
 				}
 				// `EOS` 以及以太坊都不需要额外判断是否是测试网络
 				else -> fragment.activity?.jump<SplashActivity>()
@@ -122,7 +118,7 @@ class WalletListPresenter(
 			"Switch Chain Network",
 			WalletSettingsText.switchChainNetAlert(content),
 			false,
-			{ callback() } // Cancel Event
+			{} // Cancel Event
 		) {
 			callback()
 		}

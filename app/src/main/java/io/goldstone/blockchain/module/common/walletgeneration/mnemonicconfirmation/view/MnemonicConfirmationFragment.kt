@@ -147,12 +147,8 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		if (parent is BaseOverlayFragment<*>) {
-			parent.headerTitle = CreateWalletText.mnemonicBackUp
 			parent.presenter.popFragmentFrom<MnemonicConfirmationFragment>()
 		}
 	}

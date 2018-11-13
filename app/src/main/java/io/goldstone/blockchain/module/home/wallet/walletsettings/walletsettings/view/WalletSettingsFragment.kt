@@ -10,11 +10,13 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
  * @author KaySaith
  */
 class WalletSettingsFragment : BaseOverlayFragment<WalletSettingsPresenter>() {
-	
+
 	var header: WalletSettingsHeader? = null
-	private val titles by lazy { arguments?.getString(ArgumentKey.walletSettingsTitle) }
+	private val titles by lazy {
+		arguments?.getString(ArgumentKey.walletSettingsTitle)
+	}
 	override val presenter = WalletSettingsPresenter(this)
-	
+
 	override fun ViewGroup.initView() {
 		presenter.showTargetFragmentByTitle(titles ?: headerTitle)
 	}

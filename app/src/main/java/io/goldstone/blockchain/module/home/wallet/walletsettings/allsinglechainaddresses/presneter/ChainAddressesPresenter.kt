@@ -28,8 +28,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechaina
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.support.v4.toast
 
@@ -99,16 +97,14 @@ class ChainAddressesPresenter(
 
 	fun setAddAddressEvent() = fragment.getParentFragment<WalletSettingsFragment> {
 		showAddButton(true, false) {
-			GlobalScope.launch(Dispatchers.Default) {
-				context?.apply {
-					createEvent(this) { addresses, error ->
-						if (error.hasError()) safeShowError(error)
-						else fragment.coinType?.apply {
-							updateAddressManagerDataBy(this)
-							addresses?.apply {
-								launchUI {
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(toArrayList())
-								}
+			context?.apply {
+				createEvent(this) { addresses, error ->
+					if (error.hasError()) safeShowError(error)
+					else fragment.coinType?.apply {
+						updateAddressManagerDataBy(this)
+						addresses?.apply {
+							launchUI {
+								diffAndUpdateAdapterData<ChainAddressesAdapter>(toArrayList())
 							}
 						}
 					}

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CreateWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
@@ -64,6 +65,7 @@ class CreateWalletPresenter(
 			// 将基础的不存在安全问题的信息插入数据库
 			WalletTable(
 				0,
+				SharedWallet.getMaxWalletID() + 1,
 				name,
 				multiChainAddresses.eth.address,
 				multiChainAddresses.etc.address,
