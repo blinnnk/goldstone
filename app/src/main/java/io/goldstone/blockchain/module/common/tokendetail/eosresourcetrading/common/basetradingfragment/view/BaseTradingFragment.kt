@@ -15,7 +15,8 @@ import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -69,8 +70,10 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.gainConfirmEvent {
-					showLoading(false)
-					if (!it.isNone()) context.alert(it.message)
+					if (it.hasError()) safeShowError(it)
+					launchUI {
+						showLoading(false)
+					}
 				}
 			}
 			setContactButtonClickEvent {
@@ -93,8 +96,10 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.refundOrSellConfirmEvent {
-					showLoading(false)
-					if (!it.isNone()) context.alert(it.message)
+					if (it.hasError()) safeShowError(it)
+					launchUI {
+						showLoading(false)
+					}
 				}
 			}
 			setContactButtonClickEvent {

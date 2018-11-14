@@ -32,6 +32,9 @@ object ChainExplorer {
 	// EOS
 	private const val eosMainnetWeb = "https://bloks.io"
 	private const val eosJungleWeb = "https://jungle.bloks.io"
+	// EOS Park
+	private const val eosParkMainnetWeb = "https://eospark.com/MainNet"
+	private const val eosParkJungleWeb = "https://eospark.com/Jungle"
 
 	/** Address Detail URL*/
 	val btcAddressDetail: (address: String) -> String = {
@@ -77,6 +80,10 @@ object ChainExplorer {
 		val header = if (SharedValue.isTestEnvironment()) eosJungleWeb
 		else eosMainnetWeb
 		"$header/transaction/$it"
+	}
+	val eosParkTXDetail: (txID: String) -> String = {
+		if (SharedValue.isTestEnvironment()) "$eosParkJungleWeb/tx/$it"
+		else "$eosParkMainnetWeb/tx/$it"
 	}
 	val etcWebHeader: () -> String = {
 		val header = if (SharedValue.isTestEnvironment()) etcTestnetWeb

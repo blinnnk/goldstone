@@ -42,9 +42,8 @@ class ChainAddressesPresenter(
 	override fun onFragmentShowFromHidden() {
 		super.onFragmentShowFromHidden()
 		fragment.getParentFragment<WalletSettingsFragment> {
-			showCloseButton(false) {}
 			showBackButton(true) {
-				presenter.popFragmentFrom<ChainAddressesFragment>()
+				presenter.popFragmentFrom<ChainAddressesFragment>(false)
 			}
 			setAddAddressEvent()
 		}
@@ -63,10 +62,9 @@ class ChainAddressesPresenter(
 			BCHWalletUtils.isNewCashAddress(bip44Address.address),
 			setDefaultAddressEvent = {
 				fun update(bip44Address: Bip44Address, eosAccountName: String) {
-					coinType.updateCurrentAddress(bip44Address, eosAccountName) { _ ->
+					coinType.updateCurrentAddress(bip44Address, eosAccountName) {
 						// 更新钱包默认地址, 同时更新首页的数据
 						updateWalletDetail()
-						updateData()
 						AddressManagerFragment.removeDashboard(fragment.context)
 						fragment.toast(CommonText.succeed)
 					}

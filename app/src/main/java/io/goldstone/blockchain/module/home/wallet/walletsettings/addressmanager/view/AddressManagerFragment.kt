@@ -9,7 +9,6 @@ import com.blinnnk.animation.scale
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
@@ -208,10 +207,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	private fun hideAddButton() {
-		getParentFragment<WalletSettingsFragment>()?.showAddButton(false) {}
-	}
-
 	private fun setMultiChainAddresses(wallet: WalletTable) {
 		currentMultiChainAddressesView.setTitle(WalletSettingsText.currentMultiChainAddresses)
 		currentMultiChainAddressesView.currentWallet = wallet
@@ -355,13 +350,19 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	fun updateUI(addresses: List<Bip44Address>, title: String) {
+	private fun updateUI(addresses: List<Bip44Address>, title: String) {
 		when (title) {
 			WalletSettingsText.newETHSeriesAddress -> ethSeriesView.model = addresses
 			WalletSettingsText.newETCAddress -> etcAddressesView.model = addresses
 			WalletSettingsText.newEOSAddress -> eosAddressesView.model = addresses
-			WalletSettingsText.newLTCAddress -> ltcAddressesView.model = addresses
-			WalletSettingsText.newBCHAddress -> bchAddressesView.model = addresses
+			WalletSettingsText.newLTCAddress -> {
+				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
+				else ltcAddressesView.model = addresses
+			}
+			WalletSettingsText.newBCHAddress -> {
+				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
+				else bchAddressesView.model = addresses
+			}
 			WalletSettingsText.newBTCAddress -> btcAddressesView.model = addresses
 		}
 	}

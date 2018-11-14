@@ -1,12 +1,11 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orElse
+import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.Connectivity
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
@@ -59,10 +58,10 @@ abstract class SilentUpdater {
 			allTransactions.filterNot {
 				it.contractAddress.equals(TokenContract.etcContract, true)
 			}.maxBy { it.blockNumber }?.blockNumber
-		getERC20TokenTransactions(maxBlockNumber ?: "0")
+		getERC20TokenTransactions(maxBlockNumber ?: 0)
 	}
 
-	private fun getERC20TokenTransactions(startBlock: String) {
+	private fun getERC20TokenTransactions(startBlock: Int) {
 		RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenTransactions(SharedAddress.getCurrentEthereum(), startBlock),
 			"result"

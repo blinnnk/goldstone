@@ -18,7 +18,6 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
@@ -33,9 +32,6 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailHeaderModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.presenter.WalletDetailPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.bitcoinj.core.Address
-import org.bitcoinj.params.MainNetParams
-import org.bitcoinj.params.TestNet3Params
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**

@@ -49,7 +49,7 @@ abstract class ETHSeriesTransactionObserver {
 				}
 			} else ETHJsonRPC.getBlockCount(chainURL) { blockCount, error ->
 				if (blockCount == null || error.hasError()) return@getBlockCount
-				val blockInterval = blockCount - transaction?.blockNumber?.toIntOrNull().orZero()
+				val blockInterval = blockCount - transaction?.blockNumber.orZero()
 				val hasConfirmed = blockInterval > targetInterval
 				val hasError = TinyNumberUtils.isTrue(transaction?.hasError!!)
 				if (!isFailed.isNull() || hasConfirmed) uiThread {

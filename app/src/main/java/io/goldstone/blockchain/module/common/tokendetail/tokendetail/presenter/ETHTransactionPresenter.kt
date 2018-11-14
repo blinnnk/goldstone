@@ -5,7 +5,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -19,21 +18,20 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
  */
 
 @WorkerThread
-fun TokenDetailPresenter.loadETHChainData(blockNumber: Int) {
-	updateLocalETHTransactions(blockNumber) {
-		if (it.isNone()) loadLocalData()
+fun TokenDetailPresenter.loadETHChainData(endBlock: Int) {
+	updateLocalETHTransactions(endBlock) {
+		if (it.isNone()) getETHSeriesData()
 	}
 }
 
 @WorkerThread
-fun updateLocalETHTransactions(startBlock: Int, callback: (RequestError) -> Unit) {
+fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
-		EtherScanApi.transactions(SharedAddress.getCurrentEthereum(), "$startBlock"),
+		EtherScanApi.offsetTransactions(SharedAddress.getCurrentEthereum(), endBlock),
 		"result"
 	) { transactions, error ->
-		if (transactions != null && error.isNone()) {
-			val transactionDao =
-				GoldStoneDataBase.database.transactionDao()
+		if (!transactions.isNullOrEmpty() && error.isNone()) {
+			val transactionDao = TransactionTable.dao
 			// onConflict InsertAll 利用 RoomDatabase 进行双主键做重复判断 
 			// 覆盖或新增到本地 TransactionTable 数据库里
 			transactionDao.insertAll(

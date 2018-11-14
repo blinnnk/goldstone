@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.WorkerThread
-import com.blinnnk.util.ReasonText
-import com.blinnnk.util.TinyNumberUtils
-import com.blinnnk.util.UnsafeReasons
-import com.blinnnk.util.checkPasswordInRules
+import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.error.AccountError
@@ -14,7 +11,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.WebUrl
@@ -140,7 +136,7 @@ class CreateWalletPresenter(
 		) {
 			// 首先从本地查找数据
 			val forceShowTokens =
-				GoldStoneDataBase.database.defaultTokenDao().getForceShow()
+				DefaultTokenTable.dao.getForceShow()
 			// 本地没有数据从服务器获取数据
 			if (forceShowTokens.isEmpty()) GoldStoneAPI.getDefaultTokens { serverTokens, error ->
 				if (!serverTokens.isNullOrEmpty() && error.isNone()) serverTokens.filter {

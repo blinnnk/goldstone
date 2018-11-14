@@ -85,6 +85,8 @@ data class EOSTransactionTable(
 
 	companion object {
 
+		@JvmField val dao = GoldStoneDataBase.database.eosTransactionDao()
+
 		fun getMaxDataIndexTable(
 			account: EOSAccount,
 			contract: TokenContract,
@@ -140,7 +142,7 @@ interface EOSTransactionDao {
 	@Query("UPDATE eosTransactions SET isPending = :pendingStatus, serverID = :serverID WHERE txID LIKE :txID")
 	fun updatePendingDataByTxID(txID: String, serverID: Long, pendingStatus: Boolean = false)
 
-	@Query("SELECT * FROM eosTransactions WHERE dataIndex = (SELECT MAX(dataIndex) FROM eosTransactions) AND recordAccountName LIKE :accountName AND codeName = :codeName AND symbol = :symbol AND chainID = :chainID")
+	@Query("SELECT * FROM eosTransactions WHERE dataIndex = (SELECT MAX(dataIndex) FROM eosTransactions WHERE recordAccountName LIKE :accountName AND codeName = :codeName AND symbol = :symbol AND chainID = :chainID)")
 	fun getMaxDataIndex(accountName: String, codeName: String, symbol: String, chainID: String): EOSTransactionTable?
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName")

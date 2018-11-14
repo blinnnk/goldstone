@@ -85,7 +85,6 @@ class AddressManagerPresenter(
 			showBackButton(true) {
 				presenter.showWalletSettingListFragment()
 			}
-			showCloseButton(false) {}
 		}
 	}
 

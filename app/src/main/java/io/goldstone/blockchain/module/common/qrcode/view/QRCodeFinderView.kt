@@ -9,10 +9,10 @@ import android.os.Handler
 import android.view.View
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.CameraPreview
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import java.util.*
@@ -22,34 +22,34 @@ import java.util.*
  * @author: yanglihai
  * @description:
  */
-class QRCodeFinderView(context: Context): View(context) {
+class QRCodeFinderView(context: Context) : View(context) {
 	private val currentPointOpacity = 0xA0
 	private val maxResultPoints = 20
 	private val pointSize = 6
-	
-	private val GrideDistance = 7.uiPX()
-	
+
+	private val grideDistance = 7.uiPX()
+
 	private var gridBottomLine = 0
-	
-	val cornerWidth = 5.uiPX().toFloat()
-	val cornerHeight = 25.uiPX().toFloat()
+
+	private val cornerWidth = 5.uiPX().toFloat()
+	private val cornerHeight = 25.uiPX().toFloat()
 	private val cornerColor = Spectrum.darkBlue
-	
+
 	private var paint = Paint(Paint.ANTI_ALIAS_FLAG)
-	private val maskColor: Int = GrayScale.Opacity2Black // 四周的maskcolor
+	private val maskColor: Int = GrayScale.Opacity2Black // 四周的 mask color
 	private val resultPointColor: Int = Color.YELLOW
 	private var scannerAlpha: Int = 0
 	private var possibleResultPoints: MutableList<ResultPoint>
 	private var lastPossibleResultPoints: MutableList<ResultPoint>
 	private var cameraPreview: CameraPreview? = null
-	
+
 	// Cache the framingRect and previewFramingRect, so that we can still draw it after the preview
 	// stopped.
 	private var framingRect: Rect? = null
 	private var previewFramingRect: Rect? = null
-	
+
 	private val calculateHandler = Handler()
-	
+
 	fun setCameraPreview(view: CameraPreview) {
 		this.cameraPreview = view
 		view.addStateListener(object : CameraPreview.StateListener {
@@ -57,27 +57,28 @@ class QRCodeFinderView(context: Context): View(context) {
 				refreshSizes()
 				invalidate()
 			}
+
 			override fun previewStarted() {}
 			override fun previewStopped() {}
 			override fun cameraError(error: Exception) {}
 			override fun cameraClosed() {}
 		})
 	}
-	
+
 	init {
 		// Initialize these once for performance rather than calling them every time in onDraw().
 		scannerAlpha = 0
 		possibleResultPoints = ArrayList(maxResultPoints)
 		lastPossibleResultPoints = ArrayList(maxResultPoints)
 	}
-	
+
 	private fun refreshSizes() {
 		cameraPreview?.apply {
 			this@QRCodeFinderView.framingRect = this.framingRect
 			this@QRCodeFinderView.previewFramingRect = this.previewFramingRect
 		}
 	}
-	
+
 	public override fun onDraw(canvas: Canvas) {
 		refreshSizes()
 		drawMask(canvas)
@@ -85,11 +86,11 @@ class QRCodeFinderView(context: Context): View(context) {
 		drawCorners(canvas)
 		drawResultPoints(canvas)
 	}
-	
+
 	private fun drawMask(canvas: Canvas) {
 		val width = canvas.width
 		val height = canvas.height
-		
+
 		framingRect?.apply {
 			// Draw the exterior (i.e. outside the framing rect) darkened
 			paint.color = maskColor
@@ -123,13 +124,13 @@ class QRCodeFinderView(context: Context): View(context) {
 			)
 		}
 	}
-	
-	private fun calculateBottomGrilLine() {
+
+	private fun calculateBottomGridLine() {
 		load {
 			framingRect?.apply {
 				if (gridBottomLine == 0) {
 					gridBottomLine = top + 20.uiPX()
-				}else {
+				} else {
 					gridBottomLine += 13
 					if (gridBottomLine > bottom) {
 						gridBottomLine = top
@@ -138,7 +139,7 @@ class QRCodeFinderView(context: Context): View(context) {
 			}
 			calculateHandler.removeCallbacksAndMessages(null)
 			calculateHandler.postDelayed({
-				calculateBottomGrilLine()
+				calculateBottomGridLine()
 			}, 20)
 		} then {
 			framingRect?.apply {
@@ -151,41 +152,41 @@ class QRCodeFinderView(context: Context): View(context) {
 				)
 			}
 		}
-		
+
 	}
-	
+
 	private fun drawScanGrid(canvas: Canvas) {
 		framingRect?.apply {
 			paint.color = cornerColor
 			var startTop = top.toFloat()
 			var startLeft = left.toFloat()
 			do {
-			  canvas.drawLine(startLeft,
+				canvas.drawLine(startLeft,
 					top.toFloat(),
 					startLeft,
 					gridBottomLine.toFloat(),
 					paint)
-				startLeft += GrideDistance
-			}while (startLeft < right)
-			
+				startLeft += grideDistance
+			} while (startLeft < right)
+
 			do {
-			  canvas.drawLine(left.toFloat(),
+				canvas.drawLine(left.toFloat(),
 					startTop,
 					right.toFloat(),
 					startTop,
 					paint)
-				startTop += GrideDistance
-			}while (startTop < gridBottomLine.toFloat())
-			
+				startTop += grideDistance
+			} while (startTop < gridBottomLine.toFloat())
+
 			canvas.drawRect(left.toFloat(),
 				gridBottomLine.toFloat(),
 				right.toFloat(),
 				gridBottomLine + 5f,
 				paint)
-			
+
 		}
 	}
-	
+
 	private fun drawCorners(canvas: Canvas) {
 		framingRect?.apply {
 			paint.color = cornerColor
@@ -235,7 +236,7 @@ class QRCodeFinderView(context: Context): View(context) {
 				paint)
 		}
 	}
-	
+
 	private fun drawResultPoints(canvas: Canvas) {
 		previewFramingRect?.let { previewFrame ->
 			framingRect?.let { frame ->
@@ -256,12 +257,12 @@ class QRCodeFinderView(context: Context): View(context) {
 					}
 					lastPossibleResultPoints.clear()
 				}
-				
+
 				// draw current possible result points
 				possibleResultPoints.isNotEmpty() isTrue {
 					paint.alpha = currentPointOpacity
 					paint.color = resultPointColor
-					possibleResultPoints.forEach {point ->
+					possibleResultPoints.forEach { point ->
 						canvas.drawCircle(
 							(frame.left + (point.x * scaleX).toInt()).toFloat(),
 							(frame.top + (point.y * scaleY).toInt()).toFloat(),
@@ -276,23 +277,23 @@ class QRCodeFinderView(context: Context): View(context) {
 					possibleResultPoints.clear()
 				}
 			}
-		
+
 		}
 	}
-	
+
 	fun onPause() {
 		calculateHandler.removeCallbacksAndMessages(null)
 	}
-	
+
 	fun onResume() {
-		calculateBottomGrilLine()
+		calculateBottomGridLine()
 	}
-	
+
 	override fun onDetachedFromWindow() {
 		super.onDetachedFromWindow()
 		calculateHandler.removeCallbacksAndMessages(null)
 	}
-	
+
 	/**
 	 * Only call from the UI thread.
 	 *

@@ -103,13 +103,13 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 
 	fun isChecked() = radio.isChecked
 
-	fun setData(name: String, isSelected: Boolean, id: Int? = null): NodeSelectionCell {
+	fun setData(name: String, isSelected: Boolean, id: Int): NodeSelectionCell {
 		title.text =
 			if (SharedWallet.getYingYongBaoInReviewStatus() && name.contains(CoinSymbol.pureBTCSymbol, true))
 				CoinSymbol.btc() + " " + name.substringAfter(" ")
 			else name
 		radio.isChecked = isSelected
-		id?.let { this.id = it }
+		this.id = id
 		return this
 	}
 }

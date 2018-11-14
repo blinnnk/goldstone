@@ -2,11 +2,11 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.jump
+import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor

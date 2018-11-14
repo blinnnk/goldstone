@@ -4,8 +4,9 @@ import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
+import com.blinnnk.extension.hasValue
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import com.github.mikephil.charting.charts.BarLineChartBase
 import com.github.mikephil.charting.components.XAxis
@@ -91,11 +92,12 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 					LogUtil.error("LineChart getFormattedValue", error)
 					return@IAxisValueFormatter ""
 				}
+				// 传进来的时间可能是 timeStamp long 有的时候是 转好的 string
 				val label = entry?.data.toString().toLongOrNull()
 				when {
 					position > valueData?.lastIndex.orZero() -> ""
 					label.isNull() -> entry?.data?.toString().orEmpty()
-					else -> TimeUtils.formatMdDate(label.orElse(0L))
+					else -> TimeUtils.formatMdDate(label)
 				}
 			}
 			position = XAxis.XAxisPosition.BOTTOM
@@ -150,7 +152,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 		val pointColor = Spectrum.deepBlue
 		val chartWidth = 3.5f
 		val dataSet: LineDataSet?
-		if (!mData.isNull() && mData.dataSetCount > 0) {
+		if (mData?.dataSetCount.hasValue()) {
 			dataSet = mData.getDataSetByIndex(0) as? LineDataSet
 			dataSet?.values = dataRows
 			dataSet?.color = chartColor

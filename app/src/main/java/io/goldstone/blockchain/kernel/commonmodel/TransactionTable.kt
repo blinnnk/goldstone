@@ -1,14 +1,14 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import android.support.annotation.UiThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -31,7 +31,7 @@ import java.math.BigInteger
  */
 @Entity(tableName = "transactionList", primaryKeys = ["hash", "fromAddress", "isFee"])
 data class TransactionTable(
-	var blockNumber: String,
+	var blockNumber: Int,
 	var timeStamp: String,
 	var hash: String,
 	var nonce: String,
@@ -97,7 +97,7 @@ data class TransactionTable(
 
 	// 这个是专门为入账的 `ETH Token` 准备的
 	constructor(data: ETHTransactionModel) : this(
-		data.blockNumber,
+		data.blockNumber.toIntOrZero(),
 		data.timeStamp,
 		data.transactionHash,
 		data.nonce,
@@ -134,7 +134,7 @@ data class TransactionTable(
 
 	// 这个是专门为入账的 `ERC20 Token` 准备的
 	constructor(data: ERC20TransactionModel) : this(
-		data.blockNumber,
+		data.blockNumber.toIntOrZero(),
 		data.timeStamp,
 		data.transactionHash,
 		data.nonce,
@@ -169,7 +169,7 @@ data class TransactionTable(
 		decimal: Int,
 		chainID: ChainID
 	) : this(
-		data.safeGet("blockNumber").toDecimalFromHex(),
+		data.safeGet("blockNumber").toDecimalFromHex().toIntOrZero(),
 		"",
 		data.safeGet("hash"),
 		data.safeGet("nonce").toDecimalFromHex(),
@@ -215,7 +215,7 @@ data class TransactionTable(
 	)
 
 	constructor(data: ETCTransactionModel) : this(
-		data.blockNumber.hexToDecimal().toString(),
+		data.blockNumber.hexToDecimal().toInt(),
 		data.timestamp.hexToDecimal().toString(),
 		data.hash,
 		data.nonce.hexToDecimal().toString(),
@@ -249,7 +249,9 @@ data class TransactionTable(
 	)
 
 	companion object {
-		@JvmField val dao = GoldStoneDataBase.database.transactionDao()
+		@JvmField
+		val dao = GoldStoneDataBase.database.transactionDao()
+
 		fun getETCTransactions(address: String, hold: (List<TransactionListModel>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.transactionDao().getETCTransactionsByAddress(address)
@@ -299,11 +301,14 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND isFee = :isFee ORDER BY timeStamp DESC")
 	fun getByAddressAndContract(walletAddress: String, contract: String, chainID: String, isFee: Boolean = false): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID ORDER BY timeStamp DESC")
-	fun getDataWithFee(walletAddress: String, contract: String, chainID: String): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND blockNumber <= :blockNumber ORDER BY timeStamp DESC")
+	fun getDataWithFee(walletAddress: String, contract: String, chainID: String, blockNumber: Int): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND (contractAddress LIKE :contract OR isFee = :isFee) ORDER BY timeStamp DESC")
-	fun getETHAndAllFee(walletAddress: String, contract: String, chainID: String, isFee: Boolean = true): List<TransactionTable>
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND (contractAddress LIKE :contract OR isFee = 1) AND blockNumber <= :endBlock ORDER BY timeStamp DESC LIMIT :pageCount")
+	fun getETHAndAllFee(walletAddress: String, contract: String, endBlock: Int, chainID: String, pageCount: Int = DataValue.pageCount): List<TransactionTable>
+
+	@Query("SELECT * FROM transactionList WHERE blockNumber = (SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID)")
+	fun getMaxBlockNumber(address: String, contract: String, chainID: String): TransactionTable?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(token: TransactionTable)

@@ -4,6 +4,7 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
+import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.getDeviceBrand
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -11,7 +12,6 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.isValid
@@ -27,7 +27,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 
 /**

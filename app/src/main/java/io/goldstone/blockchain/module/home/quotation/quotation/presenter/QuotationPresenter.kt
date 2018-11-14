@@ -2,6 +2,8 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
@@ -158,7 +160,7 @@ class QuotationPresenter(
 				this.isDisconnected = isDisconnected
 			}
 		} then {
-			if (!it.isNull()) recyclerView.adapter?.notifyDataSetChanged()
+			if (it.isNotNull()) recyclerView.adapter?.notifyDataSetChanged()
 		}
 	}
 

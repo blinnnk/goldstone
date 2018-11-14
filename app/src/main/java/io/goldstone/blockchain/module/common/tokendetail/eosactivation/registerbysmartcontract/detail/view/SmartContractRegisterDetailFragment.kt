@@ -57,7 +57,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 					isCenter = true
 					setDescriptionTitles()
 					title.text = EOSAccountText.smartContract
-					subtitle.text = "https://github.com/kotlin/smartContract"
+					subtitle.text = "https://github.com/Dappub/signupeoseos"
 				}.click {
 					context.clickToCopy(it.subtitle.text.toString())
 				}.into(this)
@@ -72,11 +72,11 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				SessionTitleView(context).apply { setTitle(EOSAccountText.transferTo) }.into(this)
 				GraySquareCellWithButtons(context).apply {
 					layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
-					val smartContractName = if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos"
+					val contractName = if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos"
 					setTitle(EOSAccountText.receiver)
-					setSubtitle(smartContractName)
+					setSubtitle(contractName)
 					showOnlyCopyButton {
-						context.clickToCopy(smartContractName)
+						context.clickToCopy(contractName)
 					}
 				}.into(this)
 

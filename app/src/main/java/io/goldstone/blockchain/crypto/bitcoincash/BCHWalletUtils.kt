@@ -67,7 +67,8 @@ object BCHWalletUtils {
 	}
 
 	fun isNewCashAddress(address: String): Boolean {
-		return address.contains(":") || address.substring(0, 1).equals("q", true)
+		return if (address.isEmpty()) false
+		else address.contains(":") || address.substring(0, 1).equals("q", true)
 	}
 
 	fun formattedToLegacy(address: String, network: NetworkParameters): String {
