@@ -60,7 +60,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	private val gridSessionTitle by lazy { ColumnSectionTitle(context!!) }
 	private var assignResources =
 		listOf(
-			MutablePair("RAM (Bytes)", "4096"),
+			MutablePair(TokenDetailText.ram, "4096"),
 			MutablePair("CPU (EOS)", "0.1"),
 			MutablePair("NET (EOS)", "0.1")
 		)
@@ -114,11 +114,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					presenter.registerAccount(
 						EOSAccount(accountNameInput.getContent()),
 						publickeyInput.getContent(),
-						try {
-							BigInteger(assignResources[0].right)
-						} catch (error: Exception) {
-							BigInteger.valueOf(EOSValue.defaultRegisterAssignRAM)
-						},
+						BigInteger(assignResources[0].right),
 						assignResources[1].right.toDouble(),
 						assignResources[1].right.toDouble()
 					) { response, error ->
