@@ -188,4 +188,3 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		}
 	}
 }
-

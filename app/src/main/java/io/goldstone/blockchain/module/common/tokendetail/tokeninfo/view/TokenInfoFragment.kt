@@ -8,12 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import com.blinnnk.extension.getGrandFather
 import com.blinnnk.extension.into
+import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
@@ -103,8 +105,12 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 	}
 
 	override fun showAddress(address: String, hash160: String) {
-		addressCell.setSubtitle(address)
-		hash160Cell.setSubtitle(hash160)
+		addressCell.click {
+			it.context.clickToCopy(address)
+		}.setSubtitle(address)
+		hash160Cell.click {
+			it.context.clickToCopy(hash160)
+		}.setSubtitle(hash160)
 	}
 
 	override fun showBalance(balance: String) = balanceCell.setSubtitle(balance)

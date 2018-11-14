@@ -54,8 +54,8 @@ class PaymentDetailPresenter(
 		} else {
 			val count = fragment.getTransferCount()
 			val token = getToken()
-			if (!token?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
 			if (count == 0.0) callback(TransferError.TradingInputIsEmpty)
+			if (!token?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
 			else when {
 				/** 准备 BTCSeries 转账需要的参数 */
 				token?.contract.isBTCSeries() -> prepareBTCSeriesPaymentModel(

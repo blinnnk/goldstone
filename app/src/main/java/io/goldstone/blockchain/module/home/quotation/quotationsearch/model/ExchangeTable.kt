@@ -39,6 +39,8 @@ data class ExchangeTable(
 
 	companion object {
 
+		@JvmField val dao = GoldStoneDataBase.database.exchangeTableDao()
+
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,
 			hold: (List<ExchangeTable>) -> Unit
