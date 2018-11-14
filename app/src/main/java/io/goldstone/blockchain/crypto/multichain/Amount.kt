@@ -11,11 +11,11 @@ import java.math.BigInteger
 class Amount<T>(val value: T) {
 
 	fun toBTC() = convertOrThrow(btcDecimal)
-	fun toETC() = convertOrThrow(etcDecimal)
 	fun toLTC() = convertOrThrow(ltcDecimal)
+	fun toBCH() = convertOrThrow(bchDecimal)
+	fun toETC() = convertOrThrow(etcDecimal)
 	fun toETH() = convertOrThrow(ethDecimal)
 	fun toEOS() = convertOrThrow(eosDecimal)
-	fun toBCH() = convertOrThrow(bchDecimal)
 
 	val number: () -> BigInteger = {
 		when (value) {

@@ -17,6 +17,7 @@ import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Default
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Normal
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -31,7 +32,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  * @date 2018/7/11 1:20 AM
  * @author KaySaith
  */
-open class GraySquareCellWithButtons(context: Context) : CardView(context) {
+open class GraySquareCellWithButtons(context: Context) : GSCard(context) {
 
 	private var cellHeight = 45.uiPX()
 	protected val title = TextView(context).apply {
@@ -115,11 +116,7 @@ open class GraySquareCellWithButtons(context: Context) : CardView(context) {
 		}
 		layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
 		this.setCardBackgroundColor(GrayScale.whiteGray)
-		maxCardElevation = 6f
-		cardElevation = 6f
-		preventCornerOverlap = false
-		radius = CornerSize.normal
-		useCompatPadding = true
+		resetCardElevation(5f)
 	}
 
 	fun <T : CharSequence> setTitle(text: T) {

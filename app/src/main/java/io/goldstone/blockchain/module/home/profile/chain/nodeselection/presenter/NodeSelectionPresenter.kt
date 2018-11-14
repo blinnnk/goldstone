@@ -22,27 +22,27 @@ class NodeSelectionPresenter(
 	/**
 	 * `ChainID` 会重复使用导致获取 `Chain` 并不能准确, 所以切换 `Chain` 的时候存储
 	 */
-	fun updateERC20ChainID(chainURL: ChainURL) {
+	fun updateERC20Chain(chainURL: ChainURL) {
 		SharedChain.updateCurrentETH(chainURL)
 	}
 
-	fun updateETCChainID(chainURL: ChainURL) {
+	fun updateETCChain(chainURL: ChainURL) {
 		SharedChain.updateETCCurrent(chainURL)
 	}
 
-	fun updateBTCChainID(chainURL: ChainURL) {
+	fun updateBTCChain(chainURL: ChainURL) {
 		SharedChain.updateBTCCurrent(chainURL)
 	}
 
-	fun updateBCHChainID(chainURL: ChainURL) {
+	fun updateBCHChain(chainURL: ChainURL) {
 		SharedChain.updateBCHCurrent(chainURL)
 	}
 
-	fun updateLTCChainID(chainURL: ChainURL) {
+	fun updateLTCChain(chainURL: ChainURL) {
 		SharedChain.updateLTCCurrent(chainURL)
 	}
 
-	fun updateEOSChainID(chainURL: ChainURL) {
+	fun updateEOSChain(chainURL: ChainURL) {
 		SharedChain.updateEOSCurrent(chainURL)
 	}
 

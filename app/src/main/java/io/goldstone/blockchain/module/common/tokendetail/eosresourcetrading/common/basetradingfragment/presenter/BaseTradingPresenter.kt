@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.com
 
 import android.content.Context
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
@@ -13,9 +14,9 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -31,17 +32,18 @@ import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSBuyRamTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSSellRamTransaction
-import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.TradingType
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.presenter.PaymentPreparePresenter
-import org.jetbrains.anko.runOnUiThread
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.support.v4.toast
 import java.math.BigInteger
 
@@ -71,28 +73,34 @@ open class BaseTradingPresenter(
 	}
 
 	private fun BaseTradingFragment.setUsageValue() {
-		EOSAccountTable.getAccountByName(SharedAddress.getCurrentEOSAccount().accountName) { account ->
-			when (tradingType) {
-				TradingType.CPU -> {
-					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
-					val availableCPU = account?.cpuLimit?.max.orZero() - account?.cpuLimit?.used.orZero()
-					setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), SharedValue.getCPUUnitPrice())
-				}
-				TradingType.NET -> {
-					val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
-					val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
-					// TODO 计算 NET 的租赁价格
-					setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
-				}
-				TradingType.RAM -> {
-					getMainActivity()?.showLoadingView()
-					val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
-					// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
-					val price = SharedValue.getRAMUnitPrice()
-					val amountKBInEOS = 1.0 / price
-					val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
-					setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
-					getMainActivity()?.removeLoadingView()
+		GlobalScope.launch(Dispatchers.Default) {
+			val accountDao =
+				GoldStoneDataBase.database.eosAccountDao()
+			val account =
+				accountDao.getAccount(SharedAddress.getCurrentEOSAccount().accountName)
+			withContext(Dispatchers.Main) {
+				when (tradingType) {
+					TradingType.CPU -> {
+						val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
+						val availableCPU = account?.cpuLimit?.max.orZero() - account?.cpuLimit?.used.orZero()
+						setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), SharedValue.getCPUUnitPrice())
+					}
+					TradingType.NET -> {
+						val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
+						val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
+						// TODO 计算 NET 的租赁价格
+						setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
+					}
+					TradingType.RAM -> {
+						getMainActivity()?.showLoadingView()
+						val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
+						// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
+						val price = SharedValue.getRAMUnitPrice()
+						val amountKBInEOS = 1.0 / price
+						val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
+						setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
+						getMainActivity()?.removeLoadingView()
+					}
 				}
 			}
 		}
@@ -133,16 +141,16 @@ open class BaseTradingPresenter(
 					toAccount.accountName,
 					tradingCount.toEOSUnit(),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!) { response, responseError ->
-					if (!response.isNull() && error.isNone()) completeEvent(response!!)
+				).send(privateKey) { response, responseError ->
+					if (!response.isNull() && error.isNone()) completeEvent(response)
 					else callback(responseError)
 				} else EOSSellRamTransaction(
 					chainID,
 					fromAccount.accountName,
 					BigInteger.valueOf(tradingCount.toLong()),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!) { response, ramError ->
-					if (!response.isNull() && ramError.isNone()) completeEvent(response!!)
+				).send(privateKey) { response, ramError ->
+					if (!response.isNull() && ramError.isNone()) completeEvent(response)
 					else callback(ramError)
 				}
 			} else callback(error)
@@ -174,10 +182,10 @@ open class BaseTradingPresenter(
 					stakeType,
 					fragment.isSelectedTransfer(stakeType),
 					ExpirationType.FiveMinutes
-				).send(privateKey!!) { response, responseError ->
+				).send(privateKey) { response, responseError ->
 					// 显示成功的 `Dialog`
 					if (!response.isNull() && responseError.isNone())
-						fragment.getParentContainer()?.apply { response!!.showDialog(this) }
+						fragment.getParentContainer()?.apply { response.showDialog(this) }
 					// 清空输入框里面的值
 					fragment.clearInputValue()
 					// 更新数据库数据并且更新界面的数据
@@ -193,15 +201,11 @@ open class BaseTradingPresenter(
 		EOSAPI.getAccountInfo(
 			currentAccount
 		) { newData, error ->
-			if (!newData.isNull() && error.isNone()) {
-				EOSAccountTable.getAccountByName(currentAccount.accountName, false) { localData ->
-					localData?.let { local ->
-						// 新数据标记为老数据的 `主键` 值
-						GoldStoneDataBase.database.eosAccountDao().update(newData!!.apply { this.id = local.id })
-						GoldStoneAPI.context.runOnUiThread { fragment.setUsageValue() }
-					}
-				}
-			} else fragment.context.alert(error.message)
+			if (newData != null && error.isNone()) {
+				// 新数据标记为老数据的 `主键` 值
+				GoldStoneDataBase.database.eosAccountDao().update(newData)
+				fragment.setUsageValue()
+			} else fragment.safeShowError(error)
 		}
 	}
 
@@ -214,7 +218,7 @@ open class BaseTradingPresenter(
 			tradingCount: Double,
 			contract: TokenContract,
 			isSellRam: Boolean = false,
-			@UiThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			// 检出用户的输入值是否合规
 			isValidInputValue(Pair(toAccount, tradingCount), isSellRam) { error ->
@@ -222,24 +226,23 @@ open class BaseTradingPresenter(
 					// 检查余额
 					if (isSellRam) EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
 						// 检查发起账户的 `RAM` 余额是否足够
-						GoldStoneAPI.context.runOnUiThread {
-							when {
-								!ramError.isNone() -> hold(null, ramError)
-								ramAvailable.isNull() -> hold(null, ramError)
-								ramAvailable!! < BigInteger.valueOf(tradingCount.toLong()) -> hold(null, TransferError.BalanceIsNotEnough)
-								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
-								else -> PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
-							}
+						when {
+							!ramError.isNone() -> hold(null, ramError)
+							ramAvailable.isNull() -> hold(null, ramError)
+							ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
+								hold(null, TransferError.BalanceIsNotEnough)
+							tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
+							else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
 						}
 					} else EOSAPI.getAccountBalanceBySymbol(
 						fromAccount,
 						CoinSymbol(contract.symbol),
-						contract.contract.orEmpty()
+						contract.contract
 					) { balance, balanceError ->
-						if (!balance.isNull() && balanceError.isNone()) {
+						if (balance != null && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够
-							if (balance!! < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
-							else PaymentPreparePresenter.showGetPrivateKeyDashboard(context, hold)
+							if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
+							else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
 						} else hold(null, balanceError)
 					}
 				}

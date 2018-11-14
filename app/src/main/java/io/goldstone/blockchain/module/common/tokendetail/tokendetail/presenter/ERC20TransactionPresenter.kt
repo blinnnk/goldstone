@@ -11,37 +11,28 @@ import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 /**
  * @date 2018/8/14 5:02 PM
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadERCChainData(localERCData: List<TransactionListModel>) {
-	fragment.showLoadingView()
-	doAsync {
-		val startBlockNumber = localERCData.maxBy { it.blockNumber }?.blockNumber ?: 0
-		// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
-		updateTargetLocalERC20Transactions(startBlockNumber) {
-			// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
-			// 有数据后重新执行从数据库拉取数据
-			if (it.isNone()) loadDataFromDatabaseOrElse()
-			uiThread { fragment.removeLoadingView() }
-		}
+@WorkerThread
+fun TokenDetailPresenter.loadERCChainData(blockNumber: Int) {
+	// 本地数据库没有交易数据的话那就从链上获取交易数据进行筛选
+	updateLocalERC20Transactions(blockNumber) {
+		// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
+		// 有数据后重新执行从数据库拉取数据
+		if (it.isNone()) loadLocalData()
 	}
 }
 
-fun TokenDetailPresenter.updateTargetLocalERC20Transactions(
-	startBlock: Int,
-	@WorkerThread callback: (RequestError) -> Unit
-) {
+@WorkerThread
+fun TokenDetailPresenter.updateLocalERC20Transactions(startBlock: Int, callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
 		EtherScanApi.getTargetTokenTransactions(
 			SharedAddress.getCurrentEthereum(),
-			token?.contract?.contract.orEmpty(),
+			token.contract.contract,
 			"$startBlock"
 		),
 		"result"

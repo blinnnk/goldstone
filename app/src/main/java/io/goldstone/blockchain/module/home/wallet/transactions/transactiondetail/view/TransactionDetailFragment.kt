@@ -71,7 +71,7 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 			?: arguments?.get(ArgumentKey.notificationTransaction) as? NotificationModel
 	}
 
-	override lateinit var presenter: TransactionDetailPresenter
+	override lateinit var presenter: TransactionDetailContract.GSPresenter
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return generateLayout {

@@ -1,53 +1,32 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getContactName
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ETHTransactionModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 2018/8/20 2:51 PM
  * @author KaySaith
  */
 
-fun TokenDetailPresenter.loadETHChainData(localData: List<TransactionListModel>) {
-	val blockNumber = localData.maxBy { it.blockNumber }?.blockNumber ?: 0
-	fragment.showLoadingView()
+@WorkerThread
+fun TokenDetailPresenter.loadETHChainData(blockNumber: Int) {
 	updateLocalETHTransactions(blockNumber) {
-		if (it.isNone()) loadDataFromDatabaseOrElse()
-		GoldStoneAPI.context.runOnUiThread {
-			fragment.removeLoadingView()
-		}
+		if (it.isNone()) loadLocalData()
 	}
 }
 
-fun checkAddressNameInContacts(
-	transactions: List<TransactionListModel>,
-	@UiThread callback: () -> Unit
-) {
-	ContactTable.getAllContacts { contacts ->
-		transactions.forEach { transaction ->
-			transaction.addressName = contacts.getContactName(transaction.addressName)
-		}
-		callback()
-	}
-}
-
-fun updateLocalETHTransactions(
-	startBlock: Int,
-	@WorkerThread callback: (RequestError) -> Unit
-) {
+@WorkerThread
+fun updateLocalETHTransactions(startBlock: Int, callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
 		EtherScanApi.transactions(SharedAddress.getCurrentEthereum(), "$startBlock"),
 		"result"
@@ -77,5 +56,18 @@ fun updateLocalETHTransactions(
 			callback(error)
 		} else callback(error)
 	}
+}
+
+@WorkerThread
+fun checkAddressNameInContacts(
+	transactions: List<TransactionListModel>,
+	callback: () -> Unit
+) {
+	val contacts =
+		ContactTable.dao.getAllContacts()
+	transactions.forEach { transaction ->
+		transaction.addressName = contacts.getContactName(transaction.addressName)
+	}
+	callback()
 }
 

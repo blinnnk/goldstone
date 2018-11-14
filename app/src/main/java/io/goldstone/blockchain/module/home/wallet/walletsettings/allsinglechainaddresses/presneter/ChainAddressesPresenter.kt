@@ -1,14 +1,20 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter
 
-import android.support.annotation.UiThread
-import com.blinnnk.extension.*
+import android.content.Context
+import android.support.annotation.WorkerThread
+import com.blinnnk.extension.getChildFragment
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.getViewAbsolutelyPositionInScreen
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -20,10 +26,9 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment.Companion.switchEOSDefaultAddress
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
-import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesHeaderView
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
+import kotlinx.coroutines.Dispatchers
 import org.bitcoinj.params.MainNetParams
-import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -41,9 +46,7 @@ class ChainAddressesPresenter(
 			showBackButton(true) {
 				presenter.popFragmentFrom<ChainAddressesFragment>()
 			}
-			updateAddAddressEvent {
-				if (it.hasError()) context.alert(it.message)
-			}
+			setAddAddressEvent()
 		}
 	}
 
@@ -92,66 +95,16 @@ class ChainAddressesPresenter(
 		)
 	}
 
-	fun updateAddAddressEvent(@UiThread callback: (AccountError) -> Unit) {
-		fragment.getParentFragment<WalletSettingsFragment> {
-			showAddButton(true, false) {
-				context?.apply {
-					AddressManagerFragment.verifyMultiChainWalletPassword(this) { password, verifyError ->
-						if (password.isNullOrEmpty() || verifyError.hasError()) runOnUiThread {
-							callback(verifyError)
-						} else when {
-							fragment.coinType.isETH() ->
-								AddressManagerPresenter.createETHSeriesAddress(this, password!!) { addresses, error ->
-									if (!addresses.isNull() && error.isNone()) {
-										updateAddressManagerDataBy(ChainType.ETH)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
-									} else callback(error)
-								}
-							fragment.coinType.isETC() ->
-								AddressManagerPresenter.createETCAddress(this, password!!) { addresses, error ->
-									if (!addresses.isNull() && error.isNone()) {
-										updateAddressManagerDataBy(ChainType.ETC)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
-									} else callback(error)
-								}
-
-							fragment.coinType.isLTC() ->
-								AddressManagerPresenter.createLTCAddress(this, password!!) { addresses, error ->
-									if (!addresses.isNull() && error.isNone()) {
-										updateAddressManagerDataBy(ChainType.LTC)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
-									} else callback(error)
-								}
-
-							fragment.coinType.isEOS() ->
-								AddressManagerPresenter.createEOSAddress(this, password!!) {
-									updateAddressManagerDataBy(ChainType.EOS)
-									diffAndUpdateAdapterData<ChainAddressesAdapter>(it.toArrayList())
-								}
-
-							fragment.coinType.isBCH() ->
-								AddressManagerPresenter.createBCHAddress(this, password!!) { addresses, error ->
-									if (!addresses.isNull() && error.isNone()) {
-										updateAddressManagerDataBy(ChainType.BCH)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
-									} else callback(error)
-								}
-
-							fragment.coinType.isBTC() -> {
-								AddressManagerPresenter.createBTCAddress(this, password!!) { addresses, error ->
-									if (!addresses.isNull() && error.isNone()) {
-										updateAddressManagerDataBy(ChainType.BTC)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
-									} else callback(error)
-								}
-							}
-							fragment.coinType.isAllTest() -> {
-								AddressManagerPresenter.createBTCTestAddress(this, password!!) { addresses, error ->
-									if (!addresses.isNull() && error.isNone()) {
-										updateAddressManagerDataBy(ChainType.AllTest)
-										diffAndUpdateAdapterData<ChainAddressesAdapter>(addresses!!.toArrayList())
-									} else callback(error)
-								}
+	fun setAddAddressEvent() = fragment.getParentFragment<WalletSettingsFragment> {
+		showAddButton(true, false) {
+			context?.apply {
+				createEvent(this) { addresses, error ->
+					if (error.hasError()) safeShowError(error)
+					else fragment.coinType?.apply {
+						updateAddressManagerDataBy(this)
+						addresses?.apply {
+							launchUI {
+								diffAndUpdateAdapterData<ChainAddressesAdapter>(toArrayList())
 							}
 						}
 					}
@@ -160,13 +113,36 @@ class ChainAddressesPresenter(
 		}
 	}
 
+	@WorkerThread
+	private fun createEvent(context: Context, hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit) {
+		AddressManagerFragment.verifyMultiChainWalletPassword(context) { password, verifyError ->
+			if (password.isNullOrEmpty() || verifyError.hasError()) hold(null, verifyError)
+			else when {
+				fragment.coinType.isETH() ->
+					AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
+				fragment.coinType.isETC() ->
+					AddressManagerPresenter.createETCAddress(context, password, hold)
+				fragment.coinType.isLTC() ->
+					AddressManagerPresenter.createLTCAddress(context, password, hold)
+				fragment.coinType.isEOS() ->
+					AddressManagerPresenter.createEOSAddress(context, password, hold)
+				fragment.coinType.isBCH() ->
+					AddressManagerPresenter.createBCHAddress(context, password, hold)
+				fragment.coinType.isBTC() ->
+					AddressManagerPresenter.createBTCAddress(context, password, hold)
+				fragment.coinType.isAllTest() ->
+					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
+			}
+		}
+	}
+
 	private fun updateWalletDetail() {
-		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
+		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.start()
 	}
 
 	private fun updateAddressManagerDataBy(chainType: ChainType) {
 		fragment.parentFragment?.getChildFragment<AddressManagerFragment>()?.apply {
-			WalletTable.getCurrentWallet {
+			WalletTable.getCurrent(Dispatchers.Main) {
 				when {
 					chainType.isETH() -> setEthereumAddressesModel(this)
 					chainType.isETC() -> setEthereumClassicAddressesModel(this)
@@ -218,57 +194,46 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	override fun updateData() {
-		// 用户在这个界面更新 默认地址的时候会再次调用这个方法，所以方法内包含更新当前地址的方法.
-		WalletTable.getCurrentWallet {
+	fun setAddresses() {
+		WalletTable.getCurrent(Dispatchers.Main) {
 			when {
 				fragment.coinType.isETH() -> {
-					fragment.asyncData = ethAddresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.ETH))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(ethAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.ETH))
 				}
 
 				fragment.coinType.isETC() -> {
-					fragment.asyncData = etcAddresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.ETC))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(etcAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.ETC))
 				}
 
 				fragment.coinType.isLTC() -> {
-					fragment.asyncData = ltcAddresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.LTC))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(ltcAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.LTC))
 				}
 
 				fragment.coinType.isEOS() -> {
-					fragment.asyncData = eosAddresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.EOS))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(eosAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.EOS))
 				}
 
 				fragment.coinType.isBCH() -> {
-					fragment.asyncData = bchAddresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.BCH))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(bchAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.BCH))
 				}
 
 				fragment.coinType.isBTC() -> {
-					val addresses = btcAddresses
-					fragment.asyncData = addresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.BTC))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(btcAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.BTC))
 				}
 
 				fragment.coinType.isAllTest() -> {
-					val addresses = btcSeriesTestAddresses
-					fragment.asyncData = addresses.toArrayList()
-					setDefaultAddress(getCurrentBip44Address(ChainType.AllTest))
+					diffAndUpdateAdapterData<ChainAddressesAdapter>(btcSeriesTestAddresses.toArrayList())
+					fragment.setDefaultAddress(getCurrentBip44Address(ChainType.AllTest))
 				}
 			}
 
 			updateDefaultStyle(this)
-		}
-	}
-
-	private fun setDefaultAddress(bip44Address: Bip44Address) {
-		fragment.recyclerView.getItemAtAdapterPosition<ChainAddressesHeaderView>(0) {
-			it.setDefaultAddress(bip44Address) {
-				showMoreDashboard(this, bip44Address, false)
-			}
 		}
 	}
 }

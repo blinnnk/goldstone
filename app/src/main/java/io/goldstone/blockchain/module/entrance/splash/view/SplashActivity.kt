@@ -6,7 +6,10 @@ import android.support.annotation.WorkerThread
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.jump
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
@@ -16,6 +19,7 @@ import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.ApkChannel
@@ -57,7 +61,7 @@ class SplashActivity : AppCompatActivity() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
-		savedInstanceState.isNull {
+		if (savedInstanceState.isNull()) {
 			transparentStatus()
 			setContentView(container.apply {
 				gradientView.into(this)
@@ -85,8 +89,8 @@ class SplashActivity : AppCompatActivity() {
 		}
 		// 从服务器获取配置状态
 		GoldStoneAPI.getConfigList { serverConfigs, error ->
-			if (!serverConfigs.isNull() && error.isNone()) {
-				val isInReview = serverConfigs!!.find {
+			if (serverConfigs != null && error.isNone()) {
+				val isInReview = serverConfigs.find {
 					it.name.equals("inReview", true)
 				}?.switch?.toIntOrNull() == 1
 				if (isInReview) {
@@ -112,9 +116,10 @@ class SplashActivity : AppCompatActivity() {
 			}
 			initLaunchLanguage(language)
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
-				supportFragmentManager.fragments.find { it is StartingFragment }.isNull {
-					// UI 切回主线程
-					runOnUiThread { addFragment<StartingFragment>(it.id) }
+				if (
+					supportFragmentManager.fragments.find { it is StartingFragment }.isNull()
+				) launchUI {
+					addFragment<StartingFragment>(it.id)
 				}
 			}
 			// 错开动画时间再执行数据请求
@@ -164,8 +169,8 @@ class SplashActivity : AppCompatActivity() {
 		val eosTest = chainDao.getTestnetEOSNode()
 		val eosMain = chainDao.getMainnetEOSNode()
 		val localNode = if (SharedValue.isTestEnvironment()) {
-			chainDao.getTestnet()
-		} else chainDao.getMainnet()
+			chainDao.getUsedTestnet()
+		} else chainDao.getUsedMainnet()
 		localNode.forEach {
 			when {
 				ChainType(it.chainType).isETH() -> SharedChain.updateCurrentETH(ChainURL(it))
@@ -201,21 +206,18 @@ class SplashActivity : AppCompatActivity() {
 		doAsync {
 			val config =
 				GoldStoneDataBase.database.appConfigDao().getAppConfig()
-			config.isNull() isTrue {
+			if (config == null) {
 				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
 				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 				AppConfigTable.insertAppConfig(callback)
-			} otherwise {
-				config?.isRegisteredAddresses?.isFalse {
-					/**
-					 * 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里
-					 * 检测并重新注册
-					 */
+			} else {
+				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
+				if (config.isRegisteredAddresses) {
 					val currentWallet =
 						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
-				config?.let(callback)
+				config.let(callback)
 			}
 		}
 	}

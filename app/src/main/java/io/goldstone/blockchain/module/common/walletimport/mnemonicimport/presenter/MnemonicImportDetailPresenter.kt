@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -9,11 +10,14 @@ import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.presenter.WalletImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -32,7 +36,7 @@ class MnemonicImportDetailPresenter(
 		isAgree: Boolean,
 		name: String,
 		callback: (GoldStoneError) -> Unit
-	) {
+	) = GlobalScope.launch(Dispatchers.Default) {
 		if (mnemonic.isEmpty()) {
 			callback(AccountError.InvalidMnemonic)
 		} else if (!isValidPath(multiChainPath).isNone()) callback(AccountError.InvalidBip44Path)
@@ -40,25 +44,24 @@ class MnemonicImportDetailPresenter(
 			name,
 			password,
 			repeatPassword,
-			isAgree,
-			callback
-		) { passwordValue, walletName ->
-			val mnemonicContent =
-				mnemonic.replaceWithPattern()
-					.replace("\n", " ")
-					.removeStartAndEndValue(" ")
-
-			Mnemonic.validateMnemonic(mnemonicContent) isFalse {
-				callback(AccountError.InvalidMnemonic)
-			} otherwise {
-				importWallet(
-					mnemonicContent,
-					multiChainPath,
-					passwordValue,
-					walletName,
-					passwordHint,
-					callback
-				)
+			isAgree
+		) { passwordValue, walletName, error ->
+			if (error.hasError()) callback(error)
+			else {
+				val mnemonicContent =
+					mnemonic.replaceWithPattern().replace("\n", " ").removeStartAndEndValue(" ")
+				Mnemonic.validateMnemonic(mnemonicContent) isFalse {
+					callback(AccountError.InvalidMnemonic)
+				} otherwise {
+					importWallet(
+						mnemonicContent,
+						multiChainPath,
+						passwordValue!!,
+						walletName!!,
+						passwordHint,
+						callback
+					)
+				}
 			}
 		}
 	}
@@ -77,6 +80,7 @@ class MnemonicImportDetailPresenter(
 		} else AccountError.None
 	}
 
+	@WorkerThread
 	private fun importWallet(
 		mnemonic: String,
 		multiChainPath: ChainPath,
@@ -87,37 +91,32 @@ class MnemonicImportDetailPresenter(
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
 		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
-		WalletTable.getAll {
-			val isExistent = any {
-				try {
-					JavaKeystoreUtil()
-						.decryptData(it.encryptMnemonic.orEmpty())
-						.equals(mnemonic, true)
-				} catch (error: Exception) {
-					LogUtil.error("decrypt Data", error)
-					false
-				}
+		val allWallets =
+			GoldStoneDataBase.database.walletDao().getAllWallets()
+		val isExistent = allWallets.any {
+			try {
+				JavaKeystoreUtil().decryptData(it.encryptMnemonic.orEmpty()).equals(mnemonic, true)
+			} catch (error: Exception) {
+				LogUtil.error("decrypt Data", error)
+				false
 			}
-			if (isExistent) {
-				callback(AccountError.ExistAddress)
-			} else {
-				GenerateMultiChainWallet.import(
-					fragment.context!!,
-					mnemonic,
-					password,
-					multiChainPath
-				) { multiChainAddresses ->
-					// 如果地址已经存在则会返回空的多链地址 `Model`
-					WalletImportPresenter.insertWalletToDatabase(
-						multiChainAddresses,
-						name,
-						encryptMnemonic,
-						multiChainPath,
-						hint
-					) { _, error ->
-						callback(error)
-					}
-				}
+		}
+		if (isExistent) callback(AccountError.ExistAddress)
+		else GenerateMultiChainWallet.import(
+			fragment.context!!,
+			mnemonic,
+			password,
+			multiChainPath
+		) { multiChainAddresses ->
+			// 如果地址已经存在则会返回空的多链地址 `Model`
+			WalletImportPresenter.insertWalletToDatabase(
+				multiChainAddresses,
+				name,
+				encryptMnemonic,
+				multiChainPath,
+				hint
+			) { _, error ->
+				callback(error)
 			}
 		}
 	}

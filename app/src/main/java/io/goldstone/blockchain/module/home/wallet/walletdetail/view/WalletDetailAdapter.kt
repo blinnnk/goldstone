@@ -7,10 +7,12 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.keyboardHeightListener
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 23/03/2018 4:16 PM
@@ -18,7 +20,7 @@ import org.jetbrains.anko.matchParent
  */
 class WalletDetailAdapter(
 	override var dataSet: ArrayList<WalletDetailCellModel>,
-	private val holdCell: WalletDetailCell.() -> Unit,
+	private val clickCellEvent: (WalletDetailCellModel) -> Unit,
 	private val holdHeader: WalletDetailHeaderView.() -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<WalletDetailCellModel, WalletDetailHeaderView, WalletDetailCell, View>() {
@@ -50,11 +52,11 @@ class WalletDetailAdapter(
 			holdHeader(this)
 		}
 
-	override fun WalletDetailCell.bindCell(
-		data: WalletDetailCellModel,
-		position: Int
-	) {
+	override fun WalletDetailCell.bindCell(data: WalletDetailCellModel, position: Int) {
 		model = data
-		holdCell(this)
+		onClick {
+			clickCellEvent(data)
+			preventDuplicateClicks()
+		}
 	}
 }

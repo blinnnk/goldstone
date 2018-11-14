@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.multichain
 
 import android.content.Context
+import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
@@ -21,7 +22,7 @@ object GenerateMultiChainWallet {
 	fun create(
 		context: Context,
 		password: String,
-		hold: (multiChainAddresses: ChainAddresses, mnemonic: String) -> Unit
+		@WorkerThread hold: (multiChainAddresses: ChainAddresses, mnemonic: String) -> Unit
 	) {
 		val path = ChainPath(
 			DefaultPath.ethPath,
@@ -38,18 +39,19 @@ object GenerateMultiChainWallet {
 		}
 	}
 
+
 	fun import(
 		context: Context,
 		mnemonic: String,
 		password: String,
 		path: ChainPath,
-		hold: (multiChainAddresses: ChainAddresses) -> Unit
+		@WorkerThread hold: (multiChainAddresses: ChainAddresses) -> Unit
 	) {
 		val addresses = ChainAddresses()
 		object : ConcurrentAsyncCombine() {
 			val paths = DefaultPath.allPaths()
 			override var asyncCount: Int = paths.size
-			override val delayTime: Long? = 100
+			override val completeInUIThread: Boolean = false
 			override fun doChildTask(index: Int) {
 				context.apply {
 					when (paths[index]) {
@@ -114,10 +116,7 @@ object GenerateMultiChainWallet {
 							completeMark()
 						}
 						// Bitcoin Cash
-						DefaultPath.eosPath -> EOSWalletUtils.generateKeyPair(
-							mnemonic,
-							path.bchPath
-						).let { eosKeyPair ->
+						DefaultPath.eosPath -> EOSWalletUtils.generateKeyPair(mnemonic, path.eosPath).let { eosKeyPair ->
 							// `EOS` 的 `Prefix` 使用的 是 `Bitcoin` 的 `Mainnet Prefix` 所以无论是否是测试网这里的 `isTestnet` 都传 `False`
 							context.storeBase58PrivateKey(
 								eosKeyPair.privateKey,

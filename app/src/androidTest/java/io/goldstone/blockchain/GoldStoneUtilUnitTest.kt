@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import junit.framework.Assert
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.doAsync
 import org.json.JSONObject
 import org.junit.Rule
@@ -45,7 +46,7 @@ class GoldStoneUtilUnitTest {
 
 	@Test
 	fun getAppConfig() {
-		AppConfigTable.getAppConfig {
+		AppConfigTable.getAppConfig(Dispatchers.Default) {
 			LogUtil.debug("$position + getAppconfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
@@ -64,7 +65,7 @@ class GoldStoneUtilUnitTest {
 
 	@Test
 	fun getCurrentWallet() {
-		WalletTable.getCurrentWallet {
+		WalletTable.getCurrent(Dispatchers.Default) {
 			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}

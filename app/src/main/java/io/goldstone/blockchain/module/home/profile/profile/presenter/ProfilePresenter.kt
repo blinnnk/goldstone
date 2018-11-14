@@ -15,6 +15,8 @@ import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.load
+import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -27,6 +29,7 @@ import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileAdapter
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import kotlinx.coroutines.Dispatchers
 
 
 /**
@@ -39,28 +42,14 @@ class ProfilePresenter(
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
 
 	override fun updateData() {
-		ContactTable.getAllContacts { contactCount ->
+		load {
+			ContactTable.dao.getAllContacts().size
+		} then {
 			val data = arrayListOf(
-				ProfileModel(
-					R.drawable.contacts_icon,
-					ProfileText.contacts,
-					contactCount.size.toString()
-				),
-				ProfileModel(
-					R.drawable.currency_icon,
-					ProfileText.currency,
-					SharedWallet.getCurrencyCode()
-				),
-				ProfileModel(
-					R.drawable.language_icon,
-					ProfileText.language,
-					getCurrentLanguageSymbol()
-				),
-				ProfileModel(
-					R.drawable.chain_icon,
-					ProfileText.chain,
-					if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet
-				),
+				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),
+				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
+				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
+				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(
 					R.drawable.wallet_icon,
 					ProfileText.walletManager,
@@ -82,8 +71,7 @@ class ProfilePresenter(
 					ProfileModel(R.drawable.version_icon, ProfileText.version, currentVersion)
 				else ProfileModel(R.drawable.version_icon, ProfileText.version, currentVersion suffix CommonText.new)
 			)
-			if (fragment.asyncData.isNull())
-				fragment.asyncData = data
+			if (fragment.asyncData.isNull()) fragment.asyncData = data
 			else diffAndUpdateAdapterData<ProfileAdapter>(data)
 		}
 	}
@@ -113,16 +101,12 @@ class ProfilePresenter(
 	}
 
 	private fun showShareChooser() {
-		val intent = Intent(Intent.ACTION_SEND)
-		fun getShareContentThenShowView(content: String) {
-			intent.putExtra(Intent.EXTRA_TEXT, content)
-			intent.type = "text/plain"
-			fragment.context?.startActivity(Intent.createChooser(intent, "share"))
-		}
-
-		AppConfigTable.getAppConfig {
+		AppConfigTable.getAppConfig(Dispatchers.Main) {
 			it?.apply {
-				getShareContentThenShowView(shareContent)
+				val intent = Intent(Intent.ACTION_SEND)
+				intent.putExtra(Intent.EXTRA_TEXT, shareContent)
+				intent.type = "text/plain"
+				fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 			}
 		}
 	}
@@ -135,7 +119,7 @@ class ProfilePresenter(
 		if (clickTimes <= 0 && !hasShownGoldStoneID) {
 			hasShownGoldStoneID = true
 			SharedValue.updateDeveloperModeStatus(true)
-			AppConfigTable.getAppConfig {
+			AppConfigTable.getAppConfig(Dispatchers.Main) {
 				it?.apply {
 					fragment.context.alert(goldStoneID)
 					fragment.context?.clickToCopy(goldStoneID)

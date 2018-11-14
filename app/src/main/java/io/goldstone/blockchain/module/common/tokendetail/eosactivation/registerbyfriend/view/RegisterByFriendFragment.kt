@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.register
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
@@ -22,8 +23,10 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbyfriend.presenter.RegisterByFriendPresenter
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.view.SmartContractRegisterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.scrollView
@@ -37,7 +40,7 @@ import org.jetbrains.anko.verticalLayout
 class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 
 	override val pageTitle: String
-		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
 	private val accountNameInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val copyResultButton by lazy { RoundButton(context!!) }
@@ -106,7 +109,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 								it.showLoadingStatus(false)
 								activity?.apply { SoftKeyboard.hide(this) }
 								if (!isAvailable.isNull() && error.isNone()) {
-									if (isAvailable!!) showAvailableResult(account)
+									if (isAvailable) showAvailableResult(account)
 									else context.alert(EOSAccountText.checkNameResultUnavailable)
 								} else context.alert(error.message)
 							}
@@ -126,5 +129,11 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 		confirmButton.visibility = View.GONE
 		copyResultButton.visibility = View.VISIBLE
 		availableResultView.text = newAccount.accountName + "-" + SharedAddress.getCurrentEOS()
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			presenter.popFragmentFrom<RegisterByFriendFragment>()
+		}
 	}
 }

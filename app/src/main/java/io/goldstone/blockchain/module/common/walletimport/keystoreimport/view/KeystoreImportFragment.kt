@@ -15,10 +15,11 @@ import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
@@ -107,9 +108,13 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						agreementView.radioButton.isChecked,
 						hintInput
 					) {
-						button.showLoadingStatus(false)
-						if (!it.isNone()) context.alert(it.message)
-						else activity?.jump<SplashActivity>()
+						launchUI {
+							if (it.hasError()) safeShowError(it)
+							else {
+								button.showLoadingStatus(false)
+								activity?.jump<SplashActivity>()
+							}
+						}
 					}
 				}.into(this)
 

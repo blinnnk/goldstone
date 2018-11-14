@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.crypto.ethereum.Address
@@ -19,12 +20,14 @@ import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.WalletType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 
 /**
@@ -35,33 +38,31 @@ class PasswordSettingsPresenter(
 	override val fragment: PasswordSettingsFragment
 ) : BasePresenter<PasswordSettingsFragment>() {
 
-	fun checkInputValueThenUpdatePassword(
+	@WorkerThread
+	fun checkOrUpdatePassword(
 		oldPassword: String,
 		newPassword: String,
 		repeatPassword: String,
 		passwordHint: String,
-		@UiThread callback: (GoldStoneError) -> Unit
-	) {
+		callback: (GoldStoneError) -> Unit
+	) = GlobalScope.launch(Dispatchers.Default) {
 		if (oldPassword.isEmpty()) callback(AccountError.EmptyRepeatPassword)
 		else CreateWalletPresenter.checkInputValue(
 			"",
 			newPassword,
 			repeatPassword,
-			true,
-			callback
-		) { password, _ ->
-			WalletTable.getWalletType { type, wallet ->
-				fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
-					if (isCorrect) updatePassword(
-						oldPassword,
-						password,
-						type,
-						wallet,
-						passwordHint
-					) else GoldStoneAPI.context.runOnUiThread {
-						callback(AccountError.WrongPassword)
-					}
-				}
+			true
+		) { password, _, error ->
+			if (error.hasError()) callback(error)
+			val wallet = WalletTable.dao.findWhichIsUsing(true)!!
+			fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
+				if (isCorrect) updatePassword(
+					oldPassword,
+					password!!,
+					wallet.getWalletType(),
+					wallet,
+					passwordHint
+				) else callback(AccountError.WrongPassword)
 			}
 		}
 	}
@@ -159,7 +160,7 @@ class PasswordSettingsPresenter(
 	}
 
 	@UiThread
-	private fun autoBack() {
+	private fun autoBack() = launchUI {
 		fragment.getParentFragment<WalletSettingsFragment> {
 			// `VIVO` 手机显示 `toast` 会出错
 			if (!getDeviceBrand().contains(DeviceName.vivo, true)) activity?.toast(CommonText.succeed)

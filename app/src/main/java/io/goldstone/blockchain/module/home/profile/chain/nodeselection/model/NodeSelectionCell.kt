@@ -9,15 +9,16 @@ import android.widget.RadioButton
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isDefaultStyle
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import org.jetbrains.anko.radioButton
@@ -56,7 +57,7 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		title.x = leftPadding.toFloat()
 		title.setCenterInVertical()
 		radio = radioButton {
-			isDefaultStyle()
+			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 		}
 		radio.setAlignParentRight()

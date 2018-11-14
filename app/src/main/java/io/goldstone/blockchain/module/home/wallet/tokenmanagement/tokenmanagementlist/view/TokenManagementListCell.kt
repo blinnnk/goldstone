@@ -45,7 +45,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				else -> icon.image.glideImage(iconUrl)
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol else tokenName)
+			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol.symbol else tokenName)
 		}
 	}
 	var quotationSearchModel: QuotationSelectionTable? by observing(null) {
@@ -72,7 +72,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 						else R.drawable.btc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}
-			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
+			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(CoinSymbol(symbol))
 			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
 			switch.isChecked = isUsed
 		}

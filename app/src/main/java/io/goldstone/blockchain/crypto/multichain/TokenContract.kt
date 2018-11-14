@@ -19,7 +19,7 @@ import java.io.Serializable
  */
 data class TokenContract(
 	@SerializedName("code")
-	val contract: String?,
+	val contract: String,
 	@SerializedName("symbol")
 	val symbol: String,
 	@SerializedName("decimals")
@@ -56,12 +56,12 @@ data class TokenContract(
 	}
 
 	companion object {
-		val ETH = TokenContract(TokenContract.ethContract, CoinSymbol.ETH.symbol!!, CryptoValue.ethDecimal)
-		val ETC = TokenContract(TokenContract.etcContract, CoinSymbol.ETC.symbol!!, CryptoValue.ethDecimal)
-		val BTC = TokenContract(TokenContract.btcContract, CoinSymbol.BTC.symbol!!, CryptoValue.btcSeriesDecimal)
-		val LTC = TokenContract(TokenContract.ltcContract, CoinSymbol.LTC.symbol!!, CryptoValue.btcSeriesDecimal)
-		val BCH = TokenContract(TokenContract.bchContract, CoinSymbol.BCH.symbol!!, CryptoValue.btcSeriesDecimal)
-		val EOS = TokenContract(TokenContract.eosContract, CoinSymbol.EOS.symbol!!, CryptoValue.eosDecimal)
+		val ETH = TokenContract(TokenContract.ethContract, CoinSymbol.ETH.symbol, CryptoValue.ethDecimal)
+		val ETC = TokenContract(TokenContract.etcContract, CoinSymbol.ETC.symbol, CryptoValue.ethDecimal)
+		val BTC = TokenContract(TokenContract.btcContract, CoinSymbol.BTC.symbol, CryptoValue.btcSeriesDecimal)
+		val LTC = TokenContract(TokenContract.ltcContract, CoinSymbol.LTC.symbol, CryptoValue.btcSeriesDecimal)
+		val BCH = TokenContract(TokenContract.bchContract, CoinSymbol.BCH.symbol, CryptoValue.btcSeriesDecimal)
+		val EOS = TokenContract(TokenContract.eosContract, CoinSymbol.EOS.symbol, CryptoValue.eosDecimal)
 		// GoldStone 业务约定的值
 		const val ethContract = "0x60"
 		const val etcContract = "0x61"

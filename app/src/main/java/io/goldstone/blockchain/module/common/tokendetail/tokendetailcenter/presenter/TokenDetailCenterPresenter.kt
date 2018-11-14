@@ -16,7 +16,7 @@ class TokenDetailCenterPresenter(
 
 	fun refreshTransactionListFromDatabase() {
 		// Transaction Detail Observing Transaction 后通过这个接口更新列表界面的这状态
-		fragment.getChildFragment<TokenDetailFragment>()?.presenter?.loadDataFromDatabaseOrElse()
+		fragment.getChildFragment<TokenDetailFragment>()?.presenter?.start()
 	}
 
 }

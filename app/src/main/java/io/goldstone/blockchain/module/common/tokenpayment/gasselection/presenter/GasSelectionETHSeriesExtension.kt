@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
@@ -12,6 +11,7 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
@@ -20,17 +20,18 @@ import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall.sendRawTransaction
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC.sendRawTransaction
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
-import io.goldstone.blockchain.module.common.tokenpayment.paymentprepare.model.PaymentPrepareModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.math.BigInteger
 
 /**
@@ -69,10 +70,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 				SharedAddress.getCurrentEthereum()
 			) { tokenBalance, error ->
 				// 查询 `ETH` 余额
-				MyTokenTable.getBalanceByContract(
-					TokenContract.ETH,
-					SharedAddress.getCurrentEthereum()
-				) { ethBalance, ethError ->
+				MyTokenTable.getBalanceByContract(TokenContract.ETH, SharedAddress.getCurrentEthereum()) { ethBalance, ethError ->
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
 					val isEnough =
 						tokenBalance.orZero() >= getTransferCount().toDouble() && ethBalance.orZero() > getUsedGasFee().orElse(0.0)
@@ -83,14 +81,14 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 	}
 }
 
-fun GasSelectionPresenter.prepareToTransfer(@UiThread callback: (GoldStoneError) -> Unit) {
+fun GasSelectionPresenter.prepareToTransfer(@WorkerThread callback: (GoldStoneError) -> Unit) {
 	checkBalanceIsValid(getToken()) { isEnough, error ->
-		GoldStoneAPI.context.runOnUiThread {
-			when {
-				isEnough -> showConfirmAttentionView(callback)
-				error.isNone() -> callback(TransferError.BalanceIsNotEnough)
-				else -> callback(error)
+		when {
+			isEnough -> GlobalScope.launch((Dispatchers.Main)) {
+				showConfirmAttentionView(callback)
 			}
+			error.isNone() -> callback(TransferError.BalanceIsNotEnough)
+			else -> callback(error)
 		}
 	}
 }
@@ -155,7 +153,7 @@ fun GasSelectionPresenter.transfer(
 						prepareModel?.memo ?: TransactionText.noMemo
 					)
 					// 主线程跳转到账目详情界面
-					fragment.context?.runOnUiThread {
+					launchUI {
 						rootFragment?.goToTransactionDetailFragment(
 							fragment,
 							prepareReceiptModel(this@model, countWithDecimal, taxHash)
@@ -169,7 +167,7 @@ fun GasSelectionPresenter.transfer(
 }
 
 private fun GasSelectionPresenter.prepareReceiptModel(
-	raw: PaymentPrepareModel,
+	raw: PaymentDetailModel,
 	value: BigInteger,
 	taxHash: String
 ): ReceiptModel {
@@ -218,7 +216,7 @@ fun GasSelectionPresenter.getUnitSymbol() = getToken()?.contract.getSymbol().sym
 
 private fun GasSelectionPresenter.insertPendingDataToDatabase(
 	value: BigInteger,
-	raw: PaymentPrepareModel,
+	raw: PaymentDetailModel,
 	taxHash: String,
 	memoData: String
 ) {
@@ -243,10 +241,10 @@ private fun GasSelectionPresenter.insertPendingDataToDatabase(
 			contractAddress = token?.contract?.contract.orEmpty(),
 			cumulativeGasUsed = "",
 			gasUsed = raw.gasLimit.toString(),
-			confirmations = "0",
+			confirmations = "-1",
 			isReceive = false,
-			isERC20Token = token?.symbol == CoinSymbol.eth,
-			symbol = token?.symbol.orEmpty(),
+			isERC20Token = token?.symbol.isETH(),
+			symbol = token?.symbol?.symbol.orEmpty(),
 			recordOwnerAddress = getETHERC20OrETCAddress(),
 			isPending = true,
 			memo = memoData,

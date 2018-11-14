@@ -4,6 +4,7 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toList
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
@@ -46,6 +47,11 @@ class ChainNodeTable(
 		JSONArray(data.safeGet("key_list")).toList(),
 		data.safeGet("is_default").toInt()
 	)
+
+	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.chainNodeDao()
+	}
 }
 
 @Dao
@@ -63,8 +69,8 @@ interface ChainNodeDao {
 	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194")
 	fun getEOSNodes(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND isUsed LIKE :isUsed")
-	fun getCurrentEOSNode(isUsed: Boolean = true): ChainNodeTable
+	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND isUsed = 1")
+	fun getCurrentEOSNode(): ChainNodeTable
 
 	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND netType LIKE 0")
 	fun getMainnetEOSNode(): ChainNodeTable
@@ -78,17 +84,17 @@ interface ChainNodeDao {
 	@Query("SELECT * FROM chainNode WHERE chainType LIKE 60")
 	fun getETHNodes(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE netType LIKE 0 AND isUsed Like :isUsed ORDER BY chainType")
-	fun getUsedMainnet(isUsed: Boolean = true): List<ChainNodeTable>
+	@Query("SELECT * FROM chainNode WHERE netType LIKE 0 AND isUsed = 1 ORDER BY chainType")
+	fun getUsedMainnet(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE netType LIKE 1 AND isUsed Like :isUsed ORDER BY chainType")
-	fun getUsedTestnet(isUsed: Boolean = true): List<ChainNodeTable>
+	@Query("SELECT * FROM chainNode WHERE netType LIKE 1 AND isUsed = 1 ORDER BY chainType")
+	fun getUsedTestnet(): List<ChainNodeTable>
 
-	@Query("UPDATE chainNode SET isUsed = :isUsed WHERE url = :url")
-	fun updateIsUsedByURL(url: String, isUsed: Boolean)
+	@Query("UPDATE chainNode SET isUsed = :isUsed WHERE url = :url AND chainID = :chainID")
+	fun updateIsUsedByURL(url: String, isUsed: Int, chainID: String)
 
-	@Query("UPDATE chainNode SET isUsed = :isUsed WHERE netType = :netType")
-	fun clearIsUsedStatus(netType: Int, isUsed: Boolean = false)
+	@Query("UPDATE chainNode SET isUsed = 0 WHERE netType = :netType")
+	fun clearIsUsedStatus(netType: Int)
 
 	@Insert
 	fun insert(chainTable: ChainNodeTable)

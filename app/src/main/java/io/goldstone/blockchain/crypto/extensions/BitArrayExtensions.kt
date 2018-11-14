@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.crypto.extensions
 
 import io.goldstone.blockchain.crypto.utils.clean0xPrefix
-import io.goldstone.blockchain.crypto.utils.has0xPrefix
 import org.spongycastle.jcajce.provider.digest.RIPEMD160
 import org.spongycastle.jcajce.provider.digest.SHA256
 import java.math.BigInteger
@@ -49,7 +48,7 @@ fun BigInteger.toBytesPadded(length: Int): ByteArray {
 		bytesLength = bytes.size
 		srcOffset = 0
 	}
-	
+
 	if (bytesLength > length) {
 		throw RuntimeException("Input is too large to put in byte array of size $length")
 	}
@@ -68,11 +67,11 @@ fun BigInteger.toHexStringZeroPadded(size: Int, withPrefix: Boolean = true): Str
 	} else if (signum() < 0) {
 		throw UnsupportedOperationException("Value cannot be negative")
 	}
-	
+
 	if (length < size) {
 		result = "0".repeat(size - length) + result
 	}
-	
+
 	return if (withPrefix) {
 		"0x$result"
 	} else {
@@ -81,13 +80,6 @@ fun BigInteger.toHexStringZeroPadded(size: Int, withPrefix: Boolean = true): Str
 }
 
 fun String.hexToBigInteger() = BigInteger(clean0xPrefix(), 16)
-
-fun String.maybeHexToBigInteger() = if (has0xPrefix()) {
-	BigInteger(clean0xPrefix(), 16)
-} else {
-	BigInteger(this)
-}
-
 fun ByteArray.toBigInteger(offset: Int, length: Int) =
 	BigInteger(1, Arrays.copyOfRange(this, offset, offset + length))
 

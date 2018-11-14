@@ -42,7 +42,7 @@ data class CurrentPriceModel(
 		data.price.toFloat(),
 		symbol,
 		data.percent,
-		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice?.toDouble().orElse(1.0),
+		if (data.usdtPrice.isNullOrBlank()) 1.0 else data.usdtPrice.toDouble(),
 		isDisconnected
 	)
 

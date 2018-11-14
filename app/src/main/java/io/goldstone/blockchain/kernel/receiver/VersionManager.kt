@@ -33,8 +33,9 @@ import io.goldstone.blockchain.common.value.ApkChannel
 import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.profile.profile.view.ProgressLoadingDialog
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.File
@@ -95,8 +96,8 @@ class VersionManager(val fragment: Fragment) {
 				newVersionName = versionModel.versionName.orEmpty()
 				newVersionUrl = versionModel.url.orEmpty()
 				currentVersion = newVersionName
-				launch(UI) { hold(error) }
-			} else launch(UI) {
+				GlobalScope.launch(Dispatchers.Main) { hold(error) }
+			} else GlobalScope.launch(Dispatchers.Main) {
 				fragment.context?.let {
 					currentVersion = SystemUtils.getVersionName(it)
 					hold(error)
@@ -234,7 +235,7 @@ class VersionManager(val fragment: Fragment) {
 				cursor?.close()
 			}
 			val progress = (bytesAndStatus[0].toFloat()) / (bytesAndStatus[1].toFloat()) * 100
-			launch(UI) {
+			GlobalScope.launch(Dispatchers.Main) {
 				onProgressUpdate(bytesAndStatus[2], progress.toInt())
 			}
 		}

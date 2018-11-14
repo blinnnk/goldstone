@@ -77,77 +77,79 @@ fun RAMMarketDetailPresenter.getChartDataFromDatabase(dataType: String, callback
 fun RAMMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) {
 	if (candleDataMap.isEmpty() || candleDataMap[ramChartType.info].isNull()) {
 		getChartDataFromDatabase(ramChartType.info) {
-			updateChartDataFromNet(ramChartType)
+			calculateCountAndUpdate(ramChartType)
 		}
 	} else {
 		doAsync {
-			updateChartDataFromNet(ramChartType)
+			calculateCountAndUpdate(ramChartType)
 		}
 	}
 	
 }
 
-fun RAMMarketDetailPresenter.updateChartDataFromNet(ramChartType: EOSRAMChartType) {
+fun RAMMarketDetailPresenter.calculateCountAndUpdate(ramChartType: EOSRAMChartType) {
 	val period = ramChartType.info
 	val dateType = ramChartType.dateType
-	var size = 0
-	if (candleDataMap.containsKey(ramChartType.info)) {
-		val ramTypeData = candleDataMap[ramChartType.info]
-		ramTypeData!!.maxBy { it.time }.apply {
+	
+	val ramTypeData = candleDataMap[ramChartType.info]
+	if (ramTypeData != null) {
+		ramTypeData.maxBy { it.time }.apply {
 			if (this == null) {
-				size = DataValue.candleChartCount
+				getCountDataFormNet(ramChartType, DataValue.candleChartCount)
 			} else {
 				// 根据时间差计算出需要请求的数据条目数
 				val timeDistance = System.currentTimeMillis() - this.time.toLong()
-				size = when (ramChartType.code) {
+				var size = when (ramChartType.code) {
 					EOSRAMChartType.Minute.code -> (timeDistance / (1000 * 60)).toInt()
 					EOSRAMChartType.Hour.code -> (timeDistance / (1000 * 60 * 60)).toInt()
 					else -> (timeDistance / (1000 * 60 * 60 * 24)).toInt()
 				}
-				if (size > DataValue.candleChartCount)  {
+				if (size > DataValue.candleChartCount) {
 					size = DataValue.candleChartCount
+				}
+				if (size == 0) {
+					GoldStoneAPI.context.runOnUiThread {
+						candleDataMap[period]?.apply {
+							fragment.updateCandleChartUI(dateType, this)
+						}
+					}
+				} else getCountDataFormNet(ramChartType, size)
+			}
+		}
+	} else {
+		getCountDataFormNet(ramChartType, DataValue.candleChartCount)
+	}
+}
+
+fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, count: Int) {
+	val period = ramChartType.info
+	val dateType = ramChartType.dateType
+	GoldStoneAPI.getEOSRAMPriceTrendCandle(period, count) { data, error ->
+		val candleData = data?.toArrayList()
+		if (candleData != null && error.isNone()) {
+			// 更新 `UI` 界面
+			candleDataMap[period].let { localList ->
+				if (localList == null || localList.isEmpty()) {
+					candleDataMap[period] = candleData
+				} else {
+					localList.addAll(candleData)
+					val resultList = localList.subList(localList.size - DataValue.candleChartCount, localList.size).toArrayList()
+					localList.clear()
+					localList.addAll(resultList)
+				}
+			}
+			GoldStoneAPI.context.runOnUiThread {
+				candleDataMap[period]?.apply {
+					fragment.updateCandleChartUI(dateType, this)
 				}
 			}
 			
-		}
-	} else {
-		size = DataValue.candleChartCount
-	}
-	if (size == 0) {
-		GoldStoneAPI.context.runOnUiThread {
-			candleDataMap[period]?.apply {
-				fragment.updateCandleChartUI(dateType, this)
-			}
-		}
-	} else {
-		GoldStoneAPI.getEOSRAMPriceTrendCandle(period, size) { data, error ->
-			val candleData = data?.toArrayList()
-			if (candleData != null && error.isNone()) {
-				// 更新 `UI` 界面
-				candleDataMap[period].let { localList ->
-					if (localList == null || localList.isEmpty()) {
-						candleDataMap[period] = candleData
-					} else {
-						localList.addAll(candleData)
-						val resultList = localList.subList(localList.size - DataValue.candleChartCount, localList.size).toArrayList()
-						localList.clear()
-						localList.addAll(resultList)
-					}
-				}
-				
-				GoldStoneAPI.context.runOnUiThread {
-					candleDataMap[period]?.apply {
-						fragment.updateCandleChartUI(dateType, this)
-					}
-				}
-				
-			} else {
-				GoldStoneAPI.context.runOnUiThread {
-					// Show the error exception to user
-					fragment.context.alert(error.message)
-					candleDataMap[period]?.apply {
-						fragment.updateCandleChartUI(dateType, this)
-					}
+		} else {
+			GoldStoneAPI.context.runOnUiThread {
+				// Show the error exception to user
+				fragment.context.alert(error.message)
+				candleDataMap[period]?.apply {
+					fragment.updateCandleChartUI(dateType, this)
 				}
 			}
 		}

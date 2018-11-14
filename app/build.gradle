@@ -1,6 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlinx-serialization'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-platform-android'
 apply plugin: 'kotlin-kapt'
@@ -77,12 +76,12 @@ dependencies {
   implementation 'com.android.support:cardview-v7:28.0.0'
   implementation 'com.android.support:recyclerview-v7:28.0.0'
   // Kotlin
-  implementation "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+  implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   // ANKO
-  implementation 'org.jetbrains.anko:anko:0.10.7'
+  implementation 'org.jetbrains.anko:anko:0.10.8'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.2.8'
+  implementation 'com.blinnnk:honeyui:0.3.3.1'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin
@@ -114,11 +113,6 @@ dependencies {
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
   // MPAndroidChart
   implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
-}
-
-kotlin {
-  experimental { coroutines "error" }
-  experimental { coroutines 'enable' }
 }
 
 apply plugin: 'com.google.gms.google-services'

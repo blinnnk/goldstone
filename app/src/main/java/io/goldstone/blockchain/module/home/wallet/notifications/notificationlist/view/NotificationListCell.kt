@@ -38,7 +38,7 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 		WalletTable.getAll {
 			when (model?.type) {
 				NotificationType.Transaction.code -> {
-					if (NotificationTable.getReceiveStatus(model?.extra.orEmpty()).orFalse()) {
+					if (model?.extra?.isReceive.orFalse()) {
 						setIconColor(Spectrum.green)
 						setIconResource(R.drawable.receive_icon)
 						info.subtitle.text = (CommonText.from + " " + model?.content.orEmpty()).scaleTo(22)

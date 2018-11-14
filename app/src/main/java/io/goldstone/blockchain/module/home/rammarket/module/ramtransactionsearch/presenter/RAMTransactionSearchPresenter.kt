@@ -92,7 +92,7 @@ class RAMTransactionSearchPresenter(
 		super.loadMore()
 		account?.apply {
 			searchByName(this) {
-				showBottomLoading(false)
+//				showBottomLoading(false)
 			}
 		}
 	}

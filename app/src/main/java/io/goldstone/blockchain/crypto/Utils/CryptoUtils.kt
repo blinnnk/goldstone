@@ -47,9 +47,9 @@ object CryptoUtils {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
 			"0"
 		} else if (!isHex) {
-			(gas!!.toBigDecimal() * gasPrice!!.toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
+			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
 		} else {
-			(gas!!.hexToDecimal().toBigDecimal() * gasPrice!!.hexToDecimal().toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
+			(gas.hexToDecimal().toBigDecimal() * gasPrice.hexToDecimal().toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
 		}
 	}
 
@@ -149,10 +149,6 @@ fun BigInteger.toCount(decimal: Int): Double {
 	return CryptoUtils.toCountByDecimal(this, decimal)
 }
 
-fun Double.toBTCCount(): Double {
-	return this / 100000000.0
-}
-
 fun Double.toSatoshi(): Long {
 	return (this * 100000000.0).toLong()
 }
@@ -208,6 +204,9 @@ fun BigInteger.toDataString() = this.toHexStringZeroPadded(64, false)
 
 fun String.isValidTaxHash() = length == CryptoValue.taxHashLength
 
+fun String.toUtf8Bytes() = this.toByteArray(Charsets.UTF_8)
+fun stringFromUtf8Bytes(bytes: ByteArray) = String(bytes, Charsets.UTF_8)
+
 // 这个是返回 `EventLog` 中需要的地址格式
 @Throws
 fun String.toAddressCode(hasPrefix: Boolean = true): String {
@@ -216,13 +215,6 @@ fun String.toAddressCode(hasPrefix: Boolean = true): String {
 	} else {
 		throw Exception("It is a wrong address code format")
 	}
-}
-
-@Throws
-fun String.toAddressFromCode(): String {
-	val address = if (length == 66) substring(26, length).prepend0xPrefix() else ""
-	if (!Address(address).isValid()) throw Exception("It is a wrong address code format")
-	return address
 }
 
 fun <T : List<*>> T.getObjectMD5HexString(): String {

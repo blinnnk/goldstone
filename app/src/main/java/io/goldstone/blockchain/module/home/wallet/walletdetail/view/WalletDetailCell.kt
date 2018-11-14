@@ -19,8 +19,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.multichain.isEOSSeries
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -35,15 +34,14 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
 	var model: WalletDetailCellModel? by observing(null) {
 		model?.apply {
-			if (iconUrl.isBlank()) {
-				icon.image.imageResource = R.drawable.default_token
-			} else when (symbol) {
-				CoinSymbol.eth -> icon.image.imageResource = R.drawable.eth_icon
-				CoinSymbol.etc -> icon.image.imageResource = R.drawable.etc_icon
-				CoinSymbol.ltc -> icon.image.imageResource = R.drawable.ltc_icon
-				CoinSymbol.bch -> icon.image.imageResource = R.drawable.bch_icon
-				CoinSymbol.eos -> icon.image.imageResource = R.drawable.eos_icon
-				CoinSymbol.btc() ->
+			if (iconUrl.isBlank()) icon.image.imageResource = R.drawable.default_token
+			else when {
+				symbol.isETH() -> icon.image.imageResource = R.drawable.eth_icon
+				symbol.isETC() -> icon.image.imageResource = R.drawable.etc_icon
+				symbol.isLTC() -> icon.image.imageResource = R.drawable.ltc_icon
+				symbol.isBCH() -> icon.image.imageResource = R.drawable.bch_icon
+				symbol.isEOS() -> icon.image.imageResource = R.drawable.eos_icon
+				symbol.isBTC() ->
 					icon.image.imageResource =
 						if (SharedWallet.getYingYongBaoInReviewStatus()) R.drawable.default_token
 						else R.drawable.btc_icon
@@ -51,7 +49,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
 			// 部分 `Token` 没有 `Name` 这里就直接显示 `Symbol`
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(tokenName isEmptyThen symbol)
+			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(tokenName isEmptyThen symbol.symbol)
 			if (contract.isEOSSeries() && eosWalletType != EOSWalletType.Available) {
 				if (eosWalletType == EOSWalletType.Inactivated)
 					showStatusButton(BasicRadiusButton.Companion.Style.Pending)
@@ -96,18 +94,20 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 
 	private fun showStatusButton(style: BasicRadiusButton.Companion.Style) {
 		valueInfo.visibility = View.GONE
-		if (statusButton.isNull()) {
+		if (statusButton == null) {
 			val title = when (style) {
 				BasicRadiusButton.Companion.Style.Pending -> EOSAccountText.pendingActivation
 				else -> EOSAccountText.pendingConfirmation
 			}
 			statusButton = BasicRadiusButton(context)
-			statusButton?.setTitle(title)
 			statusButton?.into(this)
-			statusButton?.setStyle(style)
-			statusButton?.setCenterInVertical()
-			statusButton?.setAlignParentRight()
-			statusButton!!.x -= 30.uiPX()
+			statusButton?.apply {
+				setTitle(title)
+				setStyle(style)
+				setCenterInVertical()
+				setAlignParentRight()
+				x -= 30.uiPX()
+			}
 		}
 	}
 

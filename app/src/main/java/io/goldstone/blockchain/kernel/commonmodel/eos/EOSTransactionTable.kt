@@ -3,7 +3,6 @@ package io.goldstone.blockchain.kernel.commonmodel.eos
 import android.arch.persistence.room.*
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getTargetObject
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -16,17 +15,15 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger
 
-@Entity(tableName = "eosTransactions")
+@Entity(tableName = "eosTransactions", primaryKeys = ["txID", "recordAccountName"])
 data class EOSTransactionTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	var dataIndex: Int,
 	var serverID: Long,
 	var txID: String,
@@ -48,7 +45,6 @@ data class EOSTransactionTable(
 		response: EOSResponse,
 		dataIndex: Int
 	) : this(
-		0,
 		dataIndex,
 		0L,
 		response.transactionID,
@@ -70,7 +66,6 @@ data class EOSTransactionTable(
 	// act part json
 	// {"account":"eosio.token","name":"transfer","authorization":[{"actor":"huaxingziben","permission":"active"}],"data":{"from":"huaxingziben","to":"googletumblr","quantity":"2.0000 EOS","memo":""},"hex_data":"30d5719f4dd78d6e70e3913aabc82865204e00000000000004454f530000000000"}
 	constructor(data: JSONObject, recordAccountName: String) : this(
-		0,
 		dataIndex = 0,
 		serverID = data.safeGet("id").toLongOrNull() ?: 0L,
 		txID = data.safeGet("txid"),
@@ -90,32 +85,20 @@ data class EOSTransactionTable(
 
 	companion object {
 
-		fun preventDuplicateInsert(account: EOSAccount, table: EOSTransactionTable) {
-			doAsync {
-				GoldStoneDataBase.database.eosTransactionDao().apply {
-					if (getDataByTxIDAndRecordName(table.txID, account.accountName).isNull()) insert(table)
-				}
-			}
-		}
-
 		fun getMaxDataIndexTable(
 			account: EOSAccount,
 			contract: TokenContract,
 			chainID: ChainID,
-			isMainThread: Boolean = true,
 			hold: (EOSTransactionTable?) -> Unit
-		) {
-			doAsync {
-				val data = GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(
+		) = GlobalScope.launch(Dispatchers.Default) {
+			val data =
+				GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(
 					account.accountName,
-					contract.contract.orEmpty(),
+					contract.contract,
 					contract.symbol,
 					chainID.id
 				)
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-					hold(data)
-				} else hold(data)
-			}
+			hold(data)
 		}
 
 		@WorkerThread
@@ -125,7 +108,6 @@ data class EOSTransactionTable(
 			end: Int,
 			symbol: String,
 			codeName: String,
-			isMainThread: Boolean = true,
 			hold: (List<EOSTransactionTable>) -> Unit
 		) {
 			// `Server` 返回的 数据 `Memo` 中会带有不确定的 `SqlLite` 不支持的特殊符号,
@@ -141,9 +123,7 @@ data class EOSTransactionTable(
 			} catch (error: Exception) {
 				listOf<EOSTransactionTable>()
 			}
-			if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(data)
-			} else hold(data)
+			hold(data)
 		}
 	}
 }
@@ -184,13 +164,13 @@ interface EOSTransactionDao {
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName AND txID LIKE :txID")
 	fun getDataByTxIDAndRecordName(txID: String, recordAccountName: String): EOSTransactionTable?
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(transaction: EOSTransactionTable)
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName Like :recordAccountName")
 	fun getAll(recordAccountName: String): List<EOSTransactionTable>
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertAll(transactions: List<EOSTransactionTable>)
 
 	@Update

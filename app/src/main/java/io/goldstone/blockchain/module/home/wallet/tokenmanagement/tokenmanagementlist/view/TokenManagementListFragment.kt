@@ -51,7 +51,7 @@ class TokenManagementListFragment :
 
 	override fun onDestroy() {
 		super.onDestroy()
-		getMainActivity()?.getWalletDetailFragment()?.presenter?.updateData()
+		getMainActivity()?.getWalletDetailFragment()?.presenter?.start()
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {

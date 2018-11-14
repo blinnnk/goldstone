@@ -55,6 +55,10 @@ class RoundButton(context: Context) : GSCard(context) {
 		loadingView.setCenterInParent()
 	}
 
+	init {
+		resetCardElevation(5f)
+	}
+
 	fun showLoadingStatus(
 		needToShow: Boolean = true,
 		color: Int = Spectrum.white,
@@ -110,7 +114,6 @@ class RoundButton(context: Context) : GSCard(context) {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-
 		setCardBackgroundColor(Spectrum.green)
 	}
 }

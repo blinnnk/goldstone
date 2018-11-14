@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
@@ -29,6 +30,9 @@ import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.Nod
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeSelectionCell
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 
 /**
@@ -133,16 +137,17 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		selectedNode.forEach { node ->
 			when {
 				ChainType(node.chainType).isETH() ->
-					presenter.updateERC20ChainID(ChainURL(node))
+					presenter.updateERC20Chain(ChainURL(node))
 				ChainType(node.chainType).isBTC() ->
-					presenter.updateBTCChainID(ChainURL(node))
+					presenter.updateBTCChain(ChainURL(node))
 				ChainType(node.chainType).isBCH() ->
-					presenter.updateBCHChainID(ChainURL(node))
+					presenter.updateBCHChain(ChainURL(node))
 				ChainType(node.chainType).isLTC() ->
-					presenter.updateLTCChainID(ChainURL(node))
-				ChainType(node.chainType).isEOS() ->
-					presenter.updateEOSChainID(ChainURL(node))
-				else -> presenter.updateETCChainID(ChainURL(node))
+					presenter.updateLTCChain(ChainURL(node))
+				ChainType(node.chainType).isEOS() -> {
+					presenter.updateEOSChain(ChainURL(node))
+				}
+				else -> presenter.updateETCChain(ChainURL(node))
 			}
 		}
 		updateLocalNodeSelectedStatus {
@@ -151,13 +156,13 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	}
 
 	private fun updateLocalNodeSelectedStatus(callback: () -> Unit) {
-		doAsync {
+		GlobalScope.launch(Dispatchers.Default) {
 			val dao = GoldStoneDataBase.database.chainNodeDao()
 			dao.clearIsUsedStatus(if (fromMainnetSetting.orFalse()) 0 else 1)
 			selectedNode.forEach {
-				dao.updateIsUsedByURL(it.url, true)
+				dao.updateIsUsedByURL(it.url, 1, it.chainID)
 			}
-			uiThread { callback() }
+			launchUI(callback)
 		}
 	}
 }

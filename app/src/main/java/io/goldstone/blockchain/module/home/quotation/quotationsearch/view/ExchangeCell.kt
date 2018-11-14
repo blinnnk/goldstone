@@ -6,6 +6,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.isDefaultStyle
 import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
@@ -13,8 +14,8 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.utils.isDefaultStyle
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import org.jetbrains.anko.*
@@ -53,7 +54,7 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 			x = 50.uiPX().toFloat()
 		}
 		checkBox = checkBox {
-			isDefaultStyle()
+			isDefaultStyle(Spectrum.blue)
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent)
 		}
 		exchangeIcon.setCenterInVertical()

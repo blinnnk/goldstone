@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -78,11 +79,13 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					chainType!!,
 					passwordInput.text.toString()
 				) { privateKey, error ->
-					if (privateKey != null && error.isNone())
-						privateKeyTextView.text = privateKey
-					else safeShowError(error)
-					button.showLoadingStatus(false)
-					activity?.apply { SoftKeyboard.hide(this) }
+					launchUI {
+						if (privateKey != null && error.isNone())
+							privateKeyTextView.text = privateKey
+						else safeShowError(error)
+						button.showLoadingStatus(false)
+						activity?.apply { SoftKeyboard.hide(this) }
+					}
 				}
 			}.into(this)
 		}

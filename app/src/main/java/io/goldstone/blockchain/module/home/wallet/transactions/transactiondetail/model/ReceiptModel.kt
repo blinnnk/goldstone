@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
-import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.utils.toMillisecond
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -16,7 +14,7 @@ import java.math.BigInteger
 data class ReceiptModel(
 	override val fromAddress: String,
 	override val toAddress: String,
-	val minerFee: String,
+	override val minerFee: String,
 	override val value: BigInteger,
 	val token: WalletDetailCellModel,
 	val taxHash: String,
@@ -25,7 +23,7 @@ data class ReceiptModel(
 ) : TransactionSealedModel(
 	true,
 	taxHash,
-	token.symbol,
+	token.symbol.symbol,
 	fromAddress,
 	toAddress,
 	CryptoUtils.toCountByDecimal(value, token.decimal),
@@ -38,6 +36,7 @@ data class ReceiptModel(
 	timestamp.toString(),
 	-1,
 	memo,
+	minerFee,
 	null
 ) {
 	constructor(

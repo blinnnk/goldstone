@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
 		setContentView(relativeLayout {
 			id = ContainerID.main
-			savedInstanceState.isNull {
+			if (savedInstanceState.isNull()) {
 				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 				addFragment<HomeFragment>(this.id, FragmentTag.home)
 			}
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 	private fun recoveryBackEventFromOtherApp() {
 		supportFragmentManager.fragments.last()?.let {
 			if (it is BaseOverlayFragment<*>) {
-				val child = it.childFragmentManager.fragments.last()
+				val child = it.childFragmentManager.fragments.lastOrNull()
 				if (child is BaseFragment<*>) {
 					child.recoveryBackEvent()
 				} else if (child is BaseRecyclerFragment<*, *>) {
@@ -181,7 +181,7 @@ class MainActivity : AppCompatActivity() {
 				(it as? BaseOverlayFragment<*>)?.presenter?.removeSelfFromActivity()
 			}
 			// 展示通知中心
-			presenter.showNotificationListFragment()
+			showNotificationListFragment()
 			currentIntent = null
 		}
 	}

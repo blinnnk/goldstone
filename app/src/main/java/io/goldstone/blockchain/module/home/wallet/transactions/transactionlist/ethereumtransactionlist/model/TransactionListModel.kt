@@ -39,7 +39,7 @@ data class TransactionListModel(
 	override val blockNumber: Int,
 	val transactionHash: String,
 	override var memo: String,
-	val minerFee: String,
+	override val minerFee: String,
 	val url: String,
 	override val isPending: Boolean,
 	val timeStamp: String,
@@ -65,6 +65,7 @@ data class TransactionListModel(
 	timeStamp,
 	confirmations,
 	memo,
+	minerFee,
 	null
 ) {
 
@@ -198,7 +199,7 @@ data class TransactionListModel(
 			}
 		}
 
-		fun generateTransactionURL(taxHash: String, symbol: String?, isEOSSeries: Boolean): String {
+		fun generateTransactionURL(taxHash: String, symbol: String, isEOSSeries: Boolean): String {
 			return when {
 				CoinSymbol(symbol).isETC() ->
 					EtherScanApi.gasTrackerHeader(taxHash)

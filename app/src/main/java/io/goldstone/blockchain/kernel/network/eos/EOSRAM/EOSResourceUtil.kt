@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.kernel.network.eos.eosram
 
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.eos.EOSCPUUnit
@@ -30,14 +29,14 @@ object EOSResourceUtil {
 		hold: (priceInEOS: Double?, error: RequestError) -> Unit
 	) {
 		EOSAPI.getRAMMarket(isMainThread) { data, error ->
-			if (error.isNone() && !data.isNull()) {
+			if (error.isNone() && data != null) {
 				val divisor = when (unit.value) {
 					EOSUnit.KB.value -> 1024
 					EOSUnit.MB.value -> 1024 * 1024
 					EOSUnit.Byte.value -> 1
 					else -> 0
 				}
-				val price = 1 * data!!.eosBalance / (1 + (data.ramBalance.toDouble() / divisor))
+				val price = 1 * data.eosBalance / (1 + (data.ramBalance.toDouble() / divisor))
 				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(price, RequestError.None) }
 				else hold(price, RequestError.None)
 			} else {
@@ -53,8 +52,8 @@ object EOSResourceUtil {
 		@UiThread hold: (amount: Double?, error: RequestError) -> Unit
 	) {
 		EOSAPI.getRAMMarket(true) { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				val ramTotal = data!!.ramCore
+			if (data != null && error.isNone()) {
+				val ramTotal = data.ramCore
 				val eosBalance = data.eosBalance + pair.first
 				val mi = data.eosWeight / 1000.0
 				val ramCoreInEOS = -ramTotal * (1 - Math.pow(1 + (pair.first / eosBalance), mi))
@@ -85,9 +84,9 @@ object EOSResourceUtil {
 		EOSAPI.getAccountInfo(
 			account
 		) { accountInfo, error ->
-			if (!accountInfo.isNull() && error.isNone()) {
+			if (accountInfo != null && error.isNone()) {
 				val priceInEOS =
-					getCPUPriceByTime(accountInfo!!.cpuWeight, accountInfo.cpuLimit.max, unit)
+					getCPUPriceByTime(accountInfo.cpuWeight, accountInfo.cpuLimit.max, unit)
 				hold(priceInEOS, GoldStoneError.None)
 			} else hold(null, error)
 		}
@@ -101,9 +100,9 @@ object EOSResourceUtil {
 		EOSAPI.getAccountInfo(
 			account
 		) { accountInfo, error ->
-			if (!accountInfo.isNull() && error.isNone()) {
+			if (accountInfo != null && error.isNone()) {
 				val priceInEOS =
-					getNETPriceByTime(accountInfo!!.netWeight, accountInfo.netLimit.max, unit)
+					getNETPriceByTime(accountInfo.netWeight, accountInfo.netLimit.max, unit)
 				hold(priceInEOS, GoldStoneError.None)
 			} else hold(null, error)
 		}

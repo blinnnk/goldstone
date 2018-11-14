@@ -16,8 +16,6 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.matchParent
 import java.util.*
@@ -29,7 +27,6 @@ import java.util.*
  */
 @Suppress("UNCHECKED_CAST")
 open class BaseRecyclerView(context: Context) : RecyclerView(context) {
-
 
 	init {
 		layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
@@ -183,18 +180,11 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		itemMove.attachToRecyclerView(this)
 	}
 
-	inline fun <reified T> getItemAtAdapterPosition(
-		position: Int,
-		crossinline block: (T) -> Unit
-	) {
-		load {
-			findViewHolderForAdapterPosition(position)?.itemView
-		} then {
-			try {
-				(it as? T)?.let(block)
-			} catch (error: Exception) {
-				LogUtil.error("getItemAtAdapterPosition", error)
-			}
+	inline fun <reified T> getItemAtAdapterPosition(position: Int, crossinline block: (T) -> Unit) {
+		try {
+			(findViewHolderForLayoutPosition(position)?.itemView as? T)?.let(block)
+		} catch (error: Exception) {
+			LogUtil.error("getItemAtAdapterPosition", error)
 		}
 	}
 }

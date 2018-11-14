@@ -32,9 +32,7 @@ fun <T : BaseOverlayFragment<*>> T.showContactDashboard(chainType: ChainType, ho
 		}.apply {
 			setTitle(ContactText.contactName)
 			addContent {
-				addFragmentAndSetArgument<ContactFragment>(
-					ContainerID.contentOverlay
-				).apply {
+				addFragmentAndSetArgument<ContactFragment>(ContainerID.contentOverlay).apply {
 					this.chainType = chainType.id
 					this.clickCellEvent = Runnable {
 						selectedAddress?.let(hold)

@@ -43,13 +43,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
-	private val addButton by lazy {
-		HeaderIcon(context).apply {
-			id = ElementID.addButton
-			imageResource = R.drawable.add_icon
-			setLeftPosition()
-		}
-	}
+	private var addButton: HeaderIcon? = null
 	private val searchButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.searchButton
@@ -104,14 +98,15 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 
 	fun showCloseButton(isShow: Boolean, clickEvent: () -> Unit) {
 		val currentButton = findViewById<ImageView>(ElementID.closeButton)
+		if (isShow) {
+			showBackButton(false) {}
+		}
 		if (currentButton == null) {
 			if (isShow) {
 				addView(closeButton.click { clickEvent() })
-				showBackButton(false) {}
 			}
 		} else if (isShow) {
 			closeButton.click { clickEvent() }
-			showBackButton(false) {}
 		} else removeView(currentButton)
 	}
 
@@ -138,16 +133,18 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		isShow: Boolean,
 		setClickEvent: ImageView.() -> Unit
 	) {
+		if (isShow) {
+			showAddButton(false) {}
+			showCloseButton(false) {}
+		}
 		// BackButton 与 CloseButton 不会同时出现
 		val currentButton = findViewById<ImageView>(ElementID.backButton)
 		if (currentButton == null) {
 			if (isShow) {
 				backButton.click { setClickEvent(backButton) }.into(this)
-				showCloseButton(false) {}
 			}
 		} else if (isShow) {
 			backButton.click { setClickEvent(backButton) }
-			showCloseButton(false) {}
 		} else removeView(currentButton)
 	}
 
@@ -156,14 +153,28 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		isLeft: Boolean = true,
 		setClickEvent: () -> Unit
 	) {
-		val currentButton = findViewById<ImageView>(ElementID.addButton)
-		if (currentButton == null) {
+		if (addButton == null) {
 			if (isShow) {
-				if (!isLeft) addButton.setRightPosition()
-				addButton.click { setClickEvent() }.into(this)
+				addButton = HeaderIcon(context).apply {
+					id = ElementID.addButton
+					imageResource = R.drawable.add_icon
+					if (isLeft) setLeftPosition() else setRightPosition()
+				}
+				addButton?.click {
+					setClickEvent()
+				}?.into(this)
 			}
-		} else if (isShow) addButton.click { setClickEvent() }
-		else removeView(currentButton)
+		} else {
+			if (isShow) {
+				addButton?.apply {
+					click { setClickEvent() }
+					if (isLeft) setLeftPosition() else setRightPosition()
+				}
+			} else {
+				removeView(addButton)
+				addButton = null
+			}
+		}
 	}
 
 	fun setFilterEvent(action: () -> Unit) {

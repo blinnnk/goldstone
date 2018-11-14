@@ -79,7 +79,7 @@ class ContactInputPresenter(
 	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
 			contactAddressModel?.let {
-				when (MultiChainUtils.isValidMultiChainAddress(it.address, it.symbol)) {
+				when (MultiChainUtils.isValidMultiChainAddress(it.address, CoinSymbol(it.symbol))) {
 					AddressType.ETHSeries -> {
 						ethSeriesInput.setText(it.address)
 						ethSeriesAddressText = it.address

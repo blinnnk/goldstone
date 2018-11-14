@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter
 
 import android.os.Bundle
+import com.blinnnk.extension.getParentFragment
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.RequestError
@@ -20,6 +21,15 @@ class SmartContractRegisterPresenter(
 	override val fragment: SmartContractRegisterFragment
 ) : BasePresenter<SmartContractRegisterFragment>() {
 
+	override fun onFragmentShowFromHidden() {
+		super.onFragmentShowFromHidden()
+		fragment.getParentFragment<TokenDetailOverlayFragment> {
+			showBackButton(true) {
+				presenter.popFragmentFrom<SmartContractRegisterFragment>()
+			}
+		}
+	}
+
 	fun showSmartContractRegisterDetailFragment(accountName: String) {
 		fragment.getParentFragment<TokenDetailOverlayFragment>()
 			?.presenter?.showTargetFragment<SmartContractRegisterDetailFragment>(
@@ -29,8 +39,7 @@ class SmartContractRegisterPresenter(
 
 	fun getEOSCurrencyPrice(hold: (currency: Double?, error: RequestError) -> Unit) {
 		GoldStoneAPI.getPriceByContractAddress(
-			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}"),
-			true
+			listOf("{\"address\":\"${TokenContract.EOS.contract}\",\"symbol\":\"${TokenContract.EOS.symbol}\"}")
 		) { currency, error ->
 			hold(currency?.firstOrNull()?.price, error)
 		}

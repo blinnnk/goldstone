@@ -9,7 +9,7 @@ import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.network.ethereum.GoldStoneEthCall
+import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -32,7 +32,7 @@ abstract class ETHSeriesTransactionObserver {
 			val chainURL =
 				if (ChainID(chainID).isETHSeries()) SharedChain.getCurrentETH()
 				else SharedChain.getETCCurrent()
-			if (transaction.isNull()) GoldStoneEthCall.getTransactionByHash(
+			if (transaction.isNull()) ETHJsonRPC.getTransactionByHash(
 				transactionHash,
 				chainURL,
 				{
@@ -47,7 +47,7 @@ abstract class ETHSeriesTransactionObserver {
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
 				}
-			} else GoldStoneEthCall.getBlockCount(chainURL) { blockCount, error ->
+			} else ETHJsonRPC.getBlockCount(chainURL) { blockCount, error ->
 				if (blockCount == null || error.hasError()) return@getBlockCount
 				val blockInterval = blockCount - transaction?.blockNumber?.toIntOrNull().orZero()
 				val hasConfirmed = blockInterval > targetInterval
@@ -68,7 +68,7 @@ abstract class ETHSeriesTransactionObserver {
 					// 没有达到 `6` 个新的 `Block` 确认一直执行监测
 					removeObserver()
 					handler.postDelayed(reDo, retryTime)
-				} else GoldStoneEthCall.getReceiptByHash(transactionHash, chainURL) { failed, failedError ->
+				} else ETHJsonRPC.getReceiptByHash(transactionHash, chainURL) { failed, failedError ->
 					// 存在某些情况, 交易已经完成但是由于只能合约的问题, 交易失败. 这里做一个判断。
 					if (failed.isNull() || failedError.hasError()) return@getReceiptByHash
 					isFailed = failed

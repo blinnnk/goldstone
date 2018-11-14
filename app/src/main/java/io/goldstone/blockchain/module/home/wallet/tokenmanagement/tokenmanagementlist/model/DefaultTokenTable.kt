@@ -167,7 +167,8 @@ data class DefaultTokenTable(
 	// 服务插入 `EOS` 主网 `Token` 的构造函数
 	constructor(
 		contract: TokenContract,
-		iconUrl: String
+		iconUrl: String,
+		chainID: ChainID
 	) : this(
 		"",
 		contract.contract.orEmpty(),
@@ -180,7 +181,7 @@ data class DefaultTokenTable(
 		"",
 		true,
 		0,
-		ChainID.EOS.id
+		chainID.id
 	)
 
 	// 服务插入 `EOS` 主网 `Token` 的构造函数
@@ -238,16 +239,11 @@ data class DefaultTokenTable(
 
 	companion object {
 
+		@JvmField val dao = GoldStoneDataBase.database.defaultTokenDao()
 		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
 			} then (hold)
-		}
-
-		fun getTokenFromAllChains(contract: String, symbol: String, hold: (DefaultTokenTable?) -> Unit) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao().getTokenFromAllChains(contract, symbol)
-			} then { hold(it.firstOrNull()) }
 		}
 
 		fun getToken(contract: String, symbol: String, chainID: ChainID, hold: (DefaultTokenTable?) -> Unit) {
@@ -278,7 +274,7 @@ data class DefaultTokenTable(
 						callback()
 					} else {
 						// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-						targetTokens?.apply {
+						targetTokens.apply {
 							exchange = data.exchange
 							website = data.website
 							marketCap = data.marketCap
@@ -288,7 +284,7 @@ data class DefaultTokenTable(
 							totalSupply = data.supply
 							startDate = data.startDate
 							description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
-						}?.let {
+						}.let {
 							defaultDao.update(it)
 							callback()
 						}
@@ -311,6 +307,9 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
+
+	@Query("SELECT * FROM defaultTokens WHERE forceShow == 1")
+	fun getForceShow(): List<DefaultTokenTable>
 
 	@Query("UPDATE defaultTokens SET price = :newPrice WHERE contract LIKE :contract AND symbol LIKE :symbol AND chainID LIKE :chainID")
 	fun updateTokenPrice(newPrice: Double, contract: String, symbol: String, chainID: String)

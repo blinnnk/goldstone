@@ -21,8 +21,8 @@ import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
@@ -64,7 +64,7 @@ class EOSUnitTest {
 			EOSAccount("eosio"),
 			BigInteger.valueOf(200000L),
 			"dd",
-			CoinSymbol.eos
+			TokenContract.EOS
 		)
 		val transactionInfoCode = transactionInfo.serialize()
 		val compareResult = transactionInfoCode == expectResult
@@ -227,7 +227,7 @@ class EOSUnitTest {
 			EOSAccount("wuxianyinli2"),
 			BigInteger.valueOf(20000),
 			"test trans",
-			CoinSymbol.eos
+			TokenContract.EOS
 		)
 		val transactionInfoCode = transactionInfo.serialize()
 		val header = TransactionHeader(ExpirationType.FiveMinutes, 12873742, 1738495360)

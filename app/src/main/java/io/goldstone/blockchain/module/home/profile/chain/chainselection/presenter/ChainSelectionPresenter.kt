@@ -5,8 +5,8 @@ import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.ChainText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.model.ChainSelectionModel
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
@@ -21,24 +21,20 @@ class ChainSelectionPresenter(
 ) : BaseRecyclerPresenter<ChainSelectionFragment, ChainSelectionModel>() {
 
 	override fun updateData() {
-		AppConfigTable.getAppConfig {
-			it?.apply {
-				fragment.asyncData = arrayListOf(
-					ChainSelectionModel(
-						ChainText.mainnet,
-						ChainText.mainnetDescription,
-						R.drawable.mainnet_icon,
-						isMainnet
-					),
-					ChainSelectionModel(
-						ChainText.testnet,
-						ChainText.testnetDescription,
-						R.drawable.testnet_icon,
-						!isMainnet
-					)
-				)
-			}
-		}
+		fragment.asyncData = arrayListOf(
+			ChainSelectionModel(
+				ChainText.mainnet,
+				ChainText.mainnetDescription,
+				R.drawable.mainnet_icon,
+				!SharedValue.isTestEnvironment()
+			),
+			ChainSelectionModel(
+				ChainText.testnet,
+				ChainText.testnetDescription,
+				R.drawable.testnet_icon,
+				SharedValue.isTestEnvironment()
+			)
+		)
 	}
 
 	fun showNodeSelectionFragment(isMainnet: Boolean) {

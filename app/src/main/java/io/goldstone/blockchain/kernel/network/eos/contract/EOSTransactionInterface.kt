@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.eos.contract
 
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -24,15 +25,14 @@ abstract class EOSTransactionInterface {
 
 	open fun send(
 		privateKey: EOSPrivateKey,
-		@UiThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
+		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		serialized { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				val signature = privateKey.sign(Sha256.from(Hex.decode(data!!.serialized))).toString()
+			if (data != null && error.isNone()) {
+				val signature = privateKey.sign(Sha256.from(Hex.decode(data.serialized))).toString()
 				EOSAPI.pushTransaction(
 					listOf(signature),
 					data.packedTX,
-					true,
 					hold
 				)
 			} else hold(null, error)
@@ -44,8 +44,8 @@ abstract class EOSTransactionInterface {
 		hold: (signedHash: String?, error: GoldStoneError) -> String
 	) {
 		serialized { data, error ->
-			if (!data.isNull() && error.isNone()) {
-				hold(EOSPrivateKey(privateKey).sign(Sha256.from(Hex.decode(data!!.serialized))).toString(), GoldStoneError.None)
+			if (data != null && error.isNone()) {
+				hold(EOSPrivateKey(privateKey).sign(Sha256.from(Hex.decode(data.serialized))).toString(), GoldStoneError.None)
 			} else hold(null, error)
 		}
 	}

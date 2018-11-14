@@ -9,11 +9,10 @@ import io.goldstone.blockchain.common.utils.load
 import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import kotlinx.coroutines.experimental.CommonPool
-import kotlinx.coroutines.experimental.CoroutineStart
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
@@ -78,6 +77,9 @@ data class QuotationSelectionTable(
 	)
 
 	companion object {
+		@JvmField
+		val dao =
+			GoldStoneDataBase.database.quotationSelectionDao()
 
 		@WorkerThread
 		fun insertSelection(table: QuotationSelectionTable) {
@@ -88,35 +90,23 @@ data class QuotationSelectionTable(
 			quotationDao.insert(table.apply { orderID = newOrderID })
 		}
 
-		fun getSelectionByPair(pair: String, hold: (QuotationSelectionTable) -> Unit) {
-			load {
-				GoldStoneDataBase.database.quotationSelectionDao().getSelectionByPair(pair)
-			} then {
-				it?.let(hold)
-			}
-		}
-
 		fun getAll(
 			isUIThread: Boolean = true,
 			hold: (List<QuotationSelectionTable>
-			) -> Unit) = launch {
-			withContext(CommonPool, CoroutineStart.LAZY) {
-				val allQuotation =
-					GoldStoneDataBase.database.quotationSelectionDao().getAll()
-				if (isUIThread) withContext(UI) {
-					hold(allQuotation)
-				} else hold(allQuotation)
-			}
+			) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
+			val allQuotation =
+				GoldStoneDataBase.database.quotationSelectionDao().getAll()
+			if (isUIThread) withContext(Dispatchers.Main) {
+				hold(allQuotation)
+			} else hold(allQuotation)
 		}
 
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
-			launch {
-				withContext(CommonPool, CoroutineStart.LAZY) {
-					GoldStoneDataBase.database.quotationSelectionDao()
-						.updateOrderIDByPair(fromPair, newOrderID)
-					withContext(UI) {
-						callback()
-					}
+			GlobalScope.launch(Dispatchers.Default) {
+				GoldStoneDataBase.database.quotationSelectionDao()
+					.updateOrderIDByPair(fromPair, newOrderID)
+				withContext(Dispatchers.Main) {
+					callback()
 				}
 			}
 		}

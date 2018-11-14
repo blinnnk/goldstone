@@ -37,12 +37,12 @@ class KeystoreImportPresenter(
 			doAsync {
 				val keyPair =
 					WalletUtil.getKeyPairFromWalletFile(keystore, password.text.toString())
-				if (keyPair.isNull()) uiThread {
+				if (keyPair == null) uiThread {
 					callback(AccountError.WrongPassword)
 				} else fragment.context?.apply {
 					PrivateKeyImportPresenter.importWalletByRootKey(
 						this,
-						keyPair!!.privateKey,
+						keyPair.privateKey,
 						walletName,
 						password.text.toString(),
 						hintInput.text.toString(),

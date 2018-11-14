@@ -1,8 +1,11 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 
 /**
@@ -99,16 +102,16 @@ class QRCode(val content: String) {
 		val chainName = content.substringBefore(":")
 		val chainID = CryptoName.getBTCSeriesChainIDByName(chainName)?.id
 		val contract = CryptoName.getBTCSeriesContractByChainName(chainName)
-		if (chainID.isNullOrEmpty() || contract.isNullOrEmpty()) {
+		if (chainID.isNull() || contract.isNullOrEmpty()) {
 			return null
 		}
 		return if (content.contains("?")) {
 			val address = content.substringBefore("?").substringAfter(":")
 			val amount = content.substringAfter("amount=").toDoubleOrNull().orZero()
-			QRCodeModel(amount, address, contract!!, chainID!!)
+			QRCodeModel(amount, address, contract, chainID)
 		} else {
 			val address = content.substringAfter(":")
-			QRCodeModel(0.0, address, contract!!, chainID!!)
+			QRCodeModel(0.0, address, contract, chainID)
 		}
 	}
 

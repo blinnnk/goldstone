@@ -24,5 +24,4 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
 		headerTitle = title.orEmpty()
 		presenter.showTargetFragmentByTitle(title.orEmpty())
 	}
-
 }

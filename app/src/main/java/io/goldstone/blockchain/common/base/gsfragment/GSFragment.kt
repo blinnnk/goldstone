@@ -33,10 +33,18 @@ abstract class GSFragment : Fragment() {
 			 * 软件为了防止重汇会在有新的窗口全屏的时候隐藏主要的 `HomeFragment` 但是隐藏操作会
 			 * 导致 `BackEvent` 在这里被重置, 这里判断在 `Parent` 为 `Null` 的时候不执行
 			 */
-			if (parentFragment.isNull()) return
-			getMainActivity()?.apply {
-				backEvent = Runnable {
-					setBaseBackEvent(this, parentFragment)
+			if (!parentFragment.isNull()) {
+				when (val parentActivity = activity) {
+					is MainActivity -> {
+						parentActivity.backEvent = Runnable {
+							setBaseBackEvent(parentActivity, parentFragment)
+						}
+					}
+					is SplashActivity -> {
+						parentActivity.backEvent = Runnable {
+							setBaseBackEvent(null, parentFragment)
+						}
+					}
 				}
 			}
 		}
@@ -44,9 +52,7 @@ abstract class GSFragment : Fragment() {
 
 	open fun recoveryBackEvent() {
 		getMainActivity()?.apply {
-			backEvent = Runnable {
-				setBaseBackEvent(this, parentFragment)
-			}
+			backEvent = Runnable { setBaseBackEvent(this, parentFragment) }
 		}
 	}
 

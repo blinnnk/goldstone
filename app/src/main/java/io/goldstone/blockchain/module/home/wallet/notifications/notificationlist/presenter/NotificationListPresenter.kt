@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -16,7 +17,6 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListAdapter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 25/03/2018 1:49 AM
@@ -33,7 +33,7 @@ class NotificationListPresenter(
 
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
-		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.updateUnreadCount()
+		fragment.getMainActivity()?.getWalletDetailFragment()?.presenter?.start()
 	}
 
 	fun showTransactionDetailFragment(transactionInfo: NotificationModel) {
@@ -59,13 +59,12 @@ class NotificationListPresenter(
 	private fun getDataFromDatabase() {
 		fragment.showLoadingView()
 		NotificationTable.getAllNotifications { localData ->
-			val latestTime = localData.maxBy { it.createTime }?.createTime
-			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
+			val latestTime = localData.maxBy { it.createTime }?.createTime ?: 0
 			if (fragment.asyncData.isNull())
 				fragment.asyncData = localData
 			else diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
 			if (NetworkUtil.hasNetworkWithAlert(fragment.context) && !hasLoadFromServer)
-				updateDataFromServer(requestTime)
+				updateDataFromServer(latestTime)
 			else fragment.removeLoadingView()
 		}
 	}
@@ -74,16 +73,10 @@ class NotificationListPresenter(
 		GoldStoneAPI.getNotificationList(requestTime) { notificationList, error ->
 			if (notificationList != null && error.isNone()) {
 				hasLoadFromServer = true
-				if (notificationList.isNotEmpty()) {
+				if (notificationList.isNotEmpty())
 					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)
-					fragment.context?.runOnUiThread {
-						getDataFromDatabase()
-					}
-				}
-			}
-			fragment.context?.runOnUiThread {
-				fragment.removeLoadingView()
-			}
+				launchUI { getDataFromDatabase() }
+			} else launchUI { fragment.removeLoadingView() }
 		}
 	}
 }

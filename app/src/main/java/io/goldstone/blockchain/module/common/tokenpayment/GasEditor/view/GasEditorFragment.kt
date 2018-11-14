@@ -47,14 +47,14 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			gasPriceInput.apply {
-				setNumberInput()
+				setNumberInput(false)
 				setMargins<LinearLayout.LayoutParams> { topMargin = 50.uiPX() }
 				title = if (isBTCSeries) TransactionText.satoshiValue else TransactionText.gasPrice
 			}.into(this)
 			// 只有 `ETH ERC20 or ETC` 才有 `GasLimit` 的概念
 			if (!isBTCSeries) {
 				gasLimitInput.apply {
-					setNumberInput()
+					setNumberInput(false)
 					setText(getGasSize().toString())
 					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 					title = TransactionText.gasLimit
@@ -78,7 +78,8 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 	override fun onStart() {
 		super.onStart()
 		val defaultPrice =
-			if (isBTCSeries) MinerFeeType.Recommend.satoshi else MinerFeeType.Recommend.value
+			if (isBTCSeries) MinerFeeType.Recommend.satoshi
+			else MinerFeeType.Recommend.value
 		gasPriceInput.setText(defaultPrice.toString())
 		gasPrice = defaultPrice
 		getGasSize()?.let { dataSize = it }
@@ -99,28 +100,30 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 		speedLevelBar.setProgressValue(currentValue(gasPrice, dataSize))
 	}
 
+	// 第三方键盘无法被设置为纯数字输入, 这里做额外的检测,
+	// 保证输入的值是数字格式.
 	private fun setProcessValue() {
-		gasPriceInput.let { price ->
-			price.afterTextChanged = Runnable {
-				gasPrice = if (price.getContent().isEmpty()) 0L else price.getContent().toLong()
+		with(gasPriceInput) {
+			afterTextChanged = Runnable {
+				checkNumberValue(false) {
+					gasPrice = if (getContent().isEmpty()) 0L else getContent().toLong()
+				}
 			}
 		}
 		if (isBTCSeries) {
 			dataSize = getGasSize().orElse(0L)
 		} else {
-			gasLimitInput.let { limit ->
-				limit.afterTextChanged = Runnable {
-					dataSize = if (limit.getContent().isEmpty()) getGasSize().orElse(0)
-					else limit.getContent().toLong()
+			with(gasLimitInput) {
+				afterTextChanged = Runnable {
+					checkNumberValue(false) {
+						dataSize = if (getContent().isEmpty()) getGasSize() ?: 0L else getContent().toLong()
+					}
 				}
 			}
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			headerTitle = TokenDetailText.customGas
 			presenter.popFragmentFrom<GasEditorFragment>()

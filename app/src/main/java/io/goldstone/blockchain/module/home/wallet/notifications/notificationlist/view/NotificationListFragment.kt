@@ -6,6 +6,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.NotificationText
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -36,25 +37,25 @@ class NotificationListFragment :
 					} else {
 						val fromAddress: String
 						val toAddress: String
-						if (CoinSymbol(NotificationTable.getSymbol(extra.orEmpty())).isBTCSeries()) {
+						if (CoinSymbol(extra.symbol).isBTCSeries()) {
 							// TODO Bitcoin Transaction FromAddress 需要处理多 FromAddress 地址的情况
 							fromAddress =
-								NotificationTable.getBTCTransactionData(extra.orEmpty(), true)[0].address
+								NotificationTable.getBTCTransactionData(extra, true)[0].address
 							toAddress =
-								NotificationTable.getBTCTransactionData(extra.orEmpty(), false).map { extra ->
+								NotificationTable.getBTCTransactionData(extra, false).map { extra ->
 									extra.address
 								}.toString()
 						} else {
-							fromAddress = NotificationTable.getFromAddress(extra.orEmpty())
-							toAddress = NotificationTable.getToAddress(extra.orEmpty())
+							fromAddress = extra.fromAddress
+							toAddress = extra.toAddress
 						}
 						presenter.showTransactionDetailFragment(
 							NotificationModel(
 								actionContent,
-								NotificationTable.getChainID(extra.orEmpty()),
-								NotificationTable.getReceiveStatus(extra.orEmpty()).orFalse(),
-								NotificationTable.getSymbol(extra.orEmpty()),
-								NotificationTable.getValue(extra.orEmpty()),
+								ChainID(extra.chainID),
+								extra.isReceive,
+								extra.symbol,
+								extra.value,
 								createTime,
 								toAddress,
 								fromAddress

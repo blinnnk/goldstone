@@ -24,6 +24,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.*
 
 @Suppress("DEPRECATION")
@@ -71,8 +72,8 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 			setCenterInParent()
 			y -= 30.uiPX()
 		}.into(this)
-		// 当 `webView`加载完毕后清楚 `loading`
-		webView = webView {
+		// 当 `webView`加载完毕后清除 `loading`
+		webView = WebView(context).apply {
 			alpha = 0.1f
 			settings.javaScriptEnabled = true
 			webViewClient = WebViewClient()
@@ -89,6 +90,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				}
 			}
 		}
+		webView.into(this)
 	}
 
 	private fun ViewGroup.showLocalContent() {
@@ -118,10 +120,9 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 						}
 					}
 					textView {
-						AppConfigTable.getAppConfig {
-							it?.apply {
-								setText(Html.fromHtml(terms), TextView.BufferType.SPANNABLE)
-							}
+						AppConfigTable.getAppConfig(Dispatchers.Main) {
+							val terms = it?.terms ?: return@getAppConfig
+							setText(Html.fromHtml(terms), TextView.BufferType.SPANNABLE)
 						}
 					}
 				}

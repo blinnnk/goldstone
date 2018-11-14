@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.rammarket.presenter
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -29,8 +28,9 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 	var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	var recentTransactionModel: RecentTransactionModel? = null
 	var ramInformationModel: RAMInformationModel = RAMInformationModel()
-	private val ramPriceSocket by lazy {
-		object : GoldStoneWebSocket("{\"t\": \"unsub_eos_ram_service\"}") {
+	private var ramPriceSocket: GoldStoneWebSocket? = null
+	private fun getPriceSocket(): GoldStoneWebSocket {
+		return object : GoldStoneWebSocket("{\"t\": \"unsub_eos_ram_service\"}") {
 			override fun onOpened() {
 				sendMessage("{\"t\":\"sub_eos_ram_service\"}")
 			}
@@ -89,15 +89,25 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 	
 	override fun onFragmentResume() {
 		super.onFragmentResume()
-		ramPriceSocket.isSocketConnected() isFalse {
-			ramPriceSocket.runSocket()
+		if (ramPriceSocket == null) {
+			ramPriceSocket = getPriceSocket().apply {
+				runSocket()
+			}
+		} else {
+			ramPriceSocket!!.isSocketConnected(). isFalse  {
+				ramPriceSocket!!.runSocket()
+			}
 		}
+		
+		
 	}
 	
 	override fun onFragmentPause() {
 		super.onFragmentPause()
-		ramPriceSocket.isSocketConnected() isTrue {
-			ramPriceSocket.closeSocket()
+		ramPriceSocket?.apply {
+			isSocketConnected() isTrue {
+				closeSocket()
+			}
 		}
 	}
 	

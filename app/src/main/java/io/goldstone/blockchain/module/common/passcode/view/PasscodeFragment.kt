@@ -71,9 +71,8 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 	}
 
 	fun showFailedAttention(content: String) {
-		failedAttention.isNull() isFalse {
-			failedAttention?.text = content
-		} otherwise {
+		if (failedAttention != null) failedAttention?.text = content
+		else {
 			failedAttention = TextView(context).apply {
 				y += 30.uiPX()
 				layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
@@ -94,17 +93,13 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		resetHeaderStyle()
 	}
 
+	// 检查是否处于冻结状态
 	private fun NumberKeyboard.setKeyboardClickEventByFrozenStatus() {
-		// 检查是否处于冻结状态
-		presenter.isFrozenStatus { isFrozen ->
+		presenter.isFrozenStatus { isFrozen, config ->
 			checkCode = Runnable {
-				if (isFrozen) return@Runnable
-				presenter.unlockOrAlert(getEnteredCode()) {
-					getEnteredCode().isEmpty() isTrue {
-						passcodeInput.recoveryStyle()
-					} otherwise {
-						passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
-					}
+				if (!isFrozen) presenter.unlockOrAlert(config, getEnteredCode()) {
+					if (getEnteredCode().isEmpty()) passcodeInput.recoveryStyle()
+					else passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
 				}
 			}
 		}

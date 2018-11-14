@@ -76,28 +76,9 @@ public class Sha256 {
   public String toString() {
     return Hex.toHexString(mHashBytes);
   }
-
   public byte[] getBytes() {
     return mHashBytes;
   }
-
-  boolean equalsFromOffset(byte[] toCompareData, int offsetInCompareData) {
-    if ((null == toCompareData) || (offsetInCompareData < 0)
-      || (mHashBytes.length <= 4)
-      || (toCompareData.length <= offsetInCompareData)) {
-      return false;
-    }
-
-    for (int i = 0; i < 4; i++) {
-
-      if (mHashBytes[i] != toCompareData[offsetInCompareData + i]) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   public int length() {
     return HASH_LENGTH;
   }

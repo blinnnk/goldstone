@@ -3,10 +3,10 @@ package io.goldstone.blockchain.kernel.network.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -16,12 +16,12 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.utils.toList
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
 import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
+import io.goldstone.blockchain.kernel.commonmodel.ETCTransactionModel
 import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -40,11 +40,9 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.ETCTransactionModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -67,27 +65,27 @@ object GoldStoneAPI {
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
 	 */
 	@JvmStatic
-	fun getDefaultTokens(
-		@WorkerThread hold: (default: List<DefaultTokenTable>?, error: RequestError) -> Unit
-	) {
+	@WorkerThread
+	fun getDefaultTokens(hold: (default: List<DefaultTokenTable>?, error: RequestError) -> Unit) {
 		// 首先比对 `MD5` 值如果合法的就会返回列表.
-		val config = GoldStoneDataBase.database.appConfigDao().getAppConfig()
+		val configDao = GoldStoneDataBase.database.appConfigDao()
+		val config = configDao.getAppConfig()
 		requestData<String>(
 			APIPath.defaultTokenList(APIPath.currentUrl, config?.defaultCoinListMD5.orEmpty()),
 			"",
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (result.isNull() || error.hasError()) {
+			if (result?.firstOrNull() == null || error.hasError()) {
 				hold(null, error)
 				return@requestData
 			}
 			// 如果接口带入的 `MD5` 值和服务器校验的一样, 那么这个接口就会返回一个空的列表
-			val data = JSONObject(result?.firstOrNull().orEmpty())
+			val data = JSONObject(result.first())
 			val defaultTokens = data.safeGet("data")
 			// MD5 值存入数据库
 			val md5 = data.safeGet("md5")
-			GoldStoneDataBase.database.appConfigDao().updateDefaultMD5(md5)
+			configDao.updateDefaultMD5(md5)
 			val gson = Gson()
 			val collectionType = object : TypeToken<Collection<DefaultTokenTable>>() {}.type
 			val allDefaultTokens = arrayListOf<DefaultTokenTable>()
@@ -108,7 +106,9 @@ object GoldStoneAPI {
 					completeMark()
 				}
 
-				override fun mergeCallBack() = hold(allDefaultTokens, RequestError.None)
+				override fun mergeCallBack() {
+					hold(allDefaultTokens, RequestError.None)
+				}
 			}.start()
 		}
 	}
@@ -162,8 +162,8 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (result != null && error.isNone()) {
-				val content = result.firstOrNull().orEmpty()
+			if (result?.firstOrNull() != null && error.isNone()) {
+				val content = result.first()
 				val data = JSONObject(content)
 				val hasNewVersion =
 					if (content.contains("has_new_version"))
@@ -203,8 +203,8 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(JSONObject(result!!.firstOrNull()).safeGet("result"), error)
+			if (result?.firstOrNull() != null && error.isNone()) {
+				hold(JSONObject(result.first()).safeGet("result"), error)
 			} else hold(null, error)
 		}
 	}
@@ -230,8 +230,8 @@ object GoldStoneAPI {
 			false,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(ShareContentModel(JSONObject(result!!.firstOrNull().orEmpty())), error)
+			if (result?.firstOrNull() != null && error.isNone()) {
+				hold(ShareContentModel(JSONObject(result.first())), error)
 			} else hold(null, error)
 		}
 	}
@@ -274,9 +274,9 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { list, error ->
-			if (error.isNone() && !list.isNull()) {
+			if (error.isNone() && list?.firstOrNull() != null) {
 				try {
-					val data = JSONObject(list!!.firstOrNull())
+					val data = JSONObject(list.first())
 					val exchangeTables = data.safeGet("list")
 					val newMd5 = data.safeGet("md5")
 					val collectionType = object : TypeToken<Collection<ExchangeTable>>() {}.type
@@ -347,8 +347,8 @@ object GoldStoneAPI {
 			targetGoldStoneID = targetGoldStoneID,
 			maxConnectTime = 5
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(result!!.firstOrNull() == "0", error)
+			if (result != null && error.isNone()) {
+				hold(result.firstOrNull() == "0", error)
 			} else hold(null, error)
 		}
 	}
@@ -412,7 +412,10 @@ object GoldStoneAPI {
 
 	fun getNotificationList(
 		time: Long,
-		@WorkerThread hold: (notifications: ArrayList<NotificationTable>?, error: RequestError) -> Unit
+		@WorkerThread hold: (
+			notifications: ArrayList<NotificationTable>?,
+			error: RequestError
+		) -> Unit
 	) {
 		RequisitionUtil.postRequest<String>(
 			RequestBody.create(
@@ -425,13 +428,13 @@ object GoldStoneAPI {
 			true
 		) { result, error ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不用 `Gson`
-			if (result != null && error.isNone()) {
-				val jsonArray = JSONArray(result.firstOrNull().orEmpty())
+			if (result?.firstOrNull() != null && error.isNone()) {
+				val jsonArray = JSONArray(result.first())
 				if (jsonArray.length() == 0) {
 					hold(arrayListOf(), error)
 				} else {
 					val notifications =
-						jsonArray.toList().map { NotificationTable(it) }.toArrayList()
+						jsonArray.toJSONObjectList().map { NotificationTable(it) }.toArrayList()
 					hold(notifications, error)
 				}
 			} else hold(null, error)
@@ -440,8 +443,7 @@ object GoldStoneAPI {
 
 	fun getPriceByContractAddress(
 		addressList: List<String>,
-		isMainThread: Boolean,
-		hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
+		@WorkerThread hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.postRequest<TokenPriceModel>(
 			RequestBody.create(
@@ -452,10 +454,8 @@ object GoldStoneAPI {
 			APIPath.getPriceByAddress(APIPath.currentUrl),
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-					hold(result, error)
-				} else hold(result, error)
+			if (result != null && error.isNone()) {
+				hold(result, error)
 			} else hold(null, error)
 		}
 	}
@@ -484,8 +484,8 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
-				hold(JSONObject(result!!.firstOrNull().orEmpty()), error)
+			if (result?.firstOrNull() != null && error.isNone()) {
+				hold(JSONObject(result.first()), error)
 			} else hold(null, error)
 		}
 	}
@@ -501,9 +501,9 @@ object GoldStoneAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (!result.isNull() && error.isNone()) {
+			if (result?.firstOrNull() != null && error.isNone()) {
 				hold(
-					CoinInfoModel(JSONObject(result!!.firstOrNull().orEmpty()), symbol, chainID),
+					CoinInfoModel(JSONObject(result.first()), symbol, chainID),
 					error
 				)
 			} else hold(null, error)

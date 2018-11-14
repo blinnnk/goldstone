@@ -1,8 +1,7 @@
 package io.goldstone.blockchain.common.utils
 
 import com.blinnnk.util.observing
-import kotlinx.coroutines.experimental.*
-import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.*
 
 /**
  * @date 11/04/2018 3:28 AM
@@ -17,7 +16,7 @@ abstract class SequentialTask {
 	}
 
 	private suspend fun first() {
-		launch(CommonPool) {
+		GlobalScope.launch(Dispatchers.Default) {
 			firstJob()
 		}.join()
 	}
@@ -25,7 +24,7 @@ abstract class SequentialTask {
 	abstract fun firstJob()
 
 	private suspend fun second() {
-		launch(CommonPool) {
+		GlobalScope.launch(Dispatchers.Default) {
 			secondJob()
 		}.join()
 	}
@@ -33,7 +32,7 @@ abstract class SequentialTask {
 	abstract fun secondJob()
 
 	private suspend fun third() {
-		launch(CommonPool) {
+		GlobalScope.launch(Dispatchers.Default) {
 			thirdJob()
 		}.join()
 	}
@@ -50,12 +49,10 @@ abstract class ConcurrentAsyncCombine {
 	open val delayTime: Long? = null
 	private var finishedCount: Int by observing(0) {
 		if (finishedCount == asyncCount) {
-			launch {
-				if (completeInUIThread) withContext(UI) {
+			GlobalScope.launch(Dispatchers.Default) {
+				if (completeInUIThread) withContext(Dispatchers.Main) {
 					mergeCallBack()
-				} else withContext(CommonPool, CoroutineStart.LAZY) {
-					mergeCallBack()
-				}
+				} else mergeCallBack()
 			}
 		}
 	}
@@ -67,17 +64,15 @@ abstract class ConcurrentAsyncCombine {
 	}
 
 	fun start() {
-		launch {
-			withContext(CommonPool, CoroutineStart.LAZY) {
-				if (asyncCount == 0) {
-					if (completeInUIThread) withContext(UI) {
-						mergeCallBack()
-					} else mergeCallBack()
-				} else {
-					for (index in 0 until asyncCount) {
-						delayTime?.let { delay(it) }
-						doChildTask(index)
-					}
+		GlobalScope.launch(Dispatchers.Default) {
+			if (asyncCount == 0) {
+				if (completeInUIThread) withContext(Dispatchers.Main) {
+					mergeCallBack()
+				} else mergeCallBack()
+			} else {
+				for (index in 0 until asyncCount) {
+					delayTime?.let { delay(it) }
+					doChildTask(index)
 				}
 			}
 		}
@@ -90,9 +85,10 @@ abstract class ConcurrentAsyncCombine {
  * 封装的配套协程工具
  */
 fun <T> load(doThings: () -> T): Deferred<T> {
-	return async(CommonPool, CoroutineStart.LAZY) { doThings() }
+	return GlobalScope.async(Dispatchers.Default) { doThings() }
 }
 
 infix fun <T> Deferred<T>.then(block: (T) -> Unit): Job {
-	return launch(UI) { block(await()) }
+	return GlobalScope.launch(Dispatchers.Main) { block(await()) }
 }
+

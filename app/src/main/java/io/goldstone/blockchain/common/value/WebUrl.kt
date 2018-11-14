@@ -37,24 +37,33 @@ object WebUrl {
 		"$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/watchOnlyWallet"
 	@JvmStatic
 	val whatIsGas = "$header/wiki/${webLanguage(SharedWallet.getCurrentLanguageCode())}/gas"
-	const
-	val backUpServer = "https://goldstone-api1.naonaola.com"
-	const
-	val backUpSocket = "wss://goldstone-api1.naonaola.com/ws"
+	const val backUpServer = "https://goldstone-api1.naonaola.com"
+	const val backUpSocket = "wss://goldstone-api1.naonaola.com/ws"
 	const val normalServer = "https://api3.goldstone.io"
 	const val normalSocket = "wss://api3.goldstone.io/ws"
-
 	// BTC Transaction Data API From `blockChain.info`
-	const val btcMain = "https://insight.bitpay.com"
-	const val btcTest = "https://test-insight.bitpay.com"
 	const val backupBtcTest = "https://testnet.blockchain.info"
 	const val backUpBtcMain = "https://www.blockchain.info"
-	// LTC Transaction Data API From `insight`
+
+	/** Third Party Insight API*/
+	// LTC
 	const val ltcMain = "https://insight.litecore.io/api"
 	const val ltcTest = "https://testnet.litecore.io/api"
+	// BCH
+	const val bchMain = "https://bch-insight.bitpay.com/api"
+	const val bchTest = "https://test-bch-insight.bitpay.com/api"
+	// BTC
+	const val btcMain = "https://insight.bitpay.com/api"
+	const val btcTest = "https://test-insight.bitpay.com/api"
+
+	/** GoldStone Insight API*/
+	// LTC
 	const val ltcGoldStone = "https://btc-node-mainnet.goldstone.io/ltc-insight"
 	const val ltcTestGoldStone = "https://btc-node-testnet.goldstone.io/ltc-insight"
-	// BCH Transaction Data API From `insight`
-	const val bchMain = "https://bch-insight.bitpay.com"
-	const val bchTest = "https://test-bch-insight.bitpay.com"
+	// BTC
+	const val btcGoldStone = "https://btc-node-mainnet.goldstone.io/btc-insight"
+	const val btcTestGoldStone = "https://btc-node-testnet.goldstone.io/btc-insight"
+	// BCH
+	const val bchGoldStone = "https://btc-node-mainnet.goldstone.io/bch-insight"
+	const val bchTestGoldStone = "https://btc-node-testnet.goldstone.io/bch-insight"
 }

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.deposit.view
 
 import android.graphics.Bitmap
+import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -10,6 +11,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.*
@@ -20,6 +22,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRView
+import kotlinx.coroutines.Dispatchers
 import org.bitcoinj.params.MainNetParams
 import org.jetbrains.anko.*
 
@@ -29,7 +32,8 @@ import org.jetbrains.anko.*
  */
 class DepositFragment : BaseFragment<DepositPresenter>() {
 
-	override val pageTitle: String get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol.orEmpty()
+	override val pageTitle: String
+		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
 	private val inputView by lazy { DepositInputView(context!!) }
 	private val qrView by lazy { QRView(context!!) }
 	override val presenter = DepositPresenter(this)
@@ -43,7 +47,9 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 				qrView.setMargins<RelativeLayout.LayoutParams> {
 					topMargin = 170.uiPX()
 				}
-				setAddressText()
+				setAddressText(false) {
+					launchUI { qrView.setAddressText(it) }
+				}
 				qrView.showSaveAndShareButtons()
 				setConfirmButtonEvent()
 				setShareEvent()
@@ -79,7 +85,9 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		qrView.showFormattedButton(true)
 		qrView.convertEvent = Runnable {
 			hasConvert = !hasConvert
-			setAddressText(hasConvert)
+			setAddressText(hasConvert) {
+				launchUI { qrView.setAddressText(it) }
+			}
 		}
 	}
 
@@ -109,54 +117,44 @@ class DepositFragment : BaseFragment<DepositPresenter>() {
 		inputView.setHeaderSymbol(symbol, true)
 	}
 
-	private fun setAddressText(convertBCHAddress: Boolean = false) {
-		WalletTable.getCurrentWallet {
-			getParentFragment<TokenDetailOverlayFragment> {
-				when {
-					token?.contract.isBTC() -> {
-						if (SharedValue.isTestEnvironment())
-							qrView.setAddressText(currentBTCSeriesTestAddress)
-						else qrView.setAddressText(currentBTCAddress)
-					}
-
-					token?.contract.isLTC() -> {
-						if (SharedValue.isTestEnvironment())
-							qrView.setAddressText(currentBTCSeriesTestAddress)
-						else qrView.setAddressText(currentLTCAddress)
-					}
-
-					token?.contract.isEOSSeries() -> {
-						qrView.setAddressText(currentEOSAccountName.getCurrent())
-					}
-
-					token?.contract.isBCH() -> {
-						if (SharedValue.isTestEnvironment()) {
-							val bchTestAddress =
-								if (convertBCHAddress) BCHUtil.instance.encodeCashAddressByLegacy(currentBTCSeriesTestAddress)
-								else currentBTCSeriesTestAddress
-							qrView.setAddressText(bchTestAddress)
-							setQRImage(QRCodePresenter.generateQRCode(bchTestAddress))
-						} else {
-							val bchMainnetAddress =
-								if (convertBCHAddress) BCHWalletUtils.formattedToLegacy(currentBCHAddress, MainNetParams.get())
-								else currentBCHAddress
-							qrView.setAddressText(bchMainnetAddress)
-							setQRImage(QRCodePresenter.generateQRCode(bchMainnetAddress))
-						}
-					}
-
-					token?.contract.isETC() ->
-						qrView.setAddressText(currentETCAddress)
-					else -> qrView.setAddressText(currentETHSeriesAddress)
+	@WorkerThread
+	private fun setAddressText(
+		convertBCHAddress: Boolean,
+		callback: (value: String) -> Unit
+	) = WalletTable.getCurrent(Dispatchers.Main) {
+		getParentFragment<TokenDetailOverlayFragment> {
+			when {
+				token?.contract.isBTC() -> {
+					if (SharedValue.isTestEnvironment()) callback(currentBTCSeriesTestAddress)
+					else callback(currentBTCAddress)
 				}
+				token?.contract.isLTC() -> {
+					if (SharedValue.isTestEnvironment()) callback(currentBTCSeriesTestAddress)
+					else callback(currentLTCAddress)
+				}
+				token?.contract.isEOSSeries() -> callback(currentEOSAccountName.getCurrent())
+				token?.contract.isBCH() -> {
+					if (SharedValue.isTestEnvironment()) {
+						val bchTestAddress =
+							if (convertBCHAddress) BCHUtil.instance.encodeCashAddressByLegacy(currentBTCSeriesTestAddress)
+							else currentBTCSeriesTestAddress
+						callback(bchTestAddress)
+						launchUI { setQRImage(QRCodePresenter.generateQRCode(bchTestAddress)) }
+					} else {
+						val bchMainnetAddress =
+							if (convertBCHAddress) BCHWalletUtils.formattedToLegacy(currentBCHAddress, MainNetParams.get())
+							else currentBCHAddress
+						callback(bchMainnetAddress)
+						launchUI { setQRImage(QRCodePresenter.generateQRCode(bchMainnetAddress)) }
+					}
+				}
+				token?.contract.isETC() -> callback(currentETCAddress)
+				else -> callback(currentETHSeriesAddress)
 			}
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<TokenDetailOverlayFragment> {
 			if (isFromQuickDeposit) {
 				presenter.removeSelfFromActivity()

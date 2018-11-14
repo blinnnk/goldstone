@@ -43,11 +43,7 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : GSFragment
 		presenter.onFragmentCreate()
 	}
 
-	override fun onCreateView(
-		inflater: LayoutInflater,
-		container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View? {
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		presenter.onFragmentCreateView()
 		return UI {
 			initView()

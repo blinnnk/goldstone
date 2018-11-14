@@ -18,10 +18,8 @@ import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
@@ -39,6 +37,9 @@ import io.goldstone.blockchain.module.home.quotation.quotation.presenter.Quotati
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.textColor
@@ -81,12 +82,15 @@ class MarketTokenDetailPresenter(
 		}
 
 		val pair = fragment.currencyInfo?.pair ?: return
-		QuotationSelectionTable.getSelectionByPair(pair) { selectionTable ->
+		load {
+				QuotationSelectionTable.dao.getSelectionByPair(pair)
+		} then {
+			if (it == null) return@then
 			val data = when (period) {
-				MarketTokenDetailChartType.WEEK.info -> selectionTable.lineChartWeek
-				MarketTokenDetailChartType.DAY.info -> selectionTable.lineChartDay
-				MarketTokenDetailChartType.MONTH.info -> selectionTable.lineChartMonth
-				else -> selectionTable.lineChartHour
+				MarketTokenDetailChartType.WEEK.info -> it.lineChartWeek
+				MarketTokenDetailChartType.DAY.info -> it.lineChartDay
+				MarketTokenDetailChartType.MONTH.info -> it.lineChartMonth
+				else -> it.lineChartHour
 			}
 			// 更新网络数据
 			if (data.isNullOrBlank() && NetworkUtil.hasNetwork(fragment.context)) {
@@ -195,7 +199,7 @@ class MarketTokenDetailPresenter(
 				priceHistory.model = priceData
 				val quotationDao =
 					GoldStoneDataBase.database.quotationSelectionDao()
-				priceData?.apply {
+				priceData.apply {
 					quotationDao.updatePriceInfo(dayHighest, dayLow, totalHighest, totalLow, info.pair)
 				}
 			}
@@ -295,13 +299,19 @@ class MarketTokenDetailPresenter(
 		info: QuotationModel,
 		hold: (tokenData: TokenInformationModel, priceData: PriceHistoryModel) -> Unit
 	) {
-		DefaultTokenTable.getTokenFromAllChains(info.contract, info.symbol) { default ->
-			QuotationSelectionTable.getSelectionByPair(info.pair) { quotation ->
+		GlobalScope.launch(Dispatchers.Default) {
+			val default =
+				DefaultTokenTable.dao.getTokenFromAllChains(info.contract, info.symbol).firstOrNull()
+			val quotation =
+				QuotationSelectionTable.dao.getSelectionByPair(info.pair)
+			if (quotation != null) {
 				val tokenData =
-					if (default.isNull()) TokenInformationModel()
-					else TokenInformationModel(default!!, info.symbol)
+					if (default == null) TokenInformationModel()
+					else TokenInformationModel(default, info.symbol)
 				val priceData = PriceHistoryModel(quotation, info.symbol)
-				hold(tokenData, priceData)
+				launchUI {
+					hold(tokenData, priceData)
+				}
 			}
 		}
 	}
@@ -312,7 +322,7 @@ class MarketTokenDetailPresenter(
 	) {
 		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
 		GoldStoneAPI.getTokenInfoFromMarket(info.symbol, chainID) { coinInfo, error ->
-			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo!!) {
+			if (!coinInfo.isNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
 				DefaultTokenTable.getToken(info.contract, info.symbol, chainID) {
 					it?.let(hold)
 				}
