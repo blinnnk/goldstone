@@ -25,7 +25,7 @@ class ChainAddressesFragment
 	override val pageTitle: String get() = coinType?.getSymbol()?.symbol.orEmpty()
 	override val presenter = ChainAddressesPresenter(this)
 
-	var headerView: ChainAddressesHeaderView? = null
+	private var headerView: ChainAddressesHeaderView? = null
 
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<Bip44Address>?) {
 		recyclerView.adapter = ChainAddressesAdapter(
@@ -52,8 +52,7 @@ class ChainAddressesFragment
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<WalletSettingsFragment> {
-			headerTitle = WalletSettingsText.viewAddresses
-			presenter.popFragmentFrom<ChainAddressesFragment>()
+			presenter.popFragmentFrom<ChainAddressesFragment>(false)
 		}
 	}
 

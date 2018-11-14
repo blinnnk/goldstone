@@ -87,7 +87,7 @@ object APIPath {
 		header: String,
 		chainID: String,
 		address: String,
-		startBlock: String
+		startBlock: Int
 	) -> String = { header, chainID, address, startBlock ->
 		"$header/tx/pageList?chainid=$chainID&address=$address&start_block=$startBlock"
 	}

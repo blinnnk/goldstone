@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.suffix
 import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
@@ -90,7 +92,8 @@ class TransactionDetailPresenter(
 
 	private fun updateConfirmationNumber() {
 		when {
-			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
+			data.contract.isBTCSeries() ->
+				updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
 			data.contract.isETHSeries() -> updateETHSeriesConfirmationCount()
 			data.contract.isEOSSeries() -> detailView.showLoading(false)
 		}
@@ -294,12 +297,10 @@ class TransactionDetailPresenter(
 			if (data.isReceive) data.toAddress else data.fromAddress,
 			checkLocal
 		) { data, error ->
-			if (data != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
+			if (data.isNotNull() && error.isNone()) launchUI {
 				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
 			} else detailView.showErrorAlert(error)
-			GlobalScope.launch(Dispatchers.Main) {
-				detailView.showLoading(false)
-			}
+			launchUI { detailView.showLoading(false) }
 		}
 	}
 

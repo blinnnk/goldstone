@@ -7,10 +7,9 @@ import java.io.Serializable
  * @author KaySaith
  */
 object DataValue {
-	const val pageCount = 100
+	const val pageCount = 10
 	const val quotationDataCount = 10
 	const val candleChartCount = 100
-	const val transactionPageCount = 20
 }
 
 object Count {
@@ -18,4 +17,4 @@ object Count {
 	const val retry = 5
 }
 
-data class PageInfo(val from: Int, val to: Int, val maxDataIndex: Int) : Serializable
+data class PageInfo(val from: Int, val to: Int, val maxDataIndex: Int, val total: Int) : Serializable

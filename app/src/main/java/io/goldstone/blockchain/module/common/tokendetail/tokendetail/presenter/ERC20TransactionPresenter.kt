@@ -23,7 +23,7 @@ fun TokenDetailPresenter.loadERCChainData(blockNumber: Int) {
 	updateLocalERC20Transactions(blockNumber) {
 		// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 		// 有数据后重新执行从数据库拉取数据
-		if (it.isNone()) loadLocalData()
+		if (it.isNone()) getETHSeriesData()
 	}
 }
 

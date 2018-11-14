@@ -52,11 +52,6 @@ class DescriptionView(context: Context) : TextView(context) {
 		return this
 	}
 
-	fun isResourceAssign(): DescriptionView {
-		text = EOSAccountText.activeByContractHint
-		return this
-	}
-
 	fun isExportKeyStore(): DescriptionView {
 		text = ImportWalletText.exportKeystore
 		return this

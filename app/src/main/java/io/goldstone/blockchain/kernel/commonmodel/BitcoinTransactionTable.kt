@@ -10,6 +10,7 @@ import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
@@ -66,7 +67,7 @@ data class BTCSeriesTransactionTable(
 		isFee,
 		// 因为 `BTC Series` 的账单会收录但是又不一定成功. 与 `以太坊` 收录即有状态不同
 		// 所以 `Pending` 状态还是会根据是否拥有 `BlockHeight` 来做判断
-		data.safeGet("blockheight").toIntOrZero() <= 0,
+		data.safeGet("confirmations").toIntOrZero() <= 6,
 		chainType
 	)
 
@@ -200,6 +201,12 @@ interface BTCSeriesTransactionDao {
 
 	@Query("SELECT * FROM bitcoinTransactionList WHERE hash = :hash AND isReceive = :isReceive AND isFee = :isFee")
 	fun getDataByHash(hash: String, isReceive: Boolean, isFee: Boolean): BTCSeriesTransactionTable?
+
+	@Query("SELECT * FROM bitcoinTransactionList WHERE dataIndex = (SELECT MAX(dataIndex) FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType = :chainType)")
+	fun getMaxDataIndex(address: String, chainType: Int): BTCSeriesTransactionTable?
+
+	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType  AND dataIndex BETWEEN :start AND :end ORDER BY dataIndex DESC")
+	fun getDataByRange(address: String, chainType: Int, start: Int, end: Int): List<BTCSeriesTransactionTable>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: BTCSeriesTransactionTable)

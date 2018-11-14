@@ -9,6 +9,8 @@ import com.blinnnk.extension.orFalse
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import com.blinnnk.util.getParentFragment
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ChainText
@@ -16,8 +18,6 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.*
@@ -79,8 +79,8 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 
 	private fun LinearLayout.showNodeList(isMainnet: Boolean, callback: () -> Unit) {
 		load {
-			val dao = GoldStoneDataBase.database.chainNodeDao()
-			if (isMainnet) dao.getMainnet() else dao.getTestnet()
+			if (isMainnet) ChainNodeTable.dao.getMainnet()
+			else ChainNodeTable.dao.getTestnet()
 		} then { nodeList ->
 			fun showChainSectionHeader(node: ChainNodeTable) = when {
 				ChainType(node.chainType).isETH() -> NodeCell(context).ethType().into(this)
@@ -106,7 +106,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					TinyNumberUtils.isTrue(node.isUsed),
 					chainTypeID + index
 				).click { cell ->
-					clearAllSelectedStatus(node.chainType)
+					clearAllSelectedStatus(node.chainType, nodeList.size)
 					cell.selectRadio()
 					selectedNode.add(node)
 				}.into(this)
@@ -115,21 +115,22 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		}
 	}
 
-	private fun clearAllSelectedStatus(type: Int) {
+	private fun clearAllSelectedStatus(type: Int, dataCount: Int) {
 		val starID = getChainTypeID(type)
-		(starID until starID + 10).forEach {
+		(starID until starID + dataCount).forEach {
 			container.findViewById<NodeSelectionCell>(it)?.clearRadio()
 		}
 		selectedNode.removeAll { it.chainType == type }
 	}
 
 	private fun getChainTypeID(type: Int) = when {
-		ChainType(type).isETH() -> 10
-		ChainType(type).isBTC() -> 20
-		ChainType(type).isLTC() -> 30
-		ChainType(type).isBCH() -> 40
-		ChainType(type).isEOS() -> 50
-		else -> 60
+		ChainType(type).isETH() -> 100
+		ChainType(type).isBTC() -> 200
+		ChainType(type).isLTC() -> 300
+		ChainType(type).isBCH() -> 400
+		ChainType(type).isEOS() -> 500
+		ChainType(type).isETC() -> 600
+		else -> 1000
 	}
 
 	private fun confirmNodeSelection() {

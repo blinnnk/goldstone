@@ -50,7 +50,7 @@ open class TransactionSealedModel(
 		TokenContract(data.contractAddress, data.symbol, null),
 		data.isFee,
 		data.hasError.toIntOrNull() == TinyNumber.True.value,
-		data.blockNumber.toIntOrNull() ?: -1,
+		data.blockNumber,
 		TimeUtils.formatDate(data.timeStamp.toMillisecond()),
 		data.confirmations.toIntOrNull() ?: -1,
 		data.memo,

@@ -8,16 +8,12 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
-import com.blinnnk.util.getParentFragment
-import com.blinnnk.util.replaceFragmentAndSetArgument
+import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -101,8 +97,13 @@ class ContactInputPresenter(
 					}
 
 					AddressType.BCH -> {
-						bchInput.setText(it.address)
-						bchAddressText = it.address
+						if (SharedValue.isTestEnvironment()) {
+							btcSeriesTestnetInput.setText(it.address)
+							btcTestnetAddressText = it.address
+						} else {
+							bchInput.setText(it.address)
+							bchAddressText = it.address
+						}
 					}
 
 					AddressType.BTCSeriesTest -> {
@@ -111,8 +112,13 @@ class ContactInputPresenter(
 					}
 
 					AddressType.LTC -> {
-						ltcInput.setText(it.address)
-						ltcAddressText = it.address
+						if (SharedValue.isTestEnvironment()) {
+							btcSeriesTestnetInput.setText(it.address)
+							btcTestnetAddressText = it.address
+						} else {
+							ltcInput.setText(it.address)
+							ltcAddressText = it.address
+						}
 					}
 				}
 			}

@@ -99,7 +99,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 
 				btcTestnetAddressInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
-					title = "${CoinSymbol.btc()} TEST"
+					title = "${CoinSymbol.btc()} Series TEST"
 					hint = ContactText.btcTestnetAddress
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.into(this)

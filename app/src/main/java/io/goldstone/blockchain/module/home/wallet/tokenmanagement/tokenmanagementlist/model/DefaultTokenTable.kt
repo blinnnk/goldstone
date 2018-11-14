@@ -4,10 +4,10 @@ import android.arch.persistence.room.*
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.TinyNumberUtils
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -239,7 +239,9 @@ data class DefaultTokenTable(
 
 	companion object {
 
-		@JvmField val dao = GoldStoneDataBase.database.defaultTokenDao()
+		@JvmField
+		val dao = GoldStoneDataBase.database.defaultTokenDao()
+
 		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()

@@ -2,11 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase

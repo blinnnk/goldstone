@@ -12,6 +12,8 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.util.getParentFragment
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
@@ -19,7 +21,10 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
@@ -83,7 +88,7 @@ class MarketTokenDetailPresenter(
 
 		val pair = fragment.currencyInfo?.pair ?: return
 		load {
-				QuotationSelectionTable.dao.getSelectionByPair(pair)
+			QuotationSelectionTable.dao.getSelectionByPair(pair)
 		} then {
 			if (it == null) return@then
 			val data = when (period) {

@@ -222,7 +222,7 @@ private fun GasSelectionPresenter.insertPendingDataToDatabase(
 ) {
 	fragment.getParentFragment<TokenDetailOverlayFragment> {
 		TransactionTable(
-			blockNumber = "",
+			blockNumber = -1,
 			// 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 			timeStamp = (System.currentTimeMillis() / 1000).toString(),
 			hash = taxHash,
