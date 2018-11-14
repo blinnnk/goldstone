@@ -348,7 +348,7 @@ class TokenDetailPresenter(
 		// TODO ETHSeries
 		try {
 			detailView.asyncData?.addAll(
-				(data as List<BTCSeriesTransactionTable>).map { TransactionListModel(it) }
+				(data as List<BTCSeriesTransactionTable>).asSequence().map { TransactionListModel(it) }.sortedByDescending { it.dataIndex }
 			)
 		} catch (error: Exception) {
 			try {

@@ -14,14 +14,12 @@ import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 25/04/2018 6:52 AM
@@ -113,6 +111,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 			}.lparams {
 				width = matchParent
 				height = matchParent
+				bottomPadding = 30.uiPX()
 			}
 		}
 	}

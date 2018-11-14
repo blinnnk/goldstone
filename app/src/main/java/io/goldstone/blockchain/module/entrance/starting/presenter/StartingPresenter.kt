@@ -99,10 +99,8 @@ class StartingPresenter(override val fragment: StartingFragment) :
 			@WorkerThread hold: (exchangeTableList: ArrayList<ExchangeTable>?, error: RequestError) -> Unit
 		) {
 			AppConfigTable.getAppConfig(Dispatchers.Default) {
-				GoldStoneAPI.getMarketList(
-					it?.exchangeListMD5.orEmpty()
-				) { serverExchangeTables, md5, error ->
-					if (!serverExchangeTables.isNull() && error.isNone()) {
+				GoldStoneAPI.getMarketList(it?.exchangeListMD5.orEmpty()) { serverExchangeTables, md5, error ->
+					if (serverExchangeTables.isNotNull() && error.isNone()) {
 						if (serverExchangeTables.isEmpty()) {
 							hold(null, RequestError.RPCResult("Empty Data"))
 						} else {

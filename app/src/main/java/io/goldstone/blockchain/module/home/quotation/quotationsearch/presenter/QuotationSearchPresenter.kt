@@ -7,19 +7,17 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
-import com.blinnnk.util.load
-import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -29,8 +27,6 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 21/04/2018 4:32 PM
@@ -117,7 +113,7 @@ class QuotationSearchPresenter(
 			} else {
 				fragment.showExchangeFilterDescriptionView(
 					QuotationText.searchFilterTextDescription(
-						if (filterNames.size > 2) QuotationText.searchExchangesNames(filterText)
+						if (filterNames.size > 3) QuotationText.searchExchangesNames(filterText)
 						else filterText
 					)
 				)
@@ -135,16 +131,17 @@ class QuotationSearchPresenter(
 		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
 		val parameter = JsonArray().apply { add(model.pair) }
 		if (isSelect) GoldStoneAPI.getCurrencyLineChartData(parameter) { chartData, error ->
-			if (chartData != null && error.isNone()) {
-				QuotationSelectionTable.insertSelection(model.apply {
-					lineChartDay = chartData.firstOrNull()?.pointList?.toString().orEmpty()
-					isSelecting = isSelect
-				})
+			if (chartData.isNotNull() && error.isNone()) {
+				QuotationSelectionTable.insertSelection(
+					model.apply {
+						lineChartDay = chartData.firstOrNull()?.pointList?.toString().orEmpty()
+						isSelecting = isSelect
+					}
+				)
 				callback(error)
 			} else callback(error)
-		} else load {
-			GoldStoneDataBase.database.quotationSelectionDao().deleteByPairs(model.pair)
-		} then {
+		} else GlobalScope.launch(Dispatchers.Default) {
+			QuotationSelectionTable.dao.deleteByPairs(model.pair)
 			callback(RequestError.None)
 		}
 	}
@@ -153,33 +150,30 @@ class QuotationSearchPresenter(
 		fragment.showLoadingView()
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
-			if (searchList != null && error.isNone()) {
-				if (searchList.isEmpty()) GlobalScope.launch(Dispatchers.Main) {
-					fragment.removeLoadingView()
-				} else {
-					val targetData =
-						GoldStoneDataBase.database.quotationSelectionDao().getTargetMarketTables(
-							selectedIds.split(",").map { it.toIntOrZero() }
-						)
-					// 如果本地没有已经选中的直接返回搜索的数据展示在界面
-					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
-					if (targetData.isEmpty()) {
-						fragment.completeQuotationTable(searchList)
-					} else searchList.forEachOrEnd { item, isEnd ->
-						item.isSelecting = targetData.any { it.pair == item.pair }
-						if (isEnd) fragment.completeQuotationTable(searchList)
-					}
+			if (!searchList.isNullOrEmpty() && error.isNone()) {
+				val targetData =
+					QuotationSelectionTable.dao.getTargetMarketTables(
+						selectedIds.split(",").map { it.toIntOrZero() }
+					)
+				// 如果本地没有已经选中的直接返回搜索的数据展示在界面
+				// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
+				if (targetData.isEmpty()) {
+					fragment.completeQuotationTable(searchList)
+				} else searchList.forEachOrEnd { item, isEnd ->
+					item.isSelecting = targetData.any { it.pair == item.pair }
+					if (isEnd) fragment.completeQuotationTable(searchList)
 				}
 			} else GlobalScope.launch(Dispatchers.Main) {
-				fragment.safeShowError(error)
+				if (error.hasError()) fragment.safeShowError(error)
 				fragment.removeLoadingView()
 			}
 		}
 	}
 
 	private fun QuotationSearchFragment.completeQuotationTable(searchList: List<QuotationSelectionTable>) {
-		val data = searchList.map { QuotationSelectionTable(it, "") }
-		GoldStoneAPI.context.runOnUiThread {
+		val data =
+			searchList.map { QuotationSelectionTable(it, "") }
+		launchUI {
 			removeLoadingView()
 			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(data.toArrayList())
 		}
@@ -268,19 +262,15 @@ class QuotationSearchPresenter(
 		fun getExchangeList(
 			@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>) -> Unit
 		) {
-			doAsync {
-				val localData = GoldStoneDataBase.database.exchangeTableDao().getAll()
+			GlobalScope.launch(Dispatchers.Default) {
+				val localData = ExchangeTable.dao.getAll()
 				if (localData.isEmpty()) StartingPresenter.getAndUpdateExchangeTables { exchangeTables, error ->
 					//数据库没有数据，从网络获取
-					if (!exchangeTables.isNull() && error.isNone()) GoldStoneAPI.context.runOnUiThread {
-						hold(exchangeTables)
-					} else GoldStoneAPI.context.runOnUiThread {
-						hold(arrayListOf())
+					launchUI {
+						if (exchangeTables.isNotNull() && error.isNone()) hold(exchangeTables)
+						else hold(arrayListOf())
 					}
-				} else GoldStoneAPI.context.runOnUiThread {
-					//数据库有数据
-					hold(localData.toArrayList())
-				}
+				} else launchUI { hold(localData.toArrayList()) }
 			}
 		}
 	}

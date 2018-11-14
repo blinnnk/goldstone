@@ -63,6 +63,7 @@ class ChainAddressesPresenter(
 			setDefaultAddressEvent = {
 				fun update(bip44Address: Bip44Address, eosAccountName: String) {
 					coinType.updateCurrentAddress(bip44Address, eosAccountName) {
+						fragment.setDefaultAddress(bip44Address)
 						// 更新钱包默认地址, 同时更新首页的数据
 						updateWalletDetail()
 						AddressManagerFragment.removeDashboard(fragment.context)
