@@ -149,7 +149,4 @@
 # Anko
 -dontwarn kotlin.jvm.internal.Intrinsics
 
-
--keep class com.blinnnk.** { *; }
--dontwarn com.blinnnk.**
 -dontwarn org.bitcoinj.store.**
