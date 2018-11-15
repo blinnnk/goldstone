@@ -9,8 +9,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -70,7 +70,7 @@ open class DashboardOverlay(
 		id = ElementID.dashboardOverlay
 		backgroundColor = GrayScale.Opacity5Black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-		container.setCenterInParent()
+		container.centerInParent()
 		isClickable = true
 		onClick {
 			removeSelf()

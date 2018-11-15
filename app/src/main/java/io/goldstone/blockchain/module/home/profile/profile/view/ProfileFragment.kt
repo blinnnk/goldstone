@@ -73,8 +73,6 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			sessionData = listOf(
 				RecyclerViewSessionModel(1, "General Settings", sessionHeight, PaddingSize.device.toFloat()),
 				RecyclerViewSessionModel(6, "EOS Account", sessionHeight, PaddingSize.device.toFloat()),
-				RecyclerViewSessionModel(7, "Security Settings", sessionHeight, PaddingSize.device.toFloat()),
-				RecyclerViewSessionModel(8, "Personal Settings", sessionHeight, PaddingSize.device.toFloat()),
 				RecyclerViewSessionModel(13, "Software", sessionHeight, PaddingSize.device.toFloat())
 			)
 			recyclerView.addItemDecoration(this)

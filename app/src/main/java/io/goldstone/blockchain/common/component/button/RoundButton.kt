@@ -8,8 +8,8 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GSCard
@@ -34,29 +34,28 @@ class RoundButton(context: Context) : GSCard(context) {
 	private lateinit var title: TextView
 	private lateinit var loadingView: ProgressBar
 
-	private var container: RelativeLayout = relativeLayout {
-		layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
-		title = textView {
-			gravity = Gravity.CENTER
-			textColor = Spectrum.white
-			layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-			textSize = fontSize(12)
-			typeface = GoldStoneFont.black(context)
-		}
-		loadingView = ProgressBar(context, null, android.R.attr.progressBarStyleInverse).apply {
-			visibility = View.GONE
-			id = ElementID.buttonLoading
-			indeterminateDrawable.setColorFilter(
-				Spectrum.white, android.graphics.PorterDuff.Mode.MULTIPLY
-			)
-			layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
-		}
-		loadingView.into(this)
-		loadingView.setCenterInParent()
-	}
-
 	init {
 		resetCardElevation(5f)
+		relativeLayout {
+			layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
+			title = textView {
+				gravity = Gravity.CENTER
+				textColor = Spectrum.white
+				layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
+				textSize = fontSize(12)
+				typeface = GoldStoneFont.black(context)
+			}
+			loadingView = ProgressBar(context, null, android.R.attr.progressBarStyleInverse).apply {
+				visibility = View.GONE
+				id = ElementID.buttonLoading
+				indeterminateDrawable.setColorFilter(
+					Spectrum.white, android.graphics.PorterDuff.Mode.MULTIPLY
+				)
+				layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
+			}
+			loadingView.into(this)
+			loadingView.centerInParent()
+		}
 	}
 
 	fun showLoadingStatus(

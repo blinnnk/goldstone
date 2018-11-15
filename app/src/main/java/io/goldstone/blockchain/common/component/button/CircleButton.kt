@@ -11,9 +11,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.Size
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -101,7 +101,7 @@ class CircleButton(context: Context) : LinearLayout(context) {
 		setIconViewColor(backgroundColor)
 		icon.setColorFilter(iconColor)
 		icon.layoutParams = RelativeLayout.LayoutParams(iconSize, iconSize)
-		icon.setCenterInParent()
+		icon.centerInParent()
 	}
 
 	private fun setTitleStyle(

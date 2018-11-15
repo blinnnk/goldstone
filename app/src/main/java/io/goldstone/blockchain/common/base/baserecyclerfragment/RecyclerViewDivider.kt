@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.common.base.baserecyclerfragment
 
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
@@ -46,7 +45,7 @@ class RecyclerViewDivider(recyclerView: BaseRecyclerView) : RecyclerView.ItemDec
 	override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
 		val childCount = parent.childCount
 		val left = parent.paddingLeft.toFloat()
-		for (index in 0 until childCount - 1) {
+		for (index in 0 until childCount) {
 			val view = parent.getChildAt(index)
 			val position = parent.getChildAdapterPosition(view)
 			sessionData.forEach {

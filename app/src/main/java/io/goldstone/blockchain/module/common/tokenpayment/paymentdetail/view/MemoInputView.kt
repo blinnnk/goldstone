@@ -7,9 +7,9 @@ import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RelativeLayout
+import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
 import com.blinnnk.extension.keyboardHeightListener
-import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.extension.timeUpThen
 import com.blinnnk.uikit.AnimationDuration
 import com.blinnnk.uikit.uiPX
@@ -56,7 +56,7 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 			backgroundTintMode = PorterDuff.Mode.CLEAR
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, matchParent)
 		}.into(this)
-		inputView.setCenterInHorizontal()
+		inputView.centerInHorizontal()
 		AnimationDuration.Default timeUpThen {
 			inputView.requestFocus()
 			(context as? Activity)?.let { SoftKeyboard.show(it, inputView) }

@@ -96,5 +96,8 @@ open class RequestError(override val message: String) : GoldStoneError(message) 
 		val RPCResult: (description: String) -> RequestError = { description ->
 			RequestError("${ErrorText.error}\n\n[${ErrorText.error}: $description]")
 		}
+
+		@JvmStatic
+		val EmptyResut = RequestError("Empty Result")
 	}
 }

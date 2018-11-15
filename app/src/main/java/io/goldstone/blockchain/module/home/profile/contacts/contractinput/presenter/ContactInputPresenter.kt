@@ -4,7 +4,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
@@ -30,6 +30,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import org.bitcoinj.params.TestNet3Params
 
 /**
  * @date 16/04/2018 1:13 PM
@@ -176,12 +177,11 @@ class ContactInputPresenter(
 		}
 
 		// 检查是否是合规的测试网比特币私钥地址格式
-		if (
-			btcTestnetAddressText.isNotEmpty() &&
-			!BTCUtils.isValidTestnetAddress(btcTestnetAddressText)
-		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat("BTCTest"))
-			return
+		if (btcTestnetAddressText.isNotEmpty()) {
+			if (!BTCUtils.isValidTestnetAddress(formattedBTCSeriesTestAddress(btcTestnetAddressText))) {
+				fragment.context?.alert(ContactText.wrongAddressFormat("BTCTest"))
+				return
+			}
 		}
 		// 检查是否是合规的主网比特币私钥地址格式
 		if (
@@ -202,14 +202,14 @@ class ContactInputPresenter(
 				eosAccountNameText,
 				eosJungleAccountNameText,
 				btcMainnetAddressText,
-				btcTestnetAddressText,
+				formattedBTCSeriesTestAddress(btcTestnetAddressText),
 				etcAddressText,
 				ltcAddressText,
 				bchAddressText
 			)
 		) {
 			fragment.getParentFragment<ProfileOverlayFragment> {
-				if (!contactAddressModel.isNull()) {
+				if (contactAddressModel.isNotNull()) {
 					// 从账单详情快捷添加地址进入的页面
 					replaceFragmentAndSetArgument<ContactFragment>(ContainerID.content)
 					activity?.apply { SoftKeyboard.hide(this) }
@@ -218,6 +218,12 @@ class ContactInputPresenter(
 				}
 			}
 		}
+	}
+
+	private fun formattedBTCSeriesTestAddress(address: String): String {
+		return if (BCHWalletUtils.isNewCashAddress(address))
+			BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
+		else address
 	}
 
 	fun setConfirmButtonStyle(

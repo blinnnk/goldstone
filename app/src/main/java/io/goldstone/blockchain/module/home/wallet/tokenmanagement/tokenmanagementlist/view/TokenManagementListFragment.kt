@@ -77,7 +77,7 @@ class TokenManagementListFragment :
 				setMargins<LinearLayout.LayoutParams> { topMargin = 80.uiPX() }
 				text = AlertText.btcWalletOnly
 			}?.into(wrapper)
-			attentionView?.setCenterInHorizontal()
+			attentionView?.centerInHorizontal()
 		}
 	}
 }

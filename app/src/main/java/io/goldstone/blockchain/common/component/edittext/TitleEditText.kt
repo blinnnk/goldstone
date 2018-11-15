@@ -5,7 +5,7 @@ import android.content.res.ColorStateList
 import android.view.Gravity
 import android.widget.EditText
 import android.widget.RelativeLayout
-import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -18,7 +18,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class TitleEditText(context: Context) : RelativeLayout(context) {
-	
+
 	private val viewHeight = 50.uiPX()
 	private val titleView = textView {
 		gravity = Gravity.CENTER_VERTICAL
@@ -34,21 +34,21 @@ class TitleEditText(context: Context) : RelativeLayout(context) {
 		textSize = fontSize(14)
 		hint = "0'/0/0"
 	}
-	
+
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, viewHeight)
-		editText.setAlignParentRight()
+		editText.alignParentRight()
 	}
-	
+
 	fun setTitle(text: String, textSize: Float = fontSize(14)) {
 		titleView.text = text
 		titleView.textSize = textSize
 	}
-	
+
 	fun getEditText(): EditText {
 		return editText
 	}
-	
+
 	fun getText(): String {
 		return if (editText.text.isEmpty()) ""
 		else editText.text.toString()

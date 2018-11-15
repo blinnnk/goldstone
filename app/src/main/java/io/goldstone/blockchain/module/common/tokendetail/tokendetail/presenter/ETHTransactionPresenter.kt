@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
@@ -21,6 +22,9 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 fun TokenDetailPresenter.loadETHChainData(endBlock: Int) {
 	updateLocalETHTransactions(endBlock) {
 		if (it.isNone()) getETHSeriesData()
+		else launchUI {
+			detailView.showBottomLoading(false)
+		}
 	}
 }
 
@@ -52,6 +56,8 @@ fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) 
 				transactionDao.insertAll(it)
 			}
 			callback(error)
+		} else if (transactions?.isEmpty() == true) {
+			callback(RequestError.EmptyResut)
 		} else callback(error)
 	}
 }

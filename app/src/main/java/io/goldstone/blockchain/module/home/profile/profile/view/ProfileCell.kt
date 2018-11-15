@@ -88,11 +88,11 @@ class ProfileCell(context: Context) : BaseCell(context) {
 			x -= CommonCellSize.rightPadding
 		}.into(this)
 
-		title.setCenterInVertical()
-		icon.setCenterInVertical()
+		title.centerInVertical()
+		icon.centerInVertical()
 		info.apply {
-			setCenterInVertical()
-			setAlignParentRight()
+			centerInVertical()
+			alignParentRight()
 		}
 	}
 }

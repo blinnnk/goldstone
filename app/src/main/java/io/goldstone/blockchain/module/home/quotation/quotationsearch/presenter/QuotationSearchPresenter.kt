@@ -226,7 +226,7 @@ class QuotationSearchPresenter(
 									}
 								}
 							bottomBar.into(this)
-							bottomBar.setAlignParentBottom()
+							bottomBar.alignParentBottom()
 						}
 					}
 					updateBarCheckAllStatus()

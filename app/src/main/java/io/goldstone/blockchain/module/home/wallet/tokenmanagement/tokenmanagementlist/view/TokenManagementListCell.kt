@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -101,13 +101,13 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 		})
 
 		tokenInfo.apply {
-			setCenterInVertical()
+			centerInVertical()
 			x += 40.uiPX()
 		}
 
 		switch.apply {
-			setCenterInVertical()
-			setAlignParentRight()
+			centerInVertical()
+			alignParentRight()
 		}
 
 		setGrayStyle()

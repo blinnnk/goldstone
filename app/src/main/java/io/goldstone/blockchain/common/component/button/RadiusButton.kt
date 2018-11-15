@@ -6,9 +6,9 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCircleBorder
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -46,7 +46,7 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 			textColor = Spectrum.blue
 			layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
 		}.into(this)
-		title.setCenterInVertical()
+		title.centerInVertical()
 		arrowIcon.apply {
 			layoutParams = RelativeLayout.LayoutParams(buttonHeight, buttonHeight)
 			imageResource = R.drawable.arrow_icon
@@ -54,8 +54,8 @@ class RadiusButton(context: Context) : RelativeLayout(context) {
 			x += 5.uiPX()
 			setColorFilter(GrayScale.lightGray)
 		}.into(this)
-		arrowIcon.setCenterInVertical()
-		arrowIcon.setAlignParentRight()
+		arrowIcon.centerInVertical()
+		arrowIcon.alignParentRight()
 	}
 
 	fun setTitle(text: String, isLeft: Boolean = true) {

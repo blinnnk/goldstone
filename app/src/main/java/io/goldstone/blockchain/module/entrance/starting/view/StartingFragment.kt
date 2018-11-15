@@ -2,24 +2,21 @@ package io.goldstone.blockchain.module.entrance.starting.view
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import com.blinnnk.extension.alignParentBottom
+import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.overlay.LoadingView
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.SplashText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
-import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -100,8 +97,8 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						30.uiPX(),
 						Spectrum.white
 					) {
-						setAlignParentBottom()
-						setCenterInHorizontal()
+						alignParentBottom()
+						centerInHorizontal()
 						y -= 100.uiPX()
 					}
 				}

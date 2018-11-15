@@ -39,12 +39,12 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		setGrayStyle()
 		setHorizontalPadding()
 		this.addView(title)
-		title.setCenterInVertical()
+		title.centerInVertical()
 		radioButton = radioButton().apply {
 			isDefaultStyle(Spectrum.blue)
 			isClickable = false
-			setAlignParentRight()
-			setCenterInVertical()
+			alignParentRight()
+			centerInVertical()
 		}
 		layoutParams.height = 50.uiPX()
 	}
@@ -65,7 +65,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 				addCorner(17.uiPX(), color)
 			}
 			icon?.into(this)
-			icon?.setCenterInVertical()
+			icon?.centerInVertical()
 		}
 		icon?.imageResource = image
 	}

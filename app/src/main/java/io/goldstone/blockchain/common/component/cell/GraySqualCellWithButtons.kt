@@ -3,7 +3,6 @@ package io.goldstone.blockchain.common.component.cell
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.support.v7.widget.CardView
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +10,9 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.measureTextWidth
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -21,7 +20,6 @@ import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Default
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons.Companion.CellType.Normal
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -107,12 +105,12 @@ open class GraySquareCellWithButtons(context: Context) : GSCard(context) {
 			addView(subtitle)
 			addView(description)
 			addView(copyButton)
-			copyButton.setAlignParentRight()
+			copyButton.alignParentRight()
 			copyButton.x -= 30.uiPX()
 			addView(moreButton)
-			moreButton.setAlignParentRight()
+			moreButton.alignParentRight()
 			addView(addButton)
-			addButton.setAlignParentRight()
+			addButton.alignParentRight()
 		}
 		layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
 		this.setCardBackgroundColor(GrayScale.whiteGray)

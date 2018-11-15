@@ -2,9 +2,9 @@ package io.goldstone.blockchain.common.base.basecell
 
 import android.content.Context
 import android.widget.ImageView
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.button.RoundIcon
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
@@ -32,8 +32,8 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 			x += 60.uiPX()
 		})
 
-		icon.setCenterInVertical()
-		info.setCenterInVertical()
+		icon.centerInVertical()
+		info.centerInVertical()
 
 		layoutParams.height = 75.uiPX()
 
@@ -59,8 +59,8 @@ open class BaseValueCell(context: Context) : BaseCell(context) {
 			isFloatRight = true
 			x -= 30.uiPX()
 			setBlackTitles()
-			setCenterInVertical()
-			setAlignParentRight()
+			centerInVertical()
+			alignParentRight()
 		}
 	}
 }

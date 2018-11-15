@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
@@ -35,8 +34,8 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 		val dao = EOSTransactionTable.dao
 		if (detailView.asyncData?.isEmpty() == true) localData.map {
 			TransactionListModel(it)
-		}.prepareTokenHistoryBalance(token.contract) {
-			it.updateChartAndHeaderData(false)
+		}.generateBalanceList(token.contract) {
+			it.updateHeaderData(false)
 		}
 		fun loadTargetRangeData(endID: Long, pageSize: Int) {
 			// 拉取指定范围和数量的账单
@@ -56,7 +55,9 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 					}
 					flipPage(data.plus(localData), callback)
 					currentMaxCount = currentMaxCount.orZero() - pageSize
-				} else callback()
+				} else {
+					callback()
+				}
 			}
 		}
 		when {

@@ -11,7 +11,7 @@ import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.setAlignParentRight
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.CheckPermission
@@ -31,11 +31,11 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  * @author: yanglihai
  * @description:
  */
-class ScanCaptureActivity: FragmentActivity() {
-	
+class ScanCaptureActivity : FragmentActivity() {
+
 	private lateinit var captureManager: QRcodeCaptureManager
 	private lateinit var barcodeScannerView: DecoratedQRCodeView
-	
+
 	val confirmButton by lazy {
 		TextView(this).apply {
 			text = QRText.selectQRCodeFromAlbum
@@ -44,46 +44,46 @@ class ScanCaptureActivity: FragmentActivity() {
 			onClick { choosePicture() }
 		}
 	}
-	
+
 	val close by lazy {
 		ImageView(this).apply {
 			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), 50.uiPX())
-			setAlignParentRight()
+			alignParentRight()
 			padding = 13.uiPX()
 			setImageResource(R.drawable.close_icon)
 			setColorFilter(Color.WHITE)
 			click { finish() }
 		}
 	}
-	
+
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
-		
+
 		window.setFlags(
 			WindowManager.LayoutParams.FLAG_FULLSCREEN,
 			WindowManager.LayoutParams.FLAG_FULLSCREEN
 		)
-		
+
 		relativeLayout {
 			barcodeScannerView = DecoratedQRCodeView(this@ScanCaptureActivity)
 			captureManager = QRcodeCaptureManager(this@ScanCaptureActivity, barcodeScannerView)
 			captureManager.initializeFromIntent(intent, savedInstanceState)
-			captureManager.decode ()
+			captureManager.decode()
 			addView(barcodeScannerView)
 			addView(close)
 			addView(confirmButton.apply {
 				gravity = Gravity.CENTER_HORIZONTAL
 				val scanRectBottom =
-					ScreenSize.Height - ScreenSize.Width * 0.1f - (ScreenSize.Height - ScreenSize.Width)* 0.9f / 2f
+					ScreenSize.Height - ScreenSize.Width * 0.1f - (ScreenSize.Height - ScreenSize.Width) * 0.9f / 2f
 				lparams(matchParent, wrapContent) {
 					topMargin = (scanRectBottom + ScreenSize.Height * 0.058f).toInt()
 				}
 			})
 		}
-		
+
 	}
-	
-	
+
+
 	private fun choosePicture() {
 		object : CheckPermission(this) {
 			override var permissionType = PermissionCategory.Write
@@ -93,8 +93,8 @@ class ScanCaptureActivity: FragmentActivity() {
 			startActivityForResult(innerIntent, 0)
 		}
 	}
-	
-	
+
+
 	override fun onActivityResult(
 		requestCode: Int,
 		resultCode: Int,
@@ -112,34 +112,34 @@ class ScanCaptureActivity: FragmentActivity() {
 						}
 					}
 				}
-				
+
 			}
-			
+
 		}
 	}
-	
+
 	override fun onResume() {
 		super.onResume()
 		captureManager.onResume()
 		barcodeScannerView.finderView.onResume()
 	}
-	
+
 	override fun onPause() {
 		super.onPause()
 		captureManager.onPause()
 		barcodeScannerView.finderView.onPause()
 	}
-	
+
 	override fun onDestroy() {
 		super.onDestroy()
 		captureManager.onDestroy()
 	}
-	
+
 	override fun onSaveInstanceState(outState: Bundle) {
 		super.onSaveInstanceState(outState)
 		captureManager.onSaveInstanceState(outState)
 	}
-	
+
 	override fun onRequestPermissionsResult(
 		requestCode: Int,
 		permissions: Array<String>,
@@ -151,13 +151,13 @@ class ScanCaptureActivity: FragmentActivity() {
 			grantResults
 		)
 	}
-	
+
 	override fun onKeyDown(
 		keyCode: Int,
 		event: KeyEvent
 	): Boolean {
 		return barcodeScannerView.onKeyDown(keyCode, event) ||
 			super.onKeyDown(keyCode, event
-		)
+			)
 	}
 }

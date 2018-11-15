@@ -221,7 +221,7 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 			textSize = fontSize(14)
 			textColor = GrayScale.midGray
 			gravity = Gravity.CENTER
-			setAlignParentBottom()
+			alignParentBottom()
 			addTouchRippleAnimation(GrayScale.whiteGray, Spectrum.blue, RippleMode.Square)
 		}
 	}

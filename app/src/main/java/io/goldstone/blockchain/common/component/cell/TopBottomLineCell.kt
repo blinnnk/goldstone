@@ -8,9 +8,9 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -93,7 +93,7 @@ open class TopBottomLineCell(context: Context) : LinearLayout(context) {
 
 	fun showButton(text: String, left: Int = 0, event: () -> Unit) {
 		button.x -= left
-		button.setAlignParentRight()
+		button.alignParentRight()
 		button
 			.apply { this.text = text }
 			.click { event() }

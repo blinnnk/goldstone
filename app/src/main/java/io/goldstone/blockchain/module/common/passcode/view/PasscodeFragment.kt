@@ -52,8 +52,8 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 
 			keyboard.into(this)
 			keyboard.apply {
-				setCenterInHorizontal()
-				setAlignParentBottom()
+				centerInHorizontal()
+				alignParentBottom()
 				y -= ScreenSize.Height * 0.12f
 				setKeyboardClickEventByFrozenStatus()
 			}

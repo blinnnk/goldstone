@@ -63,8 +63,9 @@ class TokenDetailPresenter(
 							|| currentMaxCount == null
 							|| currentMaxCount ?: 0 <= 0
 							|| detailView.asyncData?.size == totalCount
-						) return@launch
-						flipEOSPage {
+						) launchUI {
+							detailView.showBottomLoading(false)
+						} else flipEOSPage {
 							launchUI {
 								detailView.showBottomLoading(false)
 								detailView.showLoading(false)
@@ -284,8 +285,8 @@ class TokenDetailPresenter(
 				detailView.updateDataChange(data.toArrayList())
 			}
 			// 显示内存的数据后异步更新数据
-			data.prepareTokenHistoryBalance(token.contract) {
-				it.updateChartAndHeaderData(false)
+			data.generateBalanceList(token.contract) {
+				it.updateHeaderData(false)
 			}
 		}
 	}
@@ -293,13 +294,13 @@ class TokenDetailPresenter(
 	// 没数据或初始化的时候先生产默认值显示
 	private fun updateEmptyCharData() = GlobalScope.launch(Dispatchers.Default) {
 		listOf<TransactionListModel>()
-			.prepareTokenHistoryBalance(token.contract) {
-				it.updateChartAndHeaderData(true)
+			.generateBalanceList(token.contract) {
+				it.updateHeaderData(true)
 			}
 	}
 
 	@UiThread
-	fun List<TokenBalanceTable>.updateChartAndHeaderData(isPlaceholderData: Boolean) {
+	fun List<TokenBalanceTable>.updateHeaderData(isPlaceholderData: Boolean) {
 		val maxChartCount = 7
 		val chartArray = arrayListOf<ChartPoint>()
 		val charCount = if (size > maxChartCount) maxChartCount else size
@@ -315,7 +316,7 @@ class TokenDetailPresenter(
 	}
 
 	@WorkerThread
-	fun List<TransactionListModel>.prepareTokenHistoryBalance(
+	fun List<TransactionListModel>.generateBalanceList(
 		contract: TokenContract,
 		callback: (List<TokenBalanceTable>) -> Unit
 	) {

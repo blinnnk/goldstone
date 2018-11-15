@@ -6,9 +6,9 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.isDefaultStyle
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
@@ -57,11 +57,11 @@ class ExchangeCell(context: Context) : BaseCell(context) {
 			isDefaultStyle(Spectrum.blue)
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, matchParent)
 		}
-		exchangeIcon.setCenterInVertical()
-		textView.setCenterInVertical()
+		exchangeIcon.centerInVertical()
+		textView.centerInVertical()
 		checkBox.apply {
-			setCenterInVertical()
-			setAlignParentRight()
+			centerInVertical()
+			alignParentRight()
 		}
 		setGrayStyle()
 	}

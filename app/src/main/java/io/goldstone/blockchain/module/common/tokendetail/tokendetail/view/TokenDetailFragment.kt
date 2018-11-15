@@ -104,7 +104,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 
 		footer.into(wrapper)
 		footer.apply {
-			setAlignParentBottom()
+			alignParentBottom()
 			sendButton.onClick {
 				showAddressSelectionFragment()
 			}
