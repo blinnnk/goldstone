@@ -60,6 +60,7 @@ class TransactionCardView(context: Context) : GSCard(context) {
 	}
 
 	init {
+		resetCardElevation(ShadowSize.Cell)
 		setContentPadding(PaddingSize.overlay, 20.uiPX(), PaddingSize.overlay, PaddingSize.overlay)
 	}
 }

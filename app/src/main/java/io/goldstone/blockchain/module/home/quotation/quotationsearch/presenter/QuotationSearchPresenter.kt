@@ -1,12 +1,13 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.widget.CheckBox
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
@@ -19,7 +20,6 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.entrance.starting.presenter.StartingPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -63,7 +63,9 @@ class QuotationSearchPresenter(
 		fragment.activity?.apply {
 			SoftKeyboard.hide(this)
 		}
-		getExchangeList {
+		load {
+			ExchangeTable.dao.getAll()
+		} then {
 			selectedStatusChangedList.clear()
 			exchangeListInMemory.clear()
 			exchangeListInMemory.addAll(it)
@@ -91,8 +93,7 @@ class QuotationSearchPresenter(
 		if (selectedIds.isNotEmpty()) {
 			selectedIds = selectedIds.substringBeforeLast(',')
 		}
-		fragment.getParentFragment<QuotationOverlayFragment>()
-			?.resetFilterStatus(selectedIds.isNotEmpty())
+		fragment.getParentFragment<QuotationOverlayFragment>()?.resetFilterStatus(selectedIds.isNotEmpty())
 		hold(selectedNames)
 	}
 
@@ -102,7 +103,7 @@ class QuotationSearchPresenter(
 			run onlyTwoFilters@{
 				filterNames.forEachIndexed { index, item ->
 					filterText += "$item,"
-					if (index >= 1 || index == filterNames.lastIndex) {
+					if (index >= 2 || index == filterNames.lastIndex) {
 						filterText = filterText.substringBeforeLast(",")
 						return@onlyTwoFilters
 					}
@@ -126,7 +127,7 @@ class QuotationSearchPresenter(
 	fun updateMyQuotation(
 		model: QuotationSelectionTable,
 		isSelect: Boolean,
-		@WorkerThread callback: (error: GoldStoneError) -> Unit
+		callback: (error: GoldStoneError) -> Unit
 	) {
 		// 如果选中, 拉取选中的 `token` 的 `lineChart` 信息
 		val parameter = JsonArray().apply { add(model.pair) }
@@ -163,7 +164,7 @@ class QuotationSearchPresenter(
 					item.isSelecting = targetData.any { it.pair == item.pair }
 					if (isEnd) fragment.completeQuotationTable(searchList)
 				}
-			} else GlobalScope.launch(Dispatchers.Main) {
+			} else launchUI {
 				if (error.hasError()) fragment.safeShowError(error)
 				fragment.removeLoadingView()
 			}
@@ -206,7 +207,7 @@ class QuotationSearchPresenter(
 									// 点击确认事件
 									confirmButtonClickEvent = Runnable {
 										selectedStatusChangedList.forEach {
-											ExchangeTable.updateSelectedStatusById(it.first, it.second)
+											updateExchangeSelectedStatus(it.first, it.second)
 										}
 										getSelectedExchangeInfo(data) { exchangeNames ->
 											showExchangeFilterDescriptionBy(exchangeNames)
@@ -246,6 +247,13 @@ class QuotationSearchPresenter(
 		}
 	}
 
+	private fun updateExchangeSelectedStatus(id: Int, status: Boolean) {
+		GlobalScope.launch(Dispatchers.Default) {
+			val dao = ExchangeTable.dao
+			dao.updateSelectedStatus(id, status)
+		}
+	}
+
 	private fun updateSelectedStatus(id: Int, isSelected: Boolean) {
 		val targetData =
 			selectedStatusChangedList.find { it.first == id }
@@ -254,24 +262,6 @@ class QuotationSearchPresenter(
 		} else {
 			selectedStatusChangedList.remove(targetData)
 			selectedStatusChangedList.add(Pair(id, isSelected))
-		}
-	}
-
-
-	companion object {
-		fun getExchangeList(
-			@UiThread hold: (exchangeTableList: ArrayList<ExchangeTable>) -> Unit
-		) {
-			GlobalScope.launch(Dispatchers.Default) {
-				val localData = ExchangeTable.dao.getAll()
-				if (localData.isEmpty()) StartingPresenter.getAndUpdateExchangeTables { exchangeTables, error ->
-					//数据库没有数据，从网络获取
-					launchUI {
-						if (exchangeTables.isNotNull() && error.isNone()) hold(exchangeTables)
-						else hold(arrayListOf())
-					}
-				} else launchUI { hold(localData.toArrayList()) }
-			}
 		}
 	}
 }

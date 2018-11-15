@@ -88,6 +88,14 @@ class ChainID(val id: String) : Serializable {
 		}
 	}
 
+	fun getSpecificChain(): ChainURL? {
+		return if (isTestnet()) SharedChain.getAllUsedTestnetChains().find {
+			it.chainID.id.equals(id, true)
+		} else SharedChain.getAllUsedMainnetChains().find {
+			it.chainID.id.equals(id, true)
+		}
+	}
+
 	companion object {
 		const val ethMain = "1"
 		const val ropsten = "3"

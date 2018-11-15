@@ -21,6 +21,8 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getContactName
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -63,13 +65,11 @@ class TokenDetailPresenter(
 							|| currentMaxCount == null
 							|| currentMaxCount ?: 0 <= 0
 							|| detailView.asyncData?.size == totalCount
-						) launchUI {
+						) {
 							detailView.showBottomLoading(false)
 						} else flipEOSPage {
-							launchUI {
-								detailView.showBottomLoading(false)
-								detailView.showLoading(false)
-							}
+							detailView.showBottomLoading(false)
+							detailView.showLoading(false)
 						}
 					}
 				}
@@ -200,7 +200,7 @@ class TokenDetailPresenter(
 				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
 				detailView.getDetailAdapter()?.dataSet?.clear()
 				launchUI { loadMore() }
-			} else launchUI {
+			} else {
 				detailView.showLoading(false)
 				detailView.showBottomLoading(false)
 			}
@@ -234,14 +234,10 @@ class TokenDetailPresenter(
 				}
 				else -> when {
 					token.contract.isETH() -> loadETHChainData(endBlock)
-					else -> launchUI {
-						detailView.showBottomLoading(false)
-					}
+					else -> detailView.showBottomLoading(false)
 				}
 			}
-		} else launchUI {
-			detailView.showBottomLoading(false)
-		}
+		} else detailView.showBottomLoading(false)
 	}
 
 	@WorkerThread
@@ -270,23 +266,9 @@ class TokenDetailPresenter(
 					}
 					else -> loadBTCSeriesData(getChainType(), startDataIndex + 1, false)
 				}
-			} else launchUI {
+			} else {
+				detailView.showLoading(false)
 				detailView.showBottomLoading(false)
-			}
-		}
-	}
-
-	private fun updatePageBy(data: List<TransactionListModel>) {
-		allData = data
-		checkAddressNameInContacts(data) {
-			launchUI {
-				// 防止用户在加载数据过程中切换到别的 `Tab` 这里复位一下
-				detailView.setAllMenu()
-				detailView.updateDataChange(data.toArrayList())
-			}
-			// 显示内存的数据后异步更新数据
-			data.generateBalanceList(token.contract) {
-				it.updateHeaderData(false)
 			}
 		}
 	}
@@ -308,7 +290,7 @@ class TokenDetailPresenter(
 			chartArray.add(
 				ChartPoint(TimeUtils.formatMdDate(it.date), it.balance.toBigDecimal().toFloat())
 			)
-			if (chartArray.size == charCount) launchUI {
+			if (chartArray.size == charCount) {
 				detailView.setChartData(chartArray.reversed().toArrayList())
 				if (!isPlaceholderData) detailView.showLoading(false)
 			}
@@ -345,31 +327,29 @@ class TokenDetailPresenter(
 		}
 	}
 
-	fun <T : List<*>> flipPage(data: T, @UiThread callback: () -> Unit) {
-		// TODO ETHSeries
-		try {
-			detailView.asyncData?.addAll(
-				(data as List<BTCSeriesTransactionTable>).asSequence().map { TransactionListModel(it) }.sortedByDescending { it.dataIndex }
-			)
+	@WorkerThread
+	fun <T : List<*>> flipPage(data: T, callback: () -> Unit) {
+		val newData = try {
+			(data as List<BTCSeriesTransactionTable>).asSequence().map {
+				TransactionListModel(it)
+			}.sortedByDescending {
+				it.dataIndex
+			}.toList()
 		} catch (error: Exception) {
 			try {
-				detailView.asyncData?.addAll(
-					(data as List<EOSTransactionTable>).map { TransactionListModel(it) }
-				)
+				(data as List<EOSTransactionTable>).map { TransactionListModel(it) }
 			} catch (error: Exception) {
-				try {
-					detailView.asyncData?.addAll(
-						(data as List<TransactionTable>).map { TransactionListModel(it) }
-					)
-				} catch (error: Exception) {
-					return
-				}
+				(data as List<TransactionTable>).map { TransactionListModel(it) }
+			} catch (error: Exception) {
+				listOf<TransactionListModel>()
 			}
 		}
-		detailView.getDetailAdapter()?.dataSet = detailView.asyncData.orEmptyArray()
-		val totalCount = detailView.asyncData?.size.orZero()
-		allData = detailView.asyncData
-		launchUI {
+
+		checkAddressNameInContacts(newData) {
+			detailView.asyncData?.addAll(newData)
+			detailView.getDetailAdapter()?.dataSet = detailView.asyncData.orEmptyArray()
+			val totalCount = detailView.asyncData?.size.orZero()
+			allData = detailView.asyncData
 			detailView.removeEmptyView()
 			val startPosition = totalCount - data.size.orZero() + 1
 			detailView.notifyDataRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
@@ -412,6 +392,16 @@ class TokenDetailPresenter(
 				callback(balances)
 			}
 		}.start()
+	}
+
+	private var allContacts: List<ContactTable>? = null
+	@WorkerThread
+	private fun checkAddressNameInContacts(transactions: List<TransactionListModel>, callback: () -> Unit) {
+		if (allContacts.isNull()) allContacts = ContactTable.dao.getAllContacts()
+		if (allContacts?.isNotEmpty() == true) transactions.forEach { transaction ->
+			transaction.addressName = allContacts!!.getContactName(transaction.addressName)
+		}
+		callback()
 	}
 
 	private fun modulusByReceiveStatus(isReceived: Boolean) = if (isReceived) 1 else -1

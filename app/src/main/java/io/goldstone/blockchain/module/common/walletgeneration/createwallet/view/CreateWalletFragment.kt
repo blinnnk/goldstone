@@ -123,21 +123,15 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						repeatPasswordText,
 						agreementView.radioButton.isChecked
 					) { password, walletName, error ->
-						if (error.hasError()) {
-							safeShowError(error)
-							launchUI {
-								button.showLoadingStatus(false)
-							}
-						} else presenter.generateWalletWith(
+						if (error.hasError()) safeShowError(error)
+						else presenter.generateWalletWith(
 							context!!,
 							password!!,
 							walletName!!,
 							hintInput.text?.toString()
-						) {
-							if (it.hasError()) safeShowError(it)
-							launchUI {
-								button.showLoadingStatus(false)
-							}
+						)
+						launchUI {
+							button.showLoadingStatus(false)
 						}
 					}
 				}.into(this)

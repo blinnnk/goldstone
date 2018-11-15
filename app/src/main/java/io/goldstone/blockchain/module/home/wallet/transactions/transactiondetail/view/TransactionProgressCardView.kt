@@ -9,10 +9,7 @@ import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionProgressModel
 import org.jetbrains.anko.*
 import java.math.BigInteger
@@ -49,6 +46,10 @@ class TransactionProgressCardView(context: Context) : GSCard(context) {
 			}
 			addView(progress)
 		}
+	}
+
+	init {
+		resetCardElevation(ShadowSize.Cell)
 	}
 
 }

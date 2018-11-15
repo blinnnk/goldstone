@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -34,7 +33,7 @@ fun TokenDetailPresenter.loadBTCSeriesData(
 					true
 				) {
 					if (it.isNone()) getBTCSeriesData()
-					else launchUI {
+					else {
 						detailView.showBottomLoading(false)
 						detailView.showError(it)
 					}
@@ -64,7 +63,7 @@ private fun TokenDetailPresenter.loadOldData(
 		false
 	) {
 		if (it.isNone()) getBTCSeriesData()
-		else launchUI {
+		else {
 			detailView.showBottomLoading(false)
 			detailView.showError(it)
 		}
@@ -93,7 +92,7 @@ private fun loadDataFromChain(
 			if (pageInfo.maxDataIndex == 0) pageInfo.total
 			else pageInfo.maxDataIndex + (it + 1) * if (loadNew) 1 else -1
 		}
-		if (transactions != null && error.isNone()) {
+		if (!transactions.isNullOrEmpty() && error.isNone()) {
 			transactions.asSequence().mapIndexed { index, item ->
 				BTCSeriesTransactionTable(
 					item,
@@ -109,6 +108,8 @@ private fun loadDataFromChain(
 				BTCSeriesTransactionTable.dao.insertAll(all.filterNot { it.isReceive }.map { it.apply { it.isFee = true } })
 				callback(error)
 			}
+		} else if (transactions?.isEmpty() == true) {
+			callback(RequestError.EmptyResut)
 		} else callback(error)
 	}
 }

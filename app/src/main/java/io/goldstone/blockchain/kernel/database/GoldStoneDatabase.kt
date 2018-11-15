@@ -24,6 +24,7 @@ import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenDao
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenDefaultTableDao
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.SocialMediaConverter
 import java.math.BigInteger
 
 /**
@@ -65,7 +66,8 @@ import java.math.BigInteger
 	EOSTransactionDataConverter::class,
 	BigintegerConverter::class,
 	ListBip44AddressConverter::class,
-	NotificationExtraTypeConverter::class
+	NotificationExtraTypeConverter::class,
+	SocialMediaConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao

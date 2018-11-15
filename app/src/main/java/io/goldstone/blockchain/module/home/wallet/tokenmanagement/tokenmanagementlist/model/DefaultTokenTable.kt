@@ -49,10 +49,10 @@ data class DefaultTokenTable(
 	@SerializedName("weight")
 	var weight: Int,
 	var chainID: String,
+	var socialMedia: List<SocialMediaModel> = listOf(),
 	var description: String = "",
 	var exchange: String = "",
 	var whitePaper: String = "",
-	var socialMedia: String = "",
 	var startDate: String = "",
 	var website: String = "",
 	var rank: String = "",
@@ -109,11 +109,11 @@ data class DefaultTokenTable(
 		if (localData.safeGet("weight").isEmpty()) 0
 		else localData.safeGet("weight").toInt(),
 		localData.safeGet("chain_id"),
+		SocialMediaModel.generateList(localData.safeGet("social_media")),
 		localData.safeGet("description"),
 		localData.safeGet("website"),
 		localData.safeGet("exchange"),
 		localData.safeGet("white_paper"),
-		localData.safeGet("social_media"),
 		localData.safeGet("start_date")
 	)
 
@@ -123,17 +123,17 @@ data class DefaultTokenTable(
 		"",
 		data.symbol,
 		0,
-		0.0,
+		888.0,
 		"",
 		0,
 		data.supply,
 		false,
 		0,
 		data.chainID,
+		SocialMediaModel.generateList(data.socialMedia),
 		"${SharedWallet.getCurrentLanguageCode()}${data.description}",
 		data.exchange,
 		data.whitePaper,
-		data.socialMedia,
 		data.startDate,
 		data.website,
 		data.rank,
@@ -205,17 +205,8 @@ data class DefaultTokenTable(
 
 	infix fun insertThen(callback: () -> Unit) {
 		doAsync {
-			GoldStoneDataBase.database.defaultTokenDao().insert(this@DefaultTokenTable)
+			DefaultTokenTable.dao.insert(this@DefaultTokenTable)
 			GoldStoneAPI.context.runOnUiThread { callback() }
-		}
-	}
-
-	@WorkerThread
-	fun preventDuplicateInsert() {
-		GoldStoneDataBase.database.defaultTokenDao().apply {
-			if (getToken(contract, symbol, chainID).isNull()) {
-				insert(this@DefaultTokenTable)
-			}
 		}
 	}
 
@@ -264,42 +255,30 @@ data class DefaultTokenTable(
 			} then (hold)
 		}
 
-		fun updateOrInsertCoinInfo(
-			data: CoinInfoModel,
-			@WorkerThread callback: () -> Unit
-		) {
-			doAsync {
-				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-				defaultDao.getToken(data.contract.contract.orEmpty(), data.symbol, data.chainID).let { targetTokens ->
-					if (targetTokens.isNull()) {
-						defaultDao.insert(DefaultTokenTable(data))
+		@WorkerThread
+		fun updateOrInsertCoinInfo(data: CoinInfoModel, callback: () -> Unit) {
+			DefaultTokenTable.dao.getToken(data.contract.contract.orEmpty(), data.symbol, data.chainID).let { targetTokens ->
+				if (targetTokens.isNull()) {
+					DefaultTokenTable.dao.insert(DefaultTokenTable(data))
+					callback()
+				} else {
+					// 插入行情的 `TokenInformation` 只需要插入主链数据即可
+					targetTokens.apply {
+						exchange = data.exchange
+						website = data.website
+						marketCap = data.marketCap
+						whitePaper = data.whitePaper
+						socialMedia = SocialMediaModel.generateList(data.socialMedia)
+						rank = data.rank
+						totalSupply = data.supply
+						startDate = data.startDate
+						description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
+					}.let {
+						DefaultTokenTable.dao.update(it)
 						callback()
-					} else {
-						// 插入行情的 `TokenInformation` 只需要插入主链数据即可
-						targetTokens.apply {
-							exchange = data.exchange
-							website = data.website
-							marketCap = data.marketCap
-							whitePaper = data.whitePaper
-							socialMedia = data.socialMedia
-							rank = data.rank
-							totalSupply = data.supply
-							startDate = data.startDate
-							description = "${SharedWallet.getCurrentLanguageCode()}${data.description}"
-						}.let {
-							defaultDao.update(it)
-							callback()
-						}
 					}
 				}
 			}
-		}
-
-		fun updateTokenPrice(contract: TokenContract, newPrice: Double, callback: () -> Unit = {}) {
-			load {
-				GoldStoneDataBase.database.defaultTokenDao()
-					.updateTokenPrice(newPrice, contract.contract.orEmpty(), contract.symbol, contract.getCurrentChainID().id)
-			} then { callback() }
 		}
 	}
 }

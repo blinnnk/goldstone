@@ -3,9 +3,11 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.present
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.*
@@ -13,11 +15,9 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toAddressCode
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toDataString
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 /**
@@ -33,8 +33,8 @@ fun PaymentDetailPresenter.prepareETHSeriesPaymentModel(
 		fragment.getMemoContent(),
 		fragment.rootFragment?.token?.contract.getChainType()
 	) { model, error ->
-		GoldStoneAPI.context.runOnUiThread {
-			if (!model.isNull() && error.isNone()) {
+		launchUI {
+			if (model.isNotNull() && error.isNone()) {
 				fragment.rootFragment?.apply {
 					presenter.showTargetFragment<GasSelectionFragment>(
 						Bundle().apply {

@@ -12,7 +12,9 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter.Companion.insertNewAccount
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 /**
  * @date 23/03/2018 12:55 AM
@@ -81,7 +83,7 @@ class WalletImportPresenter(
 				eosPath = multiChainPath.eosPath
 			) insert { wallet ->
 				// 创建钱包并获取默认的 `token` 信息
-				CreateWalletPresenter.generateMyTokenInfo(multiChainAddresses) {
+				insertNewAccount(multiChainAddresses) {
 					callback(wallet.id, GoldStoneError.None)
 				}
 				// 注册钱包地址用于发送 `Push`

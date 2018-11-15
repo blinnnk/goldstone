@@ -180,6 +180,10 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		}
 	}
 
+	override fun showChainError() {
+		GoldStoneDialog.showChainErrorDialog(context!!)
+	}
+
 	private fun showTokenManagementFragment() {
 		activity?.apply {
 			if (!findIsItExist(FragmentTag.tokenManagement))

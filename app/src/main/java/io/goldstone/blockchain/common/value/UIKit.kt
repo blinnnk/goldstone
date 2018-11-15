@@ -28,8 +28,6 @@ object GrayScale {
 	@JvmField
 	val Opacity2Black = Color.parseColor("#33000000")
 	@JvmField
-	val Opacity3Black = Color.parseColor("#4D000000")
-	@JvmField
 	val Opacity5Black = Color.parseColor("#80000000")
 	@JvmField
 	val Opacity8Black = Color.parseColor("#CC000000")
@@ -82,6 +80,13 @@ object WalletColor {
 	private val grayYellow = Color.parseColor("#FF717335")
 	private val blueGray = Color.parseColor("#FF4B5C6E")
 	fun getAll(): List<Int> = listOf(purple, blue, cyan, darkPurple, grayYellow, blueGray)
+}
+
+object SocialMediaColor {
+	@JvmField val facebook = Color.parseColor("#FF3F5A93")
+	@JvmField val twitter = Color.parseColor("#FF67ABE8")
+	@JvmField val reddit = Color.parseColor("#FFE16238")
+	@JvmField val telegram = Color.parseColor("#FF419ACB")
 }
 
 object ShadowSize {

@@ -45,6 +45,8 @@ data class SupportCurrencyTable(
 
 	companion object {
 
+		@JvmField val dao = GoldStoneDataBase.database.currencyDao()
+
 		fun updateUsedStatus(symbol: String, @UiThread callback: (rate: Double?) -> Unit) {
 			doAsync {
 				val currencyDao =

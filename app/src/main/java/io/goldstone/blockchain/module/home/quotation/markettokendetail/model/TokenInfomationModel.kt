@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.model
 
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.SocialMediaModel
 
 /**
  * @date 2018/5/11 2:03 PM
@@ -11,7 +12,7 @@ data class TokenInformationModel(
 	val rankValue: String = "",
 	val availableSupply: String = "",
 	val marketCap: String = "",
-	val socialMedia: String = "",
+	val socialMedia: List<SocialMediaModel> = listOf(),
 	val website: String = "",
 	val exchange: String = "",
 	val startDate: String = "",

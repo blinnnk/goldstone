@@ -2,14 +2,14 @@ package io.goldstone.blockchain.common.utils
 
 import android.content.Context
 import android.support.annotation.UiThread
-import org.jetbrains.anko.runOnUiThread
+import io.goldstone.blockchain.common.thread.launchUI
 
 
 /**
  * @author KaySaith
  * @date  2018/10/19
  */
-class ErrorDisplayManager(error: Throwable) {
+class ErrorDisplayManager(private val error: Throwable) {
 	private var displayMessage: String? = null
 
 	init {
@@ -38,7 +38,11 @@ class ErrorDisplayManager(error: Throwable) {
 	@UiThread
 	fun show(context: Context?) {
 		displayMessage?.apply {
-			context?.runOnUiThread { alert(this@apply) }
+			launchUI {
+				if (!error.message.isNullOrEmpty()) {
+					context.alert(this@apply)
+				}
+			}
 		}
 	}
 }

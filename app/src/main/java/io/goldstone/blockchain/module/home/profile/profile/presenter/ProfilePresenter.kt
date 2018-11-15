@@ -42,10 +42,6 @@ class ProfilePresenter(
 			ContactTable.dao.getAllContacts().size
 		} then {
 			val data = arrayListOf(
-				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),
-				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
-				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
-				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(
 					R.drawable.wallet_icon,
 					ProfileText.walletManager,
@@ -55,8 +51,12 @@ class ProfilePresenter(
 						override val textSize: Float = fragment.view?.fontSize(14).orZero()
 					}.getFixString()
 				),
-				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
+				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
+				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
+				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
+				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
+				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.contact_us_icon, ProfileText.support, ""),
