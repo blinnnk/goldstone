@@ -192,7 +192,8 @@ fun RAMMarketDetailPresenter.calculatePricePercent() {
 	if (ramInformationModel.openPrice == 0.0) return
 	val trend = BigDecimal((ramInformationModel.currentPrice - ramInformationModel.openPrice))
 		.divide(BigDecimal(ramInformationModel.openPrice), 4, BigDecimal.ROUND_HALF_UP)
-		.multiply(BigDecimal("100")).toDouble()
+		.multiply(BigDecimal("100"))
+		.toDouble()
 	ramInformationModel.pricePercent = trend
 }
 
@@ -206,6 +207,7 @@ fun RAMMarketDetailPresenter.getTodayPrice() {
 				HighPrice = model.high.toDoubleOrZero()
 				lowPrice = model.low.toDoubleOrZero()
 			}
+			calculatePricePercent()
 		} else {
 			GoldStoneAPI.context.runOnUiThread {
 				fragment.context.alert(error.message)

@@ -67,7 +67,7 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 		}.apply {
 			// `MenuBar` 点击选中动画和内容更换
 			menuBar.setMemnuTitles(titles) { button, id ->
-				button.addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square, CornerSize.small)
+				button.addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square, 0f)
 				button.onClick {
 					currentItem = id
 					menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)

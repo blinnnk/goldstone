@@ -79,11 +79,11 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 		ramPriceView.currentPriceView.currentPrice.text = price.toDouble().formatCount(4)
 		ramPriceView.currentPriceView.trendcyPercent.apply {
 			if (percent > 0) {
-				text = "+$percent%"
+				text = "+${BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP)}%"
 				textColor = Spectrum.green
 			} else {
-				text = "$percent%"
-				textColor = Spectrum.red
+				text = "${BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP)}%"
+				textColor = Spectrum.lightRed
 			}
 		}
 		
@@ -91,8 +91,8 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	
 	fun setTodayPrice(startPrice: String, highPrice: String, lowPrice: String) {
 		ramPriceView.todayPriceView.startPrice.text = EOSRAMExchangeText.openPrice(startPrice)
-		ramPriceView.todayPriceView.highPrice.text = EOSRAMExchangeText.openPrice(highPrice)
-		ramPriceView.todayPriceView.lowPrice.text = EOSRAMExchangeText.openPrice(lowPrice)
+		ramPriceView.todayPriceView.highPrice.text = EOSRAMExchangeText.highPrice(highPrice)
+		ramPriceView.todayPriceView.lowPrice.text = EOSRAMExchangeText.lowPrice(lowPrice)
 	}
 	
 	fun setSocketDisconnectedPercentColor(color: Int) {

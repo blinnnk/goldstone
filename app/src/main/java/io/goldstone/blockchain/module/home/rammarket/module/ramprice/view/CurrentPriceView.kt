@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.CustomTargetTextStyle
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -36,20 +36,20 @@ class CurrentPriceView(context: Context) : LinearLayout(context) {
 			currentPrice = textView {
 				text = "--"
 				textSize = fontSize(26)
-				typeface = GoldStoneFont.heavy(context)
+				typeface = GoldStoneFont.black(context)
 				textColor  = GrayScale.black
 				singleLine = true
 			}
 			textView {
 				leftPadding = 10.uiPX()
-				text = "EOS/KB"
-				textSize = fontSize(10)
+				text = CustomTargetTextStyle(
+					"EOS/KB", "EOS/KB", GrayScale.black, 12.uiPX(), true, false
+				)
 				textColor = GrayScale.black
-				typeface = GoldStoneFont.book(context)
 			}
 			trendcyPercent = textView {
 				gravity = Gravity.END
-				textSize = fontSize(26)
+				textSize = fontSize(20)
 				typeface = GoldStoneFont.heavy(context)
 				text = ""
 				singleLine = true

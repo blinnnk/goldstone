@@ -38,7 +38,7 @@ class RAMPercentChartView(context: Context) : View(context) {
 		Paint().apply {
 			color = Color.BLACK
 			textSize = valueTextSize
-			typeface = GoldStoneFont.book(context)
+			typeface = GoldStoneFont.medium(context)
 			isAntiAlias = true
 		}
 	}

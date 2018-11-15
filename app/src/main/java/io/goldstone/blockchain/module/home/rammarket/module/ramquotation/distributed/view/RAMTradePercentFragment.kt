@@ -45,6 +45,7 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 		TextView(context!!).apply {
 			textColor = Spectrum.green
 			textSize = fontSize(15)
+			typeface = GoldStoneFont.medium(context)
 		}
 	}
 	
@@ -52,6 +53,7 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 		TextView(context!!).apply {
 			textColor = Spectrum.red
 			textSize = fontSize(15)
+			typeface = GoldStoneFont.medium(context)
 		}
 	}
 	

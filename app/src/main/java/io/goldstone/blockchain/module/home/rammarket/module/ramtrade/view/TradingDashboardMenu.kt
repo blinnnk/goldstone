@@ -20,7 +20,7 @@ class TradingDashboardMenu(context: Context) : ButtonMenu(context) {
 					if (index == 0) {
 						addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square, CornerSize.small)
 					} else {
-						addTouchRippleAnimation(Spectrum.red, Spectrum.yellow, RippleMode.Square, CornerSize.small)
+						addTouchRippleAnimation(Spectrum.lightRed, Spectrum.yellow, RippleMode.Square, CornerSize.small)
 					}
 					Spectrum.white
 				} else {

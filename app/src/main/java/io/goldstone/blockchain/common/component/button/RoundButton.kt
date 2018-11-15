@@ -98,7 +98,7 @@ class RoundButton(context: Context) : GSCard(context) {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
-		setCardBackgroundColor(Spectrum.red)
+		setCardBackgroundColor(Spectrum.lightRed)
 	}
 	
 	fun setDarkStyle(top: Int? = null) {

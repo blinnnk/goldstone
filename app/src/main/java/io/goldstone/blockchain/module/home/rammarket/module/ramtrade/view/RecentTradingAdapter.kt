@@ -88,7 +88,7 @@ class TitleView(context: Context) : RelativeLayout(context) {
 		gravity = Gravity.CENTER_VERTICAL
 		title = textView {
 			textColor = Spectrum.green
-			textSize = fontSize(11)
+			textSize = fontSize(12)
 			typeface = GoldStoneFont.black(context)
 			layoutParams = RelativeLayout.LayoutParams(
 				wrapContent,
@@ -97,8 +97,8 @@ class TitleView(context: Context) : RelativeLayout(context) {
 				alignParentRight()
 			}
 			setMargins<RelativeLayout.LayoutParams> {
-				topMargin = 10.uiPX()
-				bottomMargin = 10.uiPX()
+				topMargin = 8.uiPX()
+				bottomMargin = 8.uiPX()
 			}
 		}
 	}
@@ -112,22 +112,25 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 	var percent: Float = 0f
 	
 	init {
-		gravity = Gravity.CENTER_VERTICAL
 		layoutParams = ViewGroup.LayoutParams(matchParent, 22.uiPX())
 		backgroundView = view {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 		}
 		name = textView {
 			textColor = GrayScale.midGray
-			textSize = fontSize(12)
+			textSize = fontSize(14)
 			typeface = GoldStoneFont.heavy(context)
+			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
+				centerVertically()
+			}
 		}
 		transactionAmount = textView {
 			textColor = GrayScale.midGray
-			textSize = fontSize(12)
+			textSize = fontSize(14)
 			typeface = GoldStoneFont.heavy(context)
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				alignParentRight()
+				centerVertically()
 			}
 			setMargins<RelativeLayout.LayoutParams> { rightMargin = 5.uiPX() }
 		}

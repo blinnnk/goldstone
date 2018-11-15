@@ -395,4 +395,24 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
+	val eosNoAccount = when(currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "当前钱包下没有EOS账户，无法购买"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	val testNetTradeDisableMessage = when(currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "您当前使用Jungle测试网络，内存交易所仅提供主网交易，请切换节点后再买卖内存"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
 }

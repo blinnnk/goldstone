@@ -87,6 +87,8 @@ class PieChartView(context: Context) : PieChart(context) {
 		dataSet.sliceSpace = 0f // 每一块之间的间隙
 		dataSet.selectionShift = 10f // 点击每一个item放大的区域
 		
+		dataSet.valueTypeface = GoldStoneFont.medium(context)
+		
 		dataSet.valueLinePart1OffsetPercentage = 80f
 		dataSet.valueLinePart1Length = 0.5f
 		dataSet.valueLinePart2Length = 0.4f

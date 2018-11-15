@@ -28,8 +28,8 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 		orientation = LinearLayout.VERTICAL
 		layoutParams = LayoutParams(viewWidth, wrapContent)
 		linearLayout {
-			topPadding = 10.uiPX()
 			bottomPadding = 10.uiPX()
+			topPadding = -(5.uiPX())
 			startPrice = textView {
 				gravity = Gravity.START
 				text = EOSRAMExchangeText.openPrice("")

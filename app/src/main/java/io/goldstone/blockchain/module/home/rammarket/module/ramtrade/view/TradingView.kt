@@ -6,6 +6,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.tradeRAM
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 import org.jetbrains.anko.*
@@ -22,6 +23,10 @@ class TradingView(context: Context, val fragment: RAMMarketDetailFragment): Line
 				fragment.getParentFragment<RAMMarketOverlayFragment> {
 					presenter.showTransactionHistoryFragment()
 				}
+			})
+			
+			setConfirmEvent(Runnable {
+				fragment.presenter.tradeRAM()
 			})
 		}
 	}
@@ -40,17 +45,17 @@ class TradingView(context: Context, val fragment: RAMMarketDetailFragment): Line
 			layoutParams = LinearLayout.LayoutParams(matchParent, 1)
 			backgroundColor = GrayScale.lightGray
 			setMargins<LinearLayout.LayoutParams> {
-				topMargin = 16.uiPX()
-				leftPadding = RAMMarketPadding
+				topMargin = 10.uiPX()
+				leftMargin = RAMMarketPadding
 			}
 		}
 	  linearLayout {
 			tradingDashboardView.into(this)
 			recentTradingListView.apply {
-				layoutParams = LinearLayout.LayoutParams(matchParent, 332.uiPX())
+				layoutParams = LinearLayout.LayoutParams(matchParent, 290.uiPX())
 				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 6.uiPX()
-					leftMargin = 15.uiPX()
+					topMargin = 7.uiPX()
+					leftMargin = 10.uiPX()
 				}
 			}.into(this)
 		}
