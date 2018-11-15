@@ -14,7 +14,8 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 fun TokenDetailPresenter.loadETCChainData(blockNumber: Int) {
 	loadDataFromChain(blockNumber) {
-		getETHSeriesData()
+		if (it.isNone()) getETHSeriesData()
+		else detailView.showLoading(false)
 	}
 }
 
@@ -25,7 +26,7 @@ private fun loadDataFromChain(blockNumber: Int, callback: (error: RequestError) 
 		SharedAddress.getCurrentETC(),
 		blockNumber
 	) { newData, error ->
-		if (newData?.isNotEmpty() == true && error.isNone()) {
+		if (!newData.isNullOrEmpty() && error.isNone()) {
 			val transactionDao = TransactionTable.dao
 			// 插入普通账单
 			transactionDao.insertAll(newData.map { TransactionTable(it) })
@@ -40,6 +41,8 @@ private fun loadDataFromChain(blockNumber: Int, callback: (error: RequestError) 
 				}.toList()
 			)
 			callback(error)
+		} else if (newData?.isEmpty() == true) {
+			callback(RequestError.EmptyResut)
 		} else callback(error)
 	}
 }

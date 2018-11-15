@@ -137,7 +137,7 @@ class WatchOnlyImportPresenter(
 						EOSAccountInfo(eosTestnetAccountName, ChainID.EOSTest.id)
 					)
 				) insert { thisWallet ->
-					CreateWalletPresenter.generateMyTokenInfo(
+					CreateWalletPresenter.insertNewAccount(
 						ChainAddresses(
 							Bip44Address(currentETHSeriesAddress, ChainType.ETH.id),
 							Bip44Address(currentETCAddress, ChainType.ETC.id),
@@ -147,9 +147,9 @@ class WatchOnlyImportPresenter(
 							Bip44Address(currentBCHAddress, ChainType.BCH.id),
 							Bip44Address(currentEOSAddress isEmptyThen eosMainnetAccountName isEmptyThen eosTestnetAccountName, ChainType.EOS.id)
 						)
-					) { error ->
-						if (error.isNone()) thisWallet.registerPushByAddress()
-						callback(error)
+					) {
+						thisWallet.registerPushByAddress()
+						callback(GoldStoneError.None)
 					}
 				} else callback(it)
 			} else callback(AccountError.ExistAddress)

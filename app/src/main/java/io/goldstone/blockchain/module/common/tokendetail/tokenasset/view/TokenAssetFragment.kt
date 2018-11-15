@@ -101,8 +101,8 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			setTitle(EOSAccountText.publicKey)
 			val address =
 				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
-				else SharedAddress.getCurrentEOS().scaleTo(24)
-			setSubtitle(address)
+				else SharedAddress.getCurrentEOS()
+			setSubtitle(address, true)
 			onClick {
 				this@apply.context?.clickToCopy(SharedAddress.getCurrentEOS())
 				preventDuplicateClicks()

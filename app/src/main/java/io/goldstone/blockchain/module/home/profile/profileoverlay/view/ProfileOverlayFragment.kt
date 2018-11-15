@@ -15,6 +15,7 @@ class ProfileOverlayFragment : BaseOverlayFragment<ProfileOverlayPresenter>() {
 	val title by lazy {
 		arguments?.getString(ArgumentKey.profileTitle)
 	}
+
 	val contactAddressModel by lazy {
 		arguments?.getSerializable(ArgumentKey.addressModel) as? ContactModel
 	}

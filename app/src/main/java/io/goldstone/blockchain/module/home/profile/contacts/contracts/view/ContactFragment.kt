@@ -5,6 +5,7 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
@@ -19,7 +20,6 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.Cont
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.cancelButton
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.alert
 import org.jetbrains.anko.yesButton
 
@@ -43,14 +43,17 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ContactTable>?
 	) {
+		val isFromTransactionDetail =
+			getParentFragment<ProfileOverlayFragment>()?.contactAddressModel.isNull()
 		recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray()) {
-			onClick {
+			if (isFromTransactionDetail) {
+				presenter.shoEditContactFragment(it.id)
+			} else {
 				if (chainType != null) {
-					selectedAddress = this@ContactsAdapter.model.defaultAddress
+					selectedAddress = it.defaultAddress
 					if (selectedAddress?.isEmpty() == true) context.alert(AccountError.InvalidAddress.message)
 					clickCellEvent?.run()
 				}
-				preventDuplicateClicks()
 			}
 		}
 
@@ -89,16 +92,12 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		showAddButton()
+		showAddButton(true)
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
-		if (isHidden) {
-			showAddButton(false)
-		} else {
-			showAddButton()
-		}
+		showAddButton(!isHidden)
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
@@ -114,9 +113,9 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		} else super.setBackEvent(mainActivity)
 	}
 
-	private fun showAddButton(status: Boolean = true) {
+	private fun showAddButton(status: Boolean) {
 		getParentFragment<ProfileOverlayFragment> {
-			showCloseButton(true) {
+			showCloseButton(status) {
 				presenter.removeSelfFromActivity()
 			}
 			showAddButton(status) {

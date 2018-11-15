@@ -2,14 +2,11 @@
 
 package io.goldstone.blockchain.common.utils
 
-import android.R
 import android.content.Context
-import android.content.res.ColorStateList
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
-import android.widget.CompoundButton
 import android.widget.EditText
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.preventDuplicateClicks
@@ -27,8 +24,6 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.json.JSONArray
-import org.json.JSONObject
 import java.math.BigInteger
 
 /**
@@ -129,3 +124,6 @@ fun Fragment.safeShowError(error: Throwable) {
 	ErrorDisplayManager(error).show(context)
 }
 
+fun <T> List<T>.safeGet(index: Int): T? {
+	return if (lastIndex < index) null else get(index)
+}

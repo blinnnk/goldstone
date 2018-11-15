@@ -190,13 +190,13 @@ fun TokenContract?.getCurrentChainID(): ChainID {
 
 fun TokenContract?.getMainnetChainID(): ChainID {
 	return when {
-		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getCurrentETH().chainID
-		this?.contract.equals(TokenContract.etcContract, true) -> SharedChain.getETCCurrent().chainID
-		this?.contract.equals(TokenContract.btcContract, true) -> SharedChain.getBTCCurrent().chainID
-		this?.contract.equals(TokenContract.ltcContract, true) -> SharedChain.getLTCCurrent().chainID
-		this?.contract.equals(TokenContract.bchContract, true) -> SharedChain.getBCHCurrent().chainID
-		this.isEOSSeries() -> SharedChain.getEOSCurrent().chainID
-		this?.contract?.length == CryptoValue.contractAddressLength -> SharedChain.getCurrentETH().chainID
-		else -> SharedChain.getEOSCurrent().chainID
+		this?.contract.equals(TokenContract.ethContract, true) -> ChainID.ETH
+		this?.contract.equals(TokenContract.etcContract, true) -> ChainID.ETC
+		this?.contract.equals(TokenContract.btcContract, true) -> ChainID.BTC
+		this?.contract.equals(TokenContract.ltcContract, true) -> ChainID.LTC
+		this?.contract.equals(TokenContract.bchContract, true) -> ChainID.BCH
+		this.isEOSSeries() -> ChainID.EOS
+		this?.contract?.length == CryptoValue.contractAddressLength -> ChainID.ETH
+		else -> ChainID.ETH
 	}
 }

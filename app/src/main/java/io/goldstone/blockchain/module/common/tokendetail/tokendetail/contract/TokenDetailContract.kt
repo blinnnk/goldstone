@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract
 
+import android.support.annotation.UiThread
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailAdapter
@@ -22,6 +23,7 @@ interface TokenDetailContract {
 		fun notifyDataRangeChanged(start: Int, count: Int)
 		fun getDetailAdapter(): TokenDetailAdapter?
 		fun removeEmptyView()
+
 		fun setAllMenu()
 		fun flipPage()
 		fun showError(error: Throwable)

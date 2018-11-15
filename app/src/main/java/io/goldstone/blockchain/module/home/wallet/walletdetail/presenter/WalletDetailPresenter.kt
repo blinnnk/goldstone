@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.uikit.uiPX
@@ -64,7 +65,10 @@ class WalletDetailPresenter(
 						detailView.showLoading(false)
 						lockGettingChainModelsThread = false
 						updateUIByData(chainModels)
-						if (error.hasError()) detailView.showError(error)
+						if (error.hasError()) {
+							if (error.isChainError()) detailView.showChainError()
+							else detailView.showError(error)
+						}
 					}
 				} else detailView.showLoading(false)
 			}
@@ -127,7 +131,7 @@ class WalletDetailPresenter(
 					val ownerName = get(index).contract.getAddress(true)
 					MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
 						// 更新数据的余额信息
-						if (balance != null && error.isNone()) {
+						if (balance.isNotNull() && error.isNone()) {
 							MyTokenTable.dao.updateBalanceByContract(
 								balance,
 								get(index).contract.contract,

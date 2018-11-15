@@ -107,12 +107,12 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 	}
 
 	@SuppressLint("SetTextI18n")
-	fun setSubtitle(content: String) {
+	fun setSubtitle(content: String, isScaleMiddle: Boolean = false) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.text = object : FixTextLength() {
 			override var text = content
-			override val maxWidth = ScreenSize.widthWithPadding * 0.55f
+			override val maxWidth = ScreenSize.widthWithPadding * 0.65f
 			override val textSize: Float = fontSize(12.uiPX())
-		}.getFixString()
+		}.getFixString(isScaleMiddle)
 	}
 }

@@ -107,10 +107,10 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 	override fun showAddress(address: String, hash160: String) {
 		addressCell.click {
 			it.context.clickToCopy(address)
-		}.setSubtitle(address)
+		}.setSubtitle(address, true)
 		hash160Cell.click {
 			it.context.clickToCopy(hash160)
-		}.setSubtitle(hash160)
+		}.setSubtitle(hash160, true)
 	}
 
 	override fun showBalance(balance: String) = balanceCell.setSubtitle(balance)

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -44,7 +45,7 @@ class EOSAccountRegisterPresenter(
 		) { currency, currencyError ->
 			if (currency?.firstOrNull() != null && currencyError.isNone()) {
 				EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { ramPriceInEOS, error ->
-					if (ramPriceInEOS != null && error.isNone()) {
+					if (ramPriceInEOS.isNotNull() && error.isNone()) {
 						hold(currency.first().price, ramPriceInEOS, error)
 					} else hold(null, null, error)
 				}

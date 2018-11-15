@@ -90,17 +90,6 @@ data class QuotationSelectionTable(
 			quotationDao.insert(table.apply { orderID = newOrderID })
 		}
 
-		fun getAll(
-			isUIThread: Boolean = true,
-			hold: (List<QuotationSelectionTable>
-			) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
-			val allQuotation =
-				GoldStoneDataBase.database.quotationSelectionDao().getAll()
-			if (isUIThread) withContext(Dispatchers.Main) {
-				hold(allQuotation)
-			} else hold(allQuotation)
-		}
-
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
 				GoldStoneDataBase.database.quotationSelectionDao()
@@ -187,6 +176,9 @@ interface QuotationSelectionDao {
 
 	@Delete
 	fun delete(table: QuotationSelectionTable)
+
+	@Query("DELETE FROM quotationSelection WHERE pair = :pair")
+	fun deleteBy(pair: String)
 
 	@Delete
 	fun deleteAll(tables: List<QuotationSelectionTable>)

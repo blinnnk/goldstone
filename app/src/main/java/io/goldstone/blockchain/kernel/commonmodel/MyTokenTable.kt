@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
@@ -23,9 +24,6 @@ import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
 /**
@@ -187,9 +185,7 @@ data class MyTokenTable(
 				contract.isEOS() -> {
 					if (SharedAddress.getCurrentEOSAccount().isValid(false)) {
 						EOSAPI.getAccountEOSBalance(SharedAddress.getCurrentEOSAccount(), hold)
-					} else GlobalScope.launch(Dispatchers.Default) {
-						hold(null, RequestError.None)
-					}
+					} else hold(null, RequestError.None)
 				}
 
 				contract.isEOSToken() -> {
@@ -200,9 +196,7 @@ data class MyTokenTable(
 							contract.contract,
 							hold
 						)
-					else GlobalScope.launch(Dispatchers.Default) {
-						hold(null, RequestError.None)
-					}
+					else hold(null, RequestError.None)
 				}
 
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
@@ -211,7 +205,7 @@ data class MyTokenTable(
 						ownerName,
 						SharedChain.getCurrentETH()
 					) { amount, error ->
-						if (amount != null && error.isNone()) {
+						if (amount.isNotNull() && error.isNone()) {
 							val balance = CryptoUtils.toCountByDecimal(amount, token?.decimals.orZero())
 							hold(balance, RequestError.None)
 						} else hold(null, error)

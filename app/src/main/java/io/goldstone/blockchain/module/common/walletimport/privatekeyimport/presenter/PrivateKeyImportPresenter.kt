@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.annotation.WorkerThread
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -47,7 +48,8 @@ class PrivateKeyImportPresenter(
 		) { password, walletName, error ->
 			when {
 				error.hasError() -> callback(error)
-				MultiChainUtils.detectPrivateKeyType(privateKeyInput.text.toString()).isNull() -> callback(AccountError.InvalidPrivateKey)
+				MultiChainUtils.detectPrivateKeyType(privateKeyInput.text.toString()).isNull() ->
+					callback(AccountError.InvalidPrivateKey)
 				else -> fragment.context?.apply {
 					importWalletByRootKey(
 						this,
@@ -94,7 +96,7 @@ class PrivateKeyImportPresenter(
 					ChainPath(),
 					hint
 				) { walletID, error ->
-					if (walletID != null && error.isNone()) {
+					if (walletID.isNotNull() && error.isNone()) {
 						// 如果成功存储 私钥 到 KeyStore
 						context.storeRootKeyByWalletID(walletID, rootPrivateKey, password)
 						callback(error)

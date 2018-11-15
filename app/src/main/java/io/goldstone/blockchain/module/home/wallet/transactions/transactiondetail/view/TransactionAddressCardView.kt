@@ -10,10 +10,7 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
@@ -64,6 +61,7 @@ class TransactionAddressCardView(context: Context, addAction: (address: String) 
 	}
 
 	init {
+		resetCardElevation(ShadowSize.Cell)
 		setContentPadding(10.uiPX(), 20.uiPX(), PaddingSize.overlay, PaddingSize.overlay)
 	}
 }

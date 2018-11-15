@@ -6,6 +6,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
+import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 import org.jetbrains.anko.doAsync
@@ -49,7 +50,7 @@ class NodeSelectionPresenter(
 	companion object {
 		fun setAllTestnet(isMainnet: Boolean = false, callback: () -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateChainStatus(false)
+				AppConfigTable.dao.updateChainStatus(false)
 				val testnetList = GoldStoneDataBase.database.chainNodeDao().getUsedTestnet()
 				SharedValue.updateIsTestEnvironment(true)
 				updateSharedChainInfo(testnetList)
@@ -59,7 +60,7 @@ class NodeSelectionPresenter(
 
 		fun setAllMainnet(isMainnet: Boolean = false, callback: () -> Unit) {
 			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateChainStatus(true)
+				AppConfigTable.dao.updateChainStatus(true)
 				val mainnetList = GoldStoneDataBase.database.chainNodeDao().getUsedMainnet()
 				SharedValue.updateIsTestEnvironment(false)
 				updateSharedChainInfo(mainnetList)

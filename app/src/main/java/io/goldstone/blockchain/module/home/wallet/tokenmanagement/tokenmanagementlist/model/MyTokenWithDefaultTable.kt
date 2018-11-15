@@ -5,6 +5,7 @@ import android.arch.persistence.room.Query
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -34,8 +35,7 @@ data class MyTokenWithDefaultTable(
 	companion object {
 		@WorkerThread
 		fun getMyDefaultTokens(hold: (List<WalletDetailCellModel>) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
-			val wallet =
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true) ?: return@launch
+			val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@launch
 			val addresses = wallet.getCurrentAddresses(true)
 			val eosWalletType = wallet.getEOSWalletType()
 			val data =

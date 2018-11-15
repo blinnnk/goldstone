@@ -22,7 +22,7 @@ class HeaderIcon(context: Context) : ImageView(context) {
 	private val iconSize = 30.uiPX()
 
 	init {
-		setColorFilter(GrayScale.lightGray)
+		setColorFilter(Spectrum.white)
 		scaleType = ImageView.ScaleType.CENTER_INSIDE
 		addTouchRippleAnimation(Color.TRANSPARENT, Spectrum.blue, RippleMode.Round)
 	}

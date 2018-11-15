@@ -3,15 +3,11 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
-import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
-import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getContactName
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ETHTransactionModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
 /**
  * @date 2018/8/20 2:51 PM
@@ -22,9 +18,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 fun TokenDetailPresenter.loadETHChainData(endBlock: Int) {
 	updateLocalETHTransactions(endBlock) {
 		if (it.isNone()) getETHSeriesData()
-		else launchUI {
-			detailView.showBottomLoading(false)
-		}
+		else detailView.showBottomLoading(false)
 	}
 }
 
@@ -61,17 +55,3 @@ fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) 
 		} else callback(error)
 	}
 }
-
-@WorkerThread
-fun checkAddressNameInContacts(
-	transactions: List<TransactionListModel>,
-	callback: () -> Unit
-) {
-	val contacts =
-		ContactTable.dao.getAllContacts()
-	transactions.forEach { transaction ->
-		transaction.addressName = contacts.getContactName(transaction.addressName)
-	}
-	callback()
-}
-

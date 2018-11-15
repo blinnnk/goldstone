@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
+import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.presenter.MarketTokenDetailPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -101,16 +102,19 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 					presenter.showWebFragmentWithLink(link, title)
 				}
 				tokenInfoLink.into(this)
-				presenter.setCurrencyInfo(
-					currencyInfo,
-					tokenInformation,
-					priceHistory,
-					tokenInfo,
-					tokenInfoLink,
-					tokenSocialMedia
-				)
 			}
 		}
+	}
+
+	fun showCurrencyInfo(
+		tokenInfoData: TokenInformationModel,
+		priceModel: PriceHistoryModel
+	) {
+		tokenInformation.model = tokenInfoData
+		priceHistory.model = priceModel
+		tokenInfo.setTokenDescription(tokenInfoData.description)
+		tokenInfoLink.model = tokenInfoData
+		tokenSocialMedia.model = tokenInfoData
 	}
 
 	companion object {

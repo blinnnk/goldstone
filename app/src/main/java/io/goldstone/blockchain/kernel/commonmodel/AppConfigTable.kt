@@ -49,6 +49,9 @@ data class AppConfigTable(
 ) {
 
 	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.appConfigDao()
+
 		fun getAppConfig(thread: CoroutineDispatcher, hold: (AppConfigTable?) -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
 				val config = GoldStoneDataBase.database.appConfigDao().getAppConfig()
@@ -63,17 +66,6 @@ data class AppConfigTable(
 
 		fun updatePushToken(token: String) = doAsync {
 			GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
-		}
-
-		fun updateExchangeListMD5(md5: String) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().apply {
-					getAppConfig()?.let {
-						update(it.apply { this.exchangeListMD5 = md5 })
-
-					}
-				}
-			}
 		}
 
 		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
@@ -155,6 +147,9 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
 	fun updateCurrency(newCurrencyCode: String)
+
+	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5  WHERE id = 1")
+	fun updateMD5Info(defaultCoinListMD5: String, nodeListMD5: String, exchangeListMD5: String)
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
 	fun updatePincode(pinCode: Int)

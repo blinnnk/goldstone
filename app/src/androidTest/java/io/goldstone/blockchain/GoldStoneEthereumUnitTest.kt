@@ -52,7 +52,7 @@ class GoldStoneEthereumUnitTest {
 		ETHJsonRPC.getTransactionByHash(transactionHash, chainName) { transaction, _ ->
 			// The ring result of blocknumber is 3396621
 			LogUtil.debug(position + "getTransactionByHash", transaction.toString())
-			assertTrue("Blocknumber is wrong", transaction?.blockNumber?.toIntOrNull() == 396958)
+			assertTrue("Blocknumber is wrong", transaction?.blockNumber == 396958)
 		}
 	}
 

@@ -28,9 +28,8 @@ object APIPath {
 		"$header/account/searchPair?pair=$pair" +
 			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
 	}
-	val marketList: (header: String,
-									 md5: String) -> String = { header, md5 ->
-		"$header/index/marketList?md5=$md5"
+	val marketList: (header: String) -> String = { header ->
+		"$header/index/marketList?md5="
 	}
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }
@@ -42,6 +41,7 @@ object APIPath {
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
+	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
 	val getEOSTokenList: (
 		header: String,
 		chainID: String,
@@ -71,10 +71,9 @@ object APIPath {
 		"$header/eos/actionList?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
 	}
 	val defaultTokenList: (
-		header: String,
-		md5: String
-	) -> String = { header, md5 ->
-		"$header/index/defaultCoinList?md5=$md5"
+		header: String
+	) -> String = { header ->
+		"$header/index/defaultCoinList?md5="
 	}
 	val getTokenInfo: (
 		header: String,

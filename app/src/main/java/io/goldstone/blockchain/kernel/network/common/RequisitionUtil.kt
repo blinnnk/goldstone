@@ -353,7 +353,7 @@ object RequisitionUtil {
 						else response.body()?.string().orEmpty()
 					checkChainErrorCode(data).let {
 						if (it.isNotEmpty()) {
-							hold(null, RequestError.ResolveDataError(Throwable("$it\n$data")))
+							hold(null, RequestError.RPCResult(it))
 							return
 						}
 					}
@@ -373,32 +373,26 @@ object RequisitionUtil {
 
 	private fun checkChainErrorCode(data: String?): String {
 		val hasError = data?.contains("error")
-		val errorData = if (hasError == true) {
-			try {
-				JSONObject(data).safeGet("error")
-			} catch (error: Exception) {
-				LogUtil.error("checkChainErrorCode", error)
-				""
-			}
+		val errorData = if (hasError == true) try {
+			JSONObject(data).safeGet("error")
+		} catch (error: Exception) {
+			LogUtil.error("checkChainErrorCode", error)
+			""
 		} else {
 			val code =
 				if (data?.contains("code") == true)
 					JSONObject(data).get("code")?.toString()?.toIntOrNull()
 				else null
-			return if (code == -10) ErrorTag.chain
-			else ""
+			return if (code == -10) ErrorTag.chain else ""
 		}
 		return when {
 			data.isNullOrBlank() -> return ""
-			errorData.isNotEmpty() -> {
-				try {
-					if (errorData.equals("null", true)) ""
-					else JSONObject(errorData).safeGet("message")
-				} catch (error: Exception) {
-					"$error"
-				}
+			errorData.isNotEmpty() -> try {
+				if (errorData.equals("null", true)) ""
+				else JSONObject(errorData).safeGet("message")
+			} catch (error: Exception) {
+				"$error"
 			}
-
 			else -> ""
 		}
 	}

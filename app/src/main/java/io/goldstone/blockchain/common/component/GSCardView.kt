@@ -35,4 +35,8 @@ open class GSCard(context: Context) : CardView(context) {
 		maxCardElevation = size
 		cardElevation = size
 	}
+
+	fun resetCornerRadius(radius: Float) {
+		this.radius = radius
+	}
 }
