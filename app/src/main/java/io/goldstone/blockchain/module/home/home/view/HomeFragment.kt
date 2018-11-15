@@ -4,9 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
+import com.blinnnk.extension.alignParentBottom
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setAlignParentBottom
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
@@ -55,7 +55,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 				}
 			}.into(this)
 
-			tabBar.setAlignParentBottom()
+			tabBar.alignParentBottom()
 		}
 	}
 

@@ -8,8 +8,8 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -45,18 +45,13 @@ class GasSelectionFooter(context: Context) : LinearLayout(context) {
 				textColor = GrayScale.gray
 				textSize = fontSize(15)
 				typeface = GoldStoneFont.book(context)
-			}.setCenterInVertical()
+			}.centerInVertical()
 		}.into(this)
 
 		confirmButton.apply {
 			setBlueStyle(20.uiPX())
 			text = CommonText.next.toUpperCase()
 		}.into(this)
-	}
-
-	fun setCanUseStyle(isSelected: Boolean) {
-		if (isSelected) confirmButton.setBlueStyle(20.uiPX())
-		else confirmButton.setGrayStyle(20.uiPX())
 	}
 
 	fun getConfirmButton(hold: RoundButton.() -> Unit) {

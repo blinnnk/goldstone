@@ -8,8 +8,8 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
@@ -80,7 +80,7 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 
 	fun showArrow() {
 		arrow.into(container)
-		arrow.setAlignParentRight()
+		arrow.alignParentRight()
 		subtitle.x -= 20.uiPX()
 	}
 

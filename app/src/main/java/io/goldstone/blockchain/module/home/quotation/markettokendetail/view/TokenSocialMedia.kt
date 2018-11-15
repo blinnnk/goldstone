@@ -5,10 +5,7 @@ import android.content.Context
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.toUpperCaseFirstLetter
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.button.IconWithTitle
@@ -64,6 +61,6 @@ class TokenSocialMedia(
 			columnCount = 3
 			y -= 10.uiPX()
 		}
-		container.setAlignParentBottom()
+		container.alignParentBottom()
 	}
 }

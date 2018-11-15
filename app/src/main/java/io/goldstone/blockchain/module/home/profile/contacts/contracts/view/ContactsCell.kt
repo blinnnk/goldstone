@@ -11,8 +11,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -77,12 +77,12 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 		id = ElementID.slideCell
 		layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)
 		this.addView(fontIcon)
-		fontIcon.setCenterInVertical()
+		fontIcon.centerInVertical()
 		this.addView(info.apply {
 			setBlackTitles()
 			x += 60.uiPX()
 		})
-		info.setCenterInVertical()
+		info.centerInVertical()
 		addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square)
 		leftPadding = PaddingSize.device
 		rightPadding = PaddingSize.device

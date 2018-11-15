@@ -69,7 +69,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 				android.graphics.PorterDuff.Mode.MULTIPLY
 			)
 			layoutParams = RelativeLayout.LayoutParams(80.uiPX(), 80.uiPX())
-			setCenterInParent()
+			centerInParent()
 			y -= 30.uiPX()
 		}.into(this)
 		// 当 `webView`加载完毕后清除 `loading`

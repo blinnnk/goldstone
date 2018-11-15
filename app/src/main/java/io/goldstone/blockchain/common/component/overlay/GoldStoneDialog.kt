@@ -13,9 +13,9 @@ import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -73,7 +73,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				bottomPadding = 10.uiPX()
 				lparams(wrapContent, wrapContent)
 			}
-		}.setCenterInParent()
+		}.centerInParent()
 	}
 
 	fun <T> setImage(src: T) {

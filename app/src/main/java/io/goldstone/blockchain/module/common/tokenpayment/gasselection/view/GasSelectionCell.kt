@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 import android.content.Context
 import android.widget.RadioButton
 import android.widget.TextView
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isDefaultStyle
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
@@ -57,15 +57,15 @@ class GasSelectionCell(context: Context) : BaseCell(context) {
 			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 		}.apply {
-			setAlignParentRight()
-			setCenterInVertical()
+			alignParentRight()
+			centerInVertical()
 		}
 		feeTypeDescription.apply {
-			setAlignParentRight()
-			setCenterInVertical()
+			alignParentRight()
+			centerInVertical()
 			x -= 35.uiPX()
 		}
-		info.setCenterInVertical()
+		info.centerInVertical()
 		setHorizontalPadding()
 		setGrayStyle()
 		hasArrow = false

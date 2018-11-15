@@ -5,10 +5,7 @@ import android.content.Context
 import android.view.Gravity
 import android.view.View
 import android.widget.RelativeLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.scaleTo
-import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
@@ -65,6 +62,6 @@ class TokenInfoLink(
 			
 			website.setTitle(QuotationText.website)
 			whitePaper.setTitle(QuotationText.whitePaper)
-		}.setAlignParentBottom()
+		}.alignParentBottom()
 	}
 }

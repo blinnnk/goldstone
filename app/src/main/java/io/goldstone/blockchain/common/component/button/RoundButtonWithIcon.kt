@@ -6,10 +6,10 @@ import android.view.Gravity
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
 import com.blinnnk.extension.measureTextWidth
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.ArrowIconView
@@ -49,8 +49,8 @@ class RoundButtonWithIcon(context: Context) : RelativeLayout(context) {
 		arrowIcon
 			.apply { setWhiteSytle() }
 			.into(this)
-		arrowIcon.setAlignParentRight()
-		arrowIcon.setCenterInVertical()
+		arrowIcon.alignParentRight()
+		arrowIcon.centerInVertical()
 	}
 
 	fun setTitle(text: String) {

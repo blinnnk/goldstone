@@ -8,10 +8,10 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isDefaultStyle
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -55,13 +55,13 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		setWillNotDraw(false)
 		title.into(this)
 		title.x = leftPadding.toFloat()
-		title.setCenterInVertical()
+		title.centerInVertical()
 		radio = radioButton {
 			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 		}
-		radio.setAlignParentRight()
-		radio.setCenterInVertical()
+		radio.alignParentRight()
+		radio.centerInVertical()
 	}
 
 	@SuppressLint("DrawAllocation")

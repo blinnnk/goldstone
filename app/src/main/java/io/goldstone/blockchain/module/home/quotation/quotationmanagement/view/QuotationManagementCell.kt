@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.home.quotation.quotationmanagement.view
 import android.content.Context
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.GrayScale
@@ -19,20 +19,20 @@ import org.jetbrains.anko.imageResource
 
 class QuotationManagementCell(context: Context) : TokenManagementListCell(context) {
 
-  private val dragIcon by lazy { ImageView(context) }
+	private val dragIcon by lazy { ImageView(context) }
 
-  init {
-    dragIcon.apply {
-      imageResource = R.drawable.drag_icon
-      setColorFilter(GrayScale.lightGray)
-      layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
-      x -= 50.uiPX()
-    }.into(this)
+	init {
+		dragIcon.apply {
+			imageResource = R.drawable.drag_icon
+			setColorFilter(GrayScale.lightGray)
+			layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
+			x -= 50.uiPX()
+		}.into(this)
 
-    dragIcon.setCenterInVertical()
-    dragIcon.setAlignParentRight()
-    switch.isChecked = true
-    hideIcon()
-  }
+		dragIcon.centerInVertical()
+		dragIcon.alignParentRight()
+		switch.isChecked = true
+		hideIcon()
+	}
 
 }

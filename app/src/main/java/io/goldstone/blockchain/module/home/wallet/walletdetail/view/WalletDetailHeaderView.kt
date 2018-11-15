@@ -84,7 +84,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 
 		currentAccount.into(this)
 		currentAccount.apply {
-			setCenterInHorizontal()
+			centerInHorizontal()
 			y += 30.uiPX()
 		}
 
@@ -103,7 +103,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.lparams(matchParent, matchParent)
 		}.apply {
-			setCenterInParent()
+			centerInParent()
 		}
 
 		relativeLayout {
@@ -126,7 +126,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				rightMargin = 15.uiPX()
 			}
 
-			depositButton.setAlignParentRight()
+			depositButton.alignParentRight()
 		}
 
 		textView {
@@ -136,7 +136,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			textSize = fontSize(15)
 			y -= 10.uiPX()
 		}.apply {
-			setAlignParentBottom()
+			alignParentBottom()
 			x += PaddingSize.device
 		}
 
@@ -149,8 +149,8 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		addTokenButton.apply {
 			removeIcon()
 			layoutParams.height = 24.uiPX()
-			setAlignParentRight()
-			setAlignParentBottom()
+			alignParentRight()
+			alignParentBottom()
 		}
 	}
 
@@ -170,7 +170,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				y -= 12.uiPX()
 			}
 			progressBar?.into(this)
-			progressBar?.setAlignParentBottom()
+			progressBar?.alignParentBottom()
 		} else {
 			if (!progressBar.isNull()) {
 				removeView(progressBar)

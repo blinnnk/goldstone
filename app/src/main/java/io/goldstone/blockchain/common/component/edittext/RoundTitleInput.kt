@@ -75,10 +75,10 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 			editText.gravity = Gravity.END
 		}
 		addView(editText)
-		editText.setAlignParentRight()
+		editText.alignParentRight()
 		button.into(this)
-		button.setAlignParentRight()
-		button.setCenterInVertical()
+		button.alignParentRight()
+		button.centerInVertical()
 		editText.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(s: Editable?) {
 				onTextChanged?.run()

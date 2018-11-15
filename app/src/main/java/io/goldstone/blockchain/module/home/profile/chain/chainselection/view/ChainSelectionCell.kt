@@ -5,9 +5,9 @@ import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
 import com.blinnnk.extension.measureTextWidth
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
@@ -78,6 +78,6 @@ class ChainSelectionCell(context: Context) : BaseCell(context) {
 			}
 			.into(this)
 
-		titles.setCenterInVertical()
+		titles.centerInVertical()
 	}
 }

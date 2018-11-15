@@ -4,11 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.RadioButton
-import android.widget.RelativeLayout
 import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.isDefaultStyle
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
@@ -40,13 +39,13 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 		relativeLayout {
 			lparams(matchParent, matchParent)
 			addView(info)
-			info.setCenterInVertical()
+			info.centerInVertical()
 			radio = radioButton {
 				isDefaultStyle(Spectrum.blue)
 				isClickable = false
 			}
-			radio.setAlignParentRight()
-			radio.setCenterInVertical()
+			radio.alignParentRight()
+			radio.centerInVertical()
 		}
 	}
 

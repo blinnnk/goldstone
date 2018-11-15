@@ -3,8 +3,8 @@ package io.goldstone.blockchain.module.home.profile.profile.view
 import android.content.Context
 import android.widget.TextView
 import com.blinnnk.animation.updateOriginYAnimation
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.SliderHeader
 import io.goldstone.blockchain.common.language.ProfileText
@@ -18,9 +18,9 @@ import org.jetbrains.anko.textColor
  * @author KaySaith
  */
 class ProfileSlideHeader(context: Context) : SliderHeader(context) {
-	
+
 	private val title = TextView(context)
-	
+
 	init {
 		title.apply {
 			text = ProfileText.profile
@@ -28,15 +28,15 @@ class ProfileSlideHeader(context: Context) : SliderHeader(context) {
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}.into(this)
-		
-		title.setCenterInParent()
+
+		title.centerInParent()
 	}
-	
+
 	override fun onHeaderShowedStyle() {
 		super.onHeaderShowedStyle()
 		title.updateOriginYAnimation(26.uiPX().toFloat())
 	}
-	
+
 	override fun onHeaderHidesStyle() {
 		super.onHeaderHidesStyle()
 		title.updateOriginYAnimation(34.uiPX().toFloat())

@@ -250,7 +250,7 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 		}
 		if (this@GSRecyclerFragment !is TokenDetailFragment
 			&& this@GSRecyclerFragment !is QuotationFragment
-		) emptyLayout?.setCenterInParent()
+		) emptyLayout?.centerInParent()
 	}
 
 	open fun removeEmptyView() {

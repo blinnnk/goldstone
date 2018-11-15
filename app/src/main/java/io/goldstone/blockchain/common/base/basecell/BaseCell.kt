@@ -9,8 +9,8 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -45,8 +45,8 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, 60.uiPX())
 		this.addView(arrowIcon)
 		arrowIcon.x += 3.uiPX()
-		arrowIcon.setAlignParentRight()
-		arrowIcon.setCenterInVertical()
+		arrowIcon.alignParentRight()
+		arrowIcon.centerInVertical()
 	}
 
 	private var paddingSize = 0

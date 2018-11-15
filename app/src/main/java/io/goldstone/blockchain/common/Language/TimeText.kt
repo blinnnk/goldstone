@@ -112,7 +112,7 @@ object DateAndTimeText {
 
 	fun getDateText(): HoneyDateUtil.DataText {
 		return HoneyDateUtil.DataText(
-			hour,
+			month,
 			week,
 			day,
 			hour,

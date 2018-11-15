@@ -126,7 +126,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 
 				addView(exchangeName)
 
-				tokenPrice.setAlignParentRight()
+				tokenPrice.alignParentRight()
 
 				lineChart.apply {
 					id = ElementID.chartView

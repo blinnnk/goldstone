@@ -51,10 +51,10 @@ class WalletSettingsListCell(context: Context) : BaseCell(context) {
 		}.into(this)
 		setHorizontalPadding()
 		setGrayStyle()
-		title.setCenterInVertical()
+		title.centerInVertical()
 		description.apply {
-			setAlignParentRight()
-			setCenterInVertical()
+			alignParentRight()
+			centerInVertical()
 		}
 
 		layoutParams.height = 50.uiPX()

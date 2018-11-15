@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
 import android.widget.RelativeLayout
+import com.blinnnk.extension.alignParentBottom
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.data.Entry
@@ -46,8 +46,8 @@ class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 				CommonText.failed
 			)
 		}.into(this)
-		menu.setAlignParentBottom()
-		menu.setCenterInParent()
+		menu.alignParentBottom()
+		menu.centerInParent()
 		menu.selected(0)
 	}
 
