@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 
 import android.arch.persistence.room.*
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable

@@ -7,9 +7,9 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.alignParentBottom
+import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GradientType
@@ -58,7 +58,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 				isCenter = true
 				setWildStyle()
 			}.into(this)
-		}.setCenterInHorizontal()
+		}.centerInHorizontal()
 
 		conformationBar.apply {
 			visibility = View.GONE
@@ -69,7 +69,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			backgroundColor = GrayScale.Opacity5Black
 			layoutParams = RelativeLayout.LayoutParams(matchParent, 35.uiPX())
 		}.into(this)
-		conformationBar.setAlignParentBottom()
+		conformationBar.alignParentBottom()
 	}
 
 	@SuppressLint("SetTextI18n")

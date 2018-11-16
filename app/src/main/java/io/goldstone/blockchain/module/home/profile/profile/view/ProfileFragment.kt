@@ -7,11 +7,15 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.RecyclerViewDivider
+import io.goldstone.blockchain.common.base.baserecyclerfragment.RecyclerViewSessionModel
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
@@ -62,6 +66,17 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
+		val divider = RecyclerViewDivider(recyclerView)
+		with(divider) {
+			val sessionHeight = 30.uiPX()
+			setTextColor(Spectrum.opacity3White)
+			sessionData = listOf(
+				RecyclerViewSessionModel(1, "Wallet Advanced", sessionHeight, PaddingSize.device.toFloat()),
+				RecyclerViewSessionModel(5, "General Preference", sessionHeight, PaddingSize.device.toFloat()),
+				RecyclerViewSessionModel(8, "About GoldStone", sessionHeight, PaddingSize.device.toFloat())
+			)
+			recyclerView.addItemDecoration(this)
+		}
 	}
 
 	private var isShow = false

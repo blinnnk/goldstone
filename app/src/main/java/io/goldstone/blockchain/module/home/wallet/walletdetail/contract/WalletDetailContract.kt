@@ -24,6 +24,7 @@ interface WalletDetailContract {
 		fun showDepositFragment(data: WalletDetailCellModel)
 		fun updateAdapterData(data: ArrayList<WalletDetailCellModel>)
 		fun showMnemonicBackUpDialog()
+		fun showChainError()
 	}
 
 	interface GSPresenter : GoldStonePresenter {

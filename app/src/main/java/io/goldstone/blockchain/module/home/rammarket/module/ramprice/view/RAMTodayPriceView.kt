@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
@@ -27,9 +28,9 @@ class RAMTodayPriceView(context: Context): LinearLayout(context) {
 	init {
 		orientation = LinearLayout.VERTICAL
 		layoutParams = LayoutParams(viewWidth, wrapContent)
+		setMargins<LayoutParams> { topMargin = -(5.uiPX()) }
 		linearLayout {
 			bottomPadding = 10.uiPX()
-			topPadding = -(5.uiPX())
 			startPrice = textView {
 				gravity = Gravity.START
 				text = EOSRAMExchangeText.openPrice("")

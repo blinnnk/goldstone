@@ -298,12 +298,12 @@ object TokenDetailText {
 	}
 	@JvmField
 	val ram = when (currentLanguage) {
-		HoneyLanguage.English.code -> "RAM"
-		HoneyLanguage.Chinese.code -> "RAM(内存)"
-		HoneyLanguage.Japanese.code -> "RAM(ラム)"
-		HoneyLanguage.Korean.code -> "RAM(램)"
-		HoneyLanguage.Russian.code -> "RAM"
-		HoneyLanguage.TraditionalChinese.code -> "RAM(內存)"
+		HoneyLanguage.English.code -> "RAM (Bytes)"
+		HoneyLanguage.Chinese.code -> "RAM (内存)"
+		HoneyLanguage.Japanese.code -> "RAM (ラム)"
+		HoneyLanguage.Korean.code -> "RAM (램)"
+		HoneyLanguage.Russian.code -> "RAM (Bytes)"
+		HoneyLanguage.TraditionalChinese.code -> "RAM (內存)"
 		else -> ""
 	}
 	@JvmField

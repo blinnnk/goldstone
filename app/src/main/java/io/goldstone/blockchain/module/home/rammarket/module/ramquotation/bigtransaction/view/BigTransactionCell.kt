@@ -3,9 +3,8 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtra
 import android.content.Context
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.*
-import com.blinnnk.extension.setAlignParentBottom
-import com.blinnnk.extension.setAlignParentRight
+import android.widget.RelativeLayout
+import android.widget.TextView
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing

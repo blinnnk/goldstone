@@ -8,9 +8,9 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.animation.scale
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
@@ -28,7 +28,7 @@ class MiniOverlay(
 	context: Context,
 	private val hold: (cell: BaseCell, title: String) -> Unit
 ) : RelativeLayout(context) {
-	
+
 	private var overlayHeight = 0
 	private lateinit var dashBoard: ViewGroup
 	private val contentHeight = 26.uiPX()
@@ -46,7 +46,7 @@ class MiniOverlay(
 					imageView {
 						imageResource = pair.first
 						layoutParams = LinearLayout.LayoutParams(contentHeight, contentHeight)
-					}.setCenterInVertical()
+					}.centerInVertical()
 					textView {
 						x = 30.uiPX().toFloat()
 						textSize = fontSize(12)
@@ -55,7 +55,7 @@ class MiniOverlay(
 						textColor = GrayScale.black
 						typeface = GoldStoneFont.heavy(context)
 						gravity = Gravity.CENTER_VERTICAL
-					}.setCenterInVertical()
+					}.centerInVertical()
 					if (index == model.lastIndex) {
 						removeBottomLine()
 					}
@@ -67,7 +67,7 @@ class MiniOverlay(
 			layoutParams = RelativeLayout.LayoutParams(220.uiPX(), overlayHeight)
 		}
 	}
-	
+
 	init {
 		id = ElementID.miniOverlay
 		isClickable = true
@@ -76,26 +76,26 @@ class MiniOverlay(
 			removeSelf()
 		}
 	}
-	
+
 	fun getOverlayHeight() = overlayHeight
-	
+
 	fun setTopRight() {
 		if (this::dashBoard.isInitialized) {
 			dashBoard.scale(2, false, 60)
 			dashBoard.y = 20.uiPX().toFloat()
 			dashBoard.x -= 20.uiPX()
-			dashBoard.setAlignParentRight()
+			dashBoard.alignParentRight()
 		}
 	}
-	
+
 	fun setTopValue(topPosition: Float) {
 		if (this::dashBoard.isInitialized) {
 			dashBoard.y = topPosition
 			dashBoard.x -= 20.uiPX()
-			dashBoard.setAlignParentRight()
+			dashBoard.alignParentRight()
 		}
 	}
-	
+
 	fun setTopLeft() {
 		if (this::dashBoard.isInitialized) {
 			dashBoard.scale(1, false, 60)
@@ -103,7 +103,7 @@ class MiniOverlay(
 			dashBoard.x = 20.uiPX().toFloat()
 		}
 	}
-	
+
 	fun removeSelf() {
 		(parent as? ViewGroup)?.removeView(this)
 	}

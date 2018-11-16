@@ -49,14 +49,16 @@ object BCHWalletUtils {
 
 	// Mainnet Checker
 	// Only support Mainnet Address
-	fun isValidAddress(address: String): Boolean {
+	fun isValidAddress(address: String, isTestNet: Boolean = false): Boolean {
+		val net =
+			if (isTestNet) TestNet3Params.get() else MainNetParams.get()
 		return if (isNewCashAddress(address)) try {
-			formattedToLegacy(address, MainNetParams.get())
+			formattedToLegacy(address, net)
 			true
 		} catch (error: Exception) {
 			false
 		} else {
-			if (BTCUtils.isValidTestnetAddress(address)) false
+			if (BTCUtils.isValidTestnetAddress(address) && !isTestNet) false
 			else try {
 				BCHUtil.instance.encodeCashAddressByLegacy(address)
 				true
@@ -67,7 +69,8 @@ object BCHWalletUtils {
 	}
 
 	fun isNewCashAddress(address: String): Boolean {
-		return address.contains(":") || address.substring(0, 1).equals("q", true)
+		return if (address.isEmpty()) false
+		else address.contains(":") || address.substring(0, 1).equals("q", true)
 	}
 
 	fun formattedToLegacy(address: String, network: NetworkParameters): String {

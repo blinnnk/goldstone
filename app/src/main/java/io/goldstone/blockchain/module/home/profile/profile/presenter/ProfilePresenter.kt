@@ -3,9 +3,7 @@ package io.goldstone.blockchain.module.home.profile.profile.presenter
 import android.content.Intent
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.FixTextLength
-import com.blinnnk.util.SystemUtils
-import com.blinnnk.util.clickToCopy
+import com.blinnnk.util.*
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.ChainText
@@ -15,8 +13,6 @@ import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -46,10 +42,6 @@ class ProfilePresenter(
 			ContactTable.dao.getAllContacts().size
 		} then {
 			val data = arrayListOf(
-				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),
-				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
-				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
-				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(
 					R.drawable.wallet_icon,
 					ProfileText.walletManager,
@@ -59,8 +51,12 @@ class ProfilePresenter(
 						override val textSize: Float = fragment.view?.fontSize(14).orZero()
 					}.getFixString()
 				),
-				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
+				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
+				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
+				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
+				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
+				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),
 				ProfileModel(R.drawable.about_us_icon, ProfileText.aboutUs, ""),
 				ProfileModel(R.drawable.terms_icon, ProfileText.terms, ""),
 				ProfileModel(R.drawable.contact_us_icon, ProfileText.support, ""),

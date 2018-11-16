@@ -3,7 +3,10 @@ package io.goldstone.blockchain.module.common.walletimport.walletimportcenter.vi
 import android.content.Context
 import android.widget.ImageView
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.alignParentBottom
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
+import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
@@ -11,9 +14,12 @@ import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.ImportMethodText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import org.jetbrains.anko.*
+import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.imageResource
+import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.wrapContent
 
 
 /**
@@ -50,12 +56,12 @@ class WalletImportMethodCell(context: Context) : GSCard(context) {
 			titles.into(this)
 			arrowIcon.into(this)
 			arrowIcon.apply {
-				setAlignParentRight()
-				setCenterInVertical()
+				alignParentRight()
+				centerInVertical()
 			}
 			lparams(matchParent, matchParent)
 			typeIcon.into(this)
-			typeIcon.setAlignParentBottom()
+			typeIcon.alignParentBottom()
 			typeIcon.y += 45.uiPX()
 		}
 	}
@@ -64,7 +70,7 @@ class WalletImportMethodCell(context: Context) : GSCard(context) {
 		titles.apply {
 			title.text = ImportMethodText.mnemonic
 			subtitle.text = ImportWalletText.importMnemonicsHint
-			setCenterInVertical()
+			centerInVertical()
 		}
 		typeIcon.imageResource = R.drawable.mnemonic_icon
 	}
@@ -73,7 +79,7 @@ class WalletImportMethodCell(context: Context) : GSCard(context) {
 		titles.apply {
 			title.text = ImportMethodText.privateKey
 			subtitle.text = ImportWalletText.importPrivateKeyHint
-			setCenterInVertical()
+			centerInVertical()
 		}
 		typeIcon.imageResource = R.drawable.private_key_import_icon
 		typeIcon.y -= 10.uiPX()
@@ -83,7 +89,7 @@ class WalletImportMethodCell(context: Context) : GSCard(context) {
 		titles.apply {
 			title.text = ImportMethodText.keystore
 			subtitle.text = ImportWalletText.importKeystoreHint
-			setCenterInVertical()
+			centerInVertical()
 		}
 		typeIcon.imageResource = R.drawable.keystore_import_icon
 		typeIcon.y += 10.uiPX()

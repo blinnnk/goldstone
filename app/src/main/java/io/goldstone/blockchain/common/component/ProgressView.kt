@@ -6,9 +6,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.updateWidthAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.convertToDiskUnit
@@ -63,7 +63,7 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, progressViewHeight + 45.uiPX())
-		subtitle.setAlignParentRight()
+		subtitle.alignParentRight()
 		progressTotalValueView = relativeLayout {
 			lparams {
 				width = matchParent
@@ -76,10 +76,10 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 				addCorner(CornerSize.small.toInt(), Spectrum.blue)
 			}
 			leftValueView.into(this)
-			leftValueView.setCenterInVertical()
+			leftValueView.centerInVertical()
 			rightValueView.into(this)
-			rightValueView.setCenterInVertical()
-			rightValueView.setAlignParentRight()
+			rightValueView.centerInVertical()
+			rightValueView.alignParentRight()
 		}
 	}
 

@@ -3,13 +3,12 @@ package io.goldstone.blockchain.crypto.multichain
 import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 
 
@@ -101,9 +100,7 @@ class ChainType(val id: Int) : Serializable {
 			}
 			currentWallet?.apply {
 				walletDao.update(this)
-				GoldStoneAPI.context.runOnUiThread {
-					callback(this@apply)
-				}
+				launchUI { callback(this) }
 			}
 		}
 	}
@@ -132,15 +129,6 @@ class ChainType(val id: Int) : Serializable {
 		fun isSamePrivateKeyRule(type: ChainType): Boolean =
 			listOf(ChainType.BCH, ChainType.BTC, ChainType.AllTest).any { it.id == type.id }
 
-		fun getChainTypeBySymbol(symbol: String?): ChainType = when (symbol) {
-			CoinSymbol.btc() -> ChainType.BTC
-			CoinSymbol.ltc -> ChainType.LTC
-			CoinSymbol.eth -> ChainType.ETH
-			CoinSymbol.etc -> ChainType.ETC
-			CoinSymbol.bch -> ChainType.BCH
-			CoinSymbol.eos -> ChainType.EOS
-			else -> ChainType.ETH
-		}
 	}
 }
 

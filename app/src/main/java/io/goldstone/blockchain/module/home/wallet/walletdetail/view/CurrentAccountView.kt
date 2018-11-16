@@ -5,9 +5,9 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -21,7 +21,7 @@ import org.jetbrains.anko.imageResource
  * @author KaySaith
  */
 class CurrentAccountView(context: Context) : RelativeLayout(context) {
-	
+
 	val avatar by lazy { ImageView(context) }
 	val info by lazy { TwoLineTitles(context) }
 	private val qrIcon by lazy { ImageView(context) }
@@ -47,7 +47,7 @@ class CurrentAccountView(context: Context) : RelativeLayout(context) {
 			y += 1.uiPX()
 		}.into(this)
 
-		info.setCenterInVertical()
+		info.centerInVertical()
 
 		qrIcon.apply {
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
@@ -57,8 +57,8 @@ class CurrentAccountView(context: Context) : RelativeLayout(context) {
 		}.into(this)
 
 		qrIcon.apply {
-			setAlignParentRight()
-			setCenterInVertical()
+			alignParentRight()
+			centerInVertical()
 		}
 	}
 }

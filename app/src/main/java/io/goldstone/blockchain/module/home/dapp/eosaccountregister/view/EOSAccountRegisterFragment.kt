@@ -60,7 +60,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	private val gridSessionTitle by lazy { ColumnSectionTitle(context!!) }
 	private var assignResources =
 		listOf(
-			MutablePair("RAM (Bytes)", "4096"),
+			MutablePair(TokenDetailText.ram, "4096"),
 			MutablePair("CPU (EOS)", "0.1"),
 			MutablePair("NET (EOS)", "0.1")
 		)
@@ -114,12 +114,12 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					presenter.registerAccount(
 						EOSAccount(accountNameInput.getContent()),
 						publickeyInput.getContent(),
-						BigInteger.valueOf(assignResources[0].right.toLong()),
+						BigInteger(assignResources[0].right),
 						assignResources[1].right.toDouble(),
 						assignResources[1].right.toDouble()
 					) { response, error ->
 						launchUI {
-							if (response != null && error.isNone()) getParentContainer()?.apply {
+							if (response.isNotNull() && error.isNone()) getParentContainer()?.apply {
 								response.showDialog(this)
 							} else safeShowError(error)
 							button.showLoadingStatus(false, Spectrum.blue, CommonText.confirm)
@@ -145,7 +145,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	private fun setExpenditure() {
 		presenter.getEOSCurrencyAndRAMPrice { currency, ramPrice, error ->
-			if (currency != null && ramPrice != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
+			if (currency.isNotNull() && ramPrice.isNotNull() && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 				val eosCount = assignResources[1].right.toDouble() + assignResources[2].right.toDouble() + assignResources[0].right.toIntOrZero() * ramPrice
 				val totalCurrency = eosCount * currency
 				resourceCoast.setSubtitle("≈ ${eosCount.formatCount(4)} EOS ≈ ${totalCurrency.formatCurrency()} (${SharedWallet.getCurrencyCode()})")
@@ -156,8 +156,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	private fun ViewGroup.showCustomDashboard(values: List<MutablePair<String, String>>) {
 		DashboardOverlay(context) {
 			values.forEachIndexed { index, mutablePair ->
-				RoundInput(context!!).apply {
-					setNumberInput()
+				RoundInput(context).apply {
+					setNumberInput(index != 0)
 					id = index
 					layoutParams = LinearLayout.LayoutParams(ScreenSize.overlayContentWidth, 56.uiPX())
 					this.title = mutablePair.left

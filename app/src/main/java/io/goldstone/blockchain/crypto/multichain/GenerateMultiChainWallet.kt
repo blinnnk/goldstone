@@ -2,7 +2,7 @@ package io.goldstone.blockchain.crypto.multichain
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
+import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey

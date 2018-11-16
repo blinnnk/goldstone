@@ -13,12 +13,9 @@ import org.json.JSONObject
 /**
  * @date: 2018/8/29.
  * @author: yanglihai
- * @description:
  */
-@Entity(tableName = "exchangeTable")
+@Entity(tableName = "exchangeTable", primaryKeys = ["marketId"])
 data class ExchangeTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	@SerializedName("market_id")
 	var marketId: Int,
 	@SerializedName("icon")
@@ -27,10 +24,15 @@ data class ExchangeTable(
 	var exchangeName: String,
 	var isSelected: Boolean = false
 ) {
-	constructor(
-		localData: JSONObject
-	) : this(
-		0,
+
+	constructor(data: ExchangeTable) : this(
+		data.marketId,
+		data.iconUrl,
+		data.exchangeName,
+		false
+	)
+
+	constructor(localData: JSONObject) : this(
 		localData.safeGet("market_id").toInt().orZero(),
 		localData.safeGet("icon"),
 		localData.safeGet("market"),
@@ -39,6 +41,9 @@ data class ExchangeTable(
 
 	companion object {
 
+		@JvmField
+		val dao = GoldStoneDataBase.database.exchangeTableDao()
+
 		fun getMarketsBySelectedStatus(
 			isSelected: Boolean,
 			hold: (List<ExchangeTable>) -> Unit
@@ -46,24 +51,6 @@ data class ExchangeTable(
 			doAsync {
 				val marketList = GoldStoneDataBase.database.exchangeTableDao().getByStatus(isSelected)
 				GoldStoneAPI.context.runOnUiThread { hold(marketList) }
-			}
-		}
-
-		fun update(exchangeTable: ExchangeTable) {
-			doAsync {
-				GoldStoneDataBase.database.exchangeTableDao().update(exchangeTable)
-			}
-		}
-
-		fun updateSelectedStatusById(id: Int, isSelected: Boolean) {
-			doAsync {
-				GoldStoneDataBase.database.exchangeTableDao().updateSelectedStatusByExchangeId(id, isSelected)
-			}
-		}
-
-		fun delete(exchangeTable: ExchangeTable) {
-			doAsync {
-				GoldStoneDataBase.database.exchangeTableDao().delete(exchangeTable)
 			}
 		}
 	}
@@ -78,22 +65,19 @@ interface ExchangeDao {
 	@Query("select * from exchangeTable where isSelected = :isSelected")
 	fun getByStatus(isSelected: Boolean): List<ExchangeTable>
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertAll(exchange: List<ExchangeTable>)
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(exchangeTable: ExchangeTable)
 
 	@Query("UPDATE exchangeTable SET isSelected = :isSelected WHERE marketId = :id ")
-	fun updateSelectedStatusByExchangeId(id: Int, isSelected: Boolean)
+	fun updateSelectedStatus(id: Int, isSelected: Boolean)
 
 	@Update
 	fun update(exchangeTable: ExchangeTable)
 
 	@Delete
 	fun delete(exchangeTable: ExchangeTable)
-
-	@Query("delete from exchangeTable ")
-	fun deleteAll()
 
 }

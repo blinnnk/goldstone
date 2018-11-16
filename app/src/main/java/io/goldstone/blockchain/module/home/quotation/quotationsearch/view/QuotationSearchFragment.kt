@@ -12,20 +12,18 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
-import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.util.*
 
 /**
@@ -61,16 +59,12 @@ class QuotationSearchFragment :
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationSelectionTable>?
 	) {
-		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { cell ->
-			cell.quotationSearchModel?.let { model ->
-				cell.switch.onClick {
-					getMainActivity()?.showLoadingView()
-					presenter.updateMyQuotation(model, cell.switch.isChecked) { error ->
-						GoldStoneAPI.context.runOnUiThread {
-							this@QuotationSearchFragment.getMainActivity()?.removeLoadingView()
-							if (error.hasError()) safeShowError(error)
-						}
-					}
+		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { model, isChecked ->
+			getMainActivity()?.showLoadingView()
+			presenter.updateMyQuotation(model, isChecked) { error ->
+				launchUI {
+					getMainActivity()?.removeLoadingView()
+					if (error.hasError()) safeShowError(error)
 				}
 			}
 		}

@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.ExplorerModel
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
@@ -221,14 +222,15 @@ class TokenInfoPresenter(
 
 	companion object {
 
-		fun getExplorerIcon(contract: TokenContract?): Int {
+		// Icon with name
+		fun getExplorerInfo(contract: TokenContract?): List<ExplorerModel> {
 			return when {
-				contract.isBTC() -> R.drawable.blocktrail_icon
-				contract.isLTC() -> R.drawable.blockcypher_icon
-				contract.isBCH() -> R.drawable.blocktrail_icon
-				contract.isEOSSeries() -> R.drawable.bloks_io_icon
-				contract.isETC() -> R.drawable.gastracker_icon
-				else -> R.drawable.etherscan_icon
+				contract.isBTC() -> listOf(ExplorerModel( R.drawable.blocktrail_icon, "Block Trail"))
+				contract.isLTC() -> listOf(ExplorerModel(R.drawable.blockcypher_icon, "Blockcypher"))
+				contract.isBCH() -> listOf(ExplorerModel(R.drawable.blocktrail_icon, "Block Trail"))
+				contract.isEOSSeries() -> listOf(ExplorerModel(R.drawable.bloks_io_icon, "Bloks.io"), ExplorerModel(R.drawable.eos_park_icon, "EOS Park"))
+				contract.isETC() -> listOf(ExplorerModel(R.drawable.gastracker_icon, "Gas Tracker"))
+				else -> listOf(ExplorerModel(R.drawable.etherscan_icon, "EtherScan.io"))
 			}
 		}
 
@@ -241,7 +243,7 @@ class TokenInfoPresenter(
 				contract.isETC() -> ChainExplorer.etcAddressDetail(contract.getAddress())
 				else -> ChainExplorer.ethAddressDetail(contract.getAddress())
 			}
-			return Pair(getExplorerIcon(contract), url)
+			return Pair(getExplorerInfo(contract).first().icon, url)
 		}
 
 		fun showThirdPartyAddressDetail(fragment: TokenDetailOverlayFragment?, url: String) {
@@ -255,3 +257,4 @@ class TokenInfoPresenter(
 		}
 	}
 }
+

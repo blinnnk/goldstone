@@ -7,10 +7,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.animation.scale
 import com.blinnnk.animation.setValueAnimatorOfFloat
-import com.blinnnk.extension.addCircleBorder
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInHorizontal
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.FloatAnimationObject
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -49,7 +46,7 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 			titles.subtitle.text = PincodeText.enterPincodeDescription
 			isCenter = true
 		}.into(this)
-		titles.setCenterInHorizontal()
+		titles.centerInHorizontal()
 
 		inputLayout = linearLayout {
 			layoutParams = LinearLayout.LayoutParams(codeWidth, wrapContent)

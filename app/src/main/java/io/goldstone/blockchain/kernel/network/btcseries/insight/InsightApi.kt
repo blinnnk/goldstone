@@ -2,8 +2,6 @@ package io.goldstone.blockchain.kernel.network.btcseries.insight
 
 import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.value.DataValue
-import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -140,13 +138,5 @@ object InsightApi {
 				)
 			} else hold(null, error)
 		}
-	}
-
-	fun getPageInfo(transactionCount: Int, localDataMaxIndex: Int): PageInfo {
-		val willGetDataCount =
-			if (transactionCount - localDataMaxIndex > DataValue.pageCount) DataValue.pageCount
-			else transactionCount - localDataMaxIndex
-		// 网络接口数据默认都是从 `0` 开始拉取最新的
-		return PageInfo(0, willGetDataCount, localDataMaxIndex)
 	}
 }

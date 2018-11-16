@@ -8,8 +8,8 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
@@ -80,7 +80,7 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 
 	fun showArrow() {
 		arrow.into(container)
-		arrow.setAlignParentRight()
+		arrow.alignParentRight()
 		subtitle.x -= 20.uiPX()
 	}
 
@@ -107,12 +107,12 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 	}
 
 	@SuppressLint("SetTextI18n")
-	fun setSubtitle(content: String) {
+	fun setSubtitle(content: String, isScaleMiddle: Boolean = false) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.text = object : FixTextLength() {
 			override var text = content
-			override val maxWidth = ScreenSize.widthWithPadding * 0.55f
+			override val maxWidth = ScreenSize.widthWithPadding * 0.65f
 			override val textSize: Float = fontSize(12.uiPX())
-		}.getFixString()
+		}.getFixString(isScaleMiddle)
 	}
 }

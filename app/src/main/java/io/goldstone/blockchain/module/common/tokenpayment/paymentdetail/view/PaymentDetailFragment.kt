@@ -124,7 +124,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 					setBoldTitles()
 				}
 				titles.into(this)
-				titles.setCenterInParent()
+				titles.centerInParent()
 			} else {
 				recoveryOverlayHeader()
 			}

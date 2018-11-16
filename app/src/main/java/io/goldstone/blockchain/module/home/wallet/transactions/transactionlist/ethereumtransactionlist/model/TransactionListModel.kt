@@ -15,10 +15,10 @@ import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.bitcoinCashTransactionDetail
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.bitcoinTransactionDetail
-import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.eosTransactionDetail
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.litecoinTransactionDetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
 import java.math.BigInteger
@@ -40,7 +40,7 @@ data class TransactionListModel(
 	val transactionHash: String,
 	override var memo: String,
 	override val minerFee: String,
-	val url: String,
+	val url: List<String>,
 	override val isPending: Boolean,
 	val timeStamp: String,
 	override val value: BigInteger,
@@ -48,7 +48,8 @@ data class TransactionListModel(
 	override val contract: TokenContract,
 	var pageID: Long,
 	override var isFee: Boolean = false,
-	override val confirmations: Int
+	override val confirmations: Int,
+	val dataIndex: Int
 ) : TransactionSealedModel(
 	isPending,
 	transactionHash,
@@ -84,7 +85,7 @@ data class TransactionListModel(
 		data.txID,
 		data.transactionData.memo,
 		if (data.cupUsage * data.netUsage == BigInteger.ZERO) "" else generateEOSMinerContent(data.cupUsage, data.netUsage),
-		generateTransactionURL(data.txID, CoinSymbol.eos, true),
+		generateTransactionURL(data.txID, TokenContract.ETH, true),
 		data.isPending,
 		data.time.toString(),
 		BigInteger.valueOf(data.transactionData.quantity.substringBeforeLast(" ").toLongOrZero()),
@@ -92,7 +93,8 @@ data class TransactionListModel(
 		TokenContract(data.codeName, data.symbol, null),
 		data.serverID,
 		false,
-		0
+		0,
+		data.dataIndex
 	)
 
 	constructor(data: TransactionTable) : this(
@@ -104,11 +106,17 @@ data class TransactionListModel(
 		data.isReceive,
 		TimeUtils.formatDate(data.timeStamp.toLongOrZero()), // 拼接时间
 		data.to,
-		data.blockNumber.toIntOrNull() ?: -1,
+		data.blockNumber,
 		data.hash,
 		data.memo,
 		data.minerFee + getUnitSymbol(data.symbol), // 计算燃气费使用情况
-		generateTransactionURL(data.hash, data.symbol, false), // Api 地址拼接
+		generateTransactionURL(
+			data.hash,
+			if (data.contractAddress.equals(TokenContract.etcContract, true))
+				TokenContract.ETC
+			else TokenContract.ETH,
+			false
+		), // Api 地址拼接
 		data.isPending,
 		data.timeStamp,
 		BigInteger.valueOf(data.value.toLongOrZero()),
@@ -116,7 +124,8 @@ data class TransactionListModel(
 		TokenContract(data.contractAddress, data.symbol, null),
 		0L, // TODO
 		data.isFee,
-		data.confirmations.toIntOrZero()
+		data.confirmations.toIntOrZero(),
+		0
 	)
 
 	constructor(data: BTCSeriesTransactionTable) : this(
@@ -140,7 +149,7 @@ data class TransactionListModel(
 		data.hash,
 		"",
 		"${data.fee.toDouble().toBigDecimal()} ${data.symbol}",
-		generateTransactionURL(data.hash, data.symbol, false),
+		generateTransactionURL(data.hash, TokenContract.BTC, false),
 		data.isPending,
 		data.timeStamp,
 		BigInteger.valueOf(data.value.toDoubleOrZero().toSatoshi()),
@@ -148,7 +157,8 @@ data class TransactionListModel(
 		CoinSymbol(data.symbol).getContract().orEmpty(),
 		data.dataIndex.toLong(), // TODO
 		data.isFee,
-		data.confirmations
+		data.confirmations,
+		data.dataIndex
 	)
 
 	companion object {
@@ -199,20 +209,20 @@ data class TransactionListModel(
 			}
 		}
 
-		fun generateTransactionURL(taxHash: String, symbol: String, isEOSSeries: Boolean): String {
+		fun generateTransactionURL(taxHash: String, contract: TokenContract, isEOSSeries: Boolean): List<String> {
 			return when {
-				CoinSymbol(symbol).isETC() ->
-					EtherScanApi.gasTrackerHeader(taxHash)
-				CoinSymbol(symbol).isBTC() ->
-					bitcoinTransactionDetail(taxHash)
-				CoinSymbol(symbol).isLTC() ->
-					litecoinTransactionDetail(taxHash)
-				CoinSymbol(symbol).isBCH() ->
-					bitcoinCashTransactionDetail(taxHash)
-				CoinSymbol(symbol).isEOS() || isEOSSeries -> {
-					eosTransactionDetail(taxHash)
+				contract.isETC() ->
+					listOf(EtherScanApi.gasTrackerHeader(taxHash))
+				contract.isBTC() ->
+					listOf(bitcoinTransactionDetail(taxHash))
+				contract.isLTC() ->
+					listOf(litecoinTransactionDetail(taxHash))
+				contract.isBCH() ->
+					listOf(bitcoinCashTransactionDetail(taxHash))
+				contract.isEOS() || isEOSSeries -> {
+					listOf(ChainExplorer.eosTransactionDetail(taxHash), ChainExplorer.eosParkTXDetail(taxHash))
 				}
-				else -> EtherScanApi.transactionDetail(taxHash)
+				else -> listOf(EtherScanApi.transactionDetail(taxHash))
 			}
 		}
 

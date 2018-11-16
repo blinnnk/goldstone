@@ -2,27 +2,27 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.toArrayList
-import com.blinnnk.extension.toMillisecond
+import com.blinnnk.extension.*
+import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.TimeUtils
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getContactName
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -45,26 +45,34 @@ class TokenDetailPresenter(
 	override fun start() {
 		detailView.showLoading(true)
 		updateEmptyCharData()
-		loadDataFromChain()
+		checkNewDataFromChain()
 	}
 
 	var totalCount: Int? = null
 	var currentMaxCount: Int? = null
 
 	override fun loadMore() {
-		// 目前的翻页逻辑比较复杂, 暂时不支持分类 `Sort` 后的分页, 只在总类目下支持分页
-		if (
-			totalCount == null
-			|| currentMaxCount == null
-			|| currentMaxCount ?: 0 <= 0
-			|| detailView.asyncData?.size == totalCount
-			|| detailView.currentMenu != CommonText.all
-		) return
+		if (detailView.currentMenu != CommonText.all) return
 		detailView.showBottomLoading(true)
-		flipEOSPageData {
-			launchUI {
-				detailView.showBottomLoading(false)
-				detailView.showLoading(false)
+		with(token.contract) {
+			GlobalScope.launch(Dispatchers.Default) {
+				when {
+					isBTCSeries() -> getBTCSeriesData()
+					isETHSeries() -> getETHSeriesData()
+					isEOSSeries() -> {
+						if (
+							totalCount == null
+							|| currentMaxCount == null
+							|| currentMaxCount ?: 0 <= 0
+							|| detailView.asyncData?.size == totalCount
+						) {
+							detailView.showBottomLoading(false)
+						} else flipEOSPage {
+							detailView.showBottomLoading(false)
+							detailView.showLoading(false)
+						}
+					}
+				}
 			}
 		}
 	}
@@ -76,12 +84,12 @@ class TokenDetailPresenter(
 				if (it.isEmpty()) detailView.showBottomLoading(false)
 			}
 		}
-		if (token.contract.isEOSSeries()) {
-			if (allData.isNull() || allData!!.isEmpty()) {
+		if (token.contract.isEOSSeries() && allData.isNullOrEmpty()) {
+			GlobalScope.launch(Dispatchers.Default) {
 				currentMaxCount = totalCount
 				detailView.getDetailAdapter()?.dataSet?.clear()
-				flipEOSPageData { sortData() }
-			} else sortData()
+				flipEOSPage { sortData() }
+			}
 		} else sortData()
 	}
 
@@ -99,14 +107,12 @@ class TokenDetailPresenter(
 				if (it.isEmpty()) detailView.showBottomLoading(false)
 			}
 		}
-		if (token.contract.isEOSSeries()) {
-			if (allData.isNull() || allData!!.isEmpty()) {
+		if (token.contract.isEOSSeries() && allData.isNullOrEmpty()) {
+			GlobalScope.launch(Dispatchers.Default) {
 				currentMaxCount = totalCount
 				detailView.getDetailAdapter()?.dataSet?.clear()
-				flipEOSPageData {
-					sortData()
-				}
-			} else sortData()
+				flipEOSPage { sortData() }
+			}
 		} else sortData()
 	}
 
@@ -117,47 +123,49 @@ class TokenDetailPresenter(
 				if (it.isEmpty()) detailView.showBottomLoading(false)
 			}
 		}
-		if (token.contract.isEOSSeries()) {
+		if (token.contract.isEOSSeries()) GlobalScope.launch(Dispatchers.Default) {
 			currentMaxCount = totalCount
 			detailView.getDetailAdapter()?.dataSet?.clear()
-			flipEOSPageData { sortData() }
+			flipEOSPage { sortData() }
 		} else sortData()
 	}
 
-	private var hasUpdateData = false
 	@WorkerThread
-	private fun loadDataFromChain() = GlobalScope.launch(Dispatchers.Default) {
-		when {
-			token.contract.isBTCSeries() -> loadLocalData { maxDataIndex ->
-				if (!hasUpdateData) loadBTCSeriesData(token.contract.getChainType(), maxDataIndex)
-				hasUpdateData = true
-			}
-			token.contract.isETHSeries() -> loadLocalData { startBlockNumber ->
-				hasUpdateData = when {
-					token.contract.isETC() -> {
-						if (!hasUpdateData) loadETCChainData(startBlockNumber)
-						true
-					}
-					token.contract.isETH() -> {
-						if (!hasUpdateData) loadETHChainData(startBlockNumber)
-						true
-					}
-					else -> {
-						if (!hasUpdateData) loadERCChainData(startBlockNumber)
-						true
-					}
+	private fun checkNewDataFromChain() = GlobalScope.launch(Dispatchers.Default) {
+
+		with(token.contract) {
+			when {
+				isBTCSeries() -> loadBTCSeriesData(getChainType(), getMaxDataIndex(), true)
+				isETHSeries() -> when {
+					isETC() -> loadETCChainData(getMaxBlockNumber())
+					isETH() -> loadETHChainData(getMaxBlockNumber())
+					isERC20Token() -> loadERCChainData(getMaxBlockNumber())
 				}
+				isEOSSeries() -> getEOSSeriesData()
 			}
-			token.contract.isEOSSeries() -> getEOSSeriesData()
 		}
 	}
 
-	fun loadLocalData(callback: (parameter: Int) -> Unit = {}) {
-		when {
-			token.contract.isETHSeries() -> getETHSeriesData { callback(it) }
-			token.contract.isBTCSeries() -> getBTCSeriesData(token.contract) { callback(it) }
-			token.contract.isEOSSeries() -> getEOSSeriesData()
-		}
+	/**
+	 * EtherScan 的分页逻辑是依靠 BlockNumber 做分页依据的.
+	 * ( 因为 EtherScan 没有对应的 Index 所以很难在本地管理)
+	 * 当本地没有数据的时候其实的 EndIndex 设为一个超大数, 配合 Offset 就可以
+	 * 拉取到最新的 Offset 的数据. 之后用本地的最大 BlockNumber 或 页内最小 BlockNumber
+	 * 来作为拉取最新或拉取历史数据的依据参数.
+	 */
+	private fun getMaxBlockNumber(): Int {
+		return TransactionTable.dao.getMaxBlockNumber(
+			token.contract.getAddress(),
+			token.contract.contract,
+			token.chainID
+		)?.blockNumber ?: 99999999
+	}
+
+	private fun getMaxDataIndex(): Int {
+		return BTCSeriesTransactionTable.dao.getMaxDataIndex(
+			token.contract.getAddress(),
+			token.contract.getChainType().id
+		)?.dataIndex.orZero()
 	}
 
 	private fun getEOSSeriesData() {
@@ -177,7 +185,6 @@ class TokenDetailPresenter(
 					detailView.getDetailAdapter()?.dataSet?.clear()
 					// 初始化
 					loadMore()
-					detailView.showLoading(false)
 				}
 			}
 		} else EOSAPI.getTransactionCount(
@@ -186,67 +193,82 @@ class TokenDetailPresenter(
 			codeName,
 			token.symbol
 		) { count, error ->
-			if (count != null && error.isNone()) {
+			if (count.hasValue() && error.isNone()) {
 				totalCount = count
 				currentMaxCount = count
 				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
 				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
 				detailView.getDetailAdapter()?.dataSet?.clear()
 				launchUI { loadMore() }
+			} else {
+				detailView.showLoading(false)
+				detailView.showBottomLoading(false)
 			}
 		}
 	}
 
 	@WorkerThread
-	private fun getETHSeriesData(callback: (blockNumber: Int) -> Unit) {
+	fun getETHSeriesData() {
 		val address = token.contract.getAddress()
-		val transactionDao =
-			GoldStoneDataBase.database.transactionDao()
-		val transactions =
-			if (token.contract.isETH()) transactionDao.getETHAndAllFee(
-				address,
-				token.contract.contract,
-				token.chainID
-			) else transactionDao.getDataWithFee(
-				address,
-				token.contract.contract,
-				token.chainID
-			)
-		val listModel = transactions.map { TransactionListModel(it) }
-		updatePageBy(listModel)
-		callback(listModel.maxBy { it.blockNumber }?.blockNumber.orZero())
+		val transactionDao = TransactionTable.dao
+		val endBlock = if (detailView.asyncData.isNullOrEmpty()) {
+			getMaxBlockNumber()
+		} else detailView.asyncData?.minBy { it.blockNumber }?.blockNumber!! - 1
+		if (endBlock.hasValue()) {
+			val transactions =
+				if (token.contract.isETH()) transactionDao.getETHAndAllFee(
+					address,
+					token.contract.contract,
+					endBlock,
+					token.chainID
+				) else transactionDao.getDataWithFee(
+					address,
+					token.contract.contract,
+					token.chainID,
+					endBlock
+				)
+			when {
+				transactions.isNotEmpty() -> flipPage(transactions) {
+					detailView.showBottomLoading(false)
+					detailView.showLoading(false)
+				}
+				else -> when {
+					token.contract.isETH() -> loadETHChainData(endBlock)
+					else -> detailView.showBottomLoading(false)
+				}
+			}
+		} else detailView.showBottomLoading(false)
 	}
 
 	@WorkerThread
-	private fun getBTCSeriesData(
-		contract: TokenContract?,
-		callback: (maxDataIndex: Int) -> Unit
-	) {
-		val transactions =
-			BTCSeriesTransactionTable.dao.getTransactions(contract.getAddress(), contract.getChainType().id)
-		if (transactions.isNotEmpty()) {
-			updatePageBy(
-				transactions.asSequence().map {
-					TransactionListModel(it)
-				}.sortedByDescending {
-					it.timeStamp
-				}.toList()
-			)
-		}
-		callback(transactions.maxBy { it.dataIndex }?.dataIndex.orZero())
-	}
-
-	private fun updatePageBy(data: List<TransactionListModel>) {
-		allData = data
-		checkAddressNameInContacts(data) {
-			launchUI {
-				// 防止用户在加载数据过程中切换到别的 `Tab` 这里复位一下
-				detailView.setAllMenu()
-				detailView.updateDataChange(data.toArrayList())
-			}
-			// 显示内存的数据后异步更新数据
-			data.prepareTokenHistoryBalance(token.contract) {
-				it.updateChartAndHeaderData()
+	fun getBTCSeriesData() {
+		val btcSeriesDao = BTCSeriesTransactionTable.dao
+		with(token.contract) {
+			val startDataIndex =
+				if (detailView.asyncData.isNullOrEmpty()) {
+					btcSeriesDao.getMaxDataIndex(
+						getAddress(),
+						getChainType().id
+					)?.dataIndex
+				} else detailView.asyncData?.minBy { it.dataIndex }?.dataIndex!! - 1
+			if (startDataIndex.hasValue()) {
+				val transactions =
+					btcSeriesDao.getDataByRange(
+						getAddress(),
+						getChainType().id,
+						startDataIndex - DataValue.pageCount,
+						startDataIndex
+					)
+				when {
+					transactions.isNotEmpty() -> flipPage(transactions) {
+						detailView.showBottomLoading(false)
+						detailView.showLoading(false)
+					}
+					else -> loadBTCSeriesData(getChainType(), startDataIndex + 1, false)
+				}
+			} else {
+				detailView.showLoading(false)
+				detailView.showBottomLoading(false)
 			}
 		}
 	}
@@ -254,29 +276,29 @@ class TokenDetailPresenter(
 	// 没数据或初始化的时候先生产默认值显示
 	private fun updateEmptyCharData() = GlobalScope.launch(Dispatchers.Default) {
 		listOf<TransactionListModel>()
-			.prepareTokenHistoryBalance(token.contract) {
-				it.updateChartAndHeaderData()
+			.generateBalanceList(token.contract) {
+				it.updateHeaderData(true)
 			}
 	}
 
 	@UiThread
-	fun List<TokenBalanceTable>.updateChartAndHeaderData() {
+	fun List<TokenBalanceTable>.updateHeaderData(isPlaceholderData: Boolean) {
 		val maxChartCount = 7
 		val chartArray = arrayListOf<ChartPoint>()
 		val charCount = if (size > maxChartCount) maxChartCount else size
 		forEach {
 			chartArray.add(
-				ChartPoint(CryptoUtils.dateInDay(it.date), it.balance.toBigDecimal().toFloat())
+				ChartPoint(TimeUtils.formatMdDate(it.date), it.balance.toBigDecimal().toFloat())
 			)
-			if (chartArray.size == charCount) launchUI {
+			if (chartArray.size == charCount) {
 				detailView.setChartData(chartArray.reversed().toArrayList())
-				detailView.showLoading(false)
+				if (!isPlaceholderData) detailView.showLoading(false)
 			}
 		}
 	}
 
 	@WorkerThread
-	fun List<TransactionListModel>.prepareTokenHistoryBalance(
+	fun List<TransactionListModel>.generateBalanceList(
 		contract: TokenContract,
 		callback: (List<TokenBalanceTable>) -> Unit
 	) {
@@ -299,9 +321,39 @@ class TokenDetailPresenter(
 					ownerName
 				)
 			}.let {
-				callback(it)
+				callback(it.sortedByDescending { it.date })
 				TokenBalanceTable.dao.insertAll(it)
 			}
+		}
+	}
+
+	@WorkerThread
+	fun <T : List<*>> flipPage(data: T, callback: () -> Unit) {
+		val newData = try {
+			(data as List<BTCSeriesTransactionTable>).asSequence().map {
+				TransactionListModel(it)
+			}.sortedByDescending {
+				it.dataIndex
+			}.toList()
+		} catch (error: Exception) {
+			try {
+				(data as List<EOSTransactionTable>).map { TransactionListModel(it) }
+			} catch (error: Exception) {
+				(data as List<TransactionTable>).map { TransactionListModel(it) }
+			} catch (error: Exception) {
+				listOf<TransactionListModel>()
+			}
+		}
+
+		checkAddressNameInContacts(newData) {
+			detailView.asyncData?.addAll(newData)
+			detailView.getDetailAdapter()?.dataSet = detailView.asyncData.orEmptyArray()
+			val totalCount = detailView.asyncData?.size.orZero()
+			allData = detailView.asyncData
+			detailView.removeEmptyView()
+			val startPosition = totalCount - data.size.orZero() + 1
+			detailView.notifyDataRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
+			callback()
 		}
 	}
 
@@ -340,6 +392,16 @@ class TokenDetailPresenter(
 				callback(balances)
 			}
 		}.start()
+	}
+
+	private var allContacts: List<ContactTable>? = null
+	@WorkerThread
+	private fun checkAddressNameInContacts(transactions: List<TransactionListModel>, callback: () -> Unit) {
+		if (allContacts.isNull()) allContacts = ContactTable.dao.getAllContacts()
+		if (allContacts?.isNotEmpty() == true) transactions.forEach { transaction ->
+			transaction.addressName = allContacts!!.getContactName(transaction.addressName)
+		}
+		callback()
 	}
 
 	private fun modulusByReceiveStatus(isReceived: Boolean) = if (isReceived) 1 else -1

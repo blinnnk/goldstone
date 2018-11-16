@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.overlay.LoadingView.Companion.addLoadingCircle
 import io.goldstone.blockchain.common.value.ElementID
@@ -32,8 +32,8 @@ class TopMiniLoadingView(context: Context) : RelativeLayout(context) {
 			lparams(circleSize, circleSize)
 			addCorner(circleSize, Spectrum.white)
 			addLoadingCircle(this, 30.uiPX()) {
-				setCenterInParent()
+				centerInParent()
 			}
-		}.setCenterInParent()
+		}.centerInParent()
 	}
 }

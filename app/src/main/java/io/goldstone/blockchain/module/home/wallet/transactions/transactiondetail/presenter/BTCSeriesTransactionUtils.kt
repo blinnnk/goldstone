@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
@@ -25,15 +27,14 @@ object BTCSeriesTransactionUtils {
 		checkLocal: Boolean,
 		@WorkerThread hold: (transition: TransactionSealedModel?, error: RequestError) -> Unit
 	) = GlobalScope.launch(Dispatchers.Default) {
-		val transactionDao =
-			GoldStoneDataBase.database.btcSeriesTransactionDao()
+		val dao = BTCSeriesTransactionTable.dao
 		val transaction =
-			transactionDao.getDataByHash(hash, isReceive, false)
-		if (transaction != null && transaction.blockNumber > 0 && checkLocal)
+			dao.getDataByHash(hash, isReceive, false)
+		if (transaction.isNotNull() && transaction.blockNumber > 0 && checkLocal)
 			hold(TransactionSealedModel(transaction), RequestError.None)
 		else InsightApi.getTransactionByHash(chainID, !chainID.isBCH(), hash, address) { data, error ->
-			if (data != null && error.isNone()) {
-				transactionDao.insert(data)
+			if (data.isNotNull() && error.isNone()) {
+				dao.insert(data)
 				hold(TransactionSealedModel(data), error)
 			} else hold(null, error)
 		}

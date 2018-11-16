@@ -36,14 +36,19 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 	 * 状态的 `Fragment` 中, 在 `presenter.onFragmentShowFromHidden` 方法
 	 * 中重设回退按钮点击状态
 	 */
-	inline fun <reified R : Fragment> popFragmentFrom(viewPagerSize: Int = 0) {
+	inline fun <reified R : Fragment> popFragmentFrom(
+		showCloseButton: Boolean = true,
+		viewPagerSize: Int = 0
+	) {
 		fragment.apply {
 			childFragmentManager.fragments.apply {
 				if (last() is R) removeChildFragment(last())
 				// 组内只有一个 `Fragment` 的时候销毁掉回退按钮
 				if (size == 2 || viewPagerSize > 0) {
 					showBackButton(false) {}
-					showCloseButton(true) { presenter.removeSelfFromActivity() }
+					showCloseButton(showCloseButton) {
+						presenter.removeSelfFromActivity()
+					}
 				}
 
 				when {
@@ -93,7 +98,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 			putAll(bundle)
 		}
 		showBackButton(true) {
-			popFragmentFrom<T>(viewPagerSize)
+			popFragmentFrom<T>(true, viewPagerSize)
 		}
 	}
 

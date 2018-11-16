@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setAlignParentBottom
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
@@ -96,6 +93,6 @@ class AddressesListView(
 		showButton(CommonText.checkAll, PaddingSize.device) {
 			checkAllEvent?.run()
 		}
-		cellLayout.setAlignParentBottom()
+		cellLayout.alignParentBottom()
 	}
 }

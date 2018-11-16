@@ -8,9 +8,9 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInHorizontal
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -46,15 +46,15 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 		marketButton.apply {
 			type = TabItemType.Market
 		}.into(this)
-		
+
 		settingsButton.apply {
 			type = TabItemType.Setting
 			x -= PaddingSize.device
 		}.into(this)
 
 		// 修改位置
-		marketButton.setCenterInHorizontal()
-		settingsButton.setAlignParentRight()
+		marketButton.centerInHorizontal()
+		settingsButton.alignParentRight()
 
 		// 默认选中
 		walletButton.setSelectedStyle()

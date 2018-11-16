@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 import android.content.Context
 import android.view.Gravity
 import android.widget.RelativeLayout
+import com.blinnnk.extension.alignParentBottom
 import com.blinnnk.extension.into
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
@@ -51,14 +51,6 @@ data class PriceHistoryModel(
 		data.lowTotal,
 		symbol
 	)
-
-	constructor(symbol: String) : this(
-		"",
-		"",
-		"",
-		"",
-		symbol
-	)
 }
 
 class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
@@ -84,6 +76,6 @@ class PriceHistoryView(context: Context) : TopBottomLineCell(context) {
 			gravity = Gravity.CENTER_HORIZONTAL
 			dayPrice.into(this)
 			totalPrice.into(this)
-		}.setAlignParentBottom()
+		}.alignParentBottom()
 	}
 }

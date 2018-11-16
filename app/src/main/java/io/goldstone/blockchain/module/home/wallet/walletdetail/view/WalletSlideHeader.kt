@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
+import com.blinnnk.extension.centerInParent
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInParent
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.SliderHeader
@@ -40,7 +40,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		}.into(this)
 
 		notifyButton.apply {
-			setCenterInVertical()
+			centerInVertical()
 		}
 
 		balance.apply {
@@ -62,7 +62,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		notifyButton.setUnTransparent()
 
 		balance.apply {
-			setCenterInParent()
+			centerInParent()
 			visibility = View.VISIBLE
 		}
 

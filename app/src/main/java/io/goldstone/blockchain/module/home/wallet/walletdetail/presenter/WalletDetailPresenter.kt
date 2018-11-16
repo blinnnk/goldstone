@@ -1,23 +1,23 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.FixTextLength
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -65,7 +65,10 @@ class WalletDetailPresenter(
 						detailView.showLoading(false)
 						lockGettingChainModelsThread = false
 						updateUIByData(chainModels)
-						if (error.hasError()) detailView.showError(error)
+						if (error.hasError()) {
+							if (error.isChainError()) detailView.showChainError()
+							else detailView.showError(error)
+						}
 					}
 				} else detailView.showLoading(false)
 			}
@@ -128,7 +131,7 @@ class WalletDetailPresenter(
 					val ownerName = get(index).contract.getAddress(true)
 					MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
 						// 更新数据的余额信息
-						if (balance != null && error.isNone()) {
+						if (balance.isNotNull() && error.isNone()) {
 							MyTokenTable.dao.updateBalanceByContract(
 								balance,
 								get(index).contract.contract,

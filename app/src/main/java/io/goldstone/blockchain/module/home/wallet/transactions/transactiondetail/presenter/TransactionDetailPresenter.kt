@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.suffix
 import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.TinyNumber
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
@@ -90,7 +92,8 @@ class TransactionDetailPresenter(
 
 	private fun updateConfirmationNumber() {
 		when {
-			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
+			data.contract.isBTCSeries() ->
+				updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
 			data.contract.isETHSeries() -> updateETHSeriesConfirmationCount()
 			data.contract.isEOSSeries() -> detailView.showLoading(false)
 		}
@@ -194,7 +197,7 @@ class TransactionDetailPresenter(
 
 	private fun onETHSeriesTransferred(blockNumber: Int, isFailed: Boolean) {
 		// 交易过程中发生错误
-		doAsync {
+		GlobalScope.launch(Dispatchers.Default) {
 			val transactionDao =
 				GoldStoneDataBase.database.transactionDao()
 			if (isFailed) transactionDao.updateErrorStatus(
@@ -232,9 +235,9 @@ class TransactionDetailPresenter(
 		data.hash,
 		data.isReceive,
 		data.isFee,
-		data.contract.getChainURL()
+		data.chainID?.getSpecificChain() ?: data.contract.getChainURL()
 	) { memo, error ->
-		GlobalScope.launch(Dispatchers.Main) {
+		launchUI {
 			with(detailView) {
 				showLoading(false)
 				if (memo != null && error.isNone())
@@ -259,7 +262,7 @@ class TransactionDetailPresenter(
 			else data.date
 		detailView.showTransactionInformation(
 			TransactionDetailModel(data.hash, TransactionText.transactionHash),
-			TransactionDetailModel(minerFee suffix data.symbol, TransactionText.minerFee),
+			TransactionDetailModel(minerFee, TransactionText.minerFee),
 			TransactionDetailModel(blockNumberText, TransactionText.blockNumber),
 			TransactionDetailModel(confirmationsText, TransactionText.confirmations),
 			TransactionDetailModel(dateText, TransactionText.transactionDate)
@@ -270,17 +273,15 @@ class TransactionDetailPresenter(
 		ETHSeriesTransactionUtils.getTransactionByHash(
 			data.hash,
 			data.isReceive,
-			data.chainID?.getChainURL()!!,
+			data.chainID?.getSpecificChain()!!,
 			data.date
 		) { data, error ->
-			if (data != null && error.isNone()) {
-				GlobalScope.launch(Dispatchers.Main) {
-					showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
-					if (data.memo.isEmpty()) getAndShowChainMemo()
-					else {
-						detailView.showMemo(TransactionDetailModel(data.memo, TransactionText.memo))
-						detailView.showLoading(false)
-					}
+			if (data.isNotNull() && error.isNone()) launchUI {
+				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
+				if (data.memo.isEmpty()) getAndShowChainMemo()
+				else {
+					detailView.showMemo(TransactionDetailModel(data.memo, TransactionText.memo))
+					detailView.showLoading(false)
 				}
 			} else detailView.showErrorAlert(error)
 		}
@@ -294,12 +295,10 @@ class TransactionDetailPresenter(
 			if (data.isReceive) data.toAddress else data.fromAddress,
 			checkLocal
 		) { data, error ->
-			if (data != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
-				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
+			if (data.isNotNull() && error.isNone()) launchUI {
+				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee suffix data.symbol)
 			} else detailView.showErrorAlert(error)
-			GlobalScope.launch(Dispatchers.Main) {
-				detailView.showLoading(false)
-			}
+			launchUI { detailView.showLoading(false) }
 		}
 	}
 
@@ -309,7 +308,9 @@ class TransactionDetailPresenter(
 
 	private fun updateETHSeriesConfirmationCount() = getCurrentConfirmationNumber(
 		data.blockNumber,
-		data.contract.getChainURL()
+		// 这里包括更新 Notification 进入的数据, 所以首选使用 Notification Model 给出的数据 ChainID
+		// 因为 Notification 可能来自多个链
+		data.chainID?.getSpecificChain() ?: data.contract.getChainURL()
 	) { confirmationCount, error ->
 		if (confirmationCount != null && error.isNone()) {
 			val transactionDao =

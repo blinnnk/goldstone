@@ -4,20 +4,16 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orZero
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
-import com.blinnnk.util.getParentFragment
-import com.blinnnk.util.replaceFragmentAndSetArgument
+import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
@@ -34,6 +30,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import org.bitcoinj.params.TestNet3Params
 
 /**
  * @date 16/04/2018 1:13 PM
@@ -101,8 +98,13 @@ class ContactInputPresenter(
 					}
 
 					AddressType.BCH -> {
-						bchInput.setText(it.address)
-						bchAddressText = it.address
+						if (SharedValue.isTestEnvironment()) {
+							btcSeriesTestnetInput.setText(it.address)
+							btcTestnetAddressText = it.address
+						} else {
+							bchInput.setText(it.address)
+							bchAddressText = it.address
+						}
 					}
 
 					AddressType.BTCSeriesTest -> {
@@ -111,8 +113,13 @@ class ContactInputPresenter(
 					}
 
 					AddressType.LTC -> {
-						ltcInput.setText(it.address)
-						ltcAddressText = it.address
+						if (SharedValue.isTestEnvironment()) {
+							btcSeriesTestnetInput.setText(it.address)
+							btcTestnetAddressText = it.address
+						} else {
+							ltcInput.setText(it.address)
+							ltcAddressText = it.address
+						}
 					}
 				}
 			}
@@ -170,12 +177,11 @@ class ContactInputPresenter(
 		}
 
 		// 检查是否是合规的测试网比特币私钥地址格式
-		if (
-			btcTestnetAddressText.isNotEmpty() &&
-			!BTCUtils.isValidTestnetAddress(btcTestnetAddressText)
-		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat("BTCTest"))
-			return
+		if (btcTestnetAddressText.isNotEmpty()) {
+			if (!BTCUtils.isValidTestnetAddress(formattedBTCSeriesTestAddress(btcTestnetAddressText))) {
+				fragment.context?.alert(ContactText.wrongAddressFormat("BTCTest"))
+				return
+			}
 		}
 		// 检查是否是合规的主网比特币私钥地址格式
 		if (
@@ -196,14 +202,14 @@ class ContactInputPresenter(
 				eosAccountNameText,
 				eosJungleAccountNameText,
 				btcMainnetAddressText,
-				btcTestnetAddressText,
+				formattedBTCSeriesTestAddress(btcTestnetAddressText),
 				etcAddressText,
 				ltcAddressText,
 				bchAddressText
 			)
 		) {
 			fragment.getParentFragment<ProfileOverlayFragment> {
-				if (!contactAddressModel.isNull()) {
+				if (contactAddressModel.isNotNull()) {
 					// 从账单详情快捷添加地址进入的页面
 					replaceFragmentAndSetArgument<ContactFragment>(ContainerID.content)
 					activity?.apply { SoftKeyboard.hide(this) }
@@ -212,6 +218,12 @@ class ContactInputPresenter(
 				}
 			}
 		}
+	}
+
+	private fun formattedBTCSeriesTestAddress(address: String): String {
+		return if (BCHWalletUtils.isNewCashAddress(address))
+			BCHWalletUtils.formattedToLegacy(address, TestNet3Params.get())
+		else address
 	}
 
 	fun setConfirmButtonStyle(

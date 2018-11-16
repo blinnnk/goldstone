@@ -7,7 +7,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -63,7 +63,7 @@ class RoundShadowIcon(context: Context) : RelativeLayout(context) {
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
 					}
 				addView(pendingIcon)
-				pendingIcon?.setCenterInParent()
+				pendingIcon?.centerInParent()
 				pendingIcon?.z = 2f
 			}
 		}

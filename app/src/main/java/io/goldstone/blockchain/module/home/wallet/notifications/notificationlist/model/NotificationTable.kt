@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.home.wallet.notifications.notificationlis
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.*
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONObject
 

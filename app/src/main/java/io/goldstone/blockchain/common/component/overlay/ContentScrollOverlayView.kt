@@ -9,8 +9,8 @@ import android.widget.*
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInParent
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -73,7 +73,7 @@ open class ContentScrollOverlayView(
 							remove()
 						}
 					}
-					closeButton.setAlignParentRight()
+					closeButton.alignParentRight()
 				}
 
 				if (isAddingRecyclerView) contentLayout = verticalLayout {
@@ -95,7 +95,7 @@ open class ContentScrollOverlayView(
 			addCorner(CornerSize.small.toInt(), Spectrum.white)
 		}
 		container.updateAlphaAnimation(1f)
-		container.setCenterInParent()
+		container.centerInParent()
 	}
 
 	fun setContentPadding(

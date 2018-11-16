@@ -1,12 +1,11 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.setAlignParentRight
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX

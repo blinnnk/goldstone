@@ -10,8 +10,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
@@ -44,7 +44,7 @@ class LoadingView(context: Context) : RelativeLayout(context) {
 			addCorner(CornerSize.default.toInt(), Spectrum.white)
 
 			addLoadingCircle(this) {
-				setCenterInParent()
+				centerInParent()
 				y -= 20.uiPX()
 			}
 

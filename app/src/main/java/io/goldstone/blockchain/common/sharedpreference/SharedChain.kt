@@ -1,10 +1,13 @@
 package io.goldstone.blockchain.common.sharedpreference
 
+import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import io.goldstone.blockchain.common.value.SharesPreference
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -90,5 +93,35 @@ object SharedChain {
 
 	fun updateBTCCurrent(chainInfo: ChainURL) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainInfo.generateObject())
+
+	fun getAllUsedTestnetChains(): List<ChainURL> {
+		val allTestnetChains =
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.allTestnetChains)
+		val jsonArray = JSONArray(allTestnetChains).toJSONObjectList()
+		return jsonArray.map { ChainURL(it) }
+	}
+
+	fun updateAllUsedTestnetChains(chainInfo: List<ChainNodeTable>) {
+		val jsonArray = JSONArray()
+		chainInfo.forEach {
+			jsonArray.put(ChainURL(it).generateObject())
+		}
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.allTestnetChains, jsonArray.toString())
+	}
+
+	fun getAllUsedMainnetChains(): List<ChainURL> {
+		val allTestnetChains =
+			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.allMainnetChains)
+		val jsonArray = JSONArray(allTestnetChains).toJSONObjectList()
+		return jsonArray.map { ChainURL(it) }
+	}
+
+	fun updateAllUsedMainnetChains(chainInfo: List<ChainNodeTable>) {
+		val jsonArray = JSONArray()
+		chainInfo.forEach {
+			jsonArray.put(ChainURL(it).generateObject())
+		}
+		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.allMainnetChains, jsonArray.toString())
+	}
 
 }

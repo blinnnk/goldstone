@@ -5,7 +5,6 @@ import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 /**
@@ -15,7 +14,8 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 fun TokenDetailPresenter.loadETCChainData(blockNumber: Int) {
 	loadDataFromChain(blockNumber) {
-		loadLocalData()
+		if (it.isNone()) getETHSeriesData()
+		else detailView.showLoading(false)
 	}
 }
 
@@ -24,11 +24,10 @@ private fun loadDataFromChain(blockNumber: Int, callback: (error: RequestError) 
 	GoldStoneAPI.getETCTransactions(
 		SharedChain.getETCCurrent().chainID,
 		SharedAddress.getCurrentETC(),
-		"$blockNumber"
+		blockNumber
 	) { newData, error ->
-		if (newData?.isNotEmpty() == true && error.isNone()) {
-			val transactionDao =
-				GoldStoneDataBase.database.transactionDao()
+		if (!newData.isNullOrEmpty() && error.isNone()) {
+			val transactionDao = TransactionTable.dao
 			// 插入普通账单
 			transactionDao.insertAll(newData.map { TransactionTable(it) })
 			// 插入燃气费的账单
@@ -42,6 +41,8 @@ private fun loadDataFromChain(blockNumber: Int, callback: (error: RequestError) 
 				}.toList()
 			)
 			callback(error)
+		} else if (newData?.isEmpty() == true) {
+			callback(RequestError.EmptyResut)
 		} else callback(error)
 	}
 }

@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setCenterInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -75,17 +75,17 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 		setHorizontalPadding()
 		tokenInfo.apply {
 			setBoldTitles()
-			setCenterInVertical()
+			centerInVertical()
 			x += 50.uiPX()
 			y += 2.uiPX()
 		}
 
-		icon.setCenterInVertical()
+		icon.centerInVertical()
 
 		valueInfo.apply {
 			setBoldTitles()
-			setAlignParentRight()
-			setCenterInVertical()
+			alignParentRight()
+			centerInVertical()
 			x -= 30.uiPX()
 			isFloatRight = true
 			y += 2.uiPX()
@@ -104,8 +104,8 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 			statusButton?.apply {
 				setTitle(title)
 				setStyle(style)
-				setCenterInVertical()
-				setAlignParentRight()
+				centerInVertical()
+				alignParentRight()
 				x -= 30.uiPX()
 			}
 		}

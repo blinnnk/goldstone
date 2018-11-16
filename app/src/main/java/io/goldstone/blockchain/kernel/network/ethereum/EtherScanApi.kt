@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.network.ethereum
 
 import com.blinnnk.extension.getRandom
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.ChainExplorer
 
@@ -55,17 +56,13 @@ object EtherScanApi {
 	val transactionDetail: (taxHash: String) -> String = {
 		"${transactionDetailHeader(SharedChain.getCurrentETH().chainID)}$it"
 	}
-	val eosTransactionDetail: (taxHash: String) -> String = {
-		ChainExplorer.eosTransactionDetail(it)
-	}
 
-	val transactions: (address: String, startBlock: String) -> String = { address, startBlock ->
-		"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=txlist&address=$address&startblock=$startBlock&endblock=99999999&sort=asc&apikey=${apikey()}"
+	val offsetTransactions: (address: String, endBlock: Int) -> String = { address, endBlock ->
+		"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=txlist&address=$address&startblock=0&endblock=$endBlock&page=1&offset=${DataValue.pageCount}&sort=desc&apikey=${apikey()}"
 	}
-	val getTokenTransactions: (address: String, startBlock: String) -> String = { address, startBlock ->
+	val getTokenTransactions: (address: String, startBlock: Int) -> String = { address, startBlock ->
 		"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=tokentx&address=$address&startblock=$startBlock&endblock=999999999&sort=asc&apikey=${apikey()}"
 	}
-
 	val getTargetTokenTransactions: (address: String, contract: String, startBlock: String) -> String = { address, contract, startBlock ->
 		"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=tokentx&contractaddress=$contract&address=$address&startblock=$startBlock&endblock=999999999&sort=asc&apikey=${apikey()}"
 	}

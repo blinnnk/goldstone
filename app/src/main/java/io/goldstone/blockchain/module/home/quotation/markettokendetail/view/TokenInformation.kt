@@ -3,9 +3,9 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 import android.content.Context
 import android.view.Gravity
 import android.widget.RelativeLayout
+import com.blinnnk.extension.alignParentBottom
 import com.blinnnk.extension.into
 import com.blinnnk.extension.orZero
-import com.blinnnk.extension.setAlignParentBottom
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
@@ -57,6 +57,6 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 			availableSupply.setTitle(QuotationText.totalSupply)
 			marketCap.setTitle(QuotationText.marketCap)
 			startDate.setTitle(QuotationText.startDate)
-		}.setAlignParentBottom()
+		}.alignParentBottom()
 	}
 }

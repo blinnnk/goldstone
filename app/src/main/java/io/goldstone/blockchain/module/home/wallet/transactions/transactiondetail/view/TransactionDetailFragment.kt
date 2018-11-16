@@ -62,7 +62,6 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 	private lateinit var memoCard: TransactionCardView
 	private lateinit var addressCard: TransactionAddressCardView
 	private lateinit var infoCard: TransactionCardView
-	private lateinit var detailButton: RadiusButton
 	private lateinit var loadingView: TopMiniLoadingView
 
 	private val data by lazy {
@@ -134,17 +133,25 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 	override fun showTransactionInformation(vararg info: TransactionDetailModel) {
 		infoCard.model = info.toList()
 		infoCard.addContent {
-			detailButton = RadiusButton(context)
-			detailButton.apply {
-				setMargins<RelativeLayout.LayoutParams> { topMargin = 20.uiPX() }
-				setTitle(TokenDetailText.checkDetail, false)
-				val explorerIcon = TokenInfoPresenter.getExplorerIcon(data?.contract)
-				setIcon(explorerIcon)
-				onClick {
-					showExplorerWebFragment()
-					preventDuplicateClicks()
+			data?.apply {
+				TokenInfoPresenter.getExplorerInfo(data?.contract).forEachIndexed { index, explorer ->
+					val url =
+						TransactionListModel.generateTransactionURL(
+							hash,
+							contract,
+							EOSAccount(fromAddress).isValid(false)
+						)
+					RadiusButton(context).apply {
+						setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
+						setTitle(TokenDetailText.checkDetail suffix explorer.name, false)
+						setIcon(explorer.icon)
+						onClick {
+							showExplorerWebFragment(url[index])
+							preventDuplicateClicks()
+						}
+					}.into(this@addContent)
 				}
-			}.into(this)
+			}
 		}
 	}
 
@@ -167,18 +174,16 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 		}
 	}
 
-	private fun showExplorerWebFragment() {
+	private fun showExplorerWebFragment(url: String) {
 		data?.apply {
 			val webTitle = when {
 				contract.isETC() -> TransactionText.gasTracker
-				contract.isBTCSeries() || contract.isEOSSeries() -> TransactionText.transactionWeb
+				contract.isBTCSeries() || contract.isEOSSeries() ->
+					TransactionText.transactionWeb
 				else -> TransactionText.etherScanTransaction
 			}
 			val argument = Bundle().apply {
-				putString(
-					ArgumentKey.webViewUrl,
-					TransactionListModel.generateTransactionURL(hash, symbol, EOSAccount(fromAddress).isValid(false))
-				)
+				putString(ArgumentKey.webViewUrl, url)
 				putString(ArgumentKey.webViewName, webTitle)
 			}
 			parentFragment?.apply {

@@ -6,10 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.blinnnk.component.HoneyBaseSwitch
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -101,7 +98,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 			}
 
 			switch.apply {
-				setAlignParentRight()
+				alignParentRight()
 				isChecked = SharedValue.getPincodeDisplayStatus()
 			}.click { switch ->
 				// 点击后根据更新的数据库情况显示开关状态

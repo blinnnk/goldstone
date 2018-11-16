@@ -95,7 +95,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 						scaleY = 1.01f
 						layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 					}.into(this)
-				}.setAlignParentRight()
+				}.alignParentRight()
 				nameInfo.apply {
 					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 					x += 20.uiPX()
@@ -105,12 +105,12 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 					x += 20.uiPX()
 					y -= 15.uiPX()
-					setAlignParentBottom()
+					alignParentBottom()
 				}.into(this)
 				balanceInfo.apply {
 					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
-					setAlignParentBottom()
-					setAlignParentRight()
+					alignParentBottom()
+					alignParentRight()
 					x -= 20.uiPX()
 					y -= 15.uiPX()
 				}.into(this)
@@ -124,6 +124,7 @@ class WalletListCardCell(context: Context) : RelativeLayout(context) {
 			container.preventDuplicateClicks()
 		}
 	}
+
 	companion object {
 		fun getFixedTitleLength(name: String): String {
 			return object : FixTextLength() {

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings
 import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.jump
+import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -11,7 +12,10 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.utils.AddressUtils
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
@@ -150,6 +154,7 @@ class WalletSettingsListPresenter(
 				deleteAllLocalDataByAddress(addresses[index].address, addresses[index].getChainType())
 				completeMark()
 			}
+
 			override fun mergeCallBack() {
 				deleteWalletByWalletID(walletID, password) {
 					if (it.isNone()) WalletTable.deleteCurrentWallet { wallet ->

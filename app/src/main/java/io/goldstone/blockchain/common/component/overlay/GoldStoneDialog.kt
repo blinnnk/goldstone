@@ -13,14 +13,13 @@ import android.widget.TextView
 import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.setCenterInParent
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -73,7 +72,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				bottomPadding = 10.uiPX()
 				lparams(wrapContent, wrapContent)
 			}
-		}.setCenterInParent()
+		}.centerInParent()
 	}
 
 	fun <T> setImage(src: T) {
@@ -181,7 +180,7 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 			}
 		}
 
-		private fun showChainErrorDialog(context: Context) {
+		fun showChainErrorDialog(context: Context) {
 			show(context) {
 				showOnlyConfirmButton(CommonText.gotIt) {
 					remove(context)
@@ -191,12 +190,6 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 					"${SharedChain.getCurrentETH().chainID} ERROR",
 					"there are some errors on this chain, please search more information on internet"
 				)
-			}
-		}
-
-		fun chainError(reason: GoldStoneError, context: Context?) {
-			if (reason.message.equals(ErrorTag.chain, true)) {
-				context?.apply { showChainErrorDialog(this) }
 			}
 		}
 	}

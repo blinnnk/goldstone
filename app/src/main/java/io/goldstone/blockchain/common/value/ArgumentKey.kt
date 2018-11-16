@@ -57,6 +57,8 @@ object SharesPreference {
 	const val eosMainnet = "eosMainnet"
 	const val eosTestnet = "eosTestnet"
 	const val btcCurrentChain = "btcCurrentChain"
+	const val allTestnetChains = "allTestnetChains"
+	const val allMainnetChains = "allMainnetChains"
 	const val currentLanguage = "currentLanguage"
 	const val walletCount = "walletCount"
 	const val maxWalletID = "maxWalletID"

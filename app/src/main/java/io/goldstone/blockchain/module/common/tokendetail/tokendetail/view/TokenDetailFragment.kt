@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
@@ -38,20 +39,34 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	private var bottomLoading: BottomLoadingView? = null
 
 	override fun showLoading(status: Boolean) {
-		if (status) showLoadingView() else removeLoadingView()
+		if (status) showLoadingView() else launchUI {
+			removeLoadingView()
+		}
+	}
+
+	override fun removeEmptyView() {
+		launchUI {
+			super.removeEmptyView()
+		}
 	}
 
 	override fun showBottomLoading(status: Boolean) {
-		if (status) bottomLoading?.show() else bottomLoading?.hide()
+		launchUI {
+			if (status) bottomLoading?.show() else bottomLoading?.hide()
+		}
 		isLoadingData = false
 	}
 
 	override fun setChartData(data: ArrayList<ChartPoint>) {
-		headerView?.setCharData(data)
+		launchUI {
+			headerView?.setCharData(data)
+		}
 	}
 
 	override fun notifyDataRangeChanged(start: Int, count: Int) {
-		recyclerView.adapter?.notifyItemRangeChanged(start, count)
+		launchUI {
+			recyclerView.adapter?.notifyItemRangeChanged(start, count)
+		}
 	}
 
 	override fun updateDataChange(data: ArrayList<TransactionListModel>) {
@@ -104,7 +119,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 
 		footer.into(wrapper)
 		footer.apply {
-			setAlignParentBottom()
+			alignParentBottom()
 			sendButton.onClick {
 				showAddressSelectionFragment()
 			}

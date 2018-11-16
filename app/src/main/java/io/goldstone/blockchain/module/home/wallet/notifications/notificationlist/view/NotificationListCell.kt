@@ -67,8 +67,8 @@ class NotificationListCell(context: Context) : BaseValueCell(context) {
 			x -= 30.uiPX()
 		}.into(this)
 		date.apply {
-			setCenterInVertical()
-			setAlignParentRight()
+			centerInVertical()
+			alignParentRight()
 		}
 		setGrayStyle()
 	}

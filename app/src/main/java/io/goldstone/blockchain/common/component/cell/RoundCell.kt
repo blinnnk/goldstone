@@ -6,16 +6,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.animation.addTouchRippleAnimation
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.into
-import com.blinnnk.extension.setAlignParentRight
-import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -23,7 +22,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class RoundCell(context: Context) : GSCard(context) {
-	
+
 	private val cellHeight = 40.uiPX()
 	private val titleView = TextView(context).apply {
 		textSize = fontSize(14)
@@ -48,7 +47,7 @@ class RoundCell(context: Context) : GSCard(context) {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)
 	}
 	var container: RelativeLayout
-	
+
 	init {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 		setCardBackgroundColor(GrayScale.whiteGray)
@@ -58,12 +57,12 @@ class RoundCell(context: Context) : GSCard(context) {
 			subtitleView.into(this)
 			titleView.into(this)
 			arrowIcon.into(this)
-			arrowIcon.setAlignParentRight()
-			subtitleView.setAlignParentRight()
+			arrowIcon.alignParentRight()
+			subtitleView.alignParentRight()
 			subtitleView.x -= 40.uiPX()
 		}
 	}
-	
+
 	fun setTitles(title: String, subTitle: String) {
 		titleView.text = title
 		subtitleView.text = subTitle

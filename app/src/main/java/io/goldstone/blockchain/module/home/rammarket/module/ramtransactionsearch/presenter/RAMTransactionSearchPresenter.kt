@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -31,9 +32,13 @@ class RAMTransactionSearchPresenter(
 		super.onFragmentCreate()
 		account = fragment.arguments?.getString("account")
 	}
-
+	private var isLoadingData = false
 	override fun onFragmentViewCreated() {
-		super.onFragmentViewCreated()
+		updateData()
+		fragment.addRecyclerLoadMoreListener {
+			if (!isLoadingData) loadMore()
+			isLoadingData = true
+		}
 		fragment.getParentFragment<RAMMarketOverlayFragment> {
 			searchInputListener {
 				if (NetworkUtil.hasNetwork(context))   loadFirstPage(it)
@@ -92,7 +97,13 @@ class RAMTransactionSearchPresenter(
 		super.loadMore()
 		account?.apply {
 			searchByName(this) {
-//				showBottomLoading(false)
+				fragment.recyclerView.apply {
+					val bottomIndex = adapter?.itemCount.orZero() - 1
+					getItemAtAdapterPosition<BottomLoadingView>(bottomIndex) {
+						it.hide()
+					}
+					isLoadingData = false
+				}
 			}
 		}
 	}

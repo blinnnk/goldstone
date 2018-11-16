@@ -2,16 +2,20 @@ package io.goldstone.blockchain.module.home.quotation.quotation.presenter
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.NetworkUtil
+import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.ValueTag
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
@@ -20,7 +24,9 @@ import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAda
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -39,43 +45,49 @@ class QuotationPresenter(
 
 	override fun updateData() {
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
-		QuotationSelectionTable.getAll(false) { selections ->
-			selections.asSequence().map { selection ->
-				var linechart = listOf<ChartPoint>()
-				if (selection.lineChartDay.isNotEmpty())
-					linechart = convertDataToChartData(selection.lineChartDay)
-				// 如果有网络的情况下检查 `LineData` 是否有效
-				if (
-					NetworkUtil.hasNetwork(fragment.context) &&
-					linechart.isNotEmpty() &&
-					!hasCheckedPairDate
-				) {
-					linechart.filterInvalidDatePair(selection.pair)
+		GlobalScope.launch(Dispatchers.Default) {
+			val selections = QuotationSelectionTable.dao.getAll()
+			updateQuotationList(selections)
+		}
+	}
+
+	@WorkerThread
+	fun updateQuotationList(selections: List<QuotationSelectionTable>) {
+		selections.asSequence().map { selection ->
+			var linechart = listOf<ChartPoint>()
+			if (selection.lineChartDay.isNotEmpty())
+				linechart = convertDataToChartData(selection.lineChartDay)
+			// 如果有网络的情况下检查 `LineData` 是否有效
+			if (
+				NetworkUtil.hasNetwork(fragment.context) &&
+				linechart.isNotEmpty() &&
+				!hasCheckedPairDate
+			) {
+				linechart.filterInvalidDatePair(selection.pair)
+			}
+			QuotationModel(
+				selection,
+				ValueTag.emptyPrice,
+				"0",
+				linechart
+			)
+		}.sortedByDescending {
+			it.orderID
+		}.toList().let { quotations ->
+			if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
+				launchUI {
+					updateData()
 				}
-				QuotationModel(
-					selection,
-					ValueTag.emptyPrice,
-					"0",
-					linechart
-				)
-			}.sortedByDescending {
-				it.orderID
-			}.toList().let { quotations ->
-				if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
-					fragment.context?.runOnUiThread {
-						updateData()
-					}
-					hasCheckedPairDate = true
-				}
-				fragment.context?.runOnUiThread {
-					// 更新 `UI`
-					diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
-					// 设定 `Socket` 并执行
-					if (currentSocket.isNull()) setSocket {
-						hasInitSocket = true
-						currentSocket?.runSocket()
-					} else subscribeSocket()
-				}
+				hasCheckedPairDate = true
+			}
+			launchUI {
+				// 更新 `UI`
+				diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
+				// 设定 `Socket` 并执行
+				if (currentSocket.isNull()) setSocket {
+					hasInitSocket = true
+					currentSocket?.runSocket()
+				} else subscribeSocket()
 			}
 		}
 	}
@@ -109,17 +121,15 @@ class QuotationPresenter(
 		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
 	}
 
-	private fun updateInvalidDatePair(
-		pairList: JsonArray,
-		@WorkerThread callback: () -> Unit
-	) {
+	private fun updateInvalidDatePair(pairList: JsonArray, @WorkerThread callback: () -> Unit) {
 		GoldStoneAPI.getCurrencyLineChartData(pairList) { newChart, error ->
-			if (newChart != null && newChart.isNotEmpty() && error.isNone()) {
+			if (!newChart.isNullOrEmpty() && error.isNone()) {
 				// 更新数据库的数据
-				val quotationDao =
-					GoldStoneDataBase.database.quotationSelectionDao()
 				newChart.forEachIndexed { index, model ->
-					quotationDao.updateDayLineChartByPair(pairList.get(index).asString, model.pointList.toString())
+					QuotationSelectionTable.dao.updateDayLineChartByPair(
+						pairList.get(index).asString,
+						model.pointList.toString()
+					)
 				}
 				callback()
 			}
@@ -158,7 +168,7 @@ class QuotationPresenter(
 				this.isDisconnected = isDisconnected
 			}
 		} then {
-			if (!it.isNull()) recyclerView.adapter?.notifyDataSetChanged()
+			if (it.isNotNull()) recyclerView.adapter?.notifyDataSetChanged()
 		}
 	}
 

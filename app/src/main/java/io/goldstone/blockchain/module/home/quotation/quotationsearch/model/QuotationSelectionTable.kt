@@ -4,9 +4,9 @@ import android.arch.persistence.room.*
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.annotations.SerializedName
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.Dispatchers
@@ -88,17 +88,6 @@ data class QuotationSelectionTable(
 			val currentID = quotationDao.getMaxOrderIDTable()?.orderID
 			val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
 			quotationDao.insert(table.apply { orderID = newOrderID })
-		}
-
-		fun getAll(
-			isUIThread: Boolean = true,
-			hold: (List<QuotationSelectionTable>
-			) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
-			val allQuotation =
-				GoldStoneDataBase.database.quotationSelectionDao().getAll()
-			if (isUIThread) withContext(Dispatchers.Main) {
-				hold(allQuotation)
-			} else hold(allQuotation)
 		}
 
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
@@ -187,6 +176,9 @@ interface QuotationSelectionDao {
 
 	@Delete
 	fun delete(table: QuotationSelectionTable)
+
+	@Query("DELETE FROM quotationSelection WHERE pair = :pair")
+	fun deleteBy(pair: String)
 
 	@Delete
 	fun deleteAll(tables: List<QuotationSelectionTable>)

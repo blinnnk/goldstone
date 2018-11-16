@@ -4,8 +4,8 @@ import android.arch.persistence.room.*
 import android.support.annotation.UiThread
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.common.utils.load
-import io.goldstone.blockchain.common.utils.then
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.jetbrains.anko.doAsync
@@ -44,6 +44,8 @@ data class SupportCurrencyTable(
 	)
 
 	companion object {
+
+		@JvmField val dao = GoldStoneDataBase.database.currencyDao()
 
 		fun updateUsedStatus(symbol: String, @UiThread callback: (rate: Double?) -> Unit) {
 			doAsync {

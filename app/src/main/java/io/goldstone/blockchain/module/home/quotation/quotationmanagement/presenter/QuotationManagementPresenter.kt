@@ -5,12 +5,15 @@ import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -19,6 +22,13 @@ import org.jetbrains.anko.doAsync
 class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
+
+	private var mainActivity: MainActivity? = null
+
+	override fun onFragmentAttach() {
+		super.onFragmentAttach()
+		mainActivity = fragment.getMainActivity()
+	}
 
 	override fun updateData() {
 		updateSelectionsData()
@@ -30,10 +40,13 @@ class QuotationManagementPresenter(
 	}
 
 	private fun updateSelectionsData() {
-		QuotationSelectionTable.getAll { selections ->
+		GlobalScope.launch(Dispatchers.Default) {
+			val selections = QuotationSelectionTable.dao.getAll()
 			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
-				if (fragment.asyncData.isNull()) fragment.asyncData = orderedData
-				else diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+				launchUI {
+					if (fragment.asyncData.isNull()) fragment.asyncData = orderedData
+					else diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
+				}
 			}
 		}
 	}
@@ -42,17 +55,21 @@ class QuotationManagementPresenter(
 		fragment.updateSelectionOrderID()
 	}
 
-	override fun onFragmentDetach() {
-		super.onFragmentDetach()
-		checkAndUpdateQuotationData()
-		fragment.getMainActivity()?.getQuotationFragment()?.presenter?.updateData()
+	override fun onFragmentDestroy() {
+		super.onFragmentDestroy()
+		checkAndUpdateQuotationData {
+			mainActivity?.getQuotationFragment()?.presenter
+				?.updateQuotationList(QuotationSelectionTable.dao.getAll())
+		}
 	}
 
-	fun checkAndUpdateQuotationData() {
-		doAsync {
+
+	fun checkAndUpdateQuotationData(callback: () -> Unit = {}) {
+		GlobalScope.launch(Dispatchers.Default) {
 			fragment.asyncData?.filter { !it.isSelecting }?.let {
-				GoldStoneDataBase.database.quotationSelectionDao().deleteAll(it)
+				QuotationSelectionTable.dao.deleteAll(it)
 			}
+			callback()
 		}
 	}
 
