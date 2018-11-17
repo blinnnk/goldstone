@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -75,7 +76,7 @@ class TokenAssetPresenter(
 
 	private fun EOSAccountTable.updateUIValue() {
 		assetView.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
-		if (refundInfo == null) assetView.setEOSRefunds("0.0")
+		if (refundInfo.isNull()) assetView.setEOSRefunds("0.0")
 		else refundInfo.getRefundDescription().let { assetView.setEOSRefunds(it) }
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used

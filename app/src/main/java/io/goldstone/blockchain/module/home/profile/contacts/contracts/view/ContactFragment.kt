@@ -5,7 +5,6 @@ import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
@@ -44,11 +43,10 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		asyncData: ArrayList<ContactTable>?
 	) {
 		val isFromTransactionDetail =
-			getParentFragment<ProfileOverlayFragment>()?.contactAddressModel.isNull()
+			(parentFragment as? ProfileOverlayFragment)?.contactAddressModel.isNull()
 		recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray()) {
 			if (isFromTransactionDetail) {
 				presenter.shoEditContactFragment(it.id)
-			} else {
 				if (chainType != null) {
 					selectedAddress = it.defaultAddress
 					if (selectedAddress?.isEmpty() == true) context.alert(AccountError.InvalidAddress.message)

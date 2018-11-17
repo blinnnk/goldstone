@@ -10,9 +10,8 @@ import android.content.Intent
 import android.media.RingtoneManager
 import android.os.PowerManager
 import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import android.support.v4.app.NotificationCompat
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.getStringFromSharedPreferences
@@ -37,7 +36,6 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneCode
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.AddressCommissionModel
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
 
 @Suppress("IMPLICIT_CAST_TO_ANY")
@@ -165,8 +163,11 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 					GoldStoneAPI.registerWalletAddresses(
 						AesCrypto.encrypt("$convertedData").orEmpty()
 					) { result, error ->
-						if (!result.isNullOrEmpty() && error.isNone() && !isRemove)
-							updateRegisterAddressesStatus(result)
+						if (!result.isNullOrEmpty() && error.isNone() && !isRemove) {
+							GoldStoneCode.isSuccess(result.toJsonObject()["code"]) { isSucceed ->
+								AppConfigTable.dao.updateHasRegisteredAddress(isSucceed)
+							}
+						}
 					}
 				} else getCurrentBip44Addresses().forEach {
 					registerSingleAddress(AddressCommissionModel(it.address, it.chainType, option, id))
@@ -227,21 +228,10 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			}
 			return "{${content.substringBeforeLast(",")}}"
 		}
-
-		private fun updateRegisterAddressesStatus(code: String) {
-			GoldStoneCode.isSuccess(code.toJsonObject()["code"]) { isSucceed ->
-				isSucceed isTrue {
-					AppConfigTable.updateRegisterAddressesStatus(true)
-					LogUtil.debug("XinGePushReceiver", "code: $code")
-				} otherwise {
-					// 服务器返回错误的时候标记注册失败
-					AppConfigTable.updateRegisterAddressesStatus(false)
-				}
-			}
-		}
 	}
 }
 
+@WorkerThread
 @SuppressLint("HardwareIds")
 fun Context.registerDeviceForPush() {
 	// 为测试方便设置，发布上线时设置为 `false`
@@ -262,38 +252,36 @@ fun Context.registerDeviceForPush() {
 			}
 		}
 
-		override fun onFail(
-			data: Any?, errCode: Int, message: String?
-		) {
+		override fun onFail(data: Any?, errCode: Int, message: String?) {
 			LogUtil.debug("registerDeviceForPush", message.orEmpty())
 		}
 	})
 }
 
+@WorkerThread
 @SuppressLint("HardwareIds")
 fun Context.registerDevice(token: String, @UiThread callback: () -> Unit) {
 	// 把 `Token` 记录在本地数据库
-	AppConfigTable.updatePushToken(token)
+	AppConfigTable.dao.updatePushToken(token)
 	// 没有注册过就开始注册
 	val isChina = if (CountryCode.currentCountry == CountryCode.china.country) TinyNumber.True.value
 	else TinyNumber.False.value
-	AppConfigTable.getAppConfig(Dispatchers.Default) { config ->
-		val languageCode = config?.language ?: return@getAppConfig
-		GoldStoneAPI.registerDevice(
-			HoneyLanguage.getLanguageSymbol(languageCode).toLowerCase(),
-			token,
-			SharedWallet.getGoldStoneID(),
-			isChina,
-			0,
-			CountryCode.currentCountry
-		) { result, error ->
-			// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-			if (!result.isNullOrEmpty() && error.isNone()) GoldStoneCode.isSuccess(
-				JSONObject(result).safeGet("code")
-			) { isSuccessful ->
-				if (isSuccessful) {
-					saveDataToSharedPreferences(SharesPreference.registerPush, token)
-					launchUI { callback() }
+	val languageCode = SharedWallet.getCurrentLanguageCode()
+	GoldStoneAPI.registerDevice(
+		HoneyLanguage.getLanguageSymbol(languageCode).toLowerCase(),
+		token,
+		SharedWallet.getGoldStoneID(),
+		isChina,
+		0,
+		CountryCode.currentCountry
+	) { result, error ->
+		// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
+		val code = JSONObject(result).safeGet("code")
+		if (!result.isNullOrEmpty() && error.isNone()) GoldStoneCode.isSuccess(code) { isSuccessful ->
+			if (isSuccessful) {
+				saveDataToSharedPreferences(SharesPreference.registerPush, token)
+				launchUI {
+					callback()
 				}
 			}
 		}

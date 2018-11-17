@@ -1,14 +1,18 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.hasValue
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
@@ -48,11 +52,9 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 				token.contract
 			) { data, error ->
 				if (data?.isNotEmpty() == true && error.isNone()) {
-					data.mapIndexed { index, eosTransactionTable ->
+					dao.insertAll(data.mapIndexed { index, eosTransactionTable ->
 						eosTransactionTable.apply { dataIndex = currentMaxCount.orZero() - (index + 1) }
-					}.let {
-						dao.insertAll(it)
-					}
+					})
 					flipPage(data.plus(localData), callback)
 					currentMaxCount = currentMaxCount.orZero() - pageSize
 				} else {
@@ -100,6 +102,45 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 				flipPage(localData, callback)
 				currentMaxCount = localData.minBy { it.dataIndex }?.dataIndex.orZero() - 1
 			}
+		}
+	}
+}
+
+fun TokenDetailPresenter.getEOSSeriesData() {
+	// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
+	val codeName = token.contract.contract
+	if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+		EOSTransactionTable.getMaxDataIndexTable(
+			SharedAddress.getCurrentEOSAccount(),
+			token.contract,
+			SharedChain.getEOSCurrent().chainID
+		) {
+			launchUI {
+				totalCount = it?.dataIndex
+				currentMaxCount = it?.dataIndex
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				detailView.getDetailAdapter()?.dataSet?.clear()
+				// 初始化
+				loadMore()
+			}
+		}
+	} else EOSAPI.getTransactionCount(
+		SharedChain.getEOSCurrent().chainID,
+		SharedAddress.getCurrentEOSAccount(),
+		codeName,
+		token.symbol
+	) { count, error ->
+		if (count.hasValue() && error.isNone()) {
+			totalCount = count
+			currentMaxCount = count
+			// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+			// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+			detailView.getDetailAdapter()?.dataSet?.clear()
+			launchUI { loadMore() }
+		} else {
+			detailView.showLoading(false)
+			detailView.showBottomLoading(false)
 		}
 	}
 }

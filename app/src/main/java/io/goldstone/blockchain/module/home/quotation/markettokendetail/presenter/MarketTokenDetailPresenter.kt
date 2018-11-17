@@ -293,7 +293,10 @@ class MarketTokenDetailPresenter(
 
 	private fun getCurrencyInfoFromDatabase(
 		info: QuotationModel,
-		@UiThread hold: (tokenData: TokenInformationModel, priceData: PriceHistoryModel) -> Unit
+		@UiThread hold: (
+			tokenData: TokenInformationModel,
+			priceData: PriceHistoryModel
+		) -> Unit
 	) {
 		GlobalScope.launch(Dispatchers.Default) {
 			val default =

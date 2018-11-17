@@ -2,7 +2,7 @@ package io.goldstone.blockchain.crypto.multichain
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.util.ConcurrentAsyncCombine
+import com.blinnnk.util.ConcurrentJobs
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
 import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
@@ -48,11 +48,10 @@ object GenerateMultiChainWallet {
 		@WorkerThread hold: (multiChainAddresses: ChainAddresses) -> Unit
 	) {
 		val addresses = ChainAddresses()
-		object : ConcurrentAsyncCombine() {
+		object : ConcurrentJobs() {
 			val paths = DefaultPath.allPaths()
 			override var asyncCount: Int = paths.size
-			override val completeInUIThread: Boolean = false
-			override fun doChildTask(index: Int) {
+			override fun doChildJob(index: Int) {
 				context.apply {
 					when (paths[index]) {
 						// Ethereum

@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.home.profile.pincode.presenter
 
 import android.widget.EditText
-import com.blinnnk.component.HoneyBaseSwitch
+import android.widget.Switch
+import com.blinnnk.extension.isNull
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PincodeText
@@ -22,7 +25,7 @@ class PinCodeEditorPresenter(
 
 	fun setPinCodeDisplayStatus(status: Boolean, callback: (isShow: Boolean) -> Unit) {
 		AppConfigTable.getAppConfig(Dispatchers.Main) { config ->
-			if (config?.pincode == null) {
+			if (config?.pincode.isNull()) {
 				fragment.context?.alert(PincodeText.turnOnAttention)
 				callback(false)
 			} else AppConfigTable.setShowPinCodeStatus(status) {
@@ -35,7 +38,7 @@ class PinCodeEditorPresenter(
 	fun resetPinCode(
 		newPinCode: EditText,
 		repeatPinCode: EditText,
-		switch: HoneyBaseSwitch
+		switch: Switch
 	) {
 		if (newPinCode.text.isEmpty()) {
 			fragment.context?.alert(PincodeText.countAlert)
@@ -51,8 +54,9 @@ class PinCodeEditorPresenter(
 			fragment.context?.alert(PincodeText.verifyAlert)
 			return
 		}
-
-		AppConfigTable.updatePinCode(newPinCode.text.toString().toInt()) {
+		load {
+			AppConfigTable.dao.updatePincode(newPinCode.text.toString().toInt())
+		} then {
 			fragment.context?.alert(CommonText.succeed)
 			setPinCodeDisplayStatus(true) {
 				switch.isChecked = it

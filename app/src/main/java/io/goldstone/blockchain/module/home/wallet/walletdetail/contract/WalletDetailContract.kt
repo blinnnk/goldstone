@@ -12,9 +12,8 @@ import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetai
  */
 interface WalletDetailContract {
 	interface GSView : GoldStoneView<GoldStonePresenter> {
-		var  asyncData: ArrayList<WalletDetailCellModel>?
+		var asyncData: ArrayList<WalletDetailCellModel>?
 		fun showLoading(status: Boolean)
-		fun showError(error: Throwable)
 		fun setUnreadCount(count: Int)
 		fun showSelectionDashboard(tokens: List<WalletDetailCellModel>, isAddress: Boolean)
 		fun setHeaderData(model: WalletDetailHeaderModel)

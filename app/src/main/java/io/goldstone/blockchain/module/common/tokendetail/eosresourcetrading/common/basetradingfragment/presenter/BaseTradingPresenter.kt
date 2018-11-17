@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.com
 import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
@@ -10,7 +11,6 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -21,7 +21,6 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
-import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -44,7 +43,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.support.v4.toast
 import java.math.BigInteger
 
 /**
@@ -55,13 +53,13 @@ open class BaseTradingPresenter(
 	override val fragment: BaseTradingFragment
 ) : BasePresenter<BaseTradingFragment>() {
 
-	open fun gainConfirmEvent(callback: (GoldStoneError) -> Unit) {
+	open fun gainConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
 		if (fragment.tradingType == TradingType.RAM)
 			fragment.tradingRam(StakeType.BuyRam, callback)
 		else fragment.stakeResource(fragment.tradingType, StakeType.Delegate, callback)
 	}
 
-	open fun refundOrSellConfirmEvent(callback: (GoldStoneError) -> Unit) {
+	open fun refundOrSellConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
 		if (fragment.tradingType == TradingType.RAM)
 			fragment.tradingRam(StakeType.SellRam, callback)
 		else fragment.stakeResource(fragment.tradingType, StakeType.Refund, callback)
@@ -108,7 +106,7 @@ open class BaseTradingPresenter(
 
 	private fun BaseTradingFragment.tradingRam(
 		stakeType: StakeType,
-		@UiThread callback: (GoldStoneError) -> Unit
+		@UiThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
 	) {
 		val fromAccount = SharedAddress.getCurrentEOSAccount()
 		val chainID = SharedChain.getEOSCurrent().chainID
@@ -122,45 +120,27 @@ open class BaseTradingPresenter(
 			TokenContract.EOS,
 			stakeType.isSellRam()
 		) { privateKey, error ->
-			/** `Buy Ram` 是可以按照 `EOS Count` 来进行购买的, 但是 `Sell` 只能按照 `Byte` 进行销售 */
-			fun completeEvent(response: EOSResponse) {
-				// 显示成功的 `Dialog`
-				fragment.getParentContainer()?.apply { response.showDialog(this) }
-				// 清空输入框里面的值
-				fragment.clearInputValue()
-				// 成功提示
-				fragment.toast(CommonText.succeed)
-				// 更新数据库数据并且更新界面的数据
-				fragment.presenter.updateLocalDataAndUI()
-				callback(error)
-			}
-			if (error.isNone() && !privateKey.isNull()) {
+			if (error.isNone() && privateKey.isNotNull()) {
 				if (stakeType.isBuyRam()) EOSBuyRamTransaction(
 					chainID,
 					fromAccount.accountName,
 					toAccount.accountName,
 					tradingCount.toEOSUnit(),
 					ExpirationType.FiveMinutes
-				).send(privateKey) { response, responseError ->
-					if (!response.isNull() && error.isNone()) completeEvent(response)
-					else callback(responseError)
-				} else EOSSellRamTransaction(
+				).send(privateKey, callback) else EOSSellRamTransaction(
 					chainID,
 					fromAccount.accountName,
 					BigInteger.valueOf(tradingCount.toLong()),
 					ExpirationType.FiveMinutes
-				).send(privateKey) { response, ramError ->
-					if (!response.isNull() && ramError.isNone()) completeEvent(response)
-					else callback(ramError)
-				}
-			} else callback(error)
+				).send(privateKey, callback)
+			} else callback(null, error)
 		}
 	}
 
 	private fun BaseTradingFragment.stakeResource(
 		tradingType: TradingType,
 		stakeType: StakeType,
-		callback: (GoldStoneError) -> Unit
+		@WorkerThread callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		val fromAccount = SharedAddress.getCurrentEOSAccount()
 		val toAccount = getInputValue(stakeType).first
@@ -172,7 +152,7 @@ open class BaseTradingPresenter(
 			transferCount,
 			TokenContract.EOS
 		) { privateKey, error ->
-			if (error.isNone() && !privateKey.isNull()) {
+			if (error.isNone() && privateKey.isNotNull()) {
 				EOSBandWidthTransaction(
 					SharedChain.getEOSCurrent().chainID,
 					EOSAuthorization(fromAccount.accountName, EOSActor.Active),
@@ -182,26 +162,15 @@ open class BaseTradingPresenter(
 					stakeType,
 					fragment.isSelectedTransfer(stakeType),
 					ExpirationType.FiveMinutes
-				).send(privateKey) { response, responseError ->
-					// 显示成功的 `Dialog`
-					if (!response.isNull() && responseError.isNone())
-						fragment.getParentContainer()?.apply { response.showDialog(this) }
-					// 清空输入框里面的值
-					fragment.clearInputValue()
-					// 更新数据库数据并且更新界面的数据
-					fragment.presenter.updateLocalDataAndUI()
-					callback(responseError)
-				}
-			} else callback(error)
+				).send(privateKey, callback)
+			} else callback(null, error)
 		}
 	}
 
-	private fun updateLocalDataAndUI() {
+	fun updateLocalDataAndUI() {
 		val currentAccount = SharedAddress.getCurrentEOSAccount()
-		EOSAPI.getAccountInfo(
-			currentAccount
-		) { newData, error ->
-			if (newData != null && error.isNone()) {
+		EOSAPI.getAccountInfo(currentAccount) { newData, error ->
+			if (newData.isNotNull() && error.isNone()) {
 				// 新数据标记为老数据的 `主键` 值
 				GoldStoneDataBase.database.eosAccountDao().update(newData)
 				fragment.setUsageValue()

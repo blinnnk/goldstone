@@ -1,15 +1,11 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
-import android.support.annotation.UiThread
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 
 /**
@@ -45,18 +41,8 @@ data class SupportCurrencyTable(
 
 	companion object {
 
-		@JvmField val dao = GoldStoneDataBase.database.currencyDao()
-
-		fun updateUsedStatus(symbol: String, @UiThread callback: (rate: Double?) -> Unit) {
-			doAsync {
-				val currencyDao =
-					GoldStoneDataBase.database.currencyDao()
-				currencyDao.setCurrentCurrencyUnused()
-				currencyDao.setCurrencyInUse(symbol)
-				val rate = currencyDao.getCurrencyBySymbol(symbol)?.rate
-				GoldStoneAPI.context.runOnUiThread { callback(rate) }
-			}
-		}
+		@JvmField
+		val dao = GoldStoneDataBase.database.currencyDao()
 
 		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
 			load {

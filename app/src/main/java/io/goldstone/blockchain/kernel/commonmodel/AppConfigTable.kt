@@ -16,9 +16,6 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.uiThread
 
 /**
  * @date 23/04/2018 2:42 PM
@@ -45,7 +42,10 @@ data class AppConfigTable(
 	var terms: String = "",
 	var defaultCoinListMD5: String,
 	var exchangeListMD5: String,
-	var nodeListMD5: String
+	var nodeListMD5: String,
+	var termMD5: String,
+	var configMD5: String,
+	var shareContentMD5: String
 ) {
 
 	companion object {
@@ -54,53 +54,15 @@ data class AppConfigTable(
 
 		fun getAppConfig(thread: CoroutineDispatcher, hold: (AppConfigTable?) -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
-				val config = GoldStoneDataBase.database.appConfigDao().getAppConfig()
-				withContext(thread) { hold(config) }
-			}
-		}
-
-		fun updatePinCode(newPinCode: Int, callback: () -> Unit) = doAsync {
-			GoldStoneDataBase.database.appConfigDao().updatePincode(newPinCode)
-			uiThread { callback() }
-		}
-
-		fun updatePushToken(token: String) = doAsync {
-			GoldStoneDataBase.database.appConfigDao().updatePushToken(token)
-		}
-
-		fun updateRegisterAddressesStatus(isRegistered: Boolean, callback: () -> Unit = {}) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateHasRegisteredAddress(isRegistered)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
+				val config = dao.getAppConfig()
+				withContext(thread) {
+					hold(config)
 				}
 			}
 		}
 
 		fun setShowPinCodeStatus(status: Boolean, callback: (status: Boolean) -> Unit) {
-			load {
-				val configDao = GoldStoneDataBase.database.appConfigDao()
-				configDao.updateShowPincodeStatus(status)
-			} then {
-				// 更新成功
-				callback(status)
-			}
-		}
-
-		fun updateLanguage(code: Int, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateLanguageCode(code)
-				GoldStoneAPI.context.runOnUiThread {
-					callback()
-				}
-			}
-		}
-
-		fun updateCurrency(code: String, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.appConfigDao().updateCurrency(code)
-				uiThread { callback() }
-			}
+			load { dao.updateShowPincodeStatus(status) } then { callback(status) }
 		}
 
 		@SuppressLint("HardwareIds")
@@ -115,9 +77,12 @@ data class AppConfigTable(
 				isMainnet = true,
 				defaultCoinListMD5 = "",
 				exchangeListMD5 = "",
-				nodeListMD5 = ""
+				nodeListMD5 = "",
+				termMD5 = "",
+				configMD5 = "",
+				shareContentMD5 = ""
 			)
-			GoldStoneDataBase.database.appConfigDao().insert(config)
+			dao.insert(config)
 			callback(config)
 		}
 
@@ -125,13 +90,13 @@ data class AppConfigTable(
 			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(terms).let { localTerms ->
 				localTerms.find {
 					it.safeGet("language").equals(CountryCode.currentLanguageSymbol, true)
-				}.let { it ->
-					return if (it.isNull()) {
+				}.let { data ->
+					return if (data.isNull()) {
 						localTerms.find {
 							it.safeGet("language").equals(HoneyLanguage.English.symbol, true)
 						}?.safeGet("terms").orEmpty()
 					} else {
-						return it.safeGet("terms")
+						return data.safeGet("terms")
 					}
 				}
 			}
@@ -148,8 +113,8 @@ interface AppConfigDao {
 	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
 	fun updateCurrency(newCurrencyCode: String)
 
-	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5  WHERE id = 1")
-	fun updateMD5Info(defaultCoinListMD5: String, nodeListMD5: String, exchangeListMD5: String)
+	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5 WHERE id = 1")
+	fun updateMD5Info(defaultCoinListMD5: String, nodeListMD5: String, exchangeListMD5: String, termMD5: String, configMD5: String, shareContentMD5: String)
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
 	fun updatePincode(pinCode: Int)

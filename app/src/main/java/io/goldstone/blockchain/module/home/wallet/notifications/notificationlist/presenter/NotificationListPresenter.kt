@@ -57,7 +57,7 @@ class NotificationListPresenter(
 
 	private var hasLoadFromServer = false
 	private fun getDataFromDatabase() {
-		fragment.showLoadingView()
+		fragment.showLoadingView(true)
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTime }?.createTime ?: 0
 			if (fragment.asyncData.isNull())
@@ -65,7 +65,7 @@ class NotificationListPresenter(
 			else diffAndUpdateSingleCellAdapterData<NotificationListAdapter>(localData)
 			if (NetworkUtil.hasNetworkWithAlert(fragment.context) && !hasLoadFromServer)
 				updateDataFromServer(latestTime)
-			else fragment.removeLoadingView()
+			else fragment.showLoadingView(false)
 		}
 	}
 
@@ -76,7 +76,9 @@ class NotificationListPresenter(
 				if (notificationList.isNotEmpty())
 					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)
 				launchUI { getDataFromDatabase() }
-			} else launchUI { fragment.removeLoadingView() }
+			} else launchUI {
+				fragment.showLoadingView(false)
+			}
 		}
 	}
 }

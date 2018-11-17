@@ -148,7 +148,7 @@ class QuotationSearchPresenter(
 	}
 
 	private fun searchTokenBy(symbol: String) {
-		fragment.showLoadingView()
+		fragment.showLoadingView(true)
 		// 拉取搜索列表
 		GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
 			if (!searchList.isNullOrEmpty() && error.isNone()) {
@@ -166,7 +166,7 @@ class QuotationSearchPresenter(
 				}
 			} else launchUI {
 				if (error.hasError()) fragment.safeShowError(error)
-				fragment.removeLoadingView()
+				fragment.showLoadingView(false)
 			}
 		}
 	}
@@ -175,7 +175,7 @@ class QuotationSearchPresenter(
 		val data =
 			searchList.map { QuotationSelectionTable(it, "") }
 		launchUI {
-			removeLoadingView()
+			showLoadingView(false)
 			diffAndUpdateSingleCellAdapterData<QuotationSearchAdapter>(data.toArrayList())
 		}
 	}

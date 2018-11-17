@@ -182,12 +182,9 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getTerms(
-		md5: String,
-		@WorkerThread hold: (term: String?, error: RequestError) -> Unit
-	) {
+	fun getTerms(@WorkerThread hold: (term: String?, error: RequestError) -> Unit) {
 		requestData<String>(
-			APIPath.terms(APIPath.currentUrl) + md5,
+			APIPath.terms(APIPath.currentUrl),
 			"",
 			true,
 			isEncrypt = true
@@ -342,19 +339,16 @@ object GoldStoneAPI {
 		pairList: JsonArray,
 		@WorkerThread hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest<QuotationSelectionLineChartModel>(
+		RequisitionUtil.postRequest(
 			RequestBody.create(
 				requestContentType,
 				ParameterUtil.prepare(true, Pair("pair_list", pairList))
 			),
 			"data_list",
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-			isEncrypt = true
-		) { result, error ->
-			if (!result.isNullOrEmpty() && error.isNone()) {
-				hold(result, error)
-			} else hold(null, error)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
 	fun registerWalletAddresses(

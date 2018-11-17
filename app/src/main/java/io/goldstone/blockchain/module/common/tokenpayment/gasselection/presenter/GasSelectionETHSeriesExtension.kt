@@ -38,10 +38,9 @@ import java.math.BigInteger
  * @date 2018/7/25 4:02 PM
  * @author KaySaith
  */
-@WorkerThread
 fun GasSelectionPresenter.checkBalanceIsValid(
 	token: WalletDetailCellModel?,
-	hold: (isEnough: Boolean, error: GoldStoneError) -> Unit
+	@WorkerThread hold: (isEnough: Boolean, error: GoldStoneError) -> Unit
 ) {
 	when {
 		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用

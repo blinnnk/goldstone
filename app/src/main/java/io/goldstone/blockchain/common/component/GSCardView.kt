@@ -5,6 +5,7 @@ import android.support.v7.widget.CardView
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.ShadowSize
+import io.goldstone.blockchain.common.value.Spectrum
 
 
 /**
@@ -20,6 +21,7 @@ open class GSCard(context: Context) : CardView(context) {
 		radius = CornerSize.normal
 		useCompatPadding = true
 		addRippleEffect()
+		this.setCardBackgroundColor(Spectrum.white)
 	}
 
 	private fun addRippleEffect() {

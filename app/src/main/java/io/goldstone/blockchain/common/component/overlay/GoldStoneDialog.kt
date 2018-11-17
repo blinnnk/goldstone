@@ -192,5 +192,19 @@ class GoldStoneDialog(context: Context) : RelativeLayout(context) {
 				)
 			}
 		}
+
+		fun showMobile4GConfirm(context: Context, callback: () -> Unit) {
+			show(context) {
+				showButtons {
+					callback()
+					remove(context)
+				}
+				setImage(R.drawable.dialog_mobile_4g)
+				setContent(
+					"Mobile Network",
+					"Are you willing to update resources in 4g environment?"
+				)
+			}
+		}
 	}
 }

@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.component.edittext.RoundTitleInput
 import io.goldstone.blockchain.common.component.title.RadioWithTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -62,9 +63,6 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 	var amountEditTextChanged: Runnable? = null
 	private val amountEditText by lazy {
 		RoundTitleInput(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX()).apply {
-				topMargin = 10.uiPX()
-			}
 			setNumberPadKeyboard()
 			setTitle(TokenDetailText.eosAmountTitle)
 			setHint(TokenDetailText.eosAmountPlaceholder)
@@ -112,8 +110,15 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 			SpaceSplitLine(context).apply {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 40.uiPX())
 			}.into(this)
+
 			accountNameEditText.into(this)
 			amountEditText.into(this)
+			// 兼容 `API 21/22` 在添加后才识别 `Margin`
+			val params =
+				LinearLayout.LayoutParams(contentWidth, 46.uiPX())
+			params.topMargin = 10.uiPX()
+			amountEditText.layoutParams = params
+
 			radioContainer = linearLayout {
 				layoutParams = LinearLayout.LayoutParams(wrapContent, 30.uiPX())
 				y = 10.uiPX().toFloat()
@@ -185,6 +190,8 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 	fun isSelectedTransfer(): Boolean = transferResourceRadio.getRadioStatus()
 
 	fun showLoading(status: Boolean) {
-		confirmButton.showLoadingStatus(status)
+		launchUI {
+			confirmButton.showLoadingStatus(status)
+		}
 	}
 }

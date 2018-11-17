@@ -159,6 +159,7 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 	}
 
 	open fun flipPage() {}
+
 	fun addRecyclerLoadMoreListener(callback: () -> Unit) {
 		recyclerView.addOnScrollListener(
 			object : RecyclerView.OnScrollListener() {
@@ -210,12 +211,8 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 	/**
 	 * `Inside loadingView` 非阻碍式的 `Loading`
 	 */
-	open fun showLoadingView() {
-		topMiniLoading.visibility = View.VISIBLE
-	}
-
-	open fun removeLoadingView() {
-		topMiniLoading.visibility = View.GONE
+	open fun showLoadingView(status: Boolean) {
+		topMiniLoading.visibility = if (status )View.VISIBLE else View.GONE
 	}
 
 	open fun emptyClickEvent() {}

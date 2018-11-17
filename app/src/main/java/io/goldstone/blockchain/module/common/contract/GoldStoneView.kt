@@ -8,5 +8,6 @@ package io.goldstone.blockchain.module.common.contract
 interface GoldStoneView<out T : GoldStonePresenter> {
 
 	val presenter: T
+	fun showError(error: Throwable)
 
 }
