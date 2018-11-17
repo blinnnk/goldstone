@@ -4,16 +4,13 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.ButtonMenu
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.MarketTokenDetailChartType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
@@ -117,17 +114,4 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		tokenSocialMedia.model = tokenInfoData
 	}
 
-	companion object {
-		fun removeContentOverlayOrElse(
-			fragment: MarketTokenCenterFragment,
-			callback: () -> Unit
-		) {
-			fragment.getParentContainer()
-				?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
-				.apply {
-					if (isNull()) callback()
-					else this?.remove()
-				}
-		}
-	}
 }

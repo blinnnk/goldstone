@@ -8,7 +8,7 @@ import android.support.annotation.WorkerThread
 import android.support.v4.content.ContextCompat.startActivity
 import android.text.format.DateUtils
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import com.afollestad.materialdialogs.MaterialDialog
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.TimeUtils
 import com.blinnnk.util.getParentFragment
@@ -16,16 +16,16 @@ import com.blinnnk.util.load
 import com.blinnnk.util.then
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getMainnetChainID
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -47,9 +47,6 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
 import org.json.JSONObject
 
 /**
@@ -119,35 +116,21 @@ class MarketTokenDetailPresenter(
 	}
 
 	fun showAllDescription(parent: ViewGroup) {
-		if (parent.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview).isNull()) {
-			val overlay = ContentScrollOverlayView(parent.context)
-			overlay.into(parent)
-			overlay.apply {
-				setTitle(QuotationText.tokenDescription)
-				setContentPadding()
-				addContent {
-					DefaultTokenTable.getToken(
-						fragment.currencyInfo?.contract.orEmpty(),
-						fragment.currencyInfo?.symbol.orEmpty(),
-						TokenContract(fragment.currencyInfo).getMainnetChainID()
-					) {
-						// 描述的第一位存储了语言的标识, 所以从第二位开始展示
-						val content =
-							if (it?.description.isNullOrBlank() || it?.description.isNullOrEmpty())
-								QuotationText.emptyDescription
-							else it?.description?.substring(1)
-						textView(content) {
-							textColor = GrayScale.gray
-							textSize = fontSize(14)
-							typeface = GoldStoneFont.medium(context)
-							layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-						}
-					}
-				}
-				recoveryBackEvent = Runnable {
-					fragment.recoveryBackEvent()
-				}
-			}
+		DefaultTokenTable.getToken(
+			fragment.currencyInfo?.contract.orEmpty(),
+			fragment.currencyInfo?.symbol.orEmpty(),
+			TokenContract(fragment.currencyInfo).getMainnetChainID()
+		) {
+			// 描述的第一位存储了语言的标识, 所以从第二位开始展示
+			val content =
+				if (it?.description.isNullOrBlank() || it?.description.isNullOrEmpty())
+					QuotationText.emptyDescription
+				else it?.description?.substring(1)
+			MaterialDialog(parent.context)
+				.title(text = QuotationText.tokenDescription)
+				.message(text = content)
+				.positiveButton(text = CommonText.gotIt)
+				.show()
 		}
 	}
 
@@ -293,7 +276,10 @@ class MarketTokenDetailPresenter(
 
 	private fun getCurrencyInfoFromDatabase(
 		info: QuotationModel,
-		@UiThread hold: (tokenData: TokenInformationModel, priceData: PriceHistoryModel) -> Unit
+		@UiThread hold: (
+			tokenData: TokenInformationModel,
+			priceData: PriceHistoryModel
+		) -> Unit
 	) {
 		GlobalScope.launch(Dispatchers.Default) {
 			val default =

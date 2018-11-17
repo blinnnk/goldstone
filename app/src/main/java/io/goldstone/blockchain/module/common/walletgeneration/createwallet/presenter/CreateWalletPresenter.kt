@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.WorkerThread
-import com.blinnnk.util.ConcurrentAsyncCombine
-import com.blinnnk.util.ReasonText
-import com.blinnnk.util.UnsafeReasons
-import com.blinnnk.util.checkPasswordInRules
+import com.blinnnk.util.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.error.AccountError
@@ -164,10 +161,9 @@ class CreateWalletPresenter(
 
 		fun insertNewAccount(addresses: ChainAddresses, @WorkerThread callback: () -> Unit) {
 			val localTokens = DefaultTokenTable.dao.getForceShow()
-			object : ConcurrentAsyncCombine() {
+			object : ConcurrentJobs() {
 				override var asyncCount: Int = localTokens.size
-				override val completeInUIThread: Boolean = false
-				override fun doChildTask(index: Int) {
+				override fun doChildJob(index: Int) {
 					when (localTokens[index].chainID) {
 						ChainID.ethMain,
 						ChainID.ropsten,

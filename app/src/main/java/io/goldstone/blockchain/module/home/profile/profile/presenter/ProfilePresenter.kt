@@ -115,12 +115,8 @@ class ProfilePresenter(
 		if (clickTimes <= 0 && !hasShownGoldStoneID) {
 			hasShownGoldStoneID = true
 			SharedValue.updateDeveloperModeStatus(true)
-			AppConfigTable.getAppConfig(Dispatchers.Main) {
-				it?.apply {
-					fragment.context.alert(goldStoneID)
-					fragment.context?.clickToCopy(goldStoneID)
-				}
-			}
+			fragment.context.alert(SharedWallet.getGoldStoneID())
+			fragment.context?.clickToCopy(SharedWallet.getGoldStoneID())
 		}
 	}
 

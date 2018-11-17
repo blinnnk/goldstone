@@ -47,7 +47,7 @@ class GoldStoneUtilUnitTest {
 	@Test
 	fun getAppConfig() {
 		AppConfigTable.getAppConfig(Dispatchers.Default) {
-			LogUtil.debug("$position + getAppconfig", it.apply { it?.terms = "" }.toString())
+			LogUtil.debug("$position + getAppConfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
 
@@ -108,13 +108,6 @@ class GoldStoneUtilUnitTest {
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
 		LogUtil.debug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
-	}
-
-	@Test
-	fun getMyContactTable() {
-		ContactTable.getAllContacts {
-			LogUtil.debug("getMyContactTable", "$it")
-		}
 	}
 
 	data class PricePairModel(val pair: String, val price: String)

@@ -6,7 +6,6 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.kernel.receiver.VersionManager
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
@@ -41,7 +40,7 @@ class HomePresenter(
 	override fun onFragmentResume() {
 		super.onFragmentResume()
 		// `App` 频繁的检测更新所有需要使用的数据
-		object : SilentUpdater() {}.star()
+		fragment.context?.let { object : SilentUpdater() {}.star(it) }
 	}
 
 	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(fragmentTag: String) {
@@ -56,5 +55,4 @@ class HomePresenter(
 			}
 		}
 	}
-
 }

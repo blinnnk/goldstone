@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.contract
 
-import android.graphics.Bitmap
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
 import java.math.BigInteger
@@ -26,7 +25,6 @@ interface TokenAssetContract {
 			netTotal: BigInteger,
 			netWeight: String
 		)
-		fun showError(error: Throwable)
 	}
 
 	interface GSPresenter : GoldStonePresenter {

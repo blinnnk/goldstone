@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.module.home.profile.lanaguage.presenter
 
 import com.blinnnk.extension.jump
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.HoneyLanguage
@@ -20,7 +22,7 @@ import org.jetbrains.anko.yesButton
 class LanguagePresenter(
 	override val fragment: LanguageFragment
 ) : BaseRecyclerPresenter<LanguageFragment, LanguageModel>() {
-	
+
 	override fun updateData() {
 		fragment.asyncData = arrayListOf(
 			LanguageModel(HoneyLanguage.English.language),
@@ -31,7 +33,7 @@ class LanguagePresenter(
 			LanguageModel(HoneyLanguage.TraditionalChinese.language)
 		)
 	}
-	
+
 	fun setLanguage(
 		language: String,
 		hold: Boolean.() -> Unit
@@ -42,7 +44,9 @@ class LanguagePresenter(
 				AlertText.switchLanguageConfirmText
 			) {
 				yesButton {
-					updateLanguageValue(language)
+					updateLanguageValue(language) {
+						jumpAndReset()
+					}
 					hold(true)
 				}
 				noButton {
@@ -51,23 +55,24 @@ class LanguagePresenter(
 			}.show()
 		}
 	}
-	
-	private fun updateLanguageValue(language: String) {
-		val code = when (language) {
-			HoneyLanguage.English.language -> HoneyLanguage.English.code
-			HoneyLanguage.Chinese.language -> HoneyLanguage.Chinese.code
-			HoneyLanguage.Japanese.language -> HoneyLanguage.Japanese.code
-			HoneyLanguage.Russian.language -> HoneyLanguage.Russian.code
-			HoneyLanguage.Korean.language -> HoneyLanguage.Korean.code
-			HoneyLanguage.TraditionalChinese.language -> HoneyLanguage.TraditionalChinese.code
-			else -> HoneyLanguage.English.code
-		}
-		
-		AppConfigTable.updateLanguage(code) {
-			jumpAndReset()
+
+	private fun updateLanguageValue(language: String, callback: () -> Unit) {
+		load {
+			val code = when (language) {
+				HoneyLanguage.English.language -> HoneyLanguage.English.code
+				HoneyLanguage.Chinese.language -> HoneyLanguage.Chinese.code
+				HoneyLanguage.Japanese.language -> HoneyLanguage.Japanese.code
+				HoneyLanguage.Russian.language -> HoneyLanguage.Russian.code
+				HoneyLanguage.Korean.language -> HoneyLanguage.Korean.code
+				HoneyLanguage.TraditionalChinese.language -> HoneyLanguage.TraditionalChinese.code
+				else -> HoneyLanguage.English.code
+			}
+			AppConfigTable.dao.updateLanguageCode(code)
+		} then {
+			callback()
 		}
 	}
-	
+
 	private fun jumpAndReset() {
 		fragment.activity?.jump<SplashActivity>()
 		// 杀掉进程

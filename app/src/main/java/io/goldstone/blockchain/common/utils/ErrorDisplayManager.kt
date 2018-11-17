@@ -3,6 +3,8 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -38,7 +40,7 @@ class ErrorDisplayManager(private val error: Throwable) {
 	@UiThread
 	fun show(context: Context?) {
 		displayMessage?.apply {
-			launchUI {
+			GoldStoneAPI.context.runOnUiThread {
 				if (!error.message.isNullOrEmpty()) {
 					context.alert(this@apply)
 				}

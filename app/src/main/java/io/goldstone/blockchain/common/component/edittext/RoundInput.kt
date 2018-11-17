@@ -31,6 +31,11 @@ open class RoundInput(context: Context) : EditText(context) {
 	var title by observing("") {
 		invalidate()
 	}
+	var horizontalPaddingSize by observing(5.uiPX()) {
+		invalidate()
+	}
+
+	private val paddingSize = 5.uiPX()
 	private var safeLevel = ""
 	private val paint = Paint()
 	private val textPaint = Paint()
@@ -66,13 +71,10 @@ open class RoundInput(context: Context) : EditText(context) {
 		singleLine = true
 		hintTextColor = GrayScale.lightGray
 		this.setHorizontallyScrolling(false)
-		maxLines = Integer.MAX_VALUE
-
-
 		this.setWillNotDraw(false)
-
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 		this.setPadding(35.uiPX(), 20.uiPX(), 35.uiPX(), 20.uiPX())
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
+		maxLines = Integer.MAX_VALUE
 		backgroundTintMode = PorterDuff.Mode.CLEAR
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.black(context)
@@ -181,23 +183,25 @@ open class RoundInput(context: Context) : EditText(context) {
 	private var onTextCut: Runnable? = null
 	private var onTextCopy: Runnable? = null
 	var afterTextChanged: Runnable? = null
-	private val paddingSize = 5.uiPX()
 
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
 		val rectF = RectF(
-			BorderSize.bold + paddingSize, BorderSize.bold + paddingSize,
-			width - BorderSize.bold * 2 - paddingSize, height - BorderSize.bold * 2 - paddingSize
+			BorderSize.bold + horizontalPaddingSize, BorderSize.bold + paddingSize,
+			width - BorderSize.bold * 2 - horizontalPaddingSize, height - BorderSize.bold * 2 - paddingSize
 		)
 
 		canvas?.drawRoundRect(rectF, CornerSize.normal, CornerSize.normal, paint)
 		val textBackground = RectF(
-			25.uiPX().toFloat(), 0f, textPaint.measureText(title) + 50.uiPX(), titleSize
+			25.uiPX().toFloat() + horizontalPaddingSize / 2f,
+			0f,
+			textPaint.measureText(title) + 50.uiPX(),
+			titleSize
 		)
 		canvas?.drawRect(textBackground, backgroundPaint)
 
-		canvas?.drawText(title, 35.uiPX().toFloat(), 15.uiPX().toFloat(), textPaint)
+		canvas?.drawText(title, 30.uiPX() + horizontalPaddingSize / 2f, 15.uiPX().toFloat(), textPaint)
 
 		if (showAlert) {
 			canvas?.drawText(

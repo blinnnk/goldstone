@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto.utils
 
-import android.text.format.DateUtils
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -8,7 +7,6 @@ import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -59,19 +57,19 @@ object CryptoUtils {
 
 	fun getTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
-		var amount: BigInteger
-		isTransferInputCode(inputCode) isTrue {
+		val amount: BigInteger
+		return if(isTransferInputCode(inputCode)) {
 			// analysis input code and get the received address
 			address = inputCode.substring(
 				SolidityCode.contractTransfer.length, SolidityCode.contractTransfer.length + 64
 			)
-			address = toHexValue(address.substring(address.length - 40, address.length))
+			address = (address.substring(address.length - 40, address.length)).prepend0xPrefix()
 			// analysis input code and get the received count
 			amount = inputCode.substring(74, 138).hexToDecimal()
-			return InputCodeData("transfer", address, amount)
-		} otherwise {
+			InputCodeData("transfer", address, amount)
+		} else {
 			LogUtil.debug("loadTransferInfoFromInputData", "not a contract transfer")
-			return null
+			null
 		}
 	}
 
@@ -95,13 +93,6 @@ object CryptoUtils {
 		return calendar.timeInMillis
 	}
 
-	val dateInDay: (Long) -> String = {
-		DateUtils.formatDateTime(GoldStoneAPI.context, it, DateUtils.FORMAT_NO_YEAR)
-	}
-
-	private fun toHexValue(value: String): String {
-		return "0x$value"
-	}
 
 	private fun isTransferInputCode(inputCode: String) = inputCode.length > 10 && inputCode.substring(
 		0, SolidityCode.contractTransfer.length

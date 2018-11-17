@@ -5,20 +5,13 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedChain
-import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -40,14 +33,13 @@ class TokenDetailPresenter(
 	val detailView: TokenDetailContract.GSView
 ) : TokenDetailContract.GSPresenter {
 
-	var allData: List<TransactionListModel>? = null
-
 	override fun start() {
 		detailView.showLoading(true)
 		updateEmptyCharData()
 		checkNewDataFromChain()
 	}
 
+	private var allData: List<TransactionListModel>? = null
 	var totalCount: Int? = null
 	var currentMaxCount: Int? = null
 
@@ -132,7 +124,6 @@ class TokenDetailPresenter(
 
 	@WorkerThread
 	private fun checkNewDataFromChain() = GlobalScope.launch(Dispatchers.Default) {
-
 		with(token.contract) {
 			when {
 				isBTCSeries() -> loadBTCSeriesData(getChainType(), getMaxDataIndex(), true)
@@ -153,7 +144,7 @@ class TokenDetailPresenter(
 	 * 拉取到最新的 Offset 的数据. 之后用本地的最大 BlockNumber 或 页内最小 BlockNumber
 	 * 来作为拉取最新或拉取历史数据的依据参数.
 	 */
-	private fun getMaxBlockNumber(): Int {
+	fun getMaxBlockNumber(): Int {
 		return TransactionTable.dao.getMaxBlockNumber(
 			token.contract.getAddress(),
 			token.contract.contract,
@@ -166,111 +157,6 @@ class TokenDetailPresenter(
 			token.contract.getAddress(),
 			token.contract.getChainType().id
 		)?.dataIndex.orZero()
-	}
-
-	private fun getEOSSeriesData() {
-		// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
-		val codeName = token.contract.contract
-		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
-			EOSTransactionTable.getMaxDataIndexTable(
-				SharedAddress.getCurrentEOSAccount(),
-				token.contract,
-				SharedChain.getEOSCurrent().chainID
-			) {
-				launchUI {
-					totalCount = it?.dataIndex
-					currentMaxCount = it?.dataIndex
-					// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
-					// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
-					detailView.getDetailAdapter()?.dataSet?.clear()
-					// 初始化
-					loadMore()
-				}
-			}
-		} else EOSAPI.getTransactionCount(
-			SharedChain.getEOSCurrent().chainID,
-			SharedAddress.getCurrentEOSAccount(),
-			codeName,
-			token.symbol
-		) { count, error ->
-			if (count.hasValue() && error.isNone()) {
-				totalCount = count
-				currentMaxCount = count
-				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
-				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
-				detailView.getDetailAdapter()?.dataSet?.clear()
-				launchUI { loadMore() }
-			} else {
-				detailView.showLoading(false)
-				detailView.showBottomLoading(false)
-			}
-		}
-	}
-
-	@WorkerThread
-	fun getETHSeriesData() {
-		val address = token.contract.getAddress()
-		val transactionDao = TransactionTable.dao
-		val endBlock = if (detailView.asyncData.isNullOrEmpty()) {
-			getMaxBlockNumber()
-		} else detailView.asyncData?.minBy { it.blockNumber }?.blockNumber!! - 1
-		if (endBlock.hasValue()) {
-			val transactions =
-				if (token.contract.isETH()) transactionDao.getETHAndAllFee(
-					address,
-					token.contract.contract,
-					endBlock,
-					token.chainID
-				) else transactionDao.getDataWithFee(
-					address,
-					token.contract.contract,
-					token.chainID,
-					endBlock
-				)
-			when {
-				transactions.isNotEmpty() -> flipPage(transactions) {
-					detailView.showBottomLoading(false)
-					detailView.showLoading(false)
-				}
-				else -> when {
-					token.contract.isETH() -> loadETHChainData(endBlock)
-					else -> detailView.showBottomLoading(false)
-				}
-			}
-		} else detailView.showBottomLoading(false)
-	}
-
-	@WorkerThread
-	fun getBTCSeriesData() {
-		val btcSeriesDao = BTCSeriesTransactionTable.dao
-		with(token.contract) {
-			val startDataIndex =
-				if (detailView.asyncData.isNullOrEmpty()) {
-					btcSeriesDao.getMaxDataIndex(
-						getAddress(),
-						getChainType().id
-					)?.dataIndex
-				} else detailView.asyncData?.minBy { it.dataIndex }?.dataIndex!! - 1
-			if (startDataIndex.hasValue()) {
-				val transactions =
-					btcSeriesDao.getDataByRange(
-						getAddress(),
-						getChainType().id,
-						startDataIndex - DataValue.pageCount,
-						startDataIndex
-					)
-				when {
-					transactions.isNotEmpty() -> flipPage(transactions) {
-						detailView.showBottomLoading(false)
-						detailView.showLoading(false)
-					}
-					else -> loadBTCSeriesData(getChainType(), startDataIndex + 1, false)
-				}
-			} else {
-				detailView.showLoading(false)
-				detailView.showBottomLoading(false)
-			}
-		}
 	}
 
 	// 没数据或初始化的时候先生产默认值显示

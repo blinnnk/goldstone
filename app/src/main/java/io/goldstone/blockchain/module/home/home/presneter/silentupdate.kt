@@ -1,18 +1,19 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
-import android.support.annotation.WorkerThread
+import android.content.Context
 import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.Connectivity
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -38,36 +39,48 @@ import kotlinx.coroutines.launch
  */
 abstract class SilentUpdater {
 
-	fun star() = GlobalScope.launch(Dispatchers.Default) {
+	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
 		updateNETUnitPrice()
-		// 共同需要 Config
-		AppConfigTable.dao.getAppConfig()?.let {
-			checkMD5Info(it) { hasNewDefaultTokens, hasNewChainNodes, hasNewExchanges ->
-				fun updateData() {
-					if (hasNewDefaultTokens) updateLocalDefaultTokens()
-					if (hasNewChainNodes) updateNodeData()
-					if (hasNewExchanges) updateLocalExchangeData()
-				}
-				when {
-					Connectivity.isConnectedWifi(GoldStoneAPI.context) -> updateData()
-					Connectivity.isConnectedMobile(GoldStoneAPI.context) -> {
-						// TODO Show Confirm Dialog
-					}
-				}
-			}
-			updateCurrencyRateFromServer(it)
-			updateAgreement(it)
-		}
-		// 是 WIFI 的情况下, 才执行静默更新
-		if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
-			updateShareContentFromServer()
+		// 这个会分别在 4G 和 Wifi 下用不同的询问方式进行执行
+		fun updateTokenInfo() {
 			updateERCDefaultTokenInfo()
 			updateMyTokenCurrencyPrice()
 			checkAvailableEOSTokenList()
 			checkAvailableERC20TokenList()
+		}
+		AppConfigTable.dao.getAppConfig()?.let {
+			checkMD5Info(it) { hasNewDefaultTokens, hasNewChainNodes, hasNewExchanges, hasNewTerm, hasNewConfig, hasNewShareContent ->
+				fun updateData() {
+					if (hasNewDefaultTokens) updateLocalDefaultTokens()
+					if (hasNewChainNodes) updateNodeData()
+					if (hasNewExchanges) updateLocalExchangeData()
+					if (hasNewTerm) updateAgreement()
+					if (hasNewShareContent) updateShareContent()
+					if (hasNewConfig) {
+					}
+				}
+				when {
+					Connectivity.isConnectedWifi(GoldStoneAPI.context) -> updateData()
+					Connectivity.isConnectedMobile(GoldStoneAPI.context) -> {
+						launchUI {
+							GoldStoneDialog.showMobile4GConfirm(context) {
+								GlobalScope.launch(Dispatchers.Default) {
+									updateData()
+									updateTokenInfo()
+								}
+							}
+						}
+					}
+				}
+			}
+			updateCurrencyRateFromServer(it)
+		}
+		// 是 WIFI 的情况下, 才执行静默更新
+		if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
+			updateTokenInfo()
 		}
 	}
 
@@ -76,7 +89,10 @@ abstract class SilentUpdater {
 		hold: (
 			hasNewDefaultTokens: Boolean,
 			hasNewChainNodes: Boolean,
-			hasNewExchanges: Boolean
+			hasNewExchanges: Boolean,
+			hasNewTerm: Boolean,
+			hasNewConfig: Boolean,
+			hasNewShareContent: Boolean
 		) -> Unit
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
@@ -84,11 +100,24 @@ abstract class SilentUpdater {
 				val newDefaultTokenListMD5 = md5s.safeGet("default_token_list_md5")
 				val newChainNodesMD5 = md5s.safeGet("chain_nodes_md5")
 				val newExchangeListMD5 = md5s.safeGet("market_list_md5")
-				AppConfigTable.dao.updateMD5Info(newDefaultTokenListMD5, newChainNodesMD5, newExchangeListMD5)
+				val newTermMD5 = md5s.safeGet("agreement_md5")
+				val newConfigMD5 = md5s.safeGet("config_list_md5")
+				val newShareContentMD5 = md5s.safeGet("share_content_md5")
+				AppConfigTable.dao.updateMD5Info(
+					newDefaultTokenListMD5,
+					newChainNodesMD5,
+					newExchangeListMD5,
+					newTermMD5,
+					newConfigMD5,
+					newShareContentMD5
+				)
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
-					config.exchangeListMD5 != newExchangeListMD5
+					config.exchangeListMD5 != newExchangeListMD5,
+					config.termMD5 != newTermMD5,
+					config.configMD5 != newConfigMD5,
+					config.shareContentMD5 != newShareContentMD5
 				)
 			}
 		}
@@ -384,7 +413,7 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private fun updateShareContentFromServer() {
+	private fun updateShareContent() {
 		GoldStoneAPI.getShareContent { shareContent, error ->
 			if (!shareContent.isNull() && error.isNone()) {
 				val shareText = if (shareContent.title.isEmpty() && shareContent.content.isEmpty()) {
@@ -399,8 +428,6 @@ abstract class SilentUpdater {
 		}
 	}
 
-	// 获取当前的汇率
-	@WorkerThread
 	private fun updateCurrencyRateFromServer(config: AppConfigTable) {
 		GoldStoneAPI.getCurrencyRate(config.currencyCode) { rate, error ->
 			if (rate.isNotNull() && error.isNone()) {
@@ -412,10 +439,8 @@ abstract class SilentUpdater {
 		}
 	}
 
-	@WorkerThread
-	private fun updateAgreement(config: AppConfigTable) {
-		val md5 = config.terms.getObjectMD5HexString()
-		GoldStoneAPI.getTerms(md5) { term, error ->
+	private fun updateAgreement() {
+		GoldStoneAPI.getTerms { term, error ->
 			if (!term.isNullOrBlank() && error.isNone()) {
 				AppConfigTable.dao.updateTerms(term)
 			}

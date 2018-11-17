@@ -5,24 +5,33 @@ import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.checkbox.checkBoxPrompt
+import com.afollestad.materialdialogs.list.customListAdapter
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.suffix
+import com.blinnnk.extension.toArrayList
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
+import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.contract.QuotationSearchContract
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.QuotationSearchPresenter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -31,28 +40,100 @@ import java.util.*
  * @author KaySaith
  */
 
-class QuotationSearchFragment :
-	BaseRecyclerFragment<QuotationSearchPresenter, QuotationSelectionTable>() {
+class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), QuotationSearchContract.GSView {
 
 	override val pageTitle: String = "Quotation Search"
-	override val presenter = QuotationSearchPresenter(this)
-	private val exchangeFilterDescriptionView by lazy {
-		TextView(context).apply {
-			textSize = fontSize(12)
-			layoutParams = LinearLayout.LayoutParams(matchParent, 45.uiPX())
-			backgroundColor = GrayScale.whiteGray
-			leftPadding = 10.uiPX()
-			textColor = GrayScale.black
-			gravity = Gravity.CENTER_VERTICAL
-			typeface = GoldStoneFont.heavy(context)
-			singleLine = true
-			visibility = View.GONE
+	override lateinit var presenter: QuotationSearchContract.GSPresenter
+	private val rootFragment by lazy {
+		parentFragment as? QuotationOverlayFragment
+	}
+
+	private lateinit var filterDescriptionView: TextView
+
+	override fun showLoading(status: Boolean) = launchUI {
+		showLoadingView(status)
+	}
+
+	override fun showError(error: Throwable) {
+		ErrorDisplayManager(error).show(context!!)
+	}
+
+	override fun updateUI(data: List<QuotationSelectionTable>) {
+		launchUI {
+			updateSingleCellAdapterData<QuotationSearchAdapter>(data.toArrayList())
+		}
+	}
+
+	override fun showFilterDescription(data: List<ExchangeTable>) {
+		presenter.getSelectedExchange {
+			val selectedExchanges = data.filter { it.isSelected }
+			val selectedExchangeNames = selectedExchanges.map { it.exchangeName }
+			rootFragment?.resetFilterStatus(isNotEmpty())
+			if (isEmpty()) removeExchangeFilterDescriptionView()
+			else {
+				val content =
+					QuotationText.searchFilterTextDescription(
+						if (selectedExchangeNames.size > 3) selectedExchangeNames.subList(0, 3).joinToString(",") suffix "etc."
+						else selectedExchangeNames.joinToString(",")
+					)
+				filterDescriptionView.text = content
+				filterDescriptionView.visibility = View.VISIBLE
+				recyclerView.y = filterDescriptionView.layoutParams.height.toFloat()
+			}
+		}
+	}
+
+	private fun showExchangeDashboard() {
+		load {
+			ExchangeTable.dao.getAll()
+		} then { exchanges ->
+			val exchangeAdapter = ExchangeAdapter(exchanges.toArrayList()) { model, isChecked ->
+				model.isSelected = isChecked
+			}
+			MaterialDialog(context!!)
+				.title(text = QuotationText.exchangeList)
+				.customListAdapter(exchangeAdapter)
+				.checkBoxPrompt(text = QuotationText.selectAll) {
+					exchanges.forEach { model ->
+						model.isSelected = it
+					}
+					exchangeAdapter.notifyDataSetChanged()
+				}
+				.positiveButton(text = CommonText.confirm) {
+					GlobalScope.launch(Dispatchers.Default) {
+						ExchangeTable.dao.insertAll(exchanges)
+					}
+					updateResultAfterConditionChanged()
+					showFilterDescription(exchanges)
+					it.dismiss()
+				}
+				.negativeButton(text = CommonText.cancel) {
+					it.dismiss()
+				}
+				.show()
+		}
+	}
+
+	private fun updateResultAfterConditionChanged() {
+		val textForSearch = rootFragment?.getSearchContent().orEmpty()
+		if (NetworkUtil.hasNetworkWithAlert(context) && textForSearch.isNotEmpty()) {
+			presenter.searchToken(textForSearch)
 		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		wrapper.addView(exchangeFilterDescriptionView, 0)
+		asyncData = arrayListOf()
+		presenter = QuotationSearchPresenter(this)
+		presenter.start()
+		initExchangeFDescriptionView()
+		rootFragment?.showFilterImage(true)
+		rootFragment?.searchInputListener {
+			if (NetworkUtil.hasNetwork(context)) presenter.searchToken(it)
+		}
+		rootFragment?.setFilterEvent {
+			showExchangeDashboard()
+		}
 	}
 
 	override fun setRecyclerViewAdapter(
@@ -61,7 +142,7 @@ class QuotationSearchFragment :
 	) {
 		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { model, isChecked ->
 			getMainActivity()?.showLoadingView()
-			presenter.updateMyQuotation(model, isChecked) { error ->
+			presenter.updateLocalQuotation(model, isChecked) { error ->
 				launchUI {
 					getMainActivity()?.removeLoadingView()
 					if (error.hasError()) safeShowError(error)
@@ -72,12 +153,7 @@ class QuotationSearchFragment :
 
 	override fun recoveryBackEvent() {
 		getMainActivity()?.apply {
-			backEvent = Runnable {
-				val overlayView =
-					findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
-				if (overlayView.isNull()) setBackEvent(this)
-				else overlayView.remove()
-			}
+			setBackEvent(this)
 		}
 	}
 
@@ -88,15 +164,24 @@ class QuotationSearchFragment :
 		}
 	}
 
-	fun showExchangeFilterDescriptionView(content: String) {
-		exchangeFilterDescriptionView.text = content
-		exchangeFilterDescriptionView.visibility = View.VISIBLE
-		recyclerView.y = exchangeFilterDescriptionView.layoutParams.height.toFloat()
+	private fun removeExchangeFilterDescriptionView() {
+		filterDescriptionView.visibility = View.GONE
+		recyclerView.y = 0f
 	}
 
-	fun removeExchangeFilterDescriptionView() {
-		exchangeFilterDescriptionView.visibility = View.GONE
-		recyclerView.y = 0f
+	private fun initExchangeFDescriptionView() {
+		filterDescriptionView = TextView(context).apply {
+			textSize = fontSize(12)
+			layoutParams = LinearLayout.LayoutParams(matchParent, 45.uiPX())
+			backgroundColor = GrayScale.whiteGray
+			leftPadding = 10.uiPX()
+			textColor = GrayScale.black
+			gravity = Gravity.CENTER_VERTICAL
+			typeface = GoldStoneFont.heavy(context)
+			singleLine = true
+			visibility = View.GONE
+		}
+		wrapper.addView(filterDescriptionView, 0)
 	}
 
 }

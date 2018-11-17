@@ -4,7 +4,7 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isTrue
-import com.blinnnk.util.ConcurrentAsyncCombine
+import com.blinnnk.util.ConcurrentJobs
 import com.blinnnk.util.getDeviceBrand
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
@@ -19,7 +19,6 @@ import io.goldstone.blockchain.crypto.keystore.updatePassword
 import io.goldstone.blockchain.crypto.keystore.updatePasswordByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
 import io.goldstone.blockchain.crypto.multichain.WalletType
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.view.PasswordSettingsFragment
@@ -52,16 +51,18 @@ class PasswordSettingsPresenter(
 			repeatPassword,
 			true
 		) { password, _, error ->
-			if (error.hasError()) callback(error)
-			val wallet = WalletTable.dao.findWhichIsUsing(true)!!
-			fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
-				if (isCorrect) updatePassword(
-					oldPassword,
-					password!!,
-					wallet.getWalletType(),
-					wallet,
-					passwordHint
-				) else callback(AccountError.WrongPassword)
+			if (password.isNullOrEmpty() || error.hasError()) callback(error)
+			else {
+				val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@checkInputValue
+				fragment.context?.verifyCurrentWalletKeyStorePassword(oldPassword, wallet.id) { isCorrect ->
+					if (isCorrect) updatePassword(
+						oldPassword,
+						password,
+						wallet.getWalletType(),
+						wallet,
+						passwordHint
+					) else callback(AccountError.WrongPassword)
+				}
 			}
 		}
 	}
@@ -85,24 +86,25 @@ class PasswordSettingsPresenter(
 					wallet.btcSeriesTestAddresses,
 					wallet.eosAddresses
 				)
-				object : ConcurrentAsyncCombine() {
-					override var asyncCount = allAddresses.size
-					override fun doChildTask(index: Int) {
+				object : ConcurrentJobs() {
+					override var asyncCount: Int = allAddresses.size
+					override fun doChildJob(index: Int) {
 						allAddresses[index].forEach { pair ->
-							updateKeystorePassword(
+							fragment.context?.updatePassword(
 								pair.address,
 								oldPassword,
 								password,
-								passwordHint,
-								// 不是合规的 `ETH` 地址就是 `BTC` 系列地址
 								!Address(pair.address).isValid()
-							) {
+							) { _, _ ->
 								completeMark()
 							}
 						}
 					}
 
-					override fun mergeCallBack() = autoBack()
+					override fun mergeCallBack() {
+						WalletTable.dao.updateHint(passwordHint)
+						launchUI { autoBack() }
+					}
 				}.start()
 			}
 			// 新的钱包结构只存在 Bip44 多链和 单私钥多链两种情况
@@ -114,27 +116,6 @@ class PasswordSettingsPresenter(
 			) {
 				autoBack()
 			}
-		}
-	}
-
-	private fun updateKeystorePassword(
-		address: String,
-		oldPassword: String,
-		newPassword: String,
-		passwordHint: String,
-		isBTCSeriesWallet: Boolean,
-		@WorkerThread callback: (AccountError) -> Unit
-	) {
-		// ToDO 低端机型解 `Keystore` 会耗时很久,等自定义的 `Alert` 完成后应当友好提示
-		fragment.context?.updatePassword(
-			address,
-			oldPassword,
-			newPassword,
-			isBTCSeriesWallet
-		) { _, error ->
-			// Update User Password Hint
-			if (error.isNone()) GoldStoneDataBase.database.walletDao().updateHint(passwordHint)
-			callback(error)
 		}
 	}
 

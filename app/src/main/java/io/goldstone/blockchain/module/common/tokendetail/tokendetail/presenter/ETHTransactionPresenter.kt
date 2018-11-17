@@ -1,8 +1,11 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.hasValue
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.crypto.multichain.getAddress
+import io.goldstone.blockchain.crypto.multichain.isETH
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
@@ -23,7 +26,7 @@ fun TokenDetailPresenter.loadETHChainData(endBlock: Int) {
 }
 
 @WorkerThread
-fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) {
+private fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
 		EtherScanApi.offsetTransactions(SharedAddress.getCurrentEthereum(), endBlock),
 		"result"
@@ -55,3 +58,37 @@ fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) 
 		} else callback(error)
 	}
 }
+
+@WorkerThread
+fun TokenDetailPresenter.getETHSeriesData() {
+	val address = token.contract.getAddress()
+	val transactionDao = TransactionTable.dao
+	val endBlock = if (detailView.asyncData.isNullOrEmpty()) {
+		getMaxBlockNumber()
+	} else detailView.asyncData?.minBy { it.blockNumber }?.blockNumber!! - 1
+	if (endBlock.hasValue()) {
+		val transactions =
+			if (token.contract.isETH()) transactionDao.getETHAndAllFee(
+				address,
+				token.contract.contract,
+				endBlock,
+				token.chainID
+			) else transactionDao.getDataWithFee(
+				address,
+				token.contract.contract,
+				token.chainID,
+				endBlock
+			)
+		when {
+			transactions.isNotEmpty() -> flipPage(transactions) {
+				detailView.showBottomLoading(false)
+				detailView.showLoading(false)
+			}
+			else -> when {
+				token.contract.isETH() -> loadETHChainData(endBlock)
+				else -> detailView.showBottomLoading(false)
+			}
+		}
+	} else detailView.showBottomLoading(false)
+}
+

@@ -23,8 +23,6 @@ interface AddressSelectionContract {
 			count: Double,
 			token: WalletDetailCellModel
 		)
-
-		fun showError(error: Throwable)
 	}
 
 	interface GSPresenter : GoldStonePresenter {

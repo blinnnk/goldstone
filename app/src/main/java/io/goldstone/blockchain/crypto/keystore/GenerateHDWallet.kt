@@ -4,6 +4,7 @@ package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.util.TinyNumberUtils
@@ -164,7 +165,7 @@ fun Context.getPrivateKey(
 	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	getKeystoreFile(walletAddress, password, isBTCSeriesWallet) { keyStoreFile, error ->
-		if (keyStoreFile != null && error.isNone()) {
+		if (keyStoreFile.isNotNull() && error.isNone()) {
 			val keyPair =
 				WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
 			if (keyPair.isNull()) hold(null, AccountError.WrongPassword)
@@ -198,15 +199,17 @@ fun Context.deleteAccount(
 	// If there is't account found then return
 	if (keyStore.accounts.size() == 0L) {
 		callback(AccountError.None)
-	} else {
-		var targetAccountIndex: Long? = if (isBTCSeriesWallet) 0 else null
-		(0 until keyStore.accounts.size()).forEachOrEnd { index, isEnd ->
-			keyStore.accounts.get(index).address.hex.let {
-				if (it.equals(walletAddress, true) && !isBTCSeriesWallet) {
-					targetAccountIndex = index
-				}
-				// `BTC` 的 `Filename` 就是 `Address`
-				if (isEnd && targetAccountIndex != null || isBTCSeriesWallet) try {
+		return
+	}
+	var targetAccountIndex: Long? = if (isBTCSeriesWallet) 0 else null
+	(0 until keyStore.accounts.size()).forEachOrEnd { index, isEnd ->
+		keyStore.accounts.get(index).address.hex.let {
+			if (it.equals(walletAddress, true) && !isBTCSeriesWallet) {
+				targetAccountIndex = index
+			}
+			// `BTC` 的 `Filename` 就是 `Address`
+			if (isEnd && !targetAccountIndex.isNull() || isBTCSeriesWallet) {
+				try {
 					keyStore.deleteAccount(keyStore.accounts.get(targetAccountIndex!!), password)
 					callback(AccountError.None)
 				} catch (error: Exception) {
@@ -237,11 +240,7 @@ fun Context.deleteWalletByWalletID(
 	}
 }
 
-fun Context.verifyCurrentWalletKeyStorePassword(
-	password: String,
-	walletID: Int,
-	hold: (Boolean) -> Unit
-) {
+fun Context.verifyCurrentWalletKeyStorePassword(password: String, walletID: Int, hold: (Boolean) -> Unit) {
 	val currentType = SharedWallet.getCurrentWalletType()
 	when {
 		// 多链钱包随便找一个名下钱包地址进行验证即可
@@ -331,7 +330,7 @@ fun Context.updatePassword(
 		oldPassword,
 		isBTCSeriesWallet
 	) { privateKey, error ->
-		if (privateKey != null && error.isNone()) deleteAccount(
+		if (privateKey.isNotNull() && error.isNone()) deleteAccount(
 			walletAddress,
 			oldPassword,
 			isBTCSeriesWallet

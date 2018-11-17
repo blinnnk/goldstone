@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.blinnnk.animation.updateAlphaAnimation
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -15,8 +18,8 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.ValueInputView
-import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
@@ -30,7 +33,6 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -236,35 +238,30 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 	}
 
 	private fun showCustomChangeAddressOverlay() {
-		getParentContainer()?.apply {
-			val addressInput = WalletEditText(context)
-			DashboardOverlay(context) {
-				addressInput.apply {
-					setMargins<LinearLayout.LayoutParams> {
-						width = ScreenSize.widthWithPadding - 40.uiPX()
-						topMargin = 10.uiPX()
-					}
-					hint = changeAddress
+		MaterialDialog(context!!)
+			.title(text = PrepareTransferText.customChangeAddress)
+			.customView(view = RoundInput(context!!).apply {
+				title = "Address"
+				horizontalPaddingSize = PaddingSize.content
+			})
+			.negativeButton(text = CommonText.cancel)
+			.positiveButton(text = CommonText.confirm) {
+				val customView = it.getCustomView() as? RoundInput
+				val customAddress = customView?.getContent().orEmpty()
+				val contract =
+					presenter.getToken()?.contract ?: return@positiveButton
+				when {
+					contract.isBTC() || contract.isBCH() ->
+						presenter.isValidAddressOrElse(customAddress) isTrue {
+							changeAddress = customAddress
+						}
+					contract.isLTC() ->
+						presenter.isValidLTCAddressOrElse(customAddress) isTrue {
+							changeAddress = customAddress
+						}
 				}
-				addressInput.into(this)
-			}.apply {
-				confirmEvent = Runnable {
-					val customAddress = addressInput.text?.toString().orEmpty()
-					when {
-						presenter.getToken()?.contract.isBTC() || presenter.getToken()?.contract.isBCH() ->
-							presenter.isValidAddressOrElse(customAddress) isTrue {
-								// 更新默认的自定义找零地址
-								changeAddress = customAddress
-							}
-						presenter.getToken()?.contract.isLTC() ->
-							presenter.isValidLTCAddressOrElse(customAddress) isTrue {
-								// 更新默认的自定义找零地址
-								changeAddress = customAddress
-							}
-					}
-				}
-			}.showTitle(PrepareTransferText.customChangeAddress).into(this)
-		}
+			}
+			.show()
 	}
 
 	private fun LinearLayout.showAccountInfo() {

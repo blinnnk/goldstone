@@ -54,7 +54,9 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			lparams(matchParent, matchParent)
 			attentionView.apply {
 				isCenter()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
+				setMargins<LinearLayout.LayoutParams> {
+					topMargin = 30.uiPX()
+				}
 				text = WatchOnlyText.intro
 			}.into(this)
 
@@ -67,7 +69,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			}.click {
 				getParentContainer()?.apply {
 					PrivateKeyImportFragment.showWalletTypeDashboard(
-						this,
+						context,
 						currentType
 					) { type ->
 						currentType = type

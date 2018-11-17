@@ -11,12 +11,10 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import junit.framework.Assert.assertTrue
-import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,7 +58,7 @@ class GoldStoneServerUnitTest {
 	fun getNotificationList() {
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTime }?.createTime
-			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
+			val requestTime = if (latestTime.isNull()) 0 else latestTime
 			GoldStoneAPI.getNotificationList(requestTime) { list, _ ->
 				Log.d("$position + getNotificationList", list.toString())
 			}
@@ -69,7 +67,7 @@ class GoldStoneServerUnitTest {
 
 	@Test
 	fun getTermsFromServer() {
-		GoldStoneAPI.getTerms("hello") { term, _ ->
+		GoldStoneAPI.getTerms { term, _ ->
 			LogUtil.debug(position, term.orEmpty())
 			assertTrue("Terms is empty", term?.isNotEmpty() == true)
 		}
@@ -91,15 +89,11 @@ class GoldStoneServerUnitTest {
 
 	@Test
 	fun getUnreadCount() {
-		AppConfigTable.getAppConfig(Dispatchers.Default) { config ->
-			config?.apply {
-				GoldStoneAPI.getUnreadCount(
-					config.goldStoneID,
-					System.currentTimeMillis()
-				) { count, _ ->
-					LogUtil.debug(position + "getUnreadCount", count.toString())
-				}
-			}
+		GoldStoneAPI.getUnreadCount(
+			SharedWallet.getGoldStoneID(),
+			System.currentTimeMillis()
+		) { count, _ ->
+			LogUtil.debug(position + "getUnreadCount", count.toString())
 		}
 	}
 
@@ -108,7 +102,7 @@ class GoldStoneServerUnitTest {
 		GoldStoneAPI.getETCTransactions(
 			ChainID.ETCTest,
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
-			"0"
+			0
 		) { transaction, _ ->
 			LogUtil.debug("getETCTransactions", "$transaction")
 		}

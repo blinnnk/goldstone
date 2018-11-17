@@ -119,6 +119,7 @@ fun BigInteger.convertToTimeUnit(): String {
 fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
 
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
+
 @UiThread
 fun Fragment.safeShowError(error: Throwable) {
 	ErrorDisplayManager(error).show(context)

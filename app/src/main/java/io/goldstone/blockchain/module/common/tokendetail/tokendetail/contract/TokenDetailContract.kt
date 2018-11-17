@@ -23,10 +23,8 @@ interface TokenDetailContract {
 		fun notifyDataRangeChanged(start: Int, count: Int)
 		fun getDetailAdapter(): TokenDetailAdapter?
 		fun removeEmptyView()
-
 		fun setAllMenu()
 		fun flipPage()
-		fun showError(error: Throwable)
 	}
 
 	interface GSPresenter : GoldStonePresenter {

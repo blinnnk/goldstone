@@ -3,9 +3,10 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
-import com.blinnnk.component.HoneyBaseSwitch
+import android.widget.Switch
 import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.centerInVertical
+import com.blinnnk.extension.isDefaultStyle
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -21,6 +22,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import org.jetbrains.anko.imageResource
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.switch
 
 /**
  * @date 25/03/2018 5:12 PM
@@ -48,13 +50,6 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol.symbol else tokenName)
 		}
 	}
-	var quotationSearchModel: QuotationSelectionTable? by observing(null) {
-		quotationSearchModel?.apply {
-			tokenInfo.title.text = infoTitle
-			tokenInfo.subtitle.text = name
-			switch.isChecked = isSelecting
-		}
-	}
 
 	var tokenSearchModel: DefaultTokenTable? by observing(null) {
 		tokenSearchModel?.apply {
@@ -78,8 +73,8 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 		}
 	}
 
-	val switch by lazy { HoneyBaseSwitch(context) }
-	private val tokenInfo by lazy { TwoLineTitles(context) }
+	var switch: Switch
+	protected val tokenInfo by lazy { TwoLineTitles(context) }
 	protected val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
 
 	init {
@@ -95,10 +90,10 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			x += 10.uiPX()
 		})
 
-		this.addView(switch.apply {
+		switch = switch {
 			layoutParams = RelativeLayout.LayoutParams(50.uiPX(), matchParent)
-			setThemColor(Spectrum.green, Spectrum.lightGreen)
-		})
+			isDefaultStyle(Spectrum.blue)
+		}
 
 		tokenInfo.apply {
 			centerInVertical()

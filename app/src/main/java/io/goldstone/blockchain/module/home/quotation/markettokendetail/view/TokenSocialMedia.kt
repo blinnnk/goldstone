@@ -21,7 +21,6 @@ import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.TokenInformationModel
 import org.jetbrains.anko.gridLayout
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.wrapContent
 
 /**
@@ -30,12 +29,10 @@ import org.jetbrains.anko.wrapContent
  */
 @SuppressLint("ViewConstructor")
 @Suppress("DEPRECATION")
-class TokenSocialMedia(
-	context: Context,
-	clickEvent: (url: String) -> Unit
-) : TopBottomLineCell(context) {
+class TokenSocialMedia(context: Context, clickEvent: (url: String) -> Unit) : TopBottomLineCell(context) {
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		if (model.socialMedia.isEmpty()) return@observing
+		container.removeAllViewsInLayout()
 		model.socialMedia.forEach { model ->
 			IconWithTitle(context).apply {
 				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding / 3, wrapContent)

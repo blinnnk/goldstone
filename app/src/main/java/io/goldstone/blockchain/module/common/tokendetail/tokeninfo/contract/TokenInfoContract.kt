@@ -25,7 +25,6 @@ interface TokenInfoContract {
 		fun showBalance(balance: String)
 		fun showAddress(address: String, hash160: String)
 		fun showTotalValue(received: String, sent: String)
-		fun showError(error: Throwable)
 	}
 
 	interface GSPresenter : GoldStonePresenter {
