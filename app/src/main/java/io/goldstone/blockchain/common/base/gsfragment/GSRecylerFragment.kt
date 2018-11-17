@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
@@ -292,6 +293,20 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 	inline fun <reified T : RecyclerView.Adapter<*>> getAdapter() = recyclerView.adapter as? T
 
 	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> updateAdapterData(newData: ArrayList<D>, callback: () -> Unit = {}) {
+		getAdapter<T>()?.apply {
+			// Comparison the data, if they are different then update adapter
+			asyncData?.clear()
+			asyncData?.addAll(newData)
+			if (newData.isNotEmpty()) removeEmptyView()
+			else showEmptyView()
+			dataSet.clear()
+			dataSet.addAll(newData)
+			notifyDataSetChanged()
+			callback()
+		}
+	}
+
+	inline fun <reified T : HoneyBaseAdapter<D, *>> updateSingleCellAdapterData(newData: ArrayList<D>, callback: () -> Unit = {}) {
 		getAdapter<T>()?.apply {
 			// Comparison the data, if they are different then update adapter
 			asyncData?.clear()

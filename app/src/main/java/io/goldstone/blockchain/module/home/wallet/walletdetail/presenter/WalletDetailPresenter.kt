@@ -86,7 +86,7 @@ class WalletDetailPresenter(
 					if (it.size == 1) {
 						if (isAddress) detailView.showAddressSelectionFragment(it.first())
 						else detailView.showDepositFragment(it.first())
-					} else detailView.showSelectionDashboard(it, isAddress)
+					} else detailView.showSelectionDashboard(it.toArrayList(), isAddress)
 				}
 			} else detailView.showMnemonicBackUpDialog()
 		}

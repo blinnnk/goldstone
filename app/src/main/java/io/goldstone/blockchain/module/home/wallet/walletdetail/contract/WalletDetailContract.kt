@@ -15,7 +15,7 @@ interface WalletDetailContract {
 		var asyncData: ArrayList<WalletDetailCellModel>?
 		fun showLoading(status: Boolean)
 		fun setUnreadCount(count: Int)
-		fun showSelectionDashboard(tokens: List<WalletDetailCellModel>, isAddress: Boolean)
+		fun showSelectionDashboard(tokens: ArrayList<WalletDetailCellModel>, isAddress: Boolean)
 		fun setHeaderData(model: WalletDetailHeaderModel)
 		fun showMnemonicBackUpFragment()
 		fun showNotificationListFragment()

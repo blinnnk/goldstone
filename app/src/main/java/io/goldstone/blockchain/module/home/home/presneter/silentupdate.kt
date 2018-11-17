@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
 import android.content.Context
-import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.Connectivity
@@ -429,8 +428,6 @@ abstract class SilentUpdater {
 		}
 	}
 
-	// 获取当前的汇率
-	@WorkerThread
 	private fun updateCurrencyRateFromServer(config: AppConfigTable) {
 		GoldStoneAPI.getCurrencyRate(config.currencyCode) { rate, error ->
 			if (rate.isNotNull() && error.isNone()) {
@@ -442,7 +439,6 @@ abstract class SilentUpdater {
 		}
 	}
 
-	@WorkerThread
 	private fun updateAgreement() {
 		GoldStoneAPI.getTerms { term, error ->
 			if (!term.isNullOrBlank() && error.isNone()) {

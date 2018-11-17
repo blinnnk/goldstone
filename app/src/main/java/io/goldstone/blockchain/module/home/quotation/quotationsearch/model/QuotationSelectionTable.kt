@@ -21,10 +21,8 @@ import java.io.Serializable
  * @date 26/04/2018 10:47 AM
  * @author KaySaith
  */
-@Entity(tableName = "quotationSelection")
+@Entity(tableName = "quotationSelection", primaryKeys = ["marketID", "pair"])
 data class QuotationSelectionTable(
-	@PrimaryKey(autoGenerate = true)
-	var id: Int,
 	@SerializedName("market_id")
 	var marketID: Int,
 	@SerializedName("pair_display")
@@ -41,9 +39,8 @@ data class QuotationSelectionTable(
 	var name: String,
 	@SerializedName("address")
 	var contract: String,
-	var infoTitle: String,
 	var orderID: Double = 0.0,
-	var lineChartDay: String,
+	var lineChartDay: String = "",
 	var isSelecting: Boolean = false,
 	var lineChartWeek: String? = "",
 	var lineChartMonth: String? = "",
@@ -56,9 +53,9 @@ data class QuotationSelectionTable(
 
 	constructor(
 		data: QuotationSelectionTable,
-		lineChart: String
+		lineChart: String,
+		isSelected: Boolean
 	) : this(
-		0,
 		data.marketID,
 		data.pairDisplay,
 		data.baseSymbol,
@@ -67,10 +64,9 @@ data class QuotationSelectionTable(
 		data.market,
 		data.name,
 		data.contract,
-		data.pairDisplay + " " + data.market,
 		data.orderID,
 		lineChart,
-		data.isSelecting,
+		isSelected,
 		data.lineChartWeek,
 		data.lineChartMonth,
 		data.lineChartHour
@@ -83,11 +79,10 @@ data class QuotationSelectionTable(
 
 		@WorkerThread
 		fun insertSelection(table: QuotationSelectionTable) {
-			val quotationDao = GoldStoneDataBase.database.quotationSelectionDao()
 			// 添加的时候赋予新的最大的 `orderID`
-			val currentID = quotationDao.getMaxOrderIDTable()?.orderID
+			val currentID = dao.getMaxOrderIDTable()?.orderID
 			val newOrderID = if (currentID.isNull()) 1.0 else currentID.orElse(0.0) + 1
-			quotationDao.insert(table.apply { orderID = newOrderID })
+			dao.insert(table.apply { orderID = newOrderID })
 		}
 
 		fun updateSelectionOrderIDBy(fromPair: String, newOrderID: Double, callback: () -> Unit) {
@@ -168,7 +163,7 @@ interface QuotationSelectionDao {
 	@Query("SELECT * FROM quotationSelection WHERE orderID LIKE :orderID")
 	fun getSelectionByOrderID(orderID: Int): QuotationSelectionTable?
 
-	@Insert
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: QuotationSelectionTable)
 
 	@Update

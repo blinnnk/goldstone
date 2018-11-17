@@ -31,7 +31,6 @@ open class ContentScrollOverlayView(
 	isAddingRecyclerView: Boolean = false
 ) : RelativeLayout(context) {
 
-	var recoveryBackEvent: Runnable? = null
 	private var container: RelativeLayout
 	private lateinit var contentLayout: LinearLayout
 	private lateinit var titleView: TextView
@@ -123,8 +122,4 @@ open class ContentScrollOverlayView(
 		hold(contentLayout)
 	}
 
-	fun getOverlay(paddingBottomSize: Int, hold: RelativeLayout.() -> Unit) {
-		hold(container)
-		contentLayout.bottomPadding = paddingBottomSize
-	}
 }

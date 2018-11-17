@@ -80,6 +80,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.8'
+  implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha12'
   // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.3.4.5'
   // Crypto Ethereum

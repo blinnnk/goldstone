@@ -6,9 +6,12 @@ import android.widget.RelativeLayout
 import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
+import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListCell
 import org.jetbrains.anko.imageResource
 
@@ -18,6 +21,14 @@ import org.jetbrains.anko.imageResource
  */
 
 class QuotationManagementCell(context: Context) : TokenManagementListCell(context) {
+
+	var quotationSearchModel: QuotationSelectionTable? by observing(null) {
+		quotationSearchModel?.apply {
+			tokenInfo.title.text = pairDisplay suffix market
+			tokenInfo.subtitle.text = name
+			switch.isChecked = isSelecting
+		}
+	}
 
 	private val dragIcon by lazy { ImageView(context) }
 

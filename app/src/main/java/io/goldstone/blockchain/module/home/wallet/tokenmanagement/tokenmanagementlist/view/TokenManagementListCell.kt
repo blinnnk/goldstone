@@ -50,13 +50,6 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol.symbol else tokenName)
 		}
 	}
-	var quotationSearchModel: QuotationSelectionTable? by observing(null) {
-		quotationSearchModel?.apply {
-			tokenInfo.title.text = infoTitle
-			tokenInfo.subtitle.text = name
-			switch.isChecked = isSelecting
-		}
-	}
 
 	var tokenSearchModel: DefaultTokenTable? by observing(null) {
 		tokenSearchModel?.apply {
@@ -81,7 +74,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 	}
 
 	var switch: Switch
-	private val tokenInfo by lazy { TwoLineTitles(context) }
+	protected val tokenInfo by lazy { TwoLineTitles(context) }
 	protected val icon by lazy { SquareIcon(context, SquareIcon.Companion.Style.Big) }
 
 	init {

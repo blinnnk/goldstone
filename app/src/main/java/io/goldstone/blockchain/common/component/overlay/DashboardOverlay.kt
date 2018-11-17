@@ -12,7 +12,6 @@ import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
@@ -85,41 +84,5 @@ open class DashboardOverlay(
 
 	private fun removeSelf() {
 		(parent as? ViewGroup)?.removeView(this)
-	}
-}
-
-abstract class RadioDashboard {
-
-	abstract val cellContent: ArrayList<String>
-	abstract var defaultRadio: String
-	abstract fun afterSelected()
-
-	fun inTo(parent: ViewGroup?) {
-		parent?.apply {
-			DashboardOverlay(context) {
-				// 取消所有选中样式的函数内方法
-				fun recoveryRadioChecked() {
-					(0 until cellContent.size).forEach {
-						findViewById<BaseRadioCell>(it)?.checkedStatus = false
-					}
-				}
-				// 加载视图
-				cellContent.forEachIndexed { index, it ->
-					BaseRadioCell(context).apply {
-						id = index
-						if (it.equals(defaultRadio, true)) {
-							checkedStatus = true
-						}
-						setTitle(it)
-						setGrayStyle()
-					}.click {
-						recoveryRadioChecked()
-						defaultRadio = it.getTitle()
-						afterSelected()
-						it.checkedStatus = true
-					}.into(this)
-				}
-			}.into(this)
-		}
 	}
 }

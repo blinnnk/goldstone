@@ -5,9 +5,6 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 
 /**
@@ -40,19 +37,8 @@ data class ExchangeTable(
 	)
 
 	companion object {
-
 		@JvmField
 		val dao = GoldStoneDataBase.database.exchangeTableDao()
-
-		fun getMarketsBySelectedStatus(
-			isSelected: Boolean,
-			hold: (List<ExchangeTable>) -> Unit
-		) {
-			doAsync {
-				val marketList = GoldStoneDataBase.database.exchangeTableDao().getByStatus(isSelected)
-				GoldStoneAPI.context.runOnUiThread { hold(marketList) }
-			}
-		}
 	}
 
 }
@@ -62,8 +48,8 @@ interface ExchangeDao {
 	@Query("select * from exchangeTable")
 	fun getAll(): List<ExchangeTable>
 
-	@Query("select * from exchangeTable where isSelected = :isSelected")
-	fun getByStatus(isSelected: Boolean): List<ExchangeTable>
+	@Query("select * from exchangeTable where isSelected = 1")
+	fun getSelected(): List<ExchangeTable>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertAll(exchange: List<ExchangeTable>)
