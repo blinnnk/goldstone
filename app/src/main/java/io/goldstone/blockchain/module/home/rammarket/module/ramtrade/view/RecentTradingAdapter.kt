@@ -122,6 +122,7 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				centerVertically()
 			}
+			setMargins<RelativeLayout.LayoutParams> { leftMargin = 5.uiPX() }
 		}
 		transactionAmount = textView {
 			textColor = GrayScale.midGray
