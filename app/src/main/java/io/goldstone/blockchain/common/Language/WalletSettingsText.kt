@@ -1,7 +1,5 @@
 package io.goldstone.blockchain.common.language
 
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-
 /**
  * @date 2018/8/8 2:16 AM
  * @author KaySaith
@@ -63,66 +61,6 @@ object WalletSettingsText {
 		}
 	}
 
-	@JvmField
-	val newETHSeriesAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ETH Series Address"
-		HoneyLanguage.Chinese.code -> "新的ETH和ERC20代币地址"
-		HoneyLanguage.Japanese.code -> "新しいETHおよびERC20トークンアドレス"
-		HoneyLanguage.Korean.code -> "새로운 ETH 및 ERC20 토큰 주소"
-		HoneyLanguage.Russian.code -> "Новые адреса токенов ETH и ERC20"
-		HoneyLanguage.TraditionalChinese.code -> "新的ETH和ERC20代幣地址"
-		else -> ""
-	}
-	@JvmField
-	val newETCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ETC Address"
-		HoneyLanguage.Chinese.code -> "新的ETC地址"
-		HoneyLanguage.Japanese.code -> "新しいETCアドレス"
-		HoneyLanguage.Korean.code -> "새 ETC 주소"
-		HoneyLanguage.Russian.code -> "Новый адрес ETC"
-		HoneyLanguage.TraditionalChinese.code -> "新的ETC地址"
-		else -> ""
-	}
-	@JvmField
-	val newEOSAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New EOS Address"
-		HoneyLanguage.Chinese.code -> "新的EOS地址"
-		HoneyLanguage.Japanese.code -> "新しいEOSアドレス"
-		HoneyLanguage.Korean.code -> "새 EOS 주소"
-		HoneyLanguage.Russian.code -> "Новый адрес EOS"
-		HoneyLanguage.TraditionalChinese.code -> "新的EOS地址"
-		else -> ""
-	}
-	@JvmField
-	val newBTCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New ${CoinSymbol.btc()} Address"
-		HoneyLanguage.Chinese.code -> "新的${CoinSymbol.btc()}地址"
-		HoneyLanguage.Japanese.code -> "新しい${CoinSymbol.btc()}アドレス"
-		HoneyLanguage.Korean.code -> "새로운 ${CoinSymbol.btc()} 주소"
-		HoneyLanguage.Russian.code -> "Новый адрес BTC"
-		HoneyLanguage.TraditionalChinese.code -> "新的${CoinSymbol.btc()}地址"
-		else -> ""
-	}
-	@JvmField
-	val newLTCAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New LTC Address"
-		HoneyLanguage.Chinese.code -> "新的 LTC 地址"
-		HoneyLanguage.Japanese.code -> "新しい LTC アドレス"
-		HoneyLanguage.Korean.code -> "새로운 LTC 주소"
-		HoneyLanguage.Russian.code -> "Новый адрес LTC"
-		HoneyLanguage.TraditionalChinese.code -> "新的 LTC 地址"
-		else -> ""
-	}
-	@JvmField
-	val newBCHAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "New BCH Address"
-		HoneyLanguage.Chinese.code -> "新的 BCH 地址"
-		HoneyLanguage.Japanese.code -> "新しい BCH アドレス"
-		HoneyLanguage.Korean.code -> "새로운 BCH 주소"
-		HoneyLanguage.Russian.code -> "Новый адрес BCH"
-		HoneyLanguage.TraditionalChinese.code -> "新的 BCH 地址"
-		else -> ""
-	}
 	@JvmField
 	val viewAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "View All Addresses"

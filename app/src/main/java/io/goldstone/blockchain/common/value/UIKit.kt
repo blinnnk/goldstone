@@ -95,7 +95,7 @@ object ShadowSize {
 	@JvmField
 	val Card = 2.uiPX().toFloat()
 	@JvmField
-	val Cell = 5.uiPX().toFloat()
+	val Cell = 4.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
 	@JvmField
@@ -137,7 +137,7 @@ object ScreenSize {
 	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 	@JvmStatic
-	val overlayContentWidth = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 4
+	val overlayContentWidth = Resources.getSystem().displayMetrics.widthPixels - 50.uiPX()
 	@JvmStatic
 	val fullHeight = Resources.getSystem().displayMetrics.heightPixels
 	@JvmStatic

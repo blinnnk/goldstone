@@ -19,7 +19,6 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
-import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
@@ -136,11 +135,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		val dashboard =
-			getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay)
-		if (!dashboard.isNull()) {
-			getParentContainer()?.removeView(dashboard)
-		} else super.setBaseBackEvent(activity, parent)
+		super.setBaseBackEvent(activity, parent)
 	}
 
 	private fun setExpenditure() {

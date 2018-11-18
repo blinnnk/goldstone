@@ -85,10 +85,7 @@ class ProfilePresenter(
 				if (title == ProfileText.shareApp) {
 					showShareChooser()
 				} else {
-					addFragmentAndSetArguments<ProfileOverlayFragment>(
-						ContainerID.main,
-						FragmentTag.profileOverlay
-					) {
+					addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main, FragmentTag.profileOverlay) {
 						putString(ArgumentKey.profileTitle, title)
 					}
 				}

@@ -121,17 +121,12 @@ class VersionManager(val fragment: Fragment) {
 
 	fun showUpgradeDialog() {
 		fragment.context?.apply {
-			GoldStoneDialog.show(this) {
-				showButtons(CommonText.upgrade) {
-					downloadNewVersion {
-						GoldStoneDialog.remove(context)
-						if (currentChannel == ApkChannel.Google) {
-							showGooglePlayStore()
-						} else showDownloadProgress()
-					}
+			GoldStoneDialog(this).showUpgradeStatus(newVersionName, newVersionDescription) {
+				downloadNewVersion {
+					if (currentChannel == ApkChannel.Google) {
+						showGooglePlayStore()
+					} else showDownloadProgress()
 				}
-				setContent(newVersionName, newVersionDescription)
-				setImage(R.drawable.version_banner)
 			}
 		}
 	}

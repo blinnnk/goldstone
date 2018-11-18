@@ -213,7 +213,7 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 	 * `Inside loadingView` 非阻碍式的 `Loading`
 	 */
 	open fun showLoadingView(status: Boolean) {
-		topMiniLoading.visibility = if (status )View.VISIBLE else View.GONE
+		topMiniLoading.visibility = if (status) View.VISIBLE else View.GONE
 	}
 
 	open fun emptyClickEvent() {}
@@ -284,8 +284,6 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 		val parent = parentFragment
 		if (parent is BaseOverlayFragment<*>) {
 			parent.presenter.removeSelfFromActivity()
-			// 如果阻碍 `Loading` 存在也一并销毁
-			mainActivity?.removeLoadingView()
 		}
 	}
 

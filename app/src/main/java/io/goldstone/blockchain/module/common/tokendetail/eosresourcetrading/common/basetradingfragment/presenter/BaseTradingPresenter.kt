@@ -8,6 +8,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -90,14 +91,15 @@ open class BaseTradingPresenter(
 						setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
 					}
 					TradingType.RAM -> {
-						getMainActivity()?.showLoadingView()
+						val loadingView = LoadingView(fragment.context!!)
+						loadingView.show()
 						val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
 						// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
 						val price = SharedValue.getRAMUnitPrice()
 						val amountKBInEOS = 1.0 / price
 						val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
 						setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
-						getMainActivity()?.removeLoadingView()
+						loadingView.remove()
 					}
 				}
 			}

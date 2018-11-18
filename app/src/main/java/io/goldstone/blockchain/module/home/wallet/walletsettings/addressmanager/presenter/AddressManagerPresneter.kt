@@ -6,7 +6,6 @@ import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.error.AccountError
@@ -86,17 +85,6 @@ class AddressManagerPresenter(
 				presenter.showWalletSettingListFragment()
 			}
 		}
-	}
-
-	fun getAddressCreatorMenu(): ArrayList<Pair<Int, String>> {
-		return arrayListOf(
-			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHSeriesAddress),
-			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
-			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
-			Pair(R.drawable.ltc_creator_icon, WalletSettingsText.newLTCAddress),
-			Pair(R.drawable.bch_creator_icon, WalletSettingsText.newBCHAddress),
-			Pair(R.drawable.eos_creator_icon, WalletSettingsText.newEOSAddress)
-		)
 	}
 
 	fun showAllETHSeriesAddresses(): Runnable {
@@ -567,24 +555,6 @@ class AddressManagerPresenter(
 						}
 					}
 				}
-			}
-		}
-
-		fun getCellDashboardMenu(
-			hasDefaultCell: Boolean = true,
-			isBCH: Boolean = false
-		): ArrayList<Pair<Int, String>> {
-			return arrayListOf(
-				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
-				Pair(R.drawable.qr_code_icon, WalletText.qrCode),
-				Pair(R.drawable.keystore_icon, WalletSettingsText.exportKeystore),
-				Pair(R.drawable.private_key_icon, WalletSettingsText.exportPrivateKey),
-				Pair(R.drawable.bch_address_convert_icon, WalletText.getBCHLegacyAddress)
-			).apply {
-				// 如果当前 `Cell` 就是默认地址, 不限时设置默认地址的选项
-				if (!hasDefaultCell) remove(find { it.second == WalletText.setDefaultAddress })
-				// 如果当前 `Cell` 不是 `BCH` 那么不限时转换 `BCH` 地址的选项
-				if (!isBCH) remove(find { it.second == WalletText.getBCHLegacyAddress })
 			}
 		}
 

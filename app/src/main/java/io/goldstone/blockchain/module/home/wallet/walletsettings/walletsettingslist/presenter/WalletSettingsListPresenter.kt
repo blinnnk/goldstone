@@ -7,6 +7,7 @@ import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
@@ -24,7 +25,6 @@ import io.goldstone.blockchain.crypto.multichain.isStoredInKeyStoreByAddress
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -98,6 +98,8 @@ class WalletSettingsListPresenter(
 			!SharedWallet.isWatchOnlyWallet(),
 			{}
 		) { passwordInput ->
+			val loadingView = LoadingView(this)
+			loadingView.show()
 			if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
 			else {
 				val password = passwordInput?.text.toString()
@@ -105,11 +107,11 @@ class WalletSettingsListPresenter(
 					val type = getWalletType()
 					verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
 						if (isCorrect) {
-							launchUI { getMainActivity()?.showLoadingView() }
 							if (type.isBIP44())
 								deleteWalletData(id, getCurrentAllBip44Address(), password)
 							else deleteRootKeyWallet(id, getCurrentBip44Addresses(), password)
 						} else runOnUiThread {
+							loadingView.remove()
 							alert(CommonText.wrongPassword)
 						}
 					}
@@ -215,8 +217,7 @@ class WalletSettingsListPresenter(
 			}
 			// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 			XinGePushReceiver.registerAddressesForPush(wallet, true)
-			GoldStoneAPI.context.runOnUiThread {
-				fragment.getMainActivity()?.removeLoadingView()
+			launchUI {
 				fragment.activity?.jump<SplashActivity>()
 			}
 		}

@@ -66,7 +66,7 @@ abstract class SilentUpdater {
 					Connectivity.isConnectedWifi(GoldStoneAPI.context) -> updateData()
 					Connectivity.isConnectedMobile(GoldStoneAPI.context) -> {
 						launchUI {
-							GoldStoneDialog.showMobile4GConfirm(context) {
+							GoldStoneDialog(context).showMobile4GConfirm {
 								GlobalScope.launch(Dispatchers.Default) {
 									updateData()
 									updateTokenInfo()

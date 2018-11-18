@@ -45,6 +45,18 @@ object DialogText {
 		HoneyLanguage.TraditionalChinese.code -> "未檢測到網絡"
 		else -> ""
 	}
+
+	@JvmField
+	val mobileNetwork = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Mobile Network"
+		HoneyLanguage.Chinese.code -> "Mobile Network"
+		HoneyLanguage.Japanese.code -> "Mobile Network"
+		HoneyLanguage.Korean.code -> "Mobile Network"
+		HoneyLanguage.Russian.code -> "Mobile Network"
+		HoneyLanguage.TraditionalChinese.code -> "Mobile Network"
+		else -> ""
+	}
+
 	@JvmField
 	val networkDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The current state of the network is not good. Please check. You can try turning on and off airplane mode to try to recover."

@@ -20,7 +20,6 @@ import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.ValueInputView
-import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PrepareTransferText
@@ -179,10 +178,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 
 	fun backEvent() {
 		if (rootFragment?.token?.contract.isBTCSeries()) {
-			val overlay =
-				getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay)
-			if (overlay != null) getParentContainer()?.removeView(overlay)
-			else getParentFragment<TokenDetailOverlayFragment>()?.apply {
+			getParentFragment<TokenDetailOverlayFragment>()?.apply {
 				presenter.popFragmentFrom<PaymentDetailFragment>()
 			}
 		} else {

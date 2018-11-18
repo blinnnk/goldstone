@@ -5,14 +5,14 @@ import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.list.customListAdapter
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
@@ -35,6 +35,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.model.GridIconTitleModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import kotlinx.coroutines.Dispatchers
@@ -285,57 +286,54 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun showCreatorDashboard() {
-		val dialog = MaterialDialog(context!!)
-		with(dialog) {
-			title(text = "Create New Address")
-			customListAdapter(AddressGeneratorAdapter(presenter.getAddressCreatorMenu()) {
-				verifyMultiChainWalletPassword(context) { password, error ->
-					if (!password.isNullOrEmpty() && error.isNone()) {
-						createChildAddressByButtonTitle(context, it.second, password) { addresses, createError ->
-							if (error.hasError()) safeShowError(createError)
-							else launchUI {
-								addresses?.apply {
-									updateUI(this, it.second)
+		Dashboard(context!!) {
+			showDashboard(
+				"Create New Address",
+				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
+					verifyMultiChainWalletPassword(context!!) { password, error ->
+						if (!password.isNullOrEmpty() && error.isNone() && it.chainType.isNotNull()) {
+							createChildAddressByButtonTitle(context!!, it.chainType, password) { addresses, createError ->
+								if (addresses.isNullOrEmpty() || error.hasError()) safeShowError(createError)
+								else launchUI {
+									updateUI(addresses, it.chainType)
 								}
 							}
-						}
-					} else safeShowError(error)
+						} else safeShowError(error)
+					}
+					dismiss()
 				}
-				dialog.dismiss()
-			})
-			negativeButton(text = CommonText.cancel)
-			show()
+			)
 		}
 	}
 
 	private fun createChildAddressByButtonTitle(
 		context: Context,
-		title: String,
+		chainType: ChainType,
 		password: String,
 		@WorkerThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 	) {
-		when (title) {
-			WalletSettingsText.newETHSeriesAddress ->
+		when {
+			chainType.isETH() ->
 				AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
-			WalletSettingsText.newETCAddress ->
+			chainType.isETC() ->
 				AddressManagerPresenter.createETCAddress(context, password, hold)
 
-			WalletSettingsText.newEOSAddress ->
+			chainType.isEOS() ->
 				AddressManagerPresenter.createEOSAddress(context, password, hold)
 
-			WalletSettingsText.newLTCAddress -> {
+			chainType.isLTC() -> {
 				if (SharedValue.isTestEnvironment())
 					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
 				else AddressManagerPresenter.createLTCAddress(context, password, hold)
 			}
 
-			WalletSettingsText.newBCHAddress -> {
+			chainType.isBCH() -> {
 				if (SharedValue.isTestEnvironment())
 					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
 				else AddressManagerPresenter.createBCHAddress(context, password, hold)
 			}
 
-			WalletSettingsText.newBTCAddress -> {
+			chainType.isBTC() -> {
 				if (SharedValue.isTestEnvironment())
 					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
 				else AddressManagerPresenter.createBTCAddress(context, password, hold)
@@ -343,20 +341,20 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		}
 	}
 
-	private fun updateUI(addresses: List<Bip44Address>, title: String) {
-		when (title) {
-			WalletSettingsText.newETHSeriesAddress -> ethSeriesView.model = addresses
-			WalletSettingsText.newETCAddress -> etcAddressesView.model = addresses
-			WalletSettingsText.newEOSAddress -> eosAddressesView.model = addresses
-			WalletSettingsText.newLTCAddress -> {
+	private fun updateUI(addresses: List<Bip44Address>, chainType: ChainType) {
+		when {
+			chainType.isETH() -> ethSeriesView.model = addresses
+			chainType.isETC() -> etcAddressesView.model = addresses
+			chainType.isEOS() -> eosAddressesView.model = addresses
+			chainType.isLTC() -> {
 				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
 				else ltcAddressesView.model = addresses
 			}
-			WalletSettingsText.newBCHAddress -> {
+			chainType.isBCH() -> {
 				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
 				else bchAddressesView.model = addresses
 			}
-			WalletSettingsText.newBTCAddress -> btcAddressesView.model = addresses
+			chainType.isBTC() -> btcAddressesView.model = addresses
 		}
 	}
 
@@ -490,22 +488,21 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			convertBCHAddressToLegacy: () -> Unit
 		) {
 			val data =
-				AddressManagerPresenter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
-			val dialog = MaterialDialog(context)
-			with(dialog) {
-				title(text = "More Dashboard")
-				customListAdapter(AddressGeneratorAdapter(data) {
-					when (it.second) {
-						WalletText.setDefaultAddress -> setDefaultAddressEvent()
-						WalletText.qrCode -> qrCellClickEvent()
-						WalletSettingsText.exportPrivateKey -> exportPrivateKey()
-						WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
-						WalletText.getBCHLegacyAddress -> convertBCHAddressToLegacy()
+				GridIconTitleModel.getMenuModels(hasDefaultCell, isCashAddress)
+			Dashboard(context) {
+				showDashboard(
+					"More Operation",
+					GridIconTitleAdapter(data) {
+						when (it.name) {
+							WalletText.setDefaultAddress -> setDefaultAddressEvent()
+							WalletText.qrCode -> qrCellClickEvent()
+							WalletSettingsText.exportPrivateKey -> exportPrivateKey()
+							WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
+							WalletText.getBCHLegacyAddress -> convertBCHAddressToLegacy()
+						}
+						dismiss()
 					}
-					dialog.dismiss()
-				})
-				negativeButton(text = CommonText.cancel)
-				show()
+				)
 			}
 		}
 	}
