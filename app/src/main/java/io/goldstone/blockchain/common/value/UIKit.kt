@@ -18,7 +18,7 @@ object GrayScale {
 	@JvmField
 	val lightGray = Color.parseColor("#FFE5E5E5")
 	@JvmField
-	val whiteGray = Color.parseColor("#FFF1F1F1")
+	val whiteGray = Color.parseColor("#FFF2F2F2")
 	@JvmField
 	val gray = Color.parseColor("#FFAAAAAA")
 	@JvmField
@@ -95,7 +95,7 @@ object ShadowSize {
 	@JvmField
 	val Card = 2.uiPX().toFloat()
 	@JvmField
-	val Cell = 5.uiPX().toFloat()
+	val Cell = 4.uiPX().toFloat()
 	@JvmField
 	val Overlay = 15.uiPX().toFloat()
 	@JvmField
@@ -109,6 +109,8 @@ object PaddingSize {
 	val content = 10.uiPX()
 	@JvmField
 	val overlay = 15.uiPX()
+	@JvmField
+	val card = 30.uiPX()
 }
 
 object CornerSize {
@@ -135,7 +137,7 @@ object ScreenSize {
 	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 	@JvmStatic
-	val overlayContentWidth = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 4
+	val overlayContentWidth = Resources.getSystem().displayMetrics.widthPixels - 50.uiPX()
 	@JvmStatic
 	val fullHeight = Resources.getSystem().displayMetrics.heightPixels
 	@JvmStatic

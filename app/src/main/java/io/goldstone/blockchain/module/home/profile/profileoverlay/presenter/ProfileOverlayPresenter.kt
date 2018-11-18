@@ -2,13 +2,10 @@ package io.goldstone.blockchain.module.home.profile.profileoverlay.presenter
 
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.findChildFragmentByTag
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.replaceFragmentAndSetArgument
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.component.overlay.MiniOverlay
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.ProfileText
@@ -31,7 +28,8 @@ import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFra
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
-import org.jetbrains.anko.sdk27.coroutines.onClick
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.model.GridIconTitleModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.GridIconTitleAdapter
 
 /**
  * @date 26/03/2018 12:56 AM
@@ -80,27 +78,18 @@ class ProfileOverlayPresenter(
 	}
 
 	fun showWalletAddingMethodDashboard() {
-		val menuData = listOf(
-			Pair(R.drawable.create_wallet_icon, CreateWalletText.create),
-			Pair(R.drawable.import_wallet_icon, ImportWalletText.importWallet),
-			Pair(R.drawable.watch_only_icon, ImportWalletText.importWatchWallet)
-		)
-		var mini: MiniOverlay? = null
-		fragment.getContainer().apply {
-			mini = MiniOverlay(context) { cell, title ->
-				cell.onClick {
-					when (title) {
+		Dashboard(fragment.context!!) {
+			showDashboard(
+				"Wallet Management",
+				GridIconTitleAdapter(GridIconTitleModel.getWalletManagementMenu()) {
+					when (it.name) {
 						CreateWalletText.create -> showCreateWalletFragment()
 						ImportWalletText.importWallet -> showImportWalletFragment()
 						else -> showWatchWalletImportFragment()
 					}
-					mini?.removeSelf()
-					cell.preventDuplicateClicks()
+					dismiss()
 				}
-			}
-			mini?.model = menuData
-			mini?.into(this)
-			mini?.setTopLeft()
+			)
 		}
 	}
 
@@ -120,11 +109,19 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showImportWalletFragment() {
-		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.main)
+		// 防止重回展开的时候, 隐藏 ProfileOverlayFragment
+		fragment.activity?.apply {
+			supportFragmentManager.beginTransaction().hide(fragment).commit()
+			addFragment<WalletImportFragment>(ContainerID.main)
+		}
 	}
 
 	private fun showCreateWalletFragment() {
-		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.main)
+		// 防止重回展开的时候, 隐藏 ProfileOverlayFragment
+		fragment.activity?.apply {
+			supportFragmentManager.beginTransaction().hide(fragment).commit()
+			addFragment<WalletGenerationFragment>(ContainerID.main)
+		}
 	}
 
 	private fun showPrivacyFragment() {

@@ -17,6 +17,7 @@ import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.thread.launchUI
@@ -99,13 +100,19 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 					}
 					exchangeAdapter.notifyDataSetChanged()
 				}
-				.positiveButton(text = CommonText.confirm) {
+				.positiveButton(text = CommonText.confirm) { dialog ->
 					GlobalScope.launch(Dispatchers.Default) {
 						ExchangeTable.dao.insertAll(exchanges)
 					}
+					val selectedIDs = exchanges.filter { exchange ->
+						exchange.isSelected
+					}.map { exchange ->
+						exchange.marketId
+					}
+					presenter.updateSelectedExchangeID(selectedIDs)
 					updateResultAfterConditionChanged()
 					showFilterDescription(exchanges)
-					it.dismiss()
+					dialog.dismiss()
 				}
 				.negativeButton(text = CommonText.cancel) {
 					it.dismiss()
@@ -140,11 +147,12 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationSelectionTable>?
 	) {
+		val loadingView = LoadingView(context!!)
 		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { model, isChecked ->
-			getMainActivity()?.showLoadingView()
+			loadingView.show()
 			presenter.updateLocalQuotation(model, isChecked) { error ->
 				launchUI {
-					getMainActivity()?.removeLoadingView()
+					loadingView.remove()
 					if (error.hasError()) safeShowError(error)
 				}
 			}

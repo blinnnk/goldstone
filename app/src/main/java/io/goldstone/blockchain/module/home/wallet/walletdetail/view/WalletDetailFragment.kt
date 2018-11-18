@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
@@ -8,12 +7,10 @@ import com.afollestad.materialdialogs.list.customListAdapter
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.orEmptyArray
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -164,7 +161,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	}
 
 	override fun showMnemonicBackUpDialog() {
-		showMnemonicBackUpDialog(context!!) {
+		GoldStoneDialog(context!!).showBackUpMnemonicStatus {
 			showMnemonicBackUpFragment()
 		}
 	}
@@ -178,7 +175,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	}
 
 	override fun showChainError() {
-		GoldStoneDialog.showChainErrorDialog(context!!)
+		GoldStoneDialog(context!!).showChainErrorDialog()
 	}
 
 	private fun showTokenManagementFragment() {
@@ -206,22 +203,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 				addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main, FragmentTag.tokenDetail) {
 					putSerializable(ArgumentKey.tokenDetail, model)
 				}
-		}
-	}
-
-	companion object {
-		fun showMnemonicBackUpDialog(context: Context, action: () -> Unit) {
-			GoldStoneDialog.show(context) {
-				showButtons(DialogText.goToBackUp) {
-					action()
-					GoldStoneDialog.remove(context)
-				}
-				setImage(R.drawable.succeed_banner)
-				setContent(
-					DialogText.backUpMnemonic,
-					DialogText.backUpMnemonicDescription
-				)
-			}
 		}
 	}
 }

@@ -3,17 +3,16 @@ package io.goldstone.blockchain.module.home.profile.contacts.contracts.view
 import android.os.Bundle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
@@ -99,16 +98,7 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
-		val parent = parentFragment
-		if (parent is TokenDetailOverlayFragment) {
-			val dashboard =
-				parent.getContainer().findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
-			// 判断是否打开通讯录来更改回退栈
-			if (dashboard.isNotNull()) {
-				parent.getContainer().removeView(dashboard)
-				parent.removeChildFragment(this)
-			} else super.setBackEvent(mainActivity)
-		} else super.setBackEvent(mainActivity)
+		super.setBackEvent(mainActivity)
 	}
 
 	private fun showAddButton(status: Boolean) {
