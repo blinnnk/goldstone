@@ -74,16 +74,15 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			setConfirmClickEvent {
 				showLoading(true)
 				presenter.gainConfirmEvent { response, error ->
-					if (response.isNotNull() && error.isNone()) launchUI {
-						// 显示成功的 `Dialog`
-						getParentContainer()?.apply {
-							response.showDialog(this)
+					if (response.isNotNull() && error.isNone()) {
+						launchUI {
+							getParentContainer()?.apply {
+								response.showDialog(this)
+							}
+							clearInputValue()
+							toast(CommonText.succeed)
+							// 更新数据库数据并且更新界面的数据
 						}
-						// 清空输入框里面的值
-						clearInputValue()
-						// 成功提示
-						toast(CommonText.succeed)
-						// 更新数据库数据并且更新界面的数据
 						presenter.updateLocalDataAndUI()
 					} else if (error.hasError()) safeShowError(error)
 					showLoading(false)
@@ -111,9 +110,12 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				showLoading(true)
 				presenter.refundOrSellConfirmEvent { response, error ->
 					if (response.isNotNull() && error.isNone()) {
-						getParentContainer()?.apply { response.showDialog(this) }
-						// 清空输入框里面的值
-						clearInputValue()
+						launchUI {
+							getParentContainer()?.apply {
+								response.showDialog(this)
+							}
+							clearInputValue()
+						}
 						// 更新数据库数据并且更新界面的数据
 						presenter.updateLocalDataAndUI()
 					} else if (error.hasError()) safeShowError(error)

@@ -120,7 +120,11 @@ object EOSAPI {
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
 				if (result?.isNotEmpty() == true && error.isNone()) {
 					hold(
-						EOSAccountTable(JSONObject(result), SharedAddress.getCurrentEOS(), SharedChain.getEOSCurrent().chainID),
+						EOSAccountTable(
+							JSONObject(result),
+							SharedAddress.getCurrentEOS(),
+							SharedChain.getEOSCurrent().chainID
+						),
 						error
 					)
 				} else hold(null, error)
