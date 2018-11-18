@@ -38,6 +38,10 @@ class QuotationSearchPresenter(
 		}
 	}
 
+	override fun updateSelectedExchangeID(ids: List<Int>) {
+		selectedIds = ids.joinToString(",")
+	}
+
 	@WorkerThread
 	override fun updateLocalQuotation(
 		model: QuotationSelectionTable,

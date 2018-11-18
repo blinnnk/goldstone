@@ -4,11 +4,9 @@ import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getChildFragment
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.getViewAbsolutelyPositionInScreen
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.thread.launchUI
@@ -49,15 +47,9 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	fun showMoreDashboard(
-		cell: GraySquareCellWithButtons,
-		bip44Address: Bip44Address,
-		hasDefaultCell: Boolean = true
-	) {
+	fun showMoreDashboard(bip44Address: Bip44Address, hasDefaultCell: Boolean = true) {
 		val coinType = bip44Address.getChainType()
-		showMoreDashboard(
-			fragment.wrapper,
-			cell.getViewAbsolutelyPositionInScreen()[1].toFloat(),
+		fragment.wrapper.showMoreDashboard(
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(bip44Address.address),
 			setDefaultAddressEvent = {
@@ -66,7 +58,6 @@ class ChainAddressesPresenter(
 						fragment.setDefaultAddress(bip44Address)
 						// 更新钱包默认地址, 同时更新首页的数据
 						updateWalletDetail()
-						AddressManagerFragment.removeDashboard(fragment.context)
 						fragment.toast(CommonText.succeed)
 					}
 				}
@@ -89,7 +80,6 @@ class ChainAddressesPresenter(
 				val legacyAddress = BCHWalletUtils.formattedToLegacy(bip44Address.address, MainNetParams.get())
 				fragment.context.alert(legacyAddress)
 				fragment.context?.clickToCopy(legacyAddress)
-				AddressManagerFragment.removeDashboard(fragment.context)
 			}
 		)
 	}

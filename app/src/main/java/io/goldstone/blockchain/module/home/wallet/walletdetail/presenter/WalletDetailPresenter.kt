@@ -124,10 +124,9 @@ class WalletDetailPresenter(
 			object : ConcurrentJobs() {
 				override var asyncCount: Int = size
 				override fun doChildJob(index: Int) {
-					// 链上查余额
 					val ownerName = get(index).contract.getAddress(true)
+					// 更新数据的余额信息
 					MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
-						// 更新数据的余额信息
 						if (balance.isNotNull() && error.isNone()) {
 							MyTokenTable.dao.updateBalanceByContract(
 								balance,
@@ -136,8 +135,11 @@ class WalletDetailPresenter(
 								ownerName
 							)
 							get(index).count = balance
-						} else balanceError = error
-						completeMark()
+							completeMark()
+						} else {
+							balanceError = error
+							completeMark()
+						}
 					}
 				}
 

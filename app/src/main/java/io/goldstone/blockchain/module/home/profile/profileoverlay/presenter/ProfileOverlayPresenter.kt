@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
+import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.profile.chain.chainselection.view.ChainSelectionFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
@@ -120,11 +121,19 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showImportWalletFragment() {
-		fragment.activity?.addFragment<WalletImportFragment>(ContainerID.main)
+		// 防止重回展开的时候, 隐藏 ProfileOverlayFragment
+		fragment.activity?.apply {
+			supportFragmentManager.beginTransaction().hide(fragment).commit()
+			addFragment<WalletImportFragment>(ContainerID.main)
+		}
 	}
 
 	private fun showCreateWalletFragment() {
-		fragment.activity?.addFragment<WalletGenerationFragment>(ContainerID.main)
+		// 防止重回展开的时候, 隐藏 ProfileOverlayFragment
+		fragment.activity?.apply {
+			supportFragmentManager.beginTransaction().hide(fragment).commit()
+			addFragment<WalletGenerationFragment>(ContainerID.main)
+		}
 	}
 
 	private fun showPrivacyFragment() {

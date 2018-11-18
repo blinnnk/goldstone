@@ -31,7 +31,7 @@ open class DashboardOverlay(
 	hold: LinearLayout.() -> Unit
 ) : RelativeLayout(context) {
 
-	var confirmEvent: Runnable? = null
+	private var confirmEvent: Runnable? = null
 	private lateinit var titleView: TextView
 	private val confirmButton = RoundButton(context)
 	private val container = scrollView {
@@ -74,12 +74,6 @@ open class DashboardOverlay(
 		onClick {
 			removeSelf()
 		}
-	}
-
-	fun showTitle(text: String): DashboardOverlay {
-		titleView.visibility = View.VISIBLE
-		titleView.text = text
-		return this
 	}
 
 	private fun removeSelf() {

@@ -88,8 +88,8 @@ class AddressManagerPresenter(
 		}
 	}
 
-	fun getAddressCreatorMenu(): List<Pair<Int, String>> {
-		return listOf(
+	fun getAddressCreatorMenu(): ArrayList<Pair<Int, String>> {
+		return arrayListOf(
 			Pair(R.drawable.eth_creator_icon, WalletSettingsText.newETHSeriesAddress),
 			Pair(R.drawable.etc_creator_icon, WalletSettingsText.newETCAddress),
 			Pair(R.drawable.btc_creator_icon, WalletSettingsText.newBTCAddress),
@@ -164,7 +164,6 @@ class AddressManagerPresenter(
 		) {
 			walletSettingsFragment.apply {
 				if (!SharedWallet.isWatchOnlyWallet()) {
-					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<PrivateKeyExportFragment>(
 						Bundle().apply {
 							putString(ArgumentKey.address, address)
@@ -179,7 +178,6 @@ class AddressManagerPresenter(
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false) {}
-				AddressManagerFragment.removeDashboard(context)
 				presenter.showTargetFragment<QRCodeFragment>(
 					Bundle().apply { putSerializable(ArgumentKey.addressModel, addressModel) }
 				)
@@ -191,7 +189,6 @@ class AddressManagerPresenter(
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false) {}
 				if (!SharedWallet.isWatchOnlyWallet()) {
-					AddressManagerFragment.removeDashboard(context)
 					presenter.showTargetFragment<KeystoreExportFragment>(
 						Bundle().apply { putString(ArgumentKey.address, address) }
 					)
@@ -576,7 +573,7 @@ class AddressManagerPresenter(
 		fun getCellDashboardMenu(
 			hasDefaultCell: Boolean = true,
 			isBCH: Boolean = false
-		): List<Pair<Int, String>> {
+		): ArrayList<Pair<Int, String>> {
 			return arrayListOf(
 				Pair(R.drawable.default_icon, WalletText.setDefaultAddress),
 				Pair(R.drawable.qr_code_icon, WalletText.qrCode),

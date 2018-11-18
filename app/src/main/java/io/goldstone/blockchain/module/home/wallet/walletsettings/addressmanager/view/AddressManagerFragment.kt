@@ -5,12 +5,14 @@ import android.support.annotation.WorkerThread
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.ViewGroup
-import com.blinnnk.animation.scale
-import com.blinnnk.extension.*
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.customListAdapter
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.overlay.MiniOverlay
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
@@ -21,9 +23,10 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.*
@@ -58,7 +61,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			}
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					chainType,
 					!isDefault
@@ -78,7 +80,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					ChainType.ETH,
 					!isDefault
@@ -91,7 +92,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					ChainType.ETC,
 					!isDefault
@@ -104,7 +104,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					if (SharedValue.isTestEnvironment()) ChainType.AllTest else ChainType.BTC,
 					!isDefault
@@ -117,7 +116,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					ChainType.LTC,
 					!isDefault
@@ -132,7 +130,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			presenter.showEOSPublickeyDescription(cell, data.address, wallet)
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					ChainType.EOS,
 					!isDefault
@@ -146,7 +143,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		AddressesListView(context!!, 3) { cell, data, _, isDefault ->
 			cell.moreButton.onClick {
 				showCellMoreDashboard(
-					cell.moreButton.getViewAbsolutelyPositionInScreen()[1].toFloat(),
 					data,
 					ChainType.BCH,
 					!isDefault
@@ -289,29 +285,26 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun showCreatorDashboard() {
-		getMainActivity()?.getMainContainer()?.apply {
-			if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
-				val creatorDashBoard = MiniOverlay(context) { cell, title ->
-					cell.click {
-						verifyMultiChainWalletPassword(context) { password, error ->
-							if (!password.isNullOrEmpty() && error.isNone()) {
-								createChildAddressByButtonTitle(context, title, password) { addresses, createError ->
-									if (error.hasError()) safeShowError(createError)
-									else launchUI {
-										addresses?.apply {
-											updateUI(this, title)
-										}
-									}
+		val dialog = MaterialDialog(context!!)
+		with(dialog) {
+			title(text = "Create New Address")
+			customListAdapter(AddressGeneratorAdapter(presenter.getAddressCreatorMenu()) {
+				verifyMultiChainWalletPassword(context) { password, error ->
+					if (!password.isNullOrEmpty() && error.isNone()) {
+						createChildAddressByButtonTitle(context, it.second, password) { addresses, createError ->
+							if (error.hasError()) safeShowError(createError)
+							else launchUI {
+								addresses?.apply {
+									updateUI(this, it.second)
 								}
-							} else safeShowError(error)
+							}
 						}
-					}
+					} else safeShowError(error)
 				}
-				creatorDashBoard.model =
-					this@AddressManagerFragment.presenter.getAddressCreatorMenu()
-				creatorDashBoard.into(this)
-				creatorDashBoard.setTopRight()
-			}
+				dialog.dismiss()
+			})
+			negativeButton(text = CommonText.cancel)
+			show()
 		}
 	}
 
@@ -368,14 +361,11 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun showCellMoreDashboard(
-		top: Float,
 		address: Bip44Address,
 		coinType: ChainType,
 		hasDefaultCell: Boolean
 	) {
-		showMoreDashboard(
-			getParentContainer(),
-			top,
+		getParentContainer()?.showMoreDashboard(
 			hasDefaultCell,
 			BCHWalletUtils.isNewCashAddress(address.address),
 			setDefaultAddressEvent = {
@@ -393,7 +383,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isAllTest() -> setBTCSeriesTestAddressesModel(wallet)
 						}
 						toast(CommonText.succeed)
-						removeDashboard(context)
 					}
 				}
 				// `EOS` 和其他链的切换默认地址的逻辑不同
@@ -422,7 +411,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				val legacyAddress = BCHWalletUtils.formattedToLegacy(address.address, MainNetParams.get())
 				context.alert(legacyAddress)
 				context?.clickToCopy(legacyAddress)
-				removeDashboard(context)
 			}
 		)
 	}
@@ -435,11 +423,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		getParentFragment<WalletSettingsFragment> {
 			presenter.showWalletSettingListFragment()
 		}
-	}
-
-	override fun onDestroyView() {
-		super.onDestroyView()
-		removeDashboard(context)
 	}
 
 	companion object {
@@ -481,7 +464,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				WalletSettingsText.createSubAccount,
 				WalletSettingsText.createSubAccountIntro,
 				!SharedWallet.isWatchOnlyWallet(),
-				{ removeDashboard(context) }
+				{ }
 			) { passwordInput ->
 				GlobalScope.launch(Dispatchers.Default) {
 					val password = passwordInput?.text.toString()
@@ -495,12 +478,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					}
 				}
 			}
-			removeDashboard(context)
 		}
 
-		fun showMoreDashboard(
-			container: ViewGroup?,
-			top: Float,
+		fun ViewGroup.showMoreDashboard(
 			hasDefaultCell: Boolean = true,
 			isCashAddress: Boolean,
 			setDefaultAddressEvent: () -> Unit,
@@ -509,35 +489,23 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			keystoreCellClickEvent: () -> Unit,
 			convertBCHAddressToLegacy: () -> Unit
 		) {
-			container?.apply {
-				if (findViewById<MiniOverlay>(ElementID.miniOverlay).isNull()) {
-					val creatorDashBoard = MiniOverlay(context) { cell, title ->
-						cell.onClick {
-							when (title) {
-								WalletText.setDefaultAddress -> setDefaultAddressEvent()
-								WalletText.qrCode -> qrCellClickEvent()
-								WalletSettingsText.exportPrivateKey -> exportPrivateKey()
-								WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
-								WalletText.getBCHLegacyAddress -> convertBCHAddressToLegacy()
-							}
-							cell.preventDuplicateClicks()
-						}
+			val data =
+				AddressManagerPresenter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
+			val dialog = MaterialDialog(context)
+			with(dialog) {
+				title(text = "More Dashboard")
+				customListAdapter(AddressGeneratorAdapter(data) {
+					when (it.second) {
+						WalletText.setDefaultAddress -> setDefaultAddressEvent()
+						WalletText.qrCode -> qrCellClickEvent()
+						WalletSettingsText.exportPrivateKey -> exportPrivateKey()
+						WalletSettingsText.exportKeystore -> keystoreCellClickEvent()
+						WalletText.getBCHLegacyAddress -> convertBCHAddressToLegacy()
 					}
-					creatorDashBoard.scale(2, false, 60)
-					creatorDashBoard.model =
-						AddressManagerPresenter.getCellDashboardMenu(hasDefaultCell, isCashAddress)
-					creatorDashBoard.into(this)
-					// 防止超出屏幕便捷的尺寸弥补
-					val overHeightSize =
-						ScreenSize.fullHeight - creatorDashBoard.getOverlayHeight() - top
-					creatorDashBoard.setTopValue(top + if (overHeightSize < 0f) overHeightSize else 0f)
-				}
-			}
-		}
-
-		fun removeDashboard(context: Context?) {
-			(context as? MainActivity)?.getMainContainer()?.apply {
-				findViewById<MiniOverlay>(ElementID.miniOverlay)?.removeSelf()
+					dialog.dismiss()
+				})
+				negativeButton(text = CommonText.cancel)
+				show()
 			}
 		}
 	}

@@ -76,12 +76,12 @@ class EOSActivationModeFragment : BaseFragment<EOSActivationModePresenter>() {
 		activationByContractButton.click {
 			presenter.showRegisterBySmartContractFragment()
 		}.into(this)
-		activationByContractButton.setBlueStyle(10.uiPX())
+		activationByContractButton.setBlueStyle(5.uiPX())
 		activationByContractButton.text = EOSAccountText.activeByContract
 		copyAddressButton.click {
 			context?.clickToCopy(SharedAddress.getCurrentEOS())
 		}.into(this)
-		copyAddressButton.setBlueStyle(10.uiPX())
+		copyAddressButton.setBlueStyle(5.uiPX())
 		copyAddressButton.text = EOSAccountText.activeManually
 	}
 

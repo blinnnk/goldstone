@@ -22,6 +22,7 @@ interface QuotationSearchContract {
 	interface GSPresenter : GoldStonePresenter {
 		fun searchToken(symbol: String)
 		fun getSelectedExchange(hold: List<ExchangeTable>.() -> Unit)
+		fun updateSelectedExchangeID(ids: List<Int>)
 		fun updateLocalQuotation(
 			model: QuotationSelectionTable,
 			isSelect: Boolean,

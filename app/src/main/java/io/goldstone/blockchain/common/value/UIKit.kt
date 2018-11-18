@@ -18,7 +18,7 @@ object GrayScale {
 	@JvmField
 	val lightGray = Color.parseColor("#FFE5E5E5")
 	@JvmField
-	val whiteGray = Color.parseColor("#FFF1F1F1")
+	val whiteGray = Color.parseColor("#FFF2F2F2")
 	@JvmField
 	val gray = Color.parseColor("#FFAAAAAA")
 	@JvmField
@@ -109,6 +109,8 @@ object PaddingSize {
 	val content = 10.uiPX()
 	@JvmField
 	val overlay = 15.uiPX()
+	@JvmField
+	val card = 30.uiPX()
 }
 
 object CornerSize {

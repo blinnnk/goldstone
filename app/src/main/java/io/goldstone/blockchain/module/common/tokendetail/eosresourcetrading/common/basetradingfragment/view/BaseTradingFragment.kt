@@ -11,6 +11,7 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -90,7 +91,8 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			}
 			setContactButtonClickEvent {
 				getSelectedAccountFromContacts {
-					setAccount(it)
+					if (it.isEmpty()) safeShowError(AccountError.InvalidAccountName)
+					else setAccount(it)
 				}
 			}
 		}
@@ -120,7 +122,8 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			}
 			setContactButtonClickEvent {
 				getSelectedAccountFromContacts {
-					setAccount(it)
+					if (it.isEmpty()) safeShowError(AccountError.InvalidAddress)
+					else setAccount(it)
 				}
 			}
 		}
@@ -186,7 +189,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		else expendTradingCard.getInputValue()
 	}
 
-	fun clearInputValue() {
+	private fun clearInputValue() {
 		incomeTradingCard.clearInput()
 		expendTradingCard.clearInput()
 	}

@@ -99,13 +99,19 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 					}
 					exchangeAdapter.notifyDataSetChanged()
 				}
-				.positiveButton(text = CommonText.confirm) {
+				.positiveButton(text = CommonText.confirm) { dialog ->
 					GlobalScope.launch(Dispatchers.Default) {
 						ExchangeTable.dao.insertAll(exchanges)
 					}
+					val selectedIDs = exchanges.filter { exchange ->
+						exchange.isSelected
+					}.map { exchange ->
+						exchange.marketId
+					}
+					presenter.updateSelectedExchangeID(selectedIDs)
 					updateResultAfterConditionChanged()
 					showFilterDescription(exchanges)
-					it.dismiss()
+					dialog.dismiss()
 				}
 				.negativeButton(text = CommonText.cancel) {
 					it.dismiss()
