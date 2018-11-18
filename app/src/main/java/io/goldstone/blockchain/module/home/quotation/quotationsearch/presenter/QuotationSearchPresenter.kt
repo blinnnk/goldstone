@@ -4,13 +4,11 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.toIntOrZero
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.contract.QuotationSearchContract
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
@@ -27,19 +25,19 @@ class QuotationSearchPresenter(
 	private val detailView: QuotationSearchContract.GSView
 ) : QuotationSearchContract.GSPresenter {
 
-	private var selectedIds = ""
+	private var selectedIds = listOf<Int>()
 
 	override fun start() {
 		getSelectedExchange {
 			selectedIds = it.map { exchange ->
 				exchange.marketId
-			}.joinToString(",")
+			}
 			detailView.showFilterDescription(it)
 		}
 	}
 
 	override fun updateSelectedExchangeID(ids: List<Int>) {
-		selectedIds = ids.joinToString(",")
+		selectedIds = ids
 	}
 
 	@WorkerThread
@@ -74,12 +72,10 @@ class QuotationSearchPresenter(
 	override fun searchToken(symbol: String) {
 		with(detailView) {
 			showLoading(true)
-			GoldStoneAPI.getMarketSearchList(symbol, selectedIds) { searchList, error ->
+			GoldStoneAPI.getMarketSearchList(symbol, selectedIds.joinToString(",")) { searchList, error ->
 				if (!searchList.isNullOrEmpty() && error.isNone()) {
-					val selectedIDList =
-						selectedIds.split(",").map { it.toIntOrZero() }
 					val targetData =
-						QuotationSelectionTable.dao.getTargetMarketTables(selectedIDList)
+						QuotationSelectionTable.dao.getTargetMarketTables(selectedIds)
 					// 如果本地没有已经选中的直接返回搜索的数据展示在界面
 					// 否则用搜索的记过查找是否有已经选中在本地的, 更改按钮的选中状态
 					if (targetData.isEmpty()) {
@@ -92,7 +88,7 @@ class QuotationSearchPresenter(
 							updateUI(searchList)
 						}
 					}
-				} else launchUI {
+				} else {
 					if (error.hasError()) showError(error)
 					showLoading(false)
 				}

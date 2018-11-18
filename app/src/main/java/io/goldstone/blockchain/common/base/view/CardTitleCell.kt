@@ -28,10 +28,10 @@ open class CardTitleCell(context: Context) : TopBottomLineCell(context) {
 		rightPadding = PaddingSize.card
 		bottomPadding = 10.uiPX()
 		textSize = fontSize(12)
-		typeface = GoldStoneFont.medium(context)
+		typeface = GoldStoneFont.heavy(context)
 		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-		gravity = Gravity.CENTER_VERTICAL or Gravity.END
+		gravity = Gravity.CENTER_VERTICAL
 	}
 
 	init {

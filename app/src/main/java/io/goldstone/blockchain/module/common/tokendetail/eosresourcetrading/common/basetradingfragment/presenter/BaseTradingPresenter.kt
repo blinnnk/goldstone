@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.common.utils.safeShowError
@@ -68,39 +69,40 @@ open class BaseTradingPresenter(
 
 	override fun onFragmentViewCreated() {
 		super.onFragmentViewCreated()
-		fragment.setUsageValue()
+		GlobalScope.launch(Dispatchers.Default) {
+			fragment.setUsageValue()
+		}
 	}
 
+	@WorkerThread
 	private fun BaseTradingFragment.setUsageValue() {
-		GlobalScope.launch(Dispatchers.Default) {
-			val accountDao =
-				GoldStoneDataBase.database.eosAccountDao()
-			val account =
-				accountDao.getAccount(SharedAddress.getCurrentEOSAccount().accountName)
-			withContext(Dispatchers.Main) {
-				when (tradingType) {
-					TradingType.CPU -> {
-						val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
-						val availableCPU = account?.cpuLimit?.max.orZero() - account?.cpuLimit?.used.orZero()
-						setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), SharedValue.getCPUUnitPrice())
-					}
-					TradingType.NET -> {
-						val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
-						val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
-						// TODO 计算 NET 的租赁价格
-						setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
-					}
-					TradingType.RAM -> {
-						val loadingView = LoadingView(fragment.context!!)
-						loadingView.show()
-						val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
-						// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
-						val price = SharedValue.getRAMUnitPrice()
-						val amountKBInEOS = 1.0 / price
-						val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
-						setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
-						loadingView.remove()
-					}
+		val accountDao =
+			GoldStoneDataBase.database.eosAccountDao()
+		val account =
+			accountDao.getAccount(SharedAddress.getCurrentEOSAccount().accountName)
+		launchUI {
+			when (tradingType) {
+				TradingType.CPU -> {
+					val cpuEOSValue = "${account?.cpuWeight?.toEOSCount()}" suffix CoinSymbol.eos
+					val availableCPU = account?.cpuLimit?.max.orZero() - account?.cpuLimit?.used.orZero()
+					setProcessUsage(cpuEOSValue, availableCPU, account?.cpuLimit?.max.orZero(), SharedValue.getCPUUnitPrice())
+				}
+				TradingType.NET -> {
+					val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
+					val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
+					// TODO 计算 NET 的租赁价格
+					setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
+				}
+				TradingType.RAM -> {
+					val loadingView = LoadingView(fragment.context!!)
+					loadingView.show()
+					val availableRAM = account?.ramQuota.orZero() - account?.ramUsed.orZero()
+					// 因为这里只需显示大概价格, 并且这里需要用到两次, 所以直接取用了 `EOS` 个数买 `KB`` 并反推 `Price` 的方法减少网络请求
+					val price = SharedValue.getRAMUnitPrice()
+					val amountKBInEOS = 1.0 / price
+					val ramEOSAccount = "≈ " + (availableRAM.toDouble() * price / 1024).formatCount(4) suffix CoinSymbol.eos
+					setProcessUsage(ramEOSAccount, availableRAM, account?.ramQuota.orZero(), amountKBInEOS)
+					loadingView.remove()
 				}
 			}
 		}
@@ -108,7 +110,7 @@ open class BaseTradingPresenter(
 
 	private fun BaseTradingFragment.tradingRam(
 		stakeType: StakeType,
-		@UiThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
+		@WorkerThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
 	) {
 		val fromAccount = SharedAddress.getCurrentEOSAccount()
 		val chainID = SharedChain.getEOSCurrent().chainID
