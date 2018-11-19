@@ -63,4 +63,10 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		mainActivity?.getHomeFragment()?.presenter?.showWalletDetailFragment()
 	}
+	
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		if (hidden) presenter.currentSocket?.closeSocket()
+		else presenter.resetSocket()
+	}
 }

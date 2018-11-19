@@ -34,10 +34,6 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 
 			else -> {
 				presenter.showMarketTokenCenter(currencyInfo)
-				showAddButton(true) {
-					activity?.addFragmentAndSetArguments<RAMMarketOverlayFragment>(ContainerID.main) {
-					}
-				}
 			}
 			//presenter.showMarketTokenDetailFragment(currencyInfo)
 		}

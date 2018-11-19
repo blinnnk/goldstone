@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.rammarket.presenter
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -109,6 +110,7 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 				closeSocket()
 			}
 		}
+		ramPriceSocket = null
 	}
 	
 	override fun onFragmentDestroy() {

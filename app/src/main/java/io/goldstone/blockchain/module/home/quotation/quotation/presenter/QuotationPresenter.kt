@@ -136,7 +136,7 @@ class QuotationPresenter(
 		}
 	}
 
-	private var currentSocket: GoldStoneWebSocket? = null
+	var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: (GoldStoneWebSocket?) -> Unit) {
 		if (fragment.asyncData?.size ?: 0 == 0) return
 		getPriceInfoBySocket(
