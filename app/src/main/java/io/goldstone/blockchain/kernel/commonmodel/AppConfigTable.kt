@@ -30,7 +30,7 @@ data class AppConfigTable(
 	var id: Int,
 	var pincode: Int? = null,
 	var showPincode: Boolean = false,
-	var frozenTime: Long? = null,
+	var frozenTime: Long,
 	var retryTimes: Int = 5,
 	var goldStoneID: String = "",
 	var isRegisteredAddresses: Boolean = false, // For Push
@@ -71,6 +71,7 @@ data class AppConfigTable(
 				Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID) + System.currentTimeMillis()
 			val config = AppConfigTable(
 				0,
+				frozenTime = 0L,
 				goldStoneID = goldStoneID,
 				language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 				terms = getLocalTerms(),

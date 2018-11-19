@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.language.SplashText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -60,6 +61,8 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.medium(context)
 					textColor = Spectrum.opacity5White
+					leftPadding = PaddingSize.device
+					rightPadding = PaddingSize.device
 				}
 			}.lparams {
 				centerHorizontally()

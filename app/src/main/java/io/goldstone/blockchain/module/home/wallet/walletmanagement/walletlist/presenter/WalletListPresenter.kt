@@ -53,7 +53,6 @@ class WalletListPresenter(
 		load {
 			WalletTable.dao.getWalletByAddress(address)?.getWalletType()!!
 		} then { walletType ->
-			System.out.println("wallet ${walletType.type}")
 			when {
 				walletType.isBTC() -> {
 					if (SharedValue.isTestEnvironment()) {

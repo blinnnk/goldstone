@@ -3,13 +3,10 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import org.bitcoinj.core.*
 import org.bitcoinj.core.Utils.HEX
 import org.bitcoinj.crypto.TransactionSignature
-import org.bitcoinj.params.MainNetParams
-import org.bitcoinj.params.TestNet3Params
 import org.bitcoinj.script.Script
 import org.bitcoinj.script.ScriptBuilder
 
@@ -18,52 +15,6 @@ import org.bitcoinj.script.ScriptBuilder
  * @author KaySaith
  */
 object BTCSeriesTransactionUtils {
-
-	fun generateBTCSignedRawTransaction(
-		sendValue: Long,
-		fee: Long,
-		toAddress: String,
-		changeAddress: String,
-		unspentModel: List<UnspentModel>,
-		base58Privatekey: String,
-		isTest: Boolean
-	): BTCSignedModel {
-		val net =
-			if (isTest) TestNet3Params.get()
-			else MainNetParams.get()
-		return generateSignedRawTransaction(
-			sendValue,
-			fee,
-			toAddress,
-			changeAddress,
-			unspentModel,
-			base58Privatekey,
-			net,
-			false
-		)
-	}
-
-	fun generateLTCSignedRawTransaction(
-		sendValue: Long,
-		fee: Long,
-		toAddress: String,
-		changeAddress: String,
-		unspentModel: List<UnspentModel>,
-		base58Privatekey: String,
-		isTest: Boolean
-	): BTCSignedModel {
-		val net = if (isTest) TestNet3Params.get() else LitecoinNetParams()
-		return generateSignedRawTransaction(
-			sendValue,
-			fee,
-			toAddress,
-			changeAddress,
-			unspentModel,
-			base58Privatekey,
-			net,
-			false
-		)
-	}
 
 	fun generateSignedRawTransaction(
 		sendValue: Long,
@@ -124,8 +75,7 @@ object BTCSeriesTransactionUtils {
 				Transaction.SigHash.ALL,
 				true,
 				true
-			)
-			else transaction.addSignedInput(
+			) else transaction.addSignedInput(
 				outPoint,
 				utxo.script,
 				ecKey,
@@ -147,7 +97,6 @@ fun Transaction.addBCHSignedInput(
 	anyoneCanPay: Boolean,
 	forkId: Boolean
 ): TransactionInput {
-
 	val input = TransactionInput(params, this, byteArrayOf(), prevOut)
 	addInput(input)
 	val hash = if (forkId)

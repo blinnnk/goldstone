@@ -32,24 +32,22 @@ class CoinSymbol(val symbol: String) : Serializable {
 		val EOS: CoinSymbol = CoinSymbol(eos)
 		@JvmStatic
 		val btc: () -> String = {
-			if (SharedWallet.getYingYongBaoInReviewStatus()) "B.C." else "BTC"
+			if (SharedWallet.getInReviewStatus()) "B.C." else "BTC"
 		}
 		@JvmStatic
 		val allBTCSeriesSymbol: () -> List<String> = {
 			listOf(ltc, btc(), bch)
 		}
 
-		fun updateSymbolIfInReview(symbol: CoinSymbol, isTest: Boolean = false): String {
-			return if (
-				symbol.isBTC() && SharedWallet.getYingYongBaoInReviewStatus()
-			) "B.C." + if (isTest) " Test" else ""
+		fun updateSymbolIfInReview(symbol: CoinSymbol): String {
+			return if (symbol.isBTC() && SharedWallet.getInReviewStatus()) CoinSymbol.btc()
 			else symbol.symbol
 		}
 
 		fun updateNameIfInReview(name: String): String {
 			return if (
 				name.contains("Bitcoin", true) &&
-				SharedWallet.getYingYongBaoInReviewStatus()
+				SharedWallet.getInReviewStatus()
 			) "Bitc."
 			else name
 		}
@@ -58,7 +56,7 @@ class CoinSymbol(val symbol: String) : Serializable {
 
 fun CoinSymbol?.isEOS() = this?.symbol.equals(CoinSymbol.eos, true)
 fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.eth, true)
-fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.btc(), true)
+fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.pureBTCSymbol, true)
 fun CoinSymbol?.isLTC() = this?.symbol.equals(CoinSymbol.ltc, true)
 fun CoinSymbol?.isBCH() = this?.symbol.equals(CoinSymbol.bch, true)
 fun CoinSymbol?.isETC() = this?.symbol.equals(CoinSymbol.etc, true)

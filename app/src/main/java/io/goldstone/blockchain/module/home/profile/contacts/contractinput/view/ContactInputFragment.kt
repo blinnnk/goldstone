@@ -58,7 +58,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 				}.into(this)
 
-				SessionTitleView(context).setTitle("Contact Address").into(this)
+				SessionTitleView(context).setTitle(ProfileText.contacts).into(this)
 
 				ethSeriesAddressInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }

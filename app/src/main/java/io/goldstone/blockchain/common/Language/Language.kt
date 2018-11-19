@@ -214,14 +214,15 @@ object ContactText {
 		HoneyLanguage.TraditionalChinese.code -> "聯繫人名稱"
 		else -> ""
 	}
+
 	@JvmField
 	val ethERCAndETHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
-		HoneyLanguage.Chinese.code -> "输入您要存储的以太坊，ERC20或以太坊经典地址"
-		HoneyLanguage.Japanese.code -> "保存したいEthereum、ERC20またはEthereumクラシックアドレスを入力してください"
+		HoneyLanguage.Chinese.code -> "输入您要存储的以太坊,ERC20代币或以太坊经典地址"
+		HoneyLanguage.Japanese.code -> "保存したいETH、ERC20トークン、またはETCアドレスを入力してください"
 		HoneyLanguage.Korean.code -> "저장할 Ethereum, ERC20 또는 Ethereum 기본 주소를 입력하십시오."
-		HoneyLanguage.Russian.code -> "Введите классический адрес Ethereum, ERC20 или Ethereum, который вы хотите сохранить"
-		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的以太坊，ERC20或以太坊經典地址"
+		HoneyLanguage.Russian.code -> "Введите классический адрес Ethereum, ERC20 или адрес Ethereum, который вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的以太坊, ERC20代幣或以太坊經典地址"
 		else -> ""
 	}
 
@@ -229,20 +230,20 @@ object ContactText {
 	val eosHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter EOS Mainnet account name that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的EOS主网账户名"
-		HoneyLanguage.Japanese.code -> "保存したいEOSアカウント名を入力してください"
-		HoneyLanguage.Korean.code -> "저장하려는 EOS 기본 네트워크 계정 이름을 입력하십시오"
-		HoneyLanguage.Russian.code -> "Введите имя главной сетевой учетной записи EOS, которое вы хотите сохранить"
+		HoneyLanguage.Japanese.code -> "保存したいEOSメインネットワークアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장할 EOS 기본 네트워크 계정 이름을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите имя главной сетевой учетной записи EOS, которое вы хотите сохранить."
 		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的EOS主網賬戶名"
 		else -> ""
 	}
 
 	@JvmField
 	val eosJungleHint = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
-		HoneyLanguage.Chinese.code -> "輸入您要存儲的EOS主網賬戶名"
+		HoneyLanguage.English.code -> "Enter EOS Jungle address that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的EOS Jungle测试网账户名"
 		HoneyLanguage.Japanese.code -> "保存したいEOS Jungleテストネットワークアカウント名を入力してください"
-		HoneyLanguage.Korean.code -> "저장하려는 EOS Jungle 테스트 네트워크 계정 이름 입력"
-		HoneyLanguage.Russian.code -> "Введите имя учетной записи тестовой сети EOS Jungle, которую вы хотите сохранить"
+		HoneyLanguage.Korean.code -> "저장할 EOS Jungle 테스트 계정 이름을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите имя тестовой учетной записи EOS Jungle, которое вы хотите сохранить."
 		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的EOS Jungle測試網網賬戶名"
 		else -> ""
 	}
@@ -251,21 +252,31 @@ object ContactText {
 	val btcMainnetAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的比特币主网地址"
-		HoneyLanguage.Japanese.code -> "保存するビットコムホームネットワークアドレスを入力してください"
-		HoneyLanguage.Korean.code -> "저장하려는 비트 코인 홈 네트워크 주소를 입력하십시오."
-		HoneyLanguage.Russian.code -> "Введите адрес домашней сети биткойна, который вы хотите сохранить"
+		HoneyLanguage.Japanese.code -> "保存するビットコインメインネットワークアドレスを入力してください"
+		HoneyLanguage.Korean.code -> "저장할 비트 코인을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите биткойн, который вы хотите сохранить."
 		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的比特幣主網地址"
 		else -> ""
 	}
 
 	@JvmField
+	val btcTestnetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter Bitcoin, Litecoin and Bitcoin Cash Testnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "输入要存储的比特币(BTC)、莱特币(LTC)、比特币现金(BCH)测试网地址"
+		HoneyLanguage.Japanese.code -> "ストレージビットコイン（BTC）、ライトコイン（LTC）、ビットコインの現金（BCH）テストアドレスを入力してください"
+		HoneyLanguage.Korean.code -> "저장 비트 코인 (BTC), 라이트 코인 (LTC), 비트 코인 현금 (BCH) 테스트 주소를 입력"
+		HoneyLanguage.Russian.code -> "Введите сохраненный сетевой адрес Биткойн (BTC), Litecoin (LTC), Биткойн наличными (BCH)"
+		HoneyLanguage.TraditionalChinese.code -> "輸入要存儲的比特幣(BTC)、萊特幣(LTC)、比特幣現金(BCH)測試網地址"
+		else -> ""
+	}
+	@JvmField
 	val bchAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
-		HoneyLanguage.Chinese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
-		HoneyLanguage.Japanese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
-		HoneyLanguage.Korean.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
-		HoneyLanguage.Russian.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
-		HoneyLanguage.TraditionalChinese.code -> "Enter Bitcoin Cash Mainnet address that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的比特币现金主网地址"
+		HoneyLanguage.Japanese.code -> "保存するビットコイン現金メインネットワークアドレスを入力してください"
+		HoneyLanguage.Korean.code -> "저장하려는 비트 코인 현금 홈 네트워크 주소를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Введите домашний адрес домашней сети биткойны, который вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的比特幣現金主網地址"
 		else -> ""
 	}
 
@@ -273,21 +284,10 @@ object ContactText {
 	val ltcAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Litecoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的莱特币主网地址"
-		HoneyLanguage.Japanese.code -> "Enter Litecoin Mainnet address that you want to store"
-		HoneyLanguage.Korean.code -> "Enter Litecoin Mainnet address that you want to store"
-		HoneyLanguage.Russian.code -> "Enter Litecoin Mainnet address that you want to store"
-		HoneyLanguage.TraditionalChinese.code -> "Enter Litecoin Mainnet address that you want to store"
-		else -> ""
-	}
-
-	@JvmField
-	val btcTestnetAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter Bitcoin Testnet address that you want to store"
-		HoneyLanguage.Chinese.code -> "输入要存储的比特币Testnet地址"
-		HoneyLanguage.Japanese.code -> "保存するBitcoin Testnetアドレスを入力してください"
-		HoneyLanguage.Korean.code -> "저장할 Bitcoin Testnet 주소를 입력하십시오."
-		HoneyLanguage.Russian.code -> "Введите адрес тестовой сети Bitcoin для хранения"
-		HoneyLanguage.TraditionalChinese.code -> "輸入要存儲的比特幣Testnet地址"
+		HoneyLanguage.Japanese.code -> "保存したいLitecoinメインネットワークのアドレスを入力してください"
+		HoneyLanguage.Korean.code -> "저장하려는 주요 네트워크 주소 라이트 코인 입력"
+		HoneyLanguage.Russian.code -> "Введите адрес основной сети Litecoin, которую вы хотите сохранить"
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的萊特幣主網地址"
 		else -> ""
 	}
 }

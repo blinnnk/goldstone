@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.common
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
@@ -280,7 +281,7 @@ object RequisitionUtil {
 		Request.Builder()
 			.url(path)
 			.apply {
-				if (!body.isNull()) method("POST", body)
+				if (body.isNotNull()) method("POST", body)
 			}
 			.header("Content-type", "application/json")
 			.addHeader("device", goldStoneID)

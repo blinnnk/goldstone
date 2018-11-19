@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter
 
 import android.content.Context
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
@@ -16,7 +15,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isSameValueAsInt
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -44,7 +42,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presente
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
 /**
@@ -57,13 +54,28 @@ open class BaseTradingPresenter(
 
 	open fun gainConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
 		if (fragment.tradingType == TradingType.RAM)
-			fragment.tradingRam(StakeType.BuyRam, callback)
+			with(fragment) {
+				tradingRam(
+					context!!,
+					getInputValue(StakeType.BuyRam).first,
+					getInputValue(StakeType.BuyRam).second,
+					StakeType.BuyRam,
+					callback
+				)
+			}
 		else fragment.stakeResource(fragment.tradingType, StakeType.Delegate, callback)
 	}
 
 	open fun refundOrSellConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
-		if (fragment.tradingType == TradingType.RAM)
-			fragment.tradingRam(StakeType.SellRam, callback)
+		if (fragment.tradingType == TradingType.RAM) with(fragment) {
+			tradingRam(
+				context!!,
+				getInputValue(StakeType.SellRam).first,
+				getInputValue(StakeType.SellRam).second,
+				StakeType.SellRam,
+				callback
+			)
+		}
 		else fragment.stakeResource(fragment.tradingType, StakeType.Refund, callback)
 	}
 
@@ -105,39 +117,6 @@ open class BaseTradingPresenter(
 					loadingView.remove()
 				}
 			}
-		}
-	}
-
-	private fun BaseTradingFragment.tradingRam(
-		stakeType: StakeType,
-		@WorkerThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
-	) {
-		val fromAccount = SharedAddress.getCurrentEOSAccount()
-		val chainID = SharedChain.getEOSCurrent().chainID
-		val toAccount = getInputValue(stakeType).first
-		val tradingCount = getInputValue(stakeType).second
-		prepareTransaction(
-			context,
-			fromAccount,
-			toAccount,
-			tradingCount,
-			TokenContract.EOS,
-			stakeType.isSellRam()
-		) { privateKey, error ->
-			if (error.isNone() && privateKey.isNotNull()) {
-				if (stakeType.isBuyRam()) EOSBuyRamTransaction(
-					chainID,
-					fromAccount.accountName,
-					toAccount.accountName,
-					tradingCount.toEOSUnit(),
-					ExpirationType.FiveMinutes
-				).send(privateKey, callback) else EOSSellRamTransaction(
-					chainID,
-					fromAccount.accountName,
-					BigInteger.valueOf(tradingCount.toLong()),
-					ExpirationType.FiveMinutes
-				).send(privateKey, callback)
-			} else callback(null, error)
 		}
 	}
 
@@ -183,6 +162,39 @@ open class BaseTradingPresenter(
 	}
 
 	companion object {
+		fun tradingRam(
+			context: Context,
+			account: EOSAccount,
+			tradingCount: Double,
+			stakeType: StakeType,
+			@WorkerThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
+		) {
+			val fromAccount = SharedAddress.getCurrentEOSAccount()
+			val chainID = SharedChain.getEOSCurrent().chainID
+			prepareTransaction(
+				context,
+				fromAccount,
+				account,
+				tradingCount,
+				TokenContract.EOS,
+				stakeType.isSellRam()
+			) { privateKey, error ->
+				if (error.isNone() && privateKey.isNotNull()) {
+					if (stakeType.isBuyRam()) EOSBuyRamTransaction(
+						chainID,
+						fromAccount.accountName,
+						account.accountName,
+						tradingCount.toEOSUnit(),
+						ExpirationType.FiveMinutes
+					).send(privateKey, callback) else EOSSellRamTransaction(
+						chainID,
+						fromAccount.accountName,
+						BigInteger.valueOf(tradingCount.toLong()),
+						ExpirationType.FiveMinutes
+					).send(privateKey, callback)
+				} else callback(null, error)
+			}
+		}
 
 		fun prepareTransaction(
 			context: Context?,
@@ -212,7 +224,7 @@ open class BaseTradingPresenter(
 						CoinSymbol(contract.symbol),
 						contract.contract
 					) { balance, balanceError ->
-						if (balance != null && balanceError.isNone()) {
+						if (balance.isNotNull() && balanceError.isNone()) {
 							// 检查发起账户的余额是否足够
 							if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
 							else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)

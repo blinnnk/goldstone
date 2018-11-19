@@ -2,13 +2,16 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
+import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
+import io.goldstone.blockchain.crypto.multichain.isLTC
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC.sendRawTransaction
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
@@ -36,10 +39,12 @@ fun GasSelectionPresenter.checkBTCSeriesBalance(
 	prepareBTCSeriesModel?.apply {
 		// 检查余额状况
 		InsightApi.getBalance(chainType, !chainType.isBCH(), fromAddress) { balance, error ->
-			if (balance != null && error.isNone()) {
+			if (balance.isNotNull() && error.isNone()) {
 				val isEnough = balance.value > value + gasUsedGasFee?.toSatoshi().orElse(0)
 				when {
-					isEnough -> GlobalScope.launch(Dispatchers.Main) { showConfirmAttentionView(callback) }
+					isEnough -> GlobalScope.launch(Dispatchers.Main) {
+						showConfirmAttentionView(callback)
+					}
 					error.isNone() -> callback(TransferError.BalanceIsNotEnough)
 					else -> callback(error)
 				}
@@ -61,21 +66,26 @@ fun GasSelectionPresenter.transferBTCSeries(
 		chainType,
 		password
 	) { privateKey, error ->
-		if (privateKey != null && error.isNone()) prepareBTCSeriesModel.apply {
+		if (privateKey.isNotNull() && error.isNone()) prepareBTCSeriesModel.apply {
 			val fee = gasUsedGasFee?.toSatoshi().orElse(0)
+			// `BCH` 的 `Insight Api` 不需要加密
 			InsightApi.getUnspents(chainType, !chainType.isBCH(), fromAddress) { unspents, error ->
-				if (unspents != null && error.isNone()) BTCSeriesTransactionUtils.generateSignedRawTransaction(
+				if (unspents.isNotNull() && error.isNone()) BTCSeriesTransactionUtils.generateSignedRawTransaction(
 					value,
 					fee,
 					toAddress,
 					changeAddress,
 					unspents,
 					privateKey,
-					if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get(),
-					chainType.isBCH()
+					when {
+						SharedValue.isTestEnvironment() -> TestNet3Params.get()
+						chainType.isLTC() -> LitecoinNetParams()
+						else -> MainNetParams.get()
+					},
+					chainType.isBCH() // 如果是 `BCH` 采用特殊的签名方式
 				).let { signedModel ->
 					sendRawTransaction(chainType.getChainURL(), signedModel.signedMessage) { hash, hashError ->
-						if (hash != null && hash.isNotEmpty() && error.isNone()) {
+						if (!hash.isNullOrEmpty() && error.isNone()) {
 							// 插入 `Pending` 数据到本地数据库
 							insertBTCSeriesPendingData(this, fee, signedModel.messageSize, hash)
 							// 跳转到章党详情界面

@@ -57,12 +57,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		PathModel(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader, DefaultPath.default),
 		PathModel(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader, DefaultPath.default),
 		PathModel(
-			ImportWalletText.customBitcoinPath(SharedWallet.getYingYongBaoInReviewStatus()),
+			ImportWalletText.customBitcoinPath(SharedWallet.getInReviewStatus()),
 			DefaultPath.btcPathHeader,
 			DefaultPath.default
 		),
 		PathModel(
-			ImportWalletText.customBTCTestPath(SharedWallet.getYingYongBaoInReviewStatus()),
+			ImportWalletText.customBTCTestPath(SharedWallet.getInReviewStatus()),
 			DefaultPath.testPathHeader,
 			DefaultPath.default
 		),

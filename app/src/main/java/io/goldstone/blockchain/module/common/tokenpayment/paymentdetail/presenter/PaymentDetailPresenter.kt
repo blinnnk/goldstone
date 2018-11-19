@@ -105,7 +105,7 @@ class PaymentDetailPresenter(
 					ChainType.EOS,
 					password
 				) { privateKey, error ->
-					if (privateKey != null && error.isNone()) hold(EOSPrivateKey(privateKey), error)
+					if (!privateKey.isNullOrEmpty() && error.isNone()) hold(EOSPrivateKey(privateKey), error)
 					else hold(null, AccountError.WrongPassword)
 				} else hold(null, PasswordError.InputIsEmpty)
 			}

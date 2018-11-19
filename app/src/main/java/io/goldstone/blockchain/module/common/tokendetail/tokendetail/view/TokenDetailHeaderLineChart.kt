@@ -36,7 +36,7 @@ class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 			dataRows.forEach {
 				it.y = 0.1f
 			}
-			marker = object: BaseMarkerView(context) {
+			marker = object : BaseMarkerView(context) {
 				override fun getChartWidth(): Int = this@TokenDetailHeaderLineChart.width
 				override fun getChartHeight(): Int = this@TokenDetailHeaderLineChart.height
 				override fun getOffset(): MPPointF = MPPointF((-width / 2).toFloat(), -height.toFloat())
@@ -54,6 +54,9 @@ class TokenDetailHeaderLineChart(context: Context) : LineChart(context) {
 			axisLeft.axisMaximum = maxValue + distance
 			resetMarkerView()
 		}
+		isScaleXEnabled = false
+		isScaleYEnabled = false
+		mPinchZoomEnabled = false
 		super.resetData(dataRows)
 	}
 }
