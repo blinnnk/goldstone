@@ -70,6 +70,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 			val selectedExchanges = data.filter { it.isSelected }
 			val selectedExchangeNames = selectedExchanges.map { it.exchangeName }
 			rootFragment?.resetFilterStatus(isNotEmpty())
+			System.out.println("fuck you ${isNotEmpty()}")
 			if (isEmpty()) removeExchangeFilterDescriptionView()
 			else {
 				val content =
@@ -103,6 +104,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 				.positiveButton(text = CommonText.confirm) { dialog ->
 					GlobalScope.launch(Dispatchers.Default) {
 						ExchangeTable.dao.insertAll(exchanges)
+						showFilterDescription(exchanges)
 					}
 					val selectedIDs = exchanges.filter { exchange ->
 						exchange.isSelected
@@ -111,7 +113,6 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 					}
 					presenter.updateSelectedExchangeID(selectedIDs)
 					updateResultAfterConditionChanged()
-					showFilterDescription(exchanges)
 					dialog.dismiss()
 				}
 				.negativeButton(text = CommonText.cancel) {
