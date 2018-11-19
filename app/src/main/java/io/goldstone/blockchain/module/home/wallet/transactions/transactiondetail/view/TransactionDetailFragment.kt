@@ -55,7 +55,6 @@ import org.jetbrains.anko.support.v4.UI
  */
 class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView {
 
-
 	override val pageTitle: String get() = TransactionText.detail
 	private lateinit var headerView: TransactionDetailHeaderView
 	private lateinit var progressCard: TransactionProgressCardView
@@ -128,6 +127,10 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 
 	override fun showTransactionAddresses(vararg model: TransactionDetailModel) {
 		addressCard.model = model.toList()
+	}
+
+	override fun showError(error: Throwable) {
+		context?.let { ErrorDisplayManager(error).show(it) }
 	}
 
 	override fun showTransactionInformation(vararg info: TransactionDetailModel) {
@@ -242,12 +245,12 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 					addView(headerView)
 					verticalLayout {
 						gravity = Gravity.CENTER_HORIZONTAL
-						lparams {
-							width = matchParent
-							height = matchParent
-							topMargin = 200.uiPX()
-						}
 						hold(this)
+					}.apply {
+						val params =
+							RelativeLayout.LayoutParams(matchParent, matchParent)
+						params.topMargin = 200.uiPX()
+						layoutParams = params
 					}
 				}
 			}

@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view
 
 import android.content.Context
+import android.widget.Switch
 import com.blinnnk.base.HoneyBaseAdapter
-import com.blinnnk.component.HoneyBaseSwitch
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 /**
@@ -11,7 +11,7 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  */
 class TokenSearchAdapter(
 	override val dataSet: ArrayList<DefaultTokenTable>,
-	private val hold: (DefaultTokenTable, HoneyBaseSwitch) -> Unit
+	private val hold: (DefaultTokenTable, Switch) -> Unit
 ) : HoneyBaseAdapter<DefaultTokenTable, TokenSearchCell>() {
 
 	override fun generateCell(context: Context) = TokenSearchCell(context)

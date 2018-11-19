@@ -1,12 +1,14 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.hasValue
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.PageInfo
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.getAddress
+import io.goldstone.blockchain.crypto.multichain.getChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
@@ -111,5 +113,38 @@ private fun loadDataFromChain(
 		} else if (transactions?.isEmpty() == true) {
 			callback(RequestError.EmptyResut)
 		} else callback(error)
+	}
+}
+
+@WorkerThread
+fun TokenDetailPresenter.getBTCSeriesData() {
+	val btcSeriesDao = BTCSeriesTransactionTable.dao
+	with(token.contract) {
+		val startDataIndex =
+			if (detailView.asyncData.isNullOrEmpty()) {
+				btcSeriesDao.getMaxDataIndex(
+					getAddress(),
+					getChainType().id
+				)?.dataIndex
+			} else detailView.asyncData?.minBy { it.dataIndex }?.dataIndex!! - 1
+		if (startDataIndex.hasValue()) {
+			val transactions =
+				btcSeriesDao.getDataByRange(
+					getAddress(),
+					getChainType().id,
+					startDataIndex - io.goldstone.blockchain.common.value.DataValue.pageCount,
+					startDataIndex
+				)
+			when {
+				transactions.isNotEmpty() -> flipPage(transactions) {
+					detailView.showBottomLoading(false)
+					detailView.showLoading(false)
+				}
+				else -> loadBTCSeriesData(getChainType(), startDataIndex + 1, false)
+			}
+		} else {
+			detailView.showLoading(false)
+			detailView.showBottomLoading(false)
+		}
 	}
 }

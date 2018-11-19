@@ -13,7 +13,6 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
-import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ElementID
@@ -98,7 +97,7 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : GSFragment
 	// 非阻碍的小圆 `LoadingView`
 	fun showLoadingView() {
 		getParentContainer()?.contentLayout?.apply {
-			findViewById<LoadingView>(ElementID.loadingView).isNull() isTrue {
+			findViewById<TopMiniLoadingView>(ElementID.loadingView).isNull() isTrue {
 				topMiniLoadingView = TopMiniLoadingView(context).apply {
 					y += 50.uiPX()
 				}

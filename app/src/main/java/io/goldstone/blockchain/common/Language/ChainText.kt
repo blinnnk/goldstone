@@ -59,8 +59,8 @@ object ChainText {
 	@JvmField
 	val testnetDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The chain used for testing, test assets \n are usually worthless."
-		HoneyLanguage.Chinese.code -> "测试环境\n测试资产是没有价值的"
-		HoneyLanguage.Japanese.code -> "テスト環境 \n資産をテストする価値がない"
+		HoneyLanguage.Chinese.code -> "测试环境测试资产是没有价值的"
+		HoneyLanguage.Japanese.code -> "テスト環境資産をテストする価値がない"
 		HoneyLanguage.Korean.code -> "테스트 환경, 자산 테스트는 쓸모가 없다."
 		HoneyLanguage.Russian.code -> "Условия тестирования, тестирование активов бесполезно"
 		HoneyLanguage.TraditionalChinese.code -> "測試鏈上的資產通常是沒有價值的。"

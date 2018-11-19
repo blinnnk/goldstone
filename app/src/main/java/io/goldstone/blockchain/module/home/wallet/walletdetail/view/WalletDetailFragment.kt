@@ -1,15 +1,16 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.*
-import io.goldstone.blockchain.R
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.customListAdapter
+import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.addFragmentAndSetArguments
+import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
-import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -26,6 +27,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
+import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenselectionlist.TokenSelectionRecyclerView
 import io.goldstone.blockchain.module.home.wallet.walletdetail.contract.WalletDetailContract
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
@@ -80,21 +82,18 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		else slideHeader.notifyButton.removeRedDot()
 	}
 
-	override fun showSelectionDashboard(tokens: List<WalletDetailCellModel>, isAddress: Boolean) {
+	override fun showSelectionDashboard(tokens: ArrayList<WalletDetailCellModel>, isAddress: Boolean) {
 		// Prepare token list and show content scroll overlay view
-		if (getMainActivity()?.getContentScrollOverlay().isNull()) {
-			val container = getMainActivity()?.getMainContainer() ?: return
-			ContentScrollOverlayView(container.context, true).apply {
-				setTitle(TransactionText.tokenSelection)
-				addContent {
-					val data =
-						tokens.sortedByDescending { it.weight }.toArrayList()
-					TokenSelectionRecyclerView(context).setAdapter(data, isAddress).into(this)
-				}
-			}.into(container)
-			// 重置回退栈首先关闭悬浮层
-			recoveryBackEvent()
-		}
+		val dialog = MaterialDialog(context!!)
+		dialog.title(text = TransactionText.tokenSelection)
+			.customListAdapter(TokenSelectionAdapter(tokens) {
+				if (isAddress)
+					TokenSelectionRecyclerView.showTransferAddressFragment(context, it)
+				else TokenSelectionRecyclerView.showDepositFragment(context, it)
+				dialog.dismiss()
+			})
+			.negativeButton(text = CommonText.gotIt)
+			.show()
 	}
 
 	override fun showError(error: Throwable) {
@@ -142,12 +141,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	}
 
 	override fun setBackEvent(mainActivity: MainActivity?) {
-		val overlay = mainActivity?.getContentScrollOverlay()
-		if (overlay == null) super.setBackEvent(mainActivity)
-		else {
-			overlay.remove()
-			mainActivity.backEvent = null
-		}
+		super.setBackEvent(mainActivity)
 	}
 
 	override fun showMnemonicBackUpFragment() {
@@ -167,7 +161,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	}
 
 	override fun showMnemonicBackUpDialog() {
-		showMnemonicBackUpDialog(context!!) {
+		GoldStoneDialog(context!!).showBackUpMnemonicStatus {
 			showMnemonicBackUpFragment()
 		}
 	}
@@ -181,7 +175,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	}
 
 	override fun showChainError() {
-		GoldStoneDialog.showChainErrorDialog(context!!)
+		GoldStoneDialog(context!!).showChainErrorDialog()
 	}
 
 	private fun showTokenManagementFragment() {
@@ -209,22 +203,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 				addFragmentAndSetArguments<TokenDetailOverlayFragment>(ContainerID.main, FragmentTag.tokenDetail) {
 					putSerializable(ArgumentKey.tokenDetail, model)
 				}
-		}
-	}
-
-	companion object {
-		fun showMnemonicBackUpDialog(context: Context, action: () -> Unit) {
-			GoldStoneDialog.show(context) {
-				showButtons(DialogText.goToBackUp) {
-					action()
-					GoldStoneDialog.remove(context)
-				}
-				setImage(R.drawable.succeed_banner)
-				setContent(
-					DialogText.backUpMnemonic,
-					DialogText.backUpMnemonicDescription
-				)
-			}
 		}
 	}
 }

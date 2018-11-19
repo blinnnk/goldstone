@@ -59,7 +59,10 @@ class WalletListPresenter(
 						showConfirmationAlertView("Bitcoin Mainnet") {
 							switchWalletInDatabase(address, true)
 						}
-					} else fragment.activity?.jump<SplashActivity>()
+					} else {
+						switchWalletInDatabase(address, true)
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
 
 				walletType.isBTCTest() -> {
@@ -67,7 +70,10 @@ class WalletListPresenter(
 						showConfirmationAlertView("Bitcoin Testnet") {
 							switchWalletInDatabase(address, false)
 						}
-					} else fragment.activity?.jump<SplashActivity>()
+					} else {
+						switchWalletInDatabase(address, false)
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
 
 				walletType.isLTC() -> {
@@ -75,7 +81,10 @@ class WalletListPresenter(
 						showConfirmationAlertView("Litecoin Mainnet") {
 							switchWalletInDatabase(address, true)
 						}
-					} else fragment.activity?.jump<SplashActivity>()
+					} else {
+						switchWalletInDatabase(address, true)
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
 
 				walletType.isBCH() -> {
@@ -83,7 +92,10 @@ class WalletListPresenter(
 						showConfirmationAlertView("Bitcoin Cash Mainnet") {
 							switchWalletInDatabase(address, true)
 						}
-					} else fragment.activity?.jump<SplashActivity>()
+					} else {
+						switchWalletInDatabase(address, true)
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
 
 				walletType.isEOSJungle() -> {
@@ -91,7 +103,10 @@ class WalletListPresenter(
 						showConfirmationAlertView("EOS Jungle Testnet") {
 							switchWalletInDatabase(address, false)
 						}
-					} else fragment.activity?.jump<SplashActivity>()
+					} else {
+						switchWalletInDatabase(address, false)
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
 
 				walletType.isEOSMainnet() -> {
@@ -99,7 +114,10 @@ class WalletListPresenter(
 						showConfirmationAlertView("EOS Mainnet Testnet") {
 							switchWalletInDatabase(address, true)
 						}
-					} else fragment.activity?.jump<SplashActivity>()
+					} else {
+						switchWalletInDatabase(address, true)
+						fragment.activity?.jump<SplashActivity>()
+					}
 				}
 
 				walletType.isBIP44() || walletType.isMultiChain() -> {

@@ -8,12 +8,12 @@ package io.goldstone.blockchain.common.language
 object LoadingText {
 	@JvmField
 	val gettingData = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Getting Data.."
-		HoneyLanguage.Chinese.code -> "Getting Data.."
-		HoneyLanguage.Japanese.code -> "Getting Data.."
-		HoneyLanguage.Korean.code -> "Getting Data.."
-		HoneyLanguage.Russian.code -> "Getting Data.."
-		HoneyLanguage.TraditionalChinese.code -> "Getting Data.."
+		HoneyLanguage.English.code -> "Getting Data Now"
+		HoneyLanguage.Chinese.code -> "Getting Data Now"
+		HoneyLanguage.Japanese.code -> "Getting Data Now"
+		HoneyLanguage.Korean.code -> "Getting Data Now"
+		HoneyLanguage.Russian.code -> "Getting Data Now"
+		HoneyLanguage.TraditionalChinese.code -> "Getting Data Now"
 		else -> ""
 	}
 	@JvmField

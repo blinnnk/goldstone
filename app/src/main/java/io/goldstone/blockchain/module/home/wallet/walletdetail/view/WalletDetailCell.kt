@@ -43,7 +43,7 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 				symbol.isEOS() -> icon.image.imageResource = R.drawable.eos_icon
 				symbol.isBTC() ->
 					icon.image.imageResource =
-						if (SharedWallet.getYingYongBaoInReviewStatus()) R.drawable.default_token
+						if (SharedWallet.getInReviewStatus()) R.drawable.default_token
 						else R.drawable.btc_icon
 				else -> icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
 			}

@@ -5,7 +5,6 @@ import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -38,7 +37,7 @@ class ChainAddressesFragment
 				cell.context.clickToCopy(model?.address.orEmpty())
 			}
 			cell.moreButton.onClick {
-				presenter.showMoreDashboard(cell, model ?: Bip44Address())
+				presenter.showMoreDashboard(model ?: Bip44Address())
 			}
 		}
 	}
@@ -58,7 +57,7 @@ class ChainAddressesFragment
 
 	fun setDefaultAddress(address: Bip44Address) {
 		headerView?.setDefaultAddress(address) {
-			presenter.showMoreDashboard(this, address, false)
+			presenter.showMoreDashboard(address, false)
 		}
 	}
 }

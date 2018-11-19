@@ -3,6 +3,8 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -30,6 +32,9 @@ class ErrorDisplayManager(private val error: Throwable) {
 					LogUtil.error(this::class.java.simpleName, Throwable("GoldStone ERROR: *************** $errorMessage ***************"))
 					null
 				}
+				errorMessage.contains("64: dust", true) -> {
+					"amount too small to be recognised as legitimate on the bitcoin network."
+				}
 				else -> error.message
 			}
 		}
@@ -38,7 +43,7 @@ class ErrorDisplayManager(private val error: Throwable) {
 	@UiThread
 	fun show(context: Context?) {
 		displayMessage?.apply {
-			launchUI {
+			GoldStoneAPI.context.runOnUiThread {
 				if (!error.message.isNullOrEmpty()) {
 					context.alert(this@apply)
 				}

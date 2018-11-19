@@ -4,6 +4,7 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.ErrorText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -46,7 +47,7 @@ class AddressSelectionPresenter(
 			} else when {
 				token.contract.isBTCSeries() -> {
 					val qrModel = qrCode.convertBitcoinQRCode()
-					if (qrModel == null) selectionView.showError(Throwable(QRText.invalidContract))
+					if (qrModel.isNull()) selectionView.showError(Throwable(QRText.invalidContract))
 					else isCorrectCoinOrChainID(qrModel) {
 						showPaymentDetail(qrModel.walletAddress, qrModel.amount)
 					}
@@ -79,8 +80,6 @@ class AddressSelectionPresenter(
 	}
 
 	override fun showPaymentDetail(toAddress: String, count: Double) {
-		// 检查当前转账地址是否为本地任何一个钱包的正在使用的默认地址, 并提示告知用户.
-		// 检查地址是否合规
 		val addressType =
 			MultiChainUtils.isValidMultiChainAddress(toAddress, token.symbol)
 		when (addressType) {
@@ -104,7 +103,7 @@ class AddressSelectionPresenter(
 
 			AddressType.LTC -> when {
 				!token.contract.isLTC() ->
-					selectionView.showError(Throwable("This is a invalid address type for ${CoinSymbol.ltc}, Please check it again"))
+					selectionView.showError(Throwable(ErrorText.invalidChainAddress(CoinSymbol.ltc)))
 				else -> WalletTable.getAllLTCAddresses {
 					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
@@ -112,7 +111,7 @@ class AddressSelectionPresenter(
 
 			AddressType.BCH -> when {
 				!token.contract.isBCH() ->
-					selectionView.showError(Throwable("This is a invalid address type for ${CoinSymbol.bch}, Please check it again"))
+					selectionView.showError(Throwable(ErrorText.invalidChainAddress(CoinSymbol.bch)))
 				else -> WalletTable.getAllBCHAddresses {
 					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}
@@ -122,7 +121,7 @@ class AddressSelectionPresenter(
 				SharedValue.isTestEnvironment() ->
 					selectionView.showError(Throwable("this is a mainnet address, please switch your local net setting in settings first"))
 				!token.contract.isBTC() ->
-					selectionView.showError(Throwable("This is a invalid address type for ${CoinSymbol.btc()}, Please check it again"))
+					selectionView.showError(Throwable(ErrorText.invalidChainAddress(CoinSymbol.btc())))
 				else -> WalletTable.getAllBTCMainnetAddresses {
 					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}

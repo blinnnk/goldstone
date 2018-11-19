@@ -19,10 +19,8 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
-import io.goldstone.blockchain.common.value.ApkChannel
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
@@ -105,7 +103,7 @@ class SplashActivity : AppCompatActivity() {
 					initNodeList(activity)
 					initDefaultToken(activity)
 					// 检查市场状况
-					prepareYingYongBaoInReviewStatus {
+					prepareInReviewStatus {
 						updateAccountInformation(activity) {
 							launchUI {
 								jump<MainActivity>()
@@ -173,29 +171,13 @@ class SplashActivity : AppCompatActivity() {
 	}
 
 	@WorkerThread
-	private fun prepareYingYongBaoInReviewStatus(callback: (GoldStoneError) -> Unit) {
-		// 如果不是 `YingYongBao` 渠道跳过
-		if (!currentChannel.value.equals(ApkChannel.Tencent.value, true)) {
-			SharedWallet.updateYingYongBaoInReviewStatus(false)
-			callback(GoldStoneError.None)
-			return
-		}
-		// 没有网络直接返回
-		if (!NetworkUtil.hasNetwork(this)) {
-			callback(GoldStoneError.None)
-			return
-		}
-		// 从服务器获取配置状态
+	private fun prepareInReviewStatus(callback: (GoldStoneError) -> Unit) {
 		GoldStoneAPI.getConfigList { serverConfigs, error ->
 			if (serverConfigs.isNotNull() && error.isNone()) {
 				val isInReview = serverConfigs.find {
 					it.name.equals("inReview", true)
 				}?.switch?.toIntOrNull() == 1
-				if (isInReview) {
-					SharedWallet.updateYingYongBaoInReviewStatus(true)
-				} else {
-					SharedWallet.updateYingYongBaoInReviewStatus(false)
-				}
+				SharedWallet.updateInReviewStatus(isInReview)
 				callback(error)
 			} else callback(error)
 		}

@@ -44,11 +44,6 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, TransactionSize.headerView)
 		}.into(this)
 		verticalLayout {
-			lparams {
-				width = matchParent
-				height = wrapContent
-				topMargin = 50.uiPX()
-			}
 			gravity = Gravity.CENTER_HORIZONTAL
 			statusIcon.into(this)
 			info.apply {
@@ -58,6 +53,10 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 				isCenter = true
 				setWildStyle()
 			}.into(this)
+		}.apply {
+			val params = RelativeLayout.LayoutParams(matchParent, wrapContent)
+			params.margin = 50.uiPX()
+			layoutParams = params
 		}.centerInHorizontal()
 
 		conformationBar.apply {

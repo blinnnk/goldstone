@@ -1,6 +1,9 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
+import com.blinnnk.extension.suffix
+import com.blinnnk.util.observing
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListCell
 
 /**
@@ -9,6 +12,14 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
  */
 
 class QuotationSearchCell(context: Context) : TokenManagementListCell(context) {
+
+	var quotationSearchModel: QuotationSelectionTable? by observing(null) {
+		quotationSearchModel?.apply {
+			tokenInfo.title.text = pairDisplay suffix market
+			tokenInfo.subtitle.text = name
+			switch.isChecked = isSelecting
+		}
+	}
 
   init {
     hideIcon()

@@ -4,12 +4,14 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -19,6 +21,7 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.TradingCardView
@@ -27,6 +30,7 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.component.showContactDashboard
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.toast
 import java.math.BigInteger
 
 /**
@@ -69,16 +73,25 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			}
 			setConfirmClickEvent {
 				showLoading(true)
-				presenter.gainConfirmEvent {
-					if (it.hasError()) safeShowError(it)
-					launchUI {
-						showLoading(false)
-					}
+				presenter.gainConfirmEvent { response, error ->
+					if (response.isNotNull() && error.isNone()) {
+						launchUI {
+							getParentContainer()?.apply {
+								response.showDialog(this)
+							}
+							clearInputValue()
+							toast(CommonText.succeed)
+							// 更新数据库数据并且更新界面的数据
+						}
+						presenter.updateLocalDataAndUI()
+					} else if (error.hasError()) safeShowError(error)
+					showLoading(false)
 				}
 			}
 			setContactButtonClickEvent {
 				getSelectedAccountFromContacts {
-					setAccount(it)
+					if (it.isEmpty()) safeShowError(AccountError.InvalidAccountName)
+					else setAccount(it)
 				}
 			}
 		}
@@ -95,16 +108,24 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			}
 			setConfirmClickEvent {
 				showLoading(true)
-				presenter.refundOrSellConfirmEvent {
-					if (it.hasError()) safeShowError(it)
-					launchUI {
-						showLoading(false)
-					}
+				presenter.refundOrSellConfirmEvent { response, error ->
+					if (response.isNotNull() && error.isNone()) {
+						launchUI {
+							getParentContainer()?.apply {
+								response.showDialog(this)
+							}
+							clearInputValue()
+						}
+						// 更新数据库数据并且更新界面的数据
+						presenter.updateLocalDataAndUI()
+					} else if (error.hasError()) safeShowError(error)
+					showLoading(false)
 				}
 			}
 			setContactButtonClickEvent {
 				getSelectedAccountFromContacts {
-					setAccount(it)
+					if (it.isEmpty()) safeShowError(AccountError.InvalidAddress)
+					else setAccount(it)
 				}
 			}
 		}
@@ -170,7 +191,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		else expendTradingCard.getInputValue()
 	}
 
-	fun clearInputValue() {
+	private fun clearInputValue() {
 		incomeTradingCard.clearInput()
 		expendTradingCard.clearInput()
 	}

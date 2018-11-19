@@ -3,12 +3,9 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.presenter.RAMTransactionSearchPresenter
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
@@ -34,12 +31,7 @@ class RAMTransactionSearchFragment:
 
 	override fun recoveryBackEvent() {
 		getMainActivity()?.apply {
-			backEvent = Runnable {
-				val overlayView =
-					findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
-				if (overlayView.isNull()) setBackEvent(this)
-				else overlayView.remove()
-			}
+			setBackEvent(this)
 		}
 	}
 

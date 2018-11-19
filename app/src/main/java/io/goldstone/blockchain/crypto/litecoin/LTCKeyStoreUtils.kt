@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.litecoin
 
 import android.content.Context
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.keystore.getPrivateKey
@@ -42,9 +42,9 @@ fun Context.exportLTCBase58PrivateKey(
 	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	getPrivateKey(walletAddress, password, true) { privateKey, error ->
-		if (!privateKey.isNull() && error.isNone()) {
+		if (privateKey.isNotNull() && error.isNone()) {
 			val key = LTCWalletUtils.generateWIFSecret(ECKey.fromPrivate(privateKey.toBigInteger(16)).privKey)
 			hold(key, AccountError.None)
-		}
+		} else hold(null, error)
 	}
 }

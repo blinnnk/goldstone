@@ -290,18 +290,7 @@ object QuotationText {
 		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢"
 		else -> ""
 	}
-	@JvmField
-	val searchExchangesNames: (exchangeNames: String) -> String = {
-		when(currentLanguage) {
-			HoneyLanguage.English.code -> "$it etc."
-			HoneyLanguage.Chinese.code -> "$it etc."
-			HoneyLanguage.Japanese.code -> "$it etc."
-			HoneyLanguage.Korean.code -> "$it etc."
-			HoneyLanguage.Russian.code -> "$it etc."
-			HoneyLanguage.TraditionalChinese.code -> "$it etc."
-			else -> ""
-		}
-	}
+
 	@JvmField
 	val searchFilterTextDescription: (exchangeNames: String) -> String = {
 		when(currentLanguage) {
@@ -316,12 +305,12 @@ object QuotationText {
 	}
 	@JvmField
 	val selectAll = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Check All"
-		HoneyLanguage.Chinese.code ->  "Check All"
-		HoneyLanguage.Japanese.code ->  "Check All"
-		HoneyLanguage.Korean.code ->  "Check All"
-		HoneyLanguage.Russian.code -> "Check All"
-		HoneyLanguage.TraditionalChinese.code ->  "Check All"
+		HoneyLanguage.English.code -> "Check All Exchanges"
+		HoneyLanguage.Chinese.code ->  "Check All Exchanges"
+		HoneyLanguage.Japanese.code ->  "Check All Exchanges"
+		HoneyLanguage.Korean.code ->  "Check All Exchanges"
+		HoneyLanguage.Russian.code -> "Check All Exchanges"
+		HoneyLanguage.TraditionalChinese.code ->  "Check All Exchanges"
 		else -> ""
 	}
 }

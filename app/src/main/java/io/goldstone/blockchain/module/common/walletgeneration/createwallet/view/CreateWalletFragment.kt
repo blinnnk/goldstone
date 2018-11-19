@@ -16,7 +16,6 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.CreateWalletText
-import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
 import io.goldstone.blockchain.common.utils.click
@@ -123,16 +122,15 @@ class CreateWalletFragment : BaseFragment<CreateWalletPresenter>() {
 						repeatPasswordText,
 						agreementView.radioButton.isChecked
 					) { password, walletName, error ->
-						if (error.hasError()) safeShowError(error)
-						else presenter.generateWalletWith(
+						if (error.hasError()) {
+							safeShowError(error)
+							button.showLoadingStatus(false)
+						} else presenter.generateWalletWith(
 							context!!,
 							password!!,
 							walletName!!,
 							hintInput.text?.toString()
 						)
-						launchUI {
-							button.showLoadingStatus(false)
-						}
 					}
 				}.into(this)
 			}

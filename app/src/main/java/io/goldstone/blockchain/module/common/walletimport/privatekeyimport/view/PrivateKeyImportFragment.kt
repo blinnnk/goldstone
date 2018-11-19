@@ -1,10 +1,12 @@
 package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -12,8 +14,6 @@ import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
-import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
-import io.goldstone.blockchain.common.component.overlay.RadioDashboard
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
@@ -23,17 +23,14 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.AddressType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 
 /**
@@ -154,39 +151,30 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 		}
 	}
 
-	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay).apply {
-			isNotNull {
-				getParentContainer()?.removeView(this)
-			} otherwise {
-				super.setBaseBackEvent(activity, parent)
-			}
-		}
-	}
-
 	companion object {
 		fun showWalletTypeDashboard(
-			viewGroup: ViewGroup,
+			context: Context,
 			type: String,
 			updateCurrentType: (String) -> Unit
 		) {
-			object : RadioDashboard() {
-				override val cellContent =
-					arrayListOf(
-						AddressType.ETHSeries.value,
-						CoinSymbol.updateSymbolIfInReview(CoinSymbol.BTC),
-						CoinSymbol.updateSymbolIfInReview(CoinSymbol(AddressType.BTCSeriesTest.value), true),
-						AddressType.LTC.value,
-						AddressType.BCH.value,
-						AddressType.EOS.value,
-						AddressType.EOSJungle.value
-					)
-				override var defaultRadio = type
-
-				override fun afterSelected() {
-					updateCurrentType(defaultRadio)
+			val data = arrayListOf(
+				AddressType.ETHSeries.value,
+				AddressType.BTC.value,
+				AddressType.BTCSeriesTest.value,
+				AddressType.LTC.value,
+				AddressType.BCH.value,
+				AddressType.EOS.value,
+				AddressType.EOSJungle.value
+			)
+			val defaultIndex = data.indexOf(type)
+			MaterialDialog(context)
+				.title(text = "Wallet Type")
+				.listItemsSingleChoice(items = data, initialSelection = defaultIndex) { _, _, item ->
+					updateCurrentType(item)
 				}
-			}.inTo(viewGroup)
+				.positiveButton(text = CommonText.confirm)
+				.negativeButton(text = CommonText.cancel)
+				.show()
 		}
 	}
 }

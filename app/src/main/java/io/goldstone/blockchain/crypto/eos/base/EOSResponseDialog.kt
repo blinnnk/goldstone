@@ -1,15 +1,14 @@
 package io.goldstone.blockchain.crypto.eos.base
 
+import android.content.Context
 import android.view.ViewGroup
-import com.blinnnk.extension.into
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.customListAdapter
+import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.view.CardTitleCell
-import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.PaddingSize
-import org.jetbrains.anko.leftPadding
-import org.jetbrains.anko.rightPadding
 
 
 /**
@@ -17,20 +16,29 @@ import org.jetbrains.anko.rightPadding
  * @date  2018/09/22
  */
 fun EOSResponse.showDialog(parent: ViewGroup) {
-	DashboardOverlay(parent.context) {
-		leftPadding = PaddingSize.content
-		rightPadding = PaddingSize.content
-		listOf(
-			Pair("Transaction ID", transactionID),
-			Pair("CPU Usage", "$cupUsageByte"),
-			Pair("NET Usage", "$netUsageByte")
-		).forEach { pair ->
-			CardTitleCell(context).apply {
-				setTitle(pair.first)
-				setContent(pair.second)
-			}.click {
-				it.context.clickToCopy(pair.second)
-			}.into(this)
+	val data = arrayListOf(
+		Pair("Transaction ID", transactionID),
+		Pair("CPU Usage", "$cupUsageByte"),
+		Pair("NET Usage", "$netUsageByte")
+	)
+	MaterialDialog(parent.context)
+		.title(text = CommonText.succeed)
+		.customListAdapter(EOSResponseAdapter(data))
+		.positiveButton(text = CommonText.confirm)
+		.show()
+}
+
+class EOSResponseAdapter(
+	override val dataSet: ArrayList<Pair<String, String>>
+) : HoneyBaseAdapter<Pair<String, String>, CardTitleCell>() {
+	override fun generateCell(context: Context) = CardTitleCell(context)
+
+	override fun CardTitleCell.bindCell(data: Pair<String, String>, position: Int) {
+		setTitle(data.first)
+		setSubtitle(data.second)
+		click {
+			it.context.clickToCopy(data.second)
 		}
-	}.showTitle(CommonText.succeed).into(parent)
+	}
+
 }

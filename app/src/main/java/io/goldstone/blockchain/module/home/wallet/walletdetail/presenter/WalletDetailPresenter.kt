@@ -5,7 +5,7 @@ import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.ConcurrentAsyncCombine
+import com.blinnnk.util.ConcurrentJobs
 import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.load
 import com.blinnnk.util.then
@@ -86,7 +86,7 @@ class WalletDetailPresenter(
 					if (it.size == 1) {
 						if (isAddress) detailView.showAddressSelectionFragment(it.first())
 						else detailView.showDepositFragment(it.first())
-					} else detailView.showSelectionDashboard(it, isAddress)
+					} else detailView.showSelectionDashboard(it.toArrayList(), isAddress)
 				}
 			} else detailView.showMnemonicBackUpDialog()
 		}
@@ -121,16 +121,12 @@ class WalletDetailPresenter(
 		// 没有网络直接返回
 		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
 		else {
-			object : ConcurrentAsyncCombine() {
+			object : ConcurrentJobs() {
 				override var asyncCount: Int = size
-				// 如果 `Token` 过多的话这里开启的并发线程会很多导致内存溢出, 用 `DelayTime` 减轻压力
-				override val delayTime: Long? = if (asyncCount > 4) 100 else 0
-
-				override fun doChildTask(index: Int) {
-					// 链上查余额
+				override fun doChildJob(index: Int) {
 					val ownerName = get(index).contract.getAddress(true)
+					// 更新数据的余额信息
 					MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
-						// 更新数据的余额信息
 						if (balance.isNotNull() && error.isNone()) {
 							MyTokenTable.dao.updateBalanceByContract(
 								balance,
@@ -139,13 +135,18 @@ class WalletDetailPresenter(
 								ownerName
 							)
 							get(index).count = balance
-						} else balanceError = error
-						completeMark()
+							completeMark()
+						} else {
+							balanceError = error
+							completeMark()
+						}
 					}
 				}
 
 				override fun mergeCallBack() {
-					hold(this@getChainModels, balanceError)
+					launchUI {
+						hold(this@getChainModels, balanceError)
+					}
 				}
 			}.start()
 		}

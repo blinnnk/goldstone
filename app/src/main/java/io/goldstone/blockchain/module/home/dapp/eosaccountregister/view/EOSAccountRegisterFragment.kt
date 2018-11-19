@@ -9,7 +9,6 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.model.MutablePair
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.ColumnSectionTitle
 import io.goldstone.blockchain.common.component.DescriptionView
@@ -17,15 +16,13 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
-import io.goldstone.blockchain.common.component.overlay.DashboardOverlay
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -38,10 +35,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 import java.math.BigInteger
 
 
@@ -49,6 +43,7 @@ import java.math.BigInteger
  * @author KaySaith
  * @date  2018/09/21
  */
+@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	override val pageTitle: String = ProfileText.eosAccountRegister
@@ -136,11 +131,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		val dashboard =
-			getParentContainer()?.findViewById<DashboardOverlay>(ElementID.dashboardOverlay)
-		if (!dashboard.isNull()) {
-			getParentContainer()?.removeView(dashboard)
-		} else super.setBaseBackEvent(activity, parent)
+		super.setBaseBackEvent(activity, parent)
 	}
 
 	private fun setExpenditure() {
@@ -154,36 +145,44 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	}
 
 	private fun ViewGroup.showCustomDashboard(values: List<MutablePair<String, String>>) {
-		DashboardOverlay(context) {
+		val settingInputs = LinearLayout(context).apply {
+			orientation = LinearLayout.VERTICAL
+			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			values.forEachIndexed { index, mutablePair ->
 				RoundInput(context).apply {
+					horizontalPaddingSize = 20.uiPX()
 					setNumberInput(index != 0)
 					id = index
-					layoutParams = LinearLayout.LayoutParams(ScreenSize.overlayContentWidth, 56.uiPX())
+					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					this.title = mutablePair.left
 					hint = mutablePair.right
 				}.into(this)
 			}
-		}.apply {
-			confirmEvent = Runnable {
-				(0 until values.size).forEach { index ->
-					val newValue = findViewById<RoundInput>(index)?.getContent()
-					if (!newValue.isNullOrEmpty()) {
-						val formattedNumber =
-							if (values[index].left.contains(TokenDetailText.ram, true))
-								"${newValue.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
-							else "${newValue.convertToDouble(CryptoValue.eosDecimal).orElse(EOSValue.defaultRegisterAssignBandWidth)}"
-						// 更新界面上的值
-						gridSessionTitle.updateValues(index, formattedNumber)
-						// 更新内存里面的值
-						assignResources[index].right = formattedNumber
-						// 更新预估价值
-						setExpenditure()
-					}
+		}
+
+		fun LinearLayout.updateSettingValue() {
+			(0 until values.size).forEach { index ->
+				val newValue = findViewById<RoundInput>(index)?.getContent()
+				if (!newValue.isNullOrEmpty()) {
+					val formattedNumber =
+						if (values[index].left.contains(TokenDetailText.ram, true))
+							"${newValue.toIntOrNull().orElse(EOSValue.defaultRegisterAssignRAM)}"
+						else "${newValue.convertToDouble(CryptoValue.eosDecimal).orElse(EOSValue.defaultRegisterAssignBandWidth)}"
+					// 更新界面上的值
+					gridSessionTitle.updateValues(index, formattedNumber)
+					// 更新内存里面的值
+					assignResources[index].right = formattedNumber
+					// 更新预估价值
+					setExpenditure()
 				}
-				activity?.let { SoftKeyboard.hide(it) }
 			}
-		}.showTitle(EOSAccountText.customizeResource).into(this)
+		}
+
+		Dashboard(context) {
+			showDashboard(EOSAccountText.customizeResource, settingInputs) {
+				it.updateSettingValue()
+			}
+		}
 	}
 
 }

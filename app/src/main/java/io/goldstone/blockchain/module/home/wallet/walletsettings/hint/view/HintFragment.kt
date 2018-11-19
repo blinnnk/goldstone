@@ -16,9 +16,9 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -65,10 +65,8 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		WalletTable.getCurrent(Dispatchers.Main) {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
-			AppConfigTable.getAppConfig(Dispatchers.Main) {
-				if (it?.showPincode == true) getParentFragment<ProfileOverlayFragment> {
-					activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
-				}
+			if (SharedValue.getPincodeDisplayStatus()) getParentFragment<ProfileOverlayFragment> {
+				activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 			}
 			hintInput.hint = this.hint
 		}

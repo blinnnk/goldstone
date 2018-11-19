@@ -74,9 +74,7 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		MarketTokenDetailFragment.removeContentOverlayOrElse(this) {
-			super.setBaseBackEvent(activity, parent)
-		}
+		super.setBaseBackEvent(activity, parent)
 	}
 
 }

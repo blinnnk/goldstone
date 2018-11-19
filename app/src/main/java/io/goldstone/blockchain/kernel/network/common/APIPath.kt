@@ -21,10 +21,7 @@ object APIPath {
 	val updateAddresses: (header: String) -> String = { "$it/account/commitAddress" }
 	val getNotification: (header: String) -> String = { "$it/account/unreadMessageList" }
 	val terms: (header: String) -> String = { "$it/index/agreement?md5=" }
-	val marketSearch: (
-		header: String,
-		pair: String,
-		marketIds: String) -> String = { header, pair, marketIds ->
+	val marketSearch: (header: String, pair: String, marketIds: String) -> String = { header, pair, marketIds ->
 		"$header/account/searchPair?pair=$pair" +
 			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
 	}
@@ -55,11 +52,7 @@ object APIPath {
 		"$header/eosram/txListByAccount?account=$account&end=$endID&size=$size"
 	}
 	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
-	val getEOSTokenList: (
-		header: String,
-		chainID: String,
-		account: String
-	) -> String = { header, chainID, account ->
+	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
 		"$header/eos/tokenList?chainid=$chainID&account=$account"
 	}
 	val getEOSTokenCountInfo: (

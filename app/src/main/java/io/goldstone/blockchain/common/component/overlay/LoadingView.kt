@@ -7,17 +7,15 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
-import android.widget.TextView
-import com.blinnnk.animation.updateColorAnimation
-import com.blinnnk.extension.addCorner
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
 import com.blinnnk.extension.centerInParent
-import com.blinnnk.extension.into
 import com.blinnnk.uikit.HoneyColor
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -25,56 +23,37 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 @SuppressLint("SetTextI18n")
-class LoadingView(context: Context) : RelativeLayout(context) {
-
-	private val introView by lazy { TextView(context) }
-
-	init {
-		id = ElementID.loadingView
-		isClickable = true
-
-		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
-
-		updateColorAnimation(GrayScale.Opacity1Black, GrayScale.Opacity5Black)
-
-		val size = (ScreenSize.Width * 0.5).toInt()
-
-		relativeLayout {
-
-			addCorner(CornerSize.default.toInt(), Spectrum.white)
-
-			addLoadingCircle(this) {
-				centerInParent()
-				y -= 20.uiPX()
-			}
-
-			introView.apply {
-				textSize = fontSize(12)
-				textColor = GrayScale.gray
-				gravity = Gravity.CENTER_HORIZONTAL
-				typeface = GoldStoneFont.heavy(context)
-				leftPadding = 30.uiPX()
-				rightPadding = 30.uiPX()
-				lparams {
-					width = matchParent
-					height = 50.uiPX()
+class LoadingView(private val context: Context) {
+	private val dialog = MaterialDialog(context)
+	fun show() {
+		context.apply {
+			val container = relativeLayout {
+				lparams(matchParent, 200.uiPX())
+				addLoadingCircle(this) {
 					centerInParent()
-					y += 60.uiPX()
+					y -= 20.uiPX()
 				}
-			}.into(this)
-
-			lparams {
-				centerInParent()
-				width = size
-				height = size
+				textView {
+					text = LoadingText.gettingData
+					textSize = fontSize(12)
+					textColor = GrayScale.gray
+					gravity = Gravity.CENTER_HORIZONTAL
+					typeface = GoldStoneFont.heavy(context)
+					leftPadding = 30.uiPX()
+					rightPadding = 30.uiPX()
+					layoutParams = RelativeLayout.LayoutParams(matchParent, 50.uiPX())
+					y += 60.uiPX()
+				}.centerInParent()
+			}
+			with(dialog) {
+				customView(view = container)
+				show()
 			}
 		}
-
-		setIntroText(LoadingText.gettingData)
 	}
 
-	private fun setIntroText(intro: String) {
-		introView.text = intro
+	fun remove() {
+		dialog.dismiss()
 	}
 
 	companion object {

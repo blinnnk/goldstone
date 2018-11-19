@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
-import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -61,12 +60,6 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			}
-		} else GoldStoneDialog.show(context) {
-			showOnlyConfirmButton {
-				GoldStoneDialog.remove(context)
-			}
-			setImage(R.drawable.network_browken_banner)
-			setContent(DialogText.networkTitle, DialogText.networkDescription)
-		}
+		} else GoldStoneDialog(context).showNetworkStatus()
 	}
 }

@@ -61,8 +61,6 @@ abstract class GSFragment : Fragment() {
 			presenter.setBackEvent()
 		} else if (parent is BaseOverlayFragment<*>) {
 			parent.presenter.removeSelfFromActivity()
-			// 如果阻碍 `Loading` 存在也一并销毁
-			activity?.removeLoadingView()
 		}
 	}
 

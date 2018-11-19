@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.p
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.TinyNumber
@@ -9,6 +10,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -44,7 +46,7 @@ class TokenSearchPresenter(
 			if (SharedWallet.getCurrentWalletType().isBTCSeries())
 				showSearchButton(false) {}
 			else {
-				fragment.showLoadingView()
+				fragment.showLoadingView(true)
 				MyTokenTable.getMyTokens { myTokens ->
 					searchInputListener { inputContent ->
 						if (NetworkUtil.hasNetwork(fragment.context))
@@ -57,15 +59,17 @@ class TokenSearchPresenter(
 
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
-			GlobalScope.launch(Dispatchers.Main) {
-				if (result != null && error.isNone()) {
+			launchUI {
+				if (result.isNotNull() && error.isNone()) {
 					if (SharedWallet.getCurrentWalletType().isETHSeries())
 					// 如果是以太坊钱包 Only 那么过滤掉比特币系列链的 Coin
 						diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(
-							result.filterNot { TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries() }.toArrayList()
+							result.filterNot {
+								TokenContract(it.contract, it.symbol, it.decimals).isBTCSeries()
+							}.toArrayList()
 						)
 					else diffAndUpdateSingleCellAdapterData<TokenSearchAdapter>(result.toArrayList())
-					fragment.removeLoadingView()
+					fragment.showLoadingView(false)
 				} else fragment.safeShowError(error)
 			}
 		}

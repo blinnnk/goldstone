@@ -6,11 +6,9 @@ import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
-import android.widget.RelativeLayout
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
@@ -19,8 +17,6 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
-import io.goldstone.blockchain.common.component.overlay.ContentScrollOverlayView
-import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.transparentStatus
@@ -32,8 +28,6 @@ import org.jetbrains.anko.relativeLayout
 class MainActivity : AppCompatActivity() {
 
 	var backEvent: Runnable? = null
-	// 阻碍的 `LoadingView`
-	private var loadingView: LoadingView? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
 	private var tracker: Tracker? = null
 
@@ -81,21 +75,6 @@ class MainActivity : AppCompatActivity() {
 		)
 	}
 
-	fun showLoadingView() {
-		findViewById<RelativeLayout>(ContainerID.main)?.let { layout ->
-			findViewById<LoadingView>(ElementID.loadingView).isNull() isTrue {
-				loadingView = LoadingView(layout.context)
-				layout.addView(loadingView)
-			}
-		}
-	}
-
-	fun removeLoadingView() {
-		findViewById<RelativeLayout>(ContainerID.main)?.apply {
-			loadingView?.let { removeView(it) }
-		}
-	}
-
 	override fun onDestroy() {
 		super.onDestroy()
 		unregisterReceiver(netWorkReceiver)
@@ -117,10 +96,6 @@ class MainActivity : AppCompatActivity() {
 		}
 	}
 
-	fun getMainContainer(): RelativeLayout? {
-		return findViewById(ContainerID.main)
-	}
-
 	// 防止重绘的专用方法
 	fun hideHomeFragment() {
 		supportFragmentManager.findFragmentByTag(FragmentTag.home)?.let { fragment ->
@@ -129,10 +104,6 @@ class MainActivity : AppCompatActivity() {
 			}
 		}
 	}
-
-	// 检查 MainActivity 是否存在悬浮层, 并返回
-	fun getContentScrollOverlay() = getMainContainer()
-		?.findViewById<ContentScrollOverlayView>(ElementID.contentScrollview)
 
 	// 防止重绘的专用方法
 	fun showHomeFragment() {

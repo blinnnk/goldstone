@@ -13,3 +13,4 @@ import kotlinx.coroutines.launch
 fun launchUI(callback: () -> Unit) {
 	GlobalScope.launch(Dispatchers.Main) { callback() }
 }
+

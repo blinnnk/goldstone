@@ -87,9 +87,9 @@ class RAMTransactionSearchPresenter(
 	
 	private fun loadFirstPage(account: String) {
 		endID = 0
-		fragment.showLoadingView()
+		fragment.showLoadingView(true)
 		searchByName(account) {
-			fragment.removeLoadingView()
+			fragment.showLoadingView(false)
 		}
 	}
 	

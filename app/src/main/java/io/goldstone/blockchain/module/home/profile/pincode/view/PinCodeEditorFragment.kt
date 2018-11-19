@@ -5,7 +5,7 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.component.HoneyBaseSwitch
+import android.widget.Switch
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -17,10 +17,8 @@ import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.pincode.presenter.PinCodeEditorPresenter
@@ -37,7 +35,7 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 	val confirmButton by lazy { RoundButton(context!!) }
 	private val newPinCode by lazy { RoundInput(context!!) }
 	private val repeatPinCode by lazy { RoundInput(context!!) }
-	private val switch by lazy { HoneyBaseSwitch(context!!) }
+	private lateinit var switch: Switch
 	override val presenter = PinCodeEditorPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -97,15 +95,18 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 				lparams(matchParent, matchParent)
 			}
 
-			switch.apply {
-				alignParentRight()
+
+			switch = switch {
+				isDefaultStyle(Spectrum.blue)
 				isChecked = SharedValue.getPincodeDisplayStatus()
 			}.click { switch ->
 				// 点击后根据更新的数据库情况显示开关状态
 				presenter.setPinCodeDisplayStatus(switch.isChecked) {
 					switch.isChecked = it
 				}
-			}.into(this)
+			}
+			switch.alignParentRight()
+			switch.centerInVertical()
 			// 分割线
 			View(context).apply {
 				lparams {

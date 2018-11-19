@@ -2,7 +2,7 @@ package io.goldstone.blockchain.kernel.network.eos.contract
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNotNull
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
@@ -28,13 +28,9 @@ abstract class EOSTransactionInterface {
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		serialized { data, error ->
-			if (data != null && error.isNone()) {
+			if (data.isNotNull() && error.isNone()) {
 				val signature = privateKey.sign(Sha256.from(Hex.decode(data.serialized))).toString()
-				EOSAPI.pushTransaction(
-					listOf(signature),
-					data.packedTX,
-					hold
-				)
+				EOSAPI.pushTransaction(listOf(signature), data.packedTX, hold)
 			} else hold(null, error)
 		}
 	}

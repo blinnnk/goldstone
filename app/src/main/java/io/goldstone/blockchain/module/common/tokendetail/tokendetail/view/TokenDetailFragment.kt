@@ -38,21 +38,22 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	private var headerView: TokenDetailHeaderView? = null
 	private var bottomLoading: BottomLoadingView? = null
 
-	override fun showLoading(status: Boolean) {
-		if (status) showLoadingView() else launchUI {
-			removeLoadingView()
-		}
-	}
-
 	override fun removeEmptyView() {
 		launchUI {
 			super.removeEmptyView()
 		}
 	}
 
+	override fun showLoading(status: Boolean) {
+		launchUI {
+			super.showLoadingView(status)
+		}
+	}
+
 	override fun showBottomLoading(status: Boolean) {
 		launchUI {
-			if (status) bottomLoading?.show() else bottomLoading?.hide()
+			if (status) bottomLoading?.show()
+			else bottomLoading?.hide()
 		}
 		isLoadingData = false
 	}
@@ -70,7 +71,9 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	}
 
 	override fun updateDataChange(data: ArrayList<TransactionListModel>) {
-		updateAdapterData<TokenDetailAdapter>(data)
+		launchUI {
+			updateAdapterData<TokenDetailAdapter>(data)
+		}
 	}
 
 	override fun getDetailAdapter(): TokenDetailAdapter? {

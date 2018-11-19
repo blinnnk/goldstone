@@ -1,14 +1,12 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model
 
 import android.arch.persistence.room.TypeConverter
-import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.suffix
 import com.blinnnk.util.HoneyDateUtil
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.language.DateAndTimeText
-import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import org.json.JSONObject
@@ -54,10 +52,10 @@ data class RefundRequestInfo(
 		val totalRefundsEOS = getTotalRefundEOSCount().orZero()
 		val expirationTimeStamp =
 			if (totalRefundsEOS == 0.0) 0L
-			else EOSUtils.getUTCTimeStamp(requestTime)  + 86400000 * 3 - TimeUtils.getUtcTime(System.currentTimeMillis())
+			else EOSUtils.getUTCTimeStamp(requestTime) + 86400000 * 3
 		val expirationDate =
 			if (expirationTimeStamp == 0L) ""
-			else HoneyDateUtil.getSinceTime(expirationTimeStamp.orElse(0), DateAndTimeText.getDateText(), false)
+			else HoneyDateUtil.getSinceTime(expirationTimeStamp, DateAndTimeText.getDateText())
 		return "$totalRefundsEOS" suffix CoinSymbol.eos + " / " + expirationDate
 	}
 }
