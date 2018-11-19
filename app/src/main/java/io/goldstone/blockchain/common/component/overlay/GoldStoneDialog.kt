@@ -10,6 +10,7 @@ import android.widget.RelativeLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DialogText
@@ -23,6 +24,7 @@ import org.jetbrains.anko.*
  * @date 2018/5/19 11:45 AM
  * @author KaySaith
  */
+
 @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class GoldStoneDialog(private val context: Context) {
 
@@ -38,7 +40,6 @@ class GoldStoneDialog(private val context: Context) {
 		}
 		dialog.window.setBackgroundDrawable(shape)
 	}
-
 
 	private fun generateCustomView(image: Int, description: String, hold: (RelativeLayout) -> Unit) {
 		context.apply {
@@ -83,7 +84,9 @@ class GoldStoneDialog(private val context: Context) {
 		}
 	}
 
+	// 一个 App 的声明周期只弹出一次 `4G` 的 `Alert`
 	fun showMobile4GConfirm(callback: () -> Unit) {
+		if (GoldStoneApp.hasShownMobileAlert) return
 		generateCustomView(
 			R.drawable.dialog_mobile_4g,
 			"Are you willing to update resources in 4g environment?"
@@ -97,6 +100,7 @@ class GoldStoneDialog(private val context: Context) {
 				negativeButton(text = CommonText.cancel)
 				customView(view = it)
 				show()
+				GoldStoneApp.hasShownMobileAlert = true
 			}
 		}
 	}

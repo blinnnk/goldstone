@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.model
 
 import android.arch.persistence.room.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import java.io.Serializable
 
 /**
  * @date 08/04/2018 5:10 PM
@@ -14,16 +15,7 @@ data class TokenBalanceTable(
 	var insertTime: Long,
 	var balance: Double,
 	var address: String
-) {
-
-	constructor(symbol: String, time: Long) : this(
-		symbol,
-		time,
-		0L,
-		0.0,
-		""
-	)
-
+): Serializable {
 	companion object {
 		@JvmField
 		val dao = GoldStoneDataBase.database.tokenBalanceDao()
