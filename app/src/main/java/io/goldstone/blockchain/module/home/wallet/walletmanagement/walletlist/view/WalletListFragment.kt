@@ -4,6 +4,7 @@ import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
@@ -20,7 +21,9 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletListModel>?) {
 		asyncData?.let { it ->
 			recyclerView.adapter = WalletListAdapter(it) {
-				setClickEvent { presenter.switchWallet(model.address) }
+				setClickEvent {
+					presenter.switchWallet(model.address)
+				}
 			}
 		}
 	}
