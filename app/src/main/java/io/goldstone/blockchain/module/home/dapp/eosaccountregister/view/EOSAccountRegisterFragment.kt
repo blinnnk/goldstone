@@ -6,9 +6,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.blinnnk.extension.*
 import com.blinnnk.model.MutablePair
 import com.blinnnk.uikit.uiPX
@@ -19,15 +16,13 @@ import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -48,6 +43,7 @@ import java.math.BigInteger
  * @author KaySaith
  * @date  2018/09/21
  */
+@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	override val pageTitle: String = ProfileText.eosAccountRegister
@@ -154,7 +150,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			values.forEachIndexed { index, mutablePair ->
 				RoundInput(context).apply {
-					horizontalPaddingSize = PaddingSize.content
+					horizontalPaddingSize = 20.uiPX()
 					setNumberInput(index != 0)
 					id = index
 					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
@@ -181,15 +177,12 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				}
 			}
 		}
-		MaterialDialog(context)
-			.title(text = EOSAccountText.customizeResource)
-			.customView(view = settingInputs)
-			.positiveButton(text = CommonText.confirm) {
-				val inputs = it.getCustomView() as? LinearLayout
-				inputs?.updateSettingValue()
+
+		Dashboard(context) {
+			showDashboard(EOSAccountText.customizeResource, settingInputs) {
+				it.updateSettingValue()
 			}
-			.negativeButton(text = CommonText.cancel)
-			.show()
+		}
 	}
 
 }

@@ -58,9 +58,9 @@ class PinCodeEditorPresenter(
 			AppConfigTable.dao.updatePincode(newPinCode.text.toString().toInt())
 		} then {
 			fragment.context?.alert(CommonText.succeed)
-			setPinCodeDisplayStatus(true) {
-				switch.isChecked = it
-				SharedValue.updatePincodeDisplayStatus(it)
+			setPinCodeDisplayStatus(true) { hasSet ->
+				switch.isChecked = hasSet
+				SharedValue.updatePincodeDisplayStatus(hasSet)
 			}
 		}
 	}

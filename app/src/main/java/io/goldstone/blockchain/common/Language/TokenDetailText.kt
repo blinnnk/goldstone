@@ -390,7 +390,7 @@ object TokenDetailText {
 		HoneyLanguage.Japanese.code -> "デリゲートCPU\n返金CPU"
 		HoneyLanguage.Korean.code -> "CPU 를 위임하십시오\nCPU 환불"
 		HoneyLanguage.Russian.code -> "Делегат CPU\nВозврат CPU"
-		HoneyLanguage.TraditionalChinese.code -> "代理CPU\n贖回CPU"
+		HoneyLanguage.TraditionalChinese.code -> "代理CPU\n贖回 CPU"
 		else -> ""
 	}
 
@@ -423,7 +423,7 @@ object TokenDetailText {
 		HoneyLanguage.Japanese.code -> "RAMを購入する\nRAMを販売する"
 		HoneyLanguage.Korean.code -> "RAM 구입\nRAM  판매"
 		HoneyLanguage.Russian.code -> "Купить RAM\nПродать RAM"
-		HoneyLanguage.TraditionalChinese.code -> "買入RAM\n賣出RAM"
+		HoneyLanguage.TraditionalChinese.code -> "買入RAM\n賣出 RAM"
 		else -> ""
 	}
 
@@ -452,7 +452,7 @@ object TokenDetailText {
 	val eosAmountTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "EOS Amount"
 		HoneyLanguage.Chinese.code -> "EOS 数量"
-		HoneyLanguage.Japanese.code -> "EOSの数"
+		HoneyLanguage.Japanese.code -> "EOS の数"
 		HoneyLanguage.Korean.code -> "EOS 의 수"
 		HoneyLanguage.Russian.code -> "Количество EOS"
 		HoneyLanguage.TraditionalChinese.code -> "EOS 數量"
@@ -461,8 +461,8 @@ object TokenDetailText {
 	@JvmField
 	val eosAmountPlaceholder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter EOS amount"
-		HoneyLanguage.Chinese.code -> "想要兑换的EOS数量"
-		HoneyLanguage.Japanese.code -> "EOS額を入力"
+		HoneyLanguage.Chinese.code -> "想要兑换的 EOS 数量"
+		HoneyLanguage.Japanese.code -> "EOS 額を入力"
 		HoneyLanguage.Korean.code -> "EOS 금액 입력"
 		HoneyLanguage.Russian.code -> "Введите сумму EOS"
 		HoneyLanguage.TraditionalChinese.code -> "想要兌換的數量(EOS)"
@@ -493,9 +493,9 @@ object TokenDetailText {
 	@JvmField
 	val delegateTypeTransfer = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transfer"
-		HoneyLanguage.Chinese.code -> "同时转让EOS"
+		HoneyLanguage.Chinese.code -> "同时转让 EOS"
 		HoneyLanguage.Japanese.code -> "転送"
-		HoneyLanguage.Korean.code -> "EOS를 동시에 전송"
+		HoneyLanguage.Korean.code -> "EOS 를 동시에 전송"
 		HoneyLanguage.Russian.code -> "Передача"
 		HoneyLanguage.TraditionalChinese.code -> "同時轉讓EOS"
 		else -> ""
@@ -514,29 +514,29 @@ object TokenDetailText {
 	// 资源交易的page title
 	@JvmField
 	val tradingCPU = when (currentLanguage) {  HoneyLanguage.English.code -> "Delegate / Refund CPU"
-		HoneyLanguage.Chinese.code -> "代理/赎回CPU"
-		HoneyLanguage.Japanese.code -> "デリゲート/返金CPU"
+		HoneyLanguage.Chinese.code -> "代理/赎回 CPU"
+		HoneyLanguage.Japanese.code -> "デリゲート/返金 CPU"
 		HoneyLanguage.Korean.code -> "대의원 / 환불 CPU"
 		HoneyLanguage.Russian.code -> "Торговое CPU"
-		HoneyLanguage.TraditionalChinese.code -> "代理/贖回CPU"
+		HoneyLanguage.TraditionalChinese.code -> "代理/贖回 CPU"
 		else -> ""
 	}
 	@JvmField
 	val tradingNET = when (currentLanguage) {  HoneyLanguage.English.code -> "Delegate / Refund NET"
-		HoneyLanguage.Chinese.code -> "代理/赎回NET"
-		HoneyLanguage.Japanese.code -> "デリゲート/返金NET"
+		HoneyLanguage.Chinese.code -> "代理/赎回 NET"
+		HoneyLanguage.Japanese.code -> "デリゲート/返金 NET"
 		HoneyLanguage.Korean.code -> "대의원 / 환불 NET"
 		HoneyLanguage.Russian.code -> "Торговое NET"
-		HoneyLanguage.TraditionalChinese.code -> "代理/贖回NET"
+		HoneyLanguage.TraditionalChinese.code -> "代理/贖回 NET"
 		else -> ""
 	}
 	@JvmField
 	val tradingRAM = when (currentLanguage) {  HoneyLanguage.English.code -> "Buy / Sell RAM"
-		HoneyLanguage.Chinese.code -> "买入/卖出RAM"
-		HoneyLanguage.Japanese.code -> "購入/販売RAM"
-		HoneyLanguage.Korean.code -> "구입 / 판매 CPU"
+		HoneyLanguage.Chinese.code -> "买入/卖出 RAM"
+		HoneyLanguage.Japanese.code -> "購入/販売 RAM"
+		HoneyLanguage.Korean.code -> "구입 / 판매 RAM"
 		HoneyLanguage.Russian.code -> "Купить / Продать RAM"
-		HoneyLanguage.TraditionalChinese.code -> "買入/賣出RAM"
+		HoneyLanguage.TraditionalChinese.code -> "買入/賣出 RAM"
 		else -> ""
 	}
 }

@@ -6,19 +6,19 @@ import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.customview.customView
+import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
 import com.blinnnk.base.HoneyBaseAdapter
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.CornerSize
-import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.wrapContent
 
-@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+@Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "UNCHECKED_CAST")
 @SuppressLint("ViewConstructor")
 /**
  * @date 2018/7/11 1:32 PM
@@ -48,6 +48,19 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 			customListAdapter(adapter)
 			getRecyclerView()?.layoutManager =
 				GridLayoutManager(context, 3, 1, false)
+			negativeButton(text = CommonText.cancel)
+			show()
+		}
+	}
+
+	fun <T : View> showDashboard(title: String, customView: T, hold: (T) -> Unit) {
+		with(dialog) {
+			title(text = title)
+			customView(view = customView)
+			positiveButton(text = CommonText.confirm) {
+				hold(customView)
+				dialog.dismiss()
+			}
 			negativeButton(text = CommonText.cancel)
 			show()
 		}
