@@ -41,4 +41,9 @@ class GoldStoneApp : Application() {
 		}
 		return tracker
 	}
+
+	companion object {
+		@JvmField
+		var hasShownMobileAlert = false
+	}
 }
