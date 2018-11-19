@@ -2,10 +2,10 @@ package io.goldstone.blockchain.module.common.passcode.presenter
 
 import android.annotation.SuppressLint
 import android.os.Handler
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.support.v7.app.AppCompatActivity
 import com.blinnnk.animation.updateAlphaAnimation
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -35,25 +35,33 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 	private var currentFrozenTime = 0L
 	private val handler = Handler()
 
-	@UiThread
-	fun unlockOrAlert(config: AppConfigTable, passcode: String, action: () -> Unit) {
+	/**
+	 * @Important
+	 * 因为 Pincode 的众多安全判断标记都采用数据库标记而不是相对不安全的 内存 或 SP
+	 * 标记, 所以每次解锁都要从数据库获取最新的值. 这里的传入参数不能采用内存来进行
+	 * 便利. 必须每次开库检查.
+	 */
+	@WorkerThread
+	fun unlockOrAlert(passcode: String) = GlobalScope.launch(Dispatchers.Default) {
+		val config = AppConfigTable.dao.getAppConfig() ?: return@launch
 		var retryTimes = config.retryTimes.orZero()
 		checkPasscode(config, passcode) { isCorrect ->
 			if (isCorrect) {
-				if (retryTimes < Count.retry) GlobalScope.launch(Dispatchers.Default) {
-					resetConfig()
+				if (retryTimes < Count.retry) resetConfig()
+				launchUI {
+					fragment.removePasscodeFragment()
 				}
-				fragment.removePasscodeFragment()
-			} else GlobalScope.launch(Dispatchers.Default) {
+			} else {
 				retryTimes -= 1
-				val configDao =
-					GoldStoneDataBase.database.appConfigDao()
-				configDao.updateRetryTimes(retryTimes)
+				AppConfigTable.dao.updateRetryTimes(retryTimes)
 				if (retryTimes == 0) {
 					// 如果失败尝试超过 `Count.retry` 次, 那么将会存入冻结时间 `1` 分钟
 					val oneMinute = 60 * 1000L
-					val frozenTime = System.currentTimeMillis() + oneMinute
-					configDao.updateFrozenTime(frozenTime)
+					AppConfigTable.dao.updateFrozenTime(oneMinute)
+					currentFrozenTime = oneMinute
+					launchUI {
+						refreshRunnable.run()
+					}
 					// 进入冻结状态后恢复重试次数
 					resetConfig()
 				} else launchUI {
@@ -62,24 +70,23 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 				}
 			}
 		}
-		action()
 	}
 
-	fun isFrozenStatus(@WorkerThread callback: (isFrozen: Boolean, config: AppConfigTable) -> Unit) {
-		AppConfigTable.getAppConfig(Dispatchers.Default) {
+	fun isFrozenStatus(@WorkerThread callback: (isFrozen: Boolean) -> Unit) {
+		AppConfigTable.getAppConfig(Dispatchers.Main) {
 			val config = it ?: return@getAppConfig
-			if (config.frozenTime != null) {
-				currentFrozenTime = config.frozenTime ?: 0 - System.currentTimeMillis()
+			if (config.frozenTime.isNotNull()) {
+				currentFrozenTime = config.frozenTime ?: 0
 				if (currentFrozenTime > 0) {
 					refreshRunnable.run()
-					callback(true, config)
+					callback(true)
 				} else {
 					resetConfig()
-					callback(false, config)
+					callback(false)
 				}
 			} else {
 				resetConfig()
-				callback(false, config)
+				callback(false)
 			}
 		}
 	}
@@ -140,7 +147,7 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 	}
 
 	@WorkerThread
-	private fun resetConfig() {
+	private fun resetConfig() = GlobalScope.launch(Dispatchers.Default) {
 		val configDao =
 			GoldStoneDataBase.database.appConfigDao()
 		configDao.updateRetryTimes(Count.retry)

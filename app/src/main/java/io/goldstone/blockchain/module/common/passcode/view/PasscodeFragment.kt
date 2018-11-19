@@ -87,7 +87,9 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 	}
 
 	fun recoveryAfterFreeze() {
-		failedAttention?.let { container.removeView(it) }
+		failedAttention?.let {
+			container.removeView(it)
+		}
 		keyboard.setKeyboardClickEventByFrozenStatus()
 		failedAttention = null
 		resetHeaderStyle()
@@ -95,9 +97,10 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 
 	// 检查是否处于冻结状态
 	private fun NumberKeyboard.setKeyboardClickEventByFrozenStatus() {
-		presenter.isFrozenStatus { isFrozen, config ->
+		presenter.isFrozenStatus { isFrozen ->
 			checkCode = Runnable {
-				if (!isFrozen) presenter.unlockOrAlert(config, getEnteredCode()) {
+				if (!isFrozen) {
+					presenter.unlockOrAlert(getEnteredCode())
 					if (getEnteredCode().isEmpty()) passcodeInput.recoveryStyle()
 					else passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
 				}
