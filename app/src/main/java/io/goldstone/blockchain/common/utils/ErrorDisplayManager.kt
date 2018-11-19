@@ -32,6 +32,9 @@ class ErrorDisplayManager(private val error: Throwable) {
 					LogUtil.error(this::class.java.simpleName, Throwable("GoldStone ERROR: *************** $errorMessage ***************"))
 					null
 				}
+				errorMessage.contains("64: dust", true) -> {
+					"amount too small to be recognised as legitimate on the bitcoin network."
+				}
 				else -> error.message
 			}
 		}

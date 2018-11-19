@@ -83,4 +83,10 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
 		currentCode = ""
 	}
 
+	fun disableKeyboard(status: Boolean) {
+		(0 until childCount).forEach {
+			getChildAt(it).isClickable = !status
+		}
+	}
+
 }

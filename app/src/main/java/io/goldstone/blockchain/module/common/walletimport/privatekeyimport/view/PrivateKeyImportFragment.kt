@@ -25,14 +25,12 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.AddressType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 
 /**
@@ -153,10 +151,6 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 		}
 	}
 
-	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
-	}
-
 	companion object {
 		fun showWalletTypeDashboard(
 			context: Context,
@@ -165,8 +159,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 		) {
 			val data = arrayListOf(
 				AddressType.ETHSeries.value,
-				CoinSymbol.updateSymbolIfInReview(CoinSymbol.BTC),
-				CoinSymbol.updateSymbolIfInReview(CoinSymbol(AddressType.BTCSeriesTest.value), true),
+				AddressType.BTC.value,
+				AddressType.BTCSeriesTest.value,
 				AddressType.LTC.value,
 				AddressType.BCH.value,
 				AddressType.EOS.value,

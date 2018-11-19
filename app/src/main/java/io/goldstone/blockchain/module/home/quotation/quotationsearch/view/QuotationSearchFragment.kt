@@ -70,7 +70,6 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 			val selectedExchanges = data.filter { it.isSelected }
 			val selectedExchangeNames = selectedExchanges.map { it.exchangeName }
 			rootFragment?.resetFilterStatus(isNotEmpty())
-			System.out.println("fuck you ${isNotEmpty()}")
 			if (isEmpty()) removeExchangeFilterDescriptionView()
 			else {
 				val content =

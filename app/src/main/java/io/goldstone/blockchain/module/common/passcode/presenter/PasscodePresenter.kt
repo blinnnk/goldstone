@@ -5,8 +5,9 @@ import android.os.Handler
 import android.support.annotation.WorkerThread
 import android.support.v7.app.AppCompatActivity
 import com.blinnnk.animation.updateAlphaAnimation
-import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
@@ -16,7 +17,6 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
@@ -56,14 +56,14 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 				AppConfigTable.dao.updateRetryTimes(retryTimes)
 				if (retryTimes == 0) {
 					// 如果失败尝试超过 `Count.retry` 次, 那么将会存入冻结时间 `1` 分钟
-					val oneMinute = 60 * 1000L
-					AppConfigTable.dao.updateFrozenTime(oneMinute)
-					currentFrozenTime = oneMinute
-					launchUI {
+					val oneMinute = 60L
+					load {
+						AppConfigTable.dao.updateFrozenTime(oneMinute)
+					} then {
+						fragment.disableKeyboard(true)
+						currentFrozenTime = oneMinute
 						refreshRunnable.run()
 					}
-					// 进入冻结状态后恢复重试次数
-					resetConfig()
 				} else launchUI {
 					fragment.resetHeaderStyle()
 					fragment.showFailedAttention("incorrect passcode $retryTimes retry times left")
@@ -75,14 +75,11 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 	fun isFrozenStatus(@WorkerThread callback: (isFrozen: Boolean) -> Unit) {
 		AppConfigTable.getAppConfig(Dispatchers.Main) {
 			val config = it ?: return@getAppConfig
-			if (config.frozenTime.isNotNull()) {
-				currentFrozenTime = config.frozenTime ?: 0
+			if (config.frozenTime > 0) {
+				currentFrozenTime = config.frozenTime
 				if (currentFrozenTime > 0) {
 					refreshRunnable.run()
 					callback(true)
-				} else {
-					resetConfig()
-					callback(false)
 				}
 			} else {
 				resetConfig()
@@ -93,12 +90,16 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 
 	private val refreshRunnable: Runnable by lazy {
 		Runnable {
-			currentFrozenTime -= 1000L
+			currentFrozenTime -= 1
 			fragment.showFailedAttention(setRemainingFrozenTime(currentFrozenTime))
 			if (currentFrozenTime > 0) {
+				GlobalScope.launch(Dispatchers.Default) {
+					AppConfigTable.dao.updateFrozenTime(currentFrozenTime)
+				}
 				handler.postDelayed(refreshRunnable, 1000L)
 			} else {
 				resetConfig()
+				fragment.disableKeyboard(false)
 				fragment.recoveryAfterFreeze()
 			}
 		}
@@ -148,16 +149,14 @@ class PasscodePresenter(override val fragment: PasscodeFragment) : BasePresenter
 
 	@WorkerThread
 	private fun resetConfig() = GlobalScope.launch(Dispatchers.Default) {
-		val configDao =
-			GoldStoneDataBase.database.appConfigDao()
-		configDao.updateRetryTimes(Count.retry)
-		configDao.updateFrozenTime(0)
+		AppConfigTable.dao.updateRetryTimes(Count.retry)
+		AppConfigTable.dao.updateFrozenTime(0)
 		currentFrozenTime = 0L
 	}
 
 	@SuppressLint("SetTextI18n")
 	private fun setRemainingFrozenTime(currentFrozenTime: Long): String {
-		return "you have to wait ${currentFrozenTime / 1000} seconds"
+		return "you have to wait $currentFrozenTime seconds"
 	}
 
 	private fun PasscodeFragment.removePasscodeFragment(callback: () -> Unit = {}) {

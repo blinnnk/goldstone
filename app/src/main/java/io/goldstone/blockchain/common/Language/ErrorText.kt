@@ -81,6 +81,19 @@ object ErrorText {
 	}
 
 	@JvmField
+	val invalidChainAddress: (symbol: String) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "This is a invalid address type for $it, Please check it again"
+			HoneyLanguage.Chinese.code -> "This is a invalid address type for $it, Please check it again"
+			HoneyLanguage.Japanese.code -> "This is a invalid address type for $it, Please check it again"
+			HoneyLanguage.Korean.code -> "This is a invalid address type for $it, Please check it again"
+			HoneyLanguage.Russian.code -> "This is a invalid address type for $it, Please check it again"
+			HoneyLanguage.TraditionalChinese.code -> "This is a invalid address type for $it, Please check it again"
+			else -> ""
+		}
+	}
+
+	@JvmField
 	val emptyName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter the account name which you decide to register"
 		HoneyLanguage.Chinese.code -> "请输入您决定注册的帐户名称"

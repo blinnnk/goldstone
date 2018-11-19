@@ -14,10 +14,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.passcode.presenter.PasscodePresenter
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -65,13 +62,17 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		activity?.apply { SoftKeyboard.hide(this) }
 	}
 
+	fun disableKeyboard(status: Boolean) {
+		keyboard.disableKeyboard(status)
+	}
+
 	fun resetHeaderStyle() {
 		keyboard.resetCode()
 		passcodeInput.swipe()
 	}
 
 	fun showFailedAttention(content: String) {
-		if (failedAttention != null) failedAttention?.text = content
+		if (failedAttention.isNotNull()) failedAttention?.text = content
 		else {
 			failedAttention = TextView(context).apply {
 				y += 30.uiPX()
@@ -100,7 +101,8 @@ class PasscodeFragment : BaseFragment<PasscodePresenter>() {
 		presenter.isFrozenStatus { isFrozen ->
 			checkCode = Runnable {
 				if (!isFrozen) {
-					presenter.unlockOrAlert(getEnteredCode())
+					disableKeyboard(false)
+					if (getEnteredCode().length == Count.pinCode) presenter.unlockOrAlert(getEnteredCode())
 					if (getEnteredCode().isEmpty()) passcodeInput.recoveryStyle()
 					else passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
 				}

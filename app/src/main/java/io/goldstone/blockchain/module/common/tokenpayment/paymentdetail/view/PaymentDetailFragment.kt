@@ -121,7 +121,8 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 					isCenter = true
 					layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
 					this.title.text = token?.symbol?.symbol.orEmpty()
-					this.subtitle.text = "${token?.count}" suffix token?.contract.getSymbol().symbol.orEmpty()
+					this.subtitle.text =
+						token?.count?.toBigDecimal()?.toPlainString().orEmpty() suffix token?.contract.getSymbol().symbol.orEmpty()
 					setBoldTitles()
 				}
 				titles.into(this)
