@@ -26,32 +26,33 @@ import org.jetbrains.anko.textColor
 
 class GasSelectionCell(context: Context) : BaseCell(context) {
 
-	var model: GasSelectionModel by observing(GasSelectionModel()) {
-		info.title.text = model.count
-		info.subtitle.text = model.info
-		feeTypeDescription.text = model.type
-		radioButton.isChecked = model.type == model.currentType
+	var model: GasSelectionModel? by observing(null) {
+		model?.let {
+			info.title.text = it.count
+			info.subtitle.text = it.info
+			feeTypeDescription.text = it.type.type
+		}
 	}
 
 	private var radioButton: RadioButton
 	private val info by lazy { TwoLineTitles(context) }
 	private val feeTypeDescription by lazy { TextView(context) }
 
-	init {
-		info
-			.apply {
-				setBlackTitles()
-				setSmallStyle()
-			}
-			.into(this)
+	fun setSelectedStatus(isSelected: Boolean) {
+		radioButton.isChecked = isSelected
+	}
 
-		feeTypeDescription
-			.apply {
-				textSize = fontSize(12)
-				textColor = GrayScale.gray
-				typeface = GoldStoneFont.book(context)
-			}
-			.into(this)
+	init {
+		info.apply {
+			setBlackTitles()
+			setSmallStyle()
+		}.into(this)
+
+		feeTypeDescription.apply {
+			textSize = fontSize(12)
+			textColor = GrayScale.gray
+			typeface = GoldStoneFont.book(context)
+		}.into(this)
 
 		radioButton = radioButton {
 			isDefaultStyle(Spectrum.blue)

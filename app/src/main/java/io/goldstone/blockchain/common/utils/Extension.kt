@@ -1,21 +1,25 @@
-@file:Suppress("UNCHECKED_CAST")
+@file:Suppress("UNCHECKED_CAST", "DEPRECATION")
 
 package io.goldstone.blockchain.common.utils
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.text.InputType
 import android.view.View
 import android.widget.EditText
-import com.blinnnk.extension.isTrue
+import android.widget.LinearLayout
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.eos.EOSCPUUnit
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -55,32 +59,27 @@ fun Context.showAlertView(
 	cancelAction: () -> Unit,
 	action: (EditText?) -> Unit
 ) {
-	var input: EditText? = null
-	alert(subtitle, title) {
-		isCancelable = false
-		showEditText isTrue {
-			customView {
-				verticalLayout {
-					lparams {
-						padding = 20.uiPX()
-					}
-					input = editText {
-						hintTextColor = GrayScale.Opacity1Black
-						textColor = Spectrum.blue
-						inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-						hint = CommonText.enterPassword
-					}
-				}
-			}
+	val input = linearLayout {
+		lparams(matchParent, matchParent)
+		padding = 30.uiPX()
+		editText {
+			id = ElementID.passwordInput
+			layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
+			hintTextColor = GrayScale.Opacity1Black
+			textColor = Spectrum.blue
+			inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+			hint = CommonText.enterPassword
+			textSize = fontSize(14)
+			background.mutate().setColorFilter(Spectrum.blue, PorterDuff.Mode.SRC_ATOP)
 		}
-		onCancelled {
-			cancelAction()
+	}
+	Dashboard(this) {
+		if (showEditText) showDashboard(title, input, subtitle) {
+			action(it.findViewById(ElementID.passwordInput))
+		} else showAlert(title, subtitle, cancelAction) {
+			action(null)
 		}
-		yesButton {
-			if (showEditText) input?.apply(action) else action(input)
-		}
-		noButton { cancelAction() }
-	}.show()
+	}
 }
 
 fun <T : Iterable<String>> T.toJsonArray(): JsonArray {

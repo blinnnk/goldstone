@@ -1,76 +1,47 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.model
 
-import io.goldstone.blockchain.common.language.LoadingText
+import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.crypto.utils.*
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.utils.scaleToGwei
+import io.goldstone.blockchain.crypto.utils.toBTCCount
+import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
+import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @date 2018/5/16 11:37 PM
  * @author KaySaith
  */
 data class GasSelectionModel(
-	val id: Int = 0,
-	val count: String = "0.000 ETH",
-	val info: String = "≈ 0.00 Gwei (${TransactionText.gasPrice}) * 0.000 (${TransactionText.gasLimit})",
-	var type: String = LoadingText.calculating,
-	var currentType: String = "",
-	val unitSymbol: String = CoinSymbol.eth
-) {
+	val count: String,
+	val info: String,
+	var type: MinerFeeType,
+	val unitSymbol: CoinSymbol
+) : Serializable {
 
 	constructor(
-		id: Int,
-		gWei: Double,
-		gasLimit: Double,
-		currentType: String,
-		unitSymbol: String
+		fee: GasFee,
+		symbol: CoinSymbol
 	) : this(
-		id,
-		(gWei * gasLimit).toUnitValue(unitSymbol), // count 转换过的
-		"≈ ${gWei.toGWeiValue()} Gwei (${TransactionText.gasPrice}) * ${gasLimit.toGasValue()} (${TransactionText.gasLimit})",
-		calculateType(id, gWei),
-		currentType,
-		unitSymbol
-	)
-
-	constructor(
-		id: Int,
-		price: Long, // Satoshi
-		bytes: Long,
-		currentType: String,
-		symbol: String
-	) : this(
-		id,
-		"${(price * bytes).toBTCCount().toBigDecimal()} $symbol",
-		"≈ $price Satoshi  * $bytes bytes",
-		calculateBTCSeriesType(id, price),
-		currentType,
+		generateChainCount(symbol, fee),
+		generateDescription(symbol.isBTCSeries(), fee),
+		fee.type,
 		symbol
 	)
 
 	companion object {
-		fun calculateType(id: Int, gWei: Double): String {
-			return if (id == 3) MinerFeeType.Custom.type
-			else {
-				when (gWei.toGwei()) {
-					MinerFeeType.Cheap.value -> MinerFeeType.Cheap.type
-					MinerFeeType.Fast.value -> MinerFeeType.Fast.type
-					MinerFeeType.Recommend.value -> MinerFeeType.Recommend.type
-					else -> MinerFeeType.Custom.type
-				}
-			}
+
+		fun generateChainCount(symbol: CoinSymbol, fee: GasFee): String {
+			return if (symbol.isBTCSeries()) "${(fee.gasPrice * fee.gasLimit).toBTCCount().toBigDecimal()} ${symbol.symbol}"
+			else BigInteger.valueOf((fee.gasPrice.scaleToGwei() * fee.gasLimit)).toEthCount().toBigDecimal().toPlainString() suffix symbol.symbol
 		}
 
-		fun calculateBTCSeriesType(id: Int, satoshi: Long): String {
-			return if (id == 3) MinerFeeType.Custom.type
-			else {
-				when (satoshi) {
-					MinerFeeType.Cheap.satoshi -> MinerFeeType.Cheap.type
-					MinerFeeType.Fast.satoshi -> MinerFeeType.Fast.type
-					MinerFeeType.Recommend.satoshi -> MinerFeeType.Recommend.type
-					else -> MinerFeeType.Custom.type
-				}
-			}
+		fun generateDescription(isBTCSeries: Boolean, fee: GasFee): String {
+			return if (isBTCSeries) "≈ ${fee.gasPrice} Satoshi  * ${fee.gasLimit} bytes"
+			else "≈ ${fee.gasPrice} Gwei (${TransactionText.gasPrice}) * ${fee.gasLimit} (${TransactionText.gasLimit})"
 		}
 	}
 }

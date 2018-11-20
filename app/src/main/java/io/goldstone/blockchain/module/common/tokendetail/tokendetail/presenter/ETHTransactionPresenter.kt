@@ -62,18 +62,18 @@ private fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -
 @WorkerThread
 fun TokenDetailPresenter.getETHSeriesData() {
 	val address = token.contract.getAddress()
-	val transactionDao = TransactionTable.dao
+	val dao = TransactionTable.dao
 	val endBlock = if (detailView.asyncData.isNullOrEmpty()) {
 		getMaxBlockNumber()
 	} else detailView.asyncData?.minBy { it.blockNumber }?.blockNumber!! - 1
 	if (endBlock.hasValue()) {
 		val transactions =
-			if (token.contract.isETH()) transactionDao.getETHAndAllFee(
+			if (token.contract.isETH()) dao.getETHAndAllFee(
 				address,
 				token.contract.contract,
 				endBlock,
 				token.chainID
-			) else transactionDao.getDataWithFee(
+			) else dao.getDataWithFee(
 				address,
 				token.contract.contract,
 				token.chainID,
@@ -89,6 +89,8 @@ fun TokenDetailPresenter.getETHSeriesData() {
 				else -> detailView.showBottomLoading(false)
 			}
 		}
-	} else detailView.showBottomLoading(false)
+	} else {
+		detailView.showBottomLoading(false)
+	}
 }
 

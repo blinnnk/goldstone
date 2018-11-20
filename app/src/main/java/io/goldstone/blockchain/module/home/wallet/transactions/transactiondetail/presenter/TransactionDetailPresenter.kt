@@ -11,7 +11,11 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
-import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.multichain.isEOSSeries
+import io.goldstone.blockchain.crypto.multichain.isETHSeries
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.contract.TransactionDetailContract
@@ -309,10 +313,8 @@ class TransactionDetailPresenter(
 		// 因为 Notification 可能来自多个链
 		data.chainID?.getSpecificChain() ?: data.contract.getChainURL()
 	) { confirmationCount, error ->
-		if (confirmationCount != null && error.isNone()) {
-			val transactionDao =
-				GoldStoneDataBase.database.transactionDao()
-			transactionDao.updateConfirmationCount(
+		if (confirmationCount.isNotNull() && error.isNone()) {
+			TransactionTable.dao.updateConfirmationCount(
 				confirmationCount,
 				data.hash,
 				data.fromAddress,

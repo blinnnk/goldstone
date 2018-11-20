@@ -12,8 +12,6 @@ import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.insertCustomBTCSatoshi
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.insertCustomGasData
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import java.io.Serializable
 
@@ -21,7 +19,19 @@ import java.io.Serializable
  * @date 2018/5/8 3:22 PM
  * @author KaySaith
  */
-data class GasFee(var gasLimit: Long, val gasPrice: Long) : Serializable
+data class GasFee(
+	var gasLimit: Long,
+	val gasPrice: Long,
+	val type: MinerFeeType
+) : Serializable {
+	fun getUsedAmount(): Long {
+		return gasLimit * gasPrice
+	}
+
+	companion object {
+		const val recommendPrice = 30L
+	}
+}
 
 class GasEditorPresenter(
 	override val fragment: GasEditorFragment
@@ -37,25 +47,17 @@ class GasEditorPresenter(
 			)
 		} else fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
 			childFragmentManager.fragments.forEach {
-				it.updateGasSelectionList(gasLimit, gasPrice)
+				it.updateGasSelectionList(GasFee(gasLimit, gasPrice, MinerFeeType.Custom))
 				presenter.popFragmentFrom<GasEditorFragment>()
 			}
 		}
 	}
 
-	private fun Fragment.updateGasSelectionList(gasLimit: Long, gasPrice: Long) {
-		if (fragment.isBTCSeries) {
-			if (this is GasSelectionFragment) {
-				MinerFeeType.Custom.satoshi = gasPrice
-				arguments?.putSerializable(ArgumentKey.gasEditor, GasFee(gasLimit, gasPrice))
-				presenter.insertCustomBTCSatoshi()
-			}
-		} else {
-			if (this is GasSelectionFragment) {
-				MinerFeeType.Custom.value = gasPrice
-				arguments?.putSerializable(ArgumentKey.gasEditor, GasFee(gasLimit, gasPrice))
-				presenter.insertCustomGasData()
-			}
+	private fun Fragment.updateGasSelectionList(fee: GasFee) {
+		if (this is GasSelectionFragment) {
+			arguments?.putSerializable(ArgumentKey.gasEditor, fee)
+			arguments?.putSerializable(ArgumentKey.gasEditor, fee)
+			presenter.addCustomFeeCell()
 		}
 	}
 

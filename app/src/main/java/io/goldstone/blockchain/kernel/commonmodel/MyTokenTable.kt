@@ -166,7 +166,7 @@ data class MyTokenTable(
 					ownerName,
 					contract.getChainURL()
 				) { amount, error ->
-					if (amount != null && error.isNone()) {
+					if (amount.isNotNull() && error.isNone()) {
 						val balance = amount.toEthCount()
 						hold(balance, RequestError.None)
 					} else hold(null, error)

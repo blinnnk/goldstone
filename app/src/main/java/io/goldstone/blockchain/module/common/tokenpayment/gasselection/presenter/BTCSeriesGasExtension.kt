@@ -1,26 +1,25 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.support.annotation.WorkerThread
-import android.widget.LinearLayout
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.crypto.bitcoin.BTCSeriesTransactionUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.crypto.utils.toSatoshi
+import io.goldstone.blockchain.crypto.utils.formatCount
+import io.goldstone.blockchain.crypto.utils.toBTCCount
+import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC.sendRawTransaction
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
+import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
-import java.math.BigInteger
 
 /**
  * @date 2018/8/15 5:52 PM
@@ -34,8 +33,9 @@ fun GasSelectionPresenter.checkBTCSeriesBalance(
 	InsightApi.getBalance(contract.getChainType(), !contract.isBCH(), contract.getAddress()) { balance, error ->
 		if (balance.isNotNull() && error.isNone()) {
 			val isEnough =
-				balance.value > getTransferCount() + gasUsedGasFee?.toSatoshi().orElse(0)
-			if (isEnough) callback(GoldStoneError.None) else callback(TransferError.BalanceIsNotEnough)
+				balance.value > gasView.getTransferCount() + Amount(currentFee.getUsedAmount()).toBTC()
+			if (isEnough) callback(GoldStoneError.None)
+			else callback(TransferError.BalanceIsNotEnough)
 		} else callback(error)
 	}
 }
@@ -44,15 +44,16 @@ fun GasSelectionPresenter.transferBTCSeries(
 	btcSeriesModel: PaymentBTCSeriesModel,
 	chainType: ChainType,
 	privateKey: String,
+	fee: GasFee,
 	@WorkerThread callback: (receiptModel: ReceiptModel?, error: GoldStoneError) -> Unit
 ) {
 	with(btcSeriesModel) {
-		val fee = gasUsedGasFee?.toSatoshi().orElse(0)
+		val feeUsed = fee.getUsedAmount()
 		// `BCH` 的 `Insight Api` 不需要加密
 		InsightApi.getUnspents(chainType, !chainType.isBCH(), fromAddress) { unspents, error ->
 			if (unspents.isNotNull() && error.isNone()) BTCSeriesTransactionUtils.generateSignedRawTransaction(
 				value,
-				fee,
+				feeUsed,
 				toAddress,
 				changeAddress,
 				unspents,
@@ -66,9 +67,8 @@ fun GasSelectionPresenter.transferBTCSeries(
 			).let { signedModel ->
 				sendRawTransaction(chainType.getChainURL(), signedModel.signedMessage) { hash, hashError ->
 					if (!hash.isNullOrEmpty() && error.isNone()) {
-						// 插入 `Pending` 数据到本地数据库
-						insertBTCSeriesPendingData(this, fee, signedModel.messageSize, hash)
-						callback(generateReceipt(this@with, fee, hash), hashError)
+						insertBTCSeriesPendingData(this, feeUsed, signedModel.messageSize, hash)
+						callback(generateReceipt(this@with, feeUsed, hash), hashError)
 					} else callback(null, hashError)
 				}
 			} else callback(null, error)
@@ -76,27 +76,40 @@ fun GasSelectionPresenter.transferBTCSeries(
 	}
 }
 
-fun GasSelectionPresenter.updateBTCGasSettings(symbol: String, container: LinearLayout) {
-	defaultSatoshiValue.forEachIndexed { index, miner ->
-		container.findViewById<GasSelectionCell>(index)?.let { cell ->
-			cell.model = GasSelectionModel(
-				index,
-				miner.toString().toLong(),
-				fragment.btcSeriesPaymentModel?.signedMessageSize ?: 226,
-				currentMinerType.type,
-				symbol
-			)
-		}
+private fun GasSelectionPresenter.insertBTCSeriesPendingData(
+	raw: PaymentBTCSeriesModel,
+	fee: Long,
+	size: Int,
+	taxHash: String
+) {
+	val myAddress = AddressUtils.getCurrentBTCAddress()
+	BTCSeriesTransactionTable(
+		0, // TODO 插入 Pending Data 应该是 localMaxDataIndex + 1
+		token.symbol.symbol,
+		-1,
+		0,
+		System.currentTimeMillis().toString(),
+		taxHash,
+		myAddress,
+		raw.toAddress,
+		myAddress,
+		false,
+		raw.value.toBTCCount().formatCount(),
+		fee.toBTCCount().toBigDecimal().toPlainString(),
+		size.toString(),
+		-1,
+		false,
+		true,
+		token.contract.getChainType().id
+	).apply {
+		val transactionDao =
+			GoldStoneDataBase.database.btcSeriesTransactionDao()
+		// 插入 PendingData
+		transactionDao.insert(this)
+		// 插入 FeeData
+		transactionDao.insert(this.apply {
+			isPending = false
+			isFee = true
+		})
 	}
-}
-
-fun GasSelectionPresenter.insertCustomBTCSatoshi() {
-	val gasPrice = BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0))
-	currentMinerType = MinerFeeType.Custom
-	if (defaultSatoshiValue.size == 4) {
-		defaultSatoshiValue.remove(defaultSatoshiValue.last())
-	}
-	defaultSatoshiValue.add(gasPrice)
-	fragment.clearGasLayout()
-	generateGasSelections(fragment.getGasLayout())
 }

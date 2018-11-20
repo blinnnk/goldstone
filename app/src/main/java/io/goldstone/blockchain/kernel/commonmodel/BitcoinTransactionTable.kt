@@ -205,7 +205,7 @@ interface BTCSeriesTransactionDao {
 	@Query("SELECT * FROM bitcoinTransactionList WHERE dataIndex = (SELECT MAX(dataIndex) FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType = :chainType)")
 	fun getMaxDataIndex(address: String, chainType: Int): BTCSeriesTransactionTable?
 
-	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType  AND dataIndex BETWEEN :start AND :end ORDER BY dataIndex DESC")
+	@Query("SELECT * FROM bitcoinTransactionList WHERE recordAddress LIKE :address AND chainType LIKE :chainType  AND dataIndex BETWEEN :start AND :end ORDER BY timeStamp DESC")
 	fun getDataByRange(address: String, chainType: Int, start: Int, end: Int): List<BTCSeriesTransactionTable>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

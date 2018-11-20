@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import org.jetbrains.anko.doAsync
@@ -28,7 +29,7 @@ abstract class EOSTransactionObserver {
 			// 首先获取线上的最近的不可逆的区块
 			if (transactionBlockNumber.isNull()) {
 				EOSAPI.getBlockNumberByTxID(hash) { blockNumber, error ->
-					if (blockNumber != null && error.isNone()) {
+					if (blockNumber.isNotNull() && error.isNone()) {
 						transactionBlockNumber = blockNumber
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
@@ -43,7 +44,7 @@ abstract class EOSTransactionObserver {
 					}
 				}
 			} else EOSAPI.getChainInfo { chainInfo, error ->
-				if (chainInfo != null && error.isNone()) {
+				if (chainInfo.isNotNull() && error.isNone()) {
 					if (totalConfirmedCount.isNull()) {
 						totalConfirmedCount = transactionBlockNumber!! - chainInfo.lastIrreversibleBlockNumber
 					}

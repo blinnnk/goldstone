@@ -39,6 +39,11 @@ class TokenDetailPresenter(
 		checkNewDataFromChain()
 	}
 
+	override fun refreshData() {
+		detailView.asyncData = arrayListOf()
+		loadLocalData(true)
+	}
+
 	private var allData: List<TransactionListModel>? = null
 	var totalCount: Int? = null
 	var currentMaxCount: Int? = null
@@ -46,27 +51,7 @@ class TokenDetailPresenter(
 	override fun loadMore() {
 		if (detailView.currentMenu != CommonText.all) return
 		detailView.showBottomLoading(true)
-		with(token.contract) {
-			GlobalScope.launch(Dispatchers.Default) {
-				when {
-					isBTCSeries() -> getBTCSeriesData()
-					isETHSeries() -> getETHSeriesData()
-					isEOSSeries() -> {
-						if (
-							totalCount == null
-							|| currentMaxCount == null
-							|| currentMaxCount ?: 0 <= 0
-							|| detailView.asyncData?.size == totalCount
-						) {
-							detailView.showBottomLoading(false)
-						} else flipEOSPage {
-							detailView.showBottomLoading(false)
-							detailView.showLoading(false)
-						}
-					}
-				}
-			}
-		}
+		loadLocalData(false)
 	}
 
 	override fun showOnlyReceiveData() {
@@ -152,6 +137,30 @@ class TokenDetailPresenter(
 		)?.blockNumber ?: 99999999
 	}
 
+	private fun loadLocalData(isRefresh: Boolean) {
+		with(token.contract) {
+			GlobalScope.launch(Dispatchers.Default) {
+				when {
+					isBTCSeries() -> getBTCSeriesData()
+					isETHSeries() -> getETHSeriesData()
+					isEOSSeries() -> if (isRefresh) getEOSSeriesData() else  {
+						if (
+							totalCount == null
+							|| currentMaxCount == null
+							|| currentMaxCount ?: 0 <= 0
+							|| detailView.asyncData?.size == totalCount
+						) {
+							detailView.showBottomLoading(false)
+						} else flipEOSPage {
+							detailView.showBottomLoading(false)
+							detailView.showLoading(false)
+						}
+					}
+				}
+			}
+		}
+	}
+
 	private fun getMaxDataIndex(): Int {
 		return BTCSeriesTransactionTable.dao.getMaxDataIndex(
 			token.contract.getAddress(),
@@ -206,9 +215,9 @@ class TokenDetailPresenter(
 					it.balance,
 					ownerName
 				)
-			}.let {
-				callback(it.sortedByDescending { it.date })
-				TokenBalanceTable.dao.insertAll(it)
+			}.let { data ->
+				callback(data.sortedByDescending { it.date })
+				TokenBalanceTable.dao.insertAll(data)
 			}
 		}
 	}
@@ -218,8 +227,6 @@ class TokenDetailPresenter(
 		val newData = try {
 			(data as List<BTCSeriesTransactionTable>).asSequence().map {
 				TransactionListModel(it)
-			}.sortedByDescending {
-				it.dataIndex
 			}.toList()
 		} catch (error: Exception) {
 			try {
