@@ -3,7 +3,6 @@ package io.goldstone.blockchain.common.base.basecell
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.view.View
 import android.widget.LinearLayout
@@ -99,6 +98,6 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 		arrowIcon.setGrayStyle()
 		paint.color = GrayScale.lightGray
 		invalidate()
-		addTouchRippleAnimation(Color.WHITE, GrayScale.whiteGray, RippleMode.Square)
+		addTouchRippleAnimation(Spectrum.white, GrayScale.midGray, RippleMode.Square)
 	}
 }

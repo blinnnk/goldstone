@@ -23,7 +23,6 @@ import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.notifications.notification.view.NotificationFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -138,10 +137,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		// 检查是否需要显示 `PIN Code` 界面
 		if (SharedValue.getPincodeDisplayStatus()) PasscodeFragment.show(this)
 		getMainActivity()?.backEvent = null // 恢复回退站
-	}
-
-	override fun setBackEvent(mainActivity: MainActivity?) {
-		super.setBackEvent(mainActivity)
 	}
 
 	override fun showMnemonicBackUpFragment() {

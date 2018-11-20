@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.btcseries.insight
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -122,7 +123,7 @@ object InsightApi {
 			isEncrypt
 		) { result, error ->
 			val json = result?.firstOrNull()
-			if (json != null && error.isNone()) {
+			if (json.isNotNull() && error.isNone()) {
 				val data = JSONObject(json)
 				hold(
 					BTCSeriesTransactionTable(

@@ -6,7 +6,6 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.otherwise
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.language.Alert
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
@@ -18,10 +17,7 @@ import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragmen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.alert
-import org.jetbrains.anko.noButton
 import org.jetbrains.anko.toast
-import org.jetbrains.anko.yesButton
 
 @Suppress("DEPRECATION")
 /**
@@ -42,24 +38,7 @@ class CurrencyPresenter(
 		}
 	}
 
-	fun setCurrencyAlert(currencySymbol: String, hold: Boolean.() -> Unit) {
-		fragment.context?.apply {
-			alert(Alert.selectCurrency) {
-				yesButton {
-					updateCurrencyValue(currencySymbol) {
-						fragment.recyclerView.adapter?.notifyDataSetChanged()
-						fragment.context?.toast(CommonText.succeed)
-					}
-					hold(true)
-				}
-				noButton {
-					hold(false)
-				}
-			}.show()
-		}
-	}
-
-	private fun updateCurrencyValue(symbol: String, @UiThread callback: () -> Unit) {
+	fun updateCurrency(symbol: String) {
 		GlobalScope.launch(Dispatchers.Default) {
 			val currencyDao = GoldStoneDataBase.database.currencyDao()
 			currencyDao.setCurrentCurrencyUnused()
@@ -68,7 +47,10 @@ class CurrencyPresenter(
 			AppConfigTable.dao.updateCurrency(symbol)
 			rate?.let { SharedWallet.updateCurrentRate(it) }
 			SharedWallet.updateCurrencyCode(symbol)
-			launchUI(callback)
+			launchUI {
+				fragment.recyclerView.adapter?.notifyDataSetChanged()
+				fragment.context?.toast(CommonText.succeed)
+			}
 		}
 	}
 }

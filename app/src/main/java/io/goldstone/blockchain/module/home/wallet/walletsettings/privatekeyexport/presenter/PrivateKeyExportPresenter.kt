@@ -22,7 +22,12 @@ import org.bitcoinj.params.TestNet3Params
 import org.jetbrains.anko.doAsync
 
 /**
- * @date 06/04/2018 1:02 AM
+ * @date 	getPrivateKey(
+fragment.context!!,
+address,
+chainType,
+password
+) { privateKey, error ->06/04/2018 1:02 AM
  * @author KaySaith
  */
 class PrivateKeyExportPresenter(

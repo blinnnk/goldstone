@@ -2,7 +2,6 @@ package io.goldstone.blockchain.kernel.network.common
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
@@ -34,12 +33,14 @@ object RequisitionUtil {
 		condition: String,
 		api: String,
 		isEncrypt: Boolean,
+		timeout: Long = 30,
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest(
 			RequestBody.create(ETHJsonRPC.contentType, condition),
 			api,
 			isEncrypt,
+			timeout,
 			hold
 		)
 	}
@@ -144,13 +145,14 @@ object RequisitionUtil {
 		body: RequestBody,
 		path: String,
 		isEncrypt: Boolean,
+		timeout: Long,
 		hold: (result: String?, error: RequestError) -> Unit
 	) {
 		val client =
 			OkHttpClient
 				.Builder()
 				.connectTimeout(20, TimeUnit.SECONDS)
-				.readTimeout(30, TimeUnit.SECONDS)
+				.readTimeout(timeout, TimeUnit.SECONDS)
 				.build()
 		getCryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
