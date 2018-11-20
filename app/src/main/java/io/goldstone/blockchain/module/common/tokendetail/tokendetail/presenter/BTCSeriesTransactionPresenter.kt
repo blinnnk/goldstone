@@ -67,7 +67,7 @@ private fun TokenDetailPresenter.loadOldData(
 		if (it.isNone()) getBTCSeriesData()
 		else {
 			detailView.showBottomLoading(false)
-			detailView.showError(it)
+			if (!it.isEmptyResult()) detailView.showError(it)
 		}
 	}
 }

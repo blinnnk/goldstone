@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
@@ -16,10 +15,8 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.crypto.utils.toAmount
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.goToTransactionDetailFragment
+import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
-import org.jetbrains.anko.doAsync
 
 
 /**
@@ -43,23 +40,24 @@ fun PaymentDetailPresenter.transferEOS(
 	).apply {
 		trade(fragment.context) { response, error ->
 			if (error.isNone() && response != null)
-				insertPendingDataAndGoToTransactionDetail(this, response, callback)
+				insertPendingDataToDatabase(this, response) {
+					launchUI {
+						getToken()?.let {
+							val receiptModel = ReceiptModel(this, response, it)
+							GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+						}
+					}
+				}
 			else callback(error)
 		}
 	}
 }
 
-private fun PaymentDetailPresenter.insertPendingDataAndGoToTransactionDetail(
+private fun PaymentDetailPresenter.insertPendingDataToDatabase(
 	info: EOSTransactionInfo,
 	response: EOSResponse,
-	callback: (GoldStoneError) -> Unit
+	callback: () -> Unit
 ) {
-	launchUI {
-		getToken()?.let {
-			val receiptModel = ReceiptModel(info, response, it)
-			rootFragment?.goToTransactionDetailFragment(fragment, receiptModel)
-		}
-	}
 	// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
 	EOSTransactionTable.getMaxDataIndexTable(
 		info.fromAccount,
@@ -68,8 +66,8 @@ private fun PaymentDetailPresenter.insertPendingDataAndGoToTransactionDetail(
 	) {
 		val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
 		val transaction = EOSTransactionTable(info, response, dataIndex)
-		GoldStoneDataBase.database.eosTransactionDao().insert(transaction)
+		EOSTransactionTable.dao.insert(transaction)
+		callback()
 	}
-	callback(GoldStoneError.None)
 }
 

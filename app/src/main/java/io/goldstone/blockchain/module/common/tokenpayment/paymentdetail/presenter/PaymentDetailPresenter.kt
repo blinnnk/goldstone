@@ -100,7 +100,6 @@ class PaymentDetailPresenter(
 			) { passwordInput ->
 				val password = passwordInput?.text?.toString()
 				if (password?.isNotEmpty() == true) PrivateKeyExportPresenter.getPrivateKey(
-					context,
 					SharedAddress.getCurrentEOS(),
 					ChainType.EOS,
 					password

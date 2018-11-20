@@ -1,8 +1,9 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 
 import android.support.annotation.WorkerThread
-import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -16,10 +17,7 @@ import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC.sendRawTransaction
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionCell
+import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import java.math.BigInteger
@@ -37,7 +35,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		contract.isETH() || contract.isETC() -> {
 			MyTokenTable.getBalanceByContract(contract, contract.getAddress()) { balance, error ->
 				if (balance.isNotNull() && error.isNone()) {
-					if (balance.orZero() >= getTransferCount() + getUsedGasFee().orElse(0.0)) callback(GoldStoneError.None)
+					if (balance.orZero() >= gasView.getTransferCount() + BigInteger.valueOf(currentFee.getUsedAmount()).toEthCount())
+						callback(GoldStoneError.None)
 					else callback(TransferError.BalanceIsNotEnough)
 				} else callback(error)
 			}
@@ -65,24 +64,12 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 					}
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
 					val isEnough =
-						tokenBalance >= getTransferCount() && ethBalance > getUsedGasFee().orElse(0.0)
+						tokenBalance >= gasView.getTransferCount() && ethBalance > BigInteger.valueOf(currentFee.getUsedAmount()).toEthCount()
 					if (isEnough) callback(GoldStoneError.None) else callback(TransferError.BalanceIsNotEnough)
 				}
 			}
 		}
 	}
-}
-
-fun GasSelectionPresenter.insertCustomGasData() {
-	val gasPrice =
-		BigInteger.valueOf(gasFeeFromCustom()?.gasPrice.orElse(0).scaleToGwei())
-	currentMinerType = MinerFeeType.Custom
-	if (defaultGasPrices.size == 4) {
-		defaultGasPrices.remove(defaultGasPrices.last())
-	}
-	defaultGasPrices.add(gasPrice)
-	fragment.clearGasLayout()
-	generateGasSelections(fragment.getGasLayout())
 }
 
 /**
@@ -93,21 +80,23 @@ private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
 	if (token.contract.isETC()) SharedAddress.getCurrentETC()
 	else SharedAddress.getCurrentEthereum()
 
-fun GasSelectionPresenter.transfer(
+fun GasSelectionPresenter.transferETHSeries(
 	ethSeriesModel: PaymentDetailModel,
 	privateKey: String,
 	chainURL: ChainURL,
+	gasFee: GasFee,
 	@WorkerThread callback: (receiptModel: ReceiptModel?, error: GoldStoneError) -> Unit
 ) {
+	/** `GasFee` 这个 `Model` 是与 `BTC Series` 复用的, 所以这里的 `Price` 需要 `Scale` 到 `Gwei` 的值*/
 	with(ethSeriesModel) {
 		// 更新 `prepareModel`  的 `gasPrice` 的值
-		this.gasPrice = currentMinerType.getSelectedGasPrice()
+		this.gasPrice = BigInteger.valueOf(gasFee.gasPrice.scaleToGwei())
 		// Generate Transaction Model
 		val raw = Transaction().apply {
 			chain = ChainDefinition(chainURL.chainID.id.toLongOrNull() ?: 0)
 			nonce = this@with.nonce
-			gasPrice = currentMinerType.getSelectedGasPrice()
-			gasLimit = BigInteger.valueOf(prepareGasLimit(currentMinerType.getSelectedGasPrice().toLong()))
+			gasPrice = BigInteger.valueOf(gasFee.gasPrice.scaleToGwei())
+			gasLimit = BigInteger.valueOf(gasFee.gasLimit)
 			to = Address(toAddress)
 			value = if (CryptoUtils.isERC20Transfer(inputData)) BigInteger.valueOf(0)
 			else countWithDecimal
@@ -145,40 +134,11 @@ private fun GasSelectionPresenter.prepareReceiptModel(
 		token,
 		taxHash,
 		System.currentTimeMillis(),
-		fragment.ethSeriesPaymentModel?.memo.orEmpty()
+		gasView.getMemo()
 	)
 }
 
-fun GasSelectionPresenter.prepareGasLimit(gasPrice: Long): Long {
-	return if (gasPrice == MinerFeeType.Custom.value)
-		gasFeeFromCustom()?.gasLimit.orElse(0)
-	else fragment.ethSeriesPaymentModel?.gasLimit?.toLong().orElse(0)
-}
-
-fun MinerFeeType.getSelectedGasPrice(): BigInteger {
-	return when {
-		isFast() -> BigInteger.valueOf(MinerFeeType.Fast.value.scaleToGwei())
-		isCheap() -> BigInteger.valueOf(MinerFeeType.Cheap.value.scaleToGwei())
-		isRecommend() -> BigInteger.valueOf(MinerFeeType.Recommend.value.scaleToGwei())
-		else -> BigInteger.valueOf(MinerFeeType.Custom.value.scaleToGwei())
-	}
-}
-
-fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
-	defaultGasPrices.forEachIndexed { index, miner ->
-		container.findViewById<GasSelectionCell>(index)?.let { cell ->
-			cell.model = GasSelectionModel(
-				index,
-				miner.toDouble(),
-				prepareGasLimit(miner.toDouble().toGwei()).toDouble(),
-				currentMinerType.type,
-				getUnitSymbol()
-			)
-		}
-	}
-}
-
-fun GasSelectionPresenter.getUnitSymbol() = token.contract.getSymbol().symbol
+fun GasSelectionPresenter.getUnitSymbol() = token.contract.getSymbol()
 
 private fun GasSelectionPresenter.insertPendingDataToDatabase(
 	value: BigInteger,
@@ -186,40 +146,38 @@ private fun GasSelectionPresenter.insertPendingDataToDatabase(
 	taxHash: String,
 	memoData: String
 ) {
-	fragment.getParentFragment<TokenDetailOverlayFragment> {
-		TransactionTable(
-			blockNumber = -1,
-			// 以太坊返回的是 second, 本地的是 mills 在这里转化一下
-			timeStamp = (System.currentTimeMillis() / 1000).toString(),
-			hash = taxHash,
-			nonce = raw.nonce.toString(),
-			blockHash = "",
-			transactionIndex = "",
-			fromAddress = getETHERC20OrETCAddress(),
-			to = raw.toWalletAddress,
-			value = value.toString(),
-			count = CryptoUtils.toCountByDecimal(value, token?.decimal.orZero()),
-			gas = "",
-			gasPrice = currentMinerType.getSelectedGasPrice().toString(),
-			hasError = "0",
-			txReceiptStatus = "1",
-			input = raw.inputData,
-			contractAddress = token?.contract?.contract.orEmpty(),
-			cumulativeGasUsed = "",
-			gasUsed = raw.gasLimit.toString(),
-			confirmations = "-1",
-			isReceive = false,
-			isERC20Token = token?.symbol.isETH(),
-			symbol = token?.symbol?.symbol.orEmpty(),
-			recordOwnerAddress = getETHERC20OrETCAddress(),
-			isPending = true,
-			memo = memoData,
-			chainID = token?.chainID.orEmpty(),
-			isFee = false,
-			minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
-		).let {
-			GoldStoneDataBase.database.transactionDao().insert(it)
-			GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })
-		}
+	TransactionTable(
+		blockNumber = -1,
+		// 以太坊返回的是 second, 本地的是 mills 在这里转化一下
+		timeStamp = (System.currentTimeMillis() / 1000).toString(),
+		hash = taxHash,
+		nonce = raw.nonce.toString(),
+		blockHash = "",
+		transactionIndex = "",
+		fromAddress = getETHERC20OrETCAddress(),
+		to = raw.toWalletAddress,
+		value = value.toString(),
+		count = CryptoUtils.toCountByDecimal(value, token.decimal.orZero()),
+		gas = "",
+		gasPrice = currentFee.gasPrice.toString(),
+		hasError = "0",
+		txReceiptStatus = "1",
+		input = raw.inputData,
+		contractAddress = token.contract.contract,
+		cumulativeGasUsed = "",
+		gasUsed = raw.gasLimit.toString(),
+		confirmations = "-1",
+		isReceive = false,
+		isERC20Token = token.symbol.isETH(),
+		symbol = token.symbol.symbol,
+		recordOwnerAddress = getETHERC20OrETCAddress(),
+		isPending = true,
+		memo = memoData,
+		chainID = token.chainID,
+		isFee = false,
+		minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
+	).let {
+		GoldStoneDataBase.database.transactionDao().insert(it)
+		GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })
 	}
 }

@@ -15,14 +15,17 @@ import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.litecoin.exportLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.bitcoinj.core.ECKey
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
-import org.jetbrains.anko.doAsync
 
 /**
- * @date 	getPrivateKey(
+ * @date  getPrivateKey(
 fragment.context!!,
 address,
 chainType,
@@ -37,20 +40,18 @@ class PrivateKeyExportPresenter(
 	companion object {
 		@WorkerThread
 		fun getPrivateKey(
-			context: Context,
 			address: String,
 			chainType: ChainType,
 			password: String,
 			hold: (privateKey: String?, error: AccountError) -> Unit
-		) = doAsync {
-			if (password.isEmpty())
-				hold(null, AccountError.WrongPassword)
+		) = GlobalScope.launch(Dispatchers.Default) {
+			if (password.isEmpty()) hold(null, AccountError.WrongPassword)
 			else {
 				val wallet =
 					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 				if (wallet?.getWalletType()?.isMultiChain() == true)
-					context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
-				else context.getPrivateKeyByAddress(address, chainType, password, hold)
+					GoldStoneAPI.context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
+				else GoldStoneAPI.context.getPrivateKeyByAddress(address, chainType, password, hold)
 			}
 		}
 

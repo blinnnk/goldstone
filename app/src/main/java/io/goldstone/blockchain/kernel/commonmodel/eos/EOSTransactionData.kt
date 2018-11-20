@@ -34,7 +34,7 @@ data class EOSTransactionData(
 		data.safeGet("to"),
 		data.safeGet("quantity"),
 		if (data.safeGet("memo").contains("{")) data.safeGet("memo")
-		else "\"${data.safeGet("memo")}\""
+		else data.safeGet("memo")
 	)
 }
 
@@ -47,6 +47,6 @@ class EOSTransactionDataConverter {
 
 	@TypeConverter
 	fun convertToString(data: EOSTransactionData): String {
-		return "{\"from\":\"${data.fromName}\",\"to\":\"${data.toName}\",\"quantity\":\"${data.quantity}\",\"memo\":${data.memo}}"
+		return "{\"from\":\"${data.fromName}\",\"to\":\"${data.toName}\",\"quantity\":\"${data.quantity}\",\"memo\":\"${data.memo}\"}"
 	}
 }

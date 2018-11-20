@@ -33,5 +33,6 @@ interface TokenDetailContract {
 		fun showOnlyFailedData()
 		fun showOnlySentData()
 		fun showAllData()
+		fun refreshData()
 	}
 }

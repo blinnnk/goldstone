@@ -74,7 +74,6 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			}.click { button ->
 				button.showLoadingStatus()
 				PrivateKeyExportPresenter.getPrivateKey(
-					context,
 					address.orEmpty(),
 					chainType!!,
 					passwordInput.text.toString()

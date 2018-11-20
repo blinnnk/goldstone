@@ -512,7 +512,9 @@ object EOSAPI {
 			EOSUrl.getTransaction(),
 			false
 		) { jsonString, error ->
-			hold(JSONObject(jsonString), error)
+			if (jsonString.isNotNull() && error.isNone()) {
+				hold(JSONObject(jsonString), error)
+			} else hold(null, error)
 		}
 	}
 
