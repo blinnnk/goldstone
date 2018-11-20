@@ -80,6 +80,7 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.8'
+  // 2.0 Beta 以上需要兼容 AndroidX 先不要升级
   implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha12'
   // HoneyUI By Blink Co.
   implementation 'com.blinnnk:honeyui:0.3.4.5'
@@ -100,6 +101,8 @@ dependencies {
   // OkHttp
   implementation 'com.squareup.okhttp3:okhttp:3.11.0'
   implementation 'com.google.code.gson:gson:2.8.5'
+  // Event Bus
+  implementation 'org.greenrobot:eventbus:3.1.1'
   // ZXing QR Code
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
   implementation 'com.google.zxing:core:3.3.3'

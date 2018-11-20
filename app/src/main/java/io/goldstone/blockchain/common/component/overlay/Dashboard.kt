@@ -52,7 +52,7 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 		}
 	}
 
-	fun <T : View> showDashboard(title: String, customView: T, message: String, hold: (T) -> Unit) {
+	fun <T : View> showDashboard(title: String, customView: T, message: String, hold: (T) -> Unit, cancelAction: () -> Unit) {
 		with(dialog) {
 			title(text = title)
 			message(text = message)
@@ -61,7 +61,9 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 				hold(customView)
 				dialog.dismiss()
 			}
-			negativeButton(text = CommonText.cancel)
+			negativeButton(text = CommonText.cancel) {
+				cancelAction()
+			}
 			show()
 		}
 	}

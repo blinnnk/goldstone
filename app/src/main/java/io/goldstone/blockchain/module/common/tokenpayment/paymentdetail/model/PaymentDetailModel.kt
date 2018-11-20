@@ -12,7 +12,7 @@ data class PaymentDetailModel(
 	val nonce: BigInteger,
 	val gasLimit: BigInteger,
 	val toAddress: String,
-	val countWithDecimal: BigInteger,
+	val amount: BigInteger,
 	val count: Double,
 	val inputData: String,
 	val toWalletAddress: String,

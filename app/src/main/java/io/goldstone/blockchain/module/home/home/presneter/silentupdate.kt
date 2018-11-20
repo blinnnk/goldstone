@@ -70,6 +70,15 @@ abstract class SilentUpdater {
 								GlobalScope.launch(Dispatchers.Default) {
 									updateData()
 									updateTokenInfo()
+									// 确认后更新 MD5 值到数据库
+									AppConfigTable.dao.updateMD5Info(
+										newDefaultTokenListMD5,
+										newChainNodesMD5,
+										newExchangeListMD5,
+										newTermMD5,
+										newConfigMD5,
+										newShareContentMD5
+									)
 								}
 							}
 						}
@@ -84,6 +93,12 @@ abstract class SilentUpdater {
 		}
 	}
 
+	private var newDefaultTokenListMD5 = ""
+	private var newChainNodesMD5 = ""
+	private var newExchangeListMD5 = ""
+	private var newTermMD5 = ""
+	private var newConfigMD5 = ""
+	private var newShareContentMD5 = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -97,20 +112,12 @@ abstract class SilentUpdater {
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
 			if (md5s.isNotNull() && error.isNone()) {
-				val newDefaultTokenListMD5 = md5s.safeGet("default_token_list_md5")
-				val newChainNodesMD5 = md5s.safeGet("chain_nodes_md5")
-				val newExchangeListMD5 = md5s.safeGet("market_list_md5")
-				val newTermMD5 = md5s.safeGet("agreement_md5")
-				val newConfigMD5 = md5s.safeGet("config_list_md5")
-				val newShareContentMD5 = md5s.safeGet("share_content_md5")
-				AppConfigTable.dao.updateMD5Info(
-					newDefaultTokenListMD5,
-					newChainNodesMD5,
-					newExchangeListMD5,
-					newTermMD5,
-					newConfigMD5,
-					newShareContentMD5
-				)
+				newDefaultTokenListMD5 = md5s.safeGet("default_token_list_md5")
+				newChainNodesMD5 = md5s.safeGet("chain_nodes_md5")
+				newExchangeListMD5 = md5s.safeGet("market_list_md5")
+				newTermMD5 = md5s.safeGet("agreement_md5")
+				newConfigMD5 = md5s.safeGet("config_list_md5")
+				newShareContentMD5 = md5s.safeGet("share_content_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,

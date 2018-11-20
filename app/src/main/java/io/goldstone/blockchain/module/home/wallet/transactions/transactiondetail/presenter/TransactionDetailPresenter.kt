@@ -18,6 +18,7 @@ import io.goldstone.blockchain.crypto.multichain.isETHSeries
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.contract.TransactionDetailContract
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -31,6 +32,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.doAsync
 
 
@@ -128,7 +130,7 @@ class TransactionDetailPresenter(
 				showProgress(TransactionProgressModel(Math.abs(totalCount), Math.abs(totalCount).toLong()))
 			else showProgress(TransactionProgressModel(totalCount))
 			showTransactionInfo(blockNumber, totalCount, data.minerFee)
-			updateTokenDetailList()
+			EventBus.getDefault().post(TokenDetailEvent(true))
 			showHeaderData(TransactionHeaderModel(data, false, isFailed))
 		}
 	}

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -35,8 +36,10 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		contract.isETH() || contract.isETC() -> {
 			MyTokenTable.getBalanceByContract(contract, contract.getAddress()) { balance, error ->
 				if (balance.isNotNull() && error.isNone()) {
-					if (balance.orZero() >= gasView.getTransferCount() + BigInteger.valueOf(currentFee.getUsedAmount()).toEthCount())
-						callback(GoldStoneError.None)
+					if (
+						balance.toWei(TokenContract.ETH.decimal!!) >=
+						gasView.getTransferCount().orElse(BigInteger.ZERO) + BigInteger.valueOf(currentFee.getUsedAmount())
+					) callback(GoldStoneError.None)
 					else callback(TransferError.BalanceIsNotEnough)
 				} else callback(error)
 			}
@@ -64,7 +67,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 					}
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
 					val isEnough =
-						tokenBalance >= gasView.getTransferCount() && ethBalance > BigInteger.valueOf(currentFee.getUsedAmount()).toEthCount()
+						tokenBalance.toWei(token.decimal) >= gasView.getTransferCount() && ethBalance.toWei(18) > BigInteger.valueOf(currentFee.getUsedAmount())
 					if (isEnough) callback(GoldStoneError.None) else callback(TransferError.BalanceIsNotEnough)
 				}
 			}
@@ -99,7 +102,7 @@ fun GasSelectionPresenter.transferETHSeries(
 			gasLimit = BigInteger.valueOf(gasFee.gasLimit)
 			to = Address(toAddress)
 			value = if (CryptoUtils.isERC20Transfer(inputData)) BigInteger.valueOf(0)
-			else countWithDecimal
+			else amount
 			input = inputData.hexToByteArray().toList()
 		}
 		val signedHex = raw.sign(privateKey)
@@ -109,13 +112,13 @@ fun GasSelectionPresenter.transferETHSeries(
 				// 如 `nonce` 或 `gas` 导致的失败 `taxHash` 是错误的
 				// 把本次交易先插入到数据库, 方便用户从列表也能再次查看到处于 `pending` 状态的交易信息
 				if (taxHash.isValidTaxHash()) insertPendingDataToDatabase(
-					countWithDecimal,
+					amount,
 					this@with,
 					taxHash,
 					ethSeriesModel.memo
 				)
 				// 主线程跳转到账目详情界面
-				callback(prepareReceiptModel(this@with, countWithDecimal, taxHash), hashError)
+				callback(prepareReceiptModel(this@with, amount, taxHash), hashError)
 			} else callback(null, hashError)
 		}
 	}

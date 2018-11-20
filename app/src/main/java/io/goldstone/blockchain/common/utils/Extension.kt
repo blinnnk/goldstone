@@ -61,7 +61,7 @@ fun Context.showAlertView(
 ) {
 	val input = linearLayout {
 		lparams(matchParent, matchParent)
-		padding = 30.uiPX()
+		setPadding(20.uiPX(), 10.uiPX(), 20.uiPX(), 20.uiPX())
 		editText {
 			id = ElementID.passwordInput
 			layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
@@ -74,9 +74,14 @@ fun Context.showAlertView(
 		}
 	}
 	Dashboard(this) {
-		if (showEditText) showDashboard(title, input, subtitle) {
-			action(it.findViewById(ElementID.passwordInput))
-		} else showAlert(title, subtitle, cancelAction) {
+		if (showEditText) showDashboard(
+			title,
+			input,
+			subtitle,
+			{ action(it.findViewById(ElementID.passwordInput)) },
+			cancelAction
+		)
+		else showAlert(title, subtitle, cancelAction) {
 			action(null)
 		}
 	}
