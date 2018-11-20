@@ -13,13 +13,11 @@ import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.TabBarView
 import io.goldstone.blockchain.common.component.TabItem
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.receiver.VersionManager
 import io.goldstone.blockchain.module.home.home.presneter.HomePresenter
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.verticalLayout
 
 /**
  * @date 23/03/2018 12:59 PM
@@ -35,7 +33,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
-			GradientView(context).apply { setStyle(GradientType.Blue) }.into(this)
+			backgroundColor = Spectrum.blue
 			verticalLayout {
 				id = ContainerID.home
 			}

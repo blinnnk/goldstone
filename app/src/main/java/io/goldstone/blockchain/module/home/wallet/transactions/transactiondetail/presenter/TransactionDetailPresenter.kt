@@ -92,8 +92,7 @@ class TransactionDetailPresenter(
 
 	private fun updateConfirmationNumber() {
 		when {
-			data.contract.isBTCSeries() ->
-				updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
+			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true)
 			data.contract.isETHSeries() -> updateETHSeriesConfirmationCount()
 			data.contract.isEOSSeries() -> detailView.showLoading(false)
 		}
@@ -133,9 +132,7 @@ class TransactionDetailPresenter(
 	private fun updateTransactionFromNotification() {
 		when {
 			// 从通知来的消息, 可能来自与任何支持的链, 这里需要解出 `Notification` 里面带入的 `ChainID` 作为参数
-			data.contract.isBTCSeries() -> data.chainID?.let {
-				updateBTCSeriesTransaction(true, it)
-			}
+			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true)
 			data.contract.isETHSeries() ->
 				getAndShowETHSeriesDataFromNotification()
 			data.contract.isEOSSeries() -> {
@@ -287,9 +284,9 @@ class TransactionDetailPresenter(
 		}
 	}
 
-	private fun updateBTCSeriesTransaction(checkLocal: Boolean, chainID: ChainID) {
+	private fun updateBTCSeriesTransaction(checkLocal: Boolean) {
 		BTCSeriesTransactionUtils.getTransaction(
-			chainID,
+			data.chainID ?: data.contract.getChainURL().chainID,
 			data.hash,
 			data.isReceive,
 			if (data.isReceive) data.toAddress else data.fromAddress,
