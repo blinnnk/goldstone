@@ -1,15 +1,10 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.presenter
 
 import android.support.annotation.UiThread
-import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
-import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.alert
+import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.*
-import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
+import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.contract.RAMTransactionSearchContract
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.runOnUiThread
 
@@ -18,58 +13,25 @@ import org.jetbrains.anko.runOnUiThread
  * @author yangLiHai
  */
 class RAMTransactionSearchPresenter(
-	override val fragment: RAMTransactionSearchFragment
-) : BaseRecyclerPresenter<RAMTransactionSearchFragment, TradingInfoModel>() {
+	private val gsView: RAMTransactionSearchContract.GSView,
+	var account: String?
+) : RAMTransactionSearchContract.GSPresenter {
 	
-	private var account: String? = null
 	private var endID = 0
 	
-	override fun updateData() {
-		fragment.asyncData = arrayListOf()
+	override fun start() {
 	}
 	
-	override fun onFragmentCreate() {
-		super.onFragmentCreate()
-		account = fragment.arguments?.getString("account")
-	}
-	private var isLoadingData = false
-	override fun onFragmentViewCreated() {
-		updateData()
-		fragment.addRecyclerLoadMoreListener {
-			if (!isLoadingData) loadMore()
-			isLoadingData = true
-		}
-		fragment.getParentFragment<RAMMarketOverlayFragment> {
-			searchInputListener {
-				if (NetworkUtil.hasNetwork(context))   loadFirstPage(it)
-			}
-		}
-		if (account != null && account!!.isNotEmpty()) {
-			fragment.getParentFragment<RAMMarketOverlayFragment> {
-				getOverlayHeader().setSearchText(account!!)
-			}
-		}
-		
-	}
-	
-	private fun searchByName(account: String, @UiThread callback: () -> Unit) {
+	override fun searchByName(@UiThread callback: () -> Unit) {
+		if (account == null) callback()
 		doAsync {
-			GoldStoneAPI.getEOSRAMTransactionsByAccount(account, endID) { data, error ->
+			GoldStoneAPI.getEOSRAMTransactionsByAccount(account!!, endID) { data, error ->
 				if (data != null && error.isNone()) {
 					data.forEach {
-						it.account = account
+						it.account = account!!
 					}
 					GoldStoneAPI.context.runOnUiThread {
-						if (fragment.asyncData == null) {
-							fragment.setRecyclerViewAdapter(fragment.recyclerView, data.toArrayList())
-						} else {
-							if (endID == 0) fragment.asyncData!!.clear()
-							fragment.asyncData!!.addAll(data.toArrayList())
-							fragment.getAdapter<TransactionsOfNameAdapter>()?.notifyDataSetChanged()
-						}
-						if (fragment.asyncData != null && fragment.asyncData!!.size>0) {
-							fragment.removeEmptyView()
-						}
+						gsView.notifyUI(endID == 0, data.toArrayList())
 						data.isNotEmpty() isTrue {
 							endID = data[data.lastIndex].id
 						}
@@ -77,7 +39,7 @@ class RAMTransactionSearchPresenter(
 					}
 				} else {
 					GoldStoneAPI.context.runOnUiThread {
-						fragment.context?.alert(error.message)
+						gsView.showError(error)
 						callback()
 					}
 				}
@@ -85,25 +47,19 @@ class RAMTransactionSearchPresenter(
 		}
 	}
 	
-	private fun loadFirstPage(account: String) {
+	override fun loadFirstPage() {
 		endID = 0
-		fragment.showLoadingView(true)
-		searchByName(account) {
-			fragment.showLoadingView(false)
+		gsView.showLoading(true)
+		searchByName {
+			gsView.showLoading(false)
 		}
 	}
 	
 	override fun loadMore() {
-		super.loadMore()
 		account?.apply {
-			searchByName(this) {
-				fragment.recyclerView.apply {
-					val bottomIndex = adapter?.itemCount.orZero() - 1
-					getItemAtAdapterPosition<BottomLoadingView>(bottomIndex) {
-						it.hide()
-					}
-					isLoadingData = false
-				}
+			gsView.showBottomLoading(true)
+			searchByName {
+				gsView.showBottomLoading(false)
 			}
 		}
 	}

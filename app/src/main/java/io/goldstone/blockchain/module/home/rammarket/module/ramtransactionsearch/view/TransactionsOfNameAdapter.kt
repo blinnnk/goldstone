@@ -16,8 +16,9 @@ import org.jetbrains.anko.matchParent
  */
 class TransactionsOfNameAdapter(
 	override val dataSet: ArrayList<TradingInfoModel>,
-	private val hold: TransactionOfNameCell.() -> Unit)
-	: HoneyBaseAdapterWithHeaderAndFooter<TradingInfoModel, TransactionOfNameHeaderView, TransactionOfNameCell, View>() {
+	private val hold: TransactionOfNameCell.() -> Unit,
+	private val holdBottom: BottomLoadingView.() -> Unit
+) : HoneyBaseAdapterWithHeaderAndFooter<TradingInfoModel, TransactionOfNameHeaderView, TransactionOfNameCell, View>() {
 	
 	override fun generateHeader(context: Context) = TransactionOfNameHeaderView(context)
 	override fun generateCell(context: Context) =  TransactionOfNameCell(context)
@@ -25,6 +26,7 @@ class TransactionsOfNameAdapter(
 		// 让出 覆盖在上面的 `Footer` 的高度
 		setGrayDescription()
 		addView(View(context).apply { layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX()) })
+		holdBottom(this)
 	}
 	
 	override fun TransactionOfNameCell.bindCell(
