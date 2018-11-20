@@ -5,7 +5,9 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
+import io.goldstone.blockchain.module.home.rammarket.contract.RAMMarketDetailContract
 import io.goldstone.blockchain.module.home.rammarket.model.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
@@ -23,8 +25,16 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: 头部的price展示presenter
  */
-class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
- : BasePresenter<RAMMarketDetailFragment>() {
+class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.GSView)
+ : RAMMarketDetailContract.GSPresenter {
+	
+	override fun start() {
+		setAcountInfoFromDatabase()
+		getTodayPrice()
+		updateRAMCandleData(EOSRAMChartType.Minute)
+		recentTransactions()
+	}
+	
 	var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
 	var recentTransactionModel: RecentTransactionModel? = null
 	var ramInformationModel: RAMInformationModel = RAMInformationModel()
@@ -37,7 +47,7 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 			
 			override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 				if (isDisconnected) {
-					fragment.setSocketDisconnectedPercentColor(GrayScale.midGray)
+					ramMarketDetailView.setSocketDisconnectedPercentColor(GrayScale.midGray)
 					return
 				}
 				parseSocketResult(content)
@@ -45,7 +55,7 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 		}
 	}
 	
-	private fun parseSocketResult(content: JSONObject) {
+	fun parseSocketResult(content: JSONObject) {
 		val type = content.safeGet("t")
 		if (type == "eos_ram_price") {
 			// 返回的价格信息
@@ -66,29 +76,14 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 					buyList.add(model)
 				}
 				GoldStoneAPI.context.runOnUiThread {
-					fragment.notifyTradingViewData()
+					ramMarketDetailView.notifyTradingViewData()
 				}
 			}
 			
 		}
 	}
 	
-	override fun onFragmentCreate() {
-		super.onFragmentCreate()
-		fragment.context?.apply {
-			setAcountInfoFromDatabase()
-		}
-	}
-	
-	override fun onFragmentCreateView() {
-		super.onFragmentCreateView()
-		getTodayPrice()
-		updateRAMCandleData(EOSRAMChartType.Minute)
-		recentTransactions()
-	}
-	
-	override fun onFragmentResume() {
-		super.onFragmentResume()
+	fun onFragmentResume() {
 		if (ramPriceSocket == null) {
 			ramPriceSocket = getPriceSocket().apply {
 				runSocket()
@@ -98,12 +93,9 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 				ramPriceSocket!!.runSocket()
 			}
 		}
-		
-		
 	}
 	
-	override fun onFragmentPause() {
-		super.onFragmentPause()
+	fun onFragmentPause() {
 		ramPriceSocket?.apply {
 			isSocketConnected() isTrue {
 				closeSocket()
@@ -111,21 +103,5 @@ class RAMMarketDetailPresenter(override val fragment: RAMMarketDetailFragment)
 		}
 		ramPriceSocket = null
 	}
-	
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		saveCandleDataToDatabase()
-	}
-	
-	override fun onFragmentShowFromHidden() {
-		fragment.getParentFragment<RAMMarketOverlayFragment> {
-			showCloseButton(true) {
-				presenter.removeSelfFromActivity()
-			}
-		}
-	}
-	
-	
-	
 	
 }

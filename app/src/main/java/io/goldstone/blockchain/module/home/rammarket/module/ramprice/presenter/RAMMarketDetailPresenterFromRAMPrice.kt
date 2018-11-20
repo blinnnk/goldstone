@@ -110,7 +110,7 @@ fun RAMMarketDetailPresenter.calculateCountAndUpdate(ramChartType: EOSRAMChartTy
 				if (size == 0) {
 					GoldStoneAPI.context.runOnUiThread {
 						candleDataMap[period]?.apply {
-							fragment.updateCandleChartUI(dateType, this)
+							ramMarketDetailView.updateCandleChartUI(dateType, this)
 						}
 					}
 				} else getCountDataFormNet(ramChartType, size)
@@ -140,16 +140,16 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 			}
 			GoldStoneAPI.context.runOnUiThread {
 				candleDataMap[period]?.apply {
-					fragment.updateCandleChartUI(dateType, this)
+					ramMarketDetailView.updateCandleChartUI(dateType, this)
 				}
 			}
 			
 		} else {
 			GoldStoneAPI.context.runOnUiThread {
 				// Show the error exception to user
-				fragment.context.alert(error.message)
+				ramMarketDetailView.showError(error)
 				candleDataMap[period]?.apply {
-					fragment.updateCandleChartUI(dateType, this)
+					ramMarketDetailView.updateCandleChartUI(dateType, this)
 				}
 			}
 		}
@@ -158,7 +158,7 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 
 fun RAMMarketDetailPresenter.updateTodayPriceUI() {
 	ramInformationModel.let {
-		fragment.setTodayPrice(
+		ramMarketDetailView.setTodayPrice(
 			it.openPrice.formatCount(4),
 			it.HighPrice.formatCount(4),
 			it.lowPrice.formatCount(4)
@@ -177,7 +177,7 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 		}
 		updateTodayPriceUI()
 		calculatePricePercent()
-		fragment.setCurrentPriceAndPercent(
+		ramMarketDetailView.setCurrentPriceAndPercent(
 			infoModel.currentPrice,
 			infoModel.pricePercent
 		)
@@ -210,10 +210,9 @@ fun RAMMarketDetailPresenter.getTodayPrice() {
 			calculatePricePercent()
 		} else {
 			GoldStoneAPI.context.runOnUiThread {
-				fragment.context.alert(error.message)
-//				fragment.safeShowError(error)
+				ramMarketDetailView.showError(error)
 					// 出错了可能长连接已经断了， 需要在此给当前价格赋值
-				fragment.setCurrentPriceAndPercent(
+				ramMarketDetailView.setCurrentPriceAndPercent(
 					ramInformationModel.currentPrice,
 					ramInformationModel.pricePercent
 				)

@@ -1,34 +1,41 @@
 package io.goldstone.blockchain.module.home.rammarket.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.Gravity
+import android.view.*
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.updateRAMCandleData
+import io.goldstone.blockchain.module.home.rammarket.contract.RAMMarketDetailContract
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view.QuotationViewPager
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.tradeRAM
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.UI
 import java.math.BigDecimal
 
 /**
  * @date: 2018/10/29.
- * @author: yanglihai
+ * @author: yangLiHai
  * @description: price信息，包含蜡烛走势图
  */
-class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
+class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
+	
 	override val pageTitle: String = EOSRAMExchangeText.ramExchange
 	private val ramPriceView by lazy { EOSRAMPriceInfoView(context!!) }
 	private val priceMenuCandleChart by lazy {
@@ -40,8 +47,8 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	private val tradingView by lazy { TradingView(context!!, this) }
 	private val quotationViewParent by lazy { QuotationViewPager(this) }
 	
-	override val presenter: RAMMarketDetailPresenter = RAMMarketDetailPresenter(this)
-	override fun AnkoContext<Fragment>.initView() {
+	override lateinit var presenter: RAMMarketDetailPresenter
+	fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 			verticalLayout {
@@ -78,6 +85,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 						tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
 					else tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
 					presenter.tradeRAM(
+						context,
 						amount,
 						tradingView.tradingDashboardView.stakeType
 					) { eosResponse, error ->
@@ -98,7 +106,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 		
 	}
 	
-	fun setCurrentPriceAndPercent(price: Double, percent: Double) {
+	override fun setCurrentPriceAndPercent(price: Double, percent: Double) {
 		val formatCount = when {
 			price < 10.0 -> 4
 			price < 100.0 -> 3
@@ -118,17 +126,17 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 		
 	}
 	
-	fun setTodayPrice(startPrice: String, highPrice: String, lowPrice: String) {
+	override fun setTodayPrice(startPrice: String, highPrice: String, lowPrice: String) {
 		ramPriceView.todayPriceView.startPrice.text = EOSRAMExchangeText.openPrice(startPrice)
 		ramPriceView.todayPriceView.highPrice.text = EOSRAMExchangeText.highPrice(highPrice)
 		ramPriceView.todayPriceView.lowPrice.text = EOSRAMExchangeText.lowPrice(lowPrice)
 	}
 	
-	fun setSocketDisconnectedPercentColor(color: Int) {
+	override fun setSocketDisconnectedPercentColor(color: Int) {
 		ramPriceView.currentPriceView.trendcyPercent.textColor = color
 	}
 	
-	fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
+	override fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {
 		priceMenuCandleChart.removeLoadingView()
 		priceMenuCandleChart.candleChart.resetData(dateType, data.mapIndexed { index, entry ->
 			CandleEntry(
@@ -142,21 +150,58 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	
 	}
 	
-	fun setTradingViewData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
+	override fun setTradingViewData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
 		tradingView.recentTradingListView.setData(buyList, sellList)
 	}
-	fun notifyTradingViewData() {
+	override fun notifyTradingViewData() {
 		tradingView.recentTradingListView.adapter?.notifyDataSetChanged()
 	}
 	
-	fun setRAMBalance(ramBalance: String, eosBalance: String) {
+	override fun setRAMBalance(ramBalance: String, eosBalance: String) {
 		tradingView.tradingDashboardView.ramBalance.text = EOSRAMExchangeText.ramBalanceDescription(ramBalance)
 		tradingView.tradingDashboardView.eosBalance.text = EOSRAMExchangeText.eosBalanceDescription(eosBalance)
+	}
+	override fun showError(error: Throwable) {
+		ErrorDisplayManager(error).show(context)
 	}
 	private fun showCandleDataLoadingView() {
 		priceMenuCandleChart.showLoadingView()
 	}
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		return UI {
+			initView()
+		}.view
+	}
 	
-	fun getStakeType(): StakeType = tradingView.tradingDashboardView.stakeType
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter = RAMMarketDetailPresenter(this)
+		presenter.start()
+	}
 	
+	override fun onResume() {
+		super.onResume()
+		presenter.onFragmentResume()
+	}
+	
+	override fun onPause() {
+		super.onPause()
+		presenter.onFragmentPause()
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		presenter.saveCandleDataToDatabase()
+	}
+	
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		if (!hidden) {
+			getParentFragment<RAMMarketOverlayFragment> {
+				showCloseButton(true) {
+					presenter.removeSelfFromActivity()
+				}
+			}
+		}
+	}
 }
