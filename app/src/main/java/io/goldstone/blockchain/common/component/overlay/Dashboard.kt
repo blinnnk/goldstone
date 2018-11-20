@@ -7,7 +7,6 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
-import com.afollestad.materialdialogs.customview.getCustomView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
 import com.blinnnk.base.HoneyBaseAdapter
@@ -53,15 +52,32 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 		}
 	}
 
-	fun <T : View> showDashboard(title: String, customView: T, hold: (T) -> Unit) {
+	fun <T : View> showDashboard(title: String, customView: T, message: String, hold: (T) -> Unit, cancelAction: () -> Unit) {
 		with(dialog) {
 			title(text = title)
+			message(text = message)
 			customView(view = customView)
 			positiveButton(text = CommonText.confirm) {
 				hold(customView)
 				dialog.dismiss()
 			}
-			negativeButton(text = CommonText.cancel)
+			negativeButton(text = CommonText.cancel) {
+				cancelAction()
+			}
+			show()
+		}
+	}
+
+	fun showAlert(title: String, message: String, cancelAction: () -> Unit, confirmAction: () -> Unit) {
+		with(dialog) {
+			title(text = title)
+			message(text = message)
+			positiveButton(text = CommonText.confirm) {
+				confirmAction()
+			}
+			negativeButton(text = CommonText.cancel) {
+				cancelAction()
+			}
 			show()
 		}
 	}

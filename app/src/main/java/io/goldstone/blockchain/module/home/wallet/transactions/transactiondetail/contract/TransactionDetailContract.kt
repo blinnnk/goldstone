@@ -21,7 +21,6 @@ interface TransactionDetailContract {
 		fun showTransactionInformation(vararg info: TransactionDetailModel)
 		fun showErrorAlert(error: Throwable)
 		fun showContactEditor(address: String, symbol: String)
-		fun updateTokenDetailList()
 	}
 
 	interface GSPresenter : GoldStonePresenter {

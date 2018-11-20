@@ -93,6 +93,7 @@ object EOSAPI {
 				requestBody,
 				api,
 				false,
+				20,
 				hold
 			)
 		}
@@ -113,7 +114,8 @@ object EOSAPI {
 			RequisitionUtil.postRequest(
 				requestBody,
 				api,
-				false
+				false,
+				10
 			) { result, error ->
 				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
 				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
@@ -154,7 +156,8 @@ object EOSAPI {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("public_key", publicKey)),
 			api,
-			false
+			false,
+			10
 		) { result, error ->
 			if (result.isNullOrEmpty() || error.hasError()) {
 				hold(null, error)
@@ -508,7 +511,9 @@ object EOSAPI {
 			EOSUrl.getTransaction(),
 			false
 		) { jsonString, error ->
-			hold(JSONObject(jsonString), error)
+			if (jsonString.isNotNull() && error.isNone()) {
+				hold(JSONObject(jsonString), error)
+			} else hold(null, error)
 		}
 	}
 

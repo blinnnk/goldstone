@@ -317,6 +317,7 @@ object GoldStoneAPI {
 			),
 			APIPath.registerDevice(APIPath.currentUrl),
 			true,
+			30,
 			hold
 		)
 	}
@@ -366,6 +367,7 @@ object GoldStoneAPI {
 			),
 			APIPath.updateAddresses(APIPath.currentUrl),
 			true,
+			30,
 			hold
 		)
 	}
@@ -385,7 +387,8 @@ object GoldStoneAPI {
 				)
 			),
 			APIPath.getUnreadCount(APIPath.currentUrl),
-			true
+			true,
+			10
 		) { result, error ->
 			if (!result.isNullOrBlank() && error.isNone()) {
 				hold(JSONObject(result).safeGet("count").toIntOrNull(), error)

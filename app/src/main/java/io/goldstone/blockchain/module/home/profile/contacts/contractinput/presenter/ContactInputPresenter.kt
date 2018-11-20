@@ -27,10 +27,12 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
+import io.goldstone.blockchain.module.home.profile.contacts.contracts.event.ContactUpdateEvent
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.bitcoinj.params.TestNet3Params
+import org.greenrobot.eventbus.EventBus
 
 /**
  * @date 16/04/2018 1:13 PM
@@ -208,6 +210,7 @@ class ContactInputPresenter(
 				bchAddressText
 			)
 		) {
+			EventBus.getDefault().post(ContactUpdateEvent(true))
 			fragment.getParentFragment<ProfileOverlayFragment> {
 				if (contactAddressModel.isNotNull()) {
 					// 从账单详情快捷添加地址进入的页面

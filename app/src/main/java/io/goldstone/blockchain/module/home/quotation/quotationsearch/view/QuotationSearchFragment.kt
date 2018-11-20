@@ -25,6 +25,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.PairUpdateEvent
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.contract.QuotationSearchContract
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
@@ -33,6 +34,7 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.presenter.Q
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.*
 import java.util.*
 
@@ -63,6 +65,11 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 		launchUI {
 			updateSingleCellAdapterData<QuotationSearchAdapter>(data.toArrayList())
 		}
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		EventBus.getDefault().post(PairUpdateEvent(true))
 	}
 
 	override fun showFilterDescription(data: List<ExchangeTable>) {
@@ -151,6 +158,8 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { model, isChecked ->
 			loadingView.show()
 			presenter.updateLocalQuotation(model, isChecked) { error ->
+				// 更新内存里面的数据, 防止回收后 `UI` 不对
+				asyncData?.find { it.pair.equals(model.pair, true) }?.isSelecting = isChecked
 				launchUI {
 					loadingView.remove()
 					if (error.hasError()) safeShowError(error)

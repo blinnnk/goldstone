@@ -6,8 +6,6 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -23,23 +21,7 @@ class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
 
-	private var mainActivity: MainActivity? = null
-
-	override fun onFragmentAttach() {
-		super.onFragmentAttach()
-		mainActivity = fragment.getMainActivity()
-	}
-
 	override fun updateData() {
-		updateSelectionsData()
-	}
-
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		updateData()
-	}
-
-	private fun updateSelectionsData() {
 		GlobalScope.launch(Dispatchers.Default) {
 			val selections = QuotationSelectionTable.dao.getAll()
 			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
@@ -55,21 +37,13 @@ class QuotationManagementPresenter(
 		fragment.updateSelectionOrderID()
 	}
 
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		checkAndUpdateQuotationData {
-			mainActivity?.getQuotationFragment()?.presenter
-				?.updateQuotationList(QuotationSelectionTable.dao.getAll())
-		}
-	}
-
-
-	fun checkAndUpdateQuotationData(callback: () -> Unit = {}) {
+	fun updateQuotationDataChanged(callback: () -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
-			fragment.asyncData?.filter { !it.isSelecting }?.let {
-				QuotationSelectionTable.dao.deleteAll(it)
-			}
-			callback()
+			val turnOffData = fragment.asyncData?.filter { !it.isSelecting }
+			if (!turnOffData.isNullOrEmpty()) {
+				QuotationSelectionTable.dao.deleteAll(turnOffData)
+				callback()
+			} else callback()
 		}
 	}
 

@@ -28,7 +28,6 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.crypto.multichain.isEOSSeries
 import io.goldstone.blockchain.crypto.multichain.isETC
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -196,12 +195,6 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 				}
 			}
 		}
-	}
-
-	// `Observing` 成功后更新列表的数据擦出 `Pending` 的数据状态
-	override fun updateTokenDetailList() {
-		parentFragment?.getChildFragment<TokenDetailCenterFragment>()
-			?.presenter?.refreshTransactionListFromDatabase()
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {

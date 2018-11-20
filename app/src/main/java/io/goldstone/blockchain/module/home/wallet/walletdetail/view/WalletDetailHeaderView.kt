@@ -40,9 +40,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			if (avatar.isNull())
-				currentAccount.avatar.glideImage(
-					avatarBitmap ?: UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
-				)
+				currentAccount.avatar.glideImage(avatarBitmap ?: UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap())
 			else currentAccount.avatar.glideImage(avatar)
 
 			currentAccount.info.title.text = object : FixTextLength() {
@@ -56,9 +54,9 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			balanceSubtitle.text = WalletSlideHeader.setBalanceInfo()
 		}
 	}
-	val addTokenButton by lazy { RoundButtonWithIcon(context) }
-	val currentAccount by lazy { CurrentAccountView(context) }
-	private val waveView by lazy { WaveLoadingView(context) }
+	val addTokenButton = RoundButtonWithIcon(context)
+	val currentAccount = CurrentAccountView(context)
+	private val waveView = WaveLoadingView(context)
 	private var progressBar: ProgressBar? = null
 	private val balanceTitle by lazy { TextView(context) }
 	private val sectionHeaderHeight = 25.uiPX()
@@ -76,7 +74,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight - 50.uiPX())
 			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
 			progressValue = 30
-			waveColor = Color.parseColor("#FF265A80")
+			waveColor = Color.parseColor("#FF1c4f7b")
 			setAnimDuration(30000)
 			setAmplitudeRatio(50)
 			startAnimation()

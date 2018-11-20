@@ -28,11 +28,9 @@ class QuotationSearchPresenter(
 	private var selectedIds = listOf<Int>()
 
 	override fun start() {
-		getSelectedExchange {
-			selectedIds = it.map { exchange ->
-				exchange.marketId
-			}
-			detailView.showFilterDescription(it)
+		getSelectedExchange { exchanges ->
+			selectedIds = exchanges.map { it.marketId }
+			detailView.showFilterDescription(exchanges)
 		}
 	}
 

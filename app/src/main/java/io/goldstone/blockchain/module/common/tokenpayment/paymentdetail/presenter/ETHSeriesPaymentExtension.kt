@@ -73,7 +73,7 @@ private fun PaymentDetailPresenter.generateTransaction(
 	nonce: BigInteger,
 	@WorkerThread hold: (model: PaymentDetailModel?, error: RequestError) -> Unit
 ) {
-	val countWithDecimal: BigInteger
+	val amount: BigInteger
 	val data: String
 	val to: String
 	// `ETH`, `ETC` 和 `Token` 转账需要准备不同的 `Transaction`
@@ -81,15 +81,15 @@ private fun PaymentDetailPresenter.generateTransaction(
 		getToken()?.contract.isETH() || getToken()?.contract.isETC() -> {
 			to = toAddress
 			data = if (memo.isEmpty()) "0x" else "0x" + memo.toCryptHexString() // Memo
-			countWithDecimal = CryptoUtils.toValueWithDecimal(count)
+			amount = CryptoUtils.toValueWithDecimal(count)
 		}
 
 		else -> {
 			to = getToken()?.contract?.contract.orEmpty()
-			countWithDecimal = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
+			amount = CryptoUtils.toValueWithDecimal(count, getToken()?.decimal.orZero())
 			data = SolidityCode.contractTransfer + // 方法
 				toAddress.toAddressCode(false) + // 地址
-				countWithDecimal.toDataString() + // 数量
+				amount.toDataString() + // 数量
 				if (memo.isEmpty()) "" else memo.toCryptHexString() // Memo
 		}
 	}
@@ -106,7 +106,7 @@ private fun PaymentDetailPresenter.generateTransaction(
 					nonce,
 					limit,
 					to,
-					countWithDecimal,
+					amount,
 					count,
 					data,
 					fragment.address!!,

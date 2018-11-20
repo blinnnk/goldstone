@@ -49,7 +49,7 @@ data class EOSTransactionTable(
 		0L,
 		response.transactionID,
 		info.contract.symbol,
-		info.contract.contract.orEmpty(),
+		info.contract.contract,
 		response.cupUsageByte,
 		response.netUsageByte,
 		EOSTransactionData(info),

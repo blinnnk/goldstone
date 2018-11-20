@@ -17,7 +17,6 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 abstract class BasePresenter<out T : BaseFragment<*>> {
 
 	abstract val fragment: T
-
 	open fun onFragmentAttach() {
 		// Do Something When fragment Attach
 	}

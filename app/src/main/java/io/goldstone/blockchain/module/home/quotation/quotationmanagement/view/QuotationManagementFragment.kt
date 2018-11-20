@@ -1,13 +1,19 @@
 package io.goldstone.blockchain.module.home.quotation.quotationmanagement.view
 
+import android.os.Bundle
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.PairUpdateEvent
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.QuotationUpdateEvent
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -18,6 +24,25 @@ class QuotationManagementFragment :
 
 	override val pageTitle: String = QuotationText.management
 	override val presenter = QuotationManagementPresenter(this)
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		EventBus.getDefault().register(this)
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		presenter.updateQuotationDataChanged {
+			EventBus.getDefault().post(QuotationUpdateEvent(true))
+		}
+		EventBus.getDefault().unregister(this)
+	}
+
+	@Subscribe(threadMode = ThreadMode.POSTING)
+	fun updatePairListEvent(pairUpdateEvent: PairUpdateEvent) {
+		if (pairUpdateEvent.needUpdate) presenter.updateData()
+	}
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationSelectionTable>?
@@ -32,8 +57,6 @@ class QuotationManagementFragment :
 
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
-		presenter.checkAndUpdateQuotationData()
-		// 从下一个界面返回的时候更新这个界面的 `UI` 数据
 		getParentFragment<QuotationOverlayFragment> {
 			if (hidden) showSearchButton(false) {}
 			else {

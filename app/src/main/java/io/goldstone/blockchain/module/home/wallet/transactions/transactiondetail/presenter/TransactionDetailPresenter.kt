@@ -11,9 +11,14 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
-import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
+import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.multichain.isEOSSeries
+import io.goldstone.blockchain.crypto.multichain.isETHSeries
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.contract.TransactionDetailContract
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionHeaderModel
@@ -27,6 +32,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.doAsync
 
 
@@ -92,8 +98,7 @@ class TransactionDetailPresenter(
 
 	private fun updateConfirmationNumber() {
 		when {
-			data.contract.isBTCSeries() ->
-				updateBTCSeriesTransaction(true, data.contract.getChainURL().chainID)
+			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true)
 			data.contract.isETHSeries() -> updateETHSeriesConfirmationCount()
 			data.contract.isEOSSeries() -> detailView.showLoading(false)
 		}
@@ -125,7 +130,7 @@ class TransactionDetailPresenter(
 				showProgress(TransactionProgressModel(Math.abs(totalCount), Math.abs(totalCount).toLong()))
 			else showProgress(TransactionProgressModel(totalCount))
 			showTransactionInfo(blockNumber, totalCount, data.minerFee)
-			updateTokenDetailList()
+			EventBus.getDefault().post(TokenDetailEvent(true))
 			showHeaderData(TransactionHeaderModel(data, false, isFailed))
 		}
 	}
@@ -133,9 +138,7 @@ class TransactionDetailPresenter(
 	private fun updateTransactionFromNotification() {
 		when {
 			// 从通知来的消息, 可能来自与任何支持的链, 这里需要解出 `Notification` 里面带入的 `ChainID` 作为参数
-			data.contract.isBTCSeries() -> data.chainID?.let {
-				updateBTCSeriesTransaction(true, it)
-			}
+			data.contract.isBTCSeries() -> updateBTCSeriesTransaction(true)
 			data.contract.isETHSeries() ->
 				getAndShowETHSeriesDataFromNotification()
 			data.contract.isEOSSeries() -> {
@@ -287,9 +290,9 @@ class TransactionDetailPresenter(
 		}
 	}
 
-	private fun updateBTCSeriesTransaction(checkLocal: Boolean, chainID: ChainID) {
+	private fun updateBTCSeriesTransaction(checkLocal: Boolean) {
 		BTCSeriesTransactionUtils.getTransaction(
-			chainID,
+			data.chainID ?: data.contract.getChainURL().chainID,
 			data.hash,
 			data.isReceive,
 			if (data.isReceive) data.toAddress else data.fromAddress,
@@ -312,10 +315,8 @@ class TransactionDetailPresenter(
 		// 因为 Notification 可能来自多个链
 		data.chainID?.getSpecificChain() ?: data.contract.getChainURL()
 	) { confirmationCount, error ->
-		if (confirmationCount != null && error.isNone()) {
-			val transactionDao =
-				GoldStoneDataBase.database.transactionDao()
-			transactionDao.updateConfirmationCount(
+		if (confirmationCount.isNotNull() && error.isNone()) {
+			TransactionTable.dao.updateConfirmationCount(
 				confirmationCount,
 				data.hash,
 				data.fromAddress,

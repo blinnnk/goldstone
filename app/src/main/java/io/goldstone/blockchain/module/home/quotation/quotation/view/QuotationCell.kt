@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -15,10 +16,11 @@ import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.*
+import org.jetbrains.anko.margin
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.textColor
 
 @SuppressLint("SetTextI18n")
 /**
@@ -38,7 +40,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		tokenInfo.subtitle.text = model.name
 		tokenPrice.title.text = CustomTargetTextStyle(
 			model.quoteSymbol.toUpperCase(),
-			model.quoteSymbol.toUpperCase() + " " + price,
+			model.quoteSymbol.toUpperCase() suffix price.orEmpty(),
 			GrayScale.midGray,
 			13.uiPX(),
 			false,
@@ -93,9 +95,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.medium(context)
 			gravity = Gravity.END
-			layoutParams = RelativeLayout.LayoutParams(
-				matchParent, 20.uiPX()
-			)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
 			x -= 20.uiPX()
 			y += 52.uiPX()
 		}
@@ -114,28 +114,21 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	init {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
-		layoutParams = LinearLayout.LayoutParams(matchParent, 180.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 185.uiPX())
 		cardView = GSCard(context).apply {
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
-			relativeLayout {
-				layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 170.uiPX())
-				addCorner(CornerSize.default.toInt(), Spectrum.white)
-
-				addView(tokenInfo)
-				addView(tokenPrice)
-
-				addView(exchangeName)
-
-				tokenPrice.alignParentRight()
-
-				lineChart.apply {
-					id = ElementID.chartView
-					layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
-					setMargins<RelativeLayout.LayoutParams> {
-						margin = 10.uiPX()
-					}
-					y = 45.uiPX().toFloat()
-				}.into(this)
+			resetCardElevation(ShadowSize.Cell)
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.card, matchParent)
+			addView(tokenInfo)
+			addView(tokenPrice)
+			addView(exchangeName)
+			tokenPrice.alignParentRight()
+			lineChart.apply {
+				id = ElementID.chartView
+				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
+				y = 45.uiPX().toFloat()
+			}.into(this)
+			lineChart.setMargins<FrameLayout.LayoutParams> {
+				margin = 10.uiPX()
 			}
 		}
 		cardView.into(this)

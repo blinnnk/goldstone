@@ -17,7 +17,6 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasEditorPresenter
-import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.MinerFeeType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -78,20 +77,15 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 	override fun onStart() {
 		super.onStart()
 		val defaultPrice =
-			if (isBTCSeries) MinerFeeType.Recommend.satoshi
-			else MinerFeeType.Recommend.value
+			if (isBTCSeries) 50L else 30L
 		gasPriceInput.setText(defaultPrice.toString())
 		gasPrice = defaultPrice
 		getGasSize()?.let { dataSize = it }
 	}
 
-	private val currentValue: (
-		gasPrice: Long,
-		gasSize: Long
-	) -> Double = { gasPrice, gasSize ->
-		val fast = MinerFeeType.Fast.value * gasSize
-		val btcFast = MinerFeeType.Fast.satoshi * gasSize
-		(gasPrice * gasSize) / (if (isBTCSeries) btcFast else fast).toDouble()
+	private val currentValue: (gasPrice: Long, gasSize: Long) -> Double = { gasPrice, gasSize ->
+		val fast = 100 * gasSize
+		(gasPrice * gasSize) / fast.toDouble()
 	}
 	private var gasPrice: Long by observing(0L) {
 		speedLevelBar.setProgressValue(currentValue(gasPrice, dataSize))

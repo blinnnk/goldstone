@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
-import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFile

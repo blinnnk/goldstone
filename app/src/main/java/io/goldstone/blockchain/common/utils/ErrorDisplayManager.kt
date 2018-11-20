@@ -2,9 +2,8 @@ package io.goldstone.blockchain.common.utils
 
 import android.content.Context
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import org.jetbrains.anko.runOnUiThread
 
 
 /**
@@ -16,10 +15,11 @@ class ErrorDisplayManager(private val error: Throwable) {
 
 	init {
 		val errorMessage = error.message
-		if (errorMessage != null) {
+		if (errorMessage.isNotNull()) {
 			displayMessage = when {
-				errorMessage.contains("Timeout", true) ||
-					errorMessage.contains("Time out", true) -> {
+				errorMessage.contains("Timeout", true)
+					|| errorMessage.contains("Time out", true)
+					|| errorMessage.contains("timed out", true) -> {
 					// 上报 Server 逻辑, 这部分超市
 					null
 				}
@@ -32,6 +32,7 @@ class ErrorDisplayManager(private val error: Throwable) {
 					LogUtil.error(this::class.java.simpleName, Throwable("GoldStone ERROR: *************** $errorMessage ***************"))
 					null
 				}
+				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
 				errorMessage.contains("64: dust", true) -> {
 					"amount too small to be recognised as legitimate on the bitcoin network."
 				}
@@ -43,7 +44,7 @@ class ErrorDisplayManager(private val error: Throwable) {
 	@UiThread
 	fun show(context: Context?) {
 		displayMessage?.apply {
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				if (!error.message.isNullOrEmpty()) {
 					context.alert(this@apply)
 				}

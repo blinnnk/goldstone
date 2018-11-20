@@ -179,9 +179,12 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 		}
 
 		Dashboard(context) {
-			showDashboard(EOSAccountText.customizeResource, settingInputs) {
-				it.updateSettingValue()
-			}
+			showDashboard(
+				EOSAccountText.customizeResource,
+				settingInputs,
+				"edit resource that you decide assign to",
+				{ it.updateSettingValue() }
+			) {}
 		}
 	}
 
