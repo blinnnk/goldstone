@@ -21,6 +21,5 @@ interface RAMMarketDetailContract {
 		fun setRAMBalance(ramBalance: String, eosBalance: String)
 	}
 	
-	interface GSPresenter : GoldStonePresenter {
-	}
+	interface GSPresenter : GoldStonePresenter
 }

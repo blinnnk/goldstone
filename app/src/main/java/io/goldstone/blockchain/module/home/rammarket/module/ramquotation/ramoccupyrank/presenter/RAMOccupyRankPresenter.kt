@@ -1,23 +1,22 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.presenter
 
 import com.blinnnk.extension.toArrayList
-import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.model.RAMRankModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.view.RAMOccupyRankFragment
-import org.jetbrains.anko.*
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.contract.RAMOccupyRankContract
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date: 2018/11/5.
  * @author: yanglihai
  * @description:
  */
-class RAMOccupyRankPresenter(override val fragment: RAMOccupyRankFragment)
-	: BaseRecyclerPresenter<RAMOccupyRankFragment, RAMRankModel>() {
+class RAMOccupyRankPresenter(private val gsView: RAMOccupyRankContract.GSView)
+	:RAMOccupyRankContract.GSPresenter {
 	
-	override fun updateData() {
-		super.updateData()
+	override fun start() {
 		getBigTransactions()
+		
 	}
 	
 	private fun getBigTransactions() {
@@ -25,11 +24,11 @@ class RAMOccupyRankPresenter(override val fragment: RAMOccupyRankFragment)
 			GoldStoneAPI.getRAMOccupyRank { data, error ->
 				if (data != null && error.isNone()) {
 					GoldStoneAPI.context.runOnUiThread {
-						fragment.setRecyclerViewAdapter(fragment.recyclerView, data.toArrayList())
+						gsView.updateUI(data.toArrayList())
 					}
 				} else {
 					GoldStoneAPI.context.runOnUiThread {
-						fragment.context?.alert(error.message)
+						gsView.showError(error)
 					}
 				}
 			}
