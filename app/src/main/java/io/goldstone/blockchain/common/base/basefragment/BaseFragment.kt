@@ -32,11 +32,6 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : GSFragment
 	private var topMiniLoadingView: TopMiniLoadingView? = null
 	private lateinit var scrollView: ScrollView
 
-	override fun onAttach(context: Context?) {
-		super.onAttach(context)
-		presenter.onFragmentAttach()
-	}
-
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		presenter.onFragmentCreateView()
 		return UI {

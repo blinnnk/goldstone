@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.module.common.tokenpayment.gasselection.view
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -43,7 +45,7 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	private val spendingCell by lazy { GraySquareCell(context!!) }
 	private lateinit var gasLayout: LinearLayout
 	private lateinit var container: RelativeLayout
-	override val presenter = GasSelectionPresenter(this)
+	override lateinit var presenter: GasSelectionPresenter
 
 	val ethSeriesPaymentModel by lazy {
 		arguments?.getSerializable(ArgumentKey.gasPrepareModel) as? PaymentDetailModel
@@ -53,6 +55,17 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 	}
 	val overlayFragment by lazy {
 		parentFragment as? TokenDetailOverlayFragment
+	}
+
+	private val token by lazy {
+		(parentFragment as? TokenDetailOverlayFragment)?.token
+	}
+
+	override fun onAttach(context: Context?) {
+		super.onAttach(context)
+		token?.let {
+			presenter = GasSelectionPresenter(it, this)
+		}
 	}
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -96,13 +109,13 @@ class GasSelectionFragment : BaseFragment<GasSelectionPresenter>() {
 											if (receiptModel.isNotNull() && error.isNone()) {
 												overlayFragment?.goToTransactionDetailFragment(this@GasSelectionFragment, receiptModel)
 											} else {
-												safeShowError(error)
+												// 用户取消输入密码会返回 `model null`  和 `error none` 所以不用提示
+												if (error.hasError()) safeShowError(error)
 												showLoadingStatus(false)
 											}
 										}
 									} else {
-										// 用户取消输入密码会返回 `model null`  和 `error none` 所以不用提示
-										if (error.hasError()) safeShowError(error)
+										safeShowError(error)
 										showLoadingStatus(false)
 									}
 								}

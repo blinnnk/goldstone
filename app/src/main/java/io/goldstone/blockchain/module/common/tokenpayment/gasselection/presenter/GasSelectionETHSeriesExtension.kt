@@ -37,7 +37,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		contract.isETH() || contract.isETC() -> {
 			MyTokenTable.getBalanceByContract(contract, contract.getAddress()) { balance, error ->
 				if (balance.isNotNull() && error.isNone()) {
-					if (balance.orZero() >= getTransferCount().toDouble() + getUsedGasFee().orElse(0.0)) callback(GoldStoneError.None)
+					if (balance.orZero() >= getTransferCount() + getUsedGasFee().orElse(0.0)) callback(GoldStoneError.None)
 					else callback(TransferError.BalanceIsNotEnough)
 				} else callback(error)
 			}
@@ -65,7 +65,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 					}
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
 					val isEnough =
-						tokenBalance >= getTransferCount().toDouble() && ethBalance > getUsedGasFee().orElse(0.0)
+						tokenBalance >= getTransferCount() && ethBalance > getUsedGasFee().orElse(0.0)
 					if (isEnough) callback(GoldStoneError.None) else callback(TransferError.BalanceIsNotEnough)
 				}
 			}
@@ -90,7 +90,7 @@ fun GasSelectionPresenter.insertCustomGasData() {
  * 交易开始后进行当前 `taxHash` 监听判断是否完成交易.
  */
 private fun GasSelectionPresenter.getETHERC20OrETCAddress() =
-	if (getToken()?.contract.isETC()) SharedAddress.getCurrentETC()
+	if (token.contract.isETC()) SharedAddress.getCurrentETC()
 	else SharedAddress.getCurrentEthereum()
 
 fun GasSelectionPresenter.transfer(
@@ -142,7 +142,7 @@ private fun GasSelectionPresenter.prepareReceiptModel(
 		raw.toWalletAddress,
 		(raw.gasLimit * raw.gasPrice).toEthCount().toBigDecimal().toPlainString(),
 		value,
-		getToken()!!,
+		token,
 		taxHash,
 		System.currentTimeMillis(),
 		fragment.ethSeriesPaymentModel?.memo.orEmpty()
@@ -178,7 +178,7 @@ fun GasSelectionPresenter.updateGasSettings(container: LinearLayout) {
 	}
 }
 
-fun GasSelectionPresenter.getUnitSymbol() = getToken()?.contract.getSymbol().symbol.orEmpty()
+fun GasSelectionPresenter.getUnitSymbol() = token.contract.getSymbol().symbol
 
 private fun GasSelectionPresenter.insertPendingDataToDatabase(
 	value: BigInteger,
