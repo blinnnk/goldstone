@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.Pa
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.params.TestNet3Params
+import java.math.BigInteger
 
 /**
  * @date 2018/8/15 5:52 PM
@@ -33,7 +35,7 @@ fun GasSelectionPresenter.checkBTCSeriesBalance(
 	InsightApi.getBalance(contract.getChainType(), !contract.isBCH(), contract.getAddress()) { balance, error ->
 		if (balance.isNotNull() && error.isNone()) {
 			val isEnough =
-				balance.value > gasView.getTransferCount() + Amount(currentFee.getUsedAmount()).toBTC()
+				BigInteger.valueOf(balance.value) > gasView.getTransferCount().orElse(BigInteger.ZERO) + BigInteger.valueOf(currentFee.getUsedAmount())
 			if (isEnough) callback(GoldStoneError.None)
 			else callback(TransferError.BalanceIsNotEnough)
 		} else callback(error)

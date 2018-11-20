@@ -32,6 +32,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.crypto.multichain.orEmpty
+import io.goldstone.blockchain.kernel.database.BigintegerConverter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
@@ -50,6 +51,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.verticalLayout
 import org.jetbrains.anko.wrapContent
+import java.math.BigInteger
 
 /**
  * @date 2018/5/16 3:53 PM
@@ -104,11 +106,11 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 		return (paymentModel as? PaymentDetailModel)?.memo.orEmpty()
 	}
 
-	override fun getTransferCount(): Double {
+	override fun getTransferCount(): BigInteger? {
 		return when {
 			token?.contract.isBTCSeries() ->
-				(paymentModel as? PaymentBTCSeriesModel)?.value?.toDouble() ?: 0.0
-			else -> (paymentModel as? PaymentDetailModel)?.count ?: 0.0
+				(paymentModel as? PaymentBTCSeriesModel)?.value?.toBigInteger()
+			else -> (paymentModel as? PaymentDetailModel)?.amount
 		}
 	}
 

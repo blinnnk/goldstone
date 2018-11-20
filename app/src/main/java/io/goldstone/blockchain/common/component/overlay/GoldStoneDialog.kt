@@ -85,7 +85,7 @@ class GoldStoneDialog(private val context: Context) {
 	}
 
 	// 一个 App 的声明周期只弹出一次 `4G` 的 `Alert`
-	fun showMobile4GConfirm(callback: () -> Unit) {
+	fun showMobile4GConfirm(confirmAction: () -> Unit) {
 		if (GoldStoneApp.hasShownMobileAlert) return
 		generateCustomView(
 			R.drawable.dialog_mobile_4g,
@@ -94,7 +94,7 @@ class GoldStoneDialog(private val context: Context) {
 			with(dialog) {
 				title(text = DialogText.mobileNetwork)
 				positiveButton(text = CommonText.gotIt) {
-					callback()
+					confirmAction()
 					dialog.dismiss()
 				}
 				negativeButton(text = CommonText.cancel)

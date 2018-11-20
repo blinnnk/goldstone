@@ -151,6 +151,8 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 		recyclerView.adapter = QuotationSearchAdapter(asyncData.orEmptyArray()) { model, isChecked ->
 			loadingView.show()
 			presenter.updateLocalQuotation(model, isChecked) { error ->
+				// 更新内存里面的数据, 防止回收后 `UI` 不对
+				asyncData?.find { it.pair.equals(model.pair, true) }?.isSelecting = isChecked
 				launchUI {
 					loadingView.remove()
 					if (error.hasError()) safeShowError(error)

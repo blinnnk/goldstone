@@ -1,11 +1,12 @@
 package io.goldstone.blockchain.crypto.utils
 
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getDecimalCount
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -58,7 +59,7 @@ object CryptoUtils {
 	fun getTransferInfoFromInputData(inputCode: String): InputCodeData? {
 		var address: String
 		val amount: BigInteger
-		return if(isTransferInputCode(inputCode)) {
+		return if (isTransferInputCode(inputCode)) {
 			// analysis input code and get the received address
 			address = inputCode.substring(
 				SolidityCode.contractTransfer.length, SolidityCode.contractTransfer.length + 64
@@ -108,16 +109,16 @@ object CryptoUtils {
 	}
 }
 
-fun Double.toUnitValue(symbol: String = CoinSymbol.eth): String {
-	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 18
-	val value = this / 1000000000000000000.0
-	val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
-	return "$prefix${formatEditor.format(this / 1000000000000000000.0)} $symbol"
+fun Long.toEthCount(): Double {
+	return CryptoUtils.toCountByDecimal(BigInteger.valueOf(this), CryptoValue.ethDecimal)
 }
 
 fun BigInteger.toEthCount(): Double {
 	return CryptoUtils.toCountByDecimal(this, CryptoValue.ethDecimal)
+}
+
+fun Double.toWei(decimal: Int): BigInteger {
+	return (this.toBigDecimal() * BigDecimal.valueOf(Math.pow(10.0, decimal.toDouble()))).toBigInteger()
 }
 
 fun BigDecimal.toEthCount(): Double {

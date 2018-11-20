@@ -17,7 +17,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.CountryCode
@@ -94,19 +93,20 @@ class SplashActivity : AppCompatActivity() {
 			// 错开动画时间再执行数据请求
 			// Add currency data from local JSON file
 			with(presenter) {
-				prepareNodeInfo {
-					// 初次安装软件关键数据从本地 JSON 生成到数据库,
-					// 后续会在网络环境更新为网络数据
-					initLaunchLanguage(language)
-					initSupportCurrencyList(activity)
-					initDefaultExchangeData(activity)
-					initNodeList(activity)
-					initDefaultToken(activity)
-					// 检查市场状况
-					prepareInReviewStatus {
-						updateAccountInformation(activity) {
-							launchUI {
-								jump<MainActivity>()
+				initNodeList(activity) {
+					prepareNodeInfo {
+						// 初次安装软件关键数据从本地 JSON 生成到数据库,
+						// 后续会在网络环境更新为网络数据
+						initLaunchLanguage(language)
+						initSupportCurrencyList(activity)
+						initDefaultExchangeData(activity)
+						initDefaultToken(activity)
+						// 检查市场状况
+						prepareInReviewStatus {
+							updateAccountInformation(activity) {
+								launchUI {
+									jump<MainActivity>()
+								}
 							}
 						}
 					}

@@ -9,6 +9,7 @@ import io.goldstone.blockchain.module.common.contract.GoldStoneView
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import java.io.Serializable
+import java.math.BigInteger
 
 
 /**
@@ -20,7 +21,7 @@ interface GasSelectionContract {
 		fun showLoading(status: Boolean)
 		fun getMemo(): String
 		fun getGasLimit(): Long
-		fun getTransferCount(): Double
+		fun getTransferCount(): BigInteger?
 		fun showSpendingValue(value: String)
 		fun getCustomFee(): GasFee
 		fun getGasLayout(): LinearLayout

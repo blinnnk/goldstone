@@ -56,12 +56,13 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	@WorkerThread
-	fun initNodeList(context: Context) {
+	fun initNodeList(context: Context, callback: () -> Unit) {
 		if (ChainNodeTable.dao.getAll().isEmpty()) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.node_list).map { ChainNodeTable(it) }
 			ChainNodeTable.dao.insertAll(localData)
-		}
+			callback()
+		} else callback()
 	}
 
 	@WorkerThread
