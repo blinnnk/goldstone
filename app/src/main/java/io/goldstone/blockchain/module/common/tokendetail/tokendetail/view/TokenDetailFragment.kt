@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter.TokenDetailPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -18,6 +19,9 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.view.TransactionDetailFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
@@ -37,6 +41,21 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	private val footer by lazy { TokenDetailFooter(context!!) }
 	private var headerView: TokenDetailHeaderView? = null
 	private var bottomLoading: BottomLoadingView? = null
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		EventBus.getDefault().register(this)
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		EventBus.getDefault().unregister(this)
+	}
+
+	@Subscribe(threadMode = ThreadMode.POSTING)
+	fun updateTokenDetailEvent(updateEvent: TokenDetailEvent) {
+		if (updateEvent.hasConfirmed) presenter.refreshData()
+	}
 
 	override fun removeEmptyView() {
 		launchUI {

@@ -32,11 +32,6 @@ class ContactPresenter(
 		updateAddressList()
 	}
 
-	override fun onFragmentShowFromHidden() {
-		super.onFragmentShowFromHidden()
-		updateAddressList()
-	}
-
 	fun deleteContact(id: Int) {
 		ContactTable.deleteContactByID(id) {
 			updateAddressList()

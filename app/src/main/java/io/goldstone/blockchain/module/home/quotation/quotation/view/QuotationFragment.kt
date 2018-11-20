@@ -10,6 +10,10 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.QuotationUpdateEvent
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
@@ -21,6 +25,23 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override val pageTitle: String = "Quotation"
 	private val slideHeader by lazy { QuotationSlideHeader(context!!) }
 	override val presenter = QuotationPresenter(this)
+
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		EventBus.getDefault().register(this)
+	}
+
+	// 这个页面是常驻在首页通过 `ViewPager` 管理显示的,
+	// 所以在 `Hidden` 的时候注销 `EventBus`
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		if (isHidden) EventBus.getDefault().unregister(this)
+	}
+
+	@Subscribe(threadMode = ThreadMode.POSTING)
+	fun updateQuotationListEvent(updateEvent: QuotationUpdateEvent) {
+		if (updateEvent.needUpdate) presenter.updateData()
+	}
 
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
