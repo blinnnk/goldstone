@@ -14,6 +14,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -33,6 +34,8 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	private var showHistoryEvent: Runnable? = null
 	private var confirmEvent: Runnable? = null
 	private val dashboardWidth = ScreenSize.Width / 2 + RAMMarketPadding * 2
+	
+	var stakeType = StakeType.BuyRam
 	
 	fun setShowHistoryEvent(runnable: Runnable) {
 		showHistoryEvent = runnable
@@ -55,9 +58,11 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			button.click {
 				menu.selected(button.id)
 				if (button.id == 0) {
+					stakeType = StakeType.BuyRam
 					confirmButton.setBlueStyle(width = dashboardWidth - RAMMarketPadding)
 					confirmButton.resetConfirmParams()
 				} else {
+					stakeType = StakeType.SellRam
 					confirmButton.setRedStyle(width = dashboardWidth - RAMMarketPadding)
 					confirmButton.resetConfirmParams()
 				}

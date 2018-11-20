@@ -3,17 +3,21 @@ package io.goldstone.blockchain.module.home.rammarket.view
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.*
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.utils.formatCount
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.updateRAMCandleData
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view.QuotationViewPager
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.tradeRAM
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import org.jetbrains.anko.*
@@ -51,7 +55,9 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 					afterTextChanged = Runnable {
 						if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
 							val ram = text.toString().trim().toFloat() * presenter.ramInformationModel.currentPrice
-							tradingView.tradingDashboardView.eosEditText.setText(ram.formatCount(3))
+							if (ram != 0.0) {
+								tradingView.tradingDashboardView.eosEditText.setText(ram.formatCount(3))
+							}
 						}
 					}
 				}
@@ -59,11 +65,34 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 				tradingView.tradingDashboardView.eosEditText.apply {
 					afterTextChanged = Runnable {
 						if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
-							val ram = text.toString().trim().toFloat() / presenter.ramInformationModel.currentPrice
-							tradingView.tradingDashboardView.ramEditText.setText(ram.formatCount(3))
+							val eos = text.toString().trim().toFloat() / presenter.ramInformationModel.currentPrice
+							if (eos != 0.0) {
+								tradingView.tradingDashboardView.ramEditText.setText(eos.formatCount(3))
+							}
 						}
 					}
 				}
+				
+				tradingView.tradingDashboardView.setConfirmEvent(Runnable {
+					val amount = if (tradingView.tradingDashboardView.stakeType.isSellRam())
+						tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
+					else tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
+					presenter.tradeRAM(
+						amount,
+						tradingView.tradingDashboardView.stakeType
+					) { eosResponse, error ->
+						if (eosResponse.isNotNull() && error.isNone()) {
+							GoldStoneAPI.context.runOnUiThread {
+								eosResponse.showDialog(tradingView)
+							}
+						} else {
+							GoldStoneAPI.context.runOnUiThread {
+								alert(error.message)
+							}
+						}
+					}
+				})
+				
 			}
 		}
 		
@@ -127,5 +156,7 @@ class RAMMarketDetailFragment : BaseFragment<RAMMarketDetailPresenter>() {
 	private fun showCandleDataLoadingView() {
 		priceMenuCandleChart.showLoadingView()
 	}
+	
+	fun getStakeType(): StakeType = tradingView.tradingDashboardView.stakeType
 	
 }

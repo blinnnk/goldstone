@@ -415,4 +415,23 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
+	val noEnoughRAM = when(currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "没有足够的内存"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	val noEnoughEOS = when(currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "没有足够的EOS"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
 }

@@ -2,14 +2,22 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter
 
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
-import io.goldstone.blockchain.common.sharedpreference.*
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
-import org.jetbrains.anko.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
+import java.math.BigDecimal
 
 /**
  * @date: 2018/11/1.
@@ -62,8 +70,18 @@ fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
 	}
 }
 
-fun RAMMarketDetailPresenter.tradeRAM() {
-	if (SharedAddress.getCurrentEOSAccount().accountName.equals("default")) {
+/**
+ * 内存交易
+ * 买内存：amount 单位是 EOS
+ * 卖内存：amount 单位是 byte
+ */
+fun RAMMarketDetailPresenter.tradeRAM(
+	amount: Double,
+	stakeType: StakeType,
+	callback: (response: EOSResponse?, GoldStoneError) -> Unit
+) {
+	val accountName = SharedAddress.getCurrentEOSAccount().accountName
+	if (accountName == "default" || accountName.isEmpty()) {
 		fragment.context?.alert(EOSRAMExchangeText.eosNoAccount)
 		return
 	}
@@ -71,7 +89,36 @@ fun RAMMarketDetailPresenter.tradeRAM() {
 		fragment.context?.alert(EOSRAMExchangeText.testNetTradeDisableMessage)
 		return
 	}
-	
+	doAsync {
+		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName)
+		if (eosAcountTable != null) {
+			eosAcountTable.let { localData ->
+				if (stakeType == StakeType.BuyRam) {
+					if (amount > localData.balance.toDouble()) {
+						GoldStoneAPI.context.runOnUiThread {
+							fragment.context.alert(EOSRAMExchangeText.noEnoughEOS)
+						}
+						return@doAsync
+					}
+				} else if (stakeType == StakeType.SellRam) {
+					if (BigDecimal(amount).toBigInteger() > (localData.ramQuota - localData.ramUsed)) {
+						GoldStoneAPI.context.runOnUiThread {
+							fragment.context.alert(EOSRAMExchangeText.noEnoughRAM)
+						}
+						return@doAsync
+					}
+				}
+				
+				fragment.context?.apply {
+					BaseTradingPresenter.tradingRam( this, EOSAccount(accountName), amount, stakeType, callback)
+				}
+			}
+		} else {
+			GoldStoneAPI.context.runOnUiThread {
+				fragment.context.alert("数据库错误")
+			}
+		}
+	}
 	
 }
 

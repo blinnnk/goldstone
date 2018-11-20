@@ -6,7 +6,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.tradeRAM
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
 import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 import org.jetbrains.anko.*
@@ -23,10 +22,6 @@ class TradingView(context: Context, val fragment: RAMMarketDetailFragment): Line
 				fragment.getParentFragment<RAMMarketOverlayFragment> {
 					presenter.showTransactionHistoryFragment()
 				}
-			})
-			
-			setConfirmEvent(Runnable {
-				fragment.presenter.tradeRAM()
 			})
 		}
 	}
