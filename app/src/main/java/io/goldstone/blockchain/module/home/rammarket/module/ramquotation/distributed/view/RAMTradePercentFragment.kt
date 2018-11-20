@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.LinearLayout
@@ -8,20 +9,28 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.data.PieEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.chart.pie.PieChartView
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.contract.RAMDistributedContract
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.presenter.RAMTradePercentPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.UI
 
 /**
  * @date: 2018/9/25.
  * @author: yanglihai
  * @description:
  */
-class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
+class RAMTradePercentFragment : GSFragment(), RAMDistributedContract.GSView {
+	
+	override fun showError(error: Throwable) {
+		ErrorDisplayManager(error).show(context)
+	}
+	
 	override val pageTitle: String
 		get() = ""
 	
@@ -72,8 +81,12 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 			}
 		}
 	}
-	
-	override fun AnkoContext<Fragment>.initView() {
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		return UI {
+			initView()
+		}.view
+	}
+	private fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			leftPadding = RAMMarketPadding
 			rightPadding = RAMMarketPadding
@@ -126,7 +139,8 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 		}
 	}
 	
-	fun updateChartData(maxValue: Float,
+	override fun updateChartData(
+		maxValue: Float,
 		buyValues: Array<Float>,
 		buyColors: Array<Int>,
 		sellValues: Array<Float>,
@@ -153,8 +167,18 @@ class RAMTradePercentFragment : BaseFragment<RAMTradePercentPresenter>() {
 		}
 	}
 	
-	fun updatePieChartData(entries: ArrayList<PieEntry>, colors: List<Int>) {
+	override fun updatePieChartData(entries: ArrayList<PieEntry>, colors: List<Int>) {
 		pieChart.resetData(entries, colors)
+	}
+	
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter.start()
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		presenter.onFragmentDestroy()
 	}
 	
 }

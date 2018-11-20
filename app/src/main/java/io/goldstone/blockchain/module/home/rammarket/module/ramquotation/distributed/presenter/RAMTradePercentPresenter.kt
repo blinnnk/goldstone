@@ -7,13 +7,10 @@ import com.blinnnk.util.saveDataToSharedPreferences
 import com.github.mikephil.charting.data.PieEntry
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
-import io.goldstone.blockchain.common.base.basefragment.BasePresenter
-import io.goldstone.blockchain.common.component.chart.pie.PieChartView
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.view.RAMTradePercentFragment
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.contract.RAMDistributedContract
 import org.jetbrains.anko.runOnUiThread
 
 /**
@@ -21,7 +18,25 @@ import org.jetbrains.anko.runOnUiThread
  * @author: yanglihai
  * @description:
  */
-class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) : BasePresenter<RAMTradePercentFragment>() {
+class RAMTradePercentPresenter(private val gsView: RAMDistributedContract.GSView)
+	: RAMDistributedContract.GSPresenter {
+	
+	override fun start() {
+		showLocalData()
+		getTradeData()
+	}
+	
+	private fun showLocalData() {
+		try {
+			val jsonData = GoldStoneAPI.context.getStringFromSharedPreferences(tradePercentKey)
+			val type = object : TypeToken<ArrayList<Float>>() {}.type
+			tradeDistributeList.addAll(
+				Gson().fromJson(jsonData, type)
+			)
+		} catch (error: Exception) {
+			LogUtil.error("RAMTradePercentPresenter", error)
+		}
+	}
 	
 	private val tradeDistributeList = arrayListOf<Float>()
 	
@@ -39,37 +54,16 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 		Color.parseColor("#FFAAAA")
 	)
 	
-	override fun onFragmentCreate() {
-		super.onFragmentCreate()
-		fragment.context?.apply {
-			try {
-				val jsonData = getStringFromSharedPreferences(tradePercentKey)
-				val type = object : TypeToken<ArrayList<Float>>() {}.type
-				tradeDistributeList.addAll(
-					Gson().fromJson(jsonData, type)
-				)
-			} catch (error: Exception) {
-				LogUtil.error("RAMTradePercentPresenter", error)
-			}
-		}
+	
+	fun onFragmentDestroy() {
+		if (tradeDistributeList.isNotEmpty()) GoldStoneAPI.context.saveDataToSharedPreferences(
+			tradePercentKey,
+			Gson().toJson(tradeDistributeList)
+		)
+		
 	}
 	
-	override fun onFragmentCreateView() {
-		super.onFragmentCreateView()
-		getTradeData()
-	}
-	
-	override fun onFragmentDestroy() {
-		super.onFragmentDestroy()
-		fragment.context?.apply {
-			if (tradeDistributeList.isNotEmpty()) saveDataToSharedPreferences(
-				tradePercentKey,
-				Gson().toJson(tradeDistributeList)
-			)
-		}
-	}
-	
-	private fun getTradeData() {
+	override fun getTradeData() {
 		GoldStoneAPI.getEOSRAMTradeDistributed {data, error ->
 			if (error.isNone()){
 				data?.let {
@@ -87,7 +81,7 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 	
 	private fun updateUI() {
 		if (tradeDistributeList.isEmpty()) return
-		fragment.updatePieChartData(
+		gsView.updatePieChartData(
 			tradeDistributeList.map {
 				PieEntry(it, "")
 			}.toArrayList(),
@@ -100,7 +94,7 @@ class RAMTradePercentPresenter(override val fragment: RAMTradePercentFragment) :
 	// 柱状图
 	private fun updateChartUI() {
 		val maxValue = tradeDistributeList.max()
-		fragment.updateChartData(
+		gsView.updateChartData(
 			maxValue!!,
 				arrayOf(
 					tradeDistributeList[0],

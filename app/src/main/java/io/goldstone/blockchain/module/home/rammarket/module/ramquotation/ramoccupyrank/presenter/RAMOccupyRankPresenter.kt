@@ -19,7 +19,7 @@ class RAMOccupyRankPresenter(private val gsView: RAMOccupyRankContract.GSView)
 		
 	}
 	
-	private fun getBigTransactions() {
+	override fun getBigTransactions() {
 		doAsync {
 			GoldStoneAPI.getRAMOccupyRank { data, error ->
 				if (data != null && error.isNone()) {

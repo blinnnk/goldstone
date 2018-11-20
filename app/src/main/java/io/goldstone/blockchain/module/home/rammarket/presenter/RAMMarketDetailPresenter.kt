@@ -1,21 +1,18 @@
 package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import com.blinnnk.extension.*
-import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.contract.RAMMarketDetailContract
-import io.goldstone.blockchain.module.home.rammarket.model.*
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.model.RAMInformationModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.recentTransactions
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.setAcountInfoFromDatabase
-import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketDetailFragment
-import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragment
 import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.math.BigDecimal
@@ -55,7 +52,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 		}
 	}
 	
-	fun parseSocketResult(content: JSONObject) {
+	private fun parseSocketResult(content: JSONObject) {
 		val type = content.safeGet("t")
 		if (type == "eos_ram_price") {
 			// 返回的价格信息

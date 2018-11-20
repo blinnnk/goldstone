@@ -1,27 +1,37 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.view
 
+import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.Gravity
+import android.view.*
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.contract.RAMStatisticsContract
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.presenter.RAMStatisticsPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.UI
 
 /**
  * @date: 2018/11/6.
  * @author: yanglihai
  * @description:
  */
-class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
+class RAMStatisticsFragment: GSFragment(), RAMStatisticsContract.GSView {
+	
+	override fun showError(error: Throwable) {
+		ErrorDisplayManager(error).show(context)
+	}
+	
 	override val presenter: RAMStatisticsPresenter = RAMStatisticsPresenter(this)
 	override val pageTitle: String = ""
 	private val globalRAMCard by lazy {
@@ -54,7 +64,13 @@ class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
 		}
 	}
 	
-	override fun AnkoContext<Fragment>.initView() {
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		return UI {
+			initView()
+		}.view
+	}
+	
+	private fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			topPadding = 16.uiPX()
 			gravity = Gravity.CENTER_HORIZONTAL
@@ -73,7 +89,12 @@ class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
 		}
 	}
 	
-	fun setGlobalRAMData(availableAmount: Float, totalAmount: Float, percent: Float) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		presenter.start()
+	}
+	
+	override fun setGlobalRAMData(availableAmount: Float, totalAmount: Float, percent: Float) {
 		ramAssetCell.setSubtitle(EOSRAMExchangeText.totalRAM("$totalAmount GB"))
 		ramAssetCell.setValues(
 			EOSRAMExchangeText.ramAvailable( "$availableAmount GB"),
@@ -82,7 +103,7 @@ class RAMStatisticsFragment: BaseFragment<RAMStatisticsPresenter>() {
 		ramTotalCell.setSubtitle("$totalAmount GB")
 	}
 	
-	fun setChainRAMData(ramBalance: String, ramOfEOS: String) {
+	override fun setChainRAMData(ramBalance: String, ramOfEOS: String) {
 		ramBalanceCell.setSubtitle("$ramBalance GB")
 		ramOfEOSCell.setSubtitle("$ramOfEOS EOS")
 	}
