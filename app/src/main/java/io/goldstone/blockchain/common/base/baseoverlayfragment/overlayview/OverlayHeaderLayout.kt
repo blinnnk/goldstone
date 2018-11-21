@@ -55,7 +55,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	private val filterButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.filterIcon
-			imageResource = R.drawable.icon_filter
+			imageResource = R.drawable.filter_icon
 			setLeftPosition()
 		}
 	}

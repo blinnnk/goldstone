@@ -2,7 +2,9 @@ package io.goldstone.blockchain.crypto.eos.transaction
 
 import android.content.Context
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -71,17 +73,19 @@ data class EOSTransactionInfo(
 		context: Context?,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		BaseTradingPresenter.prepareTransaction(
-			context,
-			fromAccount,
-			toAccount,
-			amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
-			contract,
-			false
-		) { privateKey, error ->
-			if (error.isNone() && privateKey != null) {
-				transfer(privateKey, hold)
-			} else hold(null, error)
+		if (!toAccount.isValid(false)) {
+			hold(null, AccountError.InvalidAccountName)
+		} else {
+			BaseTradingPresenter.prepareTransaction(
+				context,
+				amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
+				contract,
+				false
+			) { privateKey, error ->
+				if (error.isNone() && privateKey.isNotNull()) {
+					transfer(privateKey, hold)
+				} else hold(null, error)
+			}
 		}
 	}
 

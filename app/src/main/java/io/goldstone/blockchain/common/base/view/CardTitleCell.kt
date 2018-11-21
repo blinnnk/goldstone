@@ -27,7 +27,7 @@ open class CardTitleCell(context: Context) : TopBottomLineCell(context) {
 		leftPadding = PaddingSize.card
 		rightPadding = PaddingSize.card
 		bottomPadding = 10.uiPX()
-		textSize = fontSize(12)
+		textSize = fontSize(14)
 		typeface = GoldStoneFont.heavy(context)
 		textColor = GrayScale.black
 		layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)

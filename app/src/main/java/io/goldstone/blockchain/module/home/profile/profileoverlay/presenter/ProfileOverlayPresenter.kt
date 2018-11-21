@@ -79,7 +79,7 @@ class ProfileOverlayPresenter(
 
 	fun showWalletAddingMethodDashboard() {
 		Dashboard(fragment.context!!) {
-			showDashboard(
+			showGrid(
 				"Wallet Management",
 				GridIconTitleAdapter(GridIconTitleModel.getWalletManagementMenu()) {
 					when (it.name) {

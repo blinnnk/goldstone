@@ -9,6 +9,7 @@ import android.util.Log
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -36,7 +37,7 @@ class GoldStoneServerUnitTest {
 	fun searchTokenBySymbolOrContract() {
 		// Change any symbol or contract value to test the result
 		val symbolOrContract = "t"
-		GoldStoneAPI.getTokenInfoBySymbolFromServer(symbolOrContract) { tokens, error ->
+		GoldStoneAPI.getTokenInfoBySymbol(symbolOrContract, Current.supportChainIDs()) { tokens, error ->
 			LogUtil.debug("$position GetSearchToken $error", tokens.toString())
 			// it must has result with `t` value by contract, if result is empty will be failed
 			assertTrue("Search token with `tr` by symbol or contract is empty", tokens.isNullOrEmpty())

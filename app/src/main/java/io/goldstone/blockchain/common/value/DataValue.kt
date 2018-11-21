@@ -18,3 +18,4 @@ object Count {
 }
 
 data class PageInfo(val from: Int, val to: Int, val maxDataIndex: Int, val total: Int) : Serializable
+

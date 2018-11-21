@@ -12,7 +12,6 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
-import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -32,7 +31,6 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.crypto.multichain.orEmpty
-import io.goldstone.blockchain.kernel.database.BigintegerConverter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.view.GasEditorFragment
@@ -66,7 +64,7 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 		parentFragment as? TokenDetailOverlayFragment
 	}
 
-	val paymentModel by lazy {
+	private val paymentModel by lazy {
 		arguments?.getSerializable(ArgumentKey.btcSeriesPrepareModel)
 			?: arguments?.getSerializable(ArgumentKey.gasPrepareModel)
 	}
@@ -88,23 +86,15 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 	}
 
 	override fun showLoading(status: Boolean) {}
-	override fun showError(error: Throwable) {
-		ErrorDisplayManager(error).show(context)
-	}
-
+	override fun showError(error: Throwable) = ErrorDisplayManager(error).show(context)
 	override fun getCustomFee(): GasFee {
 		return arguments?.getSerializable(ArgumentKey.gasEditor) as? GasFee
 			?: if (token?.contract.isBTCSeries()) GasFee(getGasLimit(), GasFee.recommendPrice, MinerFeeType.Recommend)
 			else GasFee(getGasLimit(), GasFee.recommendPrice, MinerFeeType.Recommend)
 	}
 
-	override fun clearGasLayout() {
-		gasLayout.removeAllViews()
-	}
-
-	override fun getMemo(): String {
-		return (paymentModel as? PaymentDetailModel)?.memo.orEmpty()
-	}
+	override fun clearGasLayout() = gasLayout.removeAllViews()
+	override fun getMemo(): String = (paymentModel as? PaymentDetailModel)?.memo.orEmpty()
 
 	override fun getTransferCount(): BigInteger? {
 		return when {
@@ -123,10 +113,7 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 	}
 
 	override fun getGasLayout() = gasLayout
-
-	override fun showSpendingValue(value: String) {
-		spendingCell.setSubtitle(value)
-	}
+	override fun showSpendingValue(value: String) = spendingCell.setSubtitle(value)
 
 	private fun goToGasEditorFragment() {
 		overlayFragment?.apply {
@@ -151,9 +138,7 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		getParentFragment<TokenDetailOverlayFragment>()?.apply {
-			presenter.popFragmentFrom<GasSelectionFragment>()
-		}
+		overlayFragment?.presenter?.popFragmentFrom<GasSelectionFragment>()
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

@@ -122,8 +122,6 @@ fun BigInteger.convertToTimeUnit(): String {
 	return result suffix diskUnit
 }
 
-fun Double.isSameValueAsInt(): Boolean = toString().substringAfterLast(".").toInt() == 0
-
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
 
 @UiThread

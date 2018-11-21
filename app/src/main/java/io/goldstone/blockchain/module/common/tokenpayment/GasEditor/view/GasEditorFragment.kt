@@ -10,10 +10,12 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasEditorPresenter
@@ -96,11 +98,22 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 
 	// 第三方键盘无法被设置为纯数字输入, 这里做额外的检测,
 	// 保证输入的值是数字格式.
+	private var hasShowError = false
 	private fun setProcessValue() {
 		with(gasPriceInput) {
 			afterTextChanged = Runnable {
 				checkNumberValue(false) {
-					gasPrice = if (getContent().isEmpty()) 0L else getContent().toLong()
+					// 因为 `Input` 是 `String` 格式输入, 用户可能输入超过 `21` 个 `0` 导致转 `Long` 类型出问题
+					// 用 `Try Catch` 捕捉
+					gasPrice = if (getContent().isEmpty()) 0L else try {
+						getContent().toLong()
+					} catch (error: Exception) {
+						if (!hasShowError) {
+							safeShowError(Throwable(TransferError.InvalidBigNumber))
+							hasShowError = true
+						}
+						0L
+					}
 				}
 			}
 		}

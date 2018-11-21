@@ -173,9 +173,7 @@ fun Double.formatCurrency(): String {
 fun Double.formatCount(count: Int = 9): String {
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = count
-	val value = formatEditor.format(this).toDouble()
-	val prefix = if (value >= 1.0) "" else if (value == 0.0) "0." else "0"
-	return prefix + formatEditor.format(this)
+	return formatEditor.format(this).toBigDecimal().toPlainString()
 }
 
 fun Double.formatDecimal(count: Int = 9): Double {

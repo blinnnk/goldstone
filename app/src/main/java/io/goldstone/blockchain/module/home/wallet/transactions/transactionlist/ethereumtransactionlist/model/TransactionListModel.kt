@@ -109,7 +109,7 @@ data class TransactionListModel(
 		data.blockNumber,
 		data.hash,
 		data.memo,
-		data.minerFee + getUnitSymbol(data.symbol), // 计算燃气费使用情况
+		data.minerFee, // 计算燃气费使用情况
 		generateTransactionURL(
 			data.hash,
 			if (data.contractAddress.equals(TokenContract.etcContract, true))
@@ -148,7 +148,7 @@ data class TransactionListModel(
 		data.blockNumber,
 		data.hash,
 		"",
-		"${data.fee.toDouble().toBigDecimal()} ${data.symbol}",
+		data.fee.toDouble().toBigDecimal().toPlainString(),
 		generateTransactionURL(data.hash, TokenContract.BTC, false),
 		data.isPending,
 		data.timeStamp,
@@ -224,12 +224,6 @@ data class TransactionListModel(
 				}
 				else -> listOf(EtherScanApi.transactionDetail(taxHash))
 			}
-		}
-
-		private fun getUnitSymbol(symbol: String): String {
-			return " " + if (symbol.equals(CoinSymbol.etc, true))
-				CoinSymbol.etc
-			else CoinSymbol.eth
 		}
 	}
 }

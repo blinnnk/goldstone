@@ -243,13 +243,13 @@ object TokenDetailText {
 	}
 
 	@JvmField
-	val hideSmall = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Hide Small (< 0.001)"
-		HoneyLanguage.Chinese.code -> "Hide Small (< 0.001)"
-		HoneyLanguage.Japanese.code -> "Hide Small (< 0.001)"
-		HoneyLanguage.Korean.code -> "Hide Small (< 0.001)"
-		HoneyLanguage.Russian.code -> "Hide Small (< 0.001)"
-		HoneyLanguage.TraditionalChinese.code -> "Hide Small (< 0.001)"
+	val showSmall = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Show Small (< 0.001)"
+		HoneyLanguage.Chinese.code -> "Show Small (< 0.001)"
+		HoneyLanguage.Japanese.code -> "Show Small (< 0.001)"
+		HoneyLanguage.Korean.code -> "Show Small (< 0.001)"
+		HoneyLanguage.Russian.code -> "Show Small (< 0.001)"
+		HoneyLanguage.TraditionalChinese.code -> "Show Small (< 0.001)"
 		else -> ""
 	}
 
