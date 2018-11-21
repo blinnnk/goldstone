@@ -71,17 +71,15 @@ class EOSAccountRegisterPresenter(
 					if (error.hasError()) callback(null, error)
 					else BaseTradingPresenter.prepareTransaction(
 						fragment.context,
-						creatorAccount,
-						validAccount!!,
 						totalSpent,
 						TokenContract.EOS,
 						false
 					) { privateKey, privateKeyError ->
-						if (error.isNone() && privateKey != null) {
+						if (error.isNone() && privateKey.isNotNull()) {
 							EOSRegisterTransaction(
 								SharedChain.getEOSCurrent().chainID,
 								EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
-								validAccount.accountName,
+								validAccount!!.accountName,
 								validPublicKey.orEmpty(),
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),

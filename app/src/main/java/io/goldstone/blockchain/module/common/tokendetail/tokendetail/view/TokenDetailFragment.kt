@@ -49,7 +49,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	private var filterConditions = listOf(
 		TokenDetailText.totalReceived,
 		TokenDetailText.totalSent,
-		TokenDetailText.hideSmall,
+		TokenDetailText.showSmall,
 		TokenDetailText.fee,
 		TokenDetailText.failed
 	)

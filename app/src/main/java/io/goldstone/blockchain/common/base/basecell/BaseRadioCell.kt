@@ -10,6 +10,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.imageResource
@@ -26,10 +27,10 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		radioButton.isChecked = checkedStatus
 	}
 	protected val title = TextView(context).apply {
-		x = 50.uiPX().toFloat()
+		x = 60.uiPX().toFloat()
 		textSize = fontSize(15)
 		textColor = GrayScale.black
-		typeface = GoldStoneFont.medium(context)
+		typeface = GoldStoneFont.heavy(context)
 	}
 	private var radioButton: RadioButton
 	protected var icon: ImageView? = null
@@ -37,10 +38,10 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 	init {
 		hasArrow = false
 		setGrayStyle()
-		setHorizontalPadding()
 		this.addView(title)
 		title.centerInVertical()
 		radioButton = radioButton().apply {
+			x -= PaddingSize.device
 			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 			alignParentRight()
@@ -51,7 +52,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 
 	override fun onAttachedToWindow() {
 		super.onAttachedToWindow()
-		if (icon.isNull()) title.x = 0f
+		if (icon.isNull()) title.x = PaddingSize.device.toFloat()
 	}
 
 	fun setSwitchStatusBy(isSelected: Boolean) {
@@ -61,20 +62,19 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 	fun showIcon(image: Int, color: Int = GrayScale.whiteGray) {
 		if (icon.isNull()) {
 			icon = ImageView(context).apply {
+				imageResource = image
 				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
 				addCorner(17.uiPX(), color)
+				elevation = 2.uiPX().toFloat()
+				x = PaddingSize.device.toFloat()
 			}
 			icon?.into(this)
 			icon?.centerInVertical()
 		}
-		icon?.imageResource = image
 	}
 
 	fun setTitle(text: String) {
 		title.text = text
 	}
 
-	fun getTitle(): String {
-		return title.text.toString()
-	}
 }

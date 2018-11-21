@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.kernel.network.eos.eosram
 
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
@@ -36,7 +36,7 @@ class EOSBuyRamTransaction(
 		)
 
 		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
-			if (header != null && error.isNone()) {
+			if (header.isNotNull()&& error.isNone()) {
 				// 准备 Action
 				//  `contextFreeActions` 目前只有空的状态
 				val contextFreeActions = listOf<String>()

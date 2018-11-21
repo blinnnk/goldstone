@@ -26,7 +26,7 @@ import org.jetbrains.anko.wrapContent
  */
 
 class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
-	private val dialog = MaterialDialog(context)
+	val dialog = MaterialDialog(context)
 
 	init {
 		dialog.window.setLayout(ScreenSize.overlayContentWidth, wrapContent)
@@ -42,7 +42,16 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 
 	fun dismiss() = dialog.dismiss()
 
-	fun <T, C : View> showDashboard(title: String, adapter: HoneyBaseAdapter<T, C>) {
+	fun <T, C : View> showList(title: String, adapter: HoneyBaseAdapter<T, C>) {
+		with(dialog) {
+			title(text = title)
+			customListAdapter(adapter)
+			negativeButton(text = CommonText.gotIt)
+			show()
+		}
+	}
+
+	fun <T, C : View> showGrid(title: String, adapter: HoneyBaseAdapter<T, C>) {
 		with(dialog) {
 			title(text = title)
 			customListAdapter(adapter)
@@ -55,6 +64,7 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 
 	fun <T : View> showDashboard(title: String, customView: T, message: String, hold: (T) -> Unit, cancelAction: () -> Unit) {
 		with(dialog) {
+			cancelOnTouchOutside(false)
 			title(text = title)
 			message(text = message)
 			customView(view = customView)
