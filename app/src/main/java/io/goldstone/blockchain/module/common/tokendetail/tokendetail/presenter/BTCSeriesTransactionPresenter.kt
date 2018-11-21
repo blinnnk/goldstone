@@ -132,7 +132,7 @@ fun TokenDetailPresenter.getBTCSeriesData() {
 				btcSeriesDao.getDataByRange(
 					getAddress(),
 					getChainType().id,
-					startDataIndex - io.goldstone.blockchain.common.value.DataValue.pageCount,
+					startDataIndex - DataValue.pageCount,
 					startDataIndex
 				)
 			when {

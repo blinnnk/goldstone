@@ -11,3 +11,9 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.event
  * 更新 `TokenDetail` 列面 里面账单的 `Pending` 状态
  */
 data class TokenDetailEvent(val hasConfirmed: Boolean)
+
+/**
+ * 这个是当 `ParentFragment` 隐藏或恢复的时候控制 `Filter Button` 的
+ * 事件显示的通知
+ */
+data class FilterButtonDisplayEvent(val status: Boolean)

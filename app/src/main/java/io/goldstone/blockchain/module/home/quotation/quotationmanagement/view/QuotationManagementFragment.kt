@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.PairUpdateEvent
-import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.QuotationUpdateEvent
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.presenter.QuotationManagementPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -32,9 +31,8 @@ class QuotationManagementFragment :
 
 	override fun onDestroy() {
 		super.onDestroy()
-		presenter.updateQuotationDataChanged {
-			EventBus.getDefault().post(QuotationUpdateEvent(true))
-		}
+		presenter.updateQuotationDataChanged()
+		presenter.notifyQuotationDataChanged()
 		EventBus.getDefault().unregister(this)
 	}
 

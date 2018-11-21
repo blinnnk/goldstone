@@ -304,6 +304,17 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 		}
 	}
 
+	inline fun <reified T : HoneyBaseAdapterWithHeaderAndFooter<D, *, *, *>> updateAdapterDataSet(newData: ArrayList<D>, callback: () -> Unit = {}) {
+		getAdapter<T>()?.apply {
+			if (newData.isNotEmpty()) removeEmptyView()
+			else showEmptyView()
+			dataSet.clear()
+			dataSet.addAll(newData)
+			notifyDataSetChanged()
+			callback()
+		}
+	}
+
 	inline fun <reified T : HoneyBaseAdapter<D, *>> updateSingleCellAdapterData(newData: ArrayList<D>, callback: () -> Unit = {}) {
 		getAdapter<T>()?.apply {
 			// Comparison the data, if they are different then update adapter

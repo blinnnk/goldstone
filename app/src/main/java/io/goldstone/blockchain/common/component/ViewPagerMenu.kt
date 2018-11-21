@@ -46,7 +46,7 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 	private val barHeight = 45.uiPX()
 	private var underLineLeft = 0f
 	private var underLineWidth = 0f
-	private val boderSize = fontSize(4)
+	private val borderSize = fontSize(4)
 	
 	init {
 		setWillNotDraw(false)
@@ -55,10 +55,10 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		elevation = 3.uiPX().toFloat()
 	}
 	
-	fun setMemnuTitles(titles: ArrayList<String>, hold: (button: TextView, index: Int) -> Unit) {
+	fun setMenuTitles(titles: ArrayList<String>, hold: (button: TextView, index: Int) -> Unit) {
 		this.titles = titles
-		(0 until titles.size).forEach {
-			findViewById<TextView>(it)?.let {
+		(0 until titles.size).forEach { index ->
+			findViewById<TextView>(index)?.let {
 				hold(it, it.id)
 			}
 		}
@@ -69,9 +69,9 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		paint.color = Spectrum.lightBlue
 		canvas?.drawLine(
 			underLineLeft,
-			height - boderSize,
+			height - borderSize,
 			underLineLeft + underLineWidth,
-			height - boderSize,
+			height - borderSize,
 			paint
 		)
 	}
