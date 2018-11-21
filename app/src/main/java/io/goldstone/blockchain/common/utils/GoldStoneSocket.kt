@@ -93,7 +93,6 @@ abstract class GoldStoneWebSocket(private val closeMessage: String) : WebSocketL
 
 	override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
 		super.onClosed(webSocket, code, reason)
-//		closeSocket()
 		isConnected = false
 		Log.v(tag, "$closeMessage onClosed")
 	}
