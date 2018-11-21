@@ -7,24 +7,24 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.contract.RAMMarketDetailContract
-import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
-import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.*
-import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.*
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.saveCandleDataToDatabase
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.updateRAMCandleData
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.EOSRAMPriceInfoView
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.RAMPriceChartAndMenuView
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view.QuotationViewPager
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.*
-import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.tradeRAM
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
+import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.UI
 import java.math.BigDecimal
@@ -95,7 +95,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 							}
 						} else {
 							GoldStoneAPI.context.runOnUiThread {
-								alert(error.message)
+								this@RAMMarketDetailFragment.context.alert(error.message)
 							}
 						}
 					}

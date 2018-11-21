@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter
 
 import android.content.Context
 import com.blinnnk.extension.isNull
+import com.blinnnk.extension.toDoubleOrZero
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -96,7 +97,7 @@ fun RAMMarketDetailPresenter.tradeRAM(
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (stakeType == StakeType.BuyRam) {
-					if (amount > localData.balance.toDouble()) {
+					if (amount > localData.balance.toDoubleOrZero()) {
 						GoldStoneAPI.context.runOnUiThread {
 							context.alert(EOSRAMExchangeText.noEnoughEOS)
 						}
