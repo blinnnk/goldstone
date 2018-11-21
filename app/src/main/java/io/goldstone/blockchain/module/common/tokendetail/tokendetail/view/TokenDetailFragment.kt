@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.crypto.multichain.isEOSSeries
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.FilterButtonDisplayEvent
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent
@@ -45,19 +46,15 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	private val overlayFragment by lazy {
 		getGrandFather<TokenDetailOverlayFragment>()
 	}
-	private val filterConditions = listOf(
+	private var filterConditions = listOf(
 		TokenDetailText.totalReceived,
 		TokenDetailText.totalSent,
+		TokenDetailText.hideSmall,
 		TokenDetailText.fee,
 		TokenDetailText.failed
 	)
 
-	private var currentFilterConditions = listOf(
-		TokenDetailText.totalReceived,
-		TokenDetailText.totalSent,
-		TokenDetailText.fee,
-		TokenDetailText.failed
-	)
+	private var currentFilterConditions = listOf<String>()
 
 	override fun removeEmptyView() = launchUI {
 		super.removeEmptyView()
@@ -102,11 +99,15 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		asyncData = arrayListOf()
 		overlayFragment?.showFilterButton(true) {
 			showFilterDashboard()
 		}
 		token?.let {
+			// 初始化相关数据
+			asyncData = arrayListOf()
+			if (it.contract.isEOSSeries()) filterConditions = filterConditions.dropLast(2)
+			currentFilterConditions = filterConditions
+			// 初始化 `Presenter`
 			presenter = TokenDetailPresenter(it, this)
 			presenter.start()
 		}
@@ -148,6 +149,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 					val booleans = listOf(
 						it.isReceived && !it.isFee,
 						!it.isReceived && !it.isFee,
+						it.count > 0.001,
 						it.isFee,
 						it.hasError
 					)
@@ -208,7 +210,9 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 			) { conditions ->
 				currentFilterConditions = conditions
 				asyncData?.let {
-					updateAdapterDataSet<TokenDetailAdapter>(filterData(Collections.synchronizedList(it)).toArrayList())
+					val showData = filterData(it)
+					if (showData.isEmpty()) showFilterLoadMoreAttention(asyncData?.size.orZero())
+					updateAdapterDataSet<TokenDetailAdapter>(showData.toArrayList())
 				}
 			}
 		}
