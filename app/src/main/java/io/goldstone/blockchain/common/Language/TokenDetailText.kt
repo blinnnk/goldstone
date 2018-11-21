@@ -77,6 +77,16 @@ object TokenDetailText {
 		else -> ""
 	}
 	@JvmField
+	val filterConditions = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Transaction Filter Conditions"
+		HoneyLanguage.Chinese.code -> "Transaction Filter Conditions"
+		HoneyLanguage.Japanese.code -> "Transaction Filter Conditions"
+		HoneyLanguage.Korean.code -> "Transaction Filter Conditions"
+		HoneyLanguage.Russian.code -> "Transaction Filter Conditions"
+		HoneyLanguage.TraditionalChinese.code -> "Transaction Filter Conditions"
+		else -> ""
+	}
+	@JvmField
 	val transferToLocalWalletAlertDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This will transfer value to an address already in one of your wallets. Are you sure?"
 		HoneyLanguage.Chinese.code -> "这个地址也在GoldStone钱包中。你确定要给这个地址转账吗？"
@@ -207,6 +217,39 @@ object TokenDetailText {
 		HoneyLanguage.Korean.code -> "총 보낸"
 		HoneyLanguage.Russian.code -> "Всего отправлено"
 		HoneyLanguage.TraditionalChinese.code -> "總發送"
+		else -> ""
+	}
+
+	@JvmField
+	val fee = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Fee"
+		HoneyLanguage.Chinese.code -> "Fee"
+		HoneyLanguage.Japanese.code -> "Fee"
+		HoneyLanguage.Korean.code -> "Fee"
+		HoneyLanguage.Russian.code -> "Fee"
+		HoneyLanguage.TraditionalChinese.code -> "Fee"
+		else -> ""
+	}
+
+	@JvmField
+	val failed = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Failed"
+		HoneyLanguage.Chinese.code -> "Failed"
+		HoneyLanguage.Japanese.code -> "Failed"
+		HoneyLanguage.Korean.code -> "Failed"
+		HoneyLanguage.Russian.code -> "Failed"
+		HoneyLanguage.TraditionalChinese.code -> "Failed"
+		else -> ""
+	}
+
+	@JvmField
+	val hideSmall = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Hide Small (< 0.001)"
+		HoneyLanguage.Chinese.code -> "Hide Small (< 0.001)"
+		HoneyLanguage.Japanese.code -> "Hide Small (< 0.001)"
+		HoneyLanguage.Korean.code -> "Hide Small (< 0.001)"
+		HoneyLanguage.Russian.code -> "Hide Small (< 0.001)"
+		HoneyLanguage.TraditionalChinese.code -> "Hide Small (< 0.001)"
 		else -> ""
 	}
 
@@ -513,7 +556,8 @@ object TokenDetailText {
 
 	// 资源交易的page title
 	@JvmField
-	val tradingCPU = when (currentLanguage) {  HoneyLanguage.English.code -> "Delegate / Refund CPU"
+	val tradingCPU = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delegate / Refund CPU"
 		HoneyLanguage.Chinese.code -> "代理/赎回 CPU"
 		HoneyLanguage.Japanese.code -> "デリゲート/返金 CPU"
 		HoneyLanguage.Korean.code -> "대의원 / 환불 CPU"
@@ -522,7 +566,8 @@ object TokenDetailText {
 		else -> ""
 	}
 	@JvmField
-	val tradingNET = when (currentLanguage) {  HoneyLanguage.English.code -> "Delegate / Refund NET"
+	val tradingNET = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delegate / Refund NET"
 		HoneyLanguage.Chinese.code -> "代理/赎回 NET"
 		HoneyLanguage.Japanese.code -> "デリゲート/返金 NET"
 		HoneyLanguage.Korean.code -> "대의원 / 환불 NET"
@@ -531,7 +576,8 @@ object TokenDetailText {
 		else -> ""
 	}
 	@JvmField
-	val tradingRAM = when (currentLanguage) {  HoneyLanguage.English.code -> "Buy / Sell RAM"
+	val tradingRAM = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Buy / Sell RAM"
 		HoneyLanguage.Chinese.code -> "买入/卖出 RAM"
 		HoneyLanguage.Japanese.code -> "購入/販売 RAM"
 		HoneyLanguage.Korean.code -> "구입 / 판매 RAM"

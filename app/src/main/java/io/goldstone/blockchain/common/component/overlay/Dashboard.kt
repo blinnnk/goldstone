@@ -9,6 +9,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
+import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.blinnnk.base.HoneyBaseAdapter
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.CornerSize
@@ -68,7 +69,12 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 		}
 	}
 
-	fun showAlert(title: String, message: String, cancelAction: () -> Unit, confirmAction: () -> Unit) {
+	fun showAlert(
+		title: String,
+		message: String,
+		cancelAction: () -> Unit = {},
+		confirmAction: () -> Unit
+	) {
 		with(dialog) {
 			title(text = title)
 			message(text = message)
@@ -78,6 +84,30 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 			negativeButton(text = CommonText.cancel) {
 				cancelAction()
 			}
+			show()
+		}
+	}
+
+	fun showMultiChoice(
+		title: String,
+		data: List<String>,
+		defaultIndexes: IntArray,
+		confirmAction: (List<String>) -> Unit
+	) {
+		var selectedItems = listOf<String>()
+		with(dialog) {
+			title(text = title)
+			listItemsMultiChoice(
+				items = data,
+				initialSelection = defaultIndexes,
+				waitForPositiveButton = false
+			) { _, _, items ->
+				selectedItems = items
+			}
+			positiveButton(text = CommonText.confirm) {
+				confirmAction(selectedItems)
+			}
+			negativeButton(text = CommonText.cancel)
 			show()
 		}
 	}

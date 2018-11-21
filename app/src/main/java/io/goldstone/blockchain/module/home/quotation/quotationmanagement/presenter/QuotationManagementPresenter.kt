@@ -6,12 +6,15 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
+import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.QuotationUpdateEvent
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementAdapter
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
 
 /**
  * @date 21/04/2018 3:58 PM
@@ -21,14 +24,19 @@ class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
 
+
+	private var initDataMD5: String? = null
+
 	override fun updateData() {
 		GlobalScope.launch(Dispatchers.Default) {
-			val selections = QuotationSelectionTable.dao.getAll()
-			selections.sortedByDescending { it.orderID }.toArrayList().let { orderedData ->
-				launchUI {
-					if (fragment.asyncData.isNull()) fragment.asyncData = orderedData
-					else diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(orderedData)
-				}
+			val selections =
+				QuotationSelectionTable.dao.getAllByOrderID().toArrayList()
+			if (initDataMD5.isNull()) {
+				initDataMD5 = selections.map { it.pair }.toString().getObjectMD5HexString()
+			}
+			launchUI {
+				if (fragment.asyncData.isNull()) fragment.asyncData = selections
+				else diffAndUpdateSingleCellAdapterData<QuotationManagementAdapter>(selections)
 			}
 		}
 	}
@@ -37,13 +45,25 @@ class QuotationManagementPresenter(
 		fragment.updateSelectionOrderID()
 	}
 
-	fun updateQuotationDataChanged(callback: () -> Unit) {
+	/**
+	 *  比对管理的结果和初始进入的值是否一样, 如果一样才通知 Quotation 更新数据
+	 *  因为 Quotation 包括数据更新, 和长链接重请求. 一方面是用户体验看到的闪烁
+	 *  一方面是性能. 所以这里做了一次 `MD5` 比对. 确认数据变化后才执行.
+	 */
+	fun notifyQuotationDataChanged() {
+		val new = fragment.asyncData?.map { it.pair }.toString().getObjectMD5HexString()
+		if (new != initDataMD5) {
+			EventBus.getDefault().post(QuotationUpdateEvent(true))
+		}
+	}
+
+	fun updateQuotationDataChanged() {
 		GlobalScope.launch(Dispatchers.Default) {
-			val turnOffData = fragment.asyncData?.filter { !it.isSelecting }
+			val turnOffData =
+				fragment.asyncData?.filter { !it.isSelecting }
 			if (!turnOffData.isNullOrEmpty()) {
 				QuotationSelectionTable.dao.deleteAll(turnOffData)
-				callback()
-			} else callback()
+			}
 		}
 	}
 

@@ -16,7 +16,8 @@ class QuotationManagementAdapter(
 	private val switchEvent: (model: QuotationSelectionTable, isChecked: Boolean) -> Unit
 ) : HoneyBaseAdapter<QuotationSelectionTable, QuotationManagementCell>() {
 
-	override fun generateCell(context: Context) = QuotationManagementCell(context)
+	override fun generateCell(context: Context) =
+		QuotationManagementCell(context)
 
 	override fun QuotationManagementCell.bindCell(data: QuotationSelectionTable, position: Int) {
 		quotationSearchModel = data

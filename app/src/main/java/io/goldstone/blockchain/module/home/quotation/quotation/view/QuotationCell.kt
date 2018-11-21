@@ -34,8 +34,6 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 	var model: QuotationModel by observing(QuotationModel()) {
 		val price = if (model.price == ValueTag.emptyPrice) model.price
 		else model.price.toDoubleOrNull()?.toBigDecimal()?.toPlainString()
-		// 如果价格没有变动就不用乡下执行了
-		if (price?.toDoubleOrNull().orZero() == previousPrice) return@observing
 		tokenInfo.title.text = model.pairDisplay.toUpperCase()
 		tokenInfo.subtitle.text = model.name
 		tokenPrice.title.text = CustomTargetTextStyle(
@@ -48,6 +46,15 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		)
 
 		tokenPrice.subtitle.text = model.percent + "%"
+		lineChart.resetDataWithTargetLabelCount(
+			model.chartData.mapIndexed { index, chartPoint ->
+				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
+			}.toArrayList()
+		)
+		exchangeName.text = model.exchangeName
+		// 如果价格没有变动就不用乡下执行了
+		if (price?.toDoubleOrNull().orZero() == previousPrice) return@observing
+		previousPrice = price?.toDoubleOrNull().orZero()
 		when {
 			model.isDisconnected -> {
 				tokenPrice.setColorStyle(GrayScale.midGray)
@@ -64,15 +71,6 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				lineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
-
-		lineChart.resetDataWithTargetLabelCount(
-			model.chartData.mapIndexed { index, chartPoint ->
-				Entry(index.toFloat(), chartPoint.value, chartPoint.label)
-			}.toArrayList()
-		)
-
-		exchangeName.text = model.exchangeName
-		previousPrice = price?.toDoubleOrNull().orZero()
 	}
 	private val tokenInfo by lazy {
 		TwoLineTitles(context).apply {

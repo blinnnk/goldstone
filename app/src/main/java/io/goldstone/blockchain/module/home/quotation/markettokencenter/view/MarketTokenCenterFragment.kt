@@ -52,7 +52,7 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 			addView(viewPager, RelativeLayout.LayoutParams(ScreenSize.heightWithOutHeader, matchParent))
 			viewPager.apply {
 				// `MenuBar` 点击选中动画和内容更换
-				menuBar.setMemnuTitles(menuTitles) { button, id ->
+				menuBar.setMenuTitles(menuTitles) { button, id ->
 					button.onClick {
 						currentItem = id
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)

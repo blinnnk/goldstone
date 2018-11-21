@@ -2,9 +2,12 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.ConcurrentAsyncCombine
-import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -44,67 +47,12 @@ class TokenDetailPresenter(
 		loadLocalData(true)
 	}
 
-	private var allData: List<TransactionListModel>? = null
 	var totalCount: Int? = null
 	var currentMaxCount: Int? = null
 
 	override fun loadMore() {
-		if (detailView.currentMenu != CommonText.all) return
 		detailView.showBottomLoading(true)
 		loadLocalData(false)
-	}
-
-	override fun showOnlyReceiveData() {
-		fun sortData() {
-			allData?.filter { it.isReceived }?.let {
-				detailView.updateDataChange(it.toArrayList())
-				if (it.isEmpty()) detailView.showBottomLoading(false)
-			}
-		}
-		if (token.contract.isEOSSeries() && allData.isNullOrEmpty()) {
-			GlobalScope.launch(Dispatchers.Default) {
-				currentMaxCount = totalCount
-				detailView.getDetailAdapter()?.dataSet?.clear()
-				flipEOSPage { sortData() }
-			}
-		} else sortData()
-	}
-
-	override fun showOnlyFailedData() {
-		allData?.filter { it.hasError }?.let {
-			detailView.updateDataChange(it.toArrayList())
-			if (it.isEmpty()) detailView.showBottomLoading(false)
-		}
-	}
-
-	override fun showOnlySentData() {
-		fun sortData() {
-			allData?.filter { !it.isReceived && !it.isFee }?.let {
-				detailView.updateDataChange(it.toArrayList())
-				if (it.isEmpty()) detailView.showBottomLoading(false)
-			}
-		}
-		if (token.contract.isEOSSeries() && allData.isNullOrEmpty()) {
-			GlobalScope.launch(Dispatchers.Default) {
-				currentMaxCount = totalCount
-				detailView.getDetailAdapter()?.dataSet?.clear()
-				flipEOSPage { sortData() }
-			}
-		} else sortData()
-	}
-
-	override fun showAllData() {
-		fun sortData() {
-			allData?.let {
-				detailView.updateDataChange(it.toArrayList())
-				if (it.isEmpty()) detailView.showBottomLoading(false)
-			}
-		}
-		if (token.contract.isEOSSeries()) GlobalScope.launch(Dispatchers.Default) {
-			currentMaxCount = totalCount
-			detailView.getDetailAdapter()?.dataSet?.clear()
-			flipEOSPage { sortData() }
-		} else sortData()
 	}
 
 	@WorkerThread
@@ -143,7 +91,7 @@ class TokenDetailPresenter(
 				when {
 					isBTCSeries() -> getBTCSeriesData()
 					isETHSeries() -> getETHSeriesData()
-					isEOSSeries() -> if (isRefresh) getEOSSeriesData() else  {
+					isEOSSeries() -> if (isRefresh) getEOSSeriesData() else {
 						if (
 							totalCount == null
 							|| currentMaxCount == null
@@ -239,14 +187,21 @@ class TokenDetailPresenter(
 		}
 
 		checkAddressNameInContacts(newData) {
-			detailView.asyncData?.addAll(newData)
-			detailView.getDetailAdapter()?.dataSet = detailView.asyncData.orEmptyArray()
-			val totalCount = detailView.asyncData?.size.orZero()
-			allData = detailView.asyncData
-			detailView.removeEmptyView()
-			val startPosition = totalCount - data.size.orZero() + 1
-			detailView.notifyDataRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
-			callback()
+			with(detailView) {
+				asyncData?.addAll(newData)
+				// 这个 Filter Data 是服务筛选数据用的, 只修改显示数据不修改内存数据
+				val showData = filterData(asyncData)
+				val showNewData = filterData(newData)
+				launchUI {
+					if (showNewData.isEmpty()) detailView.showFilterLoadMoreAttention(asyncData?.size.orZero())
+					getDetailAdapter()?.dataSet = showData.toArrayList()
+					val totalCount = showData.size
+					if (showData.isNotEmpty()) removeEmptyView()
+					val startPosition = totalCount - showNewData.size.orZero() + 1
+					notifyDataRangeChanged(if (startPosition < 1) 1 else startPosition, totalCount)
+					callback()
+				}
+			}
 		}
 	}
 

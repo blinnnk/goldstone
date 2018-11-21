@@ -1,9 +1,12 @@
 package io.goldstone.blockchain.module.common.walletimport.watchonly.view
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
+import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -21,11 +24,9 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.AddressType
-import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
-import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -58,23 +59,18 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				text = WatchOnlyText.intro
 			}.into(this)
 
-			typeSettings.apply {
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 20.uiPX()
-					bottomMargin = 10.uiPX()
-				}
-				setTitles(ImportWalletText.walletType, currentType)
-			}.click {
-				getParentContainer()?.apply {
-					PrivateKeyImportFragment.showWalletTypeDashboard(
-						context,
-						currentType
-					) { type ->
-						currentType = type
-						typeSettings.setTitles(ImportWalletText.walletType, type)
-					}
+			typeSettings.click {
+				showWalletTypeDashboard(context) { type ->
+					currentType = type
+					typeSettings.setTitles(ImportWalletText.walletType, type)
 				}
 			}.into(this)
+
+			typeSettings.setTitles(ImportWalletText.walletType, currentType)
+			typeSettings.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 20.uiPX()
+				bottomMargin = 10.uiPX()
+			}
 
 			nameInput.apply {
 				hint = UIUtils.generateDefaultName()
@@ -116,7 +112,24 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 		}
 	}
 
-	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
+	private fun showWalletTypeDashboard(context: Context, updateCurrentType: (String) -> Unit) {
+		val data = arrayListOf(
+			AddressType.ETHSeries.value,
+			AddressType.BTC.value,
+			AddressType.BTCSeriesTest.value,
+			AddressType.LTC.value,
+			AddressType.BCH.value,
+			AddressType.EOS.value,
+			AddressType.EOSJungle.value
+		)
+		val defaultIndex = data.indexOf(currentType)
+		MaterialDialog(context)
+			.title(text = "Wallet Type")
+			.listItemsSingleChoice(items = data, initialSelection = defaultIndex) { _, _, item ->
+				updateCurrentType(item)
+			}
+			.positiveButton(text = CommonText.confirm)
+			.negativeButton(text = CommonText.cancel)
+			.show()
 	}
 }

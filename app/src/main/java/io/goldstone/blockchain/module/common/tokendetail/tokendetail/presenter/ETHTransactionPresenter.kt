@@ -63,9 +63,15 @@ private fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -
 fun TokenDetailPresenter.getETHSeriesData() {
 	val address = token.contract.getAddress()
 	val dao = TransactionTable.dao
-	val endBlock = if (detailView.asyncData.isNullOrEmpty()) {
-		getMaxBlockNumber()
-	} else detailView.asyncData?.minBy { it.blockNumber }?.blockNumber!! - 1
+	val endBlock = try {
+		// 场景: 1 用户设定筛选条件,  2 超快速翻页
+		// 会出现数组线程不安全, 这里通过 `Try Catch` 捕捉, 并容错
+		if (detailView.asyncData.isNullOrEmpty()) {
+			getMaxBlockNumber()
+		} else detailView.asyncData?.minBy { it.blockNumber }?.blockNumber!! - 1
+	} catch (error: Exception) {
+		return
+	}
 	if (endBlock.hasValue()) {
 		val transactions =
 			if (token.contract.isETH()) dao.getETHAndAllFee(

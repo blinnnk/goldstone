@@ -51,6 +51,15 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			setLeftPosition()
 		}
 	}
+
+	private val filterButton by lazy {
+		HeaderIcon(context).apply {
+			id = ElementID.filterIcon
+			imageResource = R.drawable.icon_filter
+			setLeftPosition()
+		}
+	}
+
 	private val scanButton by lazy {
 		HeaderIcon(context).apply {
 			id = ElementID.scanButton
@@ -108,6 +117,16 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		} else if (isShow) {
 			closeButton.click { clickEvent() }
 		} else removeView(currentButton)
+	}
+
+	fun showFilterIcon(isShow: Boolean, action: () -> Unit) {
+		val currentButton = findViewById<ImageView>(ElementID.filterIcon)
+		if (currentButton == null) {
+			if (isShow) {
+				addView(filterButton.click { action() })
+			}
+		} else if (isShow) currentButton.click { action() }
+		else removeView(currentButton)
 	}
 
 	fun showScanButton(

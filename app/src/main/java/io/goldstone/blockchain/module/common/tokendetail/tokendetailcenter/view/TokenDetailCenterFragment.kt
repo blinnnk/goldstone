@@ -12,9 +12,11 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.isEOS
+import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.FilterButtonDisplayEvent
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.relativeLayout
@@ -53,7 +55,7 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 			addView(viewPager, RelativeLayout.LayoutParams(ScreenSize.heightWithOutHeader, matchParent))
 			viewPager.apply {
 				// `MenuBar` 点击选中动画和内容更换
-				menuBar.setMemnuTitles(menuTitles) { button, id ->
+				menuBar.setMenuTitles(menuTitles) { button, id ->
 					button.onClick {
 						currentItem = id
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)
@@ -72,5 +74,11 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 				}
 			}
 		}
+	}
+
+	override fun onHiddenChanged(hidden: Boolean) {
+		super.onHiddenChanged(hidden)
+		// `TokenDetailFragment` 的 左上角的 `Filter Button` 显示控制
+		EventBus.getDefault().post(FilterButtonDisplayEvent(!hidden))
 	}
 }
