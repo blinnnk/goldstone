@@ -316,13 +316,13 @@ object EOSAPI {
 	}
 
 	fun getDelegateBandWidthList(
-		accountName: String,
+		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
 		@WorkerThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", accountName),
+				Pair("scope", account.accountName),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "delband"),
 				Pair("json", true)

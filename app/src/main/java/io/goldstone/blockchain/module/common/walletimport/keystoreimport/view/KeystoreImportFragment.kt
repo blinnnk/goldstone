@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -22,6 +23,7 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
+import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
@@ -135,6 +137,9 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
+		if (activity.isNull()) {
+			getParentFragment<WalletImportFragment>()?.presenter
+				?.popFragmentFrom<KeystoreImportFragment>()
+		} else super.setBaseBackEvent(activity, parent)
 	}
 }

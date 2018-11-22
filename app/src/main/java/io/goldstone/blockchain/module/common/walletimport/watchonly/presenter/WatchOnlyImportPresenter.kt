@@ -215,7 +215,7 @@ class WatchOnlyImportPresenter(
 							)
 							SharedValue.updateIsTestEnvironment(false)
 							callback(error)
-						} else callback(error)
+						} else callback(AccountError.InactivatedAccountName)
 					}
 				}
 				else -> callback(AccountError.InactivatedAccountName)

@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.suffix
+import android.support.annotation.UiThread
+import com.blinnnk.extension.*
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -14,9 +16,12 @@ import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.contract.TokenAssetContract
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -30,30 +35,67 @@ class TokenAssetPresenter(
 	// 在详情界面有可能有 `Stake` 或 `Trade` 操作这里, 恢复显示的时候从
 	// 数据库更新一次信息
 	override fun start() {
-		if (NetworkUtil.hasNetwork(GoldStoneAPI.context))
-			showTransactionCount()
-		updateAccountInfo()
+		if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) updateAccountInfo()
+		setDelegateBandwidthEOSCount()
+		showTransactionCount()
+	}
+
+	private fun setDelegateBandwidthEOSCount() {
+		GlobalScope.launch(Dispatchers.Default) {
+			val totalDelegate = EOSAccountTable.dao.getAccount(
+				SharedAddress.getCurrentEOSAccount().accountName,
+				SharedChain.getEOSCurrent().chainID.id
+			)?.totalDelegateBandInfo
+			val description = if (totalDelegate.isNullOrEmpty()) {
+				"Check Data"
+			} else {
+				var totalEOSCount = listOf<String>()
+				totalDelegate.forEach {
+					totalEOSCount += it.cpuWeight
+					totalEOSCount += it.netWeight
+				}
+				val totalDelegateCount =
+					totalEOSCount.map { it.substringBefore(" ").toDoubleOrZero() }.sum()
+				totalDelegateCount.formatCount(4) suffix CoinSymbol.EOS.symbol
+			}
+			assetView.setEOSDelegateBandWidth(description)
+		}
+	}
+
+	override fun getDelegateBandWidthData(@UiThread hold: (ArrayList<DelegateBandWidthInfo>) -> Unit) {
+		val account = SharedAddress.getCurrentEOSAccount()
+		val chain = SharedChain.getEOSCurrent().chainID
+		load {
+			EOSAccountTable.dao.getAccount(account.accountName, chain.id)?.totalDelegateBandInfo
+		} then {
+			if (!it.isNullOrEmpty()) hold(it.toArrayList())
+			else EOSAPI.getDelegateBandWidthList(SharedAddress.getCurrentEOSAccount()) { data, error ->
+				if (data.isNotNull() && error.isNone()) {
+					EOSAccountTable.dao.updateDelegateBandwidthData(data, account.accountName, chain.id)
+					launchUI { hold(data.toArrayList()) }
+				} else assetView.showError(error)
+			}
+		}
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
 		val accountDao =
 			GoldStoneDataBase.database.eosAccountDao()
 		val account = SharedAddress.getCurrentEOSAccount()
-		fun showLocalAccounts() = GlobalScope.launch {
+		val chainID = SharedChain.getEOSCurrent().chainID
+		fun showLocalAccounts() = GlobalScope.launch(Dispatchers.Default) {
 			val localData =
-				async(Dispatchers.Default) {
-					accountDao.getAccount(account.accountName)
-				}
+				accountDao.getAccount(account.accountName, chainID.id)
 			// 首先显示数据库的数据在界面上
-			withContext(Dispatchers.Main) {
-				localData.await()?.updateUIValue()
+			launchUI {
+				localData?.updateUIValue()
 			}
 		}
 		if (onlyUpdateLocalData || !NetworkUtil.hasNetwork(GoldStoneAPI.context))
 			showLocalAccounts()
 		else EOSAPI.getAccountInfo(account) { eosAccount, error ->
-			if (eosAccount != null && error.isNone()) {
-				accountDao.insert(eosAccount)
+			if (eosAccount.isNotNull() && error.isNone()) {
+				EOSAccountTable.preventDuplicateInsert(eosAccount, chainID)
 				showLocalAccounts()
 			} else assetView.showError(error)
 		}
@@ -68,7 +110,7 @@ class TokenAssetPresenter(
 			EOSCodeName.EOSIOToken.value,
 			CoinSymbol.EOS
 		) { latestCount, error ->
-			if (latestCount != null && error.isNone()) launchUI {
+			if (latestCount.isNotNull() && error.isNone()) launchUI {
 				assetView.setTransactionCount(latestCount)
 			} else assetView.showError(error)
 		}

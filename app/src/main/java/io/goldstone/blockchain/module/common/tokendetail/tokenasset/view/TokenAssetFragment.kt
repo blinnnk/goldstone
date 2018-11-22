@@ -9,7 +9,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getGrandFather
+import com.blinnnk.extension.into
+import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
@@ -19,6 +22,8 @@ import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.overlay.Dashboard
+import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -74,6 +79,15 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			setSubtitle(CommonText.calculating)
 		}
 	}
+
+	private val delegateBandWidthCell by lazy {
+		GraySquareCell(context!!).apply {
+			showArrow()
+			setTitle(TokenDetailText.delband)
+			setSubtitle(CommonText.calculating)
+		}
+	}
+
 	private val transactionCountCell by lazy {
 		GraySquareCell(context!!).apply {
 			setTitle(TokenDetailText.transactionCount)
@@ -231,6 +245,10 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		refundsCell.setSubtitle(description)
 	}
 
+	override fun setEOSDelegateBandWidth(value: String) {
+		delegateBandWidthCell.setSubtitle(value)
+	}
+
 	override fun setResourcesValue(
 		ramAvailable: BigInteger,
 		ramTotal: BigInteger,
@@ -278,6 +296,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	private fun ViewGroup.showTransactionCells() {
 		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
 		balanceCell.into(this)
+		delegateBandWidthCell.click {
+			showDelegateBandWidthDashboard()
+		}.into(this)
 		refundsCell.into(this)
 		transactionCountCell.into(this)
 	}
@@ -299,6 +320,17 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM)
 		).forEach { pair ->
 			generateCardView(pair)
+		}
+	}
+
+	private fun showDelegateBandWidthDashboard() {
+		val loadingView = LoadingView(context!!)
+		loadingView.show()
+		presenter.getDelegateBandWidthData {
+			loadingView.remove()
+			Dashboard(context!!) {
+				showList("Delegate Bandwidth Detail", DelegateBandwidthAdapter(it))
+			}
 		}
 	}
 

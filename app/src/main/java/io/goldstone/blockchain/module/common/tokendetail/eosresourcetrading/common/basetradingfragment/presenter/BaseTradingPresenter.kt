@@ -90,7 +90,10 @@ open class BaseTradingPresenter(
 		val accountDao =
 			GoldStoneDataBase.database.eosAccountDao()
 		val account =
-			accountDao.getAccount(SharedAddress.getCurrentEOSAccount().accountName)
+			accountDao.getAccount(
+				SharedAddress.getCurrentEOSAccount().accountName,
+				SharedChain.getEOSCurrent().chainID.id
+			)
 		launchUI {
 			when (tradingType) {
 				TradingType.CPU -> {

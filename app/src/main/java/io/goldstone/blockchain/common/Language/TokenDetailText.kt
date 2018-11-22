@@ -449,6 +449,17 @@ object TokenDetailText {
 	}
 
 	@JvmField
+	val delband = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DELBAND"
+		HoneyLanguage.Chinese.code -> "DELBAND"
+		HoneyLanguage.Japanese.code -> "DELBAND"
+		HoneyLanguage.Korean.code -> "DELBAND"
+		HoneyLanguage.Russian.code -> "DELBAND"
+		HoneyLanguage.TraditionalChinese.code -> "DELBAND"
+		else -> ""
+	}
+
+	@JvmField
 	val buySellRAM = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BUY RAM\nSELL RAM"
 		HoneyLanguage.Chinese.code -> "买入RAM\n卖出RAM"

@@ -77,7 +77,14 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 				if (viewHolder.adapterPosition == -1) return
 				if (!initiated) init()
 				// draw red background
-				background?.setBounds(boundsStart + directionX.toInt(), itemView.top, boundsStart, itemView.bottom)
+				val adapterStartDistance = if (isMovingToLeft) directionX.toInt() else 0
+				val adapterEndDistance = if (isMovingToLeft)  0 else directionX.toInt()
+				background?.setBounds(
+					boundsStart + adapterStartDistance,
+					itemView.top,
+					boundsStart + adapterEndDistance,
+					itemView.bottom
+				)
 				background?.draw(canvas)
 				val start = (boundsStart + directionX).toInt()
 				val modulus = if (isMovingToLeft) -1 else 1
