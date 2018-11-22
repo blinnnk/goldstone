@@ -24,7 +24,7 @@ import org.jetbrains.anko.wrapContent
  */
 class BasicRadiusButton(context: Context) : LinearLayout(context) {
 
-	private val pendingColor = Color.parseColor("#FF227CA0")
+	private val pendingColor = Color.parseColor("#FF356C9B")
 	private val settingColor = Color.parseColor("#FF0C5071")
 
 	private val title = TextView(context).apply {

@@ -81,7 +81,7 @@ fun Context.showAlertView(
 			{ action(it.findViewById(ElementID.passwordInput)) },
 			cancelAction
 		)
-		else showAlert(title, subtitle, cancelAction) {
+		else showAlert(title, subtitle, CommonText.confirm, cancelAction) {
 			action(null)
 		}
 	}

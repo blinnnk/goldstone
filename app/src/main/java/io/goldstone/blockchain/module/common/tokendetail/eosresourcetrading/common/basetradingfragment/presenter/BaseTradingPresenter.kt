@@ -255,7 +255,6 @@ open class BaseTradingPresenter(
 			isSellRam: Boolean,
 			callback: (GoldStoneError) -> Unit
 		) {
-			System.out.println("fcuk you $tradingNumber")
 			when {
 				tradingNumber == 0 -> callback(TransferError.TradingInputIsEmpty)
 				isSellRam && tradingNumber !is Long -> // 检查输入的卖出的 `EOS` 的值是否正确

@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.extension.addCorner
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.EOSAccountText.activeByContractMethod
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.CornerSize
@@ -36,7 +37,7 @@ class AttentionView(context: Context) : TextView(context) {
 	}
 
 	fun isSmartContractRegister(): AttentionView {
-		text = "Transfer at least 2.0 EOS to the contract account (${if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos"}) by way of the exchange's coin and note/transfer from the wallet"
+		text = activeByContractMethod(if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos")
 		setBackgroundColor(Spectrum.lightRed)
 		return this
 	}

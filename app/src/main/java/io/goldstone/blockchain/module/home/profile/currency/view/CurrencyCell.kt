@@ -30,6 +30,7 @@ class CurrencyCell(context: Context) : BaseRadioCell(context) {
 			"THB" -> R.drawable.thailand_icon
 			else -> R.drawable.amercia_icon
 		}
+
 		showIcon(image)
 	}
 }

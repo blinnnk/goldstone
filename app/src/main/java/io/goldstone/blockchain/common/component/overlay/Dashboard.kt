@@ -6,6 +6,8 @@ import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.GridLayoutManager
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.WhichButton
+import com.afollestad.materialdialogs.actions.setActionButtonEnabled
 import com.afollestad.materialdialogs.customview.customView
 import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
@@ -82,13 +84,14 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 	fun showAlert(
 		title: String,
 		message: String,
+		positiveButtonTitle: String = CommonText.confirm,
 		cancelAction: () -> Unit = {},
 		confirmAction: () -> Unit
 	) {
 		with(dialog) {
 			title(text = title)
 			message(text = message)
-			positiveButton(text = CommonText.confirm) {
+			positiveButton(text = positiveButtonTitle) {
 				confirmAction()
 			}
 			negativeButton(text = CommonText.cancel) {
@@ -113,6 +116,7 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 				waitForPositiveButton = false
 			) { _, _, items ->
 				selectedItems = items
+				dialog.setActionButtonEnabled(WhichButton.POSITIVE, items.isNotEmpty())
 			}
 			positiveButton(text = CommonText.confirm) {
 				confirmAction(selectedItems)

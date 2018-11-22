@@ -210,56 +210,7 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "錢包地址"
 		else -> ""
 	}
-	@JvmField
-	val invalidPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Invalid private key"
-		HoneyLanguage.Chinese.code -> "这不是正确格式的私钥"
-		HoneyLanguage.Japanese.code -> "これは正確な形式のプライベートキーではありません"
-		HoneyLanguage.Korean.code -> "이것은 정확한 포맷의 개인키가 아닙니다"
-		HoneyLanguage.Russian.code -> "Неправильный формат закрытого ключа"
-		HoneyLanguage.TraditionalChinese.code -> "這不是正確格式的私鑰"
-		else -> ""
-	}
-	@JvmField
-	val unvalidTestnetBTCPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect Bitcoin testnet private key address format"
-		HoneyLanguage.Chinese.code -> "不是正确的比特币测试网私钥或地址格式"
-		HoneyLanguage.Japanese.code -> "正しいbitcoinテストネットワークの秘密鍵またはアドレス形式ではありません"
-		HoneyLanguage.Korean.code -> "올바른 비트 코인 테스트 네트워크 개인 키 또는 주소 형식이 아닙니다."
-		HoneyLanguage.Russian.code -> "Не правильный личный ключ или формат адреса биткойн-теста"
-		HoneyLanguage.TraditionalChinese.code -> "不是正確的比特幣測試網私鑰或地址格式"
-		else -> ""
-	}
-	@JvmField
-	val invalidLTCPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect Litecoin main network private key address format"
-		HoneyLanguage.Chinese.code -> "不是正确的莱特币私钥格式"
-		HoneyLanguage.Japanese.code -> "正しいLitecoin秘密鍵またはアドレス形式ではありません。"
-		HoneyLanguage.Korean.code -> "올바른 Litecoin 개인 키 형식이 아닙니다."
-		HoneyLanguage.Russian.code -> "Не правильный формат частного ключа Litecoin"
-		HoneyLanguage.TraditionalChinese.code -> "不是正確的莱特幣私鑰格式"
-		else -> ""
-	}
-	@JvmField
-	val invalidEOSPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect EOS private key address format"
-		HoneyLanguage.Chinese.code -> "Incorrect EOS private key address format"
-		HoneyLanguage.Japanese.code -> "Incorrect EOS private key address format"
-		HoneyLanguage.Korean.code -> "Incorrect EOS private key address format"
-		HoneyLanguage.Russian.code -> "Incorrect EOS private key address format"
-		HoneyLanguage.TraditionalChinese.code -> "Incorrect EOS private key address format"
-		else -> ""
-	}
-	@JvmField
-	val invalidMainnetBTCPrivateKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect Bitcoin main network private key address format"
-		HoneyLanguage.Chinese.code -> "不是正确的比特币私钥或地址格式"
-		HoneyLanguage.Japanese.code -> "正しいbitcoin秘密鍵またはアドレス形式ではありません。"
-		HoneyLanguage.Korean.code -> "올바른 비트 코인 개인 키 또는 주소 형식이 아닙니다."
-		HoneyLanguage.Russian.code -> "Не правильный личный ключ или адресный биткойн"
-		HoneyLanguage.TraditionalChinese.code -> "不是正確的比特幣私鑰格式"
-		else -> ""
-	}
+
 	@JvmField
 	val existAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This address has already been imported"
@@ -310,26 +261,7 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "Импортировать мнемонику для получения многоцелевого кошелька на основе стандарта BIP44. Если вы решите импортировать одноцелевой частный ключ или файл хранилища ключей, GoldStone поможет вам создать многоцелевую учетную запись с предыдущим одноцелевым активом."
 		else -> ""
 	}
-	@JvmField
-	val exportWrongPassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect password, try again"
-		HoneyLanguage.Chinese.code -> "请输入正确的密码"
-		HoneyLanguage.Japanese.code -> "正確なパスワードを入力して下さい"
-		HoneyLanguage.Korean.code -> "정확한 비밀번호를 입력하십시오"
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите правильный пароль"
-		HoneyLanguage.TraditionalChinese.code -> "請輸入正確的密碼"
-		else -> ""
-	}
-	@JvmField
-	val privateKeyAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Incorrect private key"
-		HoneyLanguage.Chinese.code -> "私钥格式不正确"
-		HoneyLanguage.Japanese.code -> "プライベートキー形式が正しくありません"
-		HoneyLanguage.Korean.code -> "개인키 오류"
-		HoneyLanguage.Russian.code -> "Неправильный формат закрытого ключа"
-		HoneyLanguage.TraditionalChinese.code -> "私鑰格式不正確"
-		else -> ""
-	}
+
 	@JvmField
 	val mnemonicAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect mnemonic format"

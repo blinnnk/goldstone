@@ -54,7 +54,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					isCenter()
 					setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-					text = ImportWalletText.importWalletDescription
+					text = ImportWalletText.keystoreIntro
 				}.into(this)
 				supportedChainMenu.into(this)
 
