@@ -6,13 +6,13 @@ import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
@@ -184,13 +184,17 @@ class SplashPresenter(val activity: SplashActivity) {
 				} else launchUI {
 					val title = "Check EOS Account Name Error"
 					val subtitle = error.message
-					context.showAlertView(
-						title,
-						subtitle,
-						false,
-						{ cacheDataAndSetNetBy(this, callback) }
-					) {
-						cacheDataAndSetNetBy(this, callback)
+					Dashboard(context) {
+						showAlertView(
+							title,
+							subtitle,
+							false,
+							{
+								cacheDataAndSetNetBy(this@checkOrUpdateEOSAccount, callback)
+							}
+						) {
+							cacheDataAndSetNetBy(this@checkOrUpdateEOSAccount, callback)
+						}
 					}
 				}
 			}

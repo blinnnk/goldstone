@@ -57,7 +57,7 @@ data class EOSTransactionTable(
 		System.currentTimeMillis(),
 		EOSTransactionMethod.Transfer.value,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
-		info.fromAccount.accountName,
+		info.fromAccount.name,
 		SharedAddress.getCurrentEOS(),
 		SharedChain.getEOSCurrent().chainID.id,
 		true
@@ -95,7 +95,7 @@ data class EOSTransactionTable(
 		) = GlobalScope.launch(Dispatchers.Default) {
 			val data =
 				GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(
-					account.accountName,
+					account.name,
 					contract.contract,
 					contract.symbol,
 					chainID.id
@@ -116,7 +116,7 @@ data class EOSTransactionTable(
 			// 这里用 `Try Catch` 兼容一下
 			val data = try {
 				GoldStoneDataBase.database.eosTransactionDao().getDataByRange(
-					account.accountName,
+					account.name,
 					start,
 					end,
 					symbol,

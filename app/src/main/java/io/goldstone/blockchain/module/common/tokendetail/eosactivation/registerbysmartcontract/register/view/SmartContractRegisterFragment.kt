@@ -120,12 +120,12 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 								it.showLoadingStatus(false)
 								activity?.apply { SoftKeyboard.hide(this) }
 								if (!isAvailable.isNull() && error.isNone()) {
-									if (isAvailable) presenter.showSmartContractRegisterDetailFragment(account.accountName)
+									if (isAvailable) presenter.showSmartContractRegisterDetailFragment(account.name)
 									else safeShowError(Throwable(EOSAccountText.checkNameResultUnavailable))
 								} else safeShowError(error)
 							}
 						}
-						account.accountName.isEmpty() -> safeShowError(Throwable(EOSAccountText.checkNameResultEmpty))
+						account.name.isEmpty() -> safeShowError(Throwable(EOSAccountText.checkNameResultEmpty))
 						else -> safeShowError(Throwable(EOSAccountText.checkNameResultInvalid))
 					}
 				}.into(this)

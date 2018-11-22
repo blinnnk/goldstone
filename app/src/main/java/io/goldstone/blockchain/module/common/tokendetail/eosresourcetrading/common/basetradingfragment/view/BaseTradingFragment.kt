@@ -65,7 +65,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val incomeTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
+			setAccountHint(SharedAddress.getCurrentEOSAccount().name)
 			if (tradingType.isRAM()) {
 				amountEditTextChanged = Runnable {
 					showRAMAmount(getInputValue().second / SharedValue.getRAMUnitPrice())
@@ -77,7 +77,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 					if (response.isNotNull() && error.isNone()) {
 						launchUI {
 							getParentContainer()?.apply {
-								response.showDialog(this)
+								response.showDialog(context)
 							}
 							clearInputValue()
 							toast(CommonText.succeed)
@@ -99,7 +99,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 
 	private val expendTradingCard by lazy {
 		TradingCardView(context!!).apply {
-			setAccountHint(SharedAddress.getCurrentEOSAccount().accountName)
+			setAccountHint(SharedAddress.getCurrentEOSAccount().name)
 			if (tradingType.isRAM()) {
 				setSellingRAMStyle()
 				amountEditTextChanged = Runnable {
@@ -112,7 +112,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 					if (response.isNotNull() && error.isNone()) {
 						launchUI {
 							getParentContainer()?.apply {
-								response.showDialog(this)
+								response.showDialog(context)
 							}
 							clearInputValue()
 						}

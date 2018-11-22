@@ -23,7 +23,6 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
-import io.goldstone.blockchain.module.common.walletimport.keystoreimport.view.KeystoreImportFragment
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
@@ -151,10 +150,8 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		if (activity.isNull()) {
-			getParentFragment<WalletImportFragment>()?.presenter
-				?.popFragmentFrom<PrivateKeyImportFragment>()
-		} else super.setBaseBackEvent(activity, parent)
+		getParentFragment<WalletImportFragment>()?.presenter
+			?.popFragmentFrom<PrivateKeyImportFragment>()
 	}
 
 }

@@ -29,6 +29,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
+import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -191,9 +192,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		if (activity.isNull()) {
-			getParentFragment<WalletImportFragment>()?.presenter
-				?.popFragmentFrom<MnemonicImportDetailFragment>()
-		} else super.setBaseBackEvent(activity, parent)
+		getParentFragment<WalletImportFragment>()?.presenter
+			?.popFragmentFrom<MnemonicImportDetailFragment>()
 	}
 }

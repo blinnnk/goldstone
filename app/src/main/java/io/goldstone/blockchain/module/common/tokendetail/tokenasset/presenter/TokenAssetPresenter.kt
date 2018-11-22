@@ -10,6 +10,12 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
+import io.goldstone.blockchain.crypto.eos.delegate.EOSDelegateTransaction
+import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
@@ -19,9 +25,11 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.contract.TokenAssetContract
+import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.math.BigInteger
 
 
 /**
@@ -31,6 +39,9 @@ import kotlinx.coroutines.launch
 class TokenAssetPresenter(
 	private val assetView: TokenAssetContract.GSView
 ) : TokenAssetContract.GSPresenter {
+
+	private val account = SharedAddress.getCurrentEOSAccount()
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	// 在详情界面有可能有 `Stake` 或 `Trade` 操作这里, 恢复显示的时候从
 	// 数据库更新一次信息
@@ -42,10 +53,8 @@ class TokenAssetPresenter(
 
 	private fun setDelegateBandwidthEOSCount() {
 		GlobalScope.launch(Dispatchers.Default) {
-			val totalDelegate = EOSAccountTable.dao.getAccount(
-				SharedAddress.getCurrentEOSAccount().accountName,
-				SharedChain.getEOSCurrent().chainID.id
-			)?.totalDelegateBandInfo
+			val totalDelegate =
+				EOSAccountTable.dao.getAccount(account.name, chainID.id)?.totalDelegateBandInfo
 			val description = if (totalDelegate.isNullOrEmpty()) {
 				"Check Data"
 			} else {
@@ -63,29 +72,55 @@ class TokenAssetPresenter(
 	}
 
 	override fun getDelegateBandWidthData(@UiThread hold: (ArrayList<DelegateBandWidthInfo>) -> Unit) {
-		val account = SharedAddress.getCurrentEOSAccount()
-		val chain = SharedChain.getEOSCurrent().chainID
 		load {
-			EOSAccountTable.dao.getAccount(account.accountName, chain.id)?.totalDelegateBandInfo
+			EOSAccountTable.dao.getAccount(account.name, chainID.id)?.totalDelegateBandInfo
 		} then {
 			if (!it.isNullOrEmpty()) hold(it.toArrayList())
-			else EOSAPI.getDelegateBandWidthList(SharedAddress.getCurrentEOSAccount()) { data, error ->
+			else EOSAPI.getDelegateBandWidthList(account) { data, error ->
 				if (data.isNotNull() && error.isNone()) {
-					EOSAccountTable.dao.updateDelegateBandwidthData(data, account.accountName, chain.id)
-					launchUI { hold(data.toArrayList()) }
+					EOSAccountTable.dao.updateDelegateBandwidthData(data, account.name, chainID.id)
+					launchUI {
+						hold(data.toArrayList())
+					}
 				} else assetView.showError(error)
 			}
+		}
+	}
+
+	override fun redemptionBandwidth(
+		password: String,
+		receiver: EOSAccount,
+		cpuAmount: BigInteger,
+		netAmount: BigInteger,
+		hold: (response: EOSResponse) -> Unit
+	) {
+		PrivateKeyExportPresenter.getPrivateKey(
+			SharedAddress.getCurrentEOS(),
+			ChainType.EOS,
+			password
+		) { privateKey, error ->
+			if (privateKey.isNotNull() && error.isNone()) {
+				EOSDelegateTransaction(
+					account,
+					receiver,
+					cpuAmount,
+					netAmount,
+					ExpirationType.FiveMinutes
+				).send(EOSPrivateKey(privateKey)) { response, responseError ->
+					if (response.isNotNull() && responseError.isNone()) hold(response)
+					else assetView.showError(responseError)
+				}
+			} else assetView.showError(error)
 		}
 	}
 
 	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
 		val accountDao =
 			GoldStoneDataBase.database.eosAccountDao()
-		val account = SharedAddress.getCurrentEOSAccount()
-		val chainID = SharedChain.getEOSCurrent().chainID
+
 		fun showLocalAccounts() = GlobalScope.launch(Dispatchers.Default) {
 			val localData =
-				accountDao.getAccount(account.accountName, chainID.id)
+				accountDao.getAccount(account.name, chainID.id)
 			// 首先显示数据库的数据在界面上
 			launchUI {
 				localData?.updateUIValue()

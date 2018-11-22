@@ -23,8 +23,8 @@ data class EOSTransactionData(
 ) {
 
 	constructor(data: EOSTransactionInfo) : this(
-		data.fromAccount.accountName,
-		data.toAccount.accountName,
+		data.fromAccount.name,
+		data.toAccount.name,
 		"${CryptoUtils.toCountByDecimal(data.amount, data.contract.decimal.orElse(CryptoValue.eosDecimal))} ${data.contract.symbol}",
 		data.memo
 	)
