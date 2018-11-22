@@ -243,17 +243,6 @@ object TokenDetailText {
 	}
 
 	@JvmField
-	val showSmall = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Chinese.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Japanese.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Korean.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Russian.code -> "Show Small (< 0.001)"
-		HoneyLanguage.TraditionalChinese.code -> "Show Small (< 0.001)"
-		else -> ""
-	}
-
-	@JvmField
 	val accountInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account Information"
 		HoneyLanguage.Chinese.code -> "账户信息"

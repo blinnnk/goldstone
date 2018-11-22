@@ -46,9 +46,9 @@ object CryptoUtils {
 		return if (gas.isNullOrBlank() || gasPrice.isNullOrBlank()) {
 			"0"
 		} else if (!isHex) {
-			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
+			(gas.toBigDecimal() * gasPrice.toBigDecimal()).toETHCount()
 		} else {
-			(gas.hexToDecimal().toBigDecimal() * gasPrice.hexToDecimal().toBigDecimal()).toEthCount().toBigDecimal().toPlainString()
+			(gas.hexToDecimal().toBigDecimal() * gasPrice.hexToDecimal().toBigDecimal()).toETHCount()
 		}
 	}
 
@@ -109,20 +109,16 @@ object CryptoUtils {
 	}
 }
 
-fun Long.toEthCount(): Double {
-	return CryptoUtils.toCountByDecimal(BigInteger.valueOf(this), CryptoValue.ethDecimal)
+fun BigDecimal.toCount(decimal: Int): BigDecimal {
+	return divide(BigDecimal.valueOf(10).pow(decimal).add(BigDecimal.ZERO))
 }
 
-fun BigInteger.toEthCount(): Double {
-	return CryptoUtils.toCountByDecimal(this, CryptoValue.ethDecimal)
+fun BigDecimal.toETHCount(): String {
+	return toCount(18).toPlainString()
 }
 
 fun Double.toWei(decimal: Int): BigInteger {
-	return (this.toBigDecimal() * BigDecimal.valueOf(Math.pow(10.0, decimal.toDouble()))).toBigInteger()
-}
-
-fun BigDecimal.toEthCount(): Double {
-	return CryptoUtils.toCountByDecimal(this.toBigInteger(), CryptoValue.ethDecimal)
+	return (BigDecimal.valueOf(this)).multiply(BigDecimal(10).pow(decimal).add(BigDecimal.ZERO)).toBigInteger()
 }
 
 fun Double.toEOSUnit(): BigInteger {
@@ -130,7 +126,7 @@ fun Double.toEOSUnit(): BigInteger {
 }
 
 fun Double.toAmount(decimal: Int): BigInteger {
-	return (this.toBigDecimal() * BigDecimal.valueOf(Math.pow(10.0, decimal.toDouble()))).toBigInteger()
+	return (BigDecimal.valueOf(this).multiply(BigDecimal(10).pow(decimal).add(BigDecimal.ZERO))).toBigInteger()
 }
 
 fun BigInteger.toEOSCount(): Double {
@@ -142,32 +138,19 @@ fun BigInteger.toCount(decimal: Int): Double {
 }
 
 fun Double.toSatoshi(): Long {
-	return (this * 100000000.0).toLong()
+	return (BigDecimal.valueOf(this).multiply(BigDecimal(10).pow(8).add(BigDecimal.ZERO))).toLong()
 }
 
 fun Long.toBTCCount(): Double {
-	return this / 100000000.0
+	return BigDecimal(this).divide(BigDecimal(10).pow(8).add(BigDecimal.ZERO)).toDouble()
 }
 
-fun Double.toGasValue(): String {
-	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 9
-	return formatEditor.format(this)
-}
-
-fun Double.toGWeiValue(): String {
-	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 9
-	return formatEditor.format(this / 1000000000)
-}
 
 fun Double.formatCurrency(): String {
 	val rate = SharedWallet.getCurrentRate()
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = 5
-	val value = formatEditor.format(this).toDouble() // 这里要转换 `Double` 和返回的不同
-	val prefix = if (value * rate >= 1.0) "" else if (value == 0.0) "0." else "0"
-	return prefix + formatEditor.format(this * rate)
+	return formatEditor.format(this * rate).toBigDecimal().toPlainString()
 }
 
 fun Double.formatCount(count: Int = 9): String {
@@ -180,11 +163,16 @@ fun Double.formatDecimal(count: Int = 9): Double {
 	return this.formatCount(count).toDouble()
 }
 
+fun BigDecimal.formatCount(count: Int = 9): String {
+	val formatEditor = DecimalFormat("#")
+	formatEditor.maximumFractionDigits = count
+	return formatEditor.format(this).toBigDecimal().toPlainString()
+}
+
 fun Int.daysAgoInMills(): Long =
 	CryptoUtils.getTargetDayInMills(-this)
 
-fun Double.toGwei() = (this / 1000000000.0).toLong()
-fun Long.scaleToGwei() = this * 1000000000
+fun Long.scaleToGwei() = BigInteger.valueOf(this) * BigInteger.valueOf(10).pow(9).add(BigInteger.ZERO)
 
 /**
  * 把常规的 `Double` 个数转换成合约要用的 `hex` 类型,

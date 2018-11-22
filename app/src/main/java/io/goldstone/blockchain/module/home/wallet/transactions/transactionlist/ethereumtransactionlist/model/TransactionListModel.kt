@@ -148,7 +148,7 @@ data class TransactionListModel(
 		data.blockNumber,
 		data.hash,
 		"",
-		data.fee.toDouble().toBigDecimal().toPlainString(),
+		data.fee.toBigDecimal().toPlainString(),
 		generateTransactionURL(data.hash, TokenContract.BTC, false),
 		data.isPending,
 		data.timeStamp,

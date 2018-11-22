@@ -7,6 +7,7 @@ import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import org.junit.Assert
 import org.junit.Test
+import java.math.BigDecimal
 import java.math.BigInteger
 
 @Suppress("DEPRECATION")
@@ -47,6 +48,11 @@ class ExampleUnitTest {
 		val list2 = listOf(Pair(1, 2), Pair(1, 1))
 		LogUtil.debug("compare", list1.containsAll(list2).toString())
 		LogUtil.debug("compare", (list1.asSequence().plus(list2).distinct().toList() - list1).toString())
+	}
+
+	@Test
+	fun bigNumber() {
+		println(BigDecimal.valueOf(10).pow(18).add(BigDecimal.ZERO))
 	}
 }
 

@@ -45,16 +45,6 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "這是觀察錢包，無法進行轉賬交易。"
 		else -> ""
 	}
-	@JvmField
-	val importWalletNetwork = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Network unavailable. Network is required to check the value of the importing wallet"
-		HoneyLanguage.Chinese.code -> "没有检测到网络，导入钱包时需要网络环境查询您的货币余额"
-		HoneyLanguage.Japanese.code -> "ネットワークが検出されていません。ウォレットをインポートする際は通貨残高を照会するためネットワーク環境が必要です"
-		HoneyLanguage.Korean.code -> "인터넷을 검색하지 못하였습니다, 지갑 도입시 온라인 환경에서 귀하의 화폐 잔고를 조회할 수 있습니다"
-		HoneyLanguage.Russian.code -> "Интернет недоступен, при импорте кошелька необходимо проверить денежный баланс в условиях Интернета"
-		HoneyLanguage.TraditionalChinese.code -> "沒有檢測到網絡，導入錢包時需要網絡環境查詢您的貨幣餘額"
-		else -> ""
-	}
 
 	@JvmField
 	val transferWrongDecimal = when (currentLanguage) {

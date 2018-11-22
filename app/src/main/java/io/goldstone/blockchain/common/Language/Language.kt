@@ -65,19 +65,6 @@ object TokenManagementText {
 	}
 }
 
-object Alert {
-	@JvmField
-	val selectCurrency = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Once you've selected this, you'll need to wait a moment while we restart the app. Are you sure you'd like to switch currency settings?"
-		HoneyLanguage.Chinese.code -> "一旦你选择切换货币，应用程序将被重新启动，并等待几秒钟。 你确定要切换货币设置吗？"
-		HoneyLanguage.Japanese.code -> "貨幣の切り替えを選択すると、アプリケーションが再起動され、数秒待つことになります貨幣設定の切り替えをしますか？"
-		HoneyLanguage.Korean.code -> "일단 화폐 교체를 선택하면, 응용 프로그램은 다시 시작후 몇초동안 기다려야 합니다. 화폐 설정을 교체할까요？"
-		HoneyLanguage.Russian.code -> "При смене валюты программа будет перезапущена, ожидание составит несколько секунд. Вы уверены, что хотите изменить настройки валюты?"
-		HoneyLanguage.TraditionalChinese.code -> "一旦你選擇切換貨幣，應用程序將被重新啟動，並等待幾秒鐘。你確定要切換貨幣設置嗎？"
-		else -> ""
-	}
-}
-
 object PincodeText {
 	@JvmField
 	val pincode = when (currentLanguage) {

@@ -26,15 +26,5 @@ object LoadingText {
 		HoneyLanguage.TraditionalChinese.code -> "正在估算燃氣費用，馬上就好"
 		else -> ""
 	}
-	@JvmField
-	val calculating = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Calculating..."
-		HoneyLanguage.Chinese.code -> "正在计算..."
-		HoneyLanguage.Japanese.code -> "現在計算中..."
-		HoneyLanguage.Korean.code -> "계산 중..."
-		HoneyLanguage.Russian.code -> "Расчет..."
-		HoneyLanguage.TraditionalChinese.code -> "正在計算..."
-		else -> ""
-	}
 
 }

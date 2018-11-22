@@ -49,7 +49,6 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	private var filterConditions = listOf(
 		TokenDetailText.totalReceived,
 		TokenDetailText.totalSent,
-		TokenDetailText.showSmall,
 		TokenDetailText.fee,
 		TokenDetailText.failed
 	)
@@ -130,18 +129,20 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 			attentionDashboard = Dashboard(context!!) {
 				showAlert(
 					"No Actions Found \n(DataSize: $dataSize Transactions)",
-					"The number of pages currently loaded has not found relevant data, try to change the classification or slide up to load more."
+					"The number of pages currently loaded has not found relevant data, try to change the classification or slide up to load more.",
+					"Load More"
 				) {
 					presenter.loadMore()
 					attentionDashboard = null
 				}
+				dialog.cancelOnTouchOutside(false)
 			}
 		}
 	}
 
 	override fun filterData(data: List<TransactionListModel>?): List<TransactionListModel> {
 		return when {
-			currentFilterConditions.isEmpty() -> listOf()
+			currentFilterConditions.isEmpty() -> data ?: listOf()
 			data.isNullOrEmpty() -> listOf()
 			else -> try {
 				// 翻页特别块的时候这里会出现数组线程不安全, 通过 `Try Catch` 容错
@@ -149,7 +150,6 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 					val booleans = listOf(
 						it.isReceived && !it.isFee,
 						!it.isReceived && !it.isFee,
-						it.count > 0.001,
 						it.isFee,
 						it.hasError
 					)

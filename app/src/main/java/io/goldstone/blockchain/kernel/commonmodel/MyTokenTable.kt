@@ -18,7 +18,7 @@ import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toEthCount
+import io.goldstone.blockchain.crypto.utils.toETHCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -167,7 +167,7 @@ data class MyTokenTable(
 					contract.getChainURL()
 				) { amount, error ->
 					if (amount.isNotNull() && error.isNone()) {
-						val balance = amount.toEthCount()
+						val balance = amount.toBigDecimal().toETHCount().toDouble()
 						hold(balance, RequestError.None)
 					} else hold(null, error)
 				}

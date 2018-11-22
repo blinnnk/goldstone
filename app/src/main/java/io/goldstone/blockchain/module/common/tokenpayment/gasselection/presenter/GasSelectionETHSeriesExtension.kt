@@ -93,12 +93,12 @@ fun GasSelectionPresenter.transferETHSeries(
 	/** `GasFee` 这个 `Model` 是与 `BTC Series` 复用的, 所以这里的 `Price` 需要 `Scale` 到 `Gwei` 的值*/
 	with(ethSeriesModel) {
 		// 更新 `prepareModel`  的 `gasPrice` 的值
-		this.gasPrice = BigInteger.valueOf(gasFee.gasPrice.scaleToGwei())
+		this.gasPrice = gasFee.gasPrice.scaleToGwei()
 		// Generate Transaction Model
 		val raw = Transaction().apply {
 			chain = ChainDefinition(chainURL.chainID.id.toLongOrNull() ?: 0)
 			nonce = this@with.nonce
-			gasPrice = BigInteger.valueOf(gasFee.gasPrice.scaleToGwei())
+			gasPrice = gasFee.gasPrice.scaleToGwei()
 			gasLimit = BigInteger.valueOf(gasFee.gasLimit)
 			to = Address(toAddress)
 			value = if (CryptoUtils.isERC20Transfer(inputData)) BigInteger.valueOf(0)
@@ -132,7 +132,7 @@ private fun GasSelectionPresenter.prepareReceiptModel(
 	return ReceiptModel(
 		raw.fromAddress,
 		raw.toWalletAddress,
-		(raw.gasLimit * raw.gasPrice).toEthCount().toBigDecimal().toPlainString(),
+		(raw.gasLimit * raw.gasPrice).toBigDecimal().toETHCount(),
 		value,
 		token,
 		taxHash,

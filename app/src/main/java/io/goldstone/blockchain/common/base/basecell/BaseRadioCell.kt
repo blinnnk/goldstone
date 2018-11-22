@@ -62,7 +62,6 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 	fun showIcon(image: Int, color: Int = GrayScale.whiteGray) {
 		if (icon.isNull()) {
 			icon = ImageView(context).apply {
-				imageResource = image
 				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
 				addCorner(17.uiPX(), color)
 				elevation = 2.uiPX().toFloat()
@@ -71,6 +70,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 			icon?.into(this)
 			icon?.centerInVertical()
 		}
+		icon?.imageResource = image
 	}
 
 	fun setTitle(text: String) {
