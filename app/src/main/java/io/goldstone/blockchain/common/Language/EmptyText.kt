@@ -66,6 +66,28 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "當有新的轉賬或其他通知消息時我們會在這裡提醒您"
 		else -> ""
 	}
+	
+	@JvmField
+	val ramTransactionSearchTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "没有交易记录"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	@JvmField
+	val ramTransactionSearchSubTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "您搜索的账号不存在或是该账号没有进行过内存买卖"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
 	@JvmField
 	val searchTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token not found"
