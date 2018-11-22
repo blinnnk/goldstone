@@ -25,7 +25,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 	private val filterIcon by lazy {
 		ImageView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(30.uiPX(), matchParent)
-			imageResource = R.drawable.icon_filtrate
+			imageResource = R.drawable.filter_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
 			visibility = View.GONE
 		}

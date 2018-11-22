@@ -10,7 +10,7 @@ import io.goldstone.blockchain.common.thread.launchUI
  * @author KaySaith
  * @date  2018/10/19
  */
-class ErrorDisplayManager(private val error: Throwable) {
+class ErrorDisplayManager(error: Throwable) {
 	private var displayMessage: String? = null
 
 	init {
@@ -29,7 +29,6 @@ class ErrorDisplayManager(private val error: Throwable) {
 				}
 				errorMessage.contains("failed to connect", true) -> {
 					// 上报 Server 逻辑, 这部分超市
-					LogUtil.error(this::class.java.simpleName, Throwable("GoldStone ERROR: *************** $errorMessage ***************"))
 					null
 				}
 				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
@@ -45,9 +44,10 @@ class ErrorDisplayManager(private val error: Throwable) {
 	fun show(context: Context?) {
 		displayMessage?.apply {
 			launchUI {
-				if (!error.message.isNullOrEmpty()) {
-					context.alert(this@apply)
-				}
+				val packageName = context?.applicationContext?.packageName
+				if (!packageName.isNullOrEmpty() && contains(packageName, true)) {
+					context.alert(substring(packageName.length, length))
+				} else context.alert(this)
 			}
 		}
 	}

@@ -1,18 +1,24 @@
 package io.goldstone.blockchain.common.utils
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.support.v4.content.FileProvider
+import com.blinnnk.extension.isEvenCount
+import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.io.File
+import java.math.BigInteger
 
 /**
  * @date: 2018/8/10.
  * @author: yanglihai
  */
 object ApkUtil {
-	
+
 	/**
 	 * @author: yanglihai
 	 * [apkFile] 需要安装的apk
@@ -30,8 +36,18 @@ object ApkUtil {
 			val apkUri = FileProvider.getUriForFile(GoldStoneAPI.context, "io.goldstone.blockchain.provider", apkFile)
 			intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
 		} else {
-			intent.setDataAndType(Uri.fromFile(apkFile),  "application/vnd.android.package-archive")
+			intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive")
 		}
 		GoldStoneAPI.context.startActivity(intent)
+	}
+
+	@SuppressLint("HardwareIds")
+	fun generateGoldStoneID(): String {
+		val deviceID = Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID)
+		val registerTime = System.currentTimeMillis()
+		val deviceIDCode = deviceID.toCryptHexString()
+		val registerTimeCode = EOSUtils.convertAmountToCode(BigInteger.valueOf(registerTime))
+		val finalCode = deviceIDCode + registerTimeCode
+		return EOSUtils.toLittleEndian(if (!finalCode.isEvenCount()) finalCode + "0" else finalCode)
 	}
 }

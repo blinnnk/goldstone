@@ -68,6 +68,10 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		overlayView.header.showBackButton(isShow, action)
 	}
 
+	fun showFilterButton(isShow: Boolean, action: () -> Unit) {
+		overlayView.header.showFilterIcon(isShow, action)
+	}
+
 	fun showCloseButton(isShow: Boolean, action: () -> Unit) {
 		overlayView.header.showCloseButton(isShow, action)
 	}

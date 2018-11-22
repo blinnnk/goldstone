@@ -17,6 +17,10 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val IncorrectDecimal = TransferError(ErrorText.incorrectDecimal)
 		@JvmStatic
+		val InvalidBigNumber = TransferError("Invalid Number, Value is too big")
+		@JvmStatic
+		val InvalidRAMNumber = TransferError("RAM Should Sell in byte amount, please check you input value, it must be long type number")
+		@JvmStatic
 		val GetWrongFeeFromChain = TransferError(ErrorText.getWrongFeeFromChain)
 		@JvmStatic
 		val TradingInputIsEmpty = TransferError(ErrorText.tradingInputIsEmpty)

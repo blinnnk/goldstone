@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
@@ -36,7 +37,7 @@ object ETHSeriesTransactionUtils {
 			val transactionDao =
 				GoldStoneDataBase.database.transactionDao()
 			val targetToken =
-				defaultDao.getERC20Token(data.contract.contract.orEmpty(), chainURL.chainID.id)
+				defaultDao.getERC20Token(data.contract.contract, chainURL.chainID.id)
 			// 如果本地有该条燃气费的 `DefaultToken` 信息那么直接从数据库获取信息并补全
 			// 否则就获取 `ContractAddress` 从链上查询对应的数据并补全本地信息
 			if (targetToken != null) {
@@ -44,13 +45,13 @@ object ETHSeriesTransactionUtils {
 					CryptoUtils.toCountByDecimal(data.value, targetToken.decimals)
 				transactionDao.updateFeeInfo(targetToken.symbol, count, data.hash)
 				callback(targetToken.symbol, count, RequestError.None)
-			} else ETHJsonRPC.getTokenInfoByContractAddress(data.contract.contract.orEmpty(), chainURL) { symbol, name, decimal, error ->
+			} else ETHJsonRPC.getTokenInfoByContractAddress(data.contract.contract, chainURL) { symbol, name, decimal, error ->
 				if (error.isNone()) {
 					val count = CryptoUtils.toCountByDecimal(data.value, decimal!!)
 					transactionDao.updateFeeInfo(symbol!!, count, data.hash)
 					defaultDao.insert(
 						DefaultTokenTable(
-							data.contract.contract.orEmpty(),
+							data.contract.contract,
 							symbol,
 							decimal,
 							chainURL.chainID,
@@ -112,10 +113,10 @@ object ETHSeriesTransactionUtils {
 				GoldStoneDataBase.database.transactionDao()
 			val targetData =
 				transactionDao.getByTaxHashAndReceivedStatus(hash, isReceive, false)
-			if (targetData != null) {
+			if (targetData.isNotNull()) {
 				hold(TransactionSealedModel(targetData), RequestError.None)
 			} else ETHJsonRPC.getTransactionByHash(hash, chainURL) { transaction, error ->
-				if (transaction != null && error.isNone()) {
+				if (transaction.isNotNull() && error.isNone()) {
 					val formattedData =
 						transaction.apply { this.timeStamp = timestamp }
 					transactionDao.insert(formattedData)

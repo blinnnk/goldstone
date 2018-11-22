@@ -36,6 +36,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (isHidden) EventBus.getDefault().unregister(this)
+		else EventBus.getDefault().register(this)
 	}
 
 	@Subscribe(threadMode = ThreadMode.POSTING)

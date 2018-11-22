@@ -14,7 +14,6 @@ import com.google.gson.JsonArray
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -107,15 +106,16 @@ object GoldStoneAPI {
 	}
 
 	@JvmStatic
-	fun getTokenInfoBySymbolFromServer(
+	fun getTokenInfoBySymbol(
 		symbolsOrContract: String,
+		chainIDs: List<ChainID>,
 		@WorkerThread hold: (tokens: List<TokenSearchModel>?, error: RequestError) -> Unit
 	) {
 		requestData(
 			APIPath.getTokenInfo(
 				APIPath.currentUrl,
 				symbolsOrContract,
-				"${SharedChain.getCurrentETH().chainID.id},${SharedChain.getETCCurrent().chainID.id},${SharedChain.getBTCCurrent().chainID.id},${SharedChain.getLTCCurrent().chainID.id},${SharedChain.getEOSCurrent().chainID.id},${SharedChain.getBCHCurrent().chainID.id}"
+				chainIDs.joinToString(",") { it.id }
 			),
 			"list",
 			false,

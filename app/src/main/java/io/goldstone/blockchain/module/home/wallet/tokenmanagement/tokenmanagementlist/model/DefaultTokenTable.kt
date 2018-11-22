@@ -235,7 +235,7 @@ data class DefaultTokenTable(
 
 		fun getDefaultTokens(hold: (List<DefaultTokenTable>) -> Unit) {
 			load {
-				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens()
+				GoldStoneDataBase.database.defaultTokenDao().getDefaultTokens(Current.supportChainIDs().map { it.id })
 			} then (hold)
 		}
 

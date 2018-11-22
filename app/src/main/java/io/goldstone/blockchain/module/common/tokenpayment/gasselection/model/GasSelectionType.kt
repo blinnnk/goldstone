@@ -4,6 +4,7 @@ import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.scaleToGwei
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.crypto.utils.toEthCount
@@ -36,7 +37,7 @@ data class GasSelectionModel(
 
 		fun generateChainCount(symbol: CoinSymbol, fee: GasFee): String {
 			return if (symbol.isBTCSeries()) "${(fee.gasPrice * fee.gasLimit).toBTCCount().toBigDecimal()} ${symbol.symbol}"
-			else BigInteger.valueOf((fee.gasPrice.scaleToGwei() * fee.gasLimit)).toEthCount().toBigDecimal().toPlainString() suffix symbol.symbol
+			else BigInteger.valueOf((fee.gasPrice.scaleToGwei() * fee.gasLimit)).toEthCount().formatCount(6) suffix symbol.symbol
 		}
 
 		fun generateDescription(isBTCSeries: Boolean, fee: GasFee): String {

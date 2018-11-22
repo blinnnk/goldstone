@@ -46,5 +46,4 @@ class TokenDetailOverlayFragment : BaseOverlayFragment<TokenDetailOverlayPresent
 			else -> presenter.showTokenDetailCenterFragment(token)
 		}
 	}
-
 }

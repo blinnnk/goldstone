@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
@@ -24,9 +25,6 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.vi
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.presenter.TokenManagementListPresenter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 /**
  * @date 27/03/2018 11:23 AM
@@ -100,8 +98,8 @@ class TokenSearchPresenter(
 		@WorkerThread hold: (data: List<DefaultTokenTable>?, error: RequestError) -> Unit
 	) {
 		val isSearchingSymbol = content.length != CryptoValue.contractAddressLength
-		GoldStoneAPI.getTokenInfoBySymbolFromServer(content) { result, error ->
-			if (result != null && result.isNotEmpty() && error.isNone()) {
+		GoldStoneAPI.getTokenInfoBySymbol(content, Current.supportChainIDs()) { result, error ->
+			if (!result.isNullOrEmpty() && error.isNone()) {
 				// 从服务器请求目标结果
 				hold(
 					result.map { serverToken ->

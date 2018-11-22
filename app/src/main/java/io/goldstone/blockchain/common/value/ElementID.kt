@@ -10,7 +10,6 @@ object ContainerID {
 	const val content = 1003
 	const val main = 1005
 	const val home = 1006
-	const val contentOverlay = 1007
 }
 
 object ElementID {
@@ -36,6 +35,7 @@ object ElementID {
 	const val checkBox = 2026
 	const val cardLayout = 2027
 	const val passwordInput = 2027
+	const val filterIcon = 2028
 }
 
 object ViewPagerID {

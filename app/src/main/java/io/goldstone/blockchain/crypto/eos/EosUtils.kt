@@ -18,21 +18,8 @@ import java.util.*
  */
 
 object EOSUtils {
-	private const val charMap = ".12345abcdefghijklmnopqrstuvwxyz"
-	private const val maxNameIndex = 12
 
-	fun longToName(nameAsLong: Long): String {
-		var temp = nameAsLong
-		val result = CharArray(maxNameIndex + 1)
-		Arrays.fill(result, ' ')
-		for (index in 0 .. maxNameIndex) {
-			val char = charMap[(temp and if (index == 0) 0x0f else 0x1f).toInt()]
-			result[maxNameIndex - index] = char
-			temp = temp shr (if (index == 0) 4 else 5)
-		}
-		// remove trailing dot
-		return String(result).replace("[.]+$".toRegex(), "")
-	}
+	private const val maxNameIndex = 12
 
 	@Throws
 	fun toLittleEndian(content: String): String {

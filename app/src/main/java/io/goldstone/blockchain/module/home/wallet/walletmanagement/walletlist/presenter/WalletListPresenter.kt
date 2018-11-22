@@ -120,13 +120,16 @@ class WalletListPresenter(
 					}
 				}
 
+				walletType.isETHSeries() -> {
+					switchWalletInDatabase(address, true)
+					fragment.activity?.jump<SplashActivity>()
+				}
+
 				walletType.isBIP44() || walletType.isMultiChain() -> {
 					if (SharedValue.isTestEnvironment())
 						switchWalletInDatabase(address, false)
 					else switchWalletInDatabase(address, true)
 				}
-				// `EOS` 以及以太坊都不需要额外判断是否是测试网络
-				else -> fragment.activity?.jump<SplashActivity>()
 			}
 		}
 	}

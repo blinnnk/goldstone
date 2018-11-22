@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.GasSelectionModel
 import org.jetbrains.anko.radioButton
 import org.jetbrains.anko.textColor

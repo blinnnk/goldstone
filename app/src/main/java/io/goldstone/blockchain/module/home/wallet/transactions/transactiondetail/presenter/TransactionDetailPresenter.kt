@@ -11,10 +11,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
-import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
-import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.crypto.multichain.isEOSSeries
-import io.goldstone.blockchain.crypto.multichain.isETHSeries
+import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -263,9 +260,12 @@ class TransactionDetailPresenter(
 		val dateText =
 			if (data.date.toLongOrNull() != null) TimeUtils.formatDate(data.date.toMillisecond())
 			else data.date
+		val displayMinerFee =
+			if (data.contract.isEOSSeries()) minerFee
+			else minerFee suffix data.contract.getSymbol().symbol
 		detailView.showTransactionInformation(
 			TransactionDetailModel(data.hash, TransactionText.transactionHash),
-			TransactionDetailModel(minerFee, TransactionText.minerFee),
+			TransactionDetailModel(displayMinerFee, TransactionText.minerFee),
 			TransactionDetailModel(blockNumberText, TransactionText.blockNumber),
 			TransactionDetailModel(confirmationsText, TransactionText.confirmations),
 			TransactionDetailModel(dateText, TransactionText.transactionDate)
@@ -276,7 +276,7 @@ class TransactionDetailPresenter(
 		ETHSeriesTransactionUtils.getTransactionByHash(
 			data.hash,
 			data.isReceive,
-			data.chainID?.getSpecificChain()!!,
+			data.chainID?.getSpecificChain() ?: data.contract.getChainURL(),
 			data.date
 		) { data, error ->
 			if (data.isNotNull() && error.isNone()) launchUI {

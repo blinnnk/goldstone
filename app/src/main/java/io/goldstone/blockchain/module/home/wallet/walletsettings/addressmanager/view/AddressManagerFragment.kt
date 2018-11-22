@@ -287,7 +287,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	private fun showCreatorDashboard() {
 		Dashboard(context!!) {
-			showDashboard(
+			showGrid(
 				"Create New Address",
 				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
 					verifyMultiChainWalletPassword(context!!) { password, error ->
@@ -490,7 +490,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			val data =
 				GridIconTitleModel.getMenuModels(hasDefaultCell, isCashAddress)
 			Dashboard(context) {
-				showDashboard(
+				showGrid(
 					"More Operation",
 					GridIconTitleAdapter(data) {
 						when (it.name) {

@@ -51,8 +51,6 @@ object Spectrum {
 	@JvmField
 	val opacity8Green = Color.parseColor("#CC1CC881")
 	@JvmField
-	val lightGreen = Color.parseColor("#801CC881")
-	@JvmField
 	val darkBlue = Color.parseColor("#FF0863B8")
 	@JvmField
 	val red = Color.parseColor("#FFFA0D0D")
@@ -83,10 +81,14 @@ object WalletColor {
 }
 
 object SocialMediaColor {
-	@JvmField val facebook = Color.parseColor("#FF3F5A93")
-	@JvmField val twitter = Color.parseColor("#FF67ABE8")
-	@JvmField val reddit = Color.parseColor("#FFE16238")
-	@JvmField val telegram = Color.parseColor("#FF419ACB")
+	@JvmField
+	val facebook = Color.parseColor("#FF3F5A93")
+	@JvmField
+	val twitter = Color.parseColor("#FF67ABE8")
+	@JvmField
+	val reddit = Color.parseColor("#FFE16238")
+	@JvmField
+	val telegram = Color.parseColor("#FF419ACB")
 }
 
 object ShadowSize {
@@ -174,17 +176,12 @@ object AvatarSize {
 
 object TokenDetailSize {
 	@JvmField
-	val headerHeight = 280.uiPX()
+	val headerHeight = 240.uiPX()
 }
 
 object WalletDetailSize {
 	@JvmField
 	val headerHeight = 365.uiPX()
-}
-
-object OverlaySize {
-	@JvmField
-	val maxWidth = 300.uiPX()
 }
 
 fun View.fontSize(defaultSize: Int): Float {

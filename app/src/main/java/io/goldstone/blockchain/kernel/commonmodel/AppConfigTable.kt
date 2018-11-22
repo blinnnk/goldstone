@@ -2,7 +2,6 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.annotation.SuppressLint
 import android.arch.persistence.room.*
-import android.provider.Settings
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
@@ -12,6 +11,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -67,12 +67,10 @@ data class AppConfigTable(
 
 		@SuppressLint("HardwareIds")
 		fun insertAppConfig(@WorkerThread callback: (AppConfigTable) -> Unit) {
-			val goldStoneID =
-				Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID) + System.currentTimeMillis()
 			val config = AppConfigTable(
 				0,
 				frozenTime = 0L,
-				goldStoneID = goldStoneID,
+				goldStoneID = ApkUtil.generateGoldStoneID(),
 				language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 				terms = getLocalTerms(),
 				isMainnet = true,

@@ -1,22 +1,24 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
 import android.content.Intent
+import android.text.format.DateFormat
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.*
+import com.blinnnk.util.FixTextLength
+import com.blinnnk.util.SystemUtils
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.crypto.eos.base.TitleCellAdapter
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.currentVersion
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
@@ -26,6 +28,8 @@ import io.goldstone.blockchain.module.home.profile.profile.view.ProfileAdapter
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import kotlinx.coroutines.Dispatchers
+import java.util.*
+import kotlin.math.roundToInt
 
 
 /**
@@ -33,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
  * @author KaySaith
  */
 
+@Suppress("DEPRECATION")
 class ProfilePresenter(
 	override val fragment: ProfileFragment
 ) : BaseRecyclerPresenter<ProfileFragment, ProfileModel>() {
@@ -106,15 +111,32 @@ class ProfilePresenter(
 	}
 
 	// 这个方法是为了内部使用查看 `GoldStoneID` 的隐藏方法
-	private var clickTimes = 10
-	private var hasShownGoldStoneID = false
+	private var clickTimes = generateUnlockTimes()
+
 	fun showGoldStoneID() {
 		clickTimes -= 1
-		if (clickTimes <= 0 && !hasShownGoldStoneID) {
-			hasShownGoldStoneID = true
-			SharedValue.updateDeveloperModeStatus(true)
-			fragment.context.alert(SharedWallet.getGoldStoneID())
-			fragment.context?.clickToCopy(SharedWallet.getGoldStoneID())
+		if (clickTimes <= 0 || SharedValue.getDeveloperModeStatus()) {
+			fragment.context?.apply {
+				val data = arrayListOf(
+					Pair("GoldStone ID", SharedWallet.getGoldStoneID()),
+					Pair("APK Channel", currentChannel.value),
+					Pair("Version Code", "${SystemUtils.getVersionCode(this)}")
+				)
+				Dashboard(this) {
+					showList("GoldStone Developer", TitleCellAdapter(data))
+				}
+				SharedValue.updateDeveloperModeStatus(true)
+			}
+		}
+	}
+
+	private fun generateUnlockTimes(): Int {
+		return try {
+			val day = DateFormat.format("dd", Date()).toString().toBigDecimal().toDouble()
+			val hour = Date().hours
+			((day * hour / 100) + 10).roundToInt()
+		} catch (error: Exception) {
+			10
 		}
 	}
 

@@ -1,12 +1,9 @@
 package io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.afollestad.materialdialogs.MaterialDialog
-import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -24,7 +21,6 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -151,30 +147,4 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 		}
 	}
 
-	companion object {
-		fun showWalletTypeDashboard(
-			context: Context,
-			type: String,
-			updateCurrentType: (String) -> Unit
-		) {
-			val data = arrayListOf(
-				AddressType.ETHSeries.value,
-				AddressType.BTC.value,
-				AddressType.BTCSeriesTest.value,
-				AddressType.LTC.value,
-				AddressType.BCH.value,
-				AddressType.EOS.value,
-				AddressType.EOSJungle.value
-			)
-			val defaultIndex = data.indexOf(type)
-			MaterialDialog(context)
-				.title(text = "Wallet Type")
-				.listItemsSingleChoice(items = data, initialSelection = defaultIndex) { _, _, item ->
-					updateCurrentType(item)
-				}
-				.positiveButton(text = CommonText.confirm)
-				.negativeButton(text = CommonText.cancel)
-				.show()
-		}
-	}
 }

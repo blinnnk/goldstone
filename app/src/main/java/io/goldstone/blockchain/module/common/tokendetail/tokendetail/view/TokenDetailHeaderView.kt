@@ -2,15 +2,11 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.view
 
 import android.content.Context
 import android.widget.RelativeLayout
-import com.blinnnk.extension.alignParentBottom
-import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.component.button.ButtonMenu
-import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.TokenDetailSize
 import io.goldstone.blockchain.module.home.quotation.quotation.model.ChartPoint
@@ -23,32 +19,15 @@ import org.jetbrains.anko.matchParent
  */
 class TokenDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-	val menu = ButtonMenu(context)
 	private val lineChart = TokenDetailHeaderLineChart(context)
 
 	init {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
 		lineChart.apply {
-			layoutParams = RelativeLayout.LayoutParams(
-				matchParent,
-				TokenDetailSize.headerHeight - menu.layoutParams.height - 40.uiPX()
-			)
-			setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
+			layoutParams = RelativeLayout.LayoutParams(matchParent, TokenDetailSize.headerHeight)
 			lineChart.setChartColorAndShadowResource(Spectrum.blue, R.drawable.fade_green)
 		}.into(this)
-
-		menu.apply {
-			y -= 10.uiPX()
-			titles = listOf(
-				CommonText.all,
-				CommonText.deposit,
-				CommonText.send,
-				CommonText.failed
-			)
-		}.into(this)
-		menu.alignParentBottom()
-		menu.centerInParent()
-		menu.selected(0)
+		lineChart.setMargins<RelativeLayout.LayoutParams> { margin = 10.uiPX() }
 	}
 
 	fun setCharData(data: ArrayList<ChartPoint>) {
