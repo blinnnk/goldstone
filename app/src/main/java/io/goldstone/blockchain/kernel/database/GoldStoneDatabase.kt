@@ -56,7 +56,6 @@ import java.math.BigInteger
 	ListStringConverter::class,
 	ResourceLimitConverter::class,
 	TotalResourcesConverter::class,
-	DelegateInfoConverter::class,
 	VoterInfoConverter::class,
 	RefundInfoConverter::class,
 	PermissionsInfoConverter::class,
@@ -67,7 +66,8 @@ import java.math.BigInteger
 	BigintegerConverter::class,
 	ListBip44AddressConverter::class,
 	NotificationExtraTypeConverter::class,
-	SocialMediaConverter::class
+	SocialMediaConverter::class,
+	DelegateBandInfoConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao

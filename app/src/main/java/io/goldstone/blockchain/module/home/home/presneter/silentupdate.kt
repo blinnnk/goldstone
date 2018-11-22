@@ -26,6 +26,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
@@ -50,6 +51,8 @@ abstract class SilentUpdater {
 			updateMyTokenCurrencyPrice()
 			checkAvailableEOSTokenList()
 			checkAvailableERC20TokenList()
+			// 拉取 EOS 的总的 Delegate Data
+			updateDelegateBandwidthData()
 		}
 		AppConfigTable.dao.getAppConfig()?.let {
 			checkMD5Info(it) { hasNewDefaultTokens, hasNewChainNodes, hasNewExchanges, hasNewTerm, hasNewConfig, hasNewShareContent ->
@@ -280,7 +283,7 @@ abstract class SilentUpdater {
 
 	private fun updateRAMUnitPrice() {
 		EOSResourceUtil.getRAMPrice(EOSUnit.KB, false) { priceInEOS, error ->
-			if (priceInEOS != null && error.isNone()) {
+			if (priceInEOS.isNotNull() && error.isNone()) {
 				SharedValue.updateRAMUnitPrice(priceInEOS)
 			}
 		}
@@ -289,8 +292,24 @@ abstract class SilentUpdater {
 	private fun updateCPUUnitPrice() {
 		if (SharedAddress.getCurrentEOSAccount().isValid()) {
 			EOSResourceUtil.getCPUPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
-				if (priceInEOS != null && error.isNone()) {
+				if (priceInEOS.isNotNull() && error.isNone()) {
 					SharedValue.updateCPUUnitPrice(priceInEOS)
+				}
+			}
+		}
+	}
+
+	private fun updateDelegateBandwidthData() {
+		val account =
+			SharedAddress.getCurrentEOSAccount()
+		if (account.isValid(false)) {
+			EOSAPI.getDelegateBandWidthList(account) { data, error ->
+				if (data.isNotNull() && error.isNone()) {
+					EOSAccountTable.dao.updateDelegateBandwidthData(
+						data,
+						account.accountName,
+						SharedChain.getEOSCurrent().chainID.id
+					)
 				}
 			}
 		}
@@ -299,7 +318,7 @@ abstract class SilentUpdater {
 	private fun updateNETUnitPrice() {
 		if (SharedAddress.getCurrentEOSAccount().isValid()) {
 			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
-				if (priceInEOS != null && error.isNone()) {
+				if (priceInEOS.isNotNull() && error.isNone()) {
 					SharedValue.updateNETUnitPrice(priceInEOS)
 				}
 			}
@@ -310,7 +329,7 @@ abstract class SilentUpdater {
 		// 拉取网络数据, 更新本地的选中状态后覆盖本地数据库 TODO 需要增加 MD5 校验减少网络请求
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
 			val nodeDao = GoldStoneDataBase.database.chainNodeDao()
-			if (serverNodes != null && error.isNone() && serverNodes.isNotEmpty()) {
+			if (serverNodes.isNotNull() && error.isNone() && serverNodes.isNotEmpty()) {
 				val localNodes = nodeDao.getAll()
 				serverNodes.map { node ->
 					node.apply {

@@ -2,7 +2,9 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toJSONObjectList
 import com.google.gson.annotations.SerializedName
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.Serializable
 
@@ -26,28 +28,33 @@ data class DelegateBandWidthInfo(
 	@SerializedName("cpu_weight")
 	val cpuWeight: String
 ) : Serializable {
+	constructor() : this(
+		"",
+		"",
+		"",
+		""
+	)
+
 	constructor(data: JSONObject) : this(
 		data.safeGet("from"),
 		data.safeGet("to"),
 		data.safeGet("net_weight"),
 		data.safeGet("cpu_weight")
 	)
+
+	fun generateObject(): String {
+		return "{\"cpu_weight\":\"$cpuWeight\",\"from\":\"$fromName\",\"net_weight\":\"$netWeight\",\"to\":\"$toName\"}"
+	}
 }
 
-class DelegateInfoConverter {
+class DelegateBandInfoConverter {
 	@TypeConverter
-	fun revertJSONObject(content: String): DelegateBandWidthInfo {
-		val data = JSONObject(content)
-		return DelegateBandWidthInfo(
-			data.safeGet("from"),
-			data.safeGet("to"),
-			data.safeGet("net_weight"),
-			data.safeGet("cpu_weight")
-		)
+	fun revertJSONObject(content: String): List<DelegateBandWidthInfo> {
+		return JSONArray(content).toJSONObjectList().map { DelegateBandWidthInfo(it) }
 	}
 
 	@TypeConverter
-	fun convertToString(delegateInfo: DelegateBandWidthInfo): String {
-		return "{\"cpu_weight\":\"${delegateInfo.cpuWeight}\",\"from\":\"${delegateInfo.fromName}\",\"net_weight\":\"${delegateInfo.netWeight}\",\"to\":\"${delegateInfo.toName}\"}"
+	fun convertToString(delegateInfo: List<DelegateBandWidthInfo>): String {
+		return delegateInfo.map { it.generateObject() }.toString()
 	}
 }
