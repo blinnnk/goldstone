@@ -66,7 +66,7 @@ class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fr
 			adapter = HoneyBaseFragmentAdapter(fragment.childFragmentManager, fragmentList)
 		}.apply {
 			// `MenuBar` 点击选中动画和内容更换
-			menuBar.setMemnuTitles(titles) { button, id ->
+			menuBar.setMenuTitles(titles) { button, id ->
 				button.addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square, 0f)
 				button.onClick {
 					currentItem = id

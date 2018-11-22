@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
+import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
@@ -22,10 +24,11 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.EOSRAM
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.view.RAMPriceChartAndMenuView
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view.QuotationViewPager
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.tradeRAM
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view.TradingView
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 import java.math.BigDecimal
 
@@ -46,64 +49,104 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	}
 	private val tradingView by lazy { TradingView(context!!, this) }
 	private val quotationViewParent by lazy { QuotationViewPager(this) }
-	
+	private val loadingView by lazy {
+		RelativeLayout(context).apply {
+			visibility = View.GONE
+			backgroundColor = Spectrum.opacity5White
+			onClick { }
+			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
+			addView(TopMiniLoadingView(context).apply {
+				(layoutParams as? RelativeLayout.LayoutParams)?.apply {
+					addRule(RelativeLayout.CENTER_VERTICAL)
+				}
+			})
+		}
+	}
 	override lateinit var presenter: RAMMarketDetailPresenter
 	fun AnkoContext<Fragment>.initView() {
-		scrollView {
-			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-			verticalLayout {
+		relativeLayout {
+			scrollView {
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-				gravity = Gravity.CENTER_HORIZONTAL
-				addView(ramPriceView)
-				addView(priceMenuCandleChart)
-				addView(tradingView)
-				addView(quotationViewParent)
-				tradingView.tradingDashboardView.ramEditText.apply {
-					afterTextChanged = Runnable {
-						if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
-							val ram = text.toString().trim().toFloat() * presenter.ramInformationModel.currentPrice
-							if (ram != 0.0) {
-								tradingView.tradingDashboardView.eosEditText.setText(ram.formatCount(3))
+				verticalLayout {
+					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+					gravity = Gravity.CENTER_HORIZONTAL
+					addView(ramPriceView)
+					addView(priceMenuCandleChart)
+					addView(tradingView)
+					addView(quotationViewParent)
+					tradingView.tradingDashboardView.ramEditText.apply {
+						afterTextChanged = Runnable {
+							if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
+								val ram = text.toString().trim().toFloat() * presenter.ramInformationModel.currentPrice
+								if (ram != 0.0) {
+									tradingView.tradingDashboardView.eosEditText.setText(ram.formatCount(3))
+								}
 							}
 						}
 					}
-				}
-				
-				tradingView.tradingDashboardView.eosEditText.apply {
-					afterTextChanged = Runnable {
-						if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
-							val eos = text.toString().trim().toFloat() / presenter.ramInformationModel.currentPrice
-							if (eos != 0.0) {
-								tradingView.tradingDashboardView.ramEditText.setText(eos.formatCount(3))
+					
+					tradingView.tradingDashboardView.eosEditText.apply {
+						afterTextChanged = Runnable {
+							if (hasFocus && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
+								val eos = text.toString().trim().toFloat() / presenter.ramInformationModel.currentPrice
+								if (eos != 0.0) {
+									tradingView.tradingDashboardView.ramEditText.setText(eos.formatCount(3))
+								}
 							}
 						}
 					}
-				}
-				
-				tradingView.tradingDashboardView.setConfirmEvent(Runnable {
-					val amount = if (tradingView.tradingDashboardView.stakeType.isSellRam())
-						tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
-					else tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
-					presenter.tradeRAM(
-						context,
-						amount,
-						tradingView.tradingDashboardView.stakeType
-					) { eosResponse, error ->
-						if (eosResponse.isNotNull() && error.isNone()) {
-							GoldStoneAPI.context.runOnUiThread {
-								eosResponse.showDialog(tradingView)
+					
+					tradingView.tradingDashboardView.setConfirmEvent(Runnable {
+						if (tradingView.tradingDashboardView.stakeType.isSellRam()) {
+							val amount = tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
+							if (amount == 0.0) return@Runnable
+							loadingView.visibility = View.VISIBLE
+							presenter.sellRAM(
+								context,
+								amount.toLong()
+							) { eosResponse, error ->
+								loadingView.visibility = View.GONE
+								if (eosResponse.isNotNull() && error.isNone()) {
+									GoldStoneAPI.context.runOnUiThread {
+										eosResponse.showDialog(tradingView)
+									}
+								} else {
+									if (!error.isNone()) {
+										GoldStoneAPI.context.runOnUiThread {
+											this@RAMMarketDetailFragment.context.alert(error.message)
+										}
+									}
+								}
 							}
 						} else {
-							GoldStoneAPI.context.runOnUiThread {
-								this@RAMMarketDetailFragment.context.alert(error.message)
+							val amount = tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
+							if (amount == 0.0) return@Runnable
+							loadingView.visibility = View.VISIBLE
+							presenter.buyRAM(
+								context,
+								amount
+							) { eosResponse, error ->
+								loadingView.visibility = View.GONE
+								if (eosResponse.isNotNull() && error.isNone()) {
+									GoldStoneAPI.context.runOnUiThread {
+										eosResponse.showDialog(tradingView)
+									}
+								} else {
+									if (!error.isNone()) {
+										GoldStoneAPI.context.runOnUiThread {
+											this@RAMMarketDetailFragment.context.alert(error.message)
+										}
+									}
+								}
 							}
 						}
-					}
-				})
-				
+					})
+				}
 			}
+			
+			addView(loadingView)
+			
 		}
-		
 	}
 	
 	override fun setCurrentPriceAndPercent(price: Double, percent: Double) {

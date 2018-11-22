@@ -44,7 +44,7 @@ class RAMTradePercentPresenter(private val gsView: RAMDistributedContract.GSView
 	
 	private val buyColors = arrayOf(
 		Spectrum.green,
-		Spectrum.lightGreen,
+		Color.parseColor("#801CC881"),
 		Color.parseColor("#FF55F6B6")
 	)
 	
