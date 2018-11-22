@@ -216,4 +216,37 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "你確定要刪除這個聯繫人和對應的地址嗎？"
 		else -> ""
 	}
+	@JvmField
+	val walletAdvanced = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wallet Advanced Settings"
+		HoneyLanguage.Chinese.code -> "钱包设置"
+		HoneyLanguage.Japanese.code -> "ウォレットの設定"
+		HoneyLanguage.Korean.code -> "월렛 설정"
+		HoneyLanguage.Russian.code -> "Настройки кошелька"
+		HoneyLanguage.TraditionalChinese.code -> "錢包設置"
+
+		else -> ""
+	}
+	@JvmField
+	val generalPreference = when (currentLanguage) {
+		HoneyLanguage.English.code -> "General Preference"
+		HoneyLanguage.Chinese.code -> "通用设置"
+		HoneyLanguage.Japanese.code -> "一般的な設定"
+		HoneyLanguage.Korean.code -> "일반 특혜"
+		HoneyLanguage.Russian.code -> "Общие предпочтения"
+		HoneyLanguage.TraditionalChinese.code -> "通用設置"
+
+		else -> ""
+	}
+	@JvmField
+	val aboutGoldStone = when (currentLanguage) {
+		HoneyLanguage.English.code -> "About GoldStone"
+		HoneyLanguage.Chinese.code -> "关于GoldStone"
+		HoneyLanguage.Japanese.code -> "GoldStoneについて"
+		HoneyLanguage.Korean.code -> "GoldStone 정보"
+		HoneyLanguage.Russian.code -> "О компании GoldStone"
+		HoneyLanguage.TraditionalChinese.code -> "關於GoldStone"
+
+		else -> ""
+	}
 }
