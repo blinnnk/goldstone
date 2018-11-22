@@ -97,45 +97,29 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 					}
 					
 					tradingView.tradingDashboardView.setConfirmEvent(Runnable {
-						if (tradingView.tradingDashboardView.stakeType.isSellRam()) {
-							val amount = tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
-							if (amount == 0.0) return@Runnable
-							loadingView.visibility = View.VISIBLE
-							presenter.sellRAM(
-								context,
-								amount.toLong()
-							) { eosResponse, error ->
-								loadingView.visibility = View.GONE
-								if (eosResponse.isNotNull() && error.isNone()) {
-									GoldStoneAPI.context.runOnUiThread {
-										eosResponse.showDialog(tradingView)
-									}
-								} else {
-									if (!error.isNone()) {
-										GoldStoneAPI.context.runOnUiThread {
-											this@RAMMarketDetailFragment.context.alert(error.message)
-										}
-									}
+						val amount = if (tradingView.tradingDashboardView.stakeType.isSellRam())
+							tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
+						else tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
+						if (amount == 0.0) return@Runnable
+						loadingView.visibility = View.VISIBLE
+						presenter.tradeRAM(
+							context,
+							amount,
+							tradingView.tradingDashboardView.stakeType
+						) { eosResponse, error ->
+							if (eosResponse.isNotNull() && error.isNone()) {
+								presenter.updateAccountData {
+									presenter.setAcountInfoFromDatabase()
 								}
-							}
-						} else {
-							val amount = tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
-							if (amount == 0.0) return@Runnable
-							loadingView.visibility = View.VISIBLE
-							presenter.buyRAM(
-								context,
-								amount
-							) { eosResponse, error ->
-								loadingView.visibility = View.GONE
-								if (eosResponse.isNotNull() && error.isNone()) {
+								GoldStoneAPI.context.runOnUiThread {
+									loadingView.visibility = View.GONE
+									eosResponse.showDialog(tradingView)
+								}
+							} else {
+								if (!error.isNone()) {
 									GoldStoneAPI.context.runOnUiThread {
-										eosResponse.showDialog(tradingView)
-									}
-								} else {
-									if (!error.isNone()) {
-										GoldStoneAPI.context.runOnUiThread {
-											this@RAMMarketDetailFragment.context.alert(error.message)
-										}
+										loadingView.visibility = View.GONE
+										this@RAMMarketDetailFragment.context.alert(error.message)
 									}
 								}
 							}

@@ -1,17 +1,19 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter
 
 import android.content.Context
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.toDoubleOrZero
+import android.support.annotation.WorkerThread
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
@@ -145,8 +147,36 @@ fun RAMMarketDetailPresenter.sellRAM(
 			}
 		}
 	}
-	
 }
+
+/**
+ * 买卖内存
+ */
+
+fun RAMMarketDetailPresenter.tradeRAM(
+	context: Context,
+	amount: Double,
+	staketype: StakeType,
+	callback: (response: EOSResponse?, GoldStoneError) -> Unit
+) {
+	if (staketype.isSellRam()) {
+		sellRAM(context, amount.toLong(), callback)
+	} else {
+		buyRAM(context, amount, callback)
+	}
+}
+
+fun RAMMarketDetailPresenter.updateAccountData(@WorkerThread callback: () -> Unit) {
+	val currentAccount = SharedAddress.getCurrentEOSAccount()
+	EOSAPI.getAccountInfo(currentAccount) { newData, error ->
+		if (newData.isNotNull() && error.isNone()) {
+			// 新数据标记为老数据的 `主键` 值
+			GoldStoneDataBase.database.eosAccountDao().update(newData)
+			callback()
+		}
+	}
+}
+
 
 
 

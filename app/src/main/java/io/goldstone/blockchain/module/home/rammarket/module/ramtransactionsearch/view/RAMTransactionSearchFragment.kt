@@ -39,11 +39,13 @@ class RAMTransactionSearchFragment:
 		presenter = RAMTransactionSearchPresenter(this, account)
 		getParentFragment<RAMMarketOverlayFragment> {
 			searchInputListener {
-				if (NetworkUtil.hasNetwork(context)) this@RAMTransactionSearchFragment.presenter.loadFirstPage()
+				if (NetworkUtil.hasNetwork(context)) {
+					this@RAMTransactionSearchFragment.presenter.account = it
+					this@RAMTransactionSearchFragment.presenter.loadFirstPage()
+				}
 			}
 		}
 		if (account != null && account.isNotEmpty()) {
-			presenter.account = account
 			getParentFragment<RAMMarketOverlayFragment> {
 				getOverlayHeader().setSearchText(account)
 			}
