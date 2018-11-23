@@ -71,7 +71,7 @@ class DepositPresenter(
 				}
 
 				token?.contract.isEOSSeries() -> {
-					val accountName = SharedAddress.getCurrentEOSAccount().accountName
+					val accountName = SharedAddress.getCurrentEOSAccount().name
 					QRCode.generateEOSCode(
 						accountName,
 						if (token?.contract.isEOSToken()) token?.contract?.contract.orEmpty() else EOSCodeName.EOSIO.value,

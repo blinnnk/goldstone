@@ -78,8 +78,8 @@ class EOSAccountRegisterPresenter(
 						if (error.isNone() && privateKey.isNotNull()) {
 							EOSRegisterTransaction(
 								SharedChain.getEOSCurrent().chainID,
-								EOSAuthorization(creatorAccount.accountName, EOSActor.Active),
-								validAccount!!.accountName,
+								EOSAuthorization(creatorAccount.name, EOSActor.Active),
+								validAccount!!.name,
 								validPublicKey.orEmpty(),
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
@@ -100,7 +100,7 @@ class EOSAccountRegisterPresenter(
 			validPublicKey: String?,
 			error: GoldStoneError
 		) -> Unit) {
-		if (newAccount.accountName.isEmpty()) {
+		if (newAccount.name.isEmpty()) {
 			hold(null, null, AccountError.EmptyName)
 			return
 		}

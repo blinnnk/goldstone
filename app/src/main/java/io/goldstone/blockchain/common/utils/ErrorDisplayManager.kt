@@ -45,9 +45,14 @@ class ErrorDisplayManager(error: Throwable) {
 		displayMessage?.apply {
 			launchUI {
 				val packageName = context?.applicationContext?.packageName
-				if (!packageName.isNullOrEmpty() && contains(packageName, true)) {
-					context.alert(substring(packageName.length, length))
-				} else context.alert(this)
+				try {
+					if (!packageName.isNullOrEmpty() && contains(packageName, true)) {
+						context.alert(substring(packageName.length, length))
+					} else context.alert(this)
+				} catch (error: Exception) {
+					// Context 丢失的时候执行
+					LogUtil.error("Error Display Manager", error)
+				}
 			}
 		}
 	}

@@ -235,7 +235,7 @@ class EOSUnitTest {
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 		val action = EOSAction(EOSCodeName.EOSIOToken, transactionInfoCode, EOSTransactionMethod.Transfer, authorizationObjects)
 		EOSTransactionUtils.serialize(
-			EOSChain.Test,
+			ChainID.EOSTest,
 			header,
 			listOf(action),
 			listOf(authorization),

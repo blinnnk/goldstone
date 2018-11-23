@@ -28,6 +28,7 @@ import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
@@ -35,6 +36,8 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
@@ -98,7 +101,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		GraySquareCell(context!!).apply {
 			showArrow()
 			setTitle(EOSAccountText.authority)
-			setSubtitle(SharedAddress.getCurrentEOSAccount().accountName)
+			setSubtitle(SharedAddress.getCurrentEOSAccount().name)
 			click {
 				val type = SharedWallet.getCurrentWalletType()
 				when {
@@ -217,7 +220,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			Bundle().apply {
 				putString(
 					ArgumentKey.defaultEOSAccountName,
-					SharedAddress.getCurrentEOSAccount().accountName
+					SharedAddress.getCurrentEOSAccount().name
 				)
 			},
 			2
@@ -329,8 +332,41 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		presenter.getDelegateBandWidthData {
 			loadingView.remove()
 			Dashboard(context!!) {
-				showList("Delegate Bandwidth Detail", DelegateBandwidthAdapter(it))
+				showList(
+					"Delegate Bandwidth Detail",
+					DelegateBandwidthAdapter(it) {
+						showDelegateEditorDashboard(EOSAccount(toName))
+					}
+				)
 			}
+		}
+	}
+
+	private fun Dashboard.showDelegateEditorDashboard(receiver: EOSAccount) {
+		with(dialog) {
+			cancelOnTouchOutside(false)
+			setContentView(
+				DelegateEditorView(context).apply {
+					setTitle("Delegate Editor")
+					closeEvent = Runnable { dismiss() }
+					confirmEvent = Runnable {
+						showLoading(true)
+						presenter.redemptionBandwidth(
+							getPassword(),
+							receiver,
+							getCPUAMount(),
+							getNetAmount()
+						) {
+							launchUI {
+								dialog.dismiss()
+								showLoading(false)
+								it.showDialog(context)
+							}
+						}
+					}
+				},
+				LinearLayout.LayoutParams(matchParent, wrapContent)
+			)
 		}
 	}
 

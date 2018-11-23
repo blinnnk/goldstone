@@ -276,12 +276,14 @@ fun Context.registerDevice(token: String, @UiThread callback: () -> Unit) {
 		CountryCode.currentCountry
 	) { result, error ->
 		// 返回的 `Code` 是 `0` 存入 `SharedPreference` `token` 下次检查是否需要重新注册
-		val code = JSONObject(result).safeGet("code")
-		if (!result.isNullOrEmpty() && error.isNone()) GoldStoneCode.isSuccess(code) { isSuccessful ->
-			if (isSuccessful) {
-				saveDataToSharedPreferences(SharesPreference.registerPush, token)
-				launchUI {
-					callback()
+		if (!result.isNullOrEmpty() && error.isNone()) {
+			val code = JSONObject(result).safeGet("code")
+			GoldStoneCode.isSuccess(code) { isSuccessful ->
+				if (isSuccessful) {
+					saveDataToSharedPreferences(SharesPreference.registerPush, token)
+					launchUI {
+						callback()
+					}
 				}
 			}
 		}

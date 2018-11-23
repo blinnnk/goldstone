@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
@@ -25,7 +26,6 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
@@ -197,33 +197,35 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 		presenter.checkIsValidTransfer { error ->
 			launchUI {
 				if (error.isNone()) {
-					context.showAlertView(
-						TransactionText.confirmTransactionTitle,
-						TransactionText.confirmTransaction,
-						true,
-						// 点击取消按钮
-						{ showLoadingStatus(false) }
-					) { input ->
-						// request keystore password from user
-						val password = input?.text.toString()
-						presenter.transfer(
-							token?.contract.orEmpty(),
-							password,
-							paymentModel!!,
-							getCustomFee()
-						) { receiptModel, error ->
-							// get response model or show error
-							launchUI {
-								if (receiptModel.isNotNull() && error.isNone()) {
-									goToTransactionDetailFragment(
-										overlayFragment,
-										this@GasSelectionFragment,
-										receiptModel
-									)
-								} else {
-									// 用户取消输入密码会返回 `model null`  和 `error none` 所以不用提示
-									if (error.hasError()) safeShowError(error)
-									showLoadingStatus(false)
+					Dashboard(context!!) {
+						showAlertView(
+							TransactionText.confirmTransactionTitle,
+							TransactionText.confirmTransaction,
+							true,
+							// 点击取消按钮
+							{ showLoadingStatus(false) }
+						) { input ->
+							// request keystore password from user
+							val password = input?.text.toString()
+							presenter.transfer(
+								token?.contract.orEmpty(),
+								password,
+								paymentModel!!,
+								getCustomFee()
+							) { receiptModel, error ->
+								// get response model or show error
+								launchUI {
+									if (receiptModel.isNotNull() && error.isNone()) {
+										goToTransactionDetailFragment(
+											overlayFragment,
+											this@GasSelectionFragment,
+											receiptModel
+										)
+									} else {
+										// 用户取消输入密码会返回 `model null`  和 `error none` 所以不用提示
+										if (error.hasError()) safeShowError(error)
+										showLoadingStatus(false)
+									}
 								}
 							}
 						}

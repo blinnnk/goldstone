@@ -26,7 +26,6 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
 import io.goldstone.blockchain.crypto.multichain.*
@@ -458,21 +457,23 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			context: Context,
 			@WorkerThread hold: (password: String?, error: AccountError) -> Unit
 		) {
-			context.showAlertView(
-				WalletSettingsText.createSubAccount,
-				WalletSettingsText.createSubAccountIntro,
-				!SharedWallet.isWatchOnlyWallet(),
-				{ }
-			) { passwordInput ->
-				GlobalScope.launch(Dispatchers.Default) {
-					val password = passwordInput?.text.toString()
-					context.verifyKeystorePassword(
-						password,
-						SharedAddress.getCurrentBTC(),
-						true
-					) {
-						if (it) hold(password, AccountError.None)
-						else hold(null, AccountError.WrongPassword)
+			Dashboard(context) {
+				showAlertView(
+					WalletSettingsText.createSubAccount,
+					WalletSettingsText.createSubAccountIntro,
+					!SharedWallet.isWatchOnlyWallet(),
+					{}
+				) { passwordInput ->
+					GlobalScope.launch(Dispatchers.Default) {
+						val password = passwordInput?.text.toString()
+						context.verifyKeystorePassword(
+							password,
+							SharedAddress.getCurrentBTC(),
+							true
+						) {
+							if (it) hold(password, AccountError.None)
+							else hold(null, AccountError.WrongPassword)
+						}
 					}
 				}
 			}

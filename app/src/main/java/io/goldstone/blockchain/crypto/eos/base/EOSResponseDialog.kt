@@ -14,13 +14,13 @@ import io.goldstone.blockchain.common.utils.click
  * @author KaySaith
  * @date  2018/09/22
  */
-fun EOSResponse.showDialog(parent: ViewGroup) {
+fun EOSResponse.showDialog(context: Context) {
 	val data = arrayListOf(
 		Pair("Transaction ID", transactionID),
 		Pair("CPU Usage", "$cupUsageByte"),
 		Pair("NET Usage", "$netUsageByte")
 	)
-	Dashboard(parent.context) {
+	Dashboard(context) {
 		showList(CommonText.succeed, TitleCellAdapter(data))
 	}
 }

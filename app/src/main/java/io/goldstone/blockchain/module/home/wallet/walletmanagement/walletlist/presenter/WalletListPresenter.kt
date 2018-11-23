@@ -5,10 +5,10 @@ import com.blinnnk.extension.jump
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
@@ -135,13 +135,14 @@ class WalletListPresenter(
 	}
 
 	private fun showConfirmationAlertView(content: String, callback: () -> Unit) {
-		fragment.context?.showAlertView(
-			"Switch Chain Network",
-			WalletSettingsText.switchChainNetAlert(content),
-			false,
-			{} // Cancel Event
-		) {
-			callback()
+		Dashboard(fragment.context!!) {
+			showAlertView(
+				"Switch Chain Network",
+				WalletSettingsText.switchChainNetAlert(content),
+				false
+				) {
+				callback()
+			}
 		}
 	}
 
