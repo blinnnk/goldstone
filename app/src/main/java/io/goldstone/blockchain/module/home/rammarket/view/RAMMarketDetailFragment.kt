@@ -113,7 +113,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 								}
 								GoldStoneAPI.context.runOnUiThread {
 									loadingView.visibility = View.GONE
-									eosResponse.showDialog(tradingView)
+									eosResponse.showDialog(context)
 								}
 							} else {
 								if (!error.isNone()) {

@@ -5,8 +5,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.*
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
@@ -63,8 +62,9 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 
 fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
 	val account = SharedAddress.getCurrentEOSAccount()
+	val chainId = SharedChain.getEOSCurrent().chainID.id
 	doAsync {
-		GoldStoneDataBase.database.eosAccountDao().getAccount(account.accountName)?.let { localData ->
+		GoldStoneDataBase.database.eosAccountDao().getAccount(account.name, chainId)?.let { localData ->
 			val ramBalance = ((localData.ramQuota -localData. ramUsed).toDouble() / 1024.0).formatCount(4)
 			GoldStoneAPI.context.runOnUiThread {
 				ramMarketDetailView.setRAMBalance(ramBalance, if (localData.balance.isEmpty()) "0.0" else localData.balance)
@@ -82,7 +82,8 @@ fun RAMMarketDetailPresenter.buyRAM(
 	amount: Double,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
-	val accountName = SharedAddress.getCurrentEOSAccount().accountName
+	val accountName = SharedAddress.getCurrentEOSAccount().name
+	val chainId = SharedChain.getEOSCurrent().chainID.id
 	if (accountName == "default" || accountName.isEmpty()) {
 		callback(null, GoldStoneError(EOSRAMExchangeText.eosNoAccount))
 		return
@@ -92,7 +93,7 @@ fun RAMMarketDetailPresenter.buyRAM(
 		return
 	}
 	doAsync {
-		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName)
+		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName, chainId)
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (amount > localData.balance.toDoubleOrZero()) {
@@ -120,7 +121,8 @@ fun RAMMarketDetailPresenter.sellRAM(
 	amount: Long,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
-	val accountName = SharedAddress.getCurrentEOSAccount().accountName
+	val accountName = SharedAddress.getCurrentEOSAccount().name
+	val chainId = SharedChain.getEOSCurrent().chainID.id
 	if (accountName == "default" || accountName.isEmpty()) {
 		callback(null, GoldStoneError(EOSRAMExchangeText.eosNoAccount))
 		return
@@ -130,7 +132,7 @@ fun RAMMarketDetailPresenter.sellRAM(
 		return
 	}
 	doAsync {
-		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName)
+		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName, chainId)
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (BigDecimal(amount).toBigInteger() > (localData.ramQuota - localData.ramUsed)) {
