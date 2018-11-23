@@ -146,5 +146,26 @@ object EmptyText {
 		HoneyLanguage.TraditionalChinese.code -> "語言"
 		else -> ""
 	}
+	
+	@JvmField
+	val ramTransactionSearchTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "没有交易记录"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	@JvmField
+	val ramTransactionSearchSubTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "您搜索的账号不存在或是该账号没有进行过内存买卖"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
 
 }

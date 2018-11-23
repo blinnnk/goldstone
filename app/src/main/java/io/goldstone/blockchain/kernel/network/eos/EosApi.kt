@@ -23,8 +23,7 @@ import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
-import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
-import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.*
 import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
@@ -604,6 +603,36 @@ object EOSAPI {
 					}
 				}
 			}
+		}
+	}
+	
+	fun getGlobalInformation(
+		@WorkerThread hold: (EOSGlobalModel?, RequestError) -> Unit
+	) {
+		
+		RequestBody.create(
+			ETHJsonRPC.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "global"),
+				Pair("json", "true")
+			)
+		).let {
+			RequisitionUtil.postRequest<EOSGlobalModel>(
+				it,
+				"rows",
+				EOSUrl.getTableRows(),
+				false,
+				false
+			) { data, error ->
+				if (data != null && data.isNotEmpty()) {
+					hold(data[0], RequestError.None)
+				} else {
+					hold(null, error)
+				}
+			}
+			
 		}
 	}
 

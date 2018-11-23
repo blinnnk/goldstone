@@ -12,20 +12,19 @@ import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 /**
  * @date 2018/6/25 1:34 PM
  * @author KaySaith
  */
-class ViewPagerMenu(context: Context) : LinearLayout(context) {
+class ViewPagerMenu(context: Context, private var itemWidth: Int = 0) : LinearLayout(context) {
 	
 	private var titles: ArrayList<String> by observing(arrayListOf()) {
-		val unitWidth = if (titles.size < 4) ScreenSize.Width / titles.size else 100.uiPX()
-		underLineWidth = unitWidth.toFloat()
+		if (itemWidth == 0) {
+			itemWidth = if (titles.size < 4) ScreenSize.Width / titles.size else 100.uiPX()
+		}
+		underLineWidth = itemWidth.toFloat()
 		titles.forEachIndexed { index, content ->
 			textView(content) {
 				id = index
@@ -33,7 +32,8 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 				typeface = GoldStoneFont.heavy(context)
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER
-				layoutParams = LinearLayout.LayoutParams(unitWidth, 43.uiPX())
+				singleLine = true
+				layoutParams = LinearLayout.LayoutParams(itemWidth, 43.uiPX())
 			}
 		}
 		invalidate()
@@ -42,6 +42,7 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		isAntiAlias = true
 		style = Paint.Style.STROKE
 		strokeWidth = fontSize(7)
+		color = Spectrum.lightBlue
 	}
 	private val barHeight = 45.uiPX()
 	private var underLineLeft = 0f
@@ -66,7 +67,6 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 	
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		paint.color = Spectrum.lightBlue
 		canvas?.drawLine(
 			underLineLeft,
 			height - borderSize,
@@ -83,5 +83,9 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 	fun moveUnderLine(distance: Float) {
 		underLineLeft = distance
 		invalidate()
+	}
+	
+	fun setBorderLineColor(color: Int) {
+		paint.color = color
 	}
 }
