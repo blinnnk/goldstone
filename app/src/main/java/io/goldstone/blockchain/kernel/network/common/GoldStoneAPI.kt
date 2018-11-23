@@ -540,7 +540,7 @@ object GoldStoneAPI {
 	
 	}
 	
-	fun getBigTransactions(mode: Int, hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit) {
+	fun getLargeTransactions(mode: Int, hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit) {
 		requestData(
 			APIPath.eosRAMBIgTransactions(APIPath.currentUrl, mode),
 			"tx_list",
