@@ -71,7 +71,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 					// 或分页数据本地不存在此范围片段, 向上获取指定 `ID`
 					if (currentMaxCount == totalCount) 0L
 					else dao.getDataByDataIndex(
-						account.accountName,
+						account.name,
 						currentMaxCount.orZero() + 1,
 						token.symbol.symbol,
 						codeName
@@ -89,7 +89,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 					if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
 						localData.minBy { it.dataIndex }?.serverID ?: 0L
 					else dao.getDataByDataIndex(
-						account.accountName,
+						account.name,
 						currentMaxCount.orZero() + 1,
 						token.symbol.symbol,
 						codeName

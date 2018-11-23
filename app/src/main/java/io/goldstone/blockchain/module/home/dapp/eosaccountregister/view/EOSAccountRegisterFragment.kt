@@ -23,7 +23,6 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.showDialog
@@ -114,10 +113,9 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 						assignResources[1].right.toDouble()
 					) { response, error ->
 						launchUI {
-							if (response.isNotNull() && error.isNone()) getParentContainer()?.apply {
-								response.showDialog(this)
-							} else safeShowError(error)
-							button.showLoadingStatus(false, Spectrum.blue, CommonText.confirm)
+							if (response.isNotNull() && error.isNone()) response.showDialog(context)
+							else safeShowError(error)
+							button.showLoadingStatus(false)
 						}
 					}
 				}.into(this)

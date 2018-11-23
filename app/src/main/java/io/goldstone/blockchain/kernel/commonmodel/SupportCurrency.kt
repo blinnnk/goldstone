@@ -2,7 +2,6 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -44,12 +43,8 @@ data class SupportCurrencyTable(
 		@JvmField
 		val dao = GoldStoneDataBase.database.currencyDao()
 
-		fun getSupportCurrencies(hold: (ArrayList<SupportCurrencyTable>) -> Unit) {
-			load {
-				GoldStoneDataBase.database.currencyDao().getSupportCurrencies()
-			} then {
-				hold(it.toArrayList())
-			}
+		fun getSupportCurrencies(hold: (List<SupportCurrencyTable>) -> Unit) {
+			load { dao.getSupportCurrencies() } then (hold)
 		}
 	}
 }

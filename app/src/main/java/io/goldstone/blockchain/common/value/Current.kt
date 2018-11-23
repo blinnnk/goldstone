@@ -11,7 +11,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
  */
 
 object Current {
-	fun allChainID(): List<ChainID> = listOf(
+	private fun allChainID(): List<ChainID> = listOf(
 		SharedChain.getCurrentETH().chainID,
 		SharedChain.getETCCurrent().chainID,
 		SharedChain.getBTCCurrent().chainID,
@@ -27,7 +27,7 @@ object Current {
 		return when {
 			currentWallet.isETHSeries() -> listOf(SharedChain.getCurrentETH().chainID)
 			currentWallet.isEOSSeries() -> listOf(SharedChain.getEOSCurrent().chainID)
-			currentWallet.isBIP44() || currentWallet.isBIP44() -> Current.allChainID()
+			currentWallet.isBIP44() || currentWallet.isMultiChain() -> Current.allChainID()
 			else -> listOf()
 		}
 	}

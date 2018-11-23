@@ -67,7 +67,7 @@ object EOSAPI {
 				actions.forEachIndexed { index, jsonObject ->
 					if (
 						jsonObject.safeGet("name").equals("transfer", true) &&
-						jsonObject.getTargetChild("data", "from").equals(fromAccount.accountName, true)
+						jsonObject.getTargetChild("data", "from").equals(fromAccount.name, true)
 					) {
 						actionIndex = index
 					}
@@ -106,7 +106,7 @@ object EOSAPI {
 	) {
 		RequestBody.create(
 			ETHJsonRPC.contentType,
-			ParameterUtil.prepareObjectContent(Pair("account_name", account.accountName))
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.name))
 		).let { requestBody ->
 			val api =
 				if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
@@ -258,7 +258,7 @@ object EOSAPI {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("code", tokenCodeName),
-				Pair("account", account.accountName),
+				Pair("account", account.name),
 				Pair("symbol", symbol.symbol)
 			),
 			EOSUrl.getAccountEOSBalance(),
@@ -282,7 +282,7 @@ object EOSAPI {
 	) {
 		RequisitionUtil.postSingle<TotalResources>(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", account.accountName),
+				Pair("scope", account.name),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "userres"),
 				Pair("json", true)
@@ -302,7 +302,7 @@ object EOSAPI {
 		if (!account.isValid(false)) hold(null, AccountError.InvalidAccountName)
 		else RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", account.accountName),
+				Pair("scope", account.name),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "refunds"),
 				Pair("json", true)
@@ -315,13 +315,13 @@ object EOSAPI {
 	}
 
 	fun getDelegateBandWidthList(
-		accountName: String,
+		account: EOSAccount,
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
 		@WorkerThread hold: (delegateBandWidths: List<DelegateBandWidthInfo>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
-				Pair("scope", accountName),
+				Pair("scope", account.name),
 				Pair("code", tokenCodeName.value),
 				Pair("table", "delband"),
 				Pair("json", true)
@@ -347,7 +347,7 @@ object EOSAPI {
 			APIPath.getEOSTransactions(
 				APIPath.currentUrl,
 				chainid.id,
-				account.accountName,
+				account.name,
 				pageSize,
 				starID,
 				endID,
@@ -365,7 +365,7 @@ object EOSAPI {
 			val data = result.firstOrNull()
 			if (!data.isNullOrEmpty()) hold(
 				JSONArray(data).toJSONObjectList().map {
-					EOSTransactionTable(it, SharedAddress.getCurrentEOSAccount().accountName)
+					EOSTransactionTable(it, SharedAddress.getCurrentEOSAccount().name)
 				},
 				RequestError.None
 			) else hold(null, RequestError.NullResponse("Empty or Null Result"))
@@ -407,7 +407,7 @@ object EOSAPI {
 			APIPath.getEOSTokenList(
 				APIPath.currentUrl,
 				chainid.id,
-				account.accountName
+				account.name
 			),
 			"token_list",
 			false,
@@ -428,7 +428,7 @@ object EOSAPI {
 			APIPath.getEOSTokenCountInfo(
 				APIPath.currentUrl,
 				chainid.id,
-				account.accountName,
+				account.name,
 				codeName,
 				symbol.symbol
 			),
@@ -456,7 +456,7 @@ object EOSAPI {
 			APIPath.getEOSTransactions(
 				APIPath.currentUrl,
 				chainid.id,
-				account.accountName,
+				account.name,
 				0,
 				-1,
 				-1,

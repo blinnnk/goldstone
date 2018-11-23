@@ -299,7 +299,7 @@ class TransactionDetailPresenter(
 			checkLocal
 		) { data, error ->
 			if (data.isNotNull() && error.isNone()) launchUI {
-				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee suffix data.symbol)
+				showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
 			} else detailView.showErrorAlert(error)
 			launchUI { detailView.showLoading(false) }
 		}

@@ -23,7 +23,6 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbyfriend.presenter.RegisterByFriendPresenter
-import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.view.SmartContractRegisterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -114,7 +113,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 								} else context.alert(error.message)
 							}
 						}
-						account.accountName.isEmpty() -> context.alert(EOSAccountText.checkNameResultEmpty)
+						account.name.isEmpty() -> context.alert(EOSAccountText.checkNameResultEmpty)
 						else -> context.alert(EOSAccountText.checkNameResultEmpty)
 					}
 				}.into(this)
@@ -128,7 +127,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 		availableDescriptionView.visibility = View.VISIBLE
 		confirmButton.visibility = View.GONE
 		copyResultButton.visibility = View.VISIBLE
-		availableResultView.text = newAccount.accountName + "-" + SharedAddress.getCurrentEOS()
+		availableResultView.text = newAccount.name + "-" + SharedAddress.getCurrentEOS()
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {

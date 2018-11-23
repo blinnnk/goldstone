@@ -5,12 +5,12 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.error.*
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.NetworkUtil
-import io.goldstone.blockchain.common.utils.showAlertView
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -91,22 +91,24 @@ class PaymentDetailPresenter(
 			context: Context?,
 			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) = GlobalScope.launch(Dispatchers.Main) {
-			context?.showAlertView(
-				TransactionText.confirmTransactionTitle.toUpperCase(),
-				TransactionText.confirmTransaction,
-				true,
-				// User click cancel button
-				{ hold(null, AccountError.None) }
-			) { passwordInput ->
-				val password = passwordInput?.text?.toString()
-				if (password?.isNotEmpty() == true) PrivateKeyExportPresenter.getPrivateKey(
-					SharedAddress.getCurrentEOS(),
-					ChainType.EOS,
-					password
-				) { privateKey, error ->
-					if (!privateKey.isNullOrEmpty() && error.isNone()) hold(EOSPrivateKey(privateKey), error)
-					else hold(null, AccountError.WrongPassword)
-				} else hold(null, PasswordError.InputIsEmpty)
+			Dashboard(context!!) {
+				showAlertView(
+					TransactionText.confirmTransactionTitle.toUpperCase(),
+					TransactionText.confirmTransaction,
+					true,
+					// User click cancel button
+					{ hold(null, AccountError.None) }
+				) { passwordInput ->
+					val password = passwordInput?.text?.toString()
+					if (password?.isNotEmpty() == true) PrivateKeyExportPresenter.getPrivateKey(
+						SharedAddress.getCurrentEOS(),
+						ChainType.EOS,
+						password
+					) { privateKey, error ->
+						if (!privateKey.isNullOrEmpty() && error.isNone()) hold(EOSPrivateKey(privateKey), error)
+						else hold(null, AccountError.WrongPassword)
+					} else hold(null, PasswordError.InputIsEmpty)
+				}
 			}
 		}
 	}

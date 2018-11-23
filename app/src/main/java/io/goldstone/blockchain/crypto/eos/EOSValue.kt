@@ -34,7 +34,8 @@ object EOSValue {
 }
 
 enum class EOSTransactionMethod(val value: String) {
-	Transfer("transfer")
+	Transfer("transfer"),
+	Undelegatebw("undelegatebw")
 }
 
 data class EOSTransactionSerialization(

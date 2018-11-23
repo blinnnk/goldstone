@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.kernel.network.eos
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
@@ -44,14 +46,14 @@ class EOSTransaction(
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
 			val action = EOSAction(
-				EOSCodeName(contract.contract.orEmpty()),
+				EOSCodeName(contract.contract),
 				transactionInfoCode,
 				EOSTransactionMethod.Transfer,
 				authorizationObjects
 			)
-			if (header != null && error.isNone()) {
+			if (header.isNotNull() && error.isNone()) {
 				val serialization = EOSTransactionUtils.serialize(
-					EOSChain.getCurrent(),
+					SharedChain.getEOSCurrent().chainID,
 					header,
 					listOf(action),
 					listOf(authorization),

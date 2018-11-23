@@ -11,7 +11,7 @@ import java.io.Serializable
 
 class EOSAccount(private val value: String) : Serializable {
 
-	val accountName = if (EOSWalletUtils.isValidAddress(value)) value else value.toLowerCase()
+	val name = if (EOSWalletUtils.isValidAddress(value)) value else value.toLowerCase()
 
 	/**
 	 * EOS Account Name 没有找到特别清晰的官方文档进行校验

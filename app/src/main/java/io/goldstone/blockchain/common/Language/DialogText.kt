@@ -67,34 +67,4 @@ object DialogText {
 		HoneyLanguage.TraditionalChinese.code -> "現在的網絡狀態不好，請檢查。您可以嘗試開啟再關閉飛行模式來嘗試恢復。"
 		else -> ""
 	}
-	@JvmField
-	val goToBackUp = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BACK UP"
-		HoneyLanguage.Chinese.code -> "立即备份"
-		HoneyLanguage.Japanese.code -> "すぐにバックアップする"
-		HoneyLanguage.Korean.code -> "백업"
-		HoneyLanguage.Russian.code -> "Немедленное резервное копирование"
-		HoneyLanguage.TraditionalChinese.code -> "立即備份"
-		else -> ""
-	}
-	@JvmField
-	val serverBusyTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Network Busy"
-		HoneyLanguage.Chinese.code -> "网络繁忙，无法连接"
-		HoneyLanguage.Japanese.code -> "ネットワークビジーで接続できません"
-		HoneyLanguage.Korean.code -> "네트워크가 사용 중입니다."
-		HoneyLanguage.Russian.code -> "Сеть занята"
-		HoneyLanguage.TraditionalChinese.code -> "網絡繁忙，無法連接"
-		else -> ""
-	}
-	@JvmField
-	val serverBusyDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Can't connect with service right now, sorry, please try again later."
-		HoneyLanguage.Chinese.code -> "现在无法和服务连接，抱歉呀，请稍后再试。"
-		HoneyLanguage.Japanese.code -> "現在サーバーと接続できません。大変申し訳ありませんが、しばらくしてから再度試して下さい。"
-		HoneyLanguage.Korean.code -> "지금 서비스에 연결할 수 없습니다. 죄송합니다. 잠시 후 다시 시도하십시오."
-		HoneyLanguage.Russian.code -> "Не удается подключиться к службе прямо сейчас, приносим свои извинения, повторите попытку позже."
-		HoneyLanguage.TraditionalChinese.code -> "現在無法和服務連接，抱歉呀，請稍後再試。"
-		else -> ""
-	}
 }

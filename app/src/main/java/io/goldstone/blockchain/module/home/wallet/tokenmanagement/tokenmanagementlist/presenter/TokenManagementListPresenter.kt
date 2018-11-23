@@ -28,9 +28,7 @@ class TokenManagementListPresenter(
 		if (fragment.asyncData.isNull()) fragment.asyncData = arrayListOf()
 		// 从异步更新数据在决定是否更新 `UI` 及内存中的数据
 		// 如果是 `ETHSeries` 的 `Token` 需要额外更新
-		fragment.getParentFragment<TokenManagementFragment> {
-			prepareMyDefaultTokens(SharedWallet.getCurrentWalletType().isETHSeries())
-		}
+		prepareMyDefaultTokens(SharedWallet.getCurrentWalletType().isETHSeries())
 	}
 
 	override fun onFragmentShowFromHidden() {

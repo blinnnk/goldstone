@@ -54,7 +54,6 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		exchangeName.text = model.exchangeName
 		// 如果价格没有变动就不用乡下执行了
 		if (price?.toDoubleOrNull().orZero() == previousPrice) return@observing
-		previousPrice = price?.toDoubleOrNull().orZero()
 		when {
 			model.isDisconnected -> {
 				tokenPrice.setColorStyle(GrayScale.midGray)
@@ -71,6 +70,7 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 				lineChart.setChartColorAndShadowResource(Spectrum.green, R.drawable.fade_green)
 			}
 		}
+		previousPrice = price?.toDoubleOrNull().orZero()
 	}
 	private val tokenInfo by lazy {
 		TwoLineTitles(context).apply {

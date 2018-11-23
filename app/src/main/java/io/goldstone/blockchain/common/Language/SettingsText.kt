@@ -197,7 +197,7 @@ object ProfileText {
 		else -> ""
 	}
 	@JvmField
-	val deletContactAlertTitle = when (currentLanguage) {
+	val deleteContactAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELETE CONTACT"
 		HoneyLanguage.Chinese.code -> "删除联系人"
 		HoneyLanguage.Japanese.code -> "連絡先の削除"
@@ -214,6 +214,17 @@ object ProfileText {
 		HoneyLanguage.Korean.code -> "이 연락처와 해당 주소를 삭제 하시겠습니까?"
 		HoneyLanguage.Russian.code -> "Вы уверены, что хотите удалить данный контакт и его соответствующий адрес?"
 		HoneyLanguage.TraditionalChinese.code -> "你確定要刪除這個聯繫人和對應的地址嗎？"
+		else -> ""
+	}
+
+	@JvmField
+	val editContactAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EDIT CONTACT"
+		HoneyLanguage.Chinese.code -> "EDIT CONTACT"
+		HoneyLanguage.Japanese.code -> "EDIT CONTACT"
+		HoneyLanguage.Korean.code -> "EDIT CONTACT"
+		HoneyLanguage.Russian.code -> "EDIT CONTACT"
+		HoneyLanguage.TraditionalChinese.code -> "EDIT CONTACT"
 		else -> ""
 	}
 }

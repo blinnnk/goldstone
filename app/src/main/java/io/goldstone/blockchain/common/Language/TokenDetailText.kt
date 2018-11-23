@@ -243,17 +243,6 @@ object TokenDetailText {
 	}
 
 	@JvmField
-	val showSmall = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Chinese.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Japanese.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Korean.code -> "Show Small (< 0.001)"
-		HoneyLanguage.Russian.code -> "Show Small (< 0.001)"
-		HoneyLanguage.TraditionalChinese.code -> "Show Small (< 0.001)"
-		else -> ""
-	}
-
-	@JvmField
 	val accountInformation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account Information"
 		HoneyLanguage.Chinese.code -> "账户信息"
@@ -456,6 +445,17 @@ object TokenDetailText {
 		HoneyLanguage.Korean.code -> "환불"
 		HoneyLanguage.Russian.code -> "Возврат"
 		HoneyLanguage.TraditionalChinese.code -> "贖回"
+		else -> ""
+	}
+
+	@JvmField
+	val delband = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DELBAND"
+		HoneyLanguage.Chinese.code -> "DELBAND"
+		HoneyLanguage.Japanese.code -> "DELBAND"
+		HoneyLanguage.Korean.code -> "DELBAND"
+		HoneyLanguage.Russian.code -> "DELBAND"
+		HoneyLanguage.TraditionalChinese.code -> "DELBAND"
 		else -> ""
 	}
 
