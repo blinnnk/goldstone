@@ -4,17 +4,14 @@ import android.content.Context
 import android.os.Handler
 import android.text.format.DateUtils
 import android.view.MotionEvent
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.github.mikephil.charting.highlight.Highlight
 import io.goldstone.blockchain.common.component.chart.candle.CandleStickChart
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
 
 /**
  * @date: 2018/8/8.

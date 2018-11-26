@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProgressView

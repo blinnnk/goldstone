@@ -16,6 +16,4 @@ class RAMRankModel(
 	val percent: String,
 	val rank: Int,
 	val gain: Double
-) {
-
-}
+)

@@ -2,19 +2,15 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 
 import android.content.Context
 import android.graphics.Color
-import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.*
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.ScreenSize
+import android.widget.RelativeLayout
+import android.widget.TextView
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.TimeUtils
-import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**

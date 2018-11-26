@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.model.RAMRankModel
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 
 /**
  * @date: 2018/11/5.

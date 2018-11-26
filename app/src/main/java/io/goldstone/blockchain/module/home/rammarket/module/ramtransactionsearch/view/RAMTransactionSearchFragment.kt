@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.baserecyclerfragment.*
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
@@ -39,15 +40,17 @@ class RAMTransactionSearchFragment:
 		presenter = RAMTransactionSearchPresenter(this, account)
 		getParentFragment<RAMMarketOverlayFragment> {
 			searchInputListener {
-				if (NetworkUtil.hasNetwork(context)) {
-					this@RAMTransactionSearchFragment.presenter.account = it
-					this@RAMTransactionSearchFragment.presenter.loadFirstPage()
+				if (it.length == 12 && NetworkUtil.hasNetwork(context)) {
+					this@RAMTransactionSearchFragment.presenter.loadFirstPage(it)
 				}
 			}
 		}
-		if (account != null && account.isNotEmpty()) {
-			getParentFragment<RAMMarketOverlayFragment> {
+		getParentFragment<RAMMarketOverlayFragment> {
+			if (account != null && account.isNotEmpty()) {
 				getContainer().header.setSearchText(account)
+			}
+			getContainer().header.setSearchEditor(EditorInfo.IME_ACTION_SEARCH) { accountName ->
+				this@RAMTransactionSearchFragment.presenter.loadFirstPage(accountName)
 			}
 		}
 	}

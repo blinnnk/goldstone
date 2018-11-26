@@ -7,7 +7,6 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.base.HoneyBaseFragmentAdapter
 import com.blinnnk.base.SubFragment
 import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.*
 import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText

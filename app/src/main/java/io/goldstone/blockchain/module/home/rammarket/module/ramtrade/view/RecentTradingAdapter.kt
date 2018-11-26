@@ -11,10 +11,10 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import java.math.BigDecimal
 
 /**
  * @date: 2018/10/31.
@@ -139,7 +139,9 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 	fun setData(accountName: String, quantity: Double, maxValue:Double, backgroundColor: Int) {
 		percent = if (maxValue == 0.0) 0f else (quantity / maxValue).toFloat()
 		name.text = accountName
-		transactionAmount.text = if (quantity > 10000) (quantity / 1000f).formatCount(1) + "k" else quantity.formatCount(1)
+		transactionAmount.text = if (quantity > 10000)
+			BigDecimal(quantity / 1000.0).setScale(1, BigDecimal.ROUND_HALF_UP).toPlainString() + "k"
+		else BigDecimal(quantity).setScale(4, BigDecimal.ROUND_HALF_UP).toPlainString()
 		backgroundView.setMargins<RelativeLayout.LayoutParams> {
 			leftMargin = (viewWidth * (1 - percent)).toInt()
 		}

@@ -46,7 +46,7 @@ class RAMOccupyRankCell(context: Context): RelativeLayout(context) {
 	}
 	
 	private fun getEOSOfRAM(ram: String): String {
-		var unitRAM =  when {
+		val unitRAM =  when {
 			ram.contains("GB") -> {
 				ram.replace("GB", "").trim().toDoubleOrZero() * 2014 * 1024
 			}

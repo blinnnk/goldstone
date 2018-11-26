@@ -18,7 +18,7 @@ interface RAMTransactionSearchContract {
 		fun notifyUI(isClear: Boolean, newData: ArrayList<TradingInfoModel>)
 	}
 	interface GSPresenter: GoldStonePresenter {
-		fun loadFirstPage()
+		fun loadFirstPage(account: String)
 		fun loadMore()
 		fun searchByName(@UiThread callback: () -> Unit)
 	}

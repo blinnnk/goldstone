@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramprice.view
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.module.home.rammarket.model.RAMMarketPadding
 import org.jetbrains.anko.*
 

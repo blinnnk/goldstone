@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.contract.RAMTransactionSearchContract
 import org.jetbrains.anko.doAsync
@@ -14,7 +15,7 @@ import org.jetbrains.anko.runOnUiThread
  */
 class RAMTransactionSearchPresenter(
 	private val gsView: RAMTransactionSearchContract.GSView,
-	var account: String?
+	private var account: String?
 ) : RAMTransactionSearchContract.GSPresenter {
 	
 	private var endID = 0
@@ -23,7 +24,13 @@ class RAMTransactionSearchPresenter(
 	}
 	
 	override fun searchByName(@UiThread callback: () -> Unit) {
-		if (account == null) callback()
+		if (account == null) {
+			callback()
+			return
+		} else if (!EOSAccount(account!!).isValid(false)) {
+			callback()
+			return
+		}
 		doAsync {
 			GoldStoneAPI.getEOSRAMTransactionsByAccount(account!!, endID) { data, error ->
 				if (data != null && error.isNone()) {
@@ -47,7 +54,9 @@ class RAMTransactionSearchPresenter(
 		}
 	}
 	
-	override fun loadFirstPage() {
+	override fun loadFirstPage(account: String) {
+		gsView.notifyUI(true, arrayListOf())
+		this.account = account
 		endID = 0
 		gsView.showLoading(true)
 		searchByName {

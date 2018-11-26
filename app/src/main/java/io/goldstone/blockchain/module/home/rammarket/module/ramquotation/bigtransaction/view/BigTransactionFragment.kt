@@ -41,6 +41,7 @@ class BigTransactionFragment: GSRecyclerFragment<TradingInfoModel>(), BigTransac
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<TradingInfoModel>?
 	) {
+		// 把滑动交给父view
 		recyclerView.setHasFixedSize(true)
 		recyclerView.isNestedScrollingEnabled = false
 		

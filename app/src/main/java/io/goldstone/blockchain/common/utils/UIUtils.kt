@@ -116,7 +116,7 @@ object TimeUtils {
 	/**
 	 * @date: 2018/8/22
 	 * @author: yanglihai
-	 * @description: 把日期转换成日期+时间，例如8-25 12:00
+	 * @description: 把日期转换成日期+时间
 	 */
 	@SuppressLint("SimpleDateFormat")
 	fun formatYMdHmDate(date: Long): String {

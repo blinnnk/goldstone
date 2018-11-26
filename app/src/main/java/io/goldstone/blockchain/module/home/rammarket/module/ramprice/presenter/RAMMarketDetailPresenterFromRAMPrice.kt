@@ -4,13 +4,12 @@ import android.annotation.SuppressLint
 import com.blinnnk.extension.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
-import io.goldstone.blockchain.module.home.rammarket.model.*
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import org.jetbrains.anko.doAsync
@@ -88,9 +87,6 @@ fun RAMMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) 
 }
 
 fun RAMMarketDetailPresenter.calculateCountAndUpdate(ramChartType: EOSRAMChartType) {
-	val period = ramChartType.info
-	val dateType = ramChartType.dateType
-	
 	val ramTypeData = candleDataMap[ramChartType.info]
 	if (ramTypeData != null) {
 		ramTypeData.maxBy { it.time }.apply {
@@ -102,15 +98,18 @@ fun RAMMarketDetailPresenter.calculateCountAndUpdate(ramChartType: EOSRAMChartTy
 				var size = when (ramChartType.code) {
 					EOSRAMChartType.Minute.code -> (timeDistance / (1000 * 60)).toInt()
 					EOSRAMChartType.Hour.code -> (timeDistance / (1000 * 60 * 60)).toInt()
-					else -> (timeDistance / (1000 * 60 * 60 * 24)).toInt()
+					EOSRAMChartType.Day.code -> (timeDistance / (1000 * 60 * 60 * 24)).toInt()
+					else -> 0
 				}
 				if (size > DataValue.candleChartCount) {
 					size = DataValue.candleChartCount
 				}
-				if (size == 0) {
+				
+				if (size == 0 || size == 1) {
+					// 只能取到前一个时间段的数据，所以size=1的时候，取得数据无效，所以直接更新UI
 					GoldStoneAPI.context.runOnUiThread {
-						candleDataMap[period]?.apply {
-							ramMarketDetailView.updateCandleChartUI(dateType, this)
+						candleDataMap[ramChartType.info]?.apply {
+							ramMarketDetailView.updateCandleChartUI(ramChartType.dateType, this)
 						}
 					}
 				} else getCountDataFormNet(ramChartType, size)
@@ -128,16 +127,25 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 		val candleData = data?.toArrayList()
 		if (candleData != null && error.isNone()) {
 			// 更新 `UI` 界面
-			candleDataMap[period].let { localList ->
-				if (localList == null || localList.isEmpty()) {
-					candleDataMap[period] = candleData
-				} else {
-					localList.addAll(candleData)
-					val resultList = localList.subList(localList.size - DataValue.candleChartCount, localList.size).toArrayList()
-					localList.clear()
-					localList.addAll(resultList)
+			if (candleData.isNotEmpty()) {
+				candleDataMap[period].let { localList ->
+					if (localList == null || localList.isEmpty()) {
+						candleDataMap[period] = candleData
+					} else {
+						localList.addAll(candleData)
+						val resultList = localList.asSequence()
+							.distinctBy { it.time }
+							.sortedBy { it.time }
+							.toList()
+							.subList(localList.size - DataValue.candleChartCount, localList.lastIndex)
+							.toArrayList()
+						localList.clear()
+						localList.addAll(resultList)
+						
+					}
 				}
 			}
+			
 			GoldStoneAPI.context.runOnUiThread {
 				candleDataMap[period]?.apply {
 					ramMarketDetailView.updateCandleChartUI(dateType, this)

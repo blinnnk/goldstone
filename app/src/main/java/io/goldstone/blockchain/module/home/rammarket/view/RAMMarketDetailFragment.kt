@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.rammarket.view
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
+import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -66,6 +67,9 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			scrollView {
+				// 防止页面抖动（页面跳转回来后recyclerView会抢夺焦点，继而页面抖动）
+				isFocusableInTouchMode = true
+				descendantFocusability = FOCUS_BLOCK_DESCENDANTS
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				verticalLayout {
 					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
@@ -140,7 +144,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 			else -> 2
 		}
 		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.formatCount(formatCount)} EOS/KB)"
-		ramPriceView.currentPriceView.currentPrice.text = price.toDouble().formatCount(4)
+		ramPriceView.currentPriceView.currentPrice.text = price.formatCount(4)
 		ramPriceView.currentPriceView.trendcyPercent.apply {
 			if (percent > 0) {
 				text = "+${BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP)}%"

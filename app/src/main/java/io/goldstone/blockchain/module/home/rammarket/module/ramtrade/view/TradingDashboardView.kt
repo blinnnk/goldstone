@@ -113,9 +113,9 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		}.into(this)
 		
 		linearLayout {
-			topPadding = 16.uiPX()
 			leftPadding = RAMMarketPadding
 			gravity = Gravity.CENTER_VERTICAL
+			layoutParams = LinearLayout.LayoutParams(wrapContent, 36.uiPX())
 			imageView {
 				imageResource = R.drawable.trading_discipline
 				setColorFilter(Spectrum.deepBlue)
