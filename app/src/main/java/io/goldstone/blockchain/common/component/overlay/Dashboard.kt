@@ -2,9 +2,13 @@ package io.goldstone.blockchain.common.component.overlay
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.PorterDuff
 import android.graphics.drawable.GradientDrawable
 import android.support.v7.widget.GridLayoutManager
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.WhichButton
 import com.afollestad.materialdialogs.actions.setActionButtonEnabled
@@ -13,12 +17,11 @@ import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.blinnnk.base.HoneyBaseAdapter
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "UNCHECKED_CAST")
 @SuppressLint("ViewConstructor")
@@ -27,7 +30,7 @@ import org.jetbrains.anko.wrapContent
  * @author KaySaith
  */
 
-class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
+class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 	val dialog = MaterialDialog(context)
 
 	init {
@@ -123,6 +126,41 @@ class Dashboard(context: Context, hold: Dashboard.() -> Unit) {
 			}
 			negativeButton(text = CommonText.cancel)
 			show()
+		}
+	}
+
+	fun showAlertView(
+		title: String,
+		subtitle: String,
+		showEditText: Boolean = true,
+		cancelAction: () -> Unit = {},
+		action: (EditText?) -> Unit
+	) {
+		with(context) {
+			val input = linearLayout {
+				lparams(matchParent, matchParent)
+				setPadding(20.uiPX(), 10.uiPX(), 20.uiPX(), 20.uiPX())
+				editText {
+					id = ElementID.passwordInput
+					layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
+					hintTextColor = GrayScale.Opacity1Black
+					textColor = Spectrum.blue
+					inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+					hint = CommonText.enterPassword
+					textSize = fontSize(14)
+					background.mutate().setColorFilter(Spectrum.blue, PorterDuff.Mode.SRC_ATOP)
+				}
+			}
+			if (showEditText) showDashboard(
+				title,
+				input,
+				subtitle,
+				{ action(it.findViewById(ElementID.passwordInput)) },
+				cancelAction
+			)
+			else showAlert(title, subtitle, CommonText.confirm, cancelAction) {
+				action(null)
+			}
 		}
 	}
 }

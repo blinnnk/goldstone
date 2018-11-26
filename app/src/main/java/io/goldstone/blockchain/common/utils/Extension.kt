@@ -52,41 +52,6 @@ fun Context?.alert(message: String) {
 	this?.alert(Appcompat, message)?.show()
 }
 
-fun Context.showAlertView(
-	title: String,
-	subtitle: String,
-	showEditText: Boolean = true,
-	cancelAction: () -> Unit,
-	action: (EditText?) -> Unit
-) {
-	val input = linearLayout {
-		lparams(matchParent, matchParent)
-		setPadding(20.uiPX(), 10.uiPX(), 20.uiPX(), 20.uiPX())
-		editText {
-			id = ElementID.passwordInput
-			layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
-			hintTextColor = GrayScale.Opacity1Black
-			textColor = Spectrum.blue
-			inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-			hint = CommonText.enterPassword
-			textSize = fontSize(14)
-			background.mutate().setColorFilter(Spectrum.blue, PorterDuff.Mode.SRC_ATOP)
-		}
-	}
-	Dashboard(this) {
-		if (showEditText) showDashboard(
-			title,
-			input,
-			subtitle,
-			{ action(it.findViewById(ElementID.passwordInput)) },
-			cancelAction
-		)
-		else showAlert(title, subtitle, CommonText.confirm, cancelAction) {
-			action(null)
-		}
-	}
-}
-
 fun <T : Iterable<String>> T.toJsonArray(): JsonArray {
 	val stringArray = JsonArray()
 	forEach {

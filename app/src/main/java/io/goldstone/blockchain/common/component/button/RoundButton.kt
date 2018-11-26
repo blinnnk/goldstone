@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.common.component.button
 
 import android.content.Context
+import android.graphics.PorterDuff
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -60,13 +61,12 @@ class RoundButton(context: Context) : GSCard(context) {
 
 	fun showLoadingStatus(
 		needToShow: Boolean = true,
-		color: Int = Spectrum.white,
 		recoveryText: String = CommonText.confirm
 	) {
 		if (needToShow) {
 			isEnabled = false
 			text = ""
-			loadingView.indeterminateDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY)
+			loadingView.indeterminateDrawable.setColorFilter(Spectrum.white, PorterDuff.Mode.MULTIPLY)
 			loadingView.visibility = View.VISIBLE
 		} else {
 			loadingView.visibility = View.GONE

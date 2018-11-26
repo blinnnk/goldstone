@@ -163,13 +163,13 @@ fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 		TokenContract(this?.contract.orEmpty(), CoinSymbol.etc, CryptoValue.ethDecimal).isETC() ->
 			SharedAddress.getCurrentETC()
 		TokenContract(this?.contract.orEmpty(), CoinSymbol.eos, CryptoValue.eosDecimal).isEOSSeries() ->
-			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
+			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().name
 			else SharedAddress.getCurrentEOS()
 		TokenContract(this?.contract.orEmpty(), CoinSymbol.eth, CryptoValue.ethDecimal).isETH() ->
 			SharedAddress.getCurrentEthereum()
 		this?.contract?.length == CryptoValue.contractAddressLength -> SharedAddress.getCurrentEthereum()
 		else -> {
-			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().accountName
+			if (isEOSAccountName) SharedAddress.getCurrentEOSAccount().name
 			else SharedAddress.getCurrentEOS()
 		}
 	}

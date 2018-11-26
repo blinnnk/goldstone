@@ -9,6 +9,7 @@ import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.RoundCell
@@ -27,6 +28,7 @@ import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -131,5 +133,10 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			.positiveButton(text = CommonText.confirm)
 			.negativeButton(text = CommonText.cancel)
 			.show()
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<ProfileOverlayFragment>()?.presenter
+			?.popFragmentFrom<WatchOnlyImportFragment>()
 	}
 }

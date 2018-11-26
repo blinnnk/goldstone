@@ -7,6 +7,7 @@ import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
@@ -16,7 +17,7 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.showAlertView
+import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
@@ -34,7 +35,6 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingsl
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListAdapter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettingslist.view.WalletSettingsListFragment
 import kotlinx.coroutines.Dispatchers
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 25/03/2018 10:15 PM
@@ -92,27 +92,29 @@ class WalletSettingsListPresenter(
 
 	/** 分别从数据库和 `Keystore` 文件内删除掉用户钱包的所有数据 */
 	private fun Context.deleteWallet() {
-		showAlertView(
-			WalletSettingsText.deleteInfoTitle,
-			WalletSettingsText.deleteInfoSubtitle,
-			!SharedWallet.isWatchOnlyWallet(),
-			{}
-		) { passwordInput ->
-			val loadingView = LoadingView(this)
-			loadingView.show()
-			if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
-			else {
-				val password = passwordInput?.text.toString()
-				WalletTable.getCurrent(Dispatchers.Default) {
-					val type = getWalletType()
-					verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
-						if (isCorrect) {
-							if (type.isBIP44())
-								deleteWalletData(id, getCurrentAllBip44Address(), password)
-							else deleteRootKeyWallet(id, getCurrentBip44Addresses(), password)
-						} else runOnUiThread {
-							loadingView.remove()
-							alert(CommonText.wrongPassword)
+		Dashboard(this) {
+			showAlertView(
+				WalletSettingsText.deleteInfoTitle,
+				WalletSettingsText.deleteInfoSubtitle,
+				!SharedWallet.isWatchOnlyWallet(),
+				{}
+			) { passwordInput ->
+				val loadingView = LoadingView(this@deleteWallet)
+				loadingView.show()
+				if (SharedWallet.isWatchOnlyWallet()) deleteWatchOnlyWallet()
+				else {
+					val password = passwordInput?.text.toString()
+					WalletTable.getCurrent(Dispatchers.Default) {
+						val type = getWalletType()
+						verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
+							if (isCorrect) {
+								if (type.isBIP44())
+									deleteWalletData(id, getCurrentAllBip44Address(), password)
+								else deleteRootKeyWallet(id, getCurrentBip44Addresses(), password)
+							} else launchUI {
+								loadingView.remove()
+								fragment.safeShowError(Throwable(CommonText.wrongPassword))
+							}
 						}
 					}
 				}

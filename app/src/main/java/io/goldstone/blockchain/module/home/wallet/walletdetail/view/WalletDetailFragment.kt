@@ -110,7 +110,9 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 			currentAccount.onClick { showWalletSettingsFragment() }
 			addTokenButton.onClick { showTokenManagementFragment() }
 			sendButton.onClick { presenter.showTransferDashboard(true) }
-			depositButton.onClick { presenter.showTransferDashboard(false) }
+			depositButton.onClick {
+				presenter.showTransferDashboard(false)
+			}
 		}
 	}
 

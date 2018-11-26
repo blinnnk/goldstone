@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -27,6 +28,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 import io.goldstone.blockchain.module.common.walletimport.walletimportcenter.view.SupportedChainMenu
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
+import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 
 /**
@@ -145,6 +147,11 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 		afterTextChanged = Runnable {
 			CreateWalletPresenter.showPasswordSafeLevel(passwordInput)
 		}
+	}
+
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		getParentFragment<WalletImportFragment>()?.presenter
+			?.popFragmentFrom<PrivateKeyImportFragment>()
 	}
 
 }

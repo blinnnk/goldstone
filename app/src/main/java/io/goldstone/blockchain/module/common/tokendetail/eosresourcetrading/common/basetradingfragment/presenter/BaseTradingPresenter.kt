@@ -90,7 +90,10 @@ open class BaseTradingPresenter(
 		val accountDao =
 			GoldStoneDataBase.database.eosAccountDao()
 		val account =
-			accountDao.getAccount(SharedAddress.getCurrentEOSAccount().accountName)
+			accountDao.getAccount(
+				SharedAddress.getCurrentEOSAccount().name,
+				SharedChain.getEOSCurrent().chainID.id
+			)
 		launchUI {
 			when (tradingType) {
 				TradingType.CPU -> {
@@ -136,8 +139,8 @@ open class BaseTradingPresenter(
 				if (error.isNone() && privateKey.isNotNull()) {
 					EOSBandWidthTransaction(
 						SharedChain.getEOSCurrent().chainID,
-						EOSAuthorization(fromAccount.accountName, EOSActor.Active),
-						toAccount.accountName,
+						EOSAuthorization(fromAccount.name, EOSActor.Active),
+						toAccount.name,
 						transferCount.toEOSUnit(),
 						tradingType,
 						stakeType,
@@ -178,7 +181,7 @@ open class BaseTradingPresenter(
 				if (error.isNone() && privateKey.isNotNull()) {
 					EOSSellRamTransaction(
 						chainID,
-						fromAccount.accountName,
+						fromAccount.name,
 						BigInteger.valueOf(tradingCount),
 						ExpirationType.FiveMinutes
 					).send(privateKey, callback)
@@ -204,8 +207,8 @@ open class BaseTradingPresenter(
 				if (error.isNone() && privateKey.isNotNull()) {
 					EOSBuyRamTransaction(
 						chainID,
-						fromAccount.accountName,
-						toAccount.accountName,
+						fromAccount.name,
+						toAccount.name,
 						tradingCount.toEOSUnit(),
 						ExpirationType.FiveMinutes
 					).send(privateKey, callback)

@@ -4,24 +4,20 @@ import android.os.Bundle
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.event.ContactUpdateEvent
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.presenter.ContactPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.QuotationUpdateEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.cancelButton
-import org.jetbrains.anko.support.v4.alert
-import org.jetbrains.anko.yesButton
 
 /**
  * @date 26/03/2018 1:37 PM
@@ -56,41 +52,39 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ContactTable>?
 	) {
-		val isFromTransactionDetail =
-			(parentFragment as? ProfileOverlayFragment)?.contactAddressModel.isNull()
 		recyclerView.adapter = ContactsAdapter(asyncData.orEmptyArray()) {
-			if (isFromTransactionDetail) {
-				presenter.shoEditContactFragment(it.id)
-			}
+			presenter.shoEditContactFragment(it.id)
 		}
 
 		recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX(), ItemTouchHelper.LEFT) { position, cell ->
-			alert {
-				isCancelable = false
-				title = ProfileText.deletContactAlertTitle
-				message = ProfileText.deleteContactAlertDescription
-				yesButton { cell?.apply { presenter.deleteContact(model.id) } }
-				cancelButton {
-					recyclerView.adapter?.notifyItemChanged(position)
-					it.dismiss()
-				}
-			}.show()
+			Dashboard(context!!) {
+				showAlert(
+					ProfileText.deleteContactAlertTitle,
+					ProfileText.deleteContactAlertDescription,
+					cancelAction = {
+						recyclerView.adapter?.notifyItemChanged(position)
+					},
+					confirmAction = {
+						cell?.apply { presenter.deleteContact(model.id) }
+					}
+				)
+			}
 		}
 
 		recyclerView.addSwipeEvent<ContactsCell>(R.drawable.edit_contact_icon, 20.uiPX(), ItemTouchHelper.RIGHT) { position, cell ->
-			alert {
-				isCancelable = false
-				title = ProfileText.deletContactAlertTitle
-				message = ProfileText.deleteContactAlertDescription
-				yesButton {
-					cell?.apply { presenter.shoEditContactFragment(model.id) }
-					recyclerView.adapter?.notifyItemChanged(position)
-				}
-				cancelButton {
-					recyclerView.adapter?.notifyItemChanged(position)
-					it.dismiss()
-				}
-			}.show()
+			Dashboard(context!!) {
+				showAlert(
+					ProfileText.editContactAlertTitle,
+					ProfileText.deleteContactAlertDescription,
+					cancelAction = {
+						recyclerView.adapter?.notifyItemChanged(position)
+					},
+					confirmAction = {
+						cell?.apply { presenter.shoEditContactFragment(model.id) }
+						recyclerView.adapter?.notifyItemChanged(position)
+					}
+				)
+			}
 		}
 	}
 

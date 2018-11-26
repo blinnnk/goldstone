@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.jump
 import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -82,10 +83,10 @@ class EOSAccountSelectionPresenter(
 				override fun doChildTask(index: Int) {
 					// 本地为空的话从网络获取数据
 					EOSAPI.getAccountInfo(EOSAccount(notInLocalAccount[index].name)) { eosAccount, error ->
-						if (eosAccount != null && error.isNone()) {
+						if (eosAccount.isNotNull() && error.isNone()) {
 							actors.addAll(getAccountActorByPublicKey(eosAccount, notInLocalAccount[index].name))
 							// 插入数据库
-							EOSAccountTable.preventDuplicateInsert(eosAccount)
+							EOSAccountTable.dao.insert(eosAccount)
 						}
 						completeMark()
 					}

@@ -94,8 +94,8 @@ data class EOSTransactionInfo(
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		EOSTransaction(
-			EOSAuthorization(fromAccount.accountName, EOSActor.Active),
-			toAccount.accountName,
+			EOSAuthorization(fromAccount.name, EOSActor.Active),
+			toAccount.name,
 			amount,
 			memo,
 			// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
@@ -115,8 +115,8 @@ data class EOSTransactionInfo(
 	}
 
 	override fun serialize(): String {
-		val encryptFromAccount = EOSUtils.getLittleEndianCode(fromAccount.accountName)
-		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount.accountName)
+		val encryptFromAccount = EOSUtils.getLittleEndianCode(fromAccount.name)
+		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount.name)
 		val amountCode = EOSUtils.convertAmountToCode(amount)
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(contract.decimal.orElse(CryptoValue.eosDecimal))
 		var symbolCode = contract.symbol.toByteArray().toNoPrefixHexString()

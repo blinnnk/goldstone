@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model
 
-import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -45,8 +44,8 @@ data class ReceiptModel(
 		response: EOSResponse,
 		token: WalletDetailCellModel
 	) : this(
-		info.fromAccount.accountName,
-		info.toAccount.accountName,
+		info.fromAccount.name,
+		info.toAccount.name,
 		TransactionListModel.generateEOSMinerContent(response.cupUsageByte, response.netUsageByte),
 		info.amount,
 		token,

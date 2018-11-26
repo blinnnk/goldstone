@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.jump
+import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.setUnderline
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
@@ -36,64 +39,82 @@ import org.jetbrains.anko.*
 class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 
 	override val pageTitle: String = ImportMethodText.keystore
-	private val attentionText by lazy { AttentionTextView(context!!) }
-	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
-	private val keystoreEditText by lazy { WalletEditText(context!!) }
-	private val nameInput by lazy { RoundInput(context!!) }
-	private val passwordInput by lazy { RoundInput(context!!) }
-	private val hintInput by lazy { RoundInput(context!!) }
-	private val agreementView by lazy { AgreementView(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var attentionText: AttentionTextView
+	private lateinit var supportedChainMenu: SupportedChainMenu
+	private lateinit var keystoreEditText: WalletEditText
+	private lateinit var nameInput: RoundInput
+	private lateinit var passwordInput: RoundInput
+	private lateinit var hintInput: RoundInput
+	private lateinit var agreementView: AgreementView
+	private lateinit var confirmButton: RoundButton
+	private val overlayFragment by lazy {
+		parentFragment as? WalletImportFragment
+	}
+
 	override val presenter = KeystoreImportPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
+
+				attentionText = AttentionTextView(context)
 				attentionText.apply {
 					isCenter()
 					setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
 					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 					text = ImportWalletText.keystoreIntro
 				}.into(this)
+
+				supportedChainMenu = SupportedChainMenu(context)
 				supportedChainMenu.into(this)
 
+				keystoreEditText = WalletEditText(context)
 				keystoreEditText.apply {
 					hint = ImportWalletText.keystoreHint
 				}.into(this)
 
+				nameInput = RoundInput(context)
 				nameInput.apply {
 					hint = UIUtils.generateDefaultName()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 					title = CreateWalletText.name
 				}.into(this)
+				nameInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 20.uiPX()
+				}
 
+				passwordInput = RoundInput(context)
 				passwordInput.apply {
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 				}.into(this)
+				passwordInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 5.uiPX()
+				}
 
+				hintInput = RoundInput(context)
 				hintInput.apply {
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.hint
 				}.into(this)
+				hintInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 5.uiPX()
+				}
 
-				agreementView
-					.apply {
-						setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-					}.click {
-						getParentFragment<WalletImportFragment> {
-							presenter.showTargetFragment<WebViewFragment>(
-								Bundle().apply {
-									putString(ArgumentKey.webViewUrl, WebUrl.terms)
-									putString(ArgumentKey.webViewName, ProfileText.terms)
-								}
-							)
+				agreementView = AgreementView(context)
+				agreementView.click {
+					overlayFragment?.presenter?.showTargetFragment<WebViewFragment>(
+						Bundle().apply {
+							putString(ArgumentKey.webViewUrl, WebUrl.terms)
+							putString(ArgumentKey.webViewName, ProfileText.terms)
 						}
-					}.into(this)
+					)
+				}.into(this)
+				agreementView.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 20.uiPX()
+				}
 
+				confirmButton = RoundButton(context)
 				confirmButton.apply {
 					setBlueStyle(10.uiPX())
 					text = CommonText.confirm.toUpperCase()
@@ -119,15 +140,13 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsKeystore.setUnderline()
 				}.click {
-					getParentFragment<WalletImportFragment> {
-						NetworkUtil.hasNetworkWithAlert(context) isTrue {
-							presenter.showTargetFragment<WebViewFragment>(
-								Bundle().apply {
-									putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
-									putString(ArgumentKey.webViewName, QAText.whatIsKeystore)
-								}
-							)
-						}
+					if (NetworkUtil.hasNetworkWithAlert(context)) {
+						overlayFragment?.presenter?.showTargetFragment<WebViewFragment>(
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.whatIsKeystore)
+								putString(ArgumentKey.webViewName, QAText.whatIsKeystore)
+							}
+						)
 					}
 				}.into(this)
 			}
@@ -135,6 +154,6 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
+		overlayFragment?.presenter?.popFragmentFrom<KeystoreImportFragment>()
 	}
 }

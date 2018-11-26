@@ -1,7 +1,10 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.contract
 
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import java.math.BigInteger
 
 
@@ -14,6 +17,7 @@ interface TokenAssetContract {
 		fun setTransactionCount(count: Int)
 		fun setEOSBalance(balance: String)
 		fun setEOSRefunds(description: String)
+		fun setEOSDelegateBandWidth(value: String)
 		fun setResourcesValue(
 			ramAvailable: BigInteger,
 			ramTotal: BigInteger,
@@ -28,5 +32,13 @@ interface TokenAssetContract {
 	}
 
 	interface GSPresenter : GoldStonePresenter {
+		fun getDelegateBandWidthData(hold: (ArrayList<DelegateBandWidthInfo>) -> Unit)
+		fun redemptionBandwidth(
+			password: String,
+			receiver: EOSAccount,
+			cpuAmount: BigInteger,
+			netAmount: BigInteger,
+			hold: (response: EOSResponse) -> Unit
+		)
 	}
 }

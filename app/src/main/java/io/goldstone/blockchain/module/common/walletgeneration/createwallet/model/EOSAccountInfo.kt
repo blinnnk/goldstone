@@ -45,7 +45,7 @@ data class EOSAccountInfo(
 	}
 
 	fun isActivatedOrWatchOnlyEOSAccount(): Boolean {
-		return isCurrent() && name.equals(SharedAddress.getCurrentEOSAccount().accountName, true)
+		return isCurrent() && name.equals(SharedAddress.getCurrentEOSAccount().name, true)
 	}
 
 	override fun getObject(): String {
