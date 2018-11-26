@@ -246,6 +246,7 @@ object ProfileText {
 		HoneyLanguage.Korean.code -> "GoldStone 정보"
 		HoneyLanguage.Russian.code -> "О компании GoldStone"
 		HoneyLanguage.TraditionalChinese.code -> "關於GoldStone"
+		else -> ""
 	}
 
 	@JvmField
