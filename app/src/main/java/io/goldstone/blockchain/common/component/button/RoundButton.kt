@@ -91,7 +91,15 @@ class RoundButton(context: Context) : GSCard(context) {
 		}
 		setCardBackgroundColor(Spectrum.blue)
 	}
-
+	
+	fun setRedStyle(top: Int? = null, width: Int = ScreenSize.card, height: Int = buttonHeight) {
+		layoutParams = LinearLayout.LayoutParams(width, height).apply {
+			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
+		}
+		setCardBackgroundColor(Spectrum.lightRed)
+	}
+	
 	fun setDarkStyle(top: Int? = null) {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, buttonHeight).apply {
 			topMargin = top ?: marginTop

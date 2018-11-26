@@ -29,13 +29,16 @@ object ElementID {
 	const val customHeader = 2017
 	const val baseFragmentContainer = 2020
 	const val bottomLoading = 2021
+	const val ramPriceLayout =2022
 	const val recyclerView = 2023
 	const val topMiniLoading = 2025
-	const val cardLayout = 2026
+	const val checkBox = 2026
+	const val cardLayout = 2027
 	const val passwordInput = 2027
 	const val filterIcon = 2028
 }
 
 object ViewPagerID {
 	const val transactions = 3002
+	const val ramMarket = 3003
 }

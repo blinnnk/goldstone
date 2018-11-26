@@ -34,7 +34,8 @@ enum class EmptyType {
 	QuotationManagement,
 	Quotation,
 	WalletDetail,
-	NotificationList
+	NotificationList,
+	RAMTransactionSearchList
 }
 
 class EmptyView(context: Context) : LinearLayout(context) {
@@ -109,7 +110,11 @@ class EmptyView(context: Context) : LinearLayout(context) {
 					y += 45.uiPX()
 				}
 			}
-
+			EmptyType.RAMTransactionSearchList -> {
+				icon.imageResource = R.drawable.ic_no_memory_transaction_records
+				introTitles.title.text = EmptyText.ramTransactionSearchTitle
+				introTitles.subtitle.text = EmptyText.ramTransactionSearchSubTitle
+			}
 			EmptyType.NotificationList -> {
 				icon.imageResource = R.drawable.notification_list_empty_icon
 				introTitles.title.text = EmptyText.notificationListTitle

@@ -38,13 +38,14 @@ open class RoundInput(context: Context) : EditText(context) {
 	private val paddingSize = 5.uiPX()
 	private var safeLevel = ""
 	private val paint = Paint()
-	private val textPaint = Paint()
+	val textPaint = Paint()
 	private val alertPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 14.uiPX().toFloat()
 	private var maxCount = 100
 	private var themeColor = Spectrum.blue
 	private var showAlert = false
+	var hasFocus = false
 
 	init {
 		paint.isAntiAlias = true
@@ -105,6 +106,7 @@ open class RoundInput(context: Context) : EditText(context) {
 		})
 
 		onFocusChange { _, hasFocus ->
+			this@RoundInput.hasFocus = hasFocus
 			if (hasFocus) {
 				paint.color = themeColor
 				textPaint.color = themeColor

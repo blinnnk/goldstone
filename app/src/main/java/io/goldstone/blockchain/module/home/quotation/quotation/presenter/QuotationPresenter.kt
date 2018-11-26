@@ -136,7 +136,7 @@ class QuotationPresenter(
 		}
 	}
 
-	private var currentSocket: GoldStoneWebSocket? = null
+	var currentSocket: GoldStoneWebSocket? = null
 	private fun setSocket(callback: (GoldStoneWebSocket?) -> Unit) {
 		if (fragment.asyncData?.size ?: 0 == 0) return
 		getPriceInfoBySocket(
@@ -205,7 +205,7 @@ class QuotationPresenter(
 			/**
 			 * 准备长连接, 发送参数. 并且在返回结果的地方异步更新界面上的 `UI`.
 			 */
-			object : GoldStoneWebSocket() {
+			object : GoldStoneWebSocket("{\"t\": \"unsub_tick\"}") {
 				override fun onOpened() {
 					sendMessage("{\"t\":\"sub_tick\", \"pair_list\":${pairList?.toJsonArray()}}")
 				}

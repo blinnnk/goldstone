@@ -61,6 +61,8 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	fun getContainer(): OverlayView = overlayView
 
 	fun getSearchContent(): String = overlayView.header.getSearchContent()
+	
+	fun getOverlayHeader(): OverlayHeaderLayout = overlayView.header
 
 	fun showBackButton(isShow: Boolean, action: ImageView.() -> Unit) {
 		overlayView.header.showBackButton(isShow, action)

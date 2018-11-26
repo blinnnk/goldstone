@@ -20,6 +20,10 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	open fun onFragmentAttach() {
 		// Do Something When fragment Attach
 	}
+	
+	open fun onFragmentCreate() {
+		// Do Something
+	}
 
 	open fun onFragmentCreateView() {
 		// Do Something When fragment Attach
@@ -34,6 +38,10 @@ abstract class BasePresenter<out T : BaseFragment<*>> {
 	}
 
 	open fun onFragmentResume() {
+		// Do Something
+	}
+	
+	open fun onFragmentPause() {
 		// Do Something
 	}
 

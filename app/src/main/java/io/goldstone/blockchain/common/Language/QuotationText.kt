@@ -169,6 +169,48 @@ object QuotationText {
 		else -> ""
 	}
 	@JvmField
+	val high = when (currentLanguage) {
+		HoneyLanguage.English.code -> "HIGH "
+		HoneyLanguage.Chinese.code -> "最高"
+		HoneyLanguage.Japanese.code -> "最高"
+		HoneyLanguage.Korean.code -> "최고"
+		HoneyLanguage.Russian.code -> "Макс."
+		HoneyLanguage.TraditionalChinese.code -> "最高"
+		else -> ""
+	}
+	@JvmField
+	val low = when (currentLanguage) {
+		HoneyLanguage.English.code -> "LOW"
+		HoneyLanguage.Chinese.code -> "最低"
+		HoneyLanguage.Japanese.code -> "最低"
+		HoneyLanguage.Korean.code -> " 최저"
+		HoneyLanguage.Russian.code -> "мин."
+		HoneyLanguage.TraditionalChinese.code -> "最低"
+		else -> ""
+	}
+	@JvmField
+	val open = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "开盘"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	@JvmField
+	val close = when (currentLanguage) {
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "收盘"
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> ""
+		else -> ""
+	}
+	
+	@JvmField
 	val rank = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Rank"
 		HoneyLanguage.Chinese.code -> "排名"

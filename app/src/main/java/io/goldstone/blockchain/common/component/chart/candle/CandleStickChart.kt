@@ -259,6 +259,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 	 * @description: 计算图标显示的第一个蜡烛的下标
 	 */
 	private fun calculateVisibleIndex() {
+		if (mData.isNull()) return
 		val trans = getTransformer(mData.dataSets[0].axisDependency)
 		val buffers = FloatArray(4)
 		realData.forEachIndexed { index, candleEntry ->

@@ -30,6 +30,10 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
+import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.model.RAMRankModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -488,6 +492,101 @@ object GoldStoneAPI {
 			} else hold(null, error)
 		}
 	}
+	
+	fun getEOSRAMPriceTrendCandle(
+		period: String,
+		size: Int,
+		hold: (candleData: List<CandleChartModel>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, period, size),
+			"ticks",
+			isEncrypt = true,
+			hold = hold
+		)
+		
+	}
+	
+	fun getEOSRAMTodayPrice(
+		hold: (CandleChartModel?, RequestError) -> Unit
+	) {
+		requestData<CandleChartModel>(
+			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
+			"ticks",
+			isEncrypt = true
+		) { data, error ->
+			if ( data!= null && data.isNotEmpty()) {
+				hold(data[0], error)
+			} else {
+				hold(null, error)
+			}
+		}
+	}
+	
+	fun getEOSRAMRecentTransactions(hold: (data: RecentTransactionModel?, error: RequestError) -> Unit) {
+		requestData<String>(
+			APIPath.eosRAMLatestTrading(APIPath.currentUrl),
+			"",
+			justGetData = true,
+			isEncrypt = true
+		) { data, error ->
+			val type = object : TypeToken<RecentTransactionModel>() {}.type
+			if (data != null && data.isNotEmpty()) {
+				hold(Gson().fromJson(data[0], type), RequestError.None)
+			} else {
+				hold(null, error)
+			}
+		}
+	
+	}
+	
+	fun getLargeTransactions(mode: Int, hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit) {
+		requestData(
+			APIPath.eosRAMBIgTransactions(APIPath.currentUrl, mode),
+			"tx_list",
+			justGetData = false,
+			isEncrypt = true,
+			hold = hold
+		)
+		
+	}
+	
+	fun getRAMOccupyRank( hold: (data: List<RAMRankModel>?, error: RequestError) -> Unit) {
+		requestData(
+			APIPath.eosRAMOccupyRank(APIPath.currentUrl),
+			"rank",
+			justGetData = false,
+			isEncrypt = true,
+				hold = hold
+		)
+	}
+	
+	
+	fun getEOSRAMTradeDistributed(
+		hold: (List<Float>?, RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.getEOSRAMTradeData(APIPath.currentUrl),
+			"data",
+			isEncrypt = true,
+			hold = hold
+		)
+	}
+	
+	fun getEOSRAMTransactionsByAccount(
+		account: String,
+		endID: Int,
+		hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.eosRAMTransactionsOfAccount(APIPath.currentUrl, account, endID, 20),
+			"tx_list",
+			justGetData = false,
+			isEncrypt = true,
+			hold = hold
+		)
+	}
+	
 }
 
 

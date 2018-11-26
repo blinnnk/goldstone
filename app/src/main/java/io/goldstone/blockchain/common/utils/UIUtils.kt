@@ -23,6 +23,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -111,6 +112,17 @@ object TimeUtils {
 	fun formatMdHmDate(date: Long): String {
 		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
+	}
+	
+	@SuppressLint("SimpleDateFormat")
+		/**
+		 * @date: 2018/8/22
+		 * @author: yanglihai
+		 * @description: 把日期转换成日期+时间，例如8-25 12:00
+		 */
+	fun formatYMdHmDate(date: Long): String {
+		val formatter = SimpleDateFormat("yyyy/MM/dd    HH:mm")
+		return formatter.format(java.util.Date(date))
 	}
 
 	@SuppressLint("SimpleDateFormat")

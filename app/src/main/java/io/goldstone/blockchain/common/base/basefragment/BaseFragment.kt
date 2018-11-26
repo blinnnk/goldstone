@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.common.base.basefragment
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -31,6 +32,16 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : GSFragment
 	private var topMiniLoadingView: TopMiniLoadingView? = null
 	private lateinit var scrollView: ScrollView
 
+	override fun onAttach(context: Context?) {
+		super.onAttach(context)
+		presenter.onFragmentAttach()
+	}
+	
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		presenter.onFragmentCreate()
+	}
+
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		presenter.onFragmentCreateView()
 		return UI {
@@ -61,6 +72,11 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : GSFragment
 		super.onResume()
 		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 		presenter.onFragmentResume()
+	}
+	
+	override fun onPause() {
+		super.onPause()
+		presenter.onFragmentPause()
 	}
 
 	override fun onDestroy() {

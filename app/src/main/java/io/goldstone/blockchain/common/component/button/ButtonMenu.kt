@@ -19,7 +19,7 @@ import org.jetbrains.anko.textView
  * @author KaySaith
  */
 
-class ButtonMenu(context: Context) : LinearLayout(context) {
+open class ButtonMenu(context: Context) : LinearLayout(context) {
 
 	private val menuHeight = 32.uiPX()
 
@@ -43,7 +43,7 @@ class ButtonMenu(context: Context) : LinearLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, menuHeight)
 	}
 
-	fun selected(index: Int = 0) {
+	open fun selected(index: Int = 0) {
 		getButton {
 			it.apply {
 				textColor = if (id == index) {

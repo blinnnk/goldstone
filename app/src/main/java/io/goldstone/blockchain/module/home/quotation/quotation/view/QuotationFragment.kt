@@ -87,4 +87,5 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		mainActivity?.getHomeFragment()?.presenter?.showWalletDetailFragment()
 	}
+	
 }

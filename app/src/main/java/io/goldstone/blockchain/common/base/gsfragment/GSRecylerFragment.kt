@@ -30,6 +30,7 @@ import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.Conta
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
+import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.view.RAMTransactionSearchFragment
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view.NotificationListFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
@@ -231,6 +232,7 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 				is QuotationFragment -> setStyle(EmptyType.Quotation)
 				is WalletDetailFragment -> setStyle(EmptyType.WalletDetail)
 				is NotificationListFragment -> setStyle(EmptyType.NotificationList)
+				is RAMTransactionSearchFragment -> setStyle(EmptyType.RAMTransactionSearchList)
 				else -> setStyle(EmptyType.TransactionDetail)
 			}
 		}
