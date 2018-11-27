@@ -56,7 +56,7 @@ class MnemonicBackupPresenter(
 				parent.apply {
 					headerTitle = CreateWalletText.mnemonicBackUp
 					showBackButton(true) {
-						parent.presenter.showWalletSettingListFragment()
+						parent.presenter.popFragmentFrom<MnemonicBackupFragment>()
 					}
 				}
 			}

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -66,7 +67,7 @@ class AddressManagerPresenter(
 		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
 			EOSAPI.getAccountNameByPublicKey(key
 			) { accountNames, error ->
-				if (accountNames != null && error.isNone()) {
+				if (accountNames.isNotNull() && error.isNone()) {
 					val description =
 						if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey
 						else WalletSettingsText.unactivatedPublicKey
@@ -82,7 +83,7 @@ class AddressManagerPresenter(
 	fun setBackEvent() {
 		fragment.getParentFragment<WalletSettingsFragment>()?.apply {
 			showBackButton(true) {
-				presenter.showWalletSettingListFragment()
+				presenter.popFragmentFrom<AddressManagerFragment>()
 			}
 		}
 	}

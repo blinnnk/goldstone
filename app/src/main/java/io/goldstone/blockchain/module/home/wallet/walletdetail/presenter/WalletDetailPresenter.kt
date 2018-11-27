@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
@@ -12,13 +13,17 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.multichain.getAddress
+import io.goldstone.blockchain.crypto.multichain.isEOSToken
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
@@ -80,15 +85,16 @@ class WalletDetailPresenter(
 	// Or Show Dialog Alert
 	override fun showTransferDashboard(isAddress: Boolean) {
 		if (SharedWallet.isWatchOnlyWallet()) detailView.showError(Throwable(AlertText.watchOnly))
-		else WalletTable.getCurrent(Dispatchers.Main) {
-			if (hasBackUpMnemonic) MyTokenWithDefaultTable.getMyDefaultTokens {
-				launchUI {
-					if (it.size == 1) {
-						if (isAddress) detailView.showAddressSelectionFragment(it.first())
-						else detailView.showDepositFragment(it.first())
-					} else detailView.showSelectionDashboard(it.toArrayList(), isAddress)
-				}
-			} else detailView.showMnemonicBackUpDialog()
+		else {
+			if (SharedWallet.hasBackUpMnemonic())
+				MyTokenWithDefaultTable.getMyDefaultTokens {
+					launchUI {
+						if (it.size == 1) {
+							if (isAddress) detailView.showAddressSelectionFragment(it.first())
+							else detailView.showDepositFragment(it.first())
+						} else detailView.showSelectionDashboard(it.toArrayList(), isAddress)
+					}
+				} else detailView.showMnemonicBackUpDialog()
 		}
 	}
 
@@ -125,8 +131,11 @@ class WalletDetailPresenter(
 				override var asyncCount: Int = size
 				override fun doChildJob(index: Int) {
 					val ownerName = get(index).contract.getAddress(true)
-					// 更新数据的余额信息
-					MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
+					if (get(index).contract.isEOSToken() && !SharedValue.isTestEnvironment()) {
+						// `EOS` 主网的余额从 `EOSPark` 批量获取, 减少低端机型在多 海量 `Token` 下获取
+						// `Balance` 要么限制线程导致缓慢, 要么多线程导致性能下降的问题.
+						completeMark()
+					} else MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
 						if (balance.isNotNull() && error.isNone()) {
 							MyTokenTable.dao.updateBalanceByContract(
 								balance,
@@ -144,7 +153,21 @@ class WalletDetailPresenter(
 				}
 
 				override fun mergeCallBack() {
-					launchUI {
+					val account = SharedAddress.getCurrentEOSAccount()
+					if (!SharedValue.isTestEnvironment()) EOSAPI.getTokenBalance(account) { data, error ->
+						if (data.isNotNull() && error.isNone()) {
+							data.forEachOrEnd { item, isEnd ->
+								MyTokenTable.dao.updateBalanceByContract(item.balance, item.codeName, item.symbol, account.name)
+								this@getChainModels.find {
+									it.contract.contract.equals(item.codeName, true) &&
+										it.symbol.symbol.equals(item.symbol, true)
+								}?.count = item.balance
+								if (isEnd) launchUI {
+									hold(this@getChainModels, balanceError)
+								}
+							}
+						}
+					} else launchUI {
 						hold(this@getChainModels, balanceError)
 					}
 				}
@@ -183,10 +206,11 @@ class WalletDetailPresenter(
 			if (it.currency == 0.0) it.price * it.count else it.currency
 		}
 		// Once the calculation is finished then update `WalletTable`
-		if (totalBalance != null) SharedWallet.updateCurrentBalance(totalBalance)
+		if (totalBalance.isNotNull()) SharedWallet.updateCurrentBalance(totalBalance)
 		WalletTable.getCurrent(Dispatchers.Main) {
 			val subtitle = getAddressDescription()
 			WalletDetailHeaderModel(
+				id,
 				null,
 				SharedWallet.getCurrentName(),
 				if (

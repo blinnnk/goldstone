@@ -11,6 +11,7 @@ import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ETHTransactionModel
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
 /**
  * @date 2018/8/20 2:51 PM
@@ -21,7 +22,10 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 fun TokenDetailPresenter.loadETHChainData(endBlock: Int) {
 	updateLocalETHTransactions(endBlock) {
 		if (it.isNone()) getETHSeriesData()
-		else detailView.showBottomLoading(false)
+		else {
+			if (it.isEmptyResult()) detailView.showLoading(false)
+			detailView.showBottomLoading(false)
+		}
 	}
 }
 
@@ -29,7 +33,7 @@ fun TokenDetailPresenter.loadETHChainData(endBlock: Int) {
 private fun updateLocalETHTransactions(endBlock: Int, callback: (RequestError) -> Unit) {
 	RequisitionUtil.requestUnCryptoData<ETHTransactionModel>(
 		EtherScanApi.offsetTransactions(SharedAddress.getCurrentEthereum(), endBlock),
-		"result"
+		listOf("result")
 	) { transactions, error ->
 		if (!transactions.isNullOrEmpty() && error.isNone()) {
 			val transactionDao = TransactionTable.dao
@@ -86,9 +90,18 @@ fun TokenDetailPresenter.getETHSeriesData() {
 				endBlock
 			)
 		when {
-			transactions.isNotEmpty() -> flipPage(transactions) {
-				detailView.showBottomLoading(false)
-				detailView.showLoading(false)
+			transactions.isNotEmpty() -> {
+				if (detailView.asyncData?.isEmpty() == true) {
+					transactions.map {
+						TransactionListModel(it)
+					}.generateBalanceList(token.contract) {
+						it.updateHeaderData(false)
+					}
+				}
+				flipPage(transactions) {
+					detailView.showBottomLoading(false)
+					detailView.showLoading(false)
+				}
 			}
 			else -> when {
 				token.contract.isETH() -> loadETHChainData(endBlock)
@@ -96,6 +109,7 @@ fun TokenDetailPresenter.getETHSeriesData() {
 			}
 		}
 	} else {
+		detailView.showLoading(false)
 		detailView.showBottomLoading(false)
 	}
 }

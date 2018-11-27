@@ -41,7 +41,7 @@ class EOSTransaction(
 			contract
 		)
 		val transactionInfoCode = transactionInfo.serialize()
-		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
+		EOSAPI.getTransactionHeader(expirationType) { header, error ->
 			val authorization = fromAccount
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action

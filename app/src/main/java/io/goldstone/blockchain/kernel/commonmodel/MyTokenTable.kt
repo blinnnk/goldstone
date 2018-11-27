@@ -238,7 +238,7 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>
 
-	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND symbol = :symbol AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
+	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND symbol = :symbol AND (ownerName LIKE :address OR ownerAddress LIKE :address) AND chainID IN (:currentChainIDS)")
 	fun updateBalanceByContract(balance: Double, contract: String, symbol: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
 	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态

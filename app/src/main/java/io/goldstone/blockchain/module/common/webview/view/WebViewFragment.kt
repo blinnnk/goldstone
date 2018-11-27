@@ -66,7 +66,7 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		loading.apply {
 			indeterminateDrawable.setColorFilter(
 				HoneyColor.Red,
-				android.graphics.PorterDuff.Mode.MULTIPLY
+				android.graphics.PorterDuff.Mode.SRC_ATOP
 			)
 			layoutParams = RelativeLayout.LayoutParams(80.uiPX(), 80.uiPX())
 			centerInParent()

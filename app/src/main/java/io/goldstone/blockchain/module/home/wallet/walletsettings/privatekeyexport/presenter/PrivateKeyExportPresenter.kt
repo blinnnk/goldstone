@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpo
 import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -109,7 +110,7 @@ class PrivateKeyExportPresenter(
 			hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
 			getBigIntegerPrivateKeyByWalletID(password, walletID) { privateKeyInteger, error ->
-				if (privateKeyInteger != null && error.isNone()) hold(when {
+				if (privateKeyInteger.isNotNull() && error.isNone()) hold(when {
 					ChainType.isSamePrivateKeyRule(chainType) -> {
 						val net =
 							if (SharedValue.isTestEnvironment()) TestNet3Params.get() else MainNetParams.get()

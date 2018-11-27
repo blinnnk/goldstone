@@ -9,10 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.getGrandFather
-import com.blinnnk.extension.into
-import com.blinnnk.extension.preventDuplicateClicks
-import com.blinnnk.extension.suffix
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
@@ -69,93 +66,20 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	private val token by lazy {
 		getParentFragment<TokenDetailCenterFragment>()?.token
 	}
-	private val tokenInfoView by lazy { TokenInfoView(context!!) }
-	private val balanceCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.balance)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-	private val refundsCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.refunds)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val delegateBandWidthCell by lazy {
-		GraySquareCell(context!!).apply {
-			showArrow()
-			setTitle(TokenDetailText.delband)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val transactionCountCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.transactionCount)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-	private val authorizationCell by lazy {
-		GraySquareCell(context!!).apply {
-			showArrow()
-			setTitle(EOSAccountText.authority)
-			setSubtitle(SharedAddress.getCurrentEOSAccount().name)
-			click {
-				val type = SharedWallet.getCurrentWalletType()
-				when {
-					type.isEOSMainnet() || type.isEOSJungle() ->
-						safeShowError(Throwable(WalletText.watchOnly))
-					else -> showPublicKeyAccountNames()
-				}
-			}
-		}
-	}
-
-	private val accountAddress by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(EOSAccountText.publicKey)
-			val address =
-				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
-				else SharedAddress.getCurrentEOS()
-			setSubtitle(address, true)
-			onClick {
-				this@apply.context?.clickToCopy(SharedAddress.getCurrentEOS())
-				preventDuplicateClicks()
-			}
-		}
-	}
-
-	private val assetCard by lazy {
-		GrayCardView(context!!).apply {
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 255.uiPX())
-		}
-	}
-
-	private val ramAssetCell by lazy {
-		ProgressView(context!!).apply {
-			setTitle(TokenDetailText.ram)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val cpuAssetCell by lazy {
-		ProgressView(context!!).apply {
-			setTitle(TokenDetailText.cpu)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val netAssetCell by lazy {
-		ProgressView(context!!).apply {
-			setTitle(TokenDetailText.net)
-			setSubtitle(CommonText.calculating)
-		}
-	}
+	private lateinit var tokenInfoView: TokenInfoView
+	private lateinit var balanceCell: GraySquareCell
+	private lateinit var refundsCell: GraySquareCell
+	private lateinit var delegateBandWidthCell: GraySquareCell
+	private lateinit var transactionCountCell: GraySquareCell
+	private lateinit var authorizationCell: GraySquareCell
+	private lateinit var accountAddress: GraySquareCell
+	private lateinit var assetCard: GrayCardView
+	private lateinit var ramAssetCell: ProgressView
+	private lateinit var cpuAssetCell: ProgressView
+	private lateinit var netAssetCell: ProgressView
+	private lateinit var loadingView: LoadingView
 
 	override lateinit var presenter: TokenAssetContract.GSPresenter
-
 	override fun onResume() {
 		super.onResume()
 		presenter = TokenAssetPresenter(this)
@@ -180,14 +104,24 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 					lparams(matchParent, wrapContent)
 					bottomPadding = 20.uiPX()
 					gravity = Gravity.CENTER_HORIZONTAL
+					tokenInfoView = TokenInfoView(context)
 					tokenInfoView.into(this)
 					showAccountManagementCells()
 					showTransactionCells()
 					showAssetDashboard()
 					SessionTitleView(context).setTitle(TokenDetailText.assetTools).into(this)
 					linearLayout {
-						lparams(ScreenSize.card, wrapContent)
-						generateMethodCards()
+						lparams {
+							width = ScreenSize.card
+							height = wrapContent
+						}
+						listOf(
+							Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
+							Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
+							Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM)
+						).forEach { pair ->
+							generateCardView(pair)
+						}
 					}
 				}
 			}
@@ -292,23 +226,84 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 
 	private fun ViewGroup.showAccountManagementCells() {
 		SessionTitleView(context).setTitle(TokenDetailText.accountManagement).into(this)
+		authorizationCell = GraySquareCell(context).apply {
+			showArrow()
+			setTitle(EOSAccountText.authority)
+			setSubtitle(SharedAddress.getCurrentEOSAccount().name)
+			click {
+				val type = SharedWallet.getCurrentWalletType()
+				when {
+					type.isEOSMainnet() || type.isEOSJungle() ->
+						safeShowError(Throwable(WalletText.watchOnly))
+					else -> showPublicKeyAccountNames()
+				}
+			}
+		}
 		authorizationCell.into(this)
+
+		accountAddress = GraySquareCell(context).apply {
+			setTitle(EOSAccountText.publicKey)
+			val address =
+				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
+				else SharedAddress.getCurrentEOS()
+			setSubtitle(address, true)
+			click {
+				context?.clickToCopy(SharedAddress.getCurrentEOS())
+			}
+		}
 		accountAddress.into(this)
 	}
 
 	private fun ViewGroup.showTransactionCells() {
 		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
+		balanceCell = GraySquareCell(context).apply {
+			setTitle(TokenDetailText.balance)
+			setSubtitle(CommonText.calculating)
+		}
 		balanceCell.into(this)
+		delegateBandWidthCell = GraySquareCell(context).apply {
+			showArrow()
+			setTitle(TokenDetailText.delband)
+			setSubtitle(CommonText.calculating)
+		}
 		delegateBandWidthCell.click {
 			showDelegateBandWidthDashboard()
 		}.into(this)
+		refundsCell = GraySquareCell(context).apply {
+			setTitle(TokenDetailText.refunds)
+			setSubtitle(CommonText.calculating)
+		}
 		refundsCell.into(this)
+
+		transactionCountCell = GraySquareCell(context).apply {
+			setTitle(TokenDetailText.transactionCount)
+			setSubtitle(CommonText.calculating)
+		}
 		transactionCountCell.into(this)
 	}
 
 	private fun ViewGroup.showAssetDashboard() {
 		SessionTitleView(context).setTitle(TokenDetailText.resources).into(this)
+		assetCard = GrayCardView(context).apply {
+			layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 255.uiPX())
+		}
 		assetCard.into(this)
+
+		ramAssetCell = ProgressView(context).apply {
+			setTitle(TokenDetailText.ram)
+			setSubtitle(CommonText.calculating)
+		}
+
+		cpuAssetCell = ProgressView(context).apply {
+			setTitle(TokenDetailText.cpu)
+			setSubtitle(CommonText.calculating)
+		}
+
+		netAssetCell = ProgressView(context).apply {
+			setTitle(TokenDetailText.net)
+			setSubtitle(CommonText.calculating)
+		}
+
 		assetCard.addContent {
 			addView(ramAssetCell)
 			addView(cpuAssetCell)
@@ -316,33 +311,29 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		}
 	}
 
-	private fun ViewGroup.generateMethodCards() {
-		listOf(
-			Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
-			Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
-			Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM)
-		).forEach { pair ->
-			generateCardView(pair)
-		}
+	override fun showCenterLoading(status: Boolean) = launchUI {
+		loadingView = LoadingView(context!!)
+		if (status) loadingView.show() else loadingView.remove()
 	}
 
 	private fun showDelegateBandWidthDashboard() {
-		val loadingView = LoadingView(context!!)
-		loadingView.show()
 		presenter.getDelegateBandWidthData {
-			loadingView.remove()
-			Dashboard(context!!) {
-				showList(
-					"Delegate Bandwidth Detail",
-					DelegateBandwidthAdapter(it) {
-						showDelegateEditorDashboard(EOSAccount(toName))
-					}
-				)
+			launchUI {
+				Dashboard(context!!) {
+					showList(
+						"Delegate Bandwidth Detail",
+						DelegateBandwidthAdapter(it) {
+							if (SharedWallet.isWatchOnlyWallet()) {
+								showError(Throwable(AlertText.watchOnly))
+							} else showRefundBandwidthEditorDashboard(EOSAccount(toName))
+						}
+					)
+				}
 			}
 		}
 	}
 
-	private fun Dashboard.showDelegateEditorDashboard(receiver: EOSAccount) {
+	private fun Dashboard.showRefundBandwidthEditorDashboard(receiver: EOSAccount) {
 		with(dialog) {
 			cancelOnTouchOutside(false)
 			setContentView(
@@ -356,11 +347,17 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 							receiver,
 							getCPUAMount(),
 							getNetAmount()
-						) {
+						) { response, error ->
 							launchUI {
-								dialog.dismiss()
-								showLoading(false)
-								it.showDialog(context)
+								if (response.isNotNull() && error.isNone()) launchUI {
+									dialog.dismiss()
+									showLoading(false)
+									presenter.updateRefundInfo()
+									response.showDialog(context)
+								} else {
+									showLoading(false)
+									showError(error)
+								}
 							}
 						}
 					}
@@ -371,8 +368,8 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.generateCardView(info: Pair<Int, String>) {
-		val cardWidth = (ScreenSize.card) / 3
-		GrayCardView(context).apply {
+		val cardWidth = ScreenSize.card / 3 - 4.uiPX()
+		val cardView = GrayCardView(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(cardWidth, 135.uiPX())
 			container.apply {
 				onClick {
@@ -398,6 +395,11 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 					}
 				}
 			}
-		}.into(this)
+		}
+		cardView.into(this)
+		cardView.setMargins<LinearLayout.LayoutParams> {
+			leftMargin = 2.uiPX()
+			rightMargin = 2.uiPX()
+		}
 	}
 }

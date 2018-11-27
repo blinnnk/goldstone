@@ -4,16 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.PorterDuff
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.alignParentRight
-import com.blinnnk.extension.centerInVertical
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isDefaultStyle
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -24,6 +21,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import org.jetbrains.anko.radioButton
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
+
 
 /**
  * @date 2018/6/20 9:00 PM
@@ -42,10 +40,6 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 		isAntiAlias = true
 		style = Paint.Style.FILL
 		color = GrayScale.midGray
-	}
-
-	var isLast by observing(false) {
-		invalidate()
 	}
 
 	private val leftPadding = 50.uiPX()
@@ -88,17 +82,13 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 			20.uiPX().toFloat(),
 			0f,
 			20.uiPX().toFloat(),
-			if (isLast) height / 2f else height.toFloat(),
+			height.toFloat(),
 			paint
 		)
 	}
 
-	fun selectRadio() {
-		radio.isChecked = true
-	}
-
-	fun clearRadio() {
-		radio.isChecked = false
+	fun setSelectedStatus(status: Boolean) {
+		radio.isChecked = status
 	}
 
 	fun isChecked() = radio.isChecked
@@ -106,7 +96,7 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 	fun setData(name: String, isSelected: Boolean, id: Int): NodeSelectionCell {
 		title.text =
 			if (SharedWallet.getInReviewStatus() && name.contains(CoinSymbol.pureBTCSymbol, true))
-				CoinSymbol.btc() + " " + name.substringAfter(" ")
+				CoinSymbol.btc() suffix name.substringAfter(" ")
 			else name
 		radio.isChecked = isSelected
 		this.id = id

@@ -223,6 +223,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		private fun cacheDataAndSetNetBy(wallet: WalletTable, callback: () -> Unit) {
 			val type = wallet.getWalletType()
 			type.updateSharedPreference()
+			SharedWallet.updateBackUpMnemonicStatus(wallet.hasBackUpMnemonic)
 			when {
 				type.isBTCTest() -> NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)

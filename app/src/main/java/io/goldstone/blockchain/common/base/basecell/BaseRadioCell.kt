@@ -30,7 +30,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		x = 60.uiPX().toFloat()
 		textSize = fontSize(15)
 		textColor = GrayScale.black
-		typeface = GoldStoneFont.heavy(context)
+		typeface = GoldStoneFont.medium(context)
 	}
 	private var radioButton: RadioButton
 	protected var icon: ImageView? = null

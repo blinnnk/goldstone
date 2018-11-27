@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.crypto.eos.eccutils
 
 import android.text.TextUtils
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.crypto.eos.ecc.CurveParam
 import io.goldstone.blockchain.crypto.eos.ecc.Ripemd160
@@ -37,7 +38,7 @@ object EosEcUtil {
 			throw IllegalArgumentException("Invalid format, checksum mismatch")
 		}
 
-		if (checksumRef != null) {
+		if (checksumRef.isNotNull()) {
 			checksumRef.data = checksumFromData
 		}
 
@@ -47,7 +48,7 @@ object EosEcUtil {
 	@JvmStatic
 	fun encodeEosCrypto(prefix: String, curveParam: CurveParam?, data: ByteArray): String {
 		var typePart = ""
-		if (curveParam != null) {
+		if (curveParam.isNotNull()) {
 			if (curveParam.isType(CurveParam.SECP256_K1)) {
 				typePart = PREFIX_K1
 			} else if (curveParam.isType(CurveParam.SECP256_R1)) {

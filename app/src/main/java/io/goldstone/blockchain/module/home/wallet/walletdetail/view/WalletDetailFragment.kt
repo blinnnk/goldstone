@@ -67,6 +67,8 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		if (!hidden) {
 			presenter.start()
 			getMainActivity()?.backEvent = null // 恢复回退站
+		} else {
+			headerView?.clearBitmap()
 		}
 	}
 

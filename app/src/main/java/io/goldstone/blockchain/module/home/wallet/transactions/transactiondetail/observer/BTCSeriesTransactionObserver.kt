@@ -3,6 +3,8 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.os.Handler
 import android.os.Looper
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
@@ -41,8 +43,8 @@ abstract class BTCSeriesTransactionObserver {
 						}
 						removeObserver()
 					} else {
-						if (blockNumber == null) getBlockCount(chainURL) { blockCount, blockCountError ->
-							if (blockCount != null && blockCountError.isNone()) {
+						if (blockNumber.isNull()) getBlockCount(chainURL) { blockCount, blockCountError ->
+							if (blockCount.isNotNull() && blockCountError.isNone()) {
 								blockNumber = blockCount - confirmationCount
 								uiThread {
 									getStatus(hasConfirmed, confirmationCount, blockNumber!!)

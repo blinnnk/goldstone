@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.centerInParent
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.uikit.HoneyColor
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -50,7 +51,7 @@ class RoundShadowIcon(context: Context) : RelativeLayout(context) {
 	}
 
 	fun showPendingIcon(status: Boolean = true) {
-		if (pendingIcon != null) {
+		if (pendingIcon.isNotNull()) {
 			if (!status) removeView(pendingIcon)
 		} else {
 			if (status) {
@@ -58,7 +59,7 @@ class RoundShadowIcon(context: Context) : RelativeLayout(context) {
 					ProgressBar(this.context, null, R.attr.progressBarStyleInverse).apply {
 						indeterminateDrawable.setColorFilter(
 							HoneyColor.HoneyWhite,
-							android.graphics.PorterDuff.Mode.MULTIPLY
+							android.graphics.PorterDuff.Mode.SRC_ATOP
 						)
 						RelativeLayout.LayoutParams(32.uiPX(), 32.uiPX())
 					}

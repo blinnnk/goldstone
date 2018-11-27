@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.math.BigInteger
@@ -62,11 +63,13 @@ class DelegateEditorView(context: Context) : LinearLayout(context) {
 		val inputWidth = ScreenSize.overlayContentWidth - 40.uiPX()
 		cpuInput.apply {
 			setNumberInput()
+			setText("0.0")
 			layoutParams = LinearLayout.LayoutParams(inputWidth, wrapContent)
 			title = "CPU Amount"
 		}.into(this)
 
 		netInput.apply {
+			setText("0.0")
 			setNumberInput()
 			layoutParams = LinearLayout.LayoutParams(inputWidth, wrapContent)
 			title = "NET Amount"
@@ -97,10 +100,10 @@ class DelegateEditorView(context: Context) : LinearLayout(context) {
 	}
 
 	fun getCPUAMount(): BigInteger =
-		BigInteger.valueOf(cpuInput.getContent().toLongOrZero()).multiply(BigInteger.valueOf(10000))
+		cpuInput.getContent().toDoubleOrZero().toEOSUnit()
 
 	fun getNetAmount(): BigInteger =
-		BigInteger.valueOf(netInput.getContent().toLongOrZero()).multiply(BigInteger.valueOf(10000))
+		netInput.getContent().toDoubleOrZero().toEOSUnit()
 
 	fun getPassword(): String = passwordInput.getContent()
 

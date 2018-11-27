@@ -31,6 +31,14 @@ data class RefundRequestInfo(
 	@SerializedName("request_time")
 	val requestTime: String // Formatted "2018-09-12T06:20:58"
 ) : Serializable {
+
+	constructor() : this(
+		"",
+		"",
+		"",
+		""
+	)
+
 	constructor(data: JSONObject) : this(
 		data.safeGet("cpu_amount"),
 		data.safeGet("net_amount"),

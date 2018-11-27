@@ -118,13 +118,12 @@ class TokenDetailPresenter(
 
 	// 没数据或初始化的时候先生产默认值显示
 	private fun updateEmptyCharData() = GlobalScope.launch(Dispatchers.Default) {
-		listOf<TransactionListModel>()
-			.generateBalanceList(token.contract) {
-				it.updateHeaderData(true)
-			}
+		listOf<TransactionListModel>().generateBalanceList(token.contract) {
+			it.updateHeaderData(true)
+		}
 	}
 
-	@UiThread
+	@WorkerThread
 	fun List<TokenBalanceTable>.updateHeaderData(isPlaceholderData: Boolean) {
 		val maxChartCount = 7
 		val chartArray = arrayListOf<ChartPoint>()
@@ -209,7 +208,7 @@ class TokenDetailPresenter(
 
 	private fun List<TransactionListModel>.generateHistoryBalance(
 		todayBalance: Double,
-		callback: (List<DateBalance>) -> Unit
+		@WorkerThread callback: (List<DateBalance>) -> Unit
 	) {
 		val maxCount = 6
 		var balances = listOf<DateBalance>()

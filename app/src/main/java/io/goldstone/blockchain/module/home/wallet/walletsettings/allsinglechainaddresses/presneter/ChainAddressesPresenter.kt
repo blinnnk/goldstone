@@ -18,6 +18,7 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.event.DefaultAddressUpdateEvent
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment.Companion.showMoreDashboard
@@ -27,6 +28,7 @@ import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechaina
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import kotlinx.coroutines.Dispatchers
 import org.bitcoinj.params.MainNetParams
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -58,6 +60,8 @@ class ChainAddressesPresenter(
 						fragment.setDefaultAddress(bip44Address)
 						// 更新钱包默认地址, 同时更新首页的数据
 						updateWalletDetail()
+						// 更新 `AddressManager` 界面的默认地址显示
+						EventBus.getDefault().post(DefaultAddressUpdateEvent(coinType))
 						fragment.toast(CommonText.succeed)
 					}
 				}

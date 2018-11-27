@@ -26,9 +26,12 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	private val slideHeader by lazy { QuotationSlideHeader(context!!) }
 	override val presenter = QuotationPresenter(this)
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		EventBus.getDefault().register(this)
+	override fun onStart() {
+		super.onStart()
+		if (!EventBus.getDefault().isRegistered(this)) {
+			EventBus.getDefault().register(this)
+		}
+
 	}
 
 	// 这个页面是常驻在首页通过 `ViewPager` 管理显示的,
@@ -36,7 +39,13 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (isHidden) EventBus.getDefault().unregister(this)
-		else EventBus.getDefault().register(this)
+		else if (!EventBus.getDefault().isRegistered(this))
+			EventBus.getDefault().register(this)
+	}
+
+	override fun onStop() {
+		super.onStop()
+		EventBus.getDefault().unregister(this)
 	}
 
 	@Subscribe(threadMode = ThreadMode.POSTING)

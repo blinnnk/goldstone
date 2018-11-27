@@ -40,7 +40,7 @@ object ETHSeriesTransactionUtils {
 				defaultDao.getERC20Token(data.contract.contract, chainURL.chainID.id)
 			// 如果本地有该条燃气费的 `DefaultToken` 信息那么直接从数据库获取信息并补全
 			// 否则就获取 `ContractAddress` 从链上查询对应的数据并补全本地信息
-			if (targetToken != null) {
+			if (targetToken.isNotNull()) {
 				val count =
 					CryptoUtils.toCountByDecimal(data.value, targetToken.decimals)
 				transactionDao.updateFeeInfo(targetToken.symbol, count, data.hash)
@@ -75,7 +75,7 @@ object ETHSeriesTransactionUtils {
 		hold: (memo: String?, error: RequestError) -> Unit
 	) {
 		ETHJsonRPC.getInputCodeByHash(hash, chainURL) { inputCode, error ->
-			if (inputCode != null && error.isNone()) {
+			if (inputCode.isNotNull() && error.isNone()) {
 				val memo = getMemoFromInputCode(inputCode)
 				val transactionDao =
 					GoldStoneDataBase.database.transactionDao()
@@ -94,7 +94,7 @@ object ETHSeriesTransactionUtils {
 		@WorkerThread hold: (confirmationCount: Int?, error: RequestError) -> Unit
 	) {
 		ETHJsonRPC.getBlockCount(chainURL) { blockCount, error ->
-			if (blockCount != null && error.isNone()) {
+			if (blockCount.isNotNull() && error.isNone()) {
 				hold(blockCount - blockNumber, error)
 			} else hold(null, error)
 		}
