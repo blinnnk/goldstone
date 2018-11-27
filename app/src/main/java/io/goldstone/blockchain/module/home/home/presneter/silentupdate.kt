@@ -175,7 +175,7 @@ abstract class SilentUpdater {
 	private fun getERC20TokenTransactions(startBlock: Int) {
 		RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenTransactions(SharedAddress.getCurrentEthereum(), startBlock),
-			"result"
+			listOf("result")
 		) { transactions, error ->
 			if (transactions?.isNotEmpty() == true && error.isNone()) {
 				val defaultDao =

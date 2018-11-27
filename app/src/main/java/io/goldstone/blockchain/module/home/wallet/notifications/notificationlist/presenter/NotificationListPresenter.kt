@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.presenter
 
 import android.os.Bundle
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
@@ -71,7 +72,7 @@ class NotificationListPresenter(
 
 	private fun updateDataFromServer(requestTime: Long) {
 		GoldStoneAPI.getNotificationList(requestTime) { notificationList, error ->
-			if (notificationList != null && error.isNone()) {
+			if (notificationList.isNotNull() && error.isNone()) {
 				hasLoadFromServer = true
 				if (notificationList.isNotEmpty())
 					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)

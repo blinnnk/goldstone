@@ -536,11 +536,11 @@ object TokenDetailText {
 	@JvmField
 	val delegateTypeTransfer = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Transfer"
-		HoneyLanguage.Chinese.code -> "同时转让 EOS"
+		HoneyLanguage.Chinese.code -> "转让 EOS"
 		HoneyLanguage.Japanese.code -> "転送"
 		HoneyLanguage.Korean.code -> "EOS 를 동시에 전송"
 		HoneyLanguage.Russian.code -> "Передача"
-		HoneyLanguage.TraditionalChinese.code -> "同時轉讓EOS"
+		HoneyLanguage.TraditionalChinese.code -> "轉讓EOS"
 		else -> ""
 	}
 	@JvmField

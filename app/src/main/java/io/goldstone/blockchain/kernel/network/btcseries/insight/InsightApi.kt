@@ -35,7 +35,7 @@ object InsightApi {
 		) { result, error ->
 			// Insight BCH 的 getBalance 接口返回的是 Double 信息, BTC
 			// 和 LTC 返回的是 Satoshi
-			if (result != null && error.isNone()) {
+			if (result.isNotNull() && error.isNone()) {
 				val data =
 					if (chainType.isBCH()) result.firstOrNull()?.toDoubleOrNull()?.toSatoshi() ?: 0
 					else result.firstOrNull()?.toLongOrNull() ?: 0
@@ -75,7 +75,7 @@ object InsightApi {
 			null,
 			isEncrypt
 		) { result, error ->
-			if (result != null && error.isNone()) {
+			if (result.isNotNull() && error.isNone()) {
 				val jsonArray = JSONArray(result.firstOrNull())
 				var data = listOf<JSONObject>()
 				(0 until jsonArray.length()).forEach {

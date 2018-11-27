@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.commonmodel
 
 import android.arch.persistence.room.*
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
@@ -180,7 +181,7 @@ data class TransactionTable(
 		data.safeGet("value").toDecimalFromHex(),
 		if (CryptoUtils.isERC20Transfer(data.safeGet("input"))) {
 			val amount = CryptoUtils.getTransferInfoFromInputData(data.safeGet("input"))?.amount
-			if (amount != null) CryptoUtils.toCountByDecimal(amount, decimal) else 0.0
+			if (amount.isNotNull()) CryptoUtils.toCountByDecimal(amount, decimal) else 0.0
 		} else {
 			CryptoUtils.toCountByDecimal(BigInteger(data.safeGet("value").toDecimalFromHex()), decimal)
 		},

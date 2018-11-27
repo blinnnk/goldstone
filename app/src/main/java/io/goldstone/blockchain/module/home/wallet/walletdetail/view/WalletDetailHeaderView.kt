@@ -36,13 +36,10 @@ import org.jetbrains.anko.*
  * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
-	private val avatarBitmap = UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
+	private val avatarBitmap = UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context)
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
-			if (avatar.isNull())
-				currentAccount.avatar.glideImage(avatarBitmap ?: UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap())
-			else currentAccount.avatar.glideImage(avatar)
-
+			balanceTitle.text = totalBalance.toDouble().formatCurrency()
 			currentAccount.info.title.text = object : FixTextLength() {
 				override var text = model?.name.orEmpty()
 				override val maxWidth = 26.uiPX().toFloat()
@@ -50,8 +47,11 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			}.getFixString()
 
 			currentAccount.info.subtitle.text = address
-			balanceTitle.text = totalBalance.toDouble().formatCurrency()
 			balanceSubtitle.text = WalletSlideHeader.setBalanceInfo()
+			// 钱包一样的话每次刷新不用重新加载图片给内存造成压力
+			if (avatar.isNull())
+				currentAccount.avatar.glideImage(avatarBitmap.getBitmap())
+			else currentAccount.avatar.glideImage(avatar)
 		}
 	}
 	val addTokenButton = RoundButtonWithIcon(context)
@@ -161,7 +161,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			).apply {
 				indeterminateDrawable.setColorFilter(
 					Spectrum.white,
-					android.graphics.PorterDuff.Mode.MULTIPLY
+					android.graphics.PorterDuff.Mode.SRC_ATOP
 				)
 				layoutParams = RelativeLayout.LayoutParams(16.uiPX(), 16.uiPX())
 				x = WalletText.section.toUpperCase().measureTextWidth(16.uiPX().toFloat()) + 16.uiPX()
@@ -175,6 +175,10 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				progressBar = null
 			}
 		}
+	}
+
+	fun clearBitmap() {
+		avatarBitmap.clearBitmap()
 	}
 }
 

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -487,39 +488,33 @@ data class WalletTable(
 			accountNames: List<EOSAccountInfo>,
 			@UiThread callback: () -> Unit
 		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					// 增量存储同一公钥下的多 `AccountName`
-					var currentAccountNames =
-						getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
-					currentAccountNames += accountNames
-					updateCurrentEOSAccountNames(currentAccountNames.distinct())
-				}
+			GlobalScope.launch(Dispatchers.Default) {
+				// 增量存储同一公钥下的多 `AccountName`
+				var currentAccountNames =
+					WalletTable.dao.getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames
+						?: listOf()
+				currentAccountNames += accountNames
+				WalletTable.dao.updateCurrentEOSAccountNames(currentAccountNames.distinct())
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
 				if (accountNames.isNotEmpty()) {
 					WalletTable.updateEOSDefaultName(accountNames.first().name) { callback() }
-				} else GoldStoneAPI.context.runOnUiThread { callback() }
+				} else launchUI(callback)
 			}
 		}
 
 		fun updateEOSDefaultName(defaultName: String, @UiThread callback: () -> Unit) {
-			doAsync {
+			GlobalScope.launch(Dispatchers.Default) {
 				// 更新钱包数据库的 `Default EOS Address`
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.apply {
-						update(apply { currentEOSAccountName.updateCurrent(defaultName) })
-						// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-						MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
-						GoldStoneAPI.context.runOnUiThread { callback() }
-					}
+				WalletTable.dao.findWhichIsUsing(true)?.apply {
+					WalletTable.dao.update(apply { currentEOSAccountName.updateCurrent(defaultName) })
+					// 同时更新 `MyTokenTable` 里面的 `OwnerName`
+					MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
+					launchUI(callback)
 				}
 			}
 		}
 
-		fun switchCurrentWallet(
-			walletAddress: String,
-			callback: (WalletTable) -> Unit
-		) {
+		fun switchCurrentWallet(walletAddress: String, callback: (WalletTable) -> Unit) {
 			doAsync {
 				GoldStoneDataBase.database.walletDao().apply {
 					updateLastUsingWalletOff()

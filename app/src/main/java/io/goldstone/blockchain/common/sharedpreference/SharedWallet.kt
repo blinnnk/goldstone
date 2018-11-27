@@ -80,6 +80,15 @@ object SharedWallet {
 			isWatchOnly
 		)
 
+	fun hasBackUpMnemonic(): Boolean =
+		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.hasBackUpMnemonic)
+
+	fun updateBackUpMnemonicStatus(hasBackUp: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.hasBackUpMnemonic,
+			hasBackUp
+		)
+
 	fun getCurrentBalance(): Double =
 		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.currentBalance)
 

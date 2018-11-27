@@ -30,7 +30,9 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  */
 class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
-	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
+	val token by lazy {
+		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
+	}
 	override val pageTitle: String get() = token?.symbol?.symbol.orEmpty()
 	private val menuBar by lazy { ViewPagerMenu(context!!) }
 	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
@@ -39,7 +41,10 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 			if (token?.contract.isEOS()) TokenDetailText.assets else TokenDetailText.information
 		arrayListOf(TokenDetailText.transactionList, secondMenuTitle)
 	}
+
 	override val presenter = TokenDetailCenterPresenter(this)
+
+	private var isTokenDetailPage = true
 
 	override fun onResume() {
 		super.onResume()
@@ -71,6 +76,9 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 					onPageScrolled { position, percent, _ ->
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 					}
+					onPageSelected {
+						isTokenDetailPage = it == 0
+					}
 				}
 			}
 		}
@@ -79,6 +87,6 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		// `TokenDetailFragment` 的 左上角的 `Filter Button` 显示控制
-		EventBus.getDefault().post(FilterButtonDisplayEvent(!hidden))
+		EventBus.getDefault().post(FilterButtonDisplayEvent(!hidden && isTokenDetailPage))
 	}
 }

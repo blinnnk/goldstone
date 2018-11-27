@@ -10,7 +10,6 @@ import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import java.io.Serializable
 import java.math.BigInteger
 
-
 /**
  * @author KaySaith
  * @date  2018/11/22

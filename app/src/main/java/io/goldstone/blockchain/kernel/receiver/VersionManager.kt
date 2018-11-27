@@ -17,10 +17,7 @@ import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
 import android.support.v4.app.NotificationCompat
 import android.support.v7.app.AlertDialog
-import com.blinnnk.extension.isFalse
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.*
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.blinnnk.util.SystemUtils
@@ -91,7 +88,7 @@ class VersionManager(val fragment: Fragment) {
 
 	fun checkVersion(@UiThread hold: (error: RequestError) -> Unit) {
 		GoldStoneAPI.getNewVersionOrElse { versionModel, error ->
-			if (versionModel != null && error.isNone()) {
+			if (versionModel.isNotNull() && error.isNone()) {
 				newVersionDescription = versionModel.description.orEmpty()
 				newVersionName = versionModel.versionName.orEmpty()
 				newVersionUrl = versionModel.url.orEmpty()

@@ -63,7 +63,7 @@ object EtherScanApi {
 	val getTokenTransactions: (address: String, startBlock: Int) -> String = { address, startBlock ->
 		"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=tokentx&address=$address&startblock=$startBlock&endblock=999999999&sort=asc&apikey=${apikey()}"
 	}
-	val getTargetTokenTransactions: (address: String, contract: String, startBlock: String) -> String = { address, contract, startBlock ->
+	val getTargetTokenTransactions: (address: String, contract: String, startBlock: Int) -> String = { address, contract, startBlock ->
 		"${etherScanLogHeader(SharedChain.getCurrentETH().chainID)}/api?module=account&action=tokentx&contractaddress=$contract&address=$address&startblock=$startBlock&endblock=999999999&sort=asc&apikey=${apikey()}"
 	}
 }

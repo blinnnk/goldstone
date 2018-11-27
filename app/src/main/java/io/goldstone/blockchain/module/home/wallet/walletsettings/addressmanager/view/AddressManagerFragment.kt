@@ -34,6 +34,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.event.DefaultAddressUpdateEvent
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.model.GridIconTitleModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -41,6 +42,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bitcoinj.params.MainNetParams
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -52,6 +56,32 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.viewAddresses
+
+	override fun onStart() {
+		super.onStart()
+		EventBus.getDefault().register(this)
+	}
+
+	override fun onStop() {
+		super.onStop()
+		EventBus.getDefault().unregister(this)
+	}
+
+	@Subscribe(threadMode = ThreadMode.POSTING)
+	fun updateAddressEvent(updateEvent: DefaultAddressUpdateEvent) {
+		WalletTable.getCurrent(Dispatchers.Main) {
+			when {
+				updateEvent.chainType.isETH() -> setEthereumAddressesModel(this)
+				updateEvent.chainType.isETC() -> setEthereumClassicAddressesModel(this)
+				updateEvent.chainType.isBTC() -> setBitcoinAddressesModel(this)
+				updateEvent.chainType.isBCH() -> setBitcoinCashAddressesModel(this)
+				updateEvent.chainType.isLTC() -> setLitecoinAddressesModel(this)
+				updateEvent.chainType.isEOS() -> setEOSAddressesModel(this)
+				updateEvent.chainType.isAllTest() -> setBTCSeriesTestAddressesModel(this)
+			}
+		}
+	}
+
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 7) { cell, data, wallet, isDefault ->
 			val chainType = data.getChainType()
@@ -418,7 +448,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<WalletSettingsFragment> {
-			presenter.showWalletSettingListFragment()
+			presenter.popFragmentFrom<AddressManagerFragment>()
 		}
 	}
 

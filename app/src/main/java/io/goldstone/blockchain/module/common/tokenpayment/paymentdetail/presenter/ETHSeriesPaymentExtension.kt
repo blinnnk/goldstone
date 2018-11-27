@@ -99,7 +99,7 @@ private fun PaymentDetailPresenter.generateTransaction(
 		data,
 		getToken()?.contract?.getChainURL()!!
 	) { limit, error ->
-		if (limit != null && error.isNone()) {
+		if (limit.isNotNull() && error.isNone()) {
 			hold(
 				PaymentDetailModel(
 					getToken()?.contract.getAddress(),

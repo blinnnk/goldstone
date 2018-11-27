@@ -22,7 +22,7 @@ android {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 19
+    versionCode 20
     versionName "1.6.2"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
@@ -83,7 +83,7 @@ dependencies {
   // 2.0 Beta 以上需要兼容 AndroidX 先不要升级
   implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha12'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.4.5'
+  implementation 'com.blinnnk:honeyui:0.3.5.0'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin

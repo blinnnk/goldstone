@@ -87,8 +87,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<WalletSettingsFragment> {
-			headerTitle = WalletSettingsText.walletSettings
-			presenter.showWalletSettingListFragment()
+			presenter.popFragmentFrom<PasswordSettingsFragment>()
 		}
 	}
 }

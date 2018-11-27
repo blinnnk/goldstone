@@ -9,6 +9,7 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import com.google.zxing.MultiFormatReader
@@ -34,13 +35,13 @@ class DecoratedQRCodeView : RelativeLayout {
 	var barcodeView: BarcodeView
 	var finderView: QRCodeFinderView
 	private var statusView: TextView
-	
+
 	private inner class WrappedCallback(private val delegate: BarcodeCallback) : BarcodeCallback {
-		
+
 		override fun barcodeResult(result: BarcodeResult) {
 			delegate.barcodeResult(result)
 		}
-		
+
 		override fun possibleResultPoints(resultPoints: List<ResultPoint>) {
 			for (point in resultPoints) {
 				finderView.addPossibleResultPoint(point)
@@ -48,9 +49,9 @@ class DecoratedQRCodeView : RelativeLayout {
 			delegate.possibleResultPoints(resultPoints)
 		}
 	}
-	
+
 	constructor(context: Context) : super(context)
-	
+
 	constructor(
 		context: Context,
 		attrs: AttributeSet
@@ -58,7 +59,7 @@ class DecoratedQRCodeView : RelativeLayout {
 		context,
 		attrs
 	)
-	
+
 	constructor(
 		context: Context,
 		attrs: AttributeSet,
@@ -68,7 +69,7 @@ class DecoratedQRCodeView : RelativeLayout {
 		attrs,
 		defStyleAttr
 	)
-	
+
 	init {
 		barcodeView = BarcodeView(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
@@ -77,7 +78,7 @@ class DecoratedQRCodeView : RelativeLayout {
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			setCameraPreview(barcodeView)
 		}
-		
+
 		statusView = TextView(context).apply {
 			setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
 			textColor = Color.WHITE
@@ -88,12 +89,12 @@ class DecoratedQRCodeView : RelativeLayout {
 			}
 			bottomPadding = 10.uiPX()
 		}
-		
+
 		addView(barcodeView)
 		addView(finderView)
 		addView(statusView)
 	}
-	
+
 	/**
 	 * Convenience method to initialize camera id, decode formats and prompt message from an intent.
 	 *
@@ -111,10 +112,10 @@ class DecoratedQRCodeView : RelativeLayout {
 			}
 		}
 		val customPromptMessage = intent.getStringExtra(Intents.Scan.PROMPT_MESSAGE)
-		if (customPromptMessage != null) {
+		if (customPromptMessage.isNotNull()) {
 			setStatusText(customPromptMessage)
 		}
-		
+
 		// Check what type of scan. Default: normal scan
 		val scanType = intent.getIntExtra(Intents.Scan.SCAN_TYPE, 0)
 		val characterSet = intent.getStringExtra(Intents.Scan.CHARACTER_SET)
@@ -128,64 +129,64 @@ class DecoratedQRCodeView : RelativeLayout {
 			scanType
 		)
 	}
-	
+
 	fun setStatusText(text: String) {
 		// statusView is optional when using a custom layout
 		if (!statusView.isNull()) {
 			statusView.text = text
 		}
 	}
-	
+
 	/**
 	 * @see BarcodeView.pause
 	 */
 	fun pause() {
 		barcodeView.pause()
 	}
-	
+
 	/**
 	 * @see BarcodeView.pauseAndWait
 	 */
 	fun pauseAndWait() {
 		barcodeView.pauseAndWait()
 	}
-	
+
 	/**
 	 * @see BarcodeView.resume
 	 */
 	fun resume() {
 		barcodeView.resume()
 	}
-	
+
 	/**
 	 * @see BarcodeView.decodeSingle
 	 */
 	fun decodeSingle(callback: BarcodeCallback) {
 		barcodeView.decodeSingle(WrappedCallback(callback))
 	}
-	
+
 	/**
 	 * @see BarcodeView.decodeContinuous
 	 */
 	fun decodeContinuous(callback: BarcodeCallback) {
 		barcodeView.decodeContinuous(WrappedCallback(callback))
 	}
-	
+
 	/**
 	 * Turn on the device's flashlight.
 	 */
 	private fun setTorchOn() {
 		barcodeView.setTorch(true)
 	}
-	
+
 	/**
 	 * Turn off the device's flashlight.
 	 */
 	private fun setTorchOff() {
 		barcodeView.setTorch(false)
-		
+
 	}
-	
+
 	/**
 	 * Changes the settings for Camera.
 	 * Must be called after [.resume].
@@ -195,7 +196,7 @@ class DecoratedQRCodeView : RelativeLayout {
 	fun changeCameraParameters(callback: CameraParametersCallback) {
 		barcodeView.changeCameraParameters(callback)
 	}
-	
+
 	/**
 	 * Handles focus, camera, volume up and volume down keys.
 	 *
@@ -221,5 +222,5 @@ class DecoratedQRCodeView : RelativeLayout {
 		}
 		return super.onKeyDown(keyCode, event)
 	}
-	
+
 }

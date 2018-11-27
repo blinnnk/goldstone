@@ -43,7 +43,7 @@ class EOSAccountSelectionPresenter(
 	) {
 		EOSAPI.getAccountNameByPublicKey(SharedAddress.getCurrentEOS()) { accounts, error ->
 			val wallet = GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
-			if (accounts != null && error.isNone()) hold(accounts)
+			if (accounts.isNotNull() && error.isNone()) hold(accounts)
 			else wallet?.eosAccountNames?.filter {
 				it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true)
 			}?.let(hold)

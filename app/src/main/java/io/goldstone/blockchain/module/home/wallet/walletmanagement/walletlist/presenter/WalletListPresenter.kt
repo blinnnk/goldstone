@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.mo
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListAdapter
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 
+
 /**
  * @date 24/03/2018 8:50 PM
  * @author KaySaith
@@ -41,9 +42,11 @@ class WalletListPresenter(
 			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
 			if (isMainnet) NodeSelectionPresenter.setAllMainnet {
 				SharedValue.updateIsTestEnvironment(false)
+				Runtime.getRuntime().gc()
 				fragment.activity?.jump<SplashActivity>()
 			} else NodeSelectionPresenter.setAllTestnet(true) {
 				SharedValue.updateIsTestEnvironment(true)
+				Runtime.getRuntime().gc()
 				fragment.activity?.jump<SplashActivity>()
 			}
 		}
@@ -61,7 +64,6 @@ class WalletListPresenter(
 						}
 					} else {
 						switchWalletInDatabase(address, true)
-						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 
@@ -72,7 +74,6 @@ class WalletListPresenter(
 						}
 					} else {
 						switchWalletInDatabase(address, false)
-						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 
@@ -83,7 +84,6 @@ class WalletListPresenter(
 						}
 					} else {
 						switchWalletInDatabase(address, true)
-						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 
@@ -94,7 +94,6 @@ class WalletListPresenter(
 						}
 					} else {
 						switchWalletInDatabase(address, true)
-						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 
@@ -105,7 +104,6 @@ class WalletListPresenter(
 						}
 					} else {
 						switchWalletInDatabase(address, false)
-						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 
@@ -116,13 +114,11 @@ class WalletListPresenter(
 						}
 					} else {
 						switchWalletInDatabase(address, true)
-						fragment.activity?.jump<SplashActivity>()
 					}
 				}
 
 				walletType.isETHSeries() -> {
 					switchWalletInDatabase(address, true)
-					fragment.activity?.jump<SplashActivity>()
 				}
 
 				walletType.isBIP44() || walletType.isMultiChain() -> {
@@ -140,7 +136,7 @@ class WalletListPresenter(
 				"Switch Chain Network",
 				WalletSettingsText.switchChainNetAlert(content),
 				false
-				) {
+			) {
 				callback()
 			}
 		}

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.kernel.network.eos
 
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.accountregister.ActorKey
@@ -33,7 +34,7 @@ class EOSRegisterTransaction(
 	override fun serialized(
 		hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit
 	) {
-		EOSAPI.getTransactionHeaderFromChain(ExpirationType.FiveMinutes) { header, error ->
+		EOSAPI.getTransactionHeader(ExpirationType.FiveMinutes) { header, error ->
 			val authorizations = listOf(creator)
 			val newAccountModel = EOSNewAccountModel(
 				authorizations,
@@ -61,7 +62,7 @@ class EOSRegisterTransaction(
 				StakeType.Delegate,
 				true
 			)
-			if (header != null && error.isNone()) {
+			if (header.isNotNull() && error.isNone()) {
 				val serialization = EOSRegisterUtil.getRegisterSerializedCode(
 					chainID,
 					header,

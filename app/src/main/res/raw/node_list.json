@@ -1,5 +1,6 @@
 [
 	{
+		"id": "5bbef2c6e3387b38dffd8ea4",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 0,
@@ -11,6 +12,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc436f4e3387b62f5ae8b1b",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 61,
@@ -22,6 +24,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc42d3fe3387b38dfb99e17",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 2,
@@ -33,6 +36,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc436a1e3387b62f5ae8b1a",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 60,
@@ -44,6 +48,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc4388de3387b62f5ae8b1e",
 		"key_list": [
 			"CErKewMAewA4Lc6NmPxl",
 			"jPzvxyWFhTq5wzuZiFQd",
@@ -76,6 +81,7 @@
 		"is_default": 0
 	},
 	{
+		"id": "5bc43b4ae3387b62f5ae8b25",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 61,
@@ -87,6 +93,7 @@
 		"is_default": 0
 	},
 	{
+		"id": "5bc43734e3387b62f5ae8b1c",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 145,
@@ -98,6 +105,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc437bbe3387b62f5ae8b1d",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 194,
@@ -109,17 +117,19 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc43bffe3387b62f5ae8b27",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 194,
-		"chain_id": "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca",
+		"chain_id": "e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473",
 		"node_name": "Jungle (Cryptolions)",
-		"url": "https://junglehistory.cryptolions.io",
+		"url": "https://jungle2.cryptolions.io",
 		"encrypt_status": 0,
 		"weight": 0,
 		"is_default": 1
 	},
 	{
+		"id": "5bc43aa6e3387b62f5ae8b23",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 0,
@@ -131,6 +141,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc4391be3387b62f5ae8b1f",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 60,
@@ -142,6 +153,7 @@
 		"is_default": 0
 	},
 	{
+		"id": "5bc4398be3387b62f5ae8b21",
 		"key_list": [
 			"CErKewMAewA4Lc6NmPxl",
 			"jPzvxyWFhTq5wzuZiFQd",
@@ -174,6 +186,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc43968e3387b62f5ae8b20",
 		"key_list": [
 			"CErKewMAewA4Lc6NmPxl",
 			"jPzvxyWFhTq5wzuZiFQd",
@@ -206,6 +219,7 @@
 		"is_default": 0
 	},
 	{
+		"id": "5bc43a48e3387b62f5ae8b22",
 		"key_list": [
 			"CErKewMAewA4Lc6NmPxl",
 			"jPzvxyWFhTq5wzuZiFQd",
@@ -238,6 +252,7 @@
 		"is_default": 0
 	},
 	{
+		"id": "5bc43c30e3387b62f5ae8b28",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 2,
@@ -249,6 +264,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc43afae3387b62f5ae8b24",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 61,
@@ -260,6 +276,7 @@
 		"is_default": 0
 	},
 	{
+		"id": "5bc43b75e3387b62f5ae8b26",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 61,
@@ -271,6 +288,7 @@
 		"is_default": 1
 	},
 	{
+		"id": "5bc43c58e3387b62f5ae8b29",
 		"key_list": [],
 		"net_type": 1,
 		"chain_type": 145,

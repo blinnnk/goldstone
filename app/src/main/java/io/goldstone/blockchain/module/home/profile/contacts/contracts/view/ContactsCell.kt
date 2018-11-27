@@ -13,6 +13,7 @@ import com.blinnnk.animation.addTouchRippleAnimation
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.isTrue
+import com.blinnnk.extension.scaleTo
 import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
@@ -36,7 +37,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 	var model: ContactTable by observing(ContactTable()) {
 		info.apply {
 			title.text = model.name
-			subtitle.text = model.generateSubtitleIntro()
+			subtitle.text = model.generateSubtitleIntro().scaleTo(45)
 		}
 		model.name.isNotEmpty() isTrue {
 			fontIcon.text = model.name.substring(0, 1).toUpperCase()
@@ -78,10 +79,12 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)
 		this.addView(fontIcon)
 		fontIcon.centerInVertical()
-		this.addView(info.apply {
-			setBlackTitles()
-			x += 60.uiPX()
-		})
+		this.addView(
+			info.apply {
+				setBlackTitles()
+				x += 60.uiPX()
+			}
+		)
 		info.centerInVertical()
 		addTouchRippleAnimation(Color.WHITE, GrayScale.lightGray, RippleMode.Square)
 		leftPadding = PaddingSize.device

@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.common
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.getTargetChild
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
@@ -228,7 +229,7 @@ object RequisitionUtil {
 	@JvmStatic
 	inline fun <reified T> requestUnCryptoData(
 		api: String,
-		keyName: String,
+		keyName: List<String>,
 		justGetData: Boolean = false,
 		crossinline hold: (data: List<T>?, error: RequestError) -> Unit
 	) {
@@ -249,7 +250,9 @@ object RequisitionUtil {
 				val data = response.body()?.string()
 				try {
 					val dataObject = data?.toJsonObject() ?: JSONObject("")
-					val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
+					val jsonData =
+						if (keyName.isEmpty()) data
+						else dataObject.getTargetChild(keyName)
 					if (justGetData) {
 						hold(listOf(jsonData as T), RequestError.None)
 					} else {

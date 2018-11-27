@@ -106,8 +106,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 					TinyNumberUtils.isTrue(node.isUsed),
 					chainTypeID + index
 				).click { cell ->
-					clearAllSelectedStatus(node.chainType, nodeList.size)
-					cell.selectRadio()
+					setSelectedStatus(node.chainType, nodeList.size, cell.id)
 					selectedNode.add(node)
 				}.into(this)
 			}
@@ -115,10 +114,10 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 		}
 	}
 
-	private fun clearAllSelectedStatus(type: Int, dataCount: Int) {
+	private fun setSelectedStatus(type: Int, dataCount: Int, id: Int) {
 		val starID = getChainTypeID(type)
 		(starID until starID + dataCount).forEach {
-			container.findViewById<NodeSelectionCell>(it)?.clearRadio()
+			container.findViewById<NodeSelectionCell>(it)?.setSelectedStatus(it == id)
 		}
 		selectedNode.removeAll { it.chainType == type }
 	}
@@ -152,6 +151,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			}
 		}
 		updateLocalNodeSelectedStatus {
+			Runtime.getRuntime().gc()
 			activity?.jump<SplashActivity>()
 		}
 	}

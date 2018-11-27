@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.google.zxing.ResultMetadataType
 import com.google.zxing.ResultPoint
@@ -42,9 +43,9 @@ class QRcodeCaptureManager(
 	private val activity: Activity,
 	private val barcodeView: DecoratedQRCodeView
 ) {
-	
+
 	private var cameraPermissionReqCode = 250
-	
+
 	private var orientationLock = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 	private val savedOrientationLock = "SAVED_ORIENTATION_LOCK"
 	private var returnBarcodeImagePath = false
@@ -53,25 +54,25 @@ class QRcodeCaptureManager(
 	private var beepManager = BeepManager(activity)
 	private val handler = Handler()
 	private var finishWhenClosed = false
-	
+
 	private val callback = object : BarcodeCallback {
 		override fun barcodeResult(result: BarcodeResult) {
 			barcodeView.pause()
 			beepManager.playBeepSoundAndVibrate()
 			handler.post { returnResult(result) }
 		}
-		
+
 		override fun possibleResultPoints(resultPoints: List<ResultPoint>) {}
 	}
-	
+
 	private val stateListener = object : CameraPreview.StateListener {
-		override fun previewSized() { }
-		override fun previewStarted() { }
-		override fun previewStopped() { }
+		override fun previewSized() {}
+		override fun previewStarted() {}
+		override fun previewStopped() {}
 		override fun cameraError(error: Exception) {
 			displayFrameworkBugMessageAndExit()
 		}
-		
+
 		override fun cameraClosed() {
 			if (finishWhenClosed) {
 				Log.d(CaptureManager::class.java.simpleName, "Camera closed; finishing activity")
@@ -79,7 +80,7 @@ class QRcodeCaptureManager(
 			}
 		}
 	}
-	
+
 	init {
 		barcodeView.barcodeView.addStateListener(stateListener)
 		inactivityTimer = InactivityTimer(activity,
@@ -89,7 +90,7 @@ class QRcodeCaptureManager(
 			}
 		)
 	}
-	
+
 	/**
 	 * Perform initialization, according to preferences set in the intent.
 	 *
@@ -102,14 +103,14 @@ class QRcodeCaptureManager(
 	) {
 		val window = activity.window
 		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-		
+
 		savedInstanceState?.apply {
 			// If the screen was locked and unlocked again, we may start in a different orientation
 			// (even one not allowed by the manifest). In this case we restore the orientation we were
 			// previously locked to.
 			orientationLock = getInt(savedOrientationLock, ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
 		}
-		
+
 		intent?.apply {
 			// Only lock the orientation if it's not locked to something else yet
 			val orientationLocked = getBooleanExtra(Intents.Scan.ORIENTATION_LOCKED, true)
@@ -119,25 +120,25 @@ class QRcodeCaptureManager(
 			if (Intents.Scan.ACTION == action) {
 				barcodeView.initializeFromIntent(this)
 			}
-			
+
 			if (!getBooleanExtra(Intents.Scan.BEEP_ENABLED, true)) {
 				beepManager.isBeepEnabled = false
 			}
-			
+
 			if (hasExtra(Intents.Scan.TIMEOUT)) {
 				handler.postDelayed(
 					{ returnResultTimeout() },
 					getLongExtra(Intents.Scan.TIMEOUT, 0L)
 				)
 			}
-			
+
 			if (getBooleanExtra(Intents.Scan.BARCODE_IMAGE_ENABLED, false)) {
 				returnBarcodeImagePath = true
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Lock display to current orientation.
 	 */
@@ -166,14 +167,14 @@ class QRcodeCaptureManager(
 		}
 		activity.requestedOrientation = this.orientationLock
 	}
-	
+
 	/**
 	 * Start decoding.
 	 */
 	fun decode() {
 		barcodeView.decodeSingle(callback)
 	}
-	
+
 	/**
 	 * Call from Activity#onResume().
 	 */
@@ -185,9 +186,9 @@ class QRcodeCaptureManager(
 		}
 		inactivityTimer.start()
 	}
-	
+
 	private var askedPermission = false
-	
+
 	@TargetApi(23)
 	private fun openCameraWithPermission() {
 		if (ContextCompat.checkSelfPermission(
@@ -207,7 +208,7 @@ class QRcodeCaptureManager(
 			// Wait for permission result
 		}
 	}
-	
+
 	/**
 	 * Call from Activity#onRequestPermissionsResult
 	 * @param requestCode The request code passed in [android.support.v4.app.ActivityCompat.requestPermissions].
@@ -232,7 +233,7 @@ class QRcodeCaptureManager(
 			}
 		}
 	}
-	
+
 	/**
 	 * Call from Activity#onPause().
 	 */
@@ -240,7 +241,7 @@ class QRcodeCaptureManager(
 		inactivityTimer.cancel()
 		barcodeView.pauseAndWait()
 	}
-	
+
 	/**
 	 * Call from Activity#onDestroy().
 	 */
@@ -249,14 +250,14 @@ class QRcodeCaptureManager(
 		inactivityTimer.cancel()
 		handler.removeCallbacksAndMessages(null)
 	}
-	
+
 	/**
 	 * Call from Activity#onSaveInstanceState().
 	 */
 	fun onSaveInstanceState(outState: Bundle) {
 		outState.putInt(savedOrientationLock, this.orientationLock)
 	}
-	
+
 	/**
 	 * Create a intent to return as the Activity result.
 	 *
@@ -277,7 +278,7 @@ class QRcodeCaptureManager(
 			intent.putExtra(Intents.Scan.RESULT_BYTES, rawBytes)
 		}
 		val metadata = rawResult.resultMetadata
-		if (metadata != null) {
+		if (metadata.isNotNull()) {
 			if (metadata.containsKey(ResultMetadataType.UPC_EAN_EXTENSION)) {
 				intent.putExtra(Intents.Scan.RESULT_UPC_EAN_EXTENSION,
 					metadata[ResultMetadataType.UPC_EAN_EXTENSION].toString())
@@ -302,9 +303,9 @@ class QRcodeCaptureManager(
 						)
 					}
 				}
-				
+
 			}
-			
+
 		}
 		barcodeImagePath?.apply {
 			intent.putExtra(
@@ -314,7 +315,7 @@ class QRcodeCaptureManager(
 		}
 		return intent
 	}
-	
+
 	/**
 	 * Save the barcode image to a temporary file stored in the application's cache, and return its path.
 	 * Only does so if returnBarcodeImagePath is enabled.
@@ -344,39 +345,39 @@ class QRcodeCaptureManager(
 				Log.w(CaptureManager::class.java.simpleName,
 					"Unable to create temporary file and store bitmap! $e")
 			}
-			
+
 		}
 		return barcodeImagePath
 	}
-	
+
 	private fun finish() {
 		activity.finish()
 	}
-	
+
 	private fun closeAndFinish() {
 		if (barcodeView.barcodeView.isCameraClosed) {
 			finish()
 		} else {
 			finishWhenClosed = true
 		}
-		
+
 		barcodeView.pause()
 		inactivityTimer.cancel()
 	}
-	
+
 	private fun returnResultTimeout() {
 		val intent = Intent(Intents.Scan.ACTION)
 		intent.putExtra(Intents.Scan.TIMEOUT, true)
 		activity.setResult(Activity.RESULT_CANCELED, intent)
 		closeAndFinish()
 	}
-	
+
 	private fun returnResult(rawResult: BarcodeResult) {
 		val intent = resultIntent(rawResult, getBarcodeImagePath(rawResult))
 		activity.setResult(Activity.RESULT_OK, intent)
 		closeAndFinish()
 	}
-	
+
 	private fun displayFrameworkBugMessageAndExit() {
 		if (activity.isFinishing || this.destroyed || finishWhenClosed) {
 			return

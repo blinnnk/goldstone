@@ -94,7 +94,7 @@ class TokenInfoPresenter(
 				// 如果本地没有数据库那么从网络检查获取
 				if (transactions.isEmpty()) getBTCSeriesTransactionCount { count, error ->
 					launchUI {
-						if (count != null && error.isNone()) infoView.showTransactionCount(count)
+						if (count.isNotNull() && error.isNone()) infoView.showTransactionCount(count)
 						else infoView.showError(error)
 						// 如果一笔交易都没有那么设置 `Total Sent` 或 `Total Received` 都是 `0`
 						val defaultValue = "0.0" suffix token.symbol.symbol
@@ -157,7 +157,7 @@ class TokenInfoPresenter(
 				token.contract.contract,
 				token.symbol
 			) { info, error ->
-				if (info != null && error.isNone()) launchUI {
+				if (info.isNotNull() && error.isNone()) launchUI {
 					infoView.showTransactionCount(info.totalCount)
 					infoView.showTotalValue("${info.totalReceived}", "${info.totalSent}")
 				} else infoView.showError(error)
@@ -172,7 +172,7 @@ class TokenInfoPresenter(
 				if (transactions.isEmpty()) {
 					// 本地没有数据的话从链上获取 `Count`
 					ETHJsonRPC.getUsableNonce(SharedChain.getCurrentETH(), address) { result, error ->
-						if (result != null && error.isNone()) launchUI {
+						if (result.isNotNull() && error.isNone()) launchUI {
 							val convertedCount = result.toInt()
 							val count = if (convertedCount > 0) convertedCount + 1 else result.toInt()
 							infoView.showTransactionCount(count)
@@ -225,7 +225,7 @@ class TokenInfoPresenter(
 		// Icon with name
 		fun getExplorerInfo(contract: TokenContract?): List<ExplorerModel> {
 			return when {
-				contract.isBTC() -> listOf(ExplorerModel( R.drawable.blocktrail_icon, "Block Trail"))
+				contract.isBTC() -> listOf(ExplorerModel(R.drawable.blocktrail_icon, "Block Trail"))
 				contract.isLTC() -> listOf(ExplorerModel(R.drawable.blockcypher_icon, "Blockcypher"))
 				contract.isBCH() -> listOf(ExplorerModel(R.drawable.blocktrail_icon, "Block Trail"))
 				contract.isEOSSeries() -> listOf(ExplorerModel(R.drawable.bloks_io_icon, "Bloks.io"), ExplorerModel(R.drawable.eos_park_icon, "EOS Park"))

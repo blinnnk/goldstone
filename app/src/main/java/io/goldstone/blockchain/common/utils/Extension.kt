@@ -3,29 +3,18 @@
 package io.goldstone.blockchain.common.utils
 
 import android.content.Context
-import android.graphics.PorterDuff
 import android.support.annotation.UiThread
 import android.support.v4.app.Fragment
-import android.text.InputType
 import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.suffix
-import com.blinnnk.uikit.uiPX
 import com.google.gson.JsonArray
-import io.goldstone.blockchain.common.component.overlay.Dashboard
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.eos.EOSCPUUnit
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import java.math.BigInteger
@@ -88,12 +77,9 @@ fun BigInteger.convertToTimeUnit(): String {
 }
 
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
+infix fun <T> List<T>.isEmptyThen(other: List<T>): List<T> = if (this.isEmpty()) other else this
 
 @UiThread
 fun Fragment.safeShowError(error: Throwable) {
 	ErrorDisplayManager(error).show(context)
-}
-
-fun <T> List<T>.safeGet(index: Int): T? {
-	return if (lastIndex < index) null else get(index)
 }

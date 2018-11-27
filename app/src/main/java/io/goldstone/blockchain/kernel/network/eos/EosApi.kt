@@ -25,6 +25,8 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSTokenBalance
+import io.goldstone.blockchain.kernel.network.eos.thirdparty.EOSPark
 import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
@@ -41,6 +43,17 @@ import java.math.BigInteger
 
 object EOSAPI {
 
+	fun getTokenBalance(
+		account: EOSAccount,
+		@WorkerThread hold: (tokenBalance: List<EOSTokenBalance>?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData(
+			EOSPark.getAccountBalance(account),
+			listOf("data", "symbol_list"),
+			hold = hold
+		)
+	}
+
 	/**
 	 * 本地转账临时插入的 Pending Data 需要填充, 服务器自定义的 ServerID 格式
 	 * unique_id = block_num * 1000000 + tx_index * 1000 + action_index
@@ -52,7 +65,7 @@ object EOSAPI {
 		hold: (Long?) -> Unit
 	) {
 		getBlockByNumber(blockNumber) { jsonString, error ->
-			if (jsonString != null && error.isNone()) {
+			if (jsonString.isNotNull() && error.isNone()) {
 				val json = JSONObject(jsonString)
 				val blockTransactions = JSONArray(json.safeGet("transactions")).toJSONObjectList()
 				var txIndex: Int? = null
@@ -73,7 +86,7 @@ object EOSAPI {
 						actionIndex = index
 					}
 				}
-				if (txIndex != null && actionIndex != null) {
+				if (txIndex.isNotNull() && actionIndex.isNotNull()) {
 					val uniqueID = blockNumber * 1000000L + txIndex!! * 1000L + actionIndex!!
 					hold(uniqueID)
 				}
@@ -139,7 +152,7 @@ object EOSAPI {
 		@WorkerThread hold: (ramAvailable: BigInteger?, error: GoldStoneError) -> Unit
 	) {
 		getAccountInfo(accountName) { account, error ->
-			if (account != null && error.isNone()) {
+			if (account.isNotNull() && error.isNone()) {
 				val availableRAM = account.ramQuota - account.ramUsed
 				hold(availableRAM, GoldStoneError.None)
 			} else hold(null, error)
@@ -199,7 +212,7 @@ object EOSAPI {
 	) {
 		RequisitionUtil.requestUnCryptoData<String>(
 			EOSUrl.getInfo(),
-			"",
+			listOf(),
 			true
 		) { result, error ->
 			hold(EOSChainInfo(JSONObject(result?.firstOrNull())), error)
@@ -238,12 +251,12 @@ object EOSAPI {
 		}
 	}
 
-	fun getTransactionHeaderFromChain(
+	fun getTransactionHeader(
 		expirationType: ExpirationType,
 		@WorkerThread hold: (header: TransactionHeader?, error: GoldStoneError) -> Unit
 	) {
 		getChainInfo { chainInfo, error ->
-			if (chainInfo != null && error.isNone()) {
+			if (chainInfo.isNotNull() && error.isNone()) {
 				hold(TransactionHeader(chainInfo, expirationType), error)
 			} else hold(null, error)
 		}
@@ -437,7 +450,7 @@ object EOSAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (result != null && error.isNone()) {
+			if (result.isNotNull() && error.isNone()) {
 				val data = result.firstOrNull()
 				if (data.isNullOrEmpty()) hold(null, RequestError.NullResponse("Empty Result"))
 				else hold(data, RequestError.None)
@@ -468,7 +481,7 @@ object EOSAPI {
 			true,
 			isEncrypt = true
 		) { result, error ->
-			if (result != null && error.isNone()) {
+			if (result.isNotNull() && error.isNone()) {
 				val data = result.firstOrNull()
 				if (!data.isNullOrEmpty()) hold(data.toIntOrNull(), RequestError.None)
 				else hold(null, RequestError.NullResponse("Empty or Null Result"))
@@ -481,7 +494,7 @@ object EOSAPI {
 		@WorkerThread hold: (blockNumber: Int?, error: GoldStoneError) -> Unit
 	) {
 		getTransactionJSONObjectByTxID(txID) { data, error ->
-			if (data != null && error.isNone()) {
+			if (data.isNotNull() && error.isNone()) {
 				hold(data.safeGet("block_num").toIntOrNull(), error)
 			} else hold(null, error)
 		}
@@ -492,7 +505,7 @@ object EOSAPI {
 		@WorkerThread hold: (cpuUsage: BigInteger?, netUsage: BigInteger?, error: RequestError) -> Unit
 	) {
 		getTransactionJSONObjectByTxID(txID) { transaction, error ->
-			if (transaction != null && error.isNone()) {
+			if (transaction.isNotNull() && error.isNone()) {
 				val receipt = transaction.getTargetObject("trx", "receipt")
 				hold(
 					receipt.getTargetChild("cpu_usage_us").toBigIntegerOrZero(),
@@ -566,9 +579,9 @@ object EOSAPI {
 			true,
 			isEncrypt = false
 		) { result, error ->
-			if (result != null && error.isNone()) {
+			if (result.isNotNull() && error.isNone()) {
 				val data = result.firstOrNull()
-				if (data != null)
+				if (data.isNotNull())
 					hold(JSONObject(data).safeGet("price").toDoubleOrNull().orZero(), RequestError.None)
 				else hold(null, RequestError.RPCResult("empty result"))
 			} else hold(null, error)
@@ -577,14 +590,14 @@ object EOSAPI {
 
 	fun updateLocalTokenPrice(contract: TokenContract) {
 		EOSAPI.getPairsFromNewDex { data, error ->
-			if (data != null && error.isNone()) {
+			if (data.isNotNull() && error.isNone()) {
 				val pair = data.find {
 					it.symbol.equals(contract.symbol, true) &&
 						it.contract.equals(contract.contract, true)
 				}?.pair
 				if (pair?.isNotEmpty() == true) {
 					EOSAPI.getPriceByPair(pair) { priceInEOS, pairError ->
-						if (priceInEOS != null && pairError.isNone()) {
+						if (priceInEOS.isNotNull() && pairError.isNone()) {
 							val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
 							val eosToken = defaultDao.getToken(
 								TokenContract.eosContract,

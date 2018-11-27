@@ -9,8 +9,6 @@ import android.view.WindowManager
 import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.isNull
-import com.blinnnk.util.TinyNumber
-import com.blinnnk.util.saveDataToSharedPreferences
 import com.google.android.gms.analytics.HitBuilders
 import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.GoldStoneApp
@@ -20,7 +18,10 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.transparentStatus
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.common.value.IntentKey
+import io.goldstone.blockchain.common.value.currentChannel
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -87,6 +88,11 @@ class MainActivity : AppCompatActivity() {
 		} else {
 			backEvent?.run()
 		}
+	}
+
+	override fun onStop() {
+		super.onStop()
+		Runtime.getRuntime().gc()
 	}
 
 	fun getHomeFragment(): HomeFragment? {
@@ -162,11 +168,6 @@ class MainActivity : AppCompatActivity() {
 		val intentFilter = IntentFilter()
 		intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
 		registerReceiver(netWorkReceiver, intentFilter)
-	}
-
-	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		super.onActivityResult(requestCode, resultCode, data)
-		this.saveDataToSharedPreferences(SharesPreference.activityIsResult, TinyNumber.True.value)
 	}
 }
 

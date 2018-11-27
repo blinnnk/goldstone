@@ -68,7 +68,7 @@ class LoadingView(private val context: Context) {
 				null,
 				R.attr.progressBarStyleInverse
 			).apply {
-				indeterminateDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.MULTIPLY)
+				indeterminateDrawable.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_ATOP)
 				layoutParams = RelativeLayout.LayoutParams(size, size)
 				getCircle(this)
 			}

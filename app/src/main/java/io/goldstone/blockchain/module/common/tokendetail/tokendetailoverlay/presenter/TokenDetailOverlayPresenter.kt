@@ -20,11 +20,9 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
-import kotlinx.coroutines.Dispatchers
 
 /**ø
  * @date 27/03/2018 3:41 PM
@@ -61,11 +59,11 @@ class TokenDetailOverlayPresenter(
 
 	fun showAddressSelectionFragment(isFromQuickTransfer: Boolean = false) {
 		if (SharedWallet.isWatchOnlyWallet()) fragment.safeShowError(Throwable(AlertText.watchOnly))
-		else WalletTable.getCurrent(Dispatchers.Main) {
-
-			if (!hasBackUpMnemonic) GoldStoneDialog(fragment.context!!).showBackUpMnemonicStatus {
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			} else {
+		else {
+			if (!SharedWallet.hasBackUpMnemonic())
+				GoldStoneDialog(fragment.context!!).showBackUpMnemonicStatus {
+					TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+				} else {
 				if (isFromQuickTransfer) {
 					fragment.addFragmentAndSetArgument<AddressSelectionFragment>(ContainerID.content)
 				} else showTargetFragment<AddressSelectionFragment>()
@@ -75,10 +73,11 @@ class TokenDetailOverlayPresenter(
 
 	fun showDepositFragment(isFromQuickTransfer: Boolean = false) {
 		if (SharedWallet.isWatchOnlyWallet()) fragment.safeShowError(Throwable(AlertText.watchOnly))
-		else WalletTable.getCurrent(Dispatchers.Main) {
-			if (!hasBackUpMnemonic) GoldStoneDialog(fragment.context!!).showBackUpMnemonicStatus {
-				TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
-			} else {
+		else {
+			if (!SharedWallet.hasBackUpMnemonic())
+				GoldStoneDialog(fragment.context!!).showBackUpMnemonicStatus {
+					TokenDetailOverlayPresenter.showMnemonicBackupFragment(fragment)
+				} else {
 				if (isFromQuickTransfer)
 					fragment.addFragmentAndSetArgument<DepositFragment>(ContainerID.content)
 				else showTargetFragment<DepositFragment>()

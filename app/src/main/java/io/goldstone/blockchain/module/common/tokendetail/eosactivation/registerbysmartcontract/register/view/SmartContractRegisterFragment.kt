@@ -2,10 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.register
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.suffix
+import com.blinnnk.extension.*
 import com.blinnnk.model.MutablePair
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
@@ -29,7 +26,6 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.detail.view.SmartContractRegisterDetailFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
@@ -100,7 +96,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 
 				resourceCoast.apply {
 					if (NetworkUtil.hasNetwork(context)) presenter.getEOSCurrencyPrice { currency, error ->
-						if (currency != null && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
+						if (currency.isNotNull() && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 							setSubtitle("2.0 EOS ≈ ${(2 * currency).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
 						} else safeShowError(error)
 					}

@@ -180,7 +180,7 @@ fun Context.getBigIntegerPrivateKeyByWalletID(
 	hold: (privateKey: BigInteger?, error: AccountError) -> Unit
 ) = getKeystoreFileByWalletID(password, walletID) { keyStoreFile, error ->
 	// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
-	if (keyStoreFile != null && error.isNone()) {
+	if (keyStoreFile.isNotNull() && error.isNone()) {
 		val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
 		if (keyPair == null) hold(null, AccountError.WrongPassword)
 		else hold(keyPair.privateKey, AccountError.None)
@@ -355,7 +355,7 @@ fun Context.updatePasswordByWalletID(
 		oldPassword,
 		walletID
 	) { privateKey, error ->
-		if (privateKey != null && error.isNone()) {
+		if (privateKey.isNotNull() && error.isNone()) {
 			deleteWalletByWalletID(walletID, oldPassword) { deleteError ->
 				if (deleteError.isNone()) {
 					storeRootKeyByWalletID(walletID, privateKey, newPassword)

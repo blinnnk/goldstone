@@ -11,7 +11,6 @@ import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 
-
 /**
  * @author KaySaith
  * @date  2018/09/19
@@ -40,7 +39,7 @@ abstract class EOSTransactionInterface {
 		hold: (signedHash: String?, error: GoldStoneError) -> String
 	) {
 		serialized { data, error ->
-			if (data != null && error.isNone()) {
+			if (data.isNotNull() && error.isNone()) {
 				hold(EOSPrivateKey(privateKey).sign(Sha256.from(Hex.decode(data.serialized))).toString(), GoldStoneError.None)
 			} else hold(null, error)
 		}
