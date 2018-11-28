@@ -251,12 +251,12 @@ object ProfileText {
 
 	@JvmField
 	val editContactAlertTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "EDIT CONTACT"
-		HoneyLanguage.Chinese.code -> "EDIT CONTACT"
-		HoneyLanguage.Japanese.code -> "EDIT CONTACT"
-		HoneyLanguage.Korean.code -> "EDIT CONTACT"
-		HoneyLanguage.Russian.code -> "EDIT CONTACT"
-		HoneyLanguage.TraditionalChinese.code -> "EDIT CONTACT"
+		HoneyLanguage.English.code->"EDIT CONTACT"
+		HoneyLanguage.Chinese.code->"编辑联系人"
+		HoneyLanguage.Japanese.code->"連絡先を編集"
+		HoneyLanguage.Korean.code->"연락처 수정"
+		HoneyLanguage.Russian.code->"Изменить контакт"
+		HoneyLanguage.TraditionalChinese.code->"編輯聯繫人"
 		else -> ""
 	}
 }
