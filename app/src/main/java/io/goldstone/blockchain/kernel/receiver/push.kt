@@ -86,10 +86,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		// Normal Notification
 	}
 
-	override fun onUnregisterResult(
-		context: Context?,
-		p1: Int
-	) {
+	override fun onUnregisterResult(context: Context?, p1: Int) {
 		if (context == null) {
 			return
 		}
@@ -247,7 +244,7 @@ fun Context.registerDeviceForPush() {
 				}
 				// 在本地数据库记录 `Push Token`
 				val currentWallet =
-					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+					WalletTable.dao.findWhichIsUsing(true)
 				XinGePushReceiver.registerAddressesForPush(currentWallet)
 			}
 		}

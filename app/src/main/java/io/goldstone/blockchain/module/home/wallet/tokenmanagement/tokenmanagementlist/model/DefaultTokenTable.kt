@@ -8,17 +8,18 @@ import com.blinnnk.util.load
 import com.blinnnk.util.then
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getCurrentChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 /**
@@ -204,9 +205,9 @@ data class DefaultTokenTable(
 	)
 
 	infix fun insertThen(callback: () -> Unit) {
-		doAsync {
+		GlobalScope.launch(Dispatchers.Default) {
 			DefaultTokenTable.dao.insert(this@DefaultTokenTable)
-			GoldStoneAPI.context.runOnUiThread { callback() }
+			launchUI(callback)
 		}
 	}
 
@@ -288,6 +289,9 @@ interface DefaultTokenDao {
 
 	@Query("SELECT * FROM defaultTokens")
 	fun getAllTokens(): List<DefaultTokenTable>
+
+	@Query("SELECT count(*) FROM defaultTokens")
+	fun rowCount(): Int
 
 	@Query("SELECT * FROM defaultTokens WHERE forceShow == 1")
 	fun getForceShow(): List<DefaultTokenTable>

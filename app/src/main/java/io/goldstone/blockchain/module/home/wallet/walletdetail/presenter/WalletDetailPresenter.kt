@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 import android.support.annotation.UiThread
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.ConcurrentJobs
@@ -51,13 +50,6 @@ class WalletDetailPresenter(
 	}
 
 	private fun updateData() {
-		// 先初始化空数组再更新列表
-		if (detailView.asyncData.isNull()) {
-			detailView.asyncData = arrayListOf()
-			generateHeaderModel {
-				detailView.setHeaderData(it)
-			}
-		}
 		// 显示本地的 `Token` 据
 		MyTokenWithDefaultTable.getMyDefaultTokens { models ->
 			launchUI {
@@ -154,16 +146,18 @@ class WalletDetailPresenter(
 
 				override fun mergeCallBack() {
 					val account = SharedAddress.getCurrentEOSAccount()
-					if (!SharedValue.isTestEnvironment()) EOSAPI.getTokenBalance(account) { data, error ->
-						if (data.isNotNull() && error.isNone()) {
-							data.forEachOrEnd { item, isEnd ->
-								MyTokenTable.dao.updateBalanceByContract(item.balance, item.codeName, item.symbol, account.name)
-								this@getChainModels.find {
-									it.contract.contract.equals(item.codeName, true) &&
-										it.symbol.symbol.equals(item.symbol, true)
-								}?.count = item.balance
-								if (isEnd) launchUI {
-									hold(this@getChainModels, balanceError)
+					if (!SharedValue.isTestEnvironment() && any { it.contract.isEOSToken() }) {
+						EOSAPI.getTokenBalance(account) { data, error ->
+							if (data.isNotNull() && error.isNone()) {
+								data.forEachOrEnd { item, isEnd ->
+									MyTokenTable.dao.updateBalanceByContract(item.balance, item.codeName, item.symbol, account.name)
+									this@getChainModels.find {
+										it.contract.contract.equals(item.codeName, true) &&
+											it.symbol.symbol.equals(item.symbol, true)
+									}?.count = item.balance
+									if (isEnd) launchUI {
+										hold(this@getChainModels, balanceError)
+									}
 								}
 							}
 						}

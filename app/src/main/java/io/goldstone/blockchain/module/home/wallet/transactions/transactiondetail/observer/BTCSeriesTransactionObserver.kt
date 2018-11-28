@@ -6,11 +6,13 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC.getBlockCount
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 2018/8/20 12:13 PM
@@ -27,7 +29,7 @@ abstract class BTCSeriesTransactionObserver {
 	private var blockNumber: Int? = null
 
 	open fun checkStatusByTransaction() {
-		doAsync {
+		GlobalScope.launch(Dispatchers.Default) {
 			BTCSeriesJsonRPC.getConfirmations(chainURL, hash) { confirmationCount, error ->
 				if (error.hasError()) {
 					// 出错失败最大重试次数设定
@@ -38,7 +40,7 @@ abstract class BTCSeriesTransactionObserver {
 				} else {
 					val hasConfirmed = confirmationCount > targetInterval
 					if (hasConfirmed) {
-						uiThread {
+						launchUI {
 							getStatus(hasConfirmed, confirmationCount, blockNumber.orZero())
 						}
 						removeObserver()
@@ -46,7 +48,7 @@ abstract class BTCSeriesTransactionObserver {
 						if (blockNumber.isNull()) getBlockCount(chainURL) { blockCount, blockCountError ->
 							if (blockCount.isNotNull() && blockCountError.isNone()) {
 								blockNumber = blockCount - confirmationCount
-								uiThread {
+								launchUI {
 									getStatus(hasConfirmed, confirmationCount, blockNumber!!)
 								}
 							}
@@ -54,7 +56,7 @@ abstract class BTCSeriesTransactionObserver {
 						// 没有达到 `6` 个新的 `Block` 确认一直执行监测
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
-						uiThread {
+						launchUI {
 							blockNumber?.let { getStatus(hasConfirmed, confirmationCount, it) }
 						}
 					}

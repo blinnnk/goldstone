@@ -10,15 +10,17 @@ import com.blinnnk.extension.isTrue
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
+import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.ethereum.getAddress
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.ethereum.geth.Geth
 import org.ethereum.geth.KeyStore
 import java.io.File
@@ -28,6 +30,46 @@ import java.math.BigInteger
  * @date 29/03/2018 4:25 PM
  * @author KaySaith
  */
+
+fun generateETHSeriesAddress(
+	mnemonicCode: String,
+	pathValue: String
+): ECKeyPair {
+	/** Generate HD Wallet */
+	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
+	return masterWallet.keyPair
+}
+
+fun Context.generateMnemonicVerifyKeyStore(
+	walletID: Int,
+	mnemonicCode: String,
+	pathValue: String,
+	password: String,
+	hold: (address: String?, error: AccountError) -> Unit
+) {
+	val keystoreFile by lazy { File(filesDir!!, "$walletID${CryptoValue.keystoreFilename}") }
+	/** Generate HD Wallet */
+	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
+	/** Generate Keystore */
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	/** Generate Keys */
+	val masterKey = masterWallet.keyPair
+	/** Get Public Key and Private Key*/
+	val publicKey = masterKey.getAddress()
+	val address = "0x" + publicKey.toLowerCase()
+	/** Import Private Key to Keystore */
+	try {
+		keyStore.importECDSAKey(
+			keyString(masterKey.privateKey.toString(16)).hexToByteArray(),
+			password
+		)
+		hold(address, AccountError.None)
+	} catch (error: Exception) {
+		if (error.toString().contains("account already exists")) {
+			hold(null, AccountError.ExistAddress)
+		} else hold(null, AccountError.WrongPassword)
+	}
+}
 
 fun Context.getEthereumWalletByMnemonic(
 	mnemonicCode: String,
@@ -89,29 +131,6 @@ val keyString: (secret: String) -> String = {
 		it.substring(0, 1) == "0" -> "0" + currentPrivateKey.toString(16)
 		it.length == 63 -> "0" + currentPrivateKey.toString(16)
 		else -> currentPrivateKey.toString(16)
-	}
-}
-
-fun Context.getWalletByPrivateKey(
-	privateKey: String,
-	password: String,
-	filename: String,
-	hold: (address: String?, error: AccountError) -> Unit
-) {
-	val keystoreFile by lazy { File(filesDir!!, filename) }
-	/** Generate Keystore */
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	val address = CryptoUtils.getAddressFromPrivateKey(privateKey)
-	/** Format PrivateKey */
-	/** Import Private Key to Keystore */
-	try {
-		keyStore.importECDSAKey(keyString(privateKey).hexToByteArray(), password)
-		hold(address, AccountError.None)
-	} catch (error: Exception) {
-		if (error.toString().contains("account already exists")) {
-			hold(ImportWalletText.existAddress, AccountError.ExistAddress)
-		}
-		println(error)
 	}
 }
 
@@ -240,62 +259,6 @@ fun Context.deleteWalletByWalletID(
 	}
 }
 
-fun Context.verifyCurrentWalletKeyStorePassword(password: String, walletID: Int, hold: (Boolean) -> Unit) {
-	val currentType = SharedWallet.getCurrentWalletType()
-	when {
-		// 多链钱包随便找一个名下钱包地址进行验证即可
-		currentType.isBIP44() -> verifyKeystorePassword(
-			password,
-			SharedAddress.getCurrentBTC(),
-			true,
-			hold
-		)
-		currentType.isMultiChain() -> verifyKeystorePasswordByWalletID(
-			password,
-			walletID,
-			hold
-		)
-	}
-}
-
-fun Context.verifyKeystorePassword(
-	password: String,
-	address: String,
-	isBTCSeriesWallet: Boolean,
-	hold: (Boolean) -> Unit
-) {
-	val filename = CryptoValue.filename(address, isBTCSeriesWallet)
-	val keystoreFile by lazy { File(filesDir!!, filename) }
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	// 先通过解锁来验证密码的正确性, 在通过结果执行删除钱包操作
-	var accountIndex = 0L
-	if (isBTCSeriesWallet) {
-		try {
-			keyStore.unlock(keyStore.accounts.get(0), password)
-		} catch (error: Exception) {
-			hold(false)
-			LogUtil.error("wrong keystore password", error)
-			return
-		}
-		keyStore.lock(keyStore.accounts.get(accountIndex).address)
-		hold(true)
-	} else {
-		(0 until keyStore.accounts.size()).forEach {
-			if (keyStore.accounts.get(it).address.hex.equals(address, true)) {
-				accountIndex = it
-				try {
-					keyStore.unlock(keyStore.accounts.get(it), password)
-				} catch (error: Exception) {
-					hold(false)
-					LogUtil.error("wrong keystore password", error)
-					return@forEach
-				}
-				keyStore.lock(keyStore.accounts.get(accountIndex).address)
-				hold(true)
-			}
-		}
-	}
-}
 
 fun Context.verifyKeystorePasswordByWalletID(
 	password: String,
@@ -317,40 +280,12 @@ fun Context.verifyKeystorePasswordByWalletID(
 	hold(true)
 }
 
-// 内部无线程
-fun Context.updatePassword(
-	walletAddress: String,
-	oldPassword: String,
-	newPassword: String,
-	isBTCSeriesWallet: Boolean,
-	hold: (privateKey: String?, error: AccountError) -> Unit
-) {
-	getPrivateKey(
-		walletAddress,
-		oldPassword,
-		isBTCSeriesWallet
-	) { privateKey, error ->
-		if (privateKey.isNotNull() && error.isNone()) deleteAccount(
-			walletAddress,
-			oldPassword,
-			isBTCSeriesWallet
-		) { accountError ->
-			if (accountError.isNone()) getWalletByPrivateKey(
-				privateKey,
-				newPassword,
-				CryptoValue.filename(walletAddress, isBTCSeriesWallet),
-				hold
-			) else hold(null, accountError)
-		} else hold(null, error)
-	}
-}
-
 fun Context.updatePasswordByWalletID(
 	walletID: Int,
 	oldPassword: String,
 	newPassword: String,
 	callback: (AccountError) -> Unit
-) {
+) = GlobalScope.launch(Dispatchers.Default) {
 	getBigIntegerPrivateKeyByWalletID(
 		oldPassword,
 		walletID

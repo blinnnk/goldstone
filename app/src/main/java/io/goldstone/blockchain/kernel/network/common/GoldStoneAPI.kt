@@ -313,7 +313,6 @@ object GoldStoneAPI {
 			),
 			APIPath.registerDevice(APIPath.currentUrl),
 			true,
-			30,
 			hold
 		)
 	}
@@ -327,8 +326,7 @@ object GoldStoneAPI {
 			"code",
 			true,
 			isEncrypt = true,
-			targetGoldStoneID = targetGoldStoneID,
-			maxConnectTime = 5
+			targetGoldStoneID = targetGoldStoneID
 		) { result, error ->
 			if (!result.isNullOrEmpty() && error.isNone()) {
 				hold(result.firstOrNull() == "0", error)
@@ -363,7 +361,6 @@ object GoldStoneAPI {
 			),
 			APIPath.updateAddresses(APIPath.currentUrl),
 			true,
-			30,
 			hold
 		)
 	}
@@ -383,8 +380,7 @@ object GoldStoneAPI {
 				)
 			),
 			APIPath.getUnreadCount(APIPath.currentUrl),
-			true,
-			10
+			true
 		) { result, error ->
 			if (!result.isNullOrBlank() && error.isNone()) {
 				hold(JSONObject(result).safeGet("count").toIntOrNull(), error)

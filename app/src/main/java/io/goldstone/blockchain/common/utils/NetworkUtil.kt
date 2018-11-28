@@ -14,6 +14,9 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.doAsync
 
 /**
@@ -45,7 +48,7 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(context: Context, intent: Intent) {
-		if (NetworkUtil.hasNetwork(context)) doAsync {
+		if (NetworkUtil.hasNetwork(context)) GlobalScope.launch(Dispatchers.Default) {
 			// 如果还没有检测过账号状态那么在网络恢复的时候检测并更新钱包的资产状态
 			if (!SharedValue.getAccountCheckedStatus()) {
 				SplashPresenter.updateAccountInformation(context) {

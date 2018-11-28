@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent
@@ -30,7 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
-import org.jetbrains.anko.doAsync
 
 
 /**
@@ -183,10 +183,8 @@ class TransactionDetailPresenter(
 
 	private fun onBTCSeriesTransferred(blockNumber: Int) {
 		// 交易过程中发生错误
-		doAsync {
-			val transactionDao =
-				GoldStoneDataBase.database.btcSeriesTransactionDao()
-			transactionDao.updateBlockNumber(
+		GlobalScope.launch(Dispatchers.Default) {
+			TransactionTable.dao.updateBlockNumber(
 				blockNumber,
 				data.hash,
 				data.fromAddress,
@@ -215,18 +213,16 @@ class TransactionDetailPresenter(
 
 	private fun onEOSSeriesTransferred(blockNumber: Int) {
 		// 交易过程中发生错误
-		doAsync {
-			val transactionDao =
-				GoldStoneDataBase.database.eosTransactionDao()
+		GlobalScope.launch(Dispatchers.Default) {
 			// Update Database BlockNumber
-			transactionDao.updateBlockNumberByTxID(data.hash, blockNumber, false)
+			EOSTransactionTable.dao.updateBlockNumberByTxID(data.hash, blockNumber, false)
 			// 根据服务器计算 `ServerID` 的规则更新本地数 `PendingData` 数据
 			EOSAPI.getTransactionServerID(
 				blockNumber,
 				data.hash,
 				SharedAddress.getCurrentEOSAccount()
 			) {
-				if (it != null) transactionDao.updatePendingDataByTxID(data.hash, it)
+				if (it != null) EOSTransactionTable.dao.updatePendingDataByTxID(data.hash, it)
 			}
 		}
 	}

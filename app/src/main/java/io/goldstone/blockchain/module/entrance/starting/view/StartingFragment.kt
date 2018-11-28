@@ -7,6 +7,8 @@ import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -16,7 +18,6 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.SplashText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -39,9 +40,8 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
-			// Logo
 			imageView {
-				glideImage(R.drawable.gold_stone_logo)
+				imageResource = R.drawable.gold_stone_logo
 			}.lparams {
 				width = logoSize
 				height = logoSize
@@ -69,9 +69,11 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				topMargin = (ScreenSize.Height * 0.2).toInt() + logoSize
 			}
 
-			WalletTable.getAll {
-				// 本地没有钱包的情况下显示登录和导入按钮
-				if (isEmpty()) {
+			load {
+				WalletTable.dao.rowCount()
+			} then { walletCount ->
+				if (walletCount == 0) {
+					// 本地没有钱包的情况下显示登录和导入按钮
 					verticalLayout {
 						gravity = Gravity.CENTER_HORIZONTAL
 						createButton.apply {
@@ -94,9 +96,9 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 						width = matchParent
 					}
 				} else {
-					presenter.updateWalletInfoForUserInfo(this)
+					presenter.updateWalletInfoForUserInfo(walletCount)
 					LoadingView.addLoadingCircle(
-						this@relativeLayout,
+						this,
 						30.uiPX(),
 						Spectrum.white
 					) {

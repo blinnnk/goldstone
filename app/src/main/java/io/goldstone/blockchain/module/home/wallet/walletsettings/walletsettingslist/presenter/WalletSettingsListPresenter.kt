@@ -20,7 +20,7 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
-import io.goldstone.blockchain.crypto.keystore.verifyCurrentWalletKeyStorePassword
+import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.isStoredInKeyStoreByAddress
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -104,7 +104,7 @@ class WalletSettingsListPresenter(
 					val password = passwordInput?.text.toString()
 					WalletTable.getCurrent(Dispatchers.Default) {
 						val type = getWalletType()
-						verifyCurrentWalletKeyStorePassword(password, id) { isCorrect ->
+						verifyKeystorePasswordByWalletID(password, id) { isCorrect ->
 							if (isCorrect) {
 								if (type.isBIP44())
 									deleteWalletData(id, getCurrentAllBip44Address(), password)

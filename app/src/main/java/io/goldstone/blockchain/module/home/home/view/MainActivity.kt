@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.IntentKey
 import io.goldstone.blockchain.common.value.currentChannel
+import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -48,9 +49,17 @@ class MainActivity : AppCompatActivity() {
 			if (savedInstanceState.isNull()) {
 				// 判断 `SaveInstanceState` 防止旋转屏幕重新创建 `Fragment`
 				addFragment<HomeFragment>(this.id, FragmentTag.home)
+				// 如果本地的钱包数量不为空那么才开始注册设备
+				// 把 `GoldStoneID` 存储到 `SharePreference` 里面
+				registerDeviceForPush()
+				registerReceiver()
 			}
 		})
-		registerReceiver()
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		unregisterReceiver(netWorkReceiver)
 	}
 
 	private var currentIntent: Intent? = null
@@ -76,11 +85,6 @@ class MainActivity : AppCompatActivity() {
 		)
 	}
 
-	override fun onDestroy() {
-		super.onDestroy()
-		unregisterReceiver(netWorkReceiver)
-	}
-
 	override fun onBackPressed() {
 		recoveryBackEventFromOtherApp()
 		if (backEvent.isNull()) {
@@ -88,11 +92,6 @@ class MainActivity : AppCompatActivity() {
 		} else {
 			backEvent?.run()
 		}
-	}
-
-	override fun onStop() {
-		super.onStop()
-		Runtime.getRuntime().gc()
 	}
 
 	fun getHomeFragment(): HomeFragment? {

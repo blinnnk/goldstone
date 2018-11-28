@@ -25,6 +25,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.value.ApkChannel
 import io.goldstone.blockchain.common.value.currentChannel
@@ -33,8 +34,6 @@ import io.goldstone.blockchain.module.home.profile.profile.view.ProgressLoadingD
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import java.io.File
 import java.util.concurrent.Executors
 
@@ -237,9 +236,9 @@ class VersionManager(val fragment: Fragment) {
 		object : CheckPermission(fragment.activity) {
 			override var permissionType = PermissionCategory.Write
 		}.start {
-			doAsync {
+			GlobalScope.launch(Dispatchers.Default) {
 				downloadId = download(newVersionUrl, newVersionName, newVersionDescription)
-				uiThread { callback() }
+				launchUI(callback)
 			}
 		}
 	}
