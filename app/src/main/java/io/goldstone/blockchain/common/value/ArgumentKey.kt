@@ -39,6 +39,8 @@ object ArgumentKey {
 	const val contact = "contact"
 	const val eosAccountRegister = "eosAccountRegister"
 	const val contactID = "contactID"
+	const val setPinCode = "setPinCode"
+	const val disableTheBackButtonToExit = "disableTheBackButtonToExit"
 }
 
 object IntentKey {
@@ -84,6 +86,8 @@ object SharesPreference {
 	const val needToShowPincode = "needToShowPincode"
 	const val accountCheckedStatus = "accountCheckedStatus"
 	const val developerMode = "developerMode"
+	const val pincodeIsOpened = "pincodeIsOpened"
+	const val fingerprintUnlockerIsOpened = "fingerprintUnlockerIsOpened"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

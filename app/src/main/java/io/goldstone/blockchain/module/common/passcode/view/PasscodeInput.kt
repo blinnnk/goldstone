@@ -94,4 +94,24 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 			}
 		}
 	}
+	fun setTitles(
+		title : String,
+		subtitle : String,
+		isPinCode : Boolean
+	) {
+		titles.apply {
+			this.title.text = title
+			if(subtitle.isBlank()) {
+				this.subtitle.visibility = View.GONE
+			} else {
+				this.subtitle.visibility = View.VISIBLE
+				this.subtitle.text = subtitle
+			}
+			if(isPinCode) {
+				inputLayout.visibility = View.VISIBLE
+			} else {
+				inputLayout.visibility = View.GONE
+			}
+		}
+	}
 }

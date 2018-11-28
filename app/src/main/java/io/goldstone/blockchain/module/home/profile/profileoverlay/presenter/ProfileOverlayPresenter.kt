@@ -6,14 +6,13 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import com.blinnnk.util.replaceFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.overlay.Dashboard
-import io.goldstone.blockchain.common.language.CreateWalletText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.walletgeneration.view.WalletGenerationFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.walletimport.watchonly.view.WatchOnlyImportFragment
@@ -24,9 +23,10 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
-import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.WalletSecuritySettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.model.GridIconTitleModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.GridIconTitleAdapter
@@ -57,7 +57,7 @@ class ProfileOverlayPresenter(
 			ProfileText.currency -> showCurrencyFragment()
 			ProfileText.language -> showLanguageFragment()
 			ProfileText.eosAccountRegister -> showEOSAccountRegisterFragment()
-			ProfileText.pinCode -> showPinCodeEditorFragment()
+			ProfileText.pinCode -> showSecuritySettingFragment()
 			ProfileText.walletManager -> showWalletListFragment()
 			ProfileText.chain -> showChainSelectionFragment()
 			ProfileText.privacy -> showPrivacyFragment()
@@ -65,6 +65,7 @@ class ProfileOverlayPresenter(
 			ProfileText.support -> showSupportFragment()
 			ProfileText.aboutUs -> showAboutFragment()
 			ProfileText.helpCenter -> showHelpCenterFragment()
+			PincodeText.setTheDigitalLock -> showPassCodeSettingFragment()
 		}
 	}
 
@@ -151,13 +152,17 @@ class ProfileOverlayPresenter(
 			putString(ArgumentKey.webViewName, ProfileText.helpCenter)
 		}
 	}
-
+	fun showPassCodeSettingFragment() {
+		fragment.addFragmentAndSetArgument<PasscodeFragment>(ContainerID.content) {
+			putBoolean(ArgumentKey.setPinCode, true)
+		}
+	}
 	private fun showChainSelectionFragment() {
 		fragment.addFragmentAndSetArgument<ChainSelectionFragment>(ContainerID.content)
 	}
 
-	private fun showPinCodeEditorFragment() {
-		fragment.addFragmentAndSetArgument<PinCodeEditorFragment>(ContainerID.content)
+	private fun showSecuritySettingFragment() {
+		fragment.addFragmentAndSetArgument<WalletSecuritySettingsFragment>(ContainerID.content)
 	}
 
 	private fun showContactsFragment() {

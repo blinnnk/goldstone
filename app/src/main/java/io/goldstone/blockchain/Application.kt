@@ -5,6 +5,7 @@ import android.app.Application
 import com.blinnnk.extension.isNull
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
+import com.squareup.leakcanary.LeakCanary
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC

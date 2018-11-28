@@ -67,6 +67,117 @@ object TokenManagementText {
 
 object PincodeText {
 	@JvmField
+	val needToVerifyYourIdentity = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Verify your identity"
+		HoneyLanguage.Chinese.code -> "Verify your identity"
+		HoneyLanguage.Japanese.code -> "Verify your identity"
+		HoneyLanguage.Korean.code -> "Verify your identity"
+		HoneyLanguage.Russian.code -> "Verify your identity"
+		HoneyLanguage.TraditionalChinese.code -> "Verify your identity"
+		else -> ""
+	}
+	@JvmField
+	val pleaseEnterYourCurrentNumericPassword = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter your current numeric password"
+		HoneyLanguage.Chinese.code -> "Please enter your current numeric password"
+		HoneyLanguage.Japanese.code -> "Please enter your current numeric password"
+		HoneyLanguage.Korean.code -> "Please enter your current numeric password"
+		HoneyLanguage.Russian.code -> "Please enter your current numeric password"
+		HoneyLanguage.TraditionalChinese.code -> "Please enter your current numeric password"
+		else -> ""
+	}
+	@JvmField
+	val setFourDigitPassword = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Set a four-digit password"
+		HoneyLanguage.Chinese.code -> "Set a four-digit password"
+		HoneyLanguage.Japanese.code -> "Set a four-digit password"
+		HoneyLanguage.Korean.code -> "Set a four-digit password"
+		HoneyLanguage.Russian.code -> "Set a four-digit password"
+		HoneyLanguage.TraditionalChinese.code -> "Set a four-digit password"
+		else -> ""
+	}
+	@JvmField
+	val resetTheFour_digitPassword = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Reset four-digit password"
+		HoneyLanguage.Chinese.code -> "Reset four-digit password"
+		HoneyLanguage.Japanese.code -> "Reset four-digit password"
+		HoneyLanguage.Korean.code -> "Reset four-digit password"
+		HoneyLanguage.Russian.code -> "Reset four-digit password"
+		HoneyLanguage.TraditionalChinese.code -> "Reset four-digit password"
+		else -> ""
+	}
+	@JvmField
+	val ifThePasswordInputIsInconsistentPleaseRe_enter = when(currentLanguage) {
+		HoneyLanguage.English.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Chinese.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Japanese.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Korean.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.Russian.code -> "If the password input is inconsistent, please re-enter"
+		HoneyLanguage.TraditionalChinese.code -> "If the password input is inconsistent, please re-enter"
+		else -> ""
+	}
+	
+	@JvmField
+	val failedAttention: (retryTimes: Int) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Chinese.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Japanese.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Korean.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.Russian.code -> "incorrect passcode $it retry times left"
+			HoneyLanguage.TraditionalChinese.code -> "incorrect passcode $it retry times left"
+			else -> ""
+		}
+	}
+	@JvmField
+	val remainingFrozenTime: (currentFrozenTime: Long) -> String = {
+		when(currentLanguage) {
+			HoneyLanguage.English.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Chinese.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Japanese.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Korean.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.Russian.code -> "you have to wait ${it / 1000} seconds"
+			HoneyLanguage.TraditionalChinese.code -> "you have to wait ${it / 1000} seconds"
+			else -> ""
+		}
+	}
+	val setPinCode = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Digital password PIN setting"
+		HoneyLanguage.Chinese.code -> "Digital password PIN setting"
+		HoneyLanguage.Japanese.code -> "Digital password PIN setting"
+		HoneyLanguage.Korean.code -> "Digital password PIN setting"
+		HoneyLanguage.Russian.code -> "Digital password PIN setting"
+		HoneyLanguage.TraditionalChinese.code -> "Digital password PIN setting"
+		else -> ""
+	}
+	val changePinCode = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Change the numeric PIN code"
+		HoneyLanguage.Chinese.code -> "Change the numeric PIN code"
+		HoneyLanguage.Japanese.code -> "Change the numeric PIN code"
+		HoneyLanguage.Korean.code -> "Change the numeric PIN code"
+		HoneyLanguage.Russian.code -> "Change the numeric PIN code"
+		HoneyLanguage.TraditionalChinese.code -> "Change the numeric PIN code"
+		else -> ""
+	}
+	val setTheDigitalLock = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Set the digital lock"
+		HoneyLanguage.Chinese.code -> "Set the digital lock"
+		HoneyLanguage.Japanese.code -> "Set the digital lock"
+		HoneyLanguage.Korean.code -> "Set the digital lock"
+		HoneyLanguage.Russian.code -> "Set the digital lock"
+		HoneyLanguage.TraditionalChinese.code -> "Set the digital lock"
+		else -> ""
+	}
+	val goToSetPinCode = when(currentLanguage) {
+		HoneyLanguage.English.code -> "To set a numeric password"
+		HoneyLanguage.Chinese.code -> "To set a numeric password"
+		HoneyLanguage.Japanese.code -> "To set a numeric password"
+		HoneyLanguage.Korean.code -> "To set a numeric password"
+		HoneyLanguage.Russian.code -> "To set a numeric password"
+		HoneyLanguage.TraditionalChinese.code -> "To set a numeric password"
+		else -> ""
+	}
+	@JvmField
 	val pincode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Pin Code"
 		HoneyLanguage.Chinese.code -> "PIN码"
@@ -458,6 +569,107 @@ object SplashText {
 		HoneyLanguage.Korean.code -> "GOLD STONE"
 		HoneyLanguage.Russian.code -> "GOLD STONE"
 		HoneyLanguage.TraditionalChinese.code -> "GOLD STONE"
+		else -> ""
+	}
+}
+object FingerprintUnlockText {
+	val fingerprintUnlock = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Fingerprint unlock"
+		HoneyLanguage.Chinese.code -> "Fingerprint unlock"
+		HoneyLanguage.Japanese.code -> "Fingerprint unlock"
+		HoneyLanguage.Korean.code -> "Fingerprint unlock"
+		HoneyLanguage.Russian.code -> "Fingerprint unlock"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint unlock"
+		else -> ""
+	}
+	val attention = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Chinese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Japanese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Korean.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.Russian.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		HoneyLanguage.TraditionalChinese.code -> "Once you have set up your wallet, you need to unlock it to view your wallet. Wallet locks can better protect your privacy."
+		else -> ""
+	}
+	val fingerprintIsOn = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Fingerprint is on"
+		HoneyLanguage.Chinese.code -> "Fingerprint is on"
+		HoneyLanguage.Japanese.code -> "Fingerprint is on"
+		HoneyLanguage.Korean.code -> "Fingerprint is on"
+		HoneyLanguage.Russian.code -> "Fingerprint is on"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint is on"
+		else -> ""
+	}
+	val checkFingerprint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Check fingerprint"
+		HoneyLanguage.Chinese.code -> "Check fingerprint"
+		HoneyLanguage.Japanese.code -> "Check fingerprint"
+		HoneyLanguage.Korean.code -> "Check fingerprint"
+		HoneyLanguage.Russian.code -> "Check fingerprint"
+		HoneyLanguage.TraditionalChinese.code -> "Check fingerprint"
+		else -> ""
+	}
+	val tryAgain = when(currentLanguage) {
+		HoneyLanguage.English.code -> "try again"
+		HoneyLanguage.Chinese.code -> "try again"
+		HoneyLanguage.Japanese.code -> "try again"
+		HoneyLanguage.Korean.code -> "try again"
+		HoneyLanguage.Russian.code -> "try again"
+		HoneyLanguage.TraditionalChinese.code -> "try again"
+		else -> ""
+	}
+	val fingerprintOpeningPrompt = when(currentLanguage) {
+		HoneyLanguage.English.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Chinese.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Japanese.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Korean.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.Russian.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		HoneyLanguage.TraditionalChinese.code -> "We recommend that you turn on your digital password at the same time.\n" + "This way, when your fingerprint is not recognized correctly,\n" + "You can also unlock your wallet with a password."
+		else -> ""
+	}
+	val goToSetFingerprint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Go to set the fingerprint"
+		HoneyLanguage.Chinese.code -> "Go to set the fingerprint"
+		HoneyLanguage.Japanese.code -> "Go to set the fingerprint"
+		HoneyLanguage.Korean.code -> "Go to set the fingerprint"
+		HoneyLanguage.Russian.code -> "Go to set the fingerprint"
+		HoneyLanguage.TraditionalChinese.code -> "Go to set the fingerprint"
+		else -> ""
+	}
+	val yourDeviceHasNotSetAFingerprintYet = when(currentLanguage) {
+		HoneyLanguage.English.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Chinese.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Japanese.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Korean.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.Russian.code -> "Your device has not set a fingerprint yet"
+		HoneyLanguage.TraditionalChinese.code -> "Your device has not set a fingerprint yet"
+		else -> ""
+	}
+	val fingerprintNotSetPrompt = when(currentLanguage) {
+		HoneyLanguage.English.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Chinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Japanese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Korean.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.Russian.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		HoneyLanguage.TraditionalChinese.code -> "We detected that you are not currently set.Over fingerprint. After entering the fingerprint in the system settings.Let's turn on fingerprint recognition."
+		else -> ""
+	}
+	val unregisteredFingerprint = when(currentLanguage) {
+		HoneyLanguage.English.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Chinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Japanese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Korean.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.Russian.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		HoneyLanguage.TraditionalChinese.code -> "The device does not record fingerprints. Please go to System -> Settings to add fingerprints."
+		else -> ""
+	}
+	val hardwareDoesNotSupportFingerprints = when(currentLanguage) {
+		HoneyLanguage.English.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Chinese.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Japanese.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Korean.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.Russian.code -> "The device has not detected the fingerprint hardware"
+		HoneyLanguage.TraditionalChinese.code -> "The device has not detected the fingerprint hardware"
 		else -> ""
 	}
 }

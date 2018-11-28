@@ -44,11 +44,11 @@ class WalletDetailAdapter(
 			 * 判断不同手机的不同 `Navigation` 的状态决定 `Footer` 的补贴高度
 			 * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
 			 */
-			keyboardHeightListener {
-				if (it < 0) {
-					hasHiddenSoftNavigationBar = true
-				}
-			}
+//			keyboardHeightListener {
+//				if (it < 0) {
+//					hasHiddenSoftNavigationBar = true
+//				}
+//			}
 			holdHeader(this)
 		}
 

@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.pincode.presenter
+package io.goldstone.blockchain.module.home.profile.securitysetting.presenter
 
 import android.widget.EditText
 import android.widget.Switch
@@ -12,7 +12,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Count
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeEditorFragment
 import kotlinx.coroutines.Dispatchers
 
 /**

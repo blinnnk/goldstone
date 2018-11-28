@@ -12,8 +12,7 @@ import com.afollestad.materialdialogs.customview.customView
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.DialogText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
@@ -169,4 +168,56 @@ class GoldStoneDialog(private val context: Context) {
 			}
 		}
 	}
+	
+	fun showPinCodeTip(callback: () -> Unit) {
+		generateCustomView(
+			R.drawable.network_browken_banner,
+			FingerprintUnlockText.fingerprintOpeningPrompt
+		) {
+			with(dialog) {
+				title(text = FingerprintUnlockText.fingerprintIsOn)
+				positiveButton(text = PincodeText.goToSetPinCode) {
+					callback()
+					dialog.dismiss()
+				}
+				customView(view = it)
+				show()
+			}
+		}
+	}
+	
+	fun showFingerPrintTip(callback: () -> Unit) {
+		generateCustomView(
+			R.drawable.network_browken_banner,
+			FingerprintUnlockText.fingerprintNotSetPrompt
+		) {
+			with(dialog) {
+				title(text = FingerprintUnlockText.yourDeviceHasNotSetAFingerprintYet)
+				positiveButton(text = FingerprintUnlockText.goToSetFingerprint) {
+					callback()
+					dialog.dismiss()
+				}
+				customView(view = it)
+				show()
+			}
+		}
+	}
+	
+	fun showBackHomeDialog(callback: () -> Unit) {
+		generateCustomView(
+			R.drawable.network_browken_banner,
+			"关闭吗？"
+		) {
+			with(dialog) {
+				title(text = "关闭")
+				positiveButton(text = CommonText.confirm) {
+					callback()
+					dialog.dismiss()
+				}
+				customView(view = it)
+				show()
+			}
+		}
+	}
+	
 }

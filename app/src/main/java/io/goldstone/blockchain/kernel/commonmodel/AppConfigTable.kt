@@ -11,6 +11,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -29,6 +30,7 @@ data class AppConfigTable(
 	@PrimaryKey(autoGenerate = true)
 	var id: Int,
 	var pincode: Int? = null,
+	var fingerprintUnlockerIsOpened: Boolean = false,
 	var showPincode: Boolean = false,
 	var frozenTime: Long,
 	var retryTimes: Int = 5,
@@ -63,6 +65,32 @@ data class AppConfigTable(
 
 		fun setShowPinCodeStatus(status: Boolean, callback: (status: Boolean) -> Unit) {
 			load { dao.updateShowPincodeStatus(status) } then { callback(status) }
+		}
+		fun setPinCodeStatus(
+			status: Boolean,
+			callback: () -> Unit
+		) {
+			load {
+				GoldStoneDataBase.database.appConfigDao().updateShowPincodeStatus(status)
+				if(!status) {
+					GoldStoneDataBase.database.appConfigDao().updatePincode(null)
+				}
+				SharedWallet.updatePincodeIsOpened(status)
+			} then {
+				callback()
+			}
+		}
+		
+		fun setFingerprintUnlockStatus(
+			status: Boolean,
+			callback: () -> Unit
+		) {
+			load {
+				GoldStoneDataBase.database.appConfigDao().updateFingerprintUnlockerIsOpened(status)
+				SharedWallet.updateFingerprintUnlockerIsOpened(status)
+			} then {
+				callback()
+			}
 		}
 
 		@SuppressLint("HardwareIds")
@@ -114,9 +142,12 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5 WHERE id = 1")
 	fun updateMD5Info(defaultCoinListMD5: String, nodeListMD5: String, exchangeListMD5: String, termMD5: String, configMD5: String, shareContentMD5: String)
-
+	
+	@Query("UPDATE appConfig SET fingerprintUnlockerIsOpened = :fingerprintUnlockerIsOpened")
+	fun updateFingerprintUnlockerIsOpened(fingerprintUnlockerIsOpened: Boolean = false)
+	
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
-	fun updatePincode(pinCode: Int)
+	fun updatePincode(pinCode: Int?)
 
 	@Query("UPDATE appConfig SET showPincode = :status WHERE id = 1")
 	fun updateShowPincodeStatus(status: Boolean)

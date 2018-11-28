@@ -79,6 +79,9 @@ class NumberKeyboard(context: Context) : RelativeLayout(context) {
 	}
 
 	fun getEnteredCode() = currentCode
+	fun setEnteredCode(currentCode: String) {
+		this.currentCode = currentCode
+	}
 	fun resetCode() {
 		currentCode = ""
 	}

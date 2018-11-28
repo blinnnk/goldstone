@@ -100,4 +100,24 @@ object SharedWallet {
 
 	fun updateNotchScreenStatus(isNotchScreen: Boolean) =
 		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
+	
+	fun updatePincodeIsOpened(pincodeIsOpened: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.pincodeIsOpened,
+			pincodeIsOpened
+		)
+	
+	fun isPincodeOpened(): Boolean {
+		return GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.pincodeIsOpened)
+	}
+	
+	fun updateFingerprintUnlockerIsOpened(fingerprintUnlockerIsOpened: Boolean) =
+		GoldStoneAPI.context.saveDataToSharedPreferences(
+			SharesPreference.fingerprintUnlockerIsOpened,
+			fingerprintUnlockerIsOpened
+		)
+	
+	fun isFingerprintUnlockerOpened(): Boolean {
+		return GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.fingerprintUnlockerIsOpened)
+	}
 }

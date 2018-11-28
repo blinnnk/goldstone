@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.profile.pincode.view
+package io.goldstone.blockchain.module.home.profile.securitysetting.view
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -21,7 +21,7 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.profile.pincode.presenter.PinCodeEditorPresenter
+import io.goldstone.blockchain.module.home.profile.securitysetting.presenter.PinCodeEditorPresenter
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
 import org.jetbrains.anko.*
 
