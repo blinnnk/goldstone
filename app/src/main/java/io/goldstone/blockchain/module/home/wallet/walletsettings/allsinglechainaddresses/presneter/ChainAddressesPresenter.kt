@@ -75,7 +75,7 @@ class ChainAddressesPresenter(
 				showQRCode(ContactModel(bip44Address.address, symbol))
 			},
 			keystoreCellClickEvent = {
-				showKeystoreExportFragment(bip44Address.address)
+				showKeystoreExportFragment(bip44Address.address, coinType)
 			},
 			exportPrivateKey = {
 				showPrivateKeyExportFragment(bip44Address.address, coinType)
@@ -112,19 +112,33 @@ class ChainAddressesPresenter(
 			if (password.isNullOrEmpty() || verifyError.hasError()) hold(null, verifyError)
 			else when {
 				fragment.coinType.isETH() ->
-					AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
+					AddressManagerPresenter.createETHSeriesAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isETC() ->
-					AddressManagerPresenter.createETCAddress(context, password, hold)
+					AddressManagerPresenter.createETCAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isLTC() ->
-					AddressManagerPresenter.createLTCAddress(context, password, hold)
+					AddressManagerPresenter.createLTCAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isEOS() ->
-					AddressManagerPresenter.createEOSAddress(context, password, hold)
+					AddressManagerPresenter.createEOSAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isBCH() ->
-					AddressManagerPresenter.createBCHAddress(context, password, hold)
+					AddressManagerPresenter.createBCHAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isBTC() ->
-					AddressManagerPresenter.createBTCAddress(context, password, hold)
+					AddressManagerPresenter.createBTCAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isAllTest() ->
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress {
+						hold(it, AccountError.None)
+					}
 			}
 		}
 	}
@@ -181,9 +195,9 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	private fun showKeystoreExportFragment(address: String) {
+	private fun showKeystoreExportFragment(address: String, coinType: ChainType) {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			AddressManagerPresenter.showKeystoreExportFragment(address, this)
+			AddressManagerPresenter.showKeystoreExportFragment(address, coinType, this)
 		}
 	}
 

@@ -18,11 +18,9 @@ import io.goldstone.blockchain.common.utils.AddressUtils
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.crypto.keystore.deleteAccount
 import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.isStoredInKeyStoreByAddress
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -177,10 +175,9 @@ class WalletSettingsListPresenter(
 		callback: (AccountError) -> Unit
 	) {
 		// delete `keystore` file
-		deleteAccount(
-			address,
-			password,
-			chainType.isStoredInKeyStoreByAddress()
+		deleteWalletByWalletID(
+			willDeleteWalletID,
+			password
 		) { error ->
 			if (error.isNone()) {
 				// 检测钱包里是否存在着这个地址的其他钱包, 如果存在就不删除数据只删除 Wallet
