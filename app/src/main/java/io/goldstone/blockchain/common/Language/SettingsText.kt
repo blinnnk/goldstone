@@ -188,12 +188,12 @@ object ProfileText {
 	}
 	@JvmField
 	val shareContent = when (currentLanguage) {
-		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://GoldStone.io"
-		HoneyLanguage.Chinese.code -> "GoldStone\n安全，易用，快捷\nhttps://GoldStone.io"
-		HoneyLanguage.Japanese.code -> "GoldStone/nは安全で使いやすくて便利\nhttps://GoldStone.io"
-		HoneyLanguage.Korean.code -> "GoldStone\n안전하고 사용하기 쉽고 빠름\nhttps://GoldStone.io"
-		HoneyLanguage.Russian.code -> "GoldStone\n цифровой кошелек самый безопасный для вас\nhttps://GoldStone.io"
-		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://GoldStone.io"
+		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://www.goldstone.io"
+		HoneyLanguage.Chinese.code -> "GoldStone\n安全，易用，快捷\nhttps://www.goldstone.io"
+		HoneyLanguage.Japanese.code -> "GoldStone/nは安全で使いやすくて便利\nhttps://www.goldstone.io"
+		HoneyLanguage.Korean.code -> "GoldStone\n안전하고 사용하기 쉽고 빠름\nhttps://www.goldstone.io"
+		HoneyLanguage.Russian.code -> "GoldStone\n цифровой кошелек самый безопасный для вас\nhttps://www.goldstone.io"
+		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://www.goldstone.io"
 		else -> ""
 	}
 	@JvmField
