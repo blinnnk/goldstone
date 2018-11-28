@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.view.Gravity
 import android.view.View
@@ -31,19 +32,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 		}
 	}
 
-	val editText by lazy {
-		EditText(context).apply {
-			hint = EmptyText.searchInput
-			backgroundTintMode = PorterDuff.Mode.CLEAR
-			textSize = fontSize(12)
-			textColor = GrayScale.black
-			hintTextColor = GrayScale.midGray
-			typeface = GoldStoneFont.book(context)
-			singleLine = true
-			layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
-			background = null
-		}
-	}
+	lateinit var editText: EditText
 
 	private val cancelButton by lazy {
 		TextView(context).apply {
@@ -61,16 +50,25 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		leftPadding = 20.uiPX()
 		rightPadding = 20.uiPX()
-
+		gravity = Gravity.CENTER_VERTICAL
 		linearLayout {
 			gravity = Gravity.CENTER_VERTICAL
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX()).apply {
-				gravity = Gravity.CENTER_VERTICAL
-			}
+			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX())
 			leftPadding = 10.uiPX()
 			addCorner(CornerSize.default.toInt(), Spectrum.white)
 			addView(filterIcon)
-			addView(editText)
+			editText = editText {
+				textAlignment = EditText.TEXT_ALIGNMENT_GRAVITY
+				hint = EmptyText.searchInput
+				backgroundTintMode = PorterDuff.Mode.CLEAR
+				textSize = fontSize(12)
+				textColor = GrayScale.black
+				hintTextColor = GrayScale.midGray
+				typeface = GoldStoneFont.medium(context)
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+				setHorizontallyScrolling(false)
+				setPadding(0, 10.uiPX(), 0, 10.uiPX())
+			}
 		}
 		addView(cancelButton)
 	}

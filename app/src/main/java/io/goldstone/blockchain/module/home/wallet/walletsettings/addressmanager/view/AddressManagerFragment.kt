@@ -321,9 +321,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
 					verifyMultiChainWalletPassword(context!!) { password, error ->
 						if (!password.isNullOrEmpty() && error.isNone() && it.chainType.isNotNull()) {
-							createChildAddressByButtonTitle(context!!, it.chainType, password) { addresses, createError ->
-								if (addresses.isNullOrEmpty() || error.hasError()) safeShowError(createError)
-								else launchUI {
+							createChildAddressByButtonTitle(it.chainType) { addresses ->
+								launchUI {
 									updateUI(addresses, it.chainType)
 								}
 							}
@@ -336,36 +335,34 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun createChildAddressByButtonTitle(
-		context: Context,
 		chainType: ChainType,
-		password: String,
-		@WorkerThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+		@WorkerThread hold: (addresses: List<Bip44Address>) -> Unit
 	) {
 		when {
 			chainType.isETH() ->
-				AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
+				AddressManagerPresenter.createETHSeriesAddress(hold)
 			chainType.isETC() ->
-				AddressManagerPresenter.createETCAddress(context, password, hold)
+				AddressManagerPresenter.createETCAddress(hold)
 
 			chainType.isEOS() ->
-				AddressManagerPresenter.createEOSAddress(context, password, hold)
+				AddressManagerPresenter.createEOSAddress(hold)
 
 			chainType.isLTC() -> {
 				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
-				else AddressManagerPresenter.createLTCAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress(hold)
+				else AddressManagerPresenter.createLTCAddress(hold)
 			}
 
 			chainType.isBCH() -> {
 				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
-				else AddressManagerPresenter.createBCHAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress(hold)
+				else AddressManagerPresenter.createBCHAddress(hold)
 			}
 
 			chainType.isBTC() -> {
 				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
-				else AddressManagerPresenter.createBTCAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress(hold)
+				else AddressManagerPresenter.createBTCAddress(hold)
 			}
 		}
 	}
@@ -431,7 +428,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			},
 			keystoreCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresenter.showKeystoreExportFragment(address.address, this)
+					AddressManagerPresenter.showKeystoreExportFragment(address.address, coinType, this)
 				}
 			},
 			convertBCHAddressToLegacy = {

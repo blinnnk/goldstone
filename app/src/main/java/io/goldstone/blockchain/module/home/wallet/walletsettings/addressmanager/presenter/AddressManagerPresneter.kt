@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter
 
-import android.content.Context
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
@@ -9,27 +8,24 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
-import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
-import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
+import io.goldstone.blockchain.crypto.ethereum.getAddress
+import io.goldstone.blockchain.crypto.keystore.generateETHSeriesAddress
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
-import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -173,382 +169,261 @@ class AddressManagerPresenter(
 			}
 		}
 
-		fun showKeystoreExportFragment(address: String, walletSettingsFragment: WalletSettingsFragment) {
+		fun showKeystoreExportFragment(
+			address: String,
+			chainType: ChainType,
+			walletSettingsFragment: WalletSettingsFragment
+		) {
 			walletSettingsFragment.apply {
 				// 这个页面不限时 `Header` 上的加号按钮
 				showAddButton(false) {}
 				if (!SharedWallet.isWatchOnlyWallet()) {
 					presenter.showTargetFragment<KeystoreExportFragment>(
-						Bundle().apply { putString(ArgumentKey.address, address) }
+						Bundle().apply {
+							putString(ArgumentKey.address, address)
+							putInt(ArgumentKey.coinType, chainType.id)
+						}
 					)
 				} else context.alert(WalletText.watchOnly)
 			}
 		}
 
 		@WorkerThread
-		fun createETHSeriesAddress(
-			context: Context,
-			password: String,
-			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
+		fun createETHSeriesAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.ETH) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
-					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address, error ->
-						if (address.isNullOrEmpty() || error.hasError()) {
-							hold(null, error)
-						} else {
-							// 新创建的账号插入所有对应的链的默认 `Token`
-							// 因为数据库存储的 Nodes 可能在同一个 ChainID 下存在多条, 例如 Infura Mainnet, GoldStone Mainnet
-							// 所以这里拉取回来的数据做一次去重复处理
-							val ethNodes =
-								GoldStoneDataBase.database.chainNodeDao().getETHNodes().distinctBy { it.chainID }
-							ethNodes.forEach {
-								insertNewToMyToken(
-									TokenContract.ethContract,
-									CoinSymbol.eth,
-									address,
-									it.chainID
-								)
-							}
-
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									address,
-									ChainType.ETH.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateETHSeriesAddresses(
-								Bip44Address(address, newAddressIndex, ChainType.ETH.id)
-							) {
-								hold(it, error)
-							}
-						}
+					val address = generateETHSeriesAddress(mnemonic, newChildPath).getAddress()
+					// 新创建的账号插入所有对应的链的默认 `Token`
+					// 因为数据库存储的 Nodes 可能在同一个 ChainID 下存在多条, 例如 Infura Mainnet, GoldStone Mainnet
+					// 所以这里拉取回来的数据做一次去重复处理
+					val ethNodes =
+						ChainNodeTable.dao.getETHNodes().distinctBy { it.chainID }
+					ethNodes.forEach {
+						insertNewToMyToken(
+							TokenContract.ethContract,
+							CoinSymbol.eth,
+							address,
+							it.chainID
+						)
 					}
+					// 注册新增的子地址
+					XinGePushReceiver.registerSingleAddress(
+						AddressCommissionModel(
+							address,
+							ChainType.ETH.id,
+							1,
+							wallet.id
+						)
+					)
+					wallet.updateETHSeriesAddresses(Bip44Address(address, newAddressIndex, ChainType.ETH.id), hold)
 				}
 			}
 		}
 
 		@WorkerThread
-		fun createETCAddress(
-			context: Context,
-			password: String,
-			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
+		fun createETCAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.ETC) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
 					val mnemonic = JavaKeystoreUtil().decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
-					context.getEthereumWalletByMnemonic(mnemonic, newChildPath, password) { address, error ->
-						if (address.isNullOrEmpty() || error.hasError()) hold(null, error)
-						else {
-							// 新创建的账号插入所有对应的链的默认 `Token`
-							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							val etcNodes =
-								GoldStoneDataBase.database.chainNodeDao().getETCNodes().distinctBy { it.chainID }
-							etcNodes.forEach {
-								insertNewToMyToken(
-									TokenContract.etcContract,
-									CoinSymbol.etc,
-									address,
-									it.chainID
-								)
-							}
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									address,
-									ChainType.ETC.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateETCAddresses(
-								Bip44Address(address, newAddressIndex, ChainType.ETC.id)
-							) {
-								hold(it, error)
-							}
-						}
+					val address = generateETHSeriesAddress(mnemonic, newChildPath).getAddress()
+					// 新创建的账号插入所有对应的链的默认 `Token`
+					// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+					val etcNodes =
+						GoldStoneDataBase.database.chainNodeDao().getETCNodes().distinctBy { it.chainID }
+					etcNodes.forEach {
+						insertNewToMyToken(
+							TokenContract.etcContract,
+							CoinSymbol.etc,
+							address,
+							it.chainID
+						)
 					}
+					// 注册新增的子地址
+					XinGePushReceiver.registerSingleAddress(
+						AddressCommissionModel(
+							address,
+							ChainType.ETC.id,
+							1,
+							wallet.id
+						)
+					)
+					wallet.updateETCAddresses(Bip44Address(address, newAddressIndex, ChainType.ETC.id), hold)
 				}
 			}
 		}
 
 		@WorkerThread
-		fun createEOSAddress(
-			context: Context,
-			password: String,
-			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
-			context.verifyKeystorePasswordByWalletID(
-				password,
-				SharedWallet.getCurrentWalletID()
-			) { isCorrect ->
-				if (!isCorrect) hold(null, AccountError.WrongPassword)
-				else WalletTable.getLatestAddressIndex(ChainType.EOS) { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.eosPath.substringBeforeLast("/") + "/" + newAddressIndex
-						EOSWalletUtils.generateKeyPair(mnemonic, newChildPath).let { eosKeyPair ->
-							context.storeBase58PrivateKey(
-								eosKeyPair.privateKey,
+		fun createEOSAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
+			WalletTable.getLatestAddressIndex(ChainType.EOS) { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let { encryptMnemonic ->
+					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.eosPath.substringBeforeLast("/") + "/" + newAddressIndex
+					EOSWalletUtils.generateKeyPair(mnemonic, newChildPath).let { eosKeyPair ->
+						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+						val eosNodes =
+							GoldStoneDataBase.database.chainNodeDao().getEOSNodes().distinctBy { it.chainID }
+						eosNodes.forEach {
+							insertNewToMyToken(
+								TokenContract.eosContract,
+								CoinSymbol.eos,
 								eosKeyPair.address,
-								password,
-								false
+								it.chainID
 							)
-
-							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							val eosNodes =
-								GoldStoneDataBase.database.chainNodeDao().getEOSNodes().distinctBy { it.chainID }
-							eosNodes.forEach {
-								insertNewToMyToken(
-									TokenContract.eosContract,
-									CoinSymbol.eos,
-									eosKeyPair.address,
-									it.chainID
-								)
-							}
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									eosKeyPair.address,
-									ChainType.EOS.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateEOSAddresses(
-								Bip44Address(eosKeyPair.address, newAddressIndex, ChainType.EOS.id)
-							) {
-								hold(it, AccountError.None)
-							}
 						}
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommissionModel(
+								eosKeyPair.address,
+								ChainType.EOS.id,
+								1,
+								wallet.id
+							)
+						)
+						wallet.updateEOSAddresses(Bip44Address(eosKeyPair.address, newAddressIndex, ChainType.EOS.id), hold)
 					}
 				}
 			}
 		}
 
 		@WorkerThread
-		fun createBTCAddress(
-			context: Context,
-			password: String,
-			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
-			context.verifyKeystorePasswordByWalletID(
-				password,
-				SharedWallet.getCurrentWalletID()
-			) { isCorrect ->
-				if (isCorrect) WalletTable.getLatestAddressIndex(ChainType.BTC) { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
-						BTCWalletUtils.getBitcoinWalletByMnemonic(
-							mnemonic,
-							newChildPath
-						) { address, secret ->
-							// 存入 `KeyStore`
-							context.storeBase58PrivateKey(
-								secret,
+		fun createBTCAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
+			WalletTable.getLatestAddressIndex(ChainType.BTC) { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let { encryptMnemonic ->
+					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
+					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+						insertNewToMyToken(
+							TokenContract.btcContract,
+							CoinSymbol.pureBTCSymbol,
+							address,
+							ChainID.btcMain
+						)
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommissionModel(
 								address,
-								password,
-								false
+								ChainType.BTC.id,
+								1,
+								wallet.id
 							)
-							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							insertNewToMyToken(
-								TokenContract.btcContract,
-								CoinSymbol.pureBTCSymbol,
-								address,
-								ChainID.btcMain
-							)
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									address,
-									ChainType.BTC.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateBTCAddresses(
-								Bip44Address(address, newAddressIndex, ChainType.BTC.id)
-							) {
-								hold(it, AccountError.None)
-							}
-						}
-					}
-				} else hold(null, AccountError.WrongPassword)
-			}
-		}
-
-		@WorkerThread
-		fun createBTCTestAddress(
-			context: Context,
-			password: String,
-			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
-			context.verifyKeystorePasswordByWalletID(
-				password,
-				SharedWallet.getCurrentWalletID()
-			) { isCorrect ->
-				if (!isCorrect) hold(null, AccountError.WrongPassword)
-				else WalletTable.getLatestAddressIndex(ChainType.AllTest) { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
-						BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, secret ->
-							context.storeBase58PrivateKey(
-								secret,
-								address,
-								password,
-								true
-							)
-							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							// `BTCTest` 是 `BTCSeries` 公用的地址
-							insertNewToMyToken(
-								TokenContract.btcContract,
-								CoinSymbol.pureBTCSymbol,
-								address,
-								ChainID.btcTest
-							)
-							// 插入 LTC 账号
-							insertNewToMyToken(
-								TokenContract.ltcContract,
-								CoinSymbol.ltc,
-								address,
-								ChainID.ltcTest
-							)
-							// 插入 BCH 账号
-							insertNewToMyToken(
-								TokenContract.bchContract,
-								CoinSymbol.bch,
-								address,
-								ChainID.bchTest
-							)
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									address,
-									ChainType.AllTest.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateBTCSeriesTestAddresses(
-								Bip44Address(address, newAddressIndex, ChainType.AllTest.id)
-							) {
-								hold(it, AccountError.None)
-							}
-						}
+						)
+						wallet.updateBTCAddresses(Bip44Address(address, newAddressIndex, ChainType.BTC.id), hold)
 					}
 				}
 			}
 		}
 
-		fun createBCHAddress(
-			context: Context,
-			password: String,
-			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
-			context.verifyKeystorePasswordByWalletID(
-				password,
-				SharedWallet.getCurrentWalletID()
-			) { isCorrect ->
-				if (!isCorrect) hold(null, AccountError.WrongPassword)
-				else WalletTable.getLatestAddressIndex(ChainType.BCH) { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.bchPath.substringBeforeLast("/") + "/" + newAddressIndex
-						BCHWalletUtils.generateBCHKeyPair(mnemonic, newChildPath).let { bchKeyPair ->
-							context.storeBase58PrivateKey(
-								bchKeyPair.privateKey,
+		@WorkerThread
+		fun createBTCTestAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
+			WalletTable.getLatestAddressIndex(ChainType.AllTest) { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let { encryptMnemonic ->
+					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
+					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
+						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+						// `BTCTest` 是 `BTCSeries` 公用的地址
+						insertNewToMyToken(
+							TokenContract.btcContract,
+							CoinSymbol.pureBTCSymbol,
+							address,
+							ChainID.btcTest
+						)
+						// 插入 LTC 账号
+						insertNewToMyToken(
+							TokenContract.ltcContract,
+							CoinSymbol.ltc,
+							address,
+							ChainID.ltcTest
+						)
+						// 插入 BCH 账号
+						insertNewToMyToken(
+							TokenContract.bchContract,
+							CoinSymbol.bch,
+							address,
+							ChainID.bchTest
+						)
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommissionModel(
+								address,
+								ChainType.AllTest.id,
+								1,
+								wallet.id
+							)
+						)
+						wallet.updateBTCSeriesTestAddresses(Bip44Address(address, newAddressIndex, ChainType.AllTest.id), hold)
+					}
+				}
+			}
+		}
+
+		fun createBCHAddress(@UiThread hold: (addresses: List<Bip44Address>) -> Unit) {
+			WalletTable.getLatestAddressIndex(ChainType.BCH) { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let { encryptMnemonic ->
+					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.bchPath.substringBeforeLast("/") + "/" + newAddressIndex
+					BCHWalletUtils.generateBCHKeyPair(mnemonic, newChildPath).let { bchKeyPair ->
+						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+						insertNewToMyToken(
+							TokenContract.bchContract,
+							CoinSymbol.bch,
+							bchKeyPair.address,
+							ChainID.bchMain
+						)
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommissionModel(
 								bchKeyPair.address,
-								password,
-								false
+								ChainType.BCH.id,
+								1,
+								wallet.id
 							)
-							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							insertNewToMyToken(
-								TokenContract.bchContract,
-								CoinSymbol.bch,
-								bchKeyPair.address,
-								ChainID.bchMain
-							)
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									bchKeyPair.address,
-									ChainType.BCH.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateBCHAddresses(
-								Bip44Address(bchKeyPair.address, newAddressIndex, ChainType.BCH.id)
-							) {
-								hold(it, AccountError.None)
-							}
-						}
+						)
+						wallet.updateBCHAddresses(Bip44Address(bchKeyPair.address, newAddressIndex, ChainType.BCH.id), hold)
 					}
 				}
 			}
 		}
 
 		@WorkerThread
-		fun createLTCAddress(
-			context: Context,
-			password: String,
-			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
-		) {
-			context.verifyKeystorePasswordByWalletID(
-				password,
-				SharedWallet.getCurrentWalletID()
-			) { isCorrect ->
-				if (!isCorrect) hold(null, AccountError.WrongPassword)
-				else WalletTable.getLatestAddressIndex(ChainType.LTC) { wallet, childAddressIndex ->
-					wallet.encryptMnemonic?.let { encryptMnemonic ->
-						val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
-						val newAddressIndex = childAddressIndex + 1
-						val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
-						LTCWalletUtils.generateBase58Keypair(
-							mnemonic,
-							newChildPath
-						).let { ltcKeyPair ->
-							context.storeLTCBase58PrivateKey(
-								ltcKeyPair.privateKey,
+		fun createLTCAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
+			WalletTable.getLatestAddressIndex(ChainType.LTC) { wallet, childAddressIndex ->
+				wallet.encryptMnemonic?.let { encryptMnemonic ->
+					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val newAddressIndex = childAddressIndex + 1
+					val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
+					LTCWalletUtils.generateBase58Keypair(
+						mnemonic,
+						newChildPath
+					).let { ltcKeyPair ->
+
+						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
+						insertNewToMyToken(
+							TokenContract.ltcContract,
+							CoinSymbol.ltc,
+							ltcKeyPair.address,
+							ChainID.ltcMain
+						)
+						// 注册新增的子地址
+						XinGePushReceiver.registerSingleAddress(
+							AddressCommissionModel(
 								ltcKeyPair.address,
-								password
+								ChainType.LTC.id,
+								1,
+								wallet.id
 							)
-							// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
-							insertNewToMyToken(
-								TokenContract.ltcContract,
-								CoinSymbol.ltc,
-								ltcKeyPair.address,
-								ChainID.ltcMain
-							)
-							// 注册新增的子地址
-							XinGePushReceiver.registerSingleAddress(
-								AddressCommissionModel(
-									ltcKeyPair.address,
-									ChainType.LTC.id,
-									1,
-									wallet.id
-								)
-							)
-							wallet.updateLTCAddresses(
-								Bip44Address(ltcKeyPair.address, newAddressIndex, ChainType.LTC.id)
-							) {
-								hold(it, AccountError.None)
-							}
-						}
+						)
+						wallet.updateLTCAddresses(Bip44Address(ltcKeyPair.address, newAddressIndex, ChainType.LTC.id), hold)
 					}
 				}
 			}
