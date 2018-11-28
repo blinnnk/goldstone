@@ -31,8 +31,11 @@ class QuotationManagementFragment :
 
 	override fun onDestroy() {
 		super.onDestroy()
-		presenter.updateQuotationDataChanged()
-		presenter.notifyQuotationDataChanged()
+		with(presenter) {
+			updateQuotationDataChanged {
+				notifyQuotationDataChanged()
+			}
+		}
 		EventBus.getDefault().unregister(this)
 	}
 

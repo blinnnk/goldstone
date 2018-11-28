@@ -84,8 +84,7 @@ class MnemonicBackupFragment : BaseFragment<MnemonicBackupPresenter>() {
 			}
 
 			is WalletSettingsFragment -> {
-				parent.headerTitle = WalletSettingsText.walletSettings
-				parent.presenter.showWalletSettingListFragment()
+				parent.presenter.popFragmentFrom<MnemonicBackupFragment>()
 			}
 		}
 	}

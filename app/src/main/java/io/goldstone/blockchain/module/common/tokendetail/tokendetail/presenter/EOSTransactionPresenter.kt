@@ -132,12 +132,14 @@ fun TokenDetailPresenter.getEOSSeriesData() {
 		token.symbol
 	) { count, error ->
 		if (count.hasValue() && error.isNone()) {
-			totalCount = count
-			currentMaxCount = count
-			// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
-			// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
-			detailView.getDetailAdapter()?.dataSet?.clear()
-			launchUI { loadMore() }
+			launchUI {
+				totalCount = count
+				currentMaxCount = count
+				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+				detailView.getDetailAdapter()?.dataSet?.clear()
+				loadMore()
+			}
 		} else {
 			detailView.showLoading(false)
 			detailView.showBottomLoading(false)

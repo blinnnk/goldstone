@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.crypto.bitcoin
 
 import android.content.Context
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.keystore.getKeystoreFile
@@ -48,7 +49,7 @@ fun Context.exportBase58PrivateKey(
 	hold: (privateKey: String?, error: AccountError) -> Unit
 ) {
 	getPrivateKey(walletAddress, password, true) { privateKey, error ->
-		if (privateKey != null && error.isNone()) {
+		if (privateKey.isNotNull() && error.isNone()) {
 			val net = if (isTest) TestNet3Params.get() else MainNetParams.get()
 			hold(ECKey.fromPrivate(privateKey.toBigInteger(16), isCompress).getPrivateKeyAsWiF(net), AccountError.None)
 		} else hold(null, error)

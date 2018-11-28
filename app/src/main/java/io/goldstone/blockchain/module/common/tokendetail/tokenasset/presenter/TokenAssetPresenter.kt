@@ -1,14 +1,13 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
-import android.support.annotation.UiThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -19,8 +18,6 @@ import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -46,9 +43,22 @@ class TokenAssetPresenter(
 	// 在详情界面有可能有 `Stake` 或 `Trade` 操作这里, 恢复显示的时候从
 	// 数据库更新一次信息
 	override fun start() {
-		if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) updateAccountInfo()
+		updateRefundInfo()
+		updateAccountInfo()
 		setDelegateBandwidthEOSCount()
 		showTransactionCount()
+	}
+
+	override fun updateRefundInfo() {
+		EOSAPI.getRecycledBandWidthList(account) { data, error ->
+			if (!data.isNullOrEmpty() && error.isNone()) {
+				val info = data.first()
+				EOSAccountTable.dao.updateRefundData(info, account.name, chainID.id)
+				launchUI {
+					assetView.setEOSRefunds(info.getRefundDescription())
+				}
+			} else if (error.hasError()) assetView.showError(error)
+		}
 	}
 
 	private fun setDelegateBandwidthEOSCount() {
@@ -67,22 +77,26 @@ class TokenAssetPresenter(
 					totalEOSCount.map { it.substringBefore(" ").toDoubleOrZero() }.sum()
 				totalDelegateCount.formatCount(4) suffix CoinSymbol.EOS.symbol
 			}
-			assetView.setEOSDelegateBandWidth(description)
+			launchUI {
+				assetView.setEOSDelegateBandWidth(description)
+			}
 		}
 	}
 
-	override fun getDelegateBandWidthData(@UiThread hold: (ArrayList<DelegateBandWidthInfo>) -> Unit) {
+	override fun getDelegateBandWidthData(hold: (ArrayList<DelegateBandWidthInfo>) -> Unit) {
 		load {
 			EOSAccountTable.dao.getAccount(account.name, chainID.id)?.totalDelegateBandInfo
 		} then {
 			if (!it.isNullOrEmpty()) hold(it.toArrayList())
-			else EOSAPI.getDelegateBandWidthList(account) { data, error ->
-				if (data.isNotNull() && error.isNone()) {
-					EOSAccountTable.dao.updateDelegateBandwidthData(data, account.name, chainID.id)
-					launchUI {
+			else {
+				assetView.showCenterLoading(true)
+				EOSAPI.getDelegateBandWidthList(account) { data, error ->
+					if (data.isNotNull() && error.isNone()) {
+						EOSAccountTable.dao.updateDelegateBandwidthData(data, account.name, chainID.id)
 						hold(data.toArrayList())
-					}
-				} else assetView.showError(error)
+					} else assetView.showError(error)
+					assetView.showCenterLoading(false)
+				}
 			}
 		}
 	}
@@ -92,7 +106,7 @@ class TokenAssetPresenter(
 		receiver: EOSAccount,
 		cpuAmount: BigInteger,
 		netAmount: BigInteger,
-		hold: (response: EOSResponse) -> Unit
+		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		PrivateKeyExportPresenter.getPrivateKey(
 			SharedAddress.getCurrentEOS(),
@@ -106,33 +120,31 @@ class TokenAssetPresenter(
 					cpuAmount,
 					netAmount,
 					ExpirationType.FiveMinutes
-				).send(EOSPrivateKey(privateKey)) { response, responseError ->
-					if (response.isNotNull() && responseError.isNone()) hold(response)
-					else assetView.showError(responseError)
-				}
-			} else assetView.showError(error)
+				).send(EOSPrivateKey(privateKey), hold)
+			} else hold(null, error)
 		}
 	}
 
-	private fun updateAccountInfo(onlyUpdateLocalData: Boolean = false) {
-		val accountDao =
-			GoldStoneDataBase.database.eosAccountDao()
-
-		fun showLocalAccounts() = GlobalScope.launch(Dispatchers.Default) {
+	private fun updateAccountInfo() {
+		GlobalScope.launch(Dispatchers.Default) {
 			val localData =
-				accountDao.getAccount(account.name, chainID.id)
-			// 首先显示数据库的数据在界面上
-			launchUI {
-				localData?.updateUIValue()
+				EOSAccountTable.dao.getAccount(account.name, chainID.id)
+			if (localData.isNull()) {
+				EOSAPI.getAccountInfo(account) { eosAccount, error ->
+					if (eosAccount.isNotNull() && error.isNone()) {
+						// 初始化插入数据
+						EOSAccountTable.preventDuplicateInsert(eosAccount, chainID) {
+							// 如果本地有了那么更新 Refund 信息
+							if (it) updateRefundInfo()
+						}
+						launchUI {
+							eosAccount.updateUIValue()
+						}
+					} else assetView.showError(error)
+				}
+			} else launchUI {
+				localData.updateUIValue()
 			}
-		}
-		if (onlyUpdateLocalData || !NetworkUtil.hasNetwork(GoldStoneAPI.context))
-			showLocalAccounts()
-		else EOSAPI.getAccountInfo(account) { eosAccount, error ->
-			if (eosAccount.isNotNull() && error.isNone()) {
-				EOSAccountTable.preventDuplicateInsert(eosAccount, chainID)
-				showLocalAccounts()
-			} else assetView.showError(error)
 		}
 	}
 
@@ -154,7 +166,7 @@ class TokenAssetPresenter(
 	private fun EOSAccountTable.updateUIValue() {
 		assetView.setEOSBalance(if (balance.isEmpty()) "0.0" else balance)
 		if (refundInfo.isNull()) assetView.setEOSRefunds("0.0")
-		else refundInfo.getRefundDescription().let { assetView.setEOSRefunds(it) }
+		else assetView.setEOSRefunds(refundInfo.getRefundDescription())
 		val availableRAM = ramQuota - ramUsed
 		val availableCPU = cpuLimit.max - cpuLimit.used
 		val cpuEOSValue = "${cpuWeight.toEOSCount()}" suffix CoinSymbol.eos

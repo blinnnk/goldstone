@@ -160,11 +160,11 @@ class MarketTokenDetailPresenter(
 				tokenData.marketCap.isEmpty()
 					|| tokenData.rankValue.isEmpty()
 					|| localLanguageCode != SharedWallet.getCurrentLanguageCode()
-			if (needToUpdate && NetworkUtil.hasNetwork(fragment.context)) {
+			if (NetworkUtil.hasNetwork(fragment.context)) {
 				var newPriceData = priceData
 				var newTokenData = tokenData
 				// 本地没有数据的话从服务端拉取 `Coin Information`
-				loadCoinInfoFromServer(info) {
+				if (needToUpdate) loadCoinInfoFromServer(info) {
 					newTokenData = TokenInformationModel(it, info.symbol)
 					fragment.showCurrencyInfo(newTokenData, newPriceData)
 				}
@@ -174,7 +174,7 @@ class MarketTokenDetailPresenter(
 					if (serverPriceData.isNotNull() && error.isNone()) {
 						newPriceData = serverPriceData
 						launchUI {
-							fragment.showCurrencyInfo(newTokenData, serverPriceData)
+							fragment.showCurrencyInfo(newTokenData, newPriceData)
 						}
 						serverPriceData.apply {
 							QuotationSelectionTable.dao.updatePriceInfo(dayHighest, dayLow, totalHighest, totalLow, info.pair)

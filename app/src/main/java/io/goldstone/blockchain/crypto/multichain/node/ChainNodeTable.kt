@@ -16,10 +16,12 @@ import java.io.Serializable
  */
 @Entity(tableName = "chainNode")
 class ChainNodeTable(
+	@PrimaryKey
+	@SerializedName("id")
+	val id: String,
 	@SerializedName("node_name")
 	val name: String,
 	@SerializedName("url")
-	@PrimaryKey
 	val url: String,
 	@SerializedName("encrypt_status")
 	val isEncrypt: Int,
@@ -37,6 +39,7 @@ class ChainNodeTable(
 	var isUsed: Int
 ) : Serializable {
 	constructor(data: JSONObject) : this(
+		data.safeGet("id"),
 		data.safeGet("node_name"),
 		data.safeGet("url"),
 		data.safeGet("encrypt_status").toInt(),
@@ -59,6 +62,9 @@ interface ChainNodeDao {
 
 	@Query("SELECT * FROM chainNode")
 	fun getAll(): List<ChainNodeTable>
+
+	@Query("SELECT count(*) FROM chainNode")
+	fun rowCount(): Int
 
 	@Query("SELECT * FROM chainNode WHERE netType LIKE 0 ORDER BY chainType")
 	fun getMainnet(): List<ChainNodeTable>

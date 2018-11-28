@@ -23,8 +23,11 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 01/04/2018 12:38 AM
@@ -73,8 +76,8 @@ data class MyTokenTable(
 		val dao = GoldStoneDataBase.database.myTokenDao()
 
 		fun updateOrInsertOwnerName(name: String, address: String) {
-			doAsync {
-				GoldStoneDataBase.database.myTokenDao().apply {
+			GlobalScope.launch(Dispatchers.Default) {
+				MyTokenTable.dao.apply {
 					val chainID = SharedChain.getEOSCurrent().chainID.id
 					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
 					// 如果不存在则, 查询 Name 是否已经存在了, 如果还是不存在, 那么就插入一条全新的
@@ -98,10 +101,10 @@ data class MyTokenTable(
 		}
 
 		fun getMyTokens(@WorkerThread hold: (List<MyTokenTable>) -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao()
+			GlobalScope.launch(Dispatchers.Default) {
+				WalletTable.dao
 					.findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
-						GoldStoneDataBase.database.myTokenDao().getTokensByAddress(addresses).let(hold)
+						MyTokenTable.dao.getTokensByAddress(addresses).let(hold)
 					}
 			}
 		}
@@ -238,7 +241,7 @@ interface MyTokenDao {
 	@Query("SELECT * FROM myTokens")
 	fun getAll(): List<MyTokenTable>
 
-	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND symbol = :symbol AND ownerName LIKE :address AND chainID IN (:currentChainIDS)")
+	@Query("UPDATE myTokens SET balance = :balance WHERE contract = :contract AND symbol = :symbol AND (ownerName LIKE :address OR ownerAddress LIKE :address) AND chainID IN (:currentChainIDS)")
 	fun updateBalanceByContract(balance: Double, contract: String, symbol: String, address: String, currentChainIDS: List<String> = Current.chainIDs())
 
 	// `OwnerName` 和 `OwnerAddress` 都是地址的情况, 是 `EOS` 的未激活或为设置默认 AccountName 的状态

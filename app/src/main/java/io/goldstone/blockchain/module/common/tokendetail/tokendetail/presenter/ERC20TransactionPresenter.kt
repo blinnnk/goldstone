@@ -24,6 +24,10 @@ fun TokenDetailPresenter.loadERCChainData(blockNumber: Int) {
 		// 返回的是交易记录, 筛选当前的 `Symbol` 如果没有就返回空数组
 		// 有数据后重新执行从数据库拉取数据
 		if (it.isNone()) getETHSeriesData()
+		else {
+			if (it.isEmptyResult()) detailView.showLoading(false)
+			detailView.showBottomLoading(false)
+		}
 	}
 }
 
@@ -33,29 +37,33 @@ fun TokenDetailPresenter.updateLocalERC20Transactions(startBlock: Int, callback:
 		EtherScanApi.getTargetTokenTransactions(
 			SharedAddress.getCurrentEthereum(),
 			token.contract.contract,
-			"$startBlock"
+			startBlock
 		),
-		"result"
+		listOf("result")
 	) { transactions, error ->
-		if (transactions?.isNotEmpty() == true && error.isNone()) {
-			val defaultDao =
-				GoldStoneDataBase.database.defaultTokenDao()
-			val transactionDao =
-				GoldStoneDataBase.database.transactionDao()
-			// onConflict InsertAll 利用 RoomDatabase 进行双主键做重复判断 
-			// 覆盖或新增到本地 TransactionTable 数据库里
-			transactionDao.insertAll(transactions.map { TransactionTable(it) })
-			// 检测获取的 ERC20 本地是否有对应的 DefaultToken 记录, 如果没有插入到本地数据库
-			// 供其他场景使用
-			val chainID = SharedChain.getCurrentETH().chainID
-			val token = transactions.first()
-			val target = defaultDao.getToken(
-				token.contract,
-				token.tokenSymbol,
-				chainID.id
-			)
-			if (target.isNull()) defaultDao.insert(DefaultTokenTable(token, chainID))
-			callback(error)
-		} else callback(error)
+		when {
+			transactions?.isNotEmpty() == true && error.isNone() -> {
+				val defaultDao =
+					GoldStoneDataBase.database.defaultTokenDao()
+				val transactionDao =
+					GoldStoneDataBase.database.transactionDao()
+				// onConflict InsertAll 利用 RoomDatabase 进行双主键做重复判断 
+				// 覆盖或新增到本地 TransactionTable 数据库里
+				transactionDao.insertAll(transactions.map { TransactionTable(it) })
+				// 检测获取的 ERC20 本地是否有对应的 DefaultToken 记录, 如果没有插入到本地数据库
+				// 供其他场景使用
+				val chainID = SharedChain.getCurrentETH().chainID
+				val token = transactions.first()
+				val target = defaultDao.getToken(
+					token.contract,
+					token.tokenSymbol,
+					chainID.id
+				)
+				if (target.isNull()) defaultDao.insert(DefaultTokenTable(token, chainID))
+				callback(error)
+			}
+			transactions?.isEmpty() == true -> callback(RequestError.EmptyResut)
+			else -> callback(error)
+		}
 	}
 }

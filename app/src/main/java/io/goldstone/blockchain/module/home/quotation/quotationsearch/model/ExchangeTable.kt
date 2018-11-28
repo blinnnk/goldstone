@@ -48,6 +48,9 @@ interface ExchangeDao {
 	@Query("select * from exchangeTable")
 	fun getAll(): List<ExchangeTable>
 
+	@Query("SELECT count(*) FROM exchangeTable")
+	fun rowCount(): Int
+
 	@Query("select * from exchangeTable where isSelected = 1")
 	fun getSelected(): List<ExchangeTable>
 

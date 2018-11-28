@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
@@ -24,6 +25,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
 import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
@@ -61,19 +63,23 @@ class EOSAccountRegisterPresenter(
 		netAEOSCount: Double,
 		callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
+		if (ramAmount < BigInteger.valueOf(4096)) {
+			callback(null, TransferError.LessRAMForRegister)
+			return
+		}
 		// 首先查询 `RAM` 每 `Byte` 对应的 `EOS Count` 计算出即将分配的 `RAM` 价值的 `EOS Count`
 		EOSResourceUtil.getRAMPrice(EOSUnit.Byte) { priceInEOS, ramPriceError ->
-			if (priceInEOS != null && ramPriceError.isNone()) {
+			if (priceInEOS.isNotNull() && ramPriceError.isNone()) {
 				val ramEOSCount = ramAmount.toDouble() * priceInEOS
 				val creatorAccount = SharedAddress.getCurrentEOSAccount()
 				val totalSpent = (cpuEOSCount + netAEOSCount + ramEOSCount).formatDecimal(4)
-				checkNewAccountInfoInChain(newAccountName, publicKey) { validAccount, validPublicKey, error ->
+				checkNewAccountInfo(newAccountName, publicKey) { validAccount, validPublicKey, error ->
 					if (error.hasError()) callback(null, error)
 					else BaseTradingPresenter.prepareTransaction(
 						fragment.context,
 						totalSpent,
 						TokenContract.EOS,
-						false
+						StakeType.Register
 					) { privateKey, privateKeyError ->
 						if (error.isNone() && privateKey.isNotNull()) {
 							EOSRegisterTransaction(
@@ -92,7 +98,7 @@ class EOSAccountRegisterPresenter(
 		}
 	}
 
-	private fun checkNewAccountInfoInChain(
+	private fun checkNewAccountInfo(
 		newAccount: EOSAccount,
 		publicKey: String,
 		@UiThread hold: (
@@ -120,7 +126,7 @@ class EOSAccountRegisterPresenter(
 		}
 		// 检查当前合规的用户名是否可被注册
 		checkNameIsAvailableInChain(newAccount) { isAvailable, error ->
-			if (isAvailable != null && error.isNone()) {
+			if (isAvailable.isNotNull() && error.isNone()) {
 				hold(newAccount, publicKey, GoldStoneError.None)
 			} else hold(null, null, error)
 		}
@@ -137,7 +143,7 @@ class EOSAccountRegisterPresenter(
 				EOSCodeName.EOSIO
 			) { resource, error ->
 				GoldStoneAPI.context.runOnUiThread {
-					if (resource != null)
+					if (resource.isNotNull())
 						hold(null, RequestError.RPCResult("this account name has been registered"))
 					else hold(true, error)
 				}

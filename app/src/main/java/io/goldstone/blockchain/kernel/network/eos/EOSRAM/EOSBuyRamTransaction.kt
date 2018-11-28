@@ -35,8 +35,8 @@ class EOSBuyRamTransaction(
 			eosAmount
 		)
 
-		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
-			if (header.isNotNull()&& error.isNone()) {
+		EOSAPI.getTransactionHeader(expirationType) { header, error ->
+			if (header.isNotNull() && error.isNone()) {
 				// 准备 Action
 				//  `contextFreeActions` 目前只有空的状态
 				val contextFreeActions = listOf<String>()

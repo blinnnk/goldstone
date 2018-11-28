@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
@@ -22,7 +23,7 @@ import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
-import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
+import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -66,7 +67,7 @@ class AddressManagerPresenter(
 		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
 			EOSAPI.getAccountNameByPublicKey(key
 			) { accountNames, error ->
-				if (accountNames != null && error.isNone()) {
+				if (accountNames.isNotNull() && error.isNone()) {
 					val description =
 						if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey
 						else WalletSettingsText.unactivatedPublicKey
@@ -82,7 +83,7 @@ class AddressManagerPresenter(
 	fun setBackEvent() {
 		fragment.getParentFragment<WalletSettingsFragment>()?.apply {
 			showBackButton(true) {
-				presenter.showWalletSettingListFragment()
+				presenter.popFragmentFrom<AddressManagerFragment>()
 			}
 		}
 	}
@@ -285,10 +286,9 @@ class AddressManagerPresenter(
 			password: String,
 			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			context.verifyKeystorePassword(
+			context.verifyKeystorePasswordByWalletID(
 				password,
-				SharedAddress.getCurrentEOS(),
-				true
+				SharedWallet.getCurrentWalletID()
 			) { isCorrect ->
 				if (!isCorrect) hold(null, AccountError.WrongPassword)
 				else WalletTable.getLatestAddressIndex(ChainType.EOS) { wallet, childAddressIndex ->
@@ -341,10 +341,9 @@ class AddressManagerPresenter(
 			password: String,
 			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			context.verifyKeystorePassword(
+			context.verifyKeystorePasswordByWalletID(
 				password,
-				SharedAddress.getCurrentBTC(),
-				true
+				SharedWallet.getCurrentWalletID()
 			) { isCorrect ->
 				if (isCorrect) WalletTable.getLatestAddressIndex(ChainType.BTC) { wallet, childAddressIndex ->
 					wallet.encryptMnemonic?.let { encryptMnemonic ->
@@ -395,10 +394,9 @@ class AddressManagerPresenter(
 			password: String,
 			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			context.verifyKeystorePassword(
+			context.verifyKeystorePasswordByWalletID(
 				password,
-				SharedAddress.getCurrentBTCSeriesTest(),
-				true
+				SharedWallet.getCurrentWalletID()
 			) { isCorrect ->
 				if (!isCorrect) hold(null, AccountError.WrongPassword)
 				else WalletTable.getLatestAddressIndex(ChainType.AllTest) { wallet, childAddressIndex ->
@@ -460,10 +458,9 @@ class AddressManagerPresenter(
 			password: String,
 			@UiThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			context.verifyKeystorePassword(
+			context.verifyKeystorePasswordByWalletID(
 				password,
-				SharedAddress.getCurrentBCH(),
-				true
+				SharedWallet.getCurrentWalletID()
 			) { isCorrect ->
 				if (!isCorrect) hold(null, AccountError.WrongPassword)
 				else WalletTable.getLatestAddressIndex(ChainType.BCH) { wallet, childAddressIndex ->
@@ -511,10 +508,9 @@ class AddressManagerPresenter(
 			password: String,
 			hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
 		) {
-			context.verifyKeystorePassword(
+			context.verifyKeystorePasswordByWalletID(
 				password,
-				SharedAddress.getCurrentLTC(),
-				true
+				SharedWallet.getCurrentWalletID()
 			) { isCorrect ->
 				if (!isCorrect) hold(null, AccountError.WrongPassword)
 				else WalletTable.getLatestAddressIndex(ChainType.LTC) { wallet, childAddressIndex ->

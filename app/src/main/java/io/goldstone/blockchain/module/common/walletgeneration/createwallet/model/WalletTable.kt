@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
@@ -19,10 +20,7 @@ import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.*
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 
 /**
@@ -178,6 +176,33 @@ data class WalletTable(
 		).asSequence().filter { it.isNotEmpty() }.distinctBy { it }.toList()
 	}
 
+	fun getAddressPathIndex(address: String, chainType: ChainType): Int {
+		return when {
+			chainType.isETH() -> {
+				ethAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			chainType.isETC() -> {
+				etcAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			chainType.isBTC() -> {
+				btcAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			chainType.isAllTest() -> {
+				btcSeriesTestAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			chainType.isLTC() -> {
+				ltcAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			chainType.isBCH() -> {
+				bchAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			chainType.isEOS() -> {
+				eosAddresses.find { it.address.equals(address, true) }?.index.orZero()
+			}
+			else -> -1
+		}
+	}
+
 	fun getCurrentBip44Address(chainType: ChainType): Bip44Address {
 		return when {
 			chainType.isETH() -> {
@@ -264,10 +289,9 @@ data class WalletTable(
 
 	@WorkerThread
 	infix fun insert(callback: (wallet: WalletTable) -> Unit) {
-		WalletTable.dao.apply {
-			findWhichIsUsing(true)?.let { update(it.apply { isUsing = false }) }
-			insert(this@WalletTable)
-		}.findWhichIsUsing(true)?.let {
+		dao.findWhichIsUsing(true)?.let { dao.update(it.apply { isUsing = false }) }
+		dao.insert(this@WalletTable)
+		dao.findWhichIsUsing(true)?.let {
 			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly.orFalse())
 			callback(it)
 		}
@@ -379,12 +403,14 @@ data class WalletTable(
 		}
 
 		fun getAll(hold: List<WalletTable>.() -> Unit) {
-			load { GoldStoneDataBase.database.walletDao().getAllWallets() } then (hold)
+			load {
+				dao.getAllWallets()
+			} then (hold)
 		}
 
 		fun getAllETHSeriesAddresses(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
+				dao.getAllWallets()
 			} then { it ->
 				hold(it.map { it.currentETHSeriesAddress })
 			}
@@ -392,7 +418,7 @@ data class WalletTable(
 
 		fun getAllBTCMainnetAddresses(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
+				dao.getAllWallets()
 			} then { it ->
 				hold(it.map { it.currentBTCAddress })
 			}
@@ -400,7 +426,7 @@ data class WalletTable(
 
 		fun getAllLTCAddresses(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
+				dao.getAllWallets()
 			} then { it ->
 				hold(it.map { it.currentLTCAddress })
 			}
@@ -409,14 +435,14 @@ data class WalletTable(
 		fun getAllEOSAccountNames(hold: List<String>.() -> Unit) {
 			load {
 				val allWallets =
-					GoldStoneDataBase.database.walletDao().getAllWallets()
+					dao.getAllWallets()
 				allWallets.map { it.currentEOSAccountName.getCurrent() }
 			} then (hold)
 		}
 
 		fun getAllBCHAddresses(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
+				dao.getAllWallets()
 			} then { it ->
 				hold(it.map { it.currentBCHAddress })
 			}
@@ -424,7 +450,7 @@ data class WalletTable(
 
 		fun getAllBTCSeriesTestnetAddresses(hold: List<String>.() -> Unit) {
 			load {
-				GoldStoneDataBase.database.walletDao().getAllWallets()
+				dao.getAllWallets()
 			} then { it ->
 				hold(it.map { it.currentBTCSeriesTestAddress })
 			}
@@ -432,9 +458,8 @@ data class WalletTable(
 
 		fun getCurrent(thread: CoroutineDispatcher, hold: WalletTable.() -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
-				val walletDao = GoldStoneDataBase.database.walletDao()
-				val currentWallet = walletDao.findWhichIsUsing(true) ?: return@launch
-				walletDao.update(currentWallet.apply { balance = SharedWallet.getCurrentBalance() })
+				val currentWallet = dao.findWhichIsUsing(true) ?: return@launch
+				dao.update(currentWallet.apply { balance = SharedWallet.getCurrentBalance() })
 				withContext(thread) {
 					hold(currentWallet)
 				}
@@ -453,7 +478,7 @@ data class WalletTable(
 			hold: (wallet: WalletTable, ethAddressIndex: Int) -> Unit
 		) {
 			val currentWallet =
-				GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+				dao.findWhichIsUsing(true)
 			currentWallet?.apply {
 				// 清理数据格式
 				val latestIndex = when {
@@ -472,89 +497,77 @@ data class WalletTable(
 		}
 
 		fun updateName(newName: String, callback: () -> Unit) {
-			load { GoldStoneDataBase.database.walletDao().updateWalletName(newName) } then { callback() }
+			load { dao.updateWalletName(newName) } then { callback() }
 		}
 
 		fun updateHint(newHint: String, callback: () -> Unit = {}) {
-			load { GoldStoneDataBase.database.walletDao().updateHint(newHint) } then { callback() }
+			load { dao.updateHint(newHint) } then { callback() }
 		}
 
 		fun updateHasBackupMnemonic(callback: () -> Unit) {
-			load { GoldStoneDataBase.database.walletDao().updateHasBackUp() } then { callback() }
+			load { dao.updateHasBackUp() } then { callback() }
 		}
 
 		fun initEOSAccountName(
 			accountNames: List<EOSAccountInfo>,
 			@UiThread callback: () -> Unit
 		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					// 增量存储同一公钥下的多 `AccountName`
-					var currentAccountNames =
-						getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
-					currentAccountNames += accountNames
-					updateCurrentEOSAccountNames(currentAccountNames.distinct())
-				}
+			GlobalScope.launch(Dispatchers.Default) {
+				// 增量存储同一公钥下的多 `AccountName`
+				var currentAccountNames =
+					dao.getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
+				currentAccountNames += accountNames
+				dao.updateCurrentEOSAccountNames(currentAccountNames.distinct())
 				// 如果公钥下只有一个 `AccountName` 那么直接设为 `DefaultName`
 				if (accountNames.isNotEmpty()) {
 					WalletTable.updateEOSDefaultName(accountNames.first().name) { callback() }
-				} else GoldStoneAPI.context.runOnUiThread { callback() }
+				} else launchUI(callback)
 			}
 		}
 
 		fun updateEOSDefaultName(defaultName: String, @UiThread callback: () -> Unit) {
-			doAsync {
+			GlobalScope.launch(Dispatchers.Default) {
 				// 更新钱包数据库的 `Default EOS Address`
-				GoldStoneDataBase.database.walletDao().apply {
-					findWhichIsUsing(true)?.apply {
-						update(apply { currentEOSAccountName.updateCurrent(defaultName) })
-						// 同时更新 `MyTokenTable` 里面的 `OwnerName`
-						MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
-						GoldStoneAPI.context.runOnUiThread { callback() }
-					}
+				dao.findWhichIsUsing(true)?.apply {
+					dao.update(apply { currentEOSAccountName.updateCurrent(defaultName) })
+					// 同时更新 `MyTokenTable` 里面的 `OwnerName`
+					MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
+					launchUI(callback)
 				}
 			}
 		}
 
-		fun switchCurrentWallet(
-			walletAddress: String,
-			callback: (WalletTable) -> Unit
-		) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					updateLastUsingWalletOff()
-					getWalletByAddress(walletAddress)?.let {
-						update(it.apply { isUsing = true })
-						GoldStoneAPI.context.runOnUiThread { callback(it) }
-					}
+		fun switchCurrentWallet(walletAddress: String, callback: (WalletTable) -> Unit) {
+			GlobalScope.launch(Dispatchers.Default) {
+				dao.updateLastUsingWalletOff()
+				dao.getWalletByAddress(walletAddress)?.let {
+					dao.update(it.apply { isUsing = true })
+					launchUI { callback(it) }
 				}
 			}
 		}
 
 		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable?) -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.walletDao().apply {
-					val willDeleteWallet = findWhichIsUsing(true)
-					willDeleteWallet?.let { delete(it) }
-					getAllWallets().let { wallets ->
-						if (wallets.isNotEmpty()) {
-							update(wallets.first().apply { isUsing = true })
-							SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
-						}
-						callback(willDeleteWallet)
+			GlobalScope.launch(Dispatchers.Default) {
+				val willDeleteWallet = dao.findWhichIsUsing(true)
+				willDeleteWallet?.let { dao.delete(it) }
+				dao.getAllWallets().let { wallets ->
+					if (wallets.isNotEmpty()) {
+						dao.update(wallets.first().apply { isUsing = true })
+						SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
 					}
+					callback(willDeleteWallet)
 				}
 			}
 		}
 
 		@WorkerThread
 		fun existAddressOrAccountName(address: String, chainID: ChainID?, hold: (isExisted: Boolean) -> Unit) {
-			val walletDao = GoldStoneDataBase.database.walletDao()
 			val isExisted = if (EOSAccount(address).isValid(false)) {
-				walletDao.getAllWallets().map { it.eosAccountNames }.flatten().any {
+				dao.getAllWallets().map { it.eosAccountNames }.flatten().any {
 					it.name.equals(address, true) && it.chainID.equals(chainID?.id, true)
 				}
-			} else !walletDao.getWalletByAddress(address).isNull()
+			} else !dao.getWalletByAddress(address).isNull()
 			hold(isExisted)
 		}
 	}
@@ -586,6 +599,12 @@ interface WalletDao {
 
 	@Query("SELECT * FROM wallet")
 	fun getAllWallets(): List<WalletTable>
+
+	@Query("SELECT count(*) FROM wallet")
+	fun rowCount(): Int
+
+	@Query("SELECT MAX(id) FROM wallet")
+	fun getMaxID(): Int
 
 	@Insert
 	fun insert(wallet: WalletTable)

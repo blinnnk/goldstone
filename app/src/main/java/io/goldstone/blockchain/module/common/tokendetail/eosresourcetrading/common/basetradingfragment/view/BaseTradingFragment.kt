@@ -84,7 +84,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 							// 更新数据库数据并且更新界面的数据
 						}
 						presenter.updateLocalDataAndUI()
-					} else if (error.hasError()) safeShowError(error)
+					} else if (error.hasError() && !error.isIgnoreError()) safeShowError(error)
 					showLoading(false)
 				}
 			}
@@ -118,7 +118,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 						}
 						// 更新数据库数据并且更新界面的数据
 						presenter.updateLocalDataAndUI()
-					} else if (error.hasError()) safeShowError(error)
+					} else if (error.hasError() && !error.isIgnoreError()) safeShowError(error)
 					showLoading(false)
 				}
 			}
@@ -208,7 +208,9 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 }
 
 enum class TradingType(val value: String) {
-	CPU("cpu"), NET("net"), RAM("ram");
+	CPU("cpu"),
+	NET("net"),
+	RAM("ram");
 
 	fun isCPU(): Boolean = value.equals(CPU.value, true)
 	fun isNET(): Boolean = value.equals(NET.value, true)
@@ -218,11 +220,20 @@ enum class TradingType(val value: String) {
 enum class StakeType(val value: String) {
 	Delegate("delegatebw"),
 	Refund("undelegatebw"),
+	RefundCPU("undelegatebwCPU"),
+	RefundNET("undelegatebwNET"),
 	BuyRam("buyram"),
-	SellRam("sellram");
+	SellRam("sellram"),
+	Trade("trade"),
+	Register("register");
 
 	fun isBuyRam(): Boolean = value.equals(BuyRam.value, true)
 	fun isSellRam(): Boolean = value.equals(SellRam.value, true)
 	fun isDelegate(): Boolean = value.equals(Delegate.value, true)
-	fun isRefund(): Boolean = value.equals(Refund.value, true)
+	fun isRefundCPU(): Boolean = value.equals(RefundCPU.value, true)
+	fun isRefundNET(): Boolean = value.equals(RefundNET.value, true)
+	fun isRefund(): Boolean =
+		value.equals(RefundCPU.value, true)
+			|| value.equals(RefundNET.value, true)
+			|| value.equals(Refund.value, true)
 }

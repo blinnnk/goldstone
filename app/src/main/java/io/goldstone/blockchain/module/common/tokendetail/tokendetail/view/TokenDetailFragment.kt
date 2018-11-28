@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.isEOSSeries
@@ -176,14 +177,13 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 		safeShowError(error)
 	}
 
-	// Event Bus 的注册, 销毁 和 订阅时间的函数
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
+	override fun onStart() {
+		super.onStart()
 		EventBus.getDefault().register(this)
 	}
 
-	override fun onDestroy() {
-		super.onDestroy()
+	override fun onStop() {
+		super.onStop()
 		EventBus.getDefault().unregister(this)
 	}
 
@@ -208,7 +208,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 				filterConditions,
 				currentFilterConditions.map { filterConditions.indexOf(it) }.toIntArray()
 			) { conditions ->
-				currentFilterConditions = conditions
+				currentFilterConditions = conditions isEmptyThen currentFilterConditions isEmptyThen filterConditions
 				asyncData?.let {
 					val showData = filterData(it)
 					if (showData.isEmpty()) showFilterLoadMoreAttention(asyncData?.size.orZero())

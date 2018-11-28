@@ -5,6 +5,7 @@ package io.goldstone.blockchain.kernel.network.ethereum
 import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNullValue
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
@@ -96,7 +97,7 @@ object ETHJsonRPC {
 			),
 			chainURL
 		) { result, error ->
-			if (result != null && error.isNone()) {
+			if (result.isNotNull() && error.isNone()) {
 				hold(JSONObject(result).safeGet("input"), error)
 			} else hold(null, error)
 		}
@@ -215,10 +216,10 @@ object ETHJsonRPC {
 						val contractAddress = data.safeGet("to")
 						val targetToken =
 							defaultToken.getERC20Token(contractAddress, chainURL.chainID.id)
-						if (targetToken != null) {
+						if (targetToken.isNotNull()) {
 							hold(TransactionTable(data, targetToken.decimals, chainURL.chainID), error)
 						} else ETHJsonRPC.getTokenDecimal(contractAddress, chainURL) { decimal, decimalError ->
-							if (decimal != null && decimalError.isNone()) {
+							if (decimal.isNotNull() && decimalError.isNone()) {
 								hold(TransactionTable(data, decimal, chainURL.chainID), error)
 							} else hold(null, decimalError)
 						}

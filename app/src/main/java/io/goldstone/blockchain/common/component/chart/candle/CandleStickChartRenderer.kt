@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.chart.candle
 
 import android.graphics.Canvas
 import android.graphics.Paint
+import com.blinnnk.extension.isNotNull
 import com.github.mikephil.charting.animation.ChartAnimator
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
@@ -312,7 +313,7 @@ class CandleStickChartRenderer(
               dataSet.getValueTextColor(index / 2))
           }
           
-          if (entry.icon != null && dataSet.isDrawIconsEnabled) {
+          if (entry.icon.isNotNull() && dataSet.isDrawIconsEnabled) {
             
             val icon = entry.icon
             

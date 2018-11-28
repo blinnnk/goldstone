@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.home.presneter
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.*
 import com.blinnnk.util.addFragmentAndSetArgument
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
@@ -40,7 +41,13 @@ class HomePresenter(
 	override fun onFragmentResume() {
 		super.onFragmentResume()
 		// `App` 频繁的检测更新所有需要使用的数据
-		fragment.context?.let { object : SilentUpdater() {}.star(it) }
+		if (!GoldStoneApp.hasSilentUpdated) {
+			fragment.context?.let {
+				object : SilentUpdater() {}.star(it) {
+					GoldStoneApp.hasSilentUpdated = true
+				}
+			}
+		}
 	}
 
 	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(fragmentTag: String) {

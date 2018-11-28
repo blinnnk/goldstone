@@ -7,11 +7,13 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 2018/5/24 2:53 AM
@@ -28,7 +30,7 @@ abstract class ETHSeriesTransactionObserver {
 	private var transaction: TransactionTable? = null
 
 	open fun checkStatusByTransaction() {
-		doAsync {
+		GlobalScope.launch(Dispatchers.Default) {
 			val chainURL =
 				if (ChainID(chainID).isETHSeries()) SharedChain.getCurrentETH()
 				else SharedChain.getETCCurrent()
@@ -52,10 +54,8 @@ abstract class ETHSeriesTransactionObserver {
 				val blockInterval = blockCount - transaction?.blockNumber.orZero()
 				val hasConfirmed = blockInterval > targetInterval
 				val hasError = TinyNumberUtils.isTrue(transaction?.hasError!!)
-				if (!isFailed.isNull() || hasConfirmed) uiThread {
-					uiThread {
-						getStatus(hasConfirmed, blockInterval, blockCount, hasError)
-					}
+				if (!isFailed.isNull() || hasConfirmed) launchUI {
+					getStatus(hasConfirmed, blockInterval, blockCount, hasError)
 					if (hasConfirmed || hasError)
 						removeObserver()
 					else {
@@ -73,7 +73,7 @@ abstract class ETHSeriesTransactionObserver {
 					if (failed.isNull() || failedError.hasError()) return@getReceiptByHash
 					isFailed = failed
 					if (isFailed == true) {
-						uiThread {
+						launchUI {
 							getStatus(false, 1, 0, false)
 						}
 						removeObserver()

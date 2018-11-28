@@ -110,7 +110,7 @@ class ChainID(val id: String) : Serializable {
 		const val ltcMain = "12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2"
 		const val ltcTest = "4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"
 		const val eosMain = "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"
-		const val eosTest = "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca" // Jungle Testnet
+		const val eosTest = "e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473" // Jungle Testnet
 
 		val ETH = ChainID(ethMain)
 		val Ropsten = ChainID(ropsten)

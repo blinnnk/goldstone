@@ -1,10 +1,11 @@
 package io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.presenter
 
+import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.replaceFragmentAndSetArgument
+import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.language.WalletSettingsText
@@ -42,10 +43,6 @@ class WalletSettingsPresenter(
 	override val fragment: WalletSettingsFragment
 ) : BaseOverlayPresenter<WalletSettingsFragment>() {
 
-	override fun onFragmentViewCreated() {
-		showCurrentWalletInfo()
-	}
-
 	override fun onFragmentDestroy() {
 		super.onFragmentDestroy()
 		// 页面销毁的时候更新钱包首页, 刷新余额以及更新钱包地址的可能
@@ -63,12 +60,11 @@ class WalletSettingsPresenter(
 		}
 	}
 
-	fun showWalletSettingListFragment() {
-		setCustomHeader()
-		fragment.replaceFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content)
+	private fun showWalletSettingListFragment() {
+		fragment.addFragmentAndSetArgument<WalletSettingsListFragment>(ContainerID.content)
 	}
 
-	private fun setCustomHeader() {
+	fun setCustomHeader() {
 		fragment.apply {
 			customHeader = {
 				layoutParams.height = 160.uiPX()
@@ -83,6 +79,7 @@ class WalletSettingsPresenter(
 					header?.visibility = View.VISIBLE
 				}
 			}
+			showCurrentWalletInfo()
 		}
 	}
 
@@ -96,20 +93,21 @@ class WalletSettingsPresenter(
 			if (SharedValue.getPincodeDisplayStatus())
 				fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 			// 加载 `Hint` 编辑界面
-			fragment.replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)
+			showTargetFragment<HintFragment>()
 		} else fragment.context.alert(WalletText.watchOnly)
 	}
 
 	private fun showMnemonicBackUpFragment() {
 		fragment.apply {
 			if (!SharedWallet.isWatchOnlyWallet()) {
-				WalletTable.getCurrent(Dispatchers.Main) {
+				if (!SharedWallet.hasBackUpMnemonic()) WalletTable.getCurrent(Dispatchers.Main) {
 					encryptMnemonic?.let {
 						recoveryHeaderStyle()
 						val mnemonicCode = JavaKeystoreUtil().decryptData(it)
-						replaceFragmentAndSetArgument<MnemonicBackupFragment>(ContainerID.content) {
+						val data = Bundle().apply {
 							putString(ArgumentKey.mnemonicCode, mnemonicCode)
 						}
+						showTargetFragment<MnemonicBackupFragment>(data)
 					}
 				}
 			} else context.alert(WalletText.watchOnly)
@@ -119,14 +117,14 @@ class WalletSettingsPresenter(
 	private fun showAllMyAddressesFragment() {
 		fragment.apply {
 			recoveryHeaderStyle()
-			replaceFragmentAndSetArgument<AddressManagerFragment>(ContainerID.content)
+			showTargetFragment<AddressManagerFragment>()
 		}
 	}
 
 	private fun showWalletNameEditorFragment() {
 		fragment.apply {
 			recoveryHeaderStyle()
-			replaceFragmentAndSetArgument<WalletNameEditorFragment>(ContainerID.content)
+			showTargetFragment<WalletNameEditorFragment>()
 		}
 	}
 
@@ -134,7 +132,7 @@ class WalletSettingsPresenter(
 		fragment.apply {
 			if (!SharedWallet.isWatchOnlyWallet()) {
 				recoveryHeaderStyle()
-				replaceFragmentAndSetArgument<PasswordSettingsFragment>(ContainerID.content)
+				showTargetFragment<PasswordSettingsFragment>()
 			} else context.alert(WalletText.watchOnly)
 		}
 	}

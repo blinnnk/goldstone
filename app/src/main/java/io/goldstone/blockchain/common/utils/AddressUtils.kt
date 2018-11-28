@@ -1,11 +1,11 @@
 package io.goldstone.blockchain.common.utils
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import org.jetbrains.anko.doAsync
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 
 object AddressUtils {
 	fun getCurrentBTCAddress(): String {
@@ -29,9 +29,9 @@ object AddressUtils {
 		excludeWalletID: Int? = null,
 		hold: (hasExistAddress: Boolean) -> Unit
 	) {
-		val allWallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+		val allWallets = WalletTable.dao.getAllWallets()
 		val targetWallets =
-			if (excludeWalletID != null) allWallets.filterNot { it.id == excludeWalletID } else allWallets
+			if (excludeWalletID.isNotNull()) allWallets.filterNot { it.id == excludeWalletID } else allWallets
 		if (targetWallets.isEmpty()) hold(false)
 		else targetWallets.map {
 			it.ethAddresses + it.btcAddresses + it.ltcAddresses + it.etcAddresses + it.btcSeriesTestAddresses + it.eosAddresses + it.bchAddresses

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.present
 import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.scaleTo
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -43,7 +44,7 @@ fun PaymentDetailPresenter.prepareBTCSeriesPaymentModel(
 		callback(TransferError.IncorrectDecimal)
 	else generateBTCSeriesPaymentModel(chainType, count, changeAddress) { paymentModel, error ->
 		GlobalScope.launch(Dispatchers.Main) {
-			if (paymentModel != null) fragment.rootFragment?.apply {
+			if (paymentModel.isNotNull()) fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(
 					Bundle().apply {
 						putSerializable(ArgumentKey.btcSeriesPrepareModel, paymentModel)

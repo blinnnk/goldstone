@@ -55,6 +55,9 @@ interface SupportCurrencyDao {
 	@Query("SELECT * FROM supportCurrency")
 	fun getSupportCurrencies(): List<SupportCurrencyTable>
 
+	@Query("SELECT count(*) FROM supportCurrency")
+	fun rowCount(): Int
+
 	@Query("SELECT * FROM supportCurrency WHERE isUsed = :isUsed")
 	fun getCurrentCurrency(isUsed: Boolean = true): SupportCurrencyTable
 

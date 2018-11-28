@@ -12,6 +12,7 @@ import io.goldstone.blockchain.crypto.multichain.getChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
 import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
 /**
  * @date 2018/8/14 4:59 PM
@@ -136,9 +137,16 @@ fun TokenDetailPresenter.getBTCSeriesData() {
 					startDataIndex
 				)
 			when {
-				transactions.isNotEmpty() -> flipPage(transactions) {
-					detailView.showBottomLoading(false)
-					detailView.showLoading(false)
+				transactions.isNotEmpty() -> {
+					transactions.map {
+						TransactionListModel(it)
+					}.generateBalanceList(token.contract) {
+						it.updateHeaderData(false)
+					}
+					flipPage(transactions) {
+						detailView.showBottomLoading(false)
+						detailView.showLoading(false)
+					}
 				}
 				else -> loadBTCSeriesData(getChainType(), startDataIndex + 1, false)
 			}

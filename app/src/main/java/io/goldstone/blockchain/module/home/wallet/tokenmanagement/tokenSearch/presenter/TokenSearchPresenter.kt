@@ -78,7 +78,7 @@ class TokenSearchPresenter(
 			TokenContract(searchToken.contract, searchToken.symbol, searchToken.decimals)
 		) { localToken ->
 			// 通过拉取账单获取的 `Token` 很可能没有名字, 这里在添加的时候顺便更新名字
-			if (localToken != null) localToken.updateDefaultStatus(
+			if (localToken.isNotNull()) localToken.updateDefaultStatus(
 				TokenContract(localToken.contract, localToken.symbol, localToken.decimals),
 				isChecked,
 				searchToken.name,
