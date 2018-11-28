@@ -2,6 +2,7 @@ package io.goldstone.blockchain.kernel.commonmodel
 
 import android.annotation.SuppressLint
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.safeGet
@@ -17,6 +18,8 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date 23/04/2018 2:42 PM
@@ -112,7 +115,43 @@ data class AppConfigTable(
 			dao.insert(config)
 			callback(config)
 		}
-
+		
+		fun updateRetryTimes(times: Int) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it?.apply {
+							update(apply { this.retryTimes = times })
+						}
+					}
+				}
+			}
+		}
+		fun setFrozenTime(frozenTime: Long, @UiThread callback: () -> Unit = {}) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it?.apply {
+							update(apply { this.frozenTime = frozenTime })
+							GoldStoneAPI.context.runOnUiThread { callback() }
+						}
+					}
+				}
+			}
+		}
+		
+		fun updatePinCode(newPinCode: Int, callback: () -> Unit) {
+			doAsync {
+				GoldStoneDataBase.database.appConfigDao().apply {
+					getAppConfig().let {
+						it?.apply {
+							update(apply { this.pincode = newPinCode })
+							callback()
+						}
+					}
+				}
+			}
+		}
 		private fun getLocalTerms(): String {
 			GoldStoneAPI.context.convertLocalJsonFileToJSONObjectArray(terms).let { localTerms ->
 				localTerms.find {

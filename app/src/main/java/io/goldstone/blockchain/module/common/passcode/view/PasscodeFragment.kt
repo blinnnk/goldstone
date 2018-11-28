@@ -302,15 +302,17 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 		resetHeaderStyle()
 	}
 	
-	// 检查是否处于冻结状态
 	private fun NumberKeyboard.setKeyboardClickEventByFrozenStatus() {
+		// 检查是否处于冻结状态
 		presenter.isFrozenStatus { isFrozen ->
 			checkCode = Runnable {
-				if (!isFrozen) {
-					disableKeyboard(false)
-					if (getEnteredCode().length == Count.pinCode) presenter.unlockOrAlert(getEnteredCode())
-					if (getEnteredCode().isEmpty()) passcodeInput.recoveryStyle()
-					else passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
+				if(isFrozen) return@Runnable
+				presenter.unlockOrAlert(getEnteredCode()) {
+					getEnteredCode().isEmpty() isTrue {
+						passcodeInput.recoveryStyle()
+					} otherwise {
+						passcodeInput.setEnteredStyle(getEnteredCode().lastIndex)
+					}
 				}
 			}
 		}
