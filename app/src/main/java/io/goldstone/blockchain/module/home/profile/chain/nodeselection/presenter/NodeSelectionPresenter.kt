@@ -3,14 +3,15 @@ package io.goldstone.blockchain.module.home.profile.chain.nodeselection.presente
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 2018/6/20 8:59 PM
@@ -48,23 +49,23 @@ class NodeSelectionPresenter(
 	}
 
 	companion object {
-		fun setAllTestnet(isMainnet: Boolean = false, callback: () -> Unit) {
-			doAsync {
+		fun setAllTestnet(isUIThread: Boolean = false, callback: () -> Unit) {
+			GlobalScope.launch(Dispatchers.Default) {
 				AppConfigTable.dao.updateChainStatus(false)
-				val testnetList = GoldStoneDataBase.database.chainNodeDao().getUsedTestnet()
+				val testnetList = ChainNodeTable.dao.getUsedTestnet()
 				SharedValue.updateIsTestEnvironment(true)
 				updateSharedChainInfo(testnetList)
-				if (isMainnet) uiThread { callback() } else callback()
+				if (isUIThread) launchUI(callback) else callback()
 			}
 		}
 
-		fun setAllMainnet(isMainnet: Boolean = false, callback: () -> Unit) {
-			doAsync {
+		fun setAllMainnet(isUIThread: Boolean = false, callback: () -> Unit) {
+			GlobalScope.launch(Dispatchers.Default) {
 				AppConfigTable.dao.updateChainStatus(true)
-				val mainnetList = GoldStoneDataBase.database.chainNodeDao().getUsedMainnet()
+				val mainnetList = ChainNodeTable.dao.getUsedMainnet()
 				SharedValue.updateIsTestEnvironment(false)
 				updateSharedChainInfo(mainnetList)
-				if (isMainnet) uiThread { callback() } else callback()
+				if (isUIThread) launchUI(callback) else callback()
 			}
 		}
 

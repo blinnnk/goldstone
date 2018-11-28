@@ -19,7 +19,6 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
@@ -27,7 +26,7 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
+import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -67,6 +66,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		EventBus.getDefault().unregister(this)
 	}
 
+	// Event Bus
 	@Subscribe(threadMode = ThreadMode.POSTING)
 	fun updateAddressEvent(updateEvent: DefaultAddressUpdateEvent) {
 		WalletTable.getCurrent(Dispatchers.Main) {
@@ -496,10 +496,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				) { passwordInput ->
 					GlobalScope.launch(Dispatchers.Default) {
 						val password = passwordInput?.text.toString()
-						context.verifyKeystorePassword(
+						context.verifyKeystorePasswordByWalletID(
 							password,
-							SharedAddress.getCurrentBTC(),
-							true
+							SharedWallet.getCurrentWalletID()
 						) {
 							if (it) hold(password, AccountError.None)
 							else hold(null, AccountError.WrongPassword)

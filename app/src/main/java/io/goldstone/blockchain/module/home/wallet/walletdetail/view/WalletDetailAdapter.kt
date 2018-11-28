@@ -6,7 +6,6 @@ import android.view.KeyEvent
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import com.blinnnk.extension.keyboardHeightListener
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -27,11 +26,10 @@ class WalletDetailAdapter(
 
 	override fun generateCell(context: Context) = WalletDetailCell(context)
 
-	private var hasHiddenSoftNavigationBar = false
 	override fun generateFooter(context: Context): View {
 		return View(context).apply {
 			val barHeight =
-				if ((!hasHiddenSoftNavigationBar && !KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) || SharedWallet.isNotchScreen()) {
+				if ((!KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)) || SharedWallet.isNotchScreen()) {
 					60.uiPX()
 				} else 10.uiPX()
 			layoutParams = LinearLayout.LayoutParams(matchParent, barHeight)
@@ -40,15 +38,6 @@ class WalletDetailAdapter(
 
 	override fun generateHeader(context: Context) =
 		WalletDetailHeaderView(context).apply {
-			/**
-			 * 判断不同手机的不同 `Navigation` 的状态决定 `Footer` 的补贴高度
-			 * 主要是, `Samsung S8, S9` 的 `Navigation` 状态判断
-			 */
-			keyboardHeightListener {
-				if (it < 0) {
-					hasHiddenSoftNavigationBar = true
-				}
-			}
 			holdHeader(this)
 		}
 

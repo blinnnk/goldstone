@@ -5,8 +5,10 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
+import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -15,7 +17,6 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.e
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
 
 
 /**
@@ -108,19 +109,19 @@ object ETHSeriesTransactionUtils {
 		@UiThread hold: (data: TransactionSealedModel?, error: RequestError) -> Unit
 	) {
 		// 先从本地找数据, 找不到就拉取链上数据并插入本地数据库
-		doAsync {
-			val transactionDao =
-				GoldStoneDataBase.database.transactionDao()
+		GlobalScope.launch(Dispatchers.Default) {
 			val targetData =
-				transactionDao.getByTaxHashAndReceivedStatus(hash, isReceive, false)
-			if (targetData.isNotNull()) {
+				TransactionTable.dao.getByTaxHashAndReceivedStatus(hash, isReceive, false)
+			if (targetData.isNotNull()) launchUI {
 				hold(TransactionSealedModel(targetData), RequestError.None)
 			} else ETHJsonRPC.getTransactionByHash(hash, chainURL) { transaction, error ->
 				if (transaction.isNotNull() && error.isNone()) {
 					val formattedData =
 						transaction.apply { this.timeStamp = timestamp }
-					transactionDao.insert(formattedData)
-					hold(TransactionSealedModel(formattedData), error)
+					TransactionTable.dao.insert(formattedData)
+					launchUI {
+						hold(TransactionSealedModel(formattedData), error)
+					}
 				} else hold(null, error)
 			}
 		}

@@ -5,10 +5,11 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.Serializable
 
 
@@ -63,8 +64,8 @@ class ChainType(val id: Int) : Serializable {
 		newEOSAccountName: String,
 		@UiThread callback: (wallet: WalletTable) -> Unit
 	) {
-		doAsync {
-			val walletDao = GoldStoneDataBase.database.walletDao()
+		GlobalScope.launch(Dispatchers.Default) {
+			val walletDao = WalletTable.dao
 			val currentWallet = walletDao.findWhichIsUsing(true)
 			when (id) {
 				ChainType.ETH.id -> {

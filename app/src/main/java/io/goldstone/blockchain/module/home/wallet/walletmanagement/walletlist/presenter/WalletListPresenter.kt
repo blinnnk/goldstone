@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.vi
  * @date 24/03/2018 8:50 PM
  * @author KaySaith
  */
+@Suppress("DEPRECATION")
 class WalletListPresenter(
 	override val fragment: WalletListFragment
 ) : BaseRecyclerPresenter<WalletListFragment, WalletListModel>() {
@@ -40,7 +41,7 @@ class WalletListPresenter(
 	private fun switchWalletInDatabase(address: String, isMainnet: Boolean) {
 		WalletTable.switchCurrentWallet(address) { it ->
 			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
-			if (isMainnet) NodeSelectionPresenter.setAllMainnet {
+			if (isMainnet) NodeSelectionPresenter.setAllMainnet(true) {
 				SharedValue.updateIsTestEnvironment(false)
 				Runtime.getRuntime().gc()
 				fragment.activity?.jump<SplashActivity>()

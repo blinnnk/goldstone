@@ -26,7 +26,6 @@ import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
-import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter.Companion.updateAccountInformation
@@ -67,23 +66,20 @@ class SplashActivity : AppCompatActivity() {
 			)
 			GlobalScope.launch(Dispatchers.Default) {
 				presenter.cleanWhenUpdateDatabaseOrElse {
-					prepareData(it)
+					prepareData()
 				}
 			}
 		}
 	}
 
 	@WorkerThread
-	private fun prepareData(allWallet: List<WalletTable>) {
+	private fun prepareData() {
 		prepareAppConfig {
 			SharedValue.updatePincodeDisplayStatus(showPincode)
 			SharedWallet.updateCurrencyCode(currencyCode)
 			// 如果本地的钱包数量不为空那么才开始注册设备
 			// 把 `GoldStoneID` 存储到 `SharePreference` 里面
-			if (allWallet.isNotEmpty()) {
-				registerDeviceForPush()
-				SharedWallet.updateGoldStoneID(goldStoneID)
-			}
+			SharedWallet.updateGoldStoneID(goldStoneID)
 			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
 				val hasStartingFragment =
 					supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
@@ -91,7 +87,6 @@ class SplashActivity : AppCompatActivity() {
 					addFragment<StartingFragment>(it.id)
 				}
 			}
-			// 错开动画时间再执行数据请求
 			// Add currency data from local JSON file
 			with(presenter) {
 				initNodeList(activity) {
@@ -163,7 +158,7 @@ class SplashActivity : AppCompatActivity() {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
 				if (config.isRegisteredAddresses) {
 					val currentWallet =
-						GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+						WalletTable.dao.findWhichIsUsing(true)
 					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
 				config.let(callback)

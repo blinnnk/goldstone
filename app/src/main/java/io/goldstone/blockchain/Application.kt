@@ -45,5 +45,7 @@ class GoldStoneApp : Application() {
 	companion object {
 		@JvmField
 		var hasShownMobileAlert = false
+		@JvmField
+		var hasSilentUpdated = false
 	}
 }

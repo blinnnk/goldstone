@@ -63,6 +63,9 @@ interface ChainNodeDao {
 	@Query("SELECT * FROM chainNode")
 	fun getAll(): List<ChainNodeTable>
 
+	@Query("SELECT count(*) FROM chainNode")
+	fun rowCount(): Int
+
 	@Query("SELECT * FROM chainNode WHERE netType LIKE 0 ORDER BY chainType")
 	fun getMainnet(): List<ChainNodeTable>
 

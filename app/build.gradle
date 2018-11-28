@@ -107,7 +107,7 @@ dependencies {
   implementation 'com.journeyapps:zxing-android-embedded:3.6.0'
   implementation 'com.google.zxing:core:3.3.3'
   // XinGe Push
-  implementation 'com.tencent.xinge:xinge:3.2.6-release'
+  implementation 'com.tencent.xinge:xinge:3.2.7-Release'
   implementation 'com.tencent.jg:jg:1.1'
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   implementation 'com.tencent.mid:mid:4.0.6-release'

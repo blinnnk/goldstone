@@ -39,7 +39,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
-		if (DefaultTokenTable.dao.getAllTokens().isEmpty()) {
+		if (DefaultTokenTable.dao.rowCount() == 0) {
 			val localDefaultTokens =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list).map { DefaultTokenTable(it) }
 			DefaultTokenTable.dao.insertAll(localDefaultTokens)
@@ -48,7 +48,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun initDefaultExchangeData(context: Context) {
-		if (ExchangeTable.dao.getAll().isEmpty()) {
+		if (ExchangeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list).map { ExchangeTable(it) }
 			ExchangeTable.dao.insertAll(localData)
@@ -57,7 +57,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun initNodeList(context: Context, callback: () -> Unit) {
-		if (ChainNodeTable.dao.getAll().isEmpty()) {
+		if (ChainNodeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.node_list).map { ChainNodeTable(it) }
 			ChainNodeTable.dao.insertAll(localData)
@@ -67,7 +67,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun initSupportCurrencyList(context: Context) {
-		if (SupportCurrencyTable.dao.getSupportCurrencies().isEmpty()) {
+		if (SupportCurrencyTable.dao.rowCount() == 0) {
 			val localCurrency =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
 					SupportCurrencyTable(it).apply {
@@ -86,9 +86,9 @@ class SplashPresenter(val activity: SplashActivity) {
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
 	@WorkerThread
-	fun cleanWhenUpdateDatabaseOrElse(callback: (allWallets: List<WalletTable>) -> Unit) {
-		val allWallets = WalletTable.dao.getAllWallets()
-		if (allWallets.isEmpty()) {
+	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
+		val walletCount = WalletTable.dao.rowCount()
+		if (walletCount == 0) {
 			cleanKeyStoreFile(activity.filesDir)
 			unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 		} else {
@@ -98,7 +98,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				unregisterGoldStoneID(SharedWallet.getNeedUnregisterGoldStoneID())
 			}
 		}
-		callback(allWallets)
+		callback()
 	}
 
 	/**

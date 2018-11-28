@@ -5,9 +5,11 @@ import android.os.Looper
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -25,7 +27,7 @@ abstract class EOSTransactionObserver {
 	private var maxRetryTimes = 6
 
 	open fun checkStatusByTransaction() {
-		doAsync {
+		GlobalScope.launch(Dispatchers.Default) {
 			// 首先获取线上的最近的不可逆的区块
 			if (transactionBlockNumber.isNull()) {
 				EOSAPI.getBlockNumberByTxID(hash) { blockNumber, error ->
@@ -58,7 +60,7 @@ abstract class EOSTransactionObserver {
 						handler.postDelayed(reDo, retryTime)
 					}
 					val confirmedCount = totalConfirmedCount!! - (transactionBlockNumber!! - chainInfo.lastIrreversibleBlockNumber)
-					uiThread {
+					launchUI {
 						getStatus(hasConfirmed, transactionBlockNumber!!, confirmedCount, totalConfirmedCount!!)
 					}
 				} else {

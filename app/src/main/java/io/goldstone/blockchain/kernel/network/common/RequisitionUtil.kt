@@ -30,18 +30,22 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
+	val client = OkHttpClient
+		.Builder()
+		.connectTimeout(30, TimeUnit.SECONDS)
+		.readTimeout(60, TimeUnit.SECONDS)
+		.build()
+
 	fun post(
 		condition: String,
 		api: String,
 		isEncrypt: Boolean,
-		timeout: Long = 30,
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
 		postRequest(
 			RequestBody.create(ETHJsonRPC.contentType, condition),
 			api,
 			isEncrypt,
-			timeout,
 			hold
 		)
 	}
@@ -107,12 +111,6 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		crossinline hold: (result: List<T>?, error: RequestError) -> Unit
 	) {
-		val client =
-			OkHttpClient
-				.Builder()
-				.connectTimeout(20, TimeUnit.SECONDS)
-				.readTimeout(30, TimeUnit.SECONDS)
-				.build()
 		getCryptoRequest(body, path, isEncrypt) { requestBody ->
 			client.newCall(requestBody).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -146,15 +144,8 @@ object RequisitionUtil {
 		body: RequestBody,
 		path: String,
 		isEncrypt: Boolean,
-		timeout: Long,
 		hold: (result: String?, error: RequestError) -> Unit
 	) {
-		val client =
-			OkHttpClient
-				.Builder()
-				.connectTimeout(20, TimeUnit.SECONDS)
-				.readTimeout(timeout, TimeUnit.SECONDS)
-				.build()
 		getCryptoRequest(body, path, isEncrypt) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -182,16 +173,8 @@ object RequisitionUtil {
 		justGetData: Boolean = false,
 		targetGoldStoneID: String? = null,
 		isEncrypt: Boolean,
-		maxConnectTime: Long = 20,
 		crossinline hold: (result: List<T>?, error: RequestError) -> Unit
 	) {
-		val client =
-			OkHttpClient
-				.Builder()
-				.connectTimeout(maxConnectTime, TimeUnit.SECONDS)
-				.readTimeout(maxConnectTime, TimeUnit.SECONDS)
-				.build()
-
 		getCryptoGetRequest(api, isEncrypt, targetGoldStoneID) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
@@ -233,14 +216,7 @@ object RequisitionUtil {
 		justGetData: Boolean = false,
 		crossinline hold: (data: List<T>?, error: RequestError) -> Unit
 	) {
-		val client =
-			OkHttpClient
-				.Builder()
-				.connectTimeout(20, TimeUnit.SECONDS)
-				.readTimeout(30, TimeUnit.SECONDS)
-				.build()
-		val request =
-			Request.Builder().url(api).build()
+		val request = Request.Builder().url(api).build()
 		client.newCall(request).enqueue(object : Callback {
 			override fun onFailure(call: Call, error: IOException) {
 				hold(null, RequestError.PostFailed("[API: ${api.getKeyName()}]\n[ERROR: $error]\n[API: $api]"))
@@ -342,11 +318,6 @@ object RequisitionUtil {
 		chainURL: ChainURL,
 		hold: (result: String?, error: RequestError) -> Unit
 	) {
-		val client = OkHttpClient
-			.Builder()
-			.connectTimeout(40, TimeUnit.SECONDS)
-			.readTimeout(60, TimeUnit.SECONDS)
-			.build()
 		getCryptoRequest(body, chainURL.getURL(), chainURL.isEncrypt) { it ->
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
