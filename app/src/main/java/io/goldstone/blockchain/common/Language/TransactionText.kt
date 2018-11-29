@@ -18,12 +18,12 @@ object TransactionText {
 	}
 	@JvmField
 	val confirmations = when (currentLanguage) {
-		HoneyLanguage.English.code -> "CONFIRMATIONS"
-		HoneyLanguage.Chinese.code -> "CONFIRMATIONS"
-		HoneyLanguage.Japanese.code -> "CONFIRMATIONS"
-		HoneyLanguage.Korean.code -> "CONFIRMATIONS"
-		HoneyLanguage.Russian.code -> "История CONFIRMATIONS"
-		HoneyLanguage.TraditionalChinese.code -> "CONFIRMATIONS"
+		HoneyLanguage.English.code -> "CONFIRMED BLOCKS"
+		HoneyLanguage.Chinese.code -> "已确认区块"
+		HoneyLanguage.Japanese.code -> "確認済みのブロック"
+		HoneyLanguage.Korean.code -> "확인 된 블록"
+		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕННЫЕ БЛОКИ"
+		HoneyLanguage.TraditionalChinese.code -> "已確認區塊"
 		else -> ""
 	}
 	@JvmField
@@ -98,7 +98,7 @@ object TransactionText {
 	}
 	@JvmField
 	val minerFee = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Miner Fee"
+		HoneyLanguage.English.code -> "MINER FEE"
 		HoneyLanguage.Chinese.code -> "矿工费"
 		HoneyLanguage.Japanese.code -> "マイニング費"
 		HoneyLanguage.Korean.code -> "채굴수수료"
