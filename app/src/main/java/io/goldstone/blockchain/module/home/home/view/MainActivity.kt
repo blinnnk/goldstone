@@ -52,8 +52,8 @@ class MainActivity : AppCompatActivity() {
 				// 如果本地的钱包数量不为空那么才开始注册设备
 				// 把 `GoldStoneID` 存储到 `SharePreference` 里面
 				registerDeviceForPush()
-				registerReceiver()
 			}
+			registerReceiver()
 		})
 	}
 
