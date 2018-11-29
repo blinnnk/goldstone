@@ -4,6 +4,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -66,7 +67,7 @@ class TokenAssetPresenter(
 			val totalDelegate =
 				EOSAccountTable.dao.getAccount(account.name, chainID.id)?.totalDelegateBandInfo
 			val description = if (totalDelegate.isNullOrEmpty()) {
-				"Check Data"
+				TokenDetailText.checkData
 			} else {
 				var totalEOSCount = listOf<String>()
 				totalDelegate.forEach {

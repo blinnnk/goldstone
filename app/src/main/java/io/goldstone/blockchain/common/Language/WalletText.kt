@@ -30,7 +30,7 @@ object WalletText {
 	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add More Tokens"
 		HoneyLanguage.Chinese.code -> "添加Token"
-		HoneyLanguage.Japanese.code -> "Tokenの追加"
+		HoneyLanguage.Japanese.code -> "Tokenを追加"
 		HoneyLanguage.Korean.code -> "기타 Token 추가"
 		HoneyLanguage.Russian.code -> "Добавить Token"
 		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"
@@ -110,7 +110,7 @@ object WalletText {
 	}
 	@JvmField
 	val ethERCAndETC = when (currentLanguage) {
-		HoneyLanguage.English.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.English.code -> "ETH / ERC20/ETC"
 		HoneyLanguage.Chinese.code -> "ETH/ERC20代币/ETC"
 		HoneyLanguage.Japanese.code -> "ETH/ERC20トークン/ETC"
 		HoneyLanguage.Korean.code -> "ETH/ERC20 토큰/ETC"
@@ -183,7 +183,7 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
-	val bitcoinTestnet = when (currentLanguage) {
+	val btcTestnet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bitcoin Testnet"
 		HoneyLanguage.Chinese.code -> "Bitcoin (比特币) 测试网"
 		HoneyLanguage.Japanese.code -> "Bitcoin(ビットコイン)テストネット"

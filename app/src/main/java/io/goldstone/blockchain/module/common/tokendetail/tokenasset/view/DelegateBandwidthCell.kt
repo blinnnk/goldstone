@@ -13,6 +13,7 @@ import com.blinnnk.extension.centerInVertical
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
+import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -39,7 +40,7 @@ class DelegateBandwidthCell(context: Context) : RelativeLayout(context) {
 					textColor = Spectrum.blue
 					typeface = GoldStoneFont.heavy(context)
 				}
-				val data = listOf(Pair("CPU WEIGHT", cpuWeight), Pair("NET WEIGHT", netWeight))
+				val data = listOf(Pair(TokenDetailText.cpuStaked, cpuWeight), Pair(TokenDetailText.netStaked, netWeight))
 				data.forEach {
 					relativeLayout {
 						topPadding = 5.uiPX()

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
+import io.goldstone.blockchain.common.language.TransactionErrorText
 import io.goldstone.blockchain.common.thread.launchUI
 
 
@@ -20,20 +21,24 @@ class ErrorDisplayManager(error: Throwable) {
 				errorMessage.contains("Timeout", true)
 					|| errorMessage.contains("Time out", true)
 					|| errorMessage.contains("timed out", true) -> {
-					// 上报 Server 逻辑, 这部分超市
+					// 上报 Server 逻辑, 这部分超时
 					null
 				}
 				errorMessage.contains("404") -> {
-					// 上报 Server 逻辑, 这部分超市
+					// 上报 Server 逻辑, 这部分超时
 					null
 				}
 				errorMessage.contains("failed to connect", true) -> {
-					// 上报 Server 逻辑, 这部分超市
+					// 上报 Server 逻辑, 这部分超时
 					null
 				}
 				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
 				errorMessage.contains("64: dust", true) -> {
 					"amount too small to be recognised as legitimate on the bitcoin network."
+				}
+				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
+				errorMessage.contains("3050003", true) -> {
+					TransactionErrorText.transferToUnactivedEOSAcount
 				}
 				else -> error.message
 			}

@@ -279,18 +279,40 @@ object TransactionText {
 		HoneyLanguage.Japanese.code -> " に"
 		HoneyLanguage.Korean.code -> "　점 만점에, 받는 사람"
 		HoneyLanguage.Russian.code -> "до"
-		HoneyLanguage.TraditionalChinese.code -> "至"
+		HoneyLanguage.TraditionalChinese.code -> " 至"
 		else -> ""
 	}
 
 	@JvmField
 	val irreversible = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Irreversible"
-		HoneyLanguage.Chinese.code -> "Irreversible"
-		HoneyLanguage.Japanese.code -> "Irreversible"
-		HoneyLanguage.Korean.code -> "Irreversible"
-		HoneyLanguage.Russian.code -> "Irreversible"
-		HoneyLanguage.TraditionalChinese.code -> "Irreversible"
+		HoneyLanguage.Chinese.code -> "不可逆的"
+		HoneyLanguage.Japanese.code -> "不可逆"
+		HoneyLanguage.Korean.code -> "뒤집을 수 없는"
+		HoneyLanguage.Russian.code -> "Необратимые"
+		HoneyLanguage.TraditionalChinese.code -> "不可逆的"
 		else -> ""
 	}
+
+	@JvmField
+	val netUsage = when (currentLanguage) {
+		HoneyLanguage.English.code -> "NET Usage"
+		HoneyLanguage.Chinese.code -> "NET 用量"
+		HoneyLanguage.Japanese.code -> "NET 消費"
+		HoneyLanguage.Korean.code -> "NET 소비"
+		HoneyLanguage.Russian.code -> "Использование NET"
+		HoneyLanguage.TraditionalChinese.code -> "NET 用量"
+		else -> ""
+	}
+	@JvmField
+	val cpuUsage = when (currentLanguage) {
+		HoneyLanguage.English.code -> "CPU Usage"
+		HoneyLanguage.Chinese.code -> "CPU 用量"
+		HoneyLanguage.Japanese.code -> "CPU 消費"
+		HoneyLanguage.Korean.code -> "CPU 소비"
+		HoneyLanguage.Russian.code -> "Использование CPU"
+		HoneyLanguage.TraditionalChinese.code -> "CPU 用量"
+		else -> ""
+	}
+
 }

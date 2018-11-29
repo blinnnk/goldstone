@@ -39,7 +39,7 @@ class WalletType(val type: String?) : Serializable {
 			isEOS() -> WalletText.eosWallet
 			isEOSMainnet() -> WalletText.eosMainnet
 			isEOSJungle() -> WalletText.eosJungle
-			isBTCTest() -> WalletText.bitcoinTestnet
+			isBTCTest() -> WalletText.btcTestnet
 			else -> ""
 		}
 	}

@@ -64,7 +64,7 @@ object ImportWalletText {
 	val customEthereumClassicPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom Ethereum Classic Path"
 		HoneyLanguage.Chinese.code -> "自定义 ETC 路径"
-		HoneyLanguage.Japanese.code -> "カスタムETCパス"
+		HoneyLanguage.Japanese.code -> "カスタム ETC パス"
 		HoneyLanguage.Korean.code -> "맞춤 ETC 경로"
 		HoneyLanguage.Russian.code -> "Пользовательский путь ETC"
 		HoneyLanguage.TraditionalChinese.code -> "自定義 ETC 路徑"
@@ -83,11 +83,11 @@ object ImportWalletText {
 	@JvmField
 	val customBCHPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom BCH Path"
-		HoneyLanguage.Chinese.code -> "自定义 BCH(比特币现金) 路径"
+		HoneyLanguage.Chinese.code -> "自定义 BCH (比特币现金) 路径"
 		HoneyLanguage.Japanese.code -> "カスタムBCHパス"
 		HoneyLanguage.Korean.code -> "맞춤 BCH 경로"
 		HoneyLanguage.Russian.code -> "Пользовательский путь BCH"
-		HoneyLanguage.TraditionalChinese.code -> "自定義 BCH(比特幣現金)路徑"
+		HoneyLanguage.TraditionalChinese.code -> "自定義 BCH(比特幣現金) 路徑"
 		else -> ""
 	}
 	@JvmField
@@ -157,7 +157,7 @@ object ImportWalletText {
 		HoneyLanguage.Japanese.code -> "アカウントにバインドするEOS公開鍵を入力します"
 		HoneyLanguage.Korean.code -> "계정에 바인딩하려는 EOS 공개 키를 입력하십시오."
 		HoneyLanguage.Russian.code -> "Заполните открытый ключ EOS, который вы хотите привязать к своей учетной записи."
-		HoneyLanguage.TraditionalChinese.code -> "填寫你想綁定在这個賬號上的EOS公鑰"
+		HoneyLanguage.TraditionalChinese.code -> "填寫你想綁定在这個賬號上的 EOS 公鑰"
 		else -> ""
 	}
 	@JvmField
@@ -173,11 +173,11 @@ object ImportWalletText {
 	@JvmField
 	val keystoreIntro = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Keystore is a JSON encrypted private key file. You need to enter the wallet password corresponding to the keystore. You can change your password at any time after importing."
-		HoneyLanguage.Chinese.code -> "Keystore是一种JSON格式的加密私钥文件。您需要输入获得Keystore时对应的钱包密码。您可以在导入后随时修改密码。"
-		HoneyLanguage.Japanese.code -> "KeystoreはJSON形式で暗号化されたプライベートキーファイルです。Keystoreに対応するウォレット・パスワードを入力する必要があります。インポート後いつでもパスワードを変更することが可能です。"
+		HoneyLanguage.Chinese.code -> "Keystore 是一种JSON格式的加密私钥文件。您需要输入获得Keystore时对应的钱包密码。您可以在导入后随时修改密码。"
+		HoneyLanguage.Japanese.code -> "Keystore はJSON形式で暗号化されたプライベートキーファイルです。Keystoreに対応するウォレット・パスワードを入力する必要があります。インポート後いつでもパスワードを変更することが可能です。"
 		HoneyLanguage.Korean.code -> "Keystore 는 JSON 으로 암호화 된 개인 키 파일입니다. 키 스토어에 해당하는 지갑 암호를 입력해야합니다. 가져온 후에는 언제든지 비밀번호를 변경할 수 있습니다."
 		HoneyLanguage.Russian.code -> "Keystore - это зашифрованный файл с закрытым ключом в формате JSON. Вам нужно ввести соответствующий пароль кошелька для получения Keystore. После импорта, Вы можете изменять пароль в любое время."
-		HoneyLanguage.TraditionalChinese.code -> "Keystore是一種JSON格式的加密私鑰文件。您需要輸入獲得Keystore時對應的錢包密碼。您可以在導入後隨時修改密碼。"
+		HoneyLanguage.TraditionalChinese.code -> "Keystore 是一種JSON格式的加密私鑰文件。您需要輸入獲得Keystore時對應的錢包密碼。您可以在導入後隨時修改密碼。"
 		else -> ""
 	}
 	@JvmField
@@ -235,7 +235,7 @@ object ImportWalletText {
 	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter password and then click confirm to get your keystore"
 		HoneyLanguage.Chinese.code -> "输入密码，然后单击确认按钮以获取 Keystore"
-		HoneyLanguage.Japanese.code -> "パスワードを入力し、[OK]ボタンをクリックしてKeystoreを取得します"
+		HoneyLanguage.Japanese.code -> "パスワードを入力し、[OK]ボタンをクリックして Keystore を取得します"
 		HoneyLanguage.Korean.code -> "비밀번호를 입력한후 확인 버튼을 클릭하여 keystore를 획득하십시오"
 		HoneyLanguage.Russian.code -> "Введите пароль и нажмите на кнопку подтверждения для получения keystore"
 		HoneyLanguage.TraditionalChinese.code -> "輸入密碼，然後單擊確認按鈕以獲取 Keystore"
@@ -254,11 +254,11 @@ object ImportWalletText {
 	@JvmField
 	val importWalletDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Import mnemonics, you will get a multi-chain wallet based on BIP44 standard. When you import a private key or keystore file of a single chain account, GoldStone will generate a multi-chain wallet for you, containing the previous single-chain assets. "
-		HoneyLanguage.Chinese.code -> "导入助记词，您将获得一个基于 BIP44 标准的分层确定性(HD)多链钱包。如果你选择导入某个单链的私钥或是keystore文件，那么 GoldStone 会帮你创建一个包含之前单链资产的多链账户。"
+		HoneyLanguage.Chinese.code -> "导入助记词，您将获得一个基于 BIP44 标准的分层确定性 (HD) 多链钱包。如果你选择导入某个单链的私钥或是 keystore 文件，那么 GoldStone 会帮你创建一个包含之前单链资产的多链账户。"
 		HoneyLanguage.Japanese.code -> "ニーモニックをインポートして、BIP44 標準に基づいたマルチチェーンウォレットを取得します。シングルチェーンの秘密キーまたはキーストアファイルをインポートする場合、GoldStoneは以前のシングルチェーンアセットを使用したマルチチェーンアカウントを作成するのに役立ちます。"
 		HoneyLanguage.Korean.code -> "니모닉 가져 오기를 사용하면 BIP44 표준을 기반으로 다중 체인 지갑을 구할 수 있습니다. 단일 체인 개인 키 또는 키 저장소 파일을 가져 오도록 선택한 경우 GoldStone 은 이전 단일 체인 자산으로 다중 체인 계정을 만드는 데 도움을줍니다."
 		HoneyLanguage.Russian.code -> "Импортировать мнемонику для получения многоцелевого кошелька на основе стандарта BIP44. Если вы решите импортировать одноцелевой частный ключ или файл хранилища ключей, GoldStone поможет вам создать многоцелевую учетную запись с предыдущим одноцелевым активом."
-		HoneyLanguage.TraditionalChinese.code -> "導入助記詞，您將獲得一個基於 BIP44 標準的分層確定性(HD)多鏈錢包。如果你選擇導入某個單鏈的私鑰或是keystore文件，那麼 GoldStone 會幫你創建一個包含之前單鏈資產的多鏈賬戶。"
+		HoneyLanguage.TraditionalChinese.code -> "導入助記詞，您將獲得一個基於 BIP44 標準的分層確定性 (HD) 多鏈錢包。如果你選擇導入某個單鏈的私鑰或是 keystore 文件，那麼 GoldStone 會幫你創建一個包含之前單鏈資產的多鏈賬戶。"
 		else -> ""
 	}
 

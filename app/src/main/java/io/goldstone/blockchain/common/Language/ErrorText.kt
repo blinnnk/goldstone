@@ -288,14 +288,28 @@ object ErrorText {
 		else -> ""
 	}
 
+	// 导入观察钱包时导入了未激活的账号
 	@JvmField
 	val inactivatedAccountName = when (currentLanguage) {
-		HoneyLanguage.English.code->"This account name has not been activated yet"
-		HoneyLanguage.Chinese.code->"这个账户没有被别人注册, 你可以使用。"
-		HoneyLanguage.Japanese.code->"このアカウントは他人によって登録されておらず、あなたはそれを使用することができます。"
-		HoneyLanguage.Korean.code->"이 계정은 다른 사람이 등록하지 않았으므로이 계정을 사용할 수 있습니다."
-		HoneyLanguage.Russian.code->"Эта учетная запись не зарегистрирована кем-то еще, и вы можете ее использовать."
-		HoneyLanguage.TraditionalChinese.code->"這個賬戶沒有被別人註冊, 你可以使用。"
+		HoneyLanguage.English.code -> "This account name has not been activated yet"
+		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册。"
+		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません。"
+		HoneyLanguage.Korean.code -> "이 계정은 아직 등록되지 않았습니다."
+		HoneyLanguage.Russian.code -> "Эта учетная запись еще не зарегистрирована."
+		HoneyLanguage.TraditionalChinese.code -> "這個 EOS 賬戶還沒有被註冊。"
+		else -> ""
+	}
+}
+
+object TransactionErrorText {
+	@JvmField
+	val transferToUnactivedEOSAcount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The EOS account you want to transfer to doesn't exist."
+		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活。"
+		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません。"
+		HoneyLanguage.Korean.code -> "전송하려는 EOS 계정이 활성화되지 않았습니다."
+		HoneyLanguage.Russian.code -> "Учетная запись EOS, которую вы хотите передать, не активирована."
+		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活。"
 		else -> ""
 	}
 }
