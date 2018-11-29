@@ -18,6 +18,7 @@ import com.blinnnk.extension.toMillisecond
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
+import com.blinnnk.util.getSystemModel
 import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.DeviceName
@@ -171,10 +172,9 @@ fun Activity.setTransparentStatusBar() {
 	}
 }
 
-private fun isTargetDevice(name: String): Boolean? {
-	val myDevice = BluetoothAdapter.getDefaultAdapter()
+fun isTargetDevice(name: String): Boolean? {
 	return try {
-		val deviceName = myDevice.name
+		val deviceName = getSystemModel()
 		name.contains(deviceName, true)
 	} catch (error: Exception) {
 		null

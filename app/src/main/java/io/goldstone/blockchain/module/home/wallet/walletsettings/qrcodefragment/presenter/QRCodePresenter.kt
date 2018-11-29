@@ -82,6 +82,7 @@ open class QRCodePresenter(
 		) {
 			saveQRCodeImageToAlbum(content, fragment) {
 				val intent = Intent(Intent.ACTION_SEND)
+				intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 				intent.type = "image/*"
 				intent.putExtra(Intent.EXTRA_STREAM, it)
 				fragment.activity?.startActivity(Intent.createChooser(intent, QRText.shareQRTitle))

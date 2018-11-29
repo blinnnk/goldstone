@@ -50,6 +50,9 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 			}
 			// Intro
 			verticalLayout {
+				lparams(matchParent, wrapContent)
+				gravity = Gravity.CENTER_HORIZONTAL
+
 				textView(SplashText.goldStone) {
 					textSize = fontSize(21)
 					textColor = Spectrum.white
@@ -58,6 +61,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 				}
 
 				textView(SplashText.slogan) {
+					gravity = Gravity.CENTER_HORIZONTAL
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.medium(context)
 					textColor = Spectrum.opacity5White
