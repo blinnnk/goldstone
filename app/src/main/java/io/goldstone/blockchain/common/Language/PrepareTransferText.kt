@@ -172,7 +172,7 @@ object PrepareTransferText {
 		HoneyLanguage.Chinese.code -> "自定义"
 		HoneyLanguage.Japanese.code -> "カスタマイズ"
 		HoneyLanguage.Korean.code -> "사용자 정의"
-		HoneyLanguage.Russian.code -> "Самоопред."
+		HoneyLanguage.Russian.code -> "Самоопред"
 		HoneyLanguage.TraditionalChinese.code -> "自定義"
 		else -> ""
 	}
