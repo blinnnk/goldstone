@@ -183,7 +183,7 @@ object WalletText {
 		else -> ""
 	}
 	@JvmField
-	val bitcoinTestnet = when (currentLanguage) {
+	val btcTestnet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Bitcoin Testnet"
 		HoneyLanguage.Chinese.code -> "Bitcoin (比特币) 测试网"
 		HoneyLanguage.Japanese.code -> "Bitcoin(ビットコイン)テストネット"

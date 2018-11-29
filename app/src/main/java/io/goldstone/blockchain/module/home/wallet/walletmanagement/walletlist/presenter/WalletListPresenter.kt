@@ -7,6 +7,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.WalletSettingsText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -60,7 +61,7 @@ class WalletListPresenter(
 			when {
 				walletType.isBTC() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showTestnetConfirmationAlertView("Bitcoin Mainnet") {
+						showMainnetConfirmationAlertView(WalletText.btcMainnet) {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -70,7 +71,7 @@ class WalletListPresenter(
 
 				walletType.isBTCTest() -> {
 					if (!SharedValue.isTestEnvironment()) {
-						showMainnetConfirmationAlertView("Bitcoin Testnet") {
+						showTestnetConfirmationAlertView(WalletText.btcTestnet) {
 							switchWalletInDatabase(address, false)
 						}
 					} else {
@@ -80,7 +81,7 @@ class WalletListPresenter(
 
 				walletType.isLTC() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showTestnetConfirmationAlertView("Litecoin Mainnet") {
+						showMainnetConfirmationAlertView(WalletText.ltcMainnet) {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -90,7 +91,7 @@ class WalletListPresenter(
 
 				walletType.isBCH() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showTestnetConfirmationAlertView("Bitcoin Cash Mainnet") {
+						showMainnetConfirmationAlertView(WalletText.bchMainnet) {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -100,7 +101,7 @@ class WalletListPresenter(
 
 				walletType.isEOSJungle() -> {
 					if (!SharedValue.isTestEnvironment()) {
-						showMainnetConfirmationAlertView("EOS Jungle Testnet") {
+						showTestnetConfirmationAlertView(WalletText.eosJungle) {
 							switchWalletInDatabase(address, false)
 						}
 					} else {
@@ -110,7 +111,7 @@ class WalletListPresenter(
 
 				walletType.isEOSMainnet() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showTestnetConfirmationAlertView("EOS Mainnet Testnet") {
+						showTestnetConfirmationAlertView(WalletText.eosMainnet) {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -135,7 +136,7 @@ class WalletListPresenter(
 		Dashboard(fragment.context!!) {
 			showAlertView(
 				WalletSettingsText.switchChainNetAlertTitle,
-				WalletSettingsText.switchChainNetToTestAlert(content),
+				WalletSettingsText.switchChainNetToMainAlert(content),
 				false
 			) {
 				callback()
@@ -147,7 +148,7 @@ class WalletListPresenter(
 		Dashboard(fragment.context!!) {
 			showAlertView(
 				WalletSettingsText.switchChainNetAlertTitle,
-				WalletSettingsText.switchChainNetToMainAlert(content),
+				WalletSettingsText.switchChainNetToTestAlert(content),
 				false
 			) {
 				callback()
