@@ -12,7 +12,7 @@ object ImportWalletText {
 		HoneyLanguage.Chinese.code -> "路径 (Path)"
 		HoneyLanguage.Japanese.code -> "パス"
 		HoneyLanguage.Korean.code -> "경로"
-		HoneyLanguage.Russian.code -> "Путь (Path)"
+		HoneyLanguage.Russian.code -> "ДОРОЖКА (PATH)"
 		HoneyLanguage.TraditionalChinese.code -> "路徑 (Path)"
 		else -> ""
 	}
@@ -22,7 +22,7 @@ object ImportWalletText {
 		HoneyLanguage.Chinese.code -> "类型"
 		HoneyLanguage.Japanese.code -> "タイプ"
 		HoneyLanguage.Korean.code -> "종류"
-		HoneyLanguage.Russian.code -> "тип"
+		HoneyLanguage.Russian.code -> "ТИП"
 		HoneyLanguage.TraditionalChinese.code -> "類型"
 		else -> ""
 	}
