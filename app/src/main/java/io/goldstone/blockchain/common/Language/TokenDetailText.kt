@@ -78,22 +78,22 @@ object TokenDetailText {
 	}
 	@JvmField
 	val filterConditions = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Transaction Filter Conditions"
-		HoneyLanguage.Chinese.code -> "Transaction Filter Conditions"
-		HoneyLanguage.Japanese.code -> "Transaction Filter Conditions"
-		HoneyLanguage.Korean.code -> "Transaction Filter Conditions"
-		HoneyLanguage.Russian.code -> "Transaction Filter Conditions"
-		HoneyLanguage.TraditionalChinese.code -> "Transaction Filter Conditions"
+		HoneyLanguage.English.code->"Transactions filter"
+		HoneyLanguage.Chinese.code->"交易账单筛选条件"
+		HoneyLanguage.Japanese.code->"取引明細審査"
+		HoneyLanguage.Korean.code->"거래 청구서 심사"
+		HoneyLanguage.Russian.code->"Проверка банковских счетов"
+		HoneyLanguage.TraditionalChinese.code->"交易賬單篩選"
 		else -> ""
 	}
 	@JvmField
 	val transferToLocalWalletAlertDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This will transfer value to an address already in one of your wallets. Are you sure?"
-		HoneyLanguage.Chinese.code -> "这个地址也在GoldStone钱包中。你确定要给这个地址转账吗？"
-		HoneyLanguage.Japanese.code -> "このアドレスもGoldStoneウォレットの中に存在しています。このアドレスに振込を行いますか？"
+		HoneyLanguage.Chinese.code -> "这个地址也在 GoldStone 钱包中。你确定要给这个地址转账吗？"
+		HoneyLanguage.Japanese.code -> "このアドレスも GoldStone ウォレットの中に存在しています。このアドレスに振込を行いますか？"
 		HoneyLanguage.Korean.code -> "이 주소 역시 GoldStone 지갑에 포함되어 있습니다. 이 주소로 이체할까요？"
 		HoneyLanguage.Russian.code -> "Этот адрес в кошельке GoldStone Вы уверены в осуществлении перевода на данный адрес?"
-		HoneyLanguage.TraditionalChinese.code -> "這個地址也在GoldStone錢包中，你確定要給自己轉賬嗎？"
+		HoneyLanguage.TraditionalChinese.code -> "這個地址也在 GoldStone 錢包中，你確定要給自己轉賬嗎？"
 		else -> ""
 	}
 	@JvmField
@@ -222,23 +222,23 @@ object TokenDetailText {
 
 	@JvmField
 	val fee = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Fee"
-		HoneyLanguage.Chinese.code -> "Fee"
-		HoneyLanguage.Japanese.code -> "Fee"
-		HoneyLanguage.Korean.code -> "Fee"
-		HoneyLanguage.Russian.code -> "Fee"
-		HoneyLanguage.TraditionalChinese.code -> "Fee"
+		HoneyLanguage.English.code->"Fee"
+		HoneyLanguage.Chinese.code->"费用"
+		HoneyLanguage.Japanese.code->"料金"
+		HoneyLanguage.Korean.code->"비용"
+		HoneyLanguage.Russian.code->"плата"
+		HoneyLanguage.TraditionalChinese.code->"費用"
 		else -> ""
 	}
 
 	@JvmField
 	val failed = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Failed"
-		HoneyLanguage.Chinese.code -> "Failed"
-		HoneyLanguage.Japanese.code -> "Failed"
-		HoneyLanguage.Korean.code -> "Failed"
-		HoneyLanguage.Russian.code -> "Failed"
-		HoneyLanguage.TraditionalChinese.code -> "Failed"
+		HoneyLanguage.English.code->"Failed"
+		HoneyLanguage.Chinese.code->"失败"
+		HoneyLanguage.Japanese.code->"失敗"
+		HoneyLanguage.Korean.code->"실패"
+		HoneyLanguage.Russian.code->"недостаточность"
+		HoneyLanguage.TraditionalChinese.code->"失敗"
 		else -> ""
 	}
 
@@ -418,22 +418,22 @@ object TokenDetailText {
 	@JvmField
 	val delegateCPU = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.Chinese.code -> "代理CPU\n赎回CPU"
-		HoneyLanguage.Japanese.code -> "デリゲートCPU\n返金CPU"
+		HoneyLanguage.Chinese.code -> "代理 CPU\n赎回 CPU"
+		HoneyLanguage.Japanese.code -> "デリゲート CPU\n返金 CPU"
 		HoneyLanguage.Korean.code -> "CPU 를 위임하십시오\nCPU 환불"
 		HoneyLanguage.Russian.code -> "Делегат CPU\nВозврат CPU"
-		HoneyLanguage.TraditionalChinese.code -> "代理CPU\n贖回 CPU"
+		HoneyLanguage.TraditionalChinese.code -> "代理 CPU\n贖回 CPU"
 		else -> ""
 	}
 
 	@JvmField
 	val delegateNET = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.Chinese.code -> "代理NET\n赎回NET"
-		HoneyLanguage.Japanese.code -> "デリゲートNET\n返金NET"
+		HoneyLanguage.Chinese.code -> "代理 NET\n赎回 NET"
+		HoneyLanguage.Japanese.code -> "デリゲート NET\n返金 NET"
 		HoneyLanguage.Korean.code -> "NET 를 위임하십시오\nNET 환불"
 		HoneyLanguage.Russian.code -> "Делегат NET\nВозврат NET"
-		HoneyLanguage.TraditionalChinese.code -> "代理NET\n贖回NET"
+		HoneyLanguage.TraditionalChinese.code -> "代理 NET\n贖回 NET"
 		else -> ""
 	}
 
@@ -450,23 +450,23 @@ object TokenDetailText {
 
 	@JvmField
 	val delband = when (currentLanguage) {
-		HoneyLanguage.English.code -> "DELBAND"
-		HoneyLanguage.Chinese.code -> "DELBAND"
-		HoneyLanguage.Japanese.code -> "DELBAND"
-		HoneyLanguage.Korean.code -> "DELBAND"
-		HoneyLanguage.Russian.code -> "DELBAND"
-		HoneyLanguage.TraditionalChinese.code -> "DELBAND"
+		HoneyLanguage.English.code->"Delegate bandwidth"
+		HoneyLanguage.Chinese.code->"代理带宽"
+		HoneyLanguage.Japanese.code->"デリゲート帯域幅"
+		HoneyLanguage.Korean.code->"프록시 대역폭"
+		HoneyLanguage.Russian.code->"Прокси-пропускная способность"
+		HoneyLanguage.TraditionalChinese.code->"代理帶寬"
 		else -> ""
 	}
 
 	@JvmField
 	val buySellRAM = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.Chinese.code -> "买入RAM\n卖出RAM"
-		HoneyLanguage.Japanese.code -> "RAMを購入する\nRAMを販売する"
+		HoneyLanguage.Chinese.code -> "买入 RAM\n卖出 RAM"
+		HoneyLanguage.Japanese.code -> "RAM を購入する\nRAM を販売する"
 		HoneyLanguage.Korean.code -> "RAM 구입\nRAM  판매"
 		HoneyLanguage.Russian.code -> "Купить RAM\nПродать RAM"
-		HoneyLanguage.TraditionalChinese.code -> "買入RAM\n賣出 RAM"
+		HoneyLanguage.TraditionalChinese.code -> "買入 RAM\n賣出 RAM"
 		else -> ""
 	}
 
@@ -504,7 +504,7 @@ object TokenDetailText {
 	@JvmField
 	val eosAmountPlaceholder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter EOS amount"
-		HoneyLanguage.Chinese.code -> "想要兑换的 EOS 数量"
+		HoneyLanguage.Chinese.code -> "想要兑换的数量(EOS"
 		HoneyLanguage.Japanese.code -> "EOS 額を入力"
 		HoneyLanguage.Korean.code -> "EOS 금액 입력"
 		HoneyLanguage.Russian.code -> "Введите сумму EOS"
@@ -513,22 +513,22 @@ object TokenDetailText {
 	}
 	@JvmField
 	val tradeRamByBytesTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Ram(Byte)"
-		HoneyLanguage.Chinese.code -> "Ram(Byte)"
-		HoneyLanguage.Japanese.code -> "Ram(Byte)"
-		HoneyLanguage.Korean.code -> "Ram(Byte)"
-		HoneyLanguage.Russian.code -> "Ram(Byte)"
-		HoneyLanguage.TraditionalChinese.code -> "Ram(Byte)"
+		HoneyLanguage.English.code -> "RAM Amount (Byte)"
+		HoneyLanguage.Chinese.code -> "RAM 数量(Byte)"
+		HoneyLanguage.Japanese.code -> "RAM量 (バイト)"
+		HoneyLanguage.Korean.code -> "RAM 양 (바이트)"
+		HoneyLanguage.Russian.code -> "Объем ОЗУ (байт)"
+		HoneyLanguage.TraditionalChinese.code -> "RAM 數量(Byte)"
 		else -> ""
 	}
 	@JvmField
 	val tradeRamByBytesPlaceholder = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Sell bytes"
-		HoneyLanguage.Chinese.code -> "卖出的RAM数量"
-		HoneyLanguage.Japanese.code -> "購入したい番号"
-		HoneyLanguage.Korean.code -> "구매하려는 번호"
-		HoneyLanguage.Russian.code -> "Номер, который вы хотите купить"
-		HoneyLanguage.TraditionalChinese.code -> "想要買的數量"
+		HoneyLanguage.English.code -> "RAM Amount (Byte)"
+		HoneyLanguage.Chinese.code -> "RAM 数量(Byte)"
+		HoneyLanguage.Japanese.code -> "RAM量 (バイト)"
+		HoneyLanguage.Korean.code -> "RAM 양 (바이트)"
+		HoneyLanguage.Russian.code -> "Объем ОЗУ (байт)"
+		HoneyLanguage.TraditionalChinese.code -> "RAM 數量(Byte)"
 		else -> ""
 	}
 
@@ -765,11 +765,11 @@ object EOSAccountText {
 	@JvmField
 	val checkNameResultUnavailable = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The account name has already been registered by someone else, change it."
-		HoneyLanguage.Chinese.code -> "该用户名已经被别人注册，换一个吧"
+		HoneyLanguage.Chinese.code -> "该用户名已经被别人注册, 换一个吧"
 		HoneyLanguage.Japanese.code -> "ユーザー名は既にバーのために、他の人が登録されています"
 		HoneyLanguage.Korean.code -> "사용자 이름이 이미 다른 사람이 등록한 경우 변경하십시오."
 		HoneyLanguage.Russian.code -> "Имя пользователя уже зарегистрировано кем-то другим, измените его."
-		HoneyLanguage.TraditionalChinese.code -> "該用戶名已經被別人註冊，換一個吧"
+		HoneyLanguage.TraditionalChinese.code -> "該用戶名已經被別人註冊, 換一個吧"
 		else -> ""
 	}
 	@JvmField
