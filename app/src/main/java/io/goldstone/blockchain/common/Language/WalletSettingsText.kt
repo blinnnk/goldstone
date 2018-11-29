@@ -426,14 +426,38 @@ object WalletSettingsText {
 	}
 
 	@JvmField
-	val switchChainNetAlert: (customContent: String) -> String = {
+	val switchChainNetAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Switch Chain Node"
+		HoneyLanguage.Chinese.code -> "切换链网络"
+		HoneyLanguage.Japanese.code -> "スイッチチェーンネットワーク"
+		HoneyLanguage.Korean.code -> "스위치 체인 노드"
+		HoneyLanguage.Russian.code -> "Коммутационный узел"
+		HoneyLanguage.TraditionalChinese.code -> "切換鏈網絡"
+		else -> ""
+	}
+
+	@JvmField
+	val switchChainNetToTestAlert: (customContent: String) -> String = {
 		when (currentLanguage) {
 			HoneyLanguage.English.code -> "This wallet is a $it single-chain wallet. Do you want to switch your wallet to the test network?"
 			HoneyLanguage.Chinese.code -> "这是一个仅限 $it 的钱包。您是否要切换钱包至测试网络？"
-			HoneyLanguage.Japanese.code -> "これは $it 専用のウォレットです。 財布をテストネットワークに切り替えるのですか？"
-			HoneyLanguage.Korean.code -> "이것은 $it 전용 지갑입니다. 지갑을 테스트 네트워크로 전환 하시겠습니까?"
+			HoneyLanguage.Japanese.code -> "これは $it 専用のウォレットです。 ウォレットをテストネットワークに切り替えるのですか？"
+			HoneyLanguage.Korean.code -> "이것은 $it 전용 지갑입니다. 지갑을 메인 네트워크로 전환 하시겠습니까?"
 			HoneyLanguage.Russian.code -> "Это кошелек $it. Вы хотите переключить свой кошелек в тестовую сеть?"
 			HoneyLanguage.TraditionalChinese.code -> "這是一個僅限$it 的錢包。您是否要切換錢包至測試網絡？"
+			else -> ""
+		}
+	}
+
+	@JvmField
+	val switchChainNetToMainAlert: (customContent: String) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "This wallet is a $it single-chain wallet. Do you want to switch your wallet to the test network?"
+			HoneyLanguage.Chinese.code -> "这是一个仅限 $it 的钱包。您是否要切换钱包至主网？"
+			HoneyLanguage.Japanese.code -> "これは $it 専用のウォレットです。 ウォレットをメインネットワークに切り替えるかどうか"
+			HoneyLanguage.Korean.code -> "이것은 $it 전용 지갑입니다. 지갑을 테스트 네트워크로 전환 하시겠습니까?"
+			HoneyLanguage.Russian.code -> "Это кошелек $it. Вы хотите переключить свой кошелек в основную сеть?"
+			HoneyLanguage.TraditionalChinese.code -> "這是一個僅限$it 的錢包。您是否要切換錢包至主網？"
 			else -> ""
 		}
 	}

@@ -288,14 +288,15 @@ object ErrorText {
 		else -> ""
 	}
 
+	// 导入观察钱包时导入了未激活的账号
 	@JvmField
 	val inactivatedAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code->"This account name has not been activated yet"
-		HoneyLanguage.Chinese.code->"这个账户没有被别人注册, 你可以使用。"
-		HoneyLanguage.Japanese.code->"このアカウントは他人によって登録されておらず、あなたはそれを使用することができます。"
-		HoneyLanguage.Korean.code->"이 계정은 다른 사람이 등록하지 않았으므로이 계정을 사용할 수 있습니다."
-		HoneyLanguage.Russian.code->"Эта учетная запись не зарегистрирована кем-то еще, и вы можете ее использовать."
-		HoneyLanguage.TraditionalChinese.code->"這個賬戶沒有被別人註冊, 你可以使用。"
+		HoneyLanguage.Chinese.code->"这个 EOS 账户还没有被注册。"
+		HoneyLanguage.Japanese.code->"このアカウントはまだ登録されていません。"
+		HoneyLanguage.Korean.code->"이 계정은 아직 등록되지 않았습니다."
+		HoneyLanguage.Russian.code->"Эта учетная запись еще не зарегистрирована."
+		HoneyLanguage.TraditionalChinese.code->"這個 EOS 賬戶還沒有被註冊。"
 		else -> ""
 	}
 }

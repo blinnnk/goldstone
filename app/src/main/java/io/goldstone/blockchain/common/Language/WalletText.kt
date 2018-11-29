@@ -110,7 +110,7 @@ object WalletText {
 	}
 	@JvmField
 	val ethERCAndETC = when (currentLanguage) {
-		HoneyLanguage.English.code -> "ETH/ERC20/ETC"
+		HoneyLanguage.English.code -> "ETH / ERC20/ETC"
 		HoneyLanguage.Chinese.code -> "ETH/ERC20代币/ETC"
 		HoneyLanguage.Japanese.code -> "ETH/ERC20トークン/ETC"
 		HoneyLanguage.Korean.code -> "ETH/ERC20 토큰/ETC"

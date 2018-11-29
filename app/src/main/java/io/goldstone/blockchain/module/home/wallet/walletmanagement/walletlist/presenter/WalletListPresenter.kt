@@ -60,7 +60,7 @@ class WalletListPresenter(
 			when {
 				walletType.isBTC() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showConfirmationAlertView("Bitcoin Mainnet") {
+						showTestnetConfirmationAlertView("Bitcoin Mainnet") {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -70,7 +70,7 @@ class WalletListPresenter(
 
 				walletType.isBTCTest() -> {
 					if (!SharedValue.isTestEnvironment()) {
-						showConfirmationAlertView("Bitcoin Testnet") {
+						showMainnetConfirmationAlertView("Bitcoin Testnet") {
 							switchWalletInDatabase(address, false)
 						}
 					} else {
@@ -80,7 +80,7 @@ class WalletListPresenter(
 
 				walletType.isLTC() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showConfirmationAlertView("Litecoin Mainnet") {
+						showTestnetConfirmationAlertView("Litecoin Mainnet") {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -90,7 +90,7 @@ class WalletListPresenter(
 
 				walletType.isBCH() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showConfirmationAlertView("Bitcoin Cash Mainnet") {
+						showTestnetConfirmationAlertView("Bitcoin Cash Mainnet") {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -100,7 +100,7 @@ class WalletListPresenter(
 
 				walletType.isEOSJungle() -> {
 					if (!SharedValue.isTestEnvironment()) {
-						showConfirmationAlertView("EOS Jungle Testnet") {
+						showMainnetConfirmationAlertView("EOS Jungle Testnet") {
 							switchWalletInDatabase(address, false)
 						}
 					} else {
@@ -110,7 +110,7 @@ class WalletListPresenter(
 
 				walletType.isEOSMainnet() -> {
 					if (SharedValue.isTestEnvironment()) {
-						showConfirmationAlertView("EOS Mainnet Testnet") {
+						showTestnetConfirmationAlertView("EOS Mainnet Testnet") {
 							switchWalletInDatabase(address, true)
 						}
 					} else {
@@ -131,11 +131,23 @@ class WalletListPresenter(
 		}
 	}
 
-	private fun showConfirmationAlertView(content: String, callback: () -> Unit) {
+	private fun showMainnetConfirmationAlertView(content: String, callback: () -> Unit) {
 		Dashboard(fragment.context!!) {
 			showAlertView(
-				"Switch Chain Network",
-				WalletSettingsText.switchChainNetAlert(content),
+				WalletSettingsText.switchChainNetAlertTitle,
+				WalletSettingsText.switchChainNetToTestAlert(content),
+				false
+			) {
+				callback()
+			}
+		}
+	}
+
+	private fun showTestnetConfirmationAlertView(content: String, callback: () -> Unit) {
+		Dashboard(fragment.context!!) {
+			showAlertView(
+				WalletSettingsText.switchChainNetAlertTitle,
+				WalletSettingsText.switchChainNetToMainAlert(content),
 				false
 			) {
 				callback()
