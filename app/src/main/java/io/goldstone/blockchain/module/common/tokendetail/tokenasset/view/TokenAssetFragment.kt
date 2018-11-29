@@ -77,7 +77,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	private lateinit var ramAssetCell: ProgressView
 	private lateinit var cpuAssetCell: ProgressView
 	private lateinit var netAssetCell: ProgressView
-	private lateinit var loadingView: LoadingView
+	private var loadingView: LoadingView? = null
 
 	override lateinit var presenter: TokenAssetContract.GSPresenter
 	override fun onResume() {
@@ -312,8 +312,8 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	override fun showCenterLoading(status: Boolean) = launchUI {
-		loadingView = LoadingView(context!!)
-		if (status) loadingView.show() else loadingView.remove()
+		if (loadingView.isNull()) loadingView = LoadingView(context!!)
+		if (status) loadingView?.show() else loadingView?.remove()
 	}
 
 	private fun showDelegateBandWidthDashboard() {

@@ -117,6 +117,10 @@ class WalletListPresenter(
 						switchWalletInDatabase(address, true)
 					}
 				}
+				// 观察钱包只导入地址就会是这个属性
+				walletType.isEOS() -> {
+					switchWalletInDatabase(address, true)
+				}
 
 				walletType.isETHSeries() -> {
 					switchWalletInDatabase(address, true)

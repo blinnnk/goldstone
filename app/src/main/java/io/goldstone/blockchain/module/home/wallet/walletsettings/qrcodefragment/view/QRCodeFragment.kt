@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment
 import android.graphics.Bitmap
 import android.support.v4.app.Fragment
 import android.widget.LinearLayout
+import com.blinnnk.extension.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -26,16 +27,25 @@ class QRCodeFragment : BaseFragment<QRCodePresenter>() {
 
 	override val pageTitle: String = WalletText.qrCode
 
-	private val qrView by lazy { QRView(context!!) }
+	private lateinit var qrView: QRView
 	override val presenter = QRCodePresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
+		qrView = QRView(context!!)
 		addView(qrView, LinearLayout.LayoutParams(matchParent, matchParent))
 		qrView.showAllButtons()
 		setSaveImageEvent()
 		setShareImageEvent()
 		if (presenter.addressModel?.symbol.equals(CoinSymbol.bch)) {
 			convertBCHAddress()
+		}
+	}
+
+	override fun onResume() {
+		super.onResume()
+		// 这个界面隐藏添加按钮
+		getParentFragment<WalletSettingsFragment> {
+			showAddButton(false) {}
 		}
 	}
 

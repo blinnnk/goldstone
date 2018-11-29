@@ -43,7 +43,7 @@ abstract class SilentUpdater {
 
 	val account = SharedAddress.getCurrentEOSAccount()
 
-	fun star(context: Context, callback: () -> Unit) = GlobalScope.launch(Dispatchers.Default) {
+	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -67,7 +67,6 @@ abstract class SilentUpdater {
 					if (hasNewShareContent) updateShareContent()
 					if (hasNewConfig) {
 					}
-					callback()
 				}
 				when {
 					Connectivity.isConnectedWifi(GoldStoneAPI.context) -> updateData()

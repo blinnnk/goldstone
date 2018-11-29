@@ -23,7 +23,7 @@ android {
     minSdkVersion 21
     targetSdkVersion 28
     versionCode 20
-    versionName "1.6.2"
+    versionName "1.6.3"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
@@ -83,7 +83,7 @@ dependencies {
   // 2.0 Beta 以上需要兼容 AndroidX 先不要升级
   implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha12'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.5.0'
+  implementation 'com.blinnnk:honeyui:0.3.5.1'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin
