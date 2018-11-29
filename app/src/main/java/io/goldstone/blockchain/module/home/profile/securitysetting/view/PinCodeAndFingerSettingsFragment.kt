@@ -26,19 +26,19 @@ import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.profile.securitysetting.presenter.WalletSecuritySettingsPresenter
+import io.goldstone.blockchain.module.home.profile.securitysetting.presenter.PinCodeAndFingerSettingsPresenter
 import org.jetbrains.anko.*
 
 /**
  * @date 11/09/2018 3:45 PM
  * @author wcx
  */
-class WalletSecuritySettingsFragment: BaseFragment<WalletSecuritySettingsPresenter>() {
+class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPresenter>() {
 	override val pageTitle: String = ProfileText.walletSecurity
 
 	private val changePinCode by lazy { LinearLayout(context) }
 	private lateinit var pinCodeSwitch: SecuritySwitchView
-	override val presenter = WalletSecuritySettingsPresenter(this)
+	override val presenter = PinCodeAndFingerSettingsPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
@@ -67,7 +67,7 @@ class WalletSecuritySettingsFragment: BaseFragment<WalletSecuritySettingsPresent
 			SecuritySwitchView(context).apply {
 				setSwitchStatus(SharedWallet.isFingerprintUnlockerOpened().orFalse())
 				setOnclick { switch ->
-					if(!getSwitchCheckedStatus()) {
+					if(getSwitchCheckedStatus()) {
 						if(checkIfTheSystemFingerprintExists().isAvailable()) {
 							// 系统已设置指纹
 							openFingerprintEvent(switch)
@@ -93,9 +93,9 @@ class WalletSecuritySettingsFragment: BaseFragment<WalletSecuritySettingsPresent
 			setOnclick {
 				// 点击后跳转到PinCode编辑界面
 				val switchChecked = pinCodeSwitch.getSwitchCheckedStatus()
-				if(!switchChecked.orFalse()) {
+				if(switchChecked) {
 					presenter.setPassCodeFragment()
-					pinCodeSwitch.setSwitchStatus(!switchChecked.orFalse())
+					pinCodeSwitch.setSwitchStatus(!switchChecked)
 				} else {
 					changePinCode.visibility = View.GONE
 					AppConfigTable.setPinCodeStatus(false) {}
@@ -153,7 +153,7 @@ class WalletSecuritySettingsFragment: BaseFragment<WalletSecuritySettingsPresent
 
 	// 点击后根据更新的数据库情况显示指紋解锁开关状态
 	private fun openFingerprintEvent(switch: Switch) {
-		presenter.setFingerprintStatus(!switch.isChecked) {
+		presenter.setFingerprintStatus(switch.isChecked) {
 			switch.isChecked = SharedWallet.isFingerprintUnlockerOpened().orFalse()
 			if(!pinCodeSwitch.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
 				setPinCodeTips()

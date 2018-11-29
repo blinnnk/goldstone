@@ -5,10 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
-import com.blinnnk.extension.addFragmentAndSetArguments
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
@@ -16,9 +13,10 @@ import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ContainerID
+import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
@@ -65,8 +63,13 @@ class HintFragment : BaseFragment<HintPresenter>() {
 		super.onViewCreated(view, savedInstanceState)
 		WalletTable.getCurrent(Dispatchers.Main) {
 			// 如果有设置 `hint` 并且有设置 `passcode` 那么首先展示 `passcode`
-			if (SharedValue.getPincodeDisplayStatus()) getParentFragment<ProfileOverlayFragment> {
-				activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
+			if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
+				getParentFragment<ProfileOverlayFragment> {
+					activity?.addFragmentAndSetArguments<PasscodeFragment>(
+						ContainerID.main,
+						FragmentTag.pinCode
+					)
+				}
 			}
 			hintInput.hint = this.hint
 		}

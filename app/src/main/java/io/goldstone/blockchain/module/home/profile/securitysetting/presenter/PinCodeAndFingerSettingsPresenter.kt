@@ -11,15 +11,15 @@ import io.goldstone.blockchain.common.value.FragmentTag
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.profile.securitysetting.view.WalletSecuritySettingsFragment
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeAndFingerSettingsFragment
 
 /**
  * @date 11/09/2018 3:45 PM
  * @author wcx
  */
-class WalletSecuritySettingsPresenter(
-	override val fragment: WalletSecuritySettingsFragment
-): BasePresenter<WalletSecuritySettingsFragment>() {
+class PinCodeAndFingerSettingsPresenter(
+	override val fragment: PinCodeAndFingerSettingsFragment
+): BasePresenter<PinCodeAndFingerSettingsFragment>() {
 
 	fun setFingerprintStatus(
 		status: Boolean,

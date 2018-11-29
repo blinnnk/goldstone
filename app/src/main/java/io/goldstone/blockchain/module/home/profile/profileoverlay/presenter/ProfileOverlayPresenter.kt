@@ -23,10 +23,9 @@ import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.C
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.view.ContactFragment
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyFragment
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment
-import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeEditorFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import io.goldstone.blockchain.module.home.profile.securitysetting.view.WalletSecuritySettingsFragment
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeAndFingerSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.view.WalletListFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.model.GridIconTitleModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.GridIconTitleAdapter
@@ -162,7 +161,7 @@ class ProfileOverlayPresenter(
 	}
 
 	private fun showSecuritySettingFragment() {
-		fragment.addFragmentAndSetArgument<WalletSecuritySettingsFragment>(ContainerID.content)
+		fragment.addFragmentAndSetArgument<PinCodeAndFingerSettingsFragment>(ContainerID.content)
 	}
 
 	private fun showContactsFragment() {

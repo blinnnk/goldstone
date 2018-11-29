@@ -19,7 +19,6 @@ import org.jetbrains.anko.*
  */
 @SuppressLint("ViewConstructor")
 class SecuritySwitchView(context: Context): RelativeLayout(context) {
-	private lateinit var switchLayout: View
 	private val switch by lazy { Switch(context) }
 	private val twoLineTitles by lazy { TwoLineTitles(context) }
 	
@@ -33,20 +32,14 @@ class SecuritySwitchView(context: Context): RelativeLayout(context) {
 			setBlackTitles()
 		}.into(this)
 		
-		relativeLayout {
+		switch.apply {
+			isChecked = false
 			layoutParams = LayoutParams(50.uiPX(), matchParent).apply {
 				alignParentRight()
+				centerInVertical()
 			}
-			switch.apply {
-				isChecked = false
-				layoutParams = LayoutParams(50.uiPX(), matchParent).apply {
-					centerInVertical()
-				}
-			}.into(this)
-			switchLayout = view {
-				layoutParams = LayoutParams(matchParent, matchParent)
-			}
-		}
+		}.into(this)
+		
 		view {
 			backgroundColor = GrayScale.midGray
 			layoutParams = LayoutParams(matchParent,1).apply {
@@ -54,11 +47,10 @@ class SecuritySwitchView(context: Context): RelativeLayout(context) {
 			}
 		}
 		
-		
 	}
 	
 	fun setOnclick(callback: (Switch) -> Unit) {
-		switchLayout.click {
+		switch.click {
 			callback(switch)
 		}
 	}
