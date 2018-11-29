@@ -242,7 +242,7 @@ object ProfileText {
 	val aboutGoldStone = when (currentLanguage) {
 		HoneyLanguage.English.code -> "About GoldStone"
 		HoneyLanguage.Chinese.code -> "关于 GoldStone"
-		HoneyLanguage.Japanese.code -> "GoldStoneについて"
+		HoneyLanguage.Japanese.code -> "GoldStone について"
 		HoneyLanguage.Korean.code -> "GoldStone 정보"
 		HoneyLanguage.Russian.code -> "О компании GoldStone"
 		HoneyLanguage.TraditionalChinese.code -> "關於 GoldStone"
