@@ -107,18 +107,10 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 	): View? {
 		setPageTitle()
 		return UI {
-			// 这个高度判断是解决少数虚拟键盘高度可以手动隐藏的, 例如 `Samsung S8, S9`
-			val wrapperHeight = when {
-				activity?.navigationBarIsHidden() == true ->
-					context?.getRealScreenHeight().orZero() - HomeSize.tabBarHeight
-				this !is BaseOverlayFragment<*> ->
-					ScreenSize.Height + ScreenSize.statusBarHeight - HomeSize.tabBarHeight
-				else -> ScreenSize.Height + ScreenSize.statusBarHeight - HomeSize.headerHeight
-			}
 			wrapper = relativeLayout {
 				topMiniLoading = TopMiniLoadingView(context)
 				topMiniLoading.visibility = View.GONE
-				layoutParams = setRecyclerViewParams(matchParent, wrapperHeight)
+				layoutParams = setRecyclerViewParams(matchParent, matchParent)
 				recyclerView = BaseRecyclerView(context)
 				setRecyclerViewLayoutManager(recyclerView)
 				addView(recyclerView, RelativeLayout.LayoutParams(matchParent, matchParent))

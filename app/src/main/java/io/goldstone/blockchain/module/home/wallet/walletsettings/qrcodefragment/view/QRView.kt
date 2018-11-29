@@ -77,7 +77,7 @@ class QRView(context: Context) : LinearLayout(context) {
 
 	fun showFormattedButton(status: Boolean) {
 		convertToLegacyButton.visibility = if (status) View.VISIBLE else View.GONE
-		convertToLegacyButton.text = "Convert BCH Address Formatted"
+		convertToLegacyButton.text = CommonText.switchBCHAddressFormat
 	}
 
 	fun setAddressText(address: String) {

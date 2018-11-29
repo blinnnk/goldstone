@@ -150,6 +150,17 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "保存到相簿"
 		else -> ""
 	}
+
+	@JvmField
+	val switchBCHAddressFormat = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Switch BCH address format"
+		HoneyLanguage.Chinese.code -> "切换 BCH 地址格式"
+		HoneyLanguage.Japanese.code -> "BCHアドレス形式の切り替え"
+		HoneyLanguage.Korean.code -> "BCH 주소 형식 전환"
+		HoneyLanguage.Russian.code -> "Переключить формат адреса BCH"
+		HoneyLanguage.TraditionalChinese.code -> "切換 BCH 地址格式"
+		else -> ""
+	}
 	@JvmField
 	val shareQRImage = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Share QR Image"

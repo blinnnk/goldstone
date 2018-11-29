@@ -53,7 +53,7 @@
 		</activity>
 		<activity
 			android:name=".module.home.home.view.MainActivity"
-			android:launchMode="singleTask"
+			android:launchMode="singleTop"
 			android:screenOrientation="portrait"
 			android:theme="@style/MainTheme"
 			android:windowSoftInputMode="adjustPan" />
@@ -81,10 +81,10 @@
 				android:name="android.support.FILE_PROVIDER_PATHS"
 				android:resource="@xml/provider_paths" />
 		</provider>
-		
+
 		<activity
 			android:name=".module.common.qrcode.view.ScanCaptureActivity"
-			android:screenOrientation="portrait"/>
+			android:screenOrientation="portrait" />
 		<!-- 对Application生效，意味着该应用的所有页面，系统都不会做竖屏场景的特殊下移 -->
 		<meta-data
 			android:name="android.notch_support"
