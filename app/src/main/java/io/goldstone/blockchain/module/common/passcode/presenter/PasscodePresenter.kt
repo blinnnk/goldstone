@@ -60,7 +60,7 @@ class PasscodePresenter(override val fragment: PasscodeFragment): BasePresenter<
 		var retryTimes = retryTime
 		it isTrue {
 			if(retryTimes < Count.retry) resetConfig()
-			if(fragment.getIsPinCodeSetting().orFalse()) {
+			if(fragment.getIsPinCodeSetting()) {
 				fragment.setIsVerifyIdentity(true)
 				fragment.setPasswordInputTitles(PincodeText.setFourDigitPassword, "")
 				fragment.resetHeaderStyle()
@@ -169,7 +169,7 @@ class PasscodePresenter(override val fragment: PasscodeFragment): BasePresenter<
 					is BaseRecyclerFragment<*,*> -> recoveryBackEvent()
 					
 					is BaseOverlayFragment<*> -> {
-						if(!fragment.getIsPinCodeSetting().orFalse() && !fragment.getIsVerifyIdentity()) {
+						if(!fragment.getIsPinCodeSetting() && !fragment.getIsVerifyIdentity()) {
 							this.presenter.removeSelfFromActivity()
 						} else {
 							childFragmentManager.fragments.last()?.apply {

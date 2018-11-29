@@ -140,7 +140,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		super.onResume()
 		presenter.start()
 		// 检查是否需要显示 `PIN Code` 界面
-		if (SharedValue.getPincodeDisplayStatus() || SharedWallet.isFingerprintUnlockerOpened()) PasscodeFragment.show(this)
+		if (SharedWallet.isPincodeOpened() || SharedWallet.isFingerprintUnlockerOpened()) PasscodeFragment.show(this)
 		getMainActivity()?.backEvent = null // 恢复回退站
 	}
 

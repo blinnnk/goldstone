@@ -75,7 +75,7 @@ class SplashActivity : AppCompatActivity() {
 	@WorkerThread
 	private fun prepareData(allWallet: List<WalletTable>) {
 		prepareAppConfig {
-			SharedValue.updatePincodeDisplayStatus(showPincode)
+			SharedWallet.updatePincodeIsOpened(showPincode)
 			SharedWallet.updateCurrencyCode(currencyCode)
 			// 如果本地的钱包数量不为空那么才开始注册设备
 			// 把 `GoldStoneID` 存储到 `SharePreference` 里面

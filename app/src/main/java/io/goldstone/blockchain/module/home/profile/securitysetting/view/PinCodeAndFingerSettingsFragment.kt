@@ -84,18 +84,17 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 		}
 		
 		pinCodeSwitch = SecuritySwitchView(context).apply {
-			setSwitchStatus(SharedWallet.isPincodeOpened().orFalse())
-			if(SharedWallet.isPincodeOpened().orFalse()) {
+			setSwitchStatus(SharedWallet.isPincodeOpened())
+			if(SharedWallet.isPincodeOpened()) {
 				changePinCode.visibility = View.VISIBLE
 			} else {
 				changePinCode.visibility = View.GONE
 			}
 			setOnclick {
 				// 点击后跳转到PinCode编辑界面
-				val switchChecked = pinCodeSwitch.getSwitchCheckedStatus()
-				if(switchChecked) {
+				if(getSwitchCheckedStatus()) {
 					presenter.setPassCodeFragment()
-					pinCodeSwitch.setSwitchStatus(!switchChecked)
+					pinCodeSwitch.setSwitchStatus(false)
 				} else {
 					changePinCode.visibility = View.GONE
 					AppConfigTable.setPinCodeStatus(false) {}

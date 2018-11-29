@@ -93,7 +93,7 @@ class WalletSettingsPresenter(
 			fragment.recoveryHeaderStyle()
 			// 属于私密修改行为, 判断是否开启了 `Pin Code` 验证
 			// 如果有私密验证首先要通过 `Pin Code`
-			if (SharedValue.getPincodeDisplayStatus())
+			if (SharedWallet.isPincodeOpened())
 				fragment.activity?.addFragmentAndSetArguments<PasscodeFragment>(ContainerID.main)
 			// 加载 `Hint` 编辑界面
 			fragment.replaceFragmentAndSetArgument<HintFragment>(ContainerID.content)

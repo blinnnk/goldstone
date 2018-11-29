@@ -36,14 +36,7 @@ class PinCodeAndFingerSettingsPresenter(
 			hideChildFragment(fragment)
 		}
 		fragment.activity?.addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main) {
-			putString(
-				ArgumentKey.profileTitle,
-				PincodeText.setTheDigitalLock
-			)
-			putBoolean(
-				ArgumentKey.setPinCode,
-				true
-			)
+			putString(ArgumentKey.profileTitle, PincodeText.setTheDigitalLock)
 		}
 	}
 

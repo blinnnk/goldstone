@@ -42,7 +42,7 @@ import org.jetbrains.anko.*
  */
 class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 	override val pageTitle: String = PincodeText.setTheDigitalLock
-	private val isPinCodeSetting by lazy { arguments?.getBoolean(ArgumentKey.setPinCode) }
+	private val isPinCodeSetting by lazy { arguments?.getBoolean(ArgumentKey.setPinCode).orFalse() }
 	private val disableTheBackButtonToExit by lazy { arguments?.getBoolean(ArgumentKey.disableTheBackButtonToExit) }
 	lateinit var container: RelativeLayout
 	private val keyboard by lazy { NumberKeyboard(context!!) }
@@ -62,7 +62,7 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 			isClickable = true
 			lparams(matchParent, matchParent)
 			GradientView(context).apply {
-				if(isPinCodeSetting.orFalse()) {
+				if(isPinCodeSetting) {
 					setStyle(GradientType.BlueGreen)
 				} else {
 					setStyle(GradientType.Blue)
@@ -71,7 +71,7 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 			}.into(this)
 			
 			passcodeInput.apply {
-				if(isPinCodeSetting.orFalse()) {
+				if(isPinCodeSetting) {
 					y += ScreenSize.Height * 0.07f
 					AppConfigTable.getAppConfig(Dispatchers.Main) { it ->
 						if(it?.pincode.isNull()) {
@@ -98,7 +98,7 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 				}
 			}.into(this)
 			
-			if(!isPinCodeSetting.orFalse()) {
+			if(!isPinCodeSetting) {
 				determineTheInterfaceMode {
 					initializePasswordInput()
 					if(isTwoVerificationMethods) {
@@ -138,7 +138,7 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 	}
 	
 	private fun setParentBackButton() {
-		if(isPinCodeSetting.orFalse()) {
+		if(isPinCodeSetting) {
 			getParentFragment<ProfileOverlayFragment> {
 				getContainer().header.showCloseButton(false) { }
 				getContainer().header.showBackButton(true) {
@@ -344,7 +344,7 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 		)
 	}
 	
-	fun getIsPinCodeSetting(): Boolean? {
+	fun getIsPinCodeSetting(): Boolean {
 		return isPinCodeSetting
 	}
 	
