@@ -114,6 +114,10 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		token?.let {
+			presenter = AddressSelectionPresenter(it, this)
+			presenter.start()
+		}
 		wrapper.addView(confirmButton)
 		setScanButtonStatus {
 			QRCodePresenter.scanQRCode(this)
@@ -124,14 +128,6 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 				confirmButton.y = viewHeight - buttonHeight * 1f
 				keyboardHeight = it
 			}
-		}
-	}
-
-	override fun onResume() {
-		super.onResume()
-		token?.let {
-			presenter = AddressSelectionPresenter(it, this)
-			presenter.start()
 		}
 	}
 

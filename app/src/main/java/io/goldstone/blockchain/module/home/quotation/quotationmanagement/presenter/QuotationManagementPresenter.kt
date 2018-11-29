@@ -32,7 +32,9 @@ class QuotationManagementPresenter(
 			val selections =
 				QuotationSelectionTable.dao.getAllByOrderID().toArrayList()
 			if (initDataMD5.isNull()) {
-				initDataMD5 = selections.map { it.pair }.toString().getObjectMD5HexString()
+				initDataMD5 = selections.map {
+					Pair(it.pair, it.isSelecting)
+				}.toString().getObjectMD5HexString()
 			}
 			launchUI {
 				if (fragment.asyncData.isNull()) fragment.asyncData = selections

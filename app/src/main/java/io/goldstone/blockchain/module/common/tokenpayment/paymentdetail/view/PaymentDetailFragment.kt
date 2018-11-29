@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view
 
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
@@ -28,8 +29,10 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.isTargetDevice
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.*
@@ -155,6 +158,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 	override fun onResume() {
 		super.onResume()
 		inputView.setFoucs()
+		adaptLETVLowVersionUI()
 	}
 
 	fun getMemoContent(): String {
@@ -347,6 +351,18 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 					presenter.popFragmentFrom<PaymentDetailFragment>()
 				} else {
 					removeMemoInputView()
+				}
+			}
+		}
+	}
+
+	private fun adaptLETVLowVersionUI() {
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M && isTargetDevice(DeviceName.letv).orFalse()) {
+			getParentFragment<TokenDetailOverlayFragment> {
+				childFragmentManager.fragments.forEach {
+					if (it !is PaymentDetailFragment) {
+						hideChildFragment(it)
+					}
 				}
 			}
 		}
