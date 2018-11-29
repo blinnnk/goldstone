@@ -30,7 +30,7 @@ object WalletText {
 	val addToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Add More Tokens"
 		HoneyLanguage.Chinese.code -> "添加Token"
-		HoneyLanguage.Japanese.code -> "Tokenの追加"
+		HoneyLanguage.Japanese.code -> "Tokenを追加"
 		HoneyLanguage.Korean.code -> "기타 Token 추가"
 		HoneyLanguage.Russian.code -> "Добавить Token"
 		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"

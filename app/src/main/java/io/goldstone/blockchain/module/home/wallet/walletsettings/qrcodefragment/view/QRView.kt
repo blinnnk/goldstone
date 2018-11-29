@@ -52,7 +52,6 @@ class QRView(context: Context) : LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(size, size)
 			scaleType = ImageView.ScaleType.CENTER_CROP
 		}.into(this)
-
 		address.apply {
 			isCenter()
 			setMargins<LinearLayout.LayoutParams> { topMargin = (-15).uiPX() }
