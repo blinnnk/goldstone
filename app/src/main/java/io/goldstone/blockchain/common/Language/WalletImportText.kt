@@ -254,11 +254,11 @@ object ImportWalletText {
 	@JvmField
 	val importWalletDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Import mnemonics, you will get a multi-chain wallet based on BIP44 standard. When you import a private key or keystore file of a single chain account, GoldStone will generate a multi-chain wallet for you, containing the previous single-chain assets. "
-		HoneyLanguage.Chinese.code -> "导入助记词，您将获得一个基于 BIP44 标准的分层确定性(HD)多链钱包。如果你选择导入某个单链的私钥或是keystore文件，那么 GoldStone 会帮你创建一个包含之前单链资产的多链账户。"
+		HoneyLanguage.Chinese.code -> "导入助记词，您将获得一个基于 BIP44 标准的分层确定性 (HD) 多链钱包。如果你选择导入某个单链的私钥或是 keystore 文件，那么 GoldStone 会帮你创建一个包含之前单链资产的多链账户。"
 		HoneyLanguage.Japanese.code -> "ニーモニックをインポートして、BIP44 標準に基づいたマルチチェーンウォレットを取得します。シングルチェーンの秘密キーまたはキーストアファイルをインポートする場合、GoldStoneは以前のシングルチェーンアセットを使用したマルチチェーンアカウントを作成するのに役立ちます。"
 		HoneyLanguage.Korean.code -> "니모닉 가져 오기를 사용하면 BIP44 표준을 기반으로 다중 체인 지갑을 구할 수 있습니다. 단일 체인 개인 키 또는 키 저장소 파일을 가져 오도록 선택한 경우 GoldStone 은 이전 단일 체인 자산으로 다중 체인 계정을 만드는 데 도움을줍니다."
 		HoneyLanguage.Russian.code -> "Импортировать мнемонику для получения многоцелевого кошелька на основе стандарта BIP44. Если вы решите импортировать одноцелевой частный ключ или файл хранилища ключей, GoldStone поможет вам создать многоцелевую учетную запись с предыдущим одноцелевым активом."
-		HoneyLanguage.TraditionalChinese.code -> "導入助記詞，您將獲得一個基於 BIP44 標準的分層確定性(HD)多鏈錢包。如果你選擇導入某個單鏈的私鑰或是keystore文件，那麼 GoldStone 會幫你創建一個包含之前單鏈資產的多鏈賬戶。"
+		HoneyLanguage.TraditionalChinese.code -> "導入助記詞，您將獲得一個基於 BIP44 標準的分層確定性 (HD) 多鏈錢包。如果你選擇導入某個單鏈的私鑰或是 keystore 文件，那麼 GoldStone 會幫你創建一個包含之前單鏈資產的多鏈賬戶。"
 		else -> ""
 	}
 
