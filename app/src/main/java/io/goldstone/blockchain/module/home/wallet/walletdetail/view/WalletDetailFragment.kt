@@ -14,6 +14,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -139,7 +140,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		super.onResume()
 		presenter.start()
 		// 检查是否需要显示 `PIN Code` 界面
-		if (SharedValue.getPincodeDisplayStatus()) PasscodeFragment.show(this)
+		if (SharedValue.getPincodeDisplayStatus() || SharedWallet.isFingerprintUnlockerOpened()) PasscodeFragment.show(this)
 		getMainActivity()?.backEvent = null // 恢复回退站
 	}
 

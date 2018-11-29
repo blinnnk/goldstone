@@ -129,7 +129,6 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 			
 			keyboard.into(this)
 			keyboard.apply {
-				layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 				centerInHorizontal()
 				alignParentBottom()
 				y -= ScreenSize.Height * 0.113f
