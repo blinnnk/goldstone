@@ -501,12 +501,12 @@ object TokenDetailText {
 
 	@JvmField
 	val refunds = when (currentLanguage) {
-		HoneyLanguage.English.code -> "REFUND"
-		HoneyLanguage.Chinese.code -> "赎回"
-		HoneyLanguage.Japanese.code -> "払い戻し"
-		HoneyLanguage.Korean.code -> "환불"
-		HoneyLanguage.Russian.code -> "Возврат"
-		HoneyLanguage.TraditionalChinese.code -> "贖回"
+		HoneyLanguage.English.code -> "REFUNDING"
+		HoneyLanguage.Chinese.code -> "赎回中"
+		HoneyLanguage.Japanese.code -> "払い戻し中"
+		HoneyLanguage.Korean.code -> "구속"
+		HoneyLanguage.Russian.code -> "фундирование"
+		HoneyLanguage.TraditionalChinese.code -> "贖回中"
 		else -> ""
 	}
 
