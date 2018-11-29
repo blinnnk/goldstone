@@ -246,7 +246,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			val address =
 				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
 				else SharedAddress.getCurrentEOS()
-			setSubtitle(address, true)
+			setSubtitle(address)
 			click {
 				context?.clickToCopy(SharedAddress.getCurrentEOS())
 			}

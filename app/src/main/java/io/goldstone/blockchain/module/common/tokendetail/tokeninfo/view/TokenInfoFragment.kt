@@ -18,7 +18,6 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.crypto.multichain.isEOSSeries
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoContract
@@ -108,10 +107,10 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 	override fun showAddress(address: String, hash160: String) {
 		addressCell.click {
 			it.context.clickToCopy(address)
-		}.setSubtitle(address, !token?.contract.isEOSSeries())
+		}.setSubtitle(address)
 		hash160Cell.click {
 			it.context.clickToCopy(hash160)
-		}.setSubtitle(hash160, true)
+		}.setSubtitle(hash160)
 	}
 
 	override fun showBalance(balance: String) = balanceCell.setSubtitle(balance)

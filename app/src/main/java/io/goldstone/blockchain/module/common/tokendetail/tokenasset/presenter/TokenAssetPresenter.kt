@@ -129,21 +129,20 @@ class TokenAssetPresenter(
 		GlobalScope.launch(Dispatchers.Default) {
 			val localData =
 				EOSAccountTable.dao.getAccount(account.name, chainID.id)
-			if (localData.isNull()) {
-				EOSAPI.getAccountInfo(account) { eosAccount, error ->
-					if (eosAccount.isNotNull() && error.isNone()) {
-						// 初始化插入数据
-						EOSAccountTable.preventDuplicateInsert(eosAccount, chainID) {
-							// 如果本地有了那么更新 Refund 信息
-							if (it) updateRefundInfo()
-						}
-						launchUI {
-							eosAccount.updateUIValue()
-						}
-					} else assetView.showError(error)
-				}
-			} else launchUI {
+			// 本地有数据的话优先显示本地数据
+			if (localData.isNotNull()) launchUI {
 				localData.updateUIValue()
+			}
+			// 异步更新网络数据
+			EOSAPI.getAccountInfo(account) { eosAccount, error ->
+				if (eosAccount.isNotNull() && error.isNone()) {
+					// 初始化插入数据
+					EOSAccountTable.updateOrInsert(eosAccount, chainID)
+					updateRefundInfo()
+					launchUI {
+						eosAccount.updateUIValue()
+					}
+				} else assetView.showError(error)
 			}
 		}
 	}
