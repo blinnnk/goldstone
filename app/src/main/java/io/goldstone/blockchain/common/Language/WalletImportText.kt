@@ -223,22 +223,22 @@ object ImportWalletText {
 	}
 	@JvmField
 	val notBip44WalletAttention = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Wallets imported using keystore or privateKey alone do not support the bip44 format, so the current wallet has only a unique address. If you want to use the bip44 wallet, please use mnemonic to import or create a new wallet directly."
-		HoneyLanguage.Chinese.code -> "仅使用keystore或privateKey导入的钱包不支持bip44格式，因此当前钱包只有一个唯一的地址。如果您想使用bip44钱包，请使用助记符直接导入或创建新钱包。"
-		HoneyLanguage.Japanese.code -> "キーストアまたはprivateKeyのみを使用してインポートされたウォレットは、bip44形式をサポートしていないため、現在のウォレットには一意のアドレスが1つしかありません。 bip44ウォレットを使用する場合は、ニーモニックを使用して新しいウォレットを直接インポートまたは作成します。"
-		HoneyLanguage.Korean.code -> "키 스토어 또는 privateKey 만 사용하여 가져온 지갑은 bip44 형식을 지원하지 않으므로 현재 지갑에는 고유 주소가 하나만 있습니다. bip44 지갑을 사용하려면 니모닉을 사용하여 새 지갑을 직접 가져 오거나 작성하십시오."
-		HoneyLanguage.Russian.code -> "Кошельки, импортированные с использованием только keystore или privateKey, не поддерживают формат bip44, поэтому текущий кошелек имеет только один уникальный адрес. Если вы хотите использовать кошелек bip44, используйте мнемонику для импорта или создания нового кошелька напрямую."
-		HoneyLanguage.TraditionalChinese.code -> "僅使用keystore或privateKey導入的錢包不支持bip44格式，因此當前錢包只有一個唯一的地址。如果您想使用bip44錢包，請使用助記符直接導入或創建新錢包。"
+		HoneyLanguage.English.code -> "Wallets imported using keystore or privateKey alone do not support the BIP44 standard."
+		HoneyLanguage.Chinese.code -> "仅使用 Keystore 或 Private Key导入的钱包不支持 BIP44 标准。"
+		HoneyLanguage.Japanese.code -> "キーストアまたは Private Key のみを使用してインポートされたウォレットは、BIP44 形式をサポートしていない。"
+		HoneyLanguage.Korean.code -> "키 스토어 또는 비공개 키만을 사용하여 가져온 월렛은 BIP44 표준을 지원하지 않습니다."
+		HoneyLanguage.Russian.code -> "Кошельки, импортированные с использованием только keystore или privateKey, не поддерживают формат BIP44."
+		HoneyLanguage.TraditionalChinese.code -> "僅使用 Keystore 或 Private Key 導入的錢包不支持 BIP44 標準。"
 		else -> ""
 	}
 	@JvmField
 	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter password and then click confirm to get your keystore"
-		HoneyLanguage.Chinese.code -> "输入密码，然后单击确认按钮以获取keystore"
+		HoneyLanguage.Chinese.code -> "输入密码，然后单击确认按钮以获取 Keystore"
 		HoneyLanguage.Japanese.code -> "パスワードを入力し、[OK]ボタンをクリックしてKeystoreを取得します"
 		HoneyLanguage.Korean.code -> "비밀번호를 입력한후 확인 버튼을 클릭하여 keystore를 획득하십시오"
 		HoneyLanguage.Russian.code -> "Введите пароль и нажмите на кнопку подтверждения для получения keystore"
-		HoneyLanguage.TraditionalChinese.code -> "輸入密碼，然後單擊確認按鈕以獲取keystore"
+		HoneyLanguage.TraditionalChinese.code -> "輸入密碼，然後單擊確認按鈕以獲取 Keystore"
 		else -> ""
 	}
 	@JvmField
