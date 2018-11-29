@@ -6,6 +6,7 @@ import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.kecca.keccak
 import io.goldstone.blockchain.crypto.utils.clean0xPrefix
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
+import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toHexString
 import org.spongycastle.math.ec.ECPoint
 import java.math.BigInteger
@@ -13,7 +14,7 @@ import java.security.*
 import java.security.spec.ECGenParameterSpec
 import java.util.*
 
-fun ECKeyPair.getAddress() = getAddress(publicKey)
+fun ECKeyPair.getAddress() = getAddress(publicKey).prepend0xPrefix()
 
 const val PRIVATE_KEY_SIZE = 32
 const val PUBLIC_KEY_SIZE = 64
@@ -52,14 +53,14 @@ fun getAddress(publicKey: BigInteger) =
 
 fun getAddress(publicKey: String): String {
 	var publicKeyNoPrefix = publicKey.clean0xPrefix()
-	
+
 	if (publicKeyNoPrefix.length < PUBLIC_KEY_LENGTH_IN_HEX) {
 		publicKeyNoPrefix = "0".repeat(PUBLIC_KEY_LENGTH_IN_HEX - publicKeyNoPrefix.length) +
 			publicKeyNoPrefix
 	}
 	val hexToByteArray = publicKeyNoPrefix.hexToByteArray()
 	val hash = hexToByteArray.keccak().toHexString()
-	
+
 	return hash.substring(hash.length - ADDRESS_LENGTH_IN_HEX)  // right most 160 bits
 }
 

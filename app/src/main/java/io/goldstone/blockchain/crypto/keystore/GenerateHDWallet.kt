@@ -3,11 +3,7 @@
 package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
-import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isTrue
-import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -16,7 +12,6 @@ import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.ethereum.getAddress
 import io.goldstone.blockchain.crypto.ethereum.walletfile.WalletUtil
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.hexToByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -48,36 +43,6 @@ fun Context.generateMnemonicVerifyKeyStore(
 	hold: (address: String?, error: AccountError) -> Unit
 ) {
 	val keystoreFile by lazy { File(filesDir!!, "$walletID${CryptoValue.keystoreFilename}") }
-	/** Generate HD Wallet */
-	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
-	/** Generate Keystore */
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	/** Generate Keys */
-	val masterKey = masterWallet.keyPair
-	/** Get Public Key and Private Key*/
-	val publicKey = masterKey.getAddress()
-	val address = "0x" + publicKey.toLowerCase()
-	/** Import Private Key to Keystore */
-	try {
-		keyStore.importECDSAKey(
-			keyString(masterKey.privateKey.toString(16)).hexToByteArray(),
-			password
-		)
-		hold(address, AccountError.None)
-	} catch (error: Exception) {
-		if (error.toString().contains("account already exists")) {
-			hold(null, AccountError.ExistAddress)
-		} else hold(null, AccountError.WrongPassword)
-	}
-}
-
-fun Context.getEthereumWalletByMnemonic(
-	mnemonicCode: String,
-	pathValue: String,
-	password: String,
-	hold: (address: String?, error: AccountError) -> Unit
-) {
-	val keystoreFile by lazy { File(filesDir!!, CryptoValue.keystoreFilename) }
 	/** Generate HD Wallet */
 	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
 	/** Generate Keystore */
@@ -134,34 +99,6 @@ val keyString: (secret: String) -> String = {
 	}
 }
 
-fun Context.getKeystoreFile(
-	walletAddress: String,
-	password: String,
-	isBTCSeriesWallet: Boolean,
-	hold: (keystoreFile: String?, error: AccountError) -> Unit
-) {
-	val isBTCSeriesOrSingChainWallet = TinyNumberUtils.hasTrue(isBTCSeriesWallet)
-	val filename = CryptoValue.filename(walletAddress, isBTCSeriesWallet)
-	val keystoreFile by lazy { File(filesDir!!, filename) }
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	if (isBTCSeriesOrSingChainWallet) try {
-		hold(String(keyStore.exportKey(keyStore.accounts.get(0), password, password)), AccountError.None)
-	} catch (error: Exception) {
-		hold(null, AccountError.WrongPassword)
-	} else (0 until keyStore.accounts.size()).forEach { index ->
-		keyStore.accounts.get(index).address.hex.let {
-			it.equals(walletAddress, true) isTrue {
-				try {
-					hold(String(keyStore.exportKey(keyStore.accounts.get(index), password, password)), AccountError.None)
-				} catch (error: Exception) {
-					hold(null, AccountError.WrongPassword)
-					LogUtil.error("getKeystoreFile", error)
-				}
-			}
-		}
-	}
-}
-
 fun Context.getKeystoreFileByWalletID(
 	password: String,
 	walletID: Int,
@@ -177,19 +114,29 @@ fun Context.getKeystoreFileByWalletID(
 	}
 }
 
-fun Context.getPrivateKey(
-	walletAddress: String,
+fun Context.generateTemporaryKeyStore(
+	mnemonicCode: String,
+	pathValue: String,
 	password: String,
-	isBTCSeriesWallet: Boolean,
-	hold: (privateKey: String?, error: AccountError) -> Unit
+	hold: (keyStore: String?, error: AccountError) -> Unit
 ) {
-	getKeystoreFile(walletAddress, password, isBTCSeriesWallet) { keyStoreFile, error ->
-		if (keyStoreFile.isNotNull() && error.isNone()) {
-			val keyPair =
-				WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
-			if (keyPair.isNull()) hold(null, AccountError.WrongPassword)
-			else hold(keyPair.privateKey.toString(16), AccountError.None)
-		} else hold(null, error)
+	val keystoreFile by lazy { File(filesDir!!, "temp") }
+	/** Generate HD Wallet */
+	val masterWallet = Mnemonic.mnemonicToKey(mnemonicCode, pathValue)
+	/** Generate Keystore */
+	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
+	/** Generate Keys */
+	val masterKey = masterWallet.keyPair
+	/** Import Private Key to Keystore */
+	try {
+		keyStore.importECDSAKey(
+			keyString(masterKey.privateKey.toString(16)).hexToByteArray(),
+			password
+		)
+		hold(String(keyStore.exportKey(keyStore.accounts.get(0), password, password)), AccountError.None)
+		keyStore.deleteAccount(keyStore.accounts.get(0), password)
+	} catch (error: Exception) {
+		hold(null, AccountError.WrongPassword)
 	}
 }
 
@@ -204,39 +151,6 @@ fun Context.getBigIntegerPrivateKeyByWalletID(
 		if (keyPair == null) hold(null, AccountError.WrongPassword)
 		else hold(keyPair.privateKey, AccountError.None)
 	} else hold(null, error)
-}
-
-fun Context.deleteAccount(
-	walletAddress: String,
-	password: String,
-	isBTCSeriesWallet: Boolean,
-	callback: (error: AccountError) -> Unit
-) {
-	val filename = CryptoValue.filename(walletAddress, isBTCSeriesWallet)
-	val keystoreFile by lazy { File(filesDir!!, filename) }
-	val keyStore = KeyStore(keystoreFile.absolutePath, Geth.LightScryptN, Geth.LightScryptP)
-	// If there is't account found then return
-	if (keyStore.accounts.size() == 0L) {
-		callback(AccountError.None)
-		return
-	}
-	var targetAccountIndex: Long? = if (isBTCSeriesWallet) 0 else null
-	(0 until keyStore.accounts.size()).forEachOrEnd { index, isEnd ->
-		keyStore.accounts.get(index).address.hex.let {
-			if (it.equals(walletAddress, true) && !isBTCSeriesWallet) {
-				targetAccountIndex = index
-			}
-			// `BTC` 的 `Filename` 就是 `Address`
-			if (isEnd && !targetAccountIndex.isNull() || isBTCSeriesWallet) {
-				try {
-					keyStore.deleteAccount(keyStore.accounts.get(targetAccountIndex!!), password)
-					callback(AccountError.None)
-				} catch (error: Exception) {
-					callback(AccountError.WrongPassword)
-				}
-			}
-		}
-	}
 }
 
 fun Context.deleteWalletByWalletID(

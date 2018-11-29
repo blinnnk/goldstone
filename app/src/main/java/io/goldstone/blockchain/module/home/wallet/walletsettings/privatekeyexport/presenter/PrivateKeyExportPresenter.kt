@@ -49,20 +49,32 @@ class PrivateKeyExportPresenter(
 			if (password.isEmpty()) hold(null, AccountError.WrongPassword)
 			else {
 				val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@launch
-				if (wallet.getWalletType().isMultiChain())
-					GoldStoneAPI.context.getPrivateKeyByWalletID(password, wallet.id, chainType, hold)
-				else GoldStoneAPI.context.getPrivateKeyByPath(wallet, address, chainType, password, hold)
+				if (wallet.getWalletType().isMultiChain()) GoldStoneAPI.context.getPrivateKeyByWalletID(
+					password,
+					wallet.id,
+					chainType,
+					hold
+				) else getPrivateKeyByPath(
+					GoldStoneAPI.context,
+					wallet,
+					address,
+					chainType,
+					password,
+					hold
+				)
 			}
 		}
 
-		private fun Context.getPrivateKeyByPath(
+		private fun getPrivateKeyByPath(
+			context: Context,
 			wallet: WalletTable,
 			address: String,
 			chainType: ChainType,
 			password: String,
 			hold: (privateKey: String?, error: AccountError) -> Unit
 		) {
-			getBigIntegerPrivateKeyByWalletID(password, wallet.id) { privateKeyInteger, error ->
+			// 校验密码是否正确
+			context.getBigIntegerPrivateKeyByWalletID(password, wallet.id) { privateKeyInteger, error ->
 				when {
 					privateKeyInteger.isNotNull() && error.isNone() -> {
 						val mnemonic = JavaKeystoreUtil().decryptData(wallet.encryptMnemonic!!)
