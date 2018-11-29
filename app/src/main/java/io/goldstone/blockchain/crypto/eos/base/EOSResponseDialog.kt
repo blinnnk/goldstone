@@ -7,6 +7,7 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.view.CardTitleCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.click
 
 
@@ -16,9 +17,9 @@ import io.goldstone.blockchain.common.utils.click
  */
 fun EOSResponse.showDialog(context: Context) {
 	val data = arrayListOf(
-		Pair("Transaction ID", transactionID),
-		Pair("CPU Usage", "$cupUsageByte"),
-		Pair("NET Usage", "$netUsageByte")
+		Pair(TransactionText.transactionHash, transactionID),
+		Pair(TransactionText.netUsage, "$cupUsageByte"),
+		Pair(TransactionText.cpuUsage, "$netUsageByte")
 	)
 	Dashboard(context) {
 		showList(CommonText.succeed, TitleCellAdapter(data))

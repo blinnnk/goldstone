@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.error.TransferError
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
@@ -144,7 +145,7 @@ class EOSAccountRegisterPresenter(
 			) { resource, error ->
 				GoldStoneAPI.context.runOnUiThread {
 					if (resource.isNotNull())
-						hold(null, RequestError.RPCResult("this account name has been registered"))
+						hold(null, RequestError.RPCResult(EOSAccountText.checkNameResultUnavailable))
 					else hold(true, error)
 				}
 			}
