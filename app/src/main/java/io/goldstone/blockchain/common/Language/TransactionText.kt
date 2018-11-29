@@ -18,12 +18,12 @@ object TransactionText {
 	}
 	@JvmField
 	val confirmations = when (currentLanguage) {
-		HoneyLanguage.English.code -> "CONFIRMED BLOCKS"
-		HoneyLanguage.Chinese.code -> "已确认区块"
-		HoneyLanguage.Japanese.code -> "確認済みのブロック"
-		HoneyLanguage.Korean.code -> "확인 된 블록"
-		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕННЫЕ БЛОКИ"
-		HoneyLanguage.TraditionalChinese.code -> "已確認區塊"
+		HoneyLanguage.English.code -> "CONFIRMATION STATUS"
+		HoneyLanguage.Chinese.code -> "确认状态"
+		HoneyLanguage.Japanese.code -> "確認ステータス"
+		HoneyLanguage.Korean.code -> "확인 상태"
+		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕНИЕ СТАТУСА"
+		HoneyLanguage.TraditionalChinese.code -> "確認狀態"
 		else -> ""
 	}
 	@JvmField
