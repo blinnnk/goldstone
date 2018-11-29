@@ -224,10 +224,10 @@ object WalletSettingsText {
 	@JvmField
 	val exportKeystore = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Export Keystore"
-		HoneyLanguage.Chinese.code -> "导出keystore"
-		HoneyLanguage.Japanese.code -> "Keystoneをエクスポートする"
+		HoneyLanguage.Chinese.code -> "导出 Keystore"
+		HoneyLanguage.Japanese.code -> "Keystone をエクスポートする"
 		HoneyLanguage.Korean.code -> "keystore 도출"
-		HoneyLanguage.Russian.code -> "Экспортировать keystore"
+		HoneyLanguage.Russian.code -> "Экспортировать Keystore"
 		HoneyLanguage.TraditionalChinese.code -> "導出 Keystore"
 		else -> ""
 	}
