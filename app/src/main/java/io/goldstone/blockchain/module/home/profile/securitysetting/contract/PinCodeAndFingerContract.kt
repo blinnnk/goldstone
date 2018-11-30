@@ -4,6 +4,7 @@ import android.widget.Switch
 import io.goldstone.blockchain.common.utils.FingerprintAvailableStatus
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.SecuritySwitchView
 
 /**
  * @date: 2018-11-28.
@@ -12,11 +13,10 @@ import io.goldstone.blockchain.module.common.contract.GoldStoneView
  */
 interface PinCodeAndFingerContract {
 	interface GSView: GoldStoneView<GSPresenter> {
-		fun setPinCodeSingleLineSwitchStatus(isChecked: Boolean)
 		
-		fun checkIfTheSystemFingerprintExists(): FingerprintAvailableStatus
+		fun SecuritySwitchView.notifyFingerStatus()
 		
-		fun openFingerprintEvent(switch: Switch)
+		fun SecuritySwitchView.notifyPincodeStatus()
 		
 		// 设置数字密码弹窗
 		fun setPinCodeTips()

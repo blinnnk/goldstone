@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.PincodeText
@@ -175,6 +176,10 @@ class PasscodePresenter(override val fragment: PasscodeFragment): BasePresenter<
 							childFragmentManager.fragments.last()?.apply {
 								when(this) {
 									is BaseFragment<*> -> {
+										showChildFragment(this)
+										recoveryBackEvent()
+									}
+									is GSFragment -> {
 										showChildFragment(this)
 										recoveryBackEvent()
 									}

@@ -1,15 +1,15 @@
 package io.goldstone.blockchain.module.home.profile.securitysetting.view
 
 import android.content.Intent
+import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.LinearLayout
 import android.widget.Switch
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
@@ -26,25 +26,35 @@ import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
+import io.goldstone.blockchain.module.home.profile.securitysetting.contract.PinCodeAndFingerContract
 import io.goldstone.blockchain.module.home.profile.securitysetting.presenter.PinCodeAndFingerSettingsPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.UI
 
 /**
  * @date 11/09/2018 3:45 PM
  * @author wcx
  */
-class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPresenter>() {
+class PinCodeAndFingerSettingsFragment: GSFragment(),PinCodeAndFingerContract.GSView {
+	
+	override fun showError(error: Throwable) {
+	
+	}
 	override val pageTitle: String = ProfileText.walletSecurity
 
 	private val changePinCode by lazy { LinearLayout(context) }
 	private lateinit var pinCodeSwitch: SecuritySwitchView
 	override val presenter = PinCodeAndFingerSettingsPresenter(this)
-
-	override fun AnkoContext<Fragment>.initView() {
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		return UI {
+			initView()
+		}.view
+	}
+	private fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			if(SharedWallet.isPincodeOpened().orFalse() || SharedWallet.isFingerprintUnlockerOpened().orFalse()) {
+			if(SharedWallet.isPincodeOpened() || SharedWallet.isFingerprintUnlockerOpened()) {
 				presenter.showVerifyPinCodeFragment()
 			}
 
@@ -65,21 +75,11 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 		if(!checkIfTheSystemFingerprintExists().hardwareIsUnsupported()) {
 			// 指纹解锁
 			SecuritySwitchView(context).apply {
-				setSwitchStatus(SharedWallet.isFingerprintUnlockerOpened().orFalse())
-				setOnclick { switch ->
-					if(getSwitchCheckedStatus()) {
-						if(checkIfTheSystemFingerprintExists().isAvailable()) {
-							// 系统已设置指纹
-							openFingerprintEvent(switch)
-						} else {
-							setFingerprintTips()
-							switch.isChecked = !switch.isChecked
-						}
-					} else {
-						openFingerprintEvent(switch)
-					}
+				setSwitchStatus(SharedWallet.isFingerprintUnlockerOpened())
+				setOnclick {
+					notifyFingerStatus()
 				}
-				setTitle(FingerprintUnlockText.fingerprintUnlock, "")
+				setTitle(FingerprintUnlockText.fingerprintUnlock, "sub title")
 			}.into(this)
 		}
 		
@@ -92,15 +92,9 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 			}
 			setOnclick {
 				// 点击后跳转到PinCode编辑界面
-				if(getSwitchCheckedStatus()) {
-					presenter.setPassCodeFragment()
-					pinCodeSwitch.setSwitchStatus(false)
-				} else {
-					changePinCode.visibility = View.GONE
-					AppConfigTable.setPinCodeStatus(false) {}
-				}
+				notifyPincodeStatus()
 			}
-			setTitle(PincodeText.show, "")
+			setTitle(PincodeText.show, "sub title")
 		}
 		pinCodeSwitch.into(this)
 
@@ -129,7 +123,7 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 					presenter.setPassCodeFragment()
 				}
 
-				setTitle(PincodeText.changePinCode, "")
+				setTitle(PincodeText.changePinCode, "sub title")
 			}.into(this)
 		}.into(this)
 	}
@@ -143,25 +137,45 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 	}
 
 	private fun checkIfTheSystemFingerprintExists(): FingerprintAvailableStatus {
-		context?.let {
-			val fingerprintHelper = FingerprintHelper(it)
-			return fingerprintHelper.checkIfTheFingerprintIsAvailable()
+		return FingerprintHelper.checkIfTheFingerprintIsAvailable()
+	}
+	
+	override fun SecuritySwitchView.notifyFingerStatus() {
+		if(getSwitchCheckedStatus()) {
+			if(checkIfTheSystemFingerprintExists().isAvailable()) {
+				// 系统已设置指纹
+				openFingerprintEvent()
+			} else {
+				setFingerprintTips()
+				setSwitchStatus(false)
+			}
+		} else {
+			openFingerprintEvent()
 		}
-		return FingerprintAvailableStatus.HardwareDidNotSupport
+	}
+	
+	override fun SecuritySwitchView.notifyPincodeStatus() {
+		if(getSwitchCheckedStatus()) {
+			presenter.setPassCodeFragment()
+			pinCodeSwitch.setSwitchStatus(false)
+		} else {
+			changePinCode.visibility = View.GONE
+			AppConfigTable.setPinCodeStatus(false) {}
+		}
 	}
 
 	// 点击后根据更新的数据库情况显示指紋解锁开关状态
-	private fun openFingerprintEvent(switch: Switch) {
-		presenter.setFingerprintStatus(switch.isChecked) {
-			switch.isChecked = SharedWallet.isFingerprintUnlockerOpened().orFalse()
-			if(!pinCodeSwitch.getSwitchCheckedStatus().orFalse() && switch.isChecked) {
+	private fun SecuritySwitchView.openFingerprintEvent() {
+		presenter.updateFingerStatus(getSwitchCheckedStatus()) {
+			setSwitchStatus(SharedWallet.isFingerprintUnlockerOpened())
+			if(!pinCodeSwitch.getSwitchCheckedStatus() && getSwitchCheckedStatus()) {
 				setPinCodeTips()
 			}
 		}
 	}
 
 	// 设置数字密码弹窗
-	private fun setPinCodeTips() {
+	override fun setPinCodeTips() {
 		context?.let {
 			GoldStoneDialog(it).showPinCodeTip {
 				presenter.setPassCodeFragment()
@@ -170,15 +184,10 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 	}
 
 	// 设置指纹密码弹窗
-	private fun setFingerprintTips() {
+	override fun setFingerprintTips() {
 		context?.let {
 			GoldStoneDialog(it).showFingerPrintTip {
-				val intent = Intent("android.settings.SETTINGS")
-				intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-				try {
-					it.startActivity(intent)
-				} catch(e: Exception) {
-				}
+				presenter.goToSettingFinger()
 			}
 		}
 	}
@@ -186,7 +195,7 @@ class PinCodeAndFingerSettingsFragment: BaseFragment<PinCodeAndFingerSettingsPre
 	override fun onHiddenChanged(hidden: Boolean) {
 		if(!hidden) {
 			// 设置新密码返回更新状态
-			if(SharedWallet.isPincodeOpened().orFalse()) {
+			if(SharedWallet.isPincodeOpened()) {
 				setChangePinCodeVisibility()
 				setPinCodeSingleLineSwitchStatus(true)
 			}

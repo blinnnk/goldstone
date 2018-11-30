@@ -53,7 +53,7 @@ class PasscodeFragment: BaseFragment<PasscodePresenter>() {
 	private var isVerifyIdentity = false
 	private var isEnterYourNewPasswordAgain = false
 	
-	private val fingerprintHelper by lazy { FingerprintHelper(context!!) }
+	private val fingerprintHelper by lazy { FingerprintHelper() }
 	override val presenter = PasscodePresenter(this)
 	
 	override fun AnkoContext<Fragment>.initView() {

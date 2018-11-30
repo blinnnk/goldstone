@@ -2,22 +2,21 @@
 
 package io.goldstone.blockchain.common.utils
 
-import android.content.Context
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
 import android.os.CancellationSignal
 import android.support.annotation.UiThread
-import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
 import io.goldstone.blockchain.common.error.WalletSecurityError
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 /**
  * @date 04/09/2018 3:32 PM
  * @author wcx
  */
-class FingerprintHelper(private val context: Context) {
+class FingerprintHelper {
 	private var fingerprintManager: FingerprintManager? = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-		context.getSystemService(FingerprintManager::class.java)
+		GoldStoneAPI.context.getSystemService(FingerprintManager::class.java)
 	} else {
 		null
 	}
@@ -142,21 +141,6 @@ class FingerprintHelper(private val context: Context) {
 		}
 	}
 	
-	fun checkIfTheFingerprintIsAvailable(): FingerprintAvailableStatus {
-		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-			if(fingerprintManager.isNull()) {
-				fingerprintManager = context.getSystemService(FingerprintManager::class.java)
-			}
-			if(!fingerprintManager?.isHardwareDetected.orFalse()) {
-				return FingerprintAvailableStatus.HardwareDidNotSupport
-			} else if(!fingerprintManager?.hasEnrolledFingerprints().orFalse()) {
-				return FingerprintAvailableStatus.NoFingerprintSavedRecord
-			}
-			return FingerprintAvailableStatus.Available
-		} else {
-			return FingerprintAvailableStatus.HardwareDidNotSupport
-		}
-	}
 	
 	fun stopAuthenticate() {
 		cancellationSignal?.cancel()
@@ -177,6 +161,23 @@ class FingerprintHelper(private val context: Context) {
 			helpCode: Int,
 			helpString: CharSequence
 		)
+	}
+	companion object {
+		
+		fun checkIfTheFingerprintIsAvailable(): FingerprintAvailableStatus {
+			if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+				val fingerprintManager = GoldStoneAPI.context.getSystemService(FingerprintManager::class.java)
+				
+				if(!fingerprintManager.isHardwareDetected.orFalse()) {
+					return FingerprintAvailableStatus.HardwareDidNotSupport
+				} else if(!fingerprintManager.hasEnrolledFingerprints().orFalse()) {
+					return FingerprintAvailableStatus.NoFingerprintSavedRecord
+				}
+				return FingerprintAvailableStatus.Available
+			} else {
+				return FingerprintAvailableStatus.HardwareDidNotSupport
+			}
+		}
 	}
 }
 
