@@ -16,6 +16,7 @@ object ErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "您輸入的數值過大，超出了允許的範圍。"
 		else -> ""
 	}
+
 	@JvmField
 	val balanceIsNotEnough = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Insufficient current account balance"
@@ -29,11 +30,11 @@ object ErrorText {
 	@JvmField
 	val sellRAMTooLess = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The RAM sold needs to be larger than 1 byte (bytes)."
-		HoneyLanguage.Chinese.code -> "卖出的RAM需要大于1byte(字节)."
+		HoneyLanguage.Chinese.code -> "卖出的RAM需要大于 1 byte(字节)."
 		HoneyLanguage.Japanese.code -> "販売されるRAMは1バイト（バイト）より大きくする必要があります。"
 		HoneyLanguage.Korean.code -> "판매 된 RAM은 1 바이트 (바이트)보다 커야합니다."
 		HoneyLanguage.Russian.code -> "Объем продаваемой ОЗУ должен быть больше 1 байта (байты)."
-		HoneyLanguage.TraditionalChinese.code -> "賣出的RAM需要大於1byte(字節)."
+		HoneyLanguage.TraditionalChinese.code -> "賣出的RAM需要大於 1 byte(字節)."
 		else -> ""
 	}
 	@JvmField
@@ -331,6 +332,31 @@ object TransactionErrorText {
 		HoneyLanguage.Korean.code -> "지갑 잠금을 해제하려면 비밀번호를 입력하십시오."
 		HoneyLanguage.Russian.code -> "Введите пароль, чтобы разблокировать свой кошелек."
 		HoneyLanguage.TraditionalChinese.code -> "請輸入密碼以解鎖錢包。"
+		else -> ""
+	}
+	// 余额不足以支付燃气费的提示
+	@JvmField
+	val notEnoughGasFee = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your account's ETH balance is not sufficient to pay for gas."
+		HoneyLanguage.Chinese.code -> "您账户的ETH余额不足以支付燃气费。"
+		HoneyLanguage.Japanese.code -> "アカウントのETH残高はガスのために支払うために十分ではありません。"
+		HoneyLanguage.Korean.code -> "계정의 ETH 잔액으로 가스 요금을 지불하기에 충분하지 않습니다."
+		HoneyLanguage.Russian.code -> "Баланса ETH для вашей учетной записи недостаточно для оплаты газа."
+		HoneyLanguage.TraditionalChinese.code -> "您賬戶的ETH餘額不足以支付燃氣費。"
+		else -> ""
+	}
+
+}
+
+object WalletErrorText {
+	@JvmField
+	val mnemonicsBackUpReminder = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please back up your mnemonics before proceeding with asset operations."
+		HoneyLanguage.Chinese.code -> "请先备份好助记词再进行资产操作。"
+		HoneyLanguage.Japanese.code -> "資産操作を続行する前にニーモニックをバックアップしてください。"
+		HoneyLanguage.Korean.code -> "자산 조작을 계속하기 전에 니모닉을 백업하십시오."
+		HoneyLanguage.Russian.code -> "Пожалуйста, создайте резервную копию своей мнемоники перед продолжением операций с активами."
+		HoneyLanguage.TraditionalChinese.code -> "請先備份好助記詞再進行資產操作。"
 		else -> ""
 	}
 }

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.error
 import io.goldstone.blockchain.common.language.EosResourceErrorText
 import io.goldstone.blockchain.common.language.ErrorText
 import io.goldstone.blockchain.common.language.TransactionErrorText
+import io.goldstone.blockchain.common.language.WalletErrorText
 
 
 /**
@@ -38,7 +39,7 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val DecryptKeyStoreError = AccountError(ErrorText.decryptKeyStoreError)
 		@JvmStatic
-		val BackUpMnemonic = AccountError("Please back up you mnemonic first")
+		val BackUpMnemonic = AccountError(WalletErrorText.mnemonicsBackUpReminder)
 		@JvmStatic
 		val InvalidAccountName = AccountError(ErrorText.invalidAccountName)
 		@JvmStatic

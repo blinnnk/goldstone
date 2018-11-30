@@ -36,7 +36,11 @@ class ErrorDisplayManager(error: Throwable) {
 				errorMessage.contains("64: dust", true) -> {
 					"amount too small to be recognised as legitimate on the bitcoin network."
 				}
-				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
+				// EOS账号已经存在无法注册的错误.
+				errorMessage.contains("insufficient funds for gas * price + value", true) -> {
+					TransactionErrorText.notEnoughGasFee
+				}
+				// EOS账号已经存在无法注册的错误.
 				errorMessage.contains("3050003", true) -> {
 					TransactionErrorText.transferToUnactivedEOSAcount
 				}
