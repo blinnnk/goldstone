@@ -1,6 +1,8 @@
 package io.goldstone.blockchain.common.error
 
+import io.goldstone.blockchain.common.language.EosResourceErrorText
 import io.goldstone.blockchain.common.language.ErrorText
+import io.goldstone.blockchain.common.language.TransactionErrorText
 
 
 /**
@@ -17,9 +19,9 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val IncorrectDecimal = TransferError(ErrorText.incorrectDecimal)
 		@JvmStatic
-		val InvalidBigNumber = TransferError("Invalid Number, Value is too big")
+		val InvalidBigNumber = TransferError(ErrorText.inputTooBig)
 		@JvmStatic
-		val InvalidRAMNumber = TransferError("RAM Should Sell in byte amount, please check you input value, it must be long type number")
+		val InvalidRAMNumber = TransferError(EosResourceErrorText.ramNoDecimals)
 		@JvmStatic
 		val GetWrongFeeFromChain = TransferError(ErrorText.getWrongFeeFromChain)
 		@JvmStatic
@@ -27,7 +29,7 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val WrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
-		val LessRAMForRegister = TransferError("less RAM for register account")
+		val LessRAMForRegister = TransferError(EosResourceErrorText.ramNotEnoughForNewAccount)
 	}
 }
 
@@ -77,7 +79,7 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 class PasswordError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val InputIsEmpty = AccountError("please enter your password to unlock your wallet")
+		val InputIsEmpty = AccountError(TransactionErrorText.emptyConfirmPassword)
 		@JvmStatic
 		val None = AccountError(GoldStoneError.None.message)
 	}

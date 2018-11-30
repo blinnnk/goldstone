@@ -7,6 +7,16 @@ package io.goldstone.blockchain.common.language
 
 object ErrorText {
 	@JvmField
+	val inputTooBig = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The value you entered is too large and is outside the allowable range."
+		HoneyLanguage.Chinese.code -> "您输入的数值过大，超出了允许的范围。"
+		HoneyLanguage.Japanese.code -> "入力した値が大きすぎ、許容範囲外です。"
+		HoneyLanguage.Korean.code -> "입력 한 값이 너무 커서 허용 범위를 벗어났습니다."
+		HoneyLanguage.Russian.code -> "Введенное вами значение слишком велико и выходит за допустимый диапазон."
+		HoneyLanguage.TraditionalChinese.code -> "您輸入的數值過大，超出了允許的範圍。"
+		else -> ""
+	}
+	@JvmField
 	val balanceIsNotEnough = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Insufficient current account balance"
 		HoneyLanguage.Chinese.code -> "当前账户余额不足"
@@ -310,6 +320,40 @@ object TransactionErrorText {
 		HoneyLanguage.Korean.code -> "전송하려는 EOS 계정이 활성화되지 않았습니다."
 		HoneyLanguage.Russian.code -> "Учетная запись EOS, которую вы хотите передать, не активирована."
 		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活。"
+		else -> ""
+	}
+
+	@JvmField
+	val emptyConfirmPassword = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter password to unlock your wallet."
+		HoneyLanguage.Chinese.code -> "请输入密码以解锁钱包。"
+		HoneyLanguage.Japanese.code -> "ウォレットのロックを解除するにはパスワードを入力してください。"
+		HoneyLanguage.Korean.code -> "지갑 잠금을 해제하려면 비밀번호를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Введите пароль, чтобы разблокировать свой кошелек."
+		HoneyLanguage.TraditionalChinese.code -> "請輸入密碼以解鎖錢包。"
+		else -> ""
+	}
+}
+
+object EosResourceErrorText {
+	@JvmField
+	val ramNoDecimals = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The smallest unit of memory trading is bytes (Byte, 1 KB = 1024 Byte). Decimal numbers are not supported. Please check your input."
+		HoneyLanguage.Chinese.code -> "内存交易的最小单位是字节(Byte, 1 KB = 1024 Byte)，不支持小数数字，请检查您的输入。"
+		HoneyLanguage.Japanese.code -> "メモリ取引の最小単位はバイト(Byte, 1 KB = 1024 Byte)です。小数はサポートされていません。入力を確認してください。"
+		HoneyLanguage.Korean.code -> "메모리 거래의 최소 단위는 바이트 (Byte, 1 KB = 1024 Byte) 이며 십진수는 지원되지 않습니다. 입력을 확인하십시오."
+		HoneyLanguage.Russian.code -> "Наименьшая единица памяти - байты(Byte, 1 KB = 1024 Byte). Десятичные числа не поддерживаются. Проверьте свои данные."
+		HoneyLanguage.TraditionalChinese.code -> "內存交易的最小單位是字節(Byte, 1 KB = 1024 Byte)，不支持小數數字，請檢查您的輸入。"
+		else -> ""
+	}
+	@JvmField
+	val ramNotEnoughForNewAccount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your memory (RAM) balance is not sufficient to activate your new account."
+		HoneyLanguage.Chinese.code -> "您的内存(RAM)余额不足以激活新账号。"
+		HoneyLanguage.Japanese.code -> "メモリ（RAM）の残高では、新しいアカウントを有効にすることはできません。"
+		HoneyLanguage.Korean.code -> "메모리 (RAM) 잔액만으로는 새 계정을 활성화 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "Баланса вашей памяти (ОЗУ) недостаточно, чтобы активировать новую учетную запись."
+		HoneyLanguage.TraditionalChinese.code -> "您的內存(RAM)餘額不足以激活新賬號。"
 		else -> ""
 	}
 }
