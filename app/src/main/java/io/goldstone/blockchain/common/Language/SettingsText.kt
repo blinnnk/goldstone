@@ -158,12 +158,12 @@ object ProfileText {
 	}
 	@JvmField
 	val eosAccountRegister = when (currentLanguage) {
-		HoneyLanguage.English.code -> "EOS Account Registration"
-		HoneyLanguage.Chinese.code -> "EOS 账号注册"
-		HoneyLanguage.Japanese.code -> "EOSアカウントの登録"
-		HoneyLanguage.Korean.code -> "EOS 계정 등록"
-		HoneyLanguage.Russian.code -> "Регистрация учетной записи EOS"
-		HoneyLanguage.TraditionalChinese.code -> "EOS 賬號註冊"
+		HoneyLanguage.English.code -> "Create New EOS Account"
+		HoneyLanguage.Chinese.code -> "创建新 EOS 账号"
+		HoneyLanguage.Japanese.code -> "新しいEOSアカウント"
+		HoneyLanguage.Korean.code -> "새 EOS 계정 활성화"
+		HoneyLanguage.Russian.code -> "Создать учетную запись EOS"
+		HoneyLanguage.TraditionalChinese.code -> "創建新 EOS 賬號"
 		else -> ""
 	}
 	@JvmField
@@ -257,6 +257,16 @@ object ProfileText {
 		HoneyLanguage.Korean.code->"연락처 수정"
 		HoneyLanguage.Russian.code->"Изменить контакт"
 		HoneyLanguage.TraditionalChinese.code->"編輯聯繫人"
+		else -> ""
+	}
+	@JvmField
+	val editContactAlertDescription = when (currentLanguage) {
+		HoneyLanguage.English.code->"Do you want to edit this contact?"
+		HoneyLanguage.Chinese.code->"要编辑此联系人吗?"
+		HoneyLanguage.Japanese.code->"この連絡先を編集しますか?"
+		HoneyLanguage.Korean.code->"이 연락처를 편집 하시겠습니까?"
+		HoneyLanguage.Russian.code->"Вы хотите отредактировать этот контакт?"
+		HoneyLanguage.TraditionalChinese.code->"要編輯此聯繫人嗎?"
 		else -> ""
 	}
 }

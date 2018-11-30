@@ -10,7 +10,7 @@ object PrepareTransferText {
 	val invalidEOSMemoSize = when (currentLanguage) {
 		HoneyLanguage.English.code->"EOS memo up to 256 characters"
 		HoneyLanguage.Chinese.code->"EOS 备忘录最多256个字符"
-		HoneyLanguage.Japanese.code->"EOSメモは256文字まで"
+		HoneyLanguage.Japanese.code->"EOS メモは256文字まで"
 		HoneyLanguage.Korean.code->"EOS 메모 최대 256 자"
 		HoneyLanguage.Russian.code->"Памятка EOS до 256 символов"
 		HoneyLanguage.TraditionalChinese.code->"EOS 備忘錄最多256個字符"
