@@ -37,13 +37,13 @@ class IconWithTitle(context: Context) : LinearLayout(context) {
 		title.apply {
 			topPadding = 5.uiPX()
 			layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
-			typeface = GoldStoneFont.heavy(context)
+			typeface = GoldStoneFont.medium(context)
 			textSize = fontSize(12)
 			textColor = GrayScale.midGray
 		}.into(this)
 	}
 
-	fun setContent(imageSrc: String, text: String, color: Int, iconSize: Int = 60.uiPX()) {
+	fun <T> setContent(imageSrc: T, text: String, color: Int, iconSize: Int = 60.uiPX()) {
 		icon.apply {
 			addCorner(60.uiPX(), color)
 			layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)

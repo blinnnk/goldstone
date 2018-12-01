@@ -45,7 +45,7 @@ class EOSDelegateTransaction(
 				val action = EOSAction(
 					EOSCodeName.EOSIO,
 					transactionCode,
-					EOSTransactionMethod.Undelegatebw,
+					EOSTransactionMethod.undelegatebw(),
 					authorizationObject
 				)
 				val serialization = EOSTransactionUtils.serialize(

@@ -8,6 +8,7 @@ package io.goldstone.blockchain.common.value
 object FragmentTag {
 	const val home = "home"
 	const val walletDetail = "walletDetail"
+	const val dappCenter = "dappCenter"
 	const val walletSettings = "walletSettings"
 	const val profile = "profile"
 	const val profileOverlay = "profileOverlay"

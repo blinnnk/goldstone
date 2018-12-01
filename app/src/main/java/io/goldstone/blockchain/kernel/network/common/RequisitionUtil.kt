@@ -30,11 +30,12 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
+	@JvmField
 	val client = OkHttpClient
 		.Builder()
 		.connectTimeout(30, TimeUnit.SECONDS)
 		.readTimeout(60, TimeUnit.SECONDS)
-		.build()
+		.build()!!
 
 	fun post(
 		condition: String,
@@ -257,8 +258,7 @@ object RequisitionUtil {
 	) -> Request = { path, goldStoneID, body ->
 		val timeStamp = System.currentTimeMillis().toString()
 		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
-		val sign =
-			(goldStoneID + "0" + GoldStoneCryptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
+		val sign = getSignHeader(goldStoneID, timeStamp, version)
 		Request.Builder()
 			.url(path)
 			.apply {
@@ -272,6 +272,10 @@ object RequisitionUtil {
 			.addHeader("sign", sign)
 			.addHeader("channel", currentChannel.value)
 			.build()
+	}
+
+	fun getSignHeader(goldStoneID: String, timeStamp: String, version: String): String {
+		return (goldStoneID + "0" + GoldStoneCryptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
 	}
 
 	/** —————————————————— header 加密请求参数准备 ——————————————————————*/

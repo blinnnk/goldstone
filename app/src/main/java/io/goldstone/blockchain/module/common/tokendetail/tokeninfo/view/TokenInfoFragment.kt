@@ -98,7 +98,6 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 
 	override fun showError(error: Throwable) = safeShowError(error)
 	override fun showTransactionCount(count: Int) = transactionCountCell.setSubtitle("$count")
-	override fun showActivationDate(date: String) = tokenInfoView.updateLatestActivationDate(date)
 	override fun showTotalValue(received: String, sent: String) {
 		totalReceiveCell.setSubtitle(received)
 		totalSentCell.setSubtitle(sent)

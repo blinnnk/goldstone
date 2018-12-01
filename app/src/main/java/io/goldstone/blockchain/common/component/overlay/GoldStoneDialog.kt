@@ -105,14 +105,17 @@ class GoldStoneDialog(private val context: Context) {
 		}
 	}
 
-	fun showNetworkStatus() {
+	fun showNetworkStatus(callback: () -> Unit) {
 		generateCustomView(
 			R.drawable.network_browken_banner,
 			DialogText.networkDescription
 		) {
 			with(dialog) {
+				cancelOnTouchOutside(false)
 				title(text = DialogText.networkTitle)
-				positiveButton(text = CommonText.gotIt)
+				positiveButton(text = CommonText.gotIt) {
+					callback()
+				}
 				customView(view = it)
 				show()
 			}

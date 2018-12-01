@@ -185,7 +185,7 @@ object EOSAPI {
 					EOSAccountInfo(
 						it,
 						SharedChain.getEOSCurrent().chainID.id,
-						SharedAddress.getCurrentEOS()
+						publicKey
 					)
 				}
 			hold(accountNames, RequestError.None)

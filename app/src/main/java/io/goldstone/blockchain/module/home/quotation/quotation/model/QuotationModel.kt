@@ -35,7 +35,7 @@ data class QuotationModel(
 		price,
 		percent,
 		chartData,
-		data.market.toLowerCase(),
+		data.market,
 		data.orderID,
 		data.pairDisplay,
 		data.pair,

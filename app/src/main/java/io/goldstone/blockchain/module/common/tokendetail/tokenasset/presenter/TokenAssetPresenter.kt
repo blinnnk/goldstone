@@ -1,9 +1,12 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
 import com.blinnnk.extension.*
+import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -16,8 +19,10 @@ import io.goldstone.blockchain.crypto.eos.delegate.EOSDelegateTransaction
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -58,6 +63,21 @@ class TokenAssetPresenter(
 					assetView.setEOSRefunds(info.getRefundDescription())
 				}
 			} else if (error.hasError()) assetView.showError(error)
+		}
+	}
+
+	override fun getLatestActivationDate(contract: TokenContract, hold: (String) -> Unit) {
+		GlobalScope.launch(Dispatchers.Default) {
+			val time = EOSTransactionTable.dao.getMaxDataIndex(
+				account.name,
+				contract.contract,
+				contract.symbol,
+				chainID.id
+			)?.time
+			launchUI {
+				if (time.isNotNull()) hold(HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText()))
+				else hold(CommonText.calculating)
+			}
 		}
 	}
 

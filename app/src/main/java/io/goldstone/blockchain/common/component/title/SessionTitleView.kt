@@ -23,7 +23,6 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 
 	private val titleView = TextView(context).apply {
 		textSize = fontSize(12)
-		textColor = GrayScale.midGray
 		typeface = GoldStoneFont.black(context)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
 		setPadding(0, 15.uiPX(), 0, 10.uiPX())
@@ -36,25 +35,33 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.black(context)
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-			setPadding(0, 14.uiPX(), 0, 10.uiPX())
+			setPadding(0, 15.uiPX(), 5.uiPX(), 10.uiPX())
 			gravity = Gravity.END
 		}
 	}
 
 	init {
 		leftPadding = 20.uiPX()
-		rightPadding = 20.uiPX()
+		rightPadding = 10.uiPX()
 		addView(titleView)
 		addView(subtitle)
 	}
 
-	fun setTitle(text: String): SessionTitleView {
+	fun setTitle(text: String, color: Int = GrayScale.midGray): SessionTitleView {
 		titleView.text = text
+		titleView.textColor = color
 		return this
 	}
 
-	fun setSubtitle(specificText: String, wholeText: String, specificColor: Int) {
+	fun setSubtitle(
+		specificText: String,
+		wholeText: String,
+		specificColor: Int,
+		color: Int = GrayScale.midGray
+	): SessionTitleView {
 		subtitle.visibility = View.VISIBLE
+		subtitle.textColor = color
 		subtitle.text = CustomTargetTextStyle(specificText, wholeText, specificColor, 11.uiPX(), false, false)
+		return this
 	}
 }

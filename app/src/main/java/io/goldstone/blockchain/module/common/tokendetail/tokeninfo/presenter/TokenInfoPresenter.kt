@@ -7,6 +7,7 @@ import com.blinnnk.util.HoneyDateUtil
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -20,6 +21,7 @@ import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.ExplorerModel
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -59,6 +61,51 @@ class TokenInfoPresenter(
 		val chainName =
 			CryptoName.getChainNameByContract(token.contract).toUpperCase() + " " + TokenDetailText.chainType
 		infoView.setTokenInfo(code, chainName, CommonText.calculating, info.first, info.second)
+		GlobalScope.launch(Dispatchers.Default) {
+			when {
+				token.contract.isEOSToken() -> {
+					val time = EOSTransactionTable.dao.getMaxDataIndex(
+						SharedAddress.getCurrentEOSAccount().name,
+						token.contract.contract,
+						token.contract.symbol,
+						token.chainID
+					)?.time
+					val date = if (time.isNotNull()) {
+						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
+					} else CommonText.calculating
+					launchUI {
+						infoView.setTokenInfo(code, chainName, date, info.first, info.second)
+					}
+				}
+				token.contract.isBTCSeries() -> {
+					val time =
+						BTCSeriesTransactionTable.dao.getMaxDataIndex(
+							token.contract.getAddress(),
+							token.contract.getChainType().id
+						)?.timeStamp?.toMillisecond()
+					val date = if (time.isNotNull()) {
+						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
+					} else CommonText.calculating
+					launchUI {
+						infoView.setTokenInfo(code, chainName, date, info.first, info.second)
+					}
+				}
+				else -> {
+					val time =
+						TransactionTable.dao.getMaxBlockNumber(
+							token.contract.getAddress(),
+							token.contract.contract,
+							token.chainID
+						)?.timeStamp?.toMillisecond()
+					val date = if (time.isNotNull()) {
+						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
+					} else CommonText.calculating
+					launchUI {
+						infoView.setTokenInfo(code, chainName, date, info.first, info.second)
+					}
+				}
+			}
+		}
 	}
 
 	private fun setBalance() {
@@ -117,14 +164,6 @@ class TokenInfoPresenter(
 							it.value.toDoubleOrNull().orZero()
 						}.toString() suffix token.symbol.symbol
 					infoView.showTotalValue(totalReceiveValue, totalSentValue)
-					// 获取最近一笔交易的时间显示最后活跃时间
-					val latestDate =
-						HoneyDateUtil.getSinceTime(
-							transactions.maxBy {
-								it.timeStamp.toLongOrNull() ?: 0
-							}?.timeStamp?.toMillisecond().orElse(0L)
-						)
-					infoView.showActivationDate(latestDate)
 				}
 			}
 			token.contract.isETC() -> TransactionTable.getETCTransactions(address) { transactions ->
@@ -141,14 +180,6 @@ class TokenInfoPresenter(
 					it.count
 				}.toString() suffix token.symbol.symbol
 				infoView.showTotalValue(totalReceiveValue, totalSentValue)
-				// 获取最近一笔交易的时间显示最后活跃时间
-				val latestDate =
-					HoneyDateUtil.getSinceTime(
-						transactions.maxBy {
-							it.timeStamp.toLongOrNull() ?: 0
-						}?.timeStamp?.toMillisecond().orElse(0L)
-					)
-				infoView.showActivationDate(latestDate)
 			}
 
 			token.contract.isEOSToken() -> EOSAPI.getEOSCountInfo(
@@ -198,14 +229,6 @@ class TokenInfoPresenter(
 							it.count
 						}.toString() suffix token.symbol.symbol
 					infoView.showTotalValue(totalReceiveValue, totalSentValue)
-					// 获取最近一笔交易的时间显示最后活跃时间
-					val latestDate =
-						HoneyDateUtil.getSinceTime(
-							transactions.maxBy {
-								it.timeStamp.toLongOrNull() ?: 0
-							}?.timeStamp?.toMillisecond().orElse(0L)
-						)
-					infoView.showActivationDate(latestDate)
 				}
 			}
 		}

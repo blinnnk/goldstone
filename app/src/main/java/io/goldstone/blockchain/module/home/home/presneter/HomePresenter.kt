@@ -6,6 +6,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAppCenterFragment
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
@@ -22,6 +23,12 @@ class HomePresenter(
 	fun showWalletDetailFragment() {
 		fragment.selectWalletDetail {
 			fragment.showOrAddFragment<WalletDetailFragment>(FragmentTag.walletDetail)
+		}
+	}
+
+	fun showDAppCenterFragment() {
+		fragment.selectDAppCenter {
+			fragment.showOrAddFragment<DAppCenterFragment>(FragmentTag.dappCenter)
 		}
 	}
 
@@ -53,7 +60,9 @@ class HomePresenter(
 			it.isNull() isTrue {
 				addFragmentAndSetArgument<T>(ContainerID.home, fragmentTag)
 			} otherwise {
-				it?.let { showChildFragment(it) }
+				it?.let {
+					showChildFragment(it)
+				}
 			}
 		}
 	}
