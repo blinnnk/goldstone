@@ -274,7 +274,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 
 			sendInfo.apply {
 				setTitle(PrepareTransferText.send)
-				setSubtitle(CryptoUtils.scaleMiddleAddress(address.orEmpty()))
+				setSubtitle(address.orEmpty())
 			}.into(this)
 
 			from.apply {

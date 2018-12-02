@@ -3,12 +3,11 @@ package io.goldstone.blockchain.module.home.wallet.transactions.transactiondetai
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
-import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GSCard
-import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.component.cell.buttonSquareCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -42,7 +41,7 @@ class TransactionAddressCardView(context: Context, addAction: (address: String) 
 					}
 					val addresses = convertMultiToOrFromAddresses(it.info)
 					addresses.forEach { address ->
-						GraySquareCellWithButtons(context).apply {
+						buttonSquareCell {
 							val isExisted = contacts.any { contact ->
 								contact.equals(address, true)
 							}
@@ -53,7 +52,7 @@ class TransactionAddressCardView(context: Context, addAction: (address: String) 
 								addAction = { addAction(address) }
 							)
 							setTitle(CryptoUtils.scaleMiddleAddress(address))
-						}.into(this)
+						}
 					}
 				}
 			}

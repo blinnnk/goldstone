@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.View
+import android.view.ViewManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -14,12 +15,14 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
+import io.goldstone.blockchain.common.component.button.IconWithTitle
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 /**
  * @date 25/04/2018 8:56 AM
@@ -107,12 +110,17 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 	}
 
 	@SuppressLint("SetTextI18n")
-	fun setSubtitle(content: String, isScaleMiddle: Boolean = false) {
+	fun setSubtitle(content: String) {
+		val isScaleMiddle = content.length > 24
 		subtitle.visibility = View.VISIBLE
 		subtitle.text = object : FixTextLength() {
 			override var text = content
-			override val maxWidth = ScreenSize.widthWithPadding * 0.6f
+			override val maxWidth = ScreenSize.widthWithPadding * 0.65f
 			override val textSize: Float = fontSize(12.uiPX())
 		}.getFixString(isScaleMiddle)
 	}
 }
+
+
+fun ViewManager.graySquareCell() = graySquareCell {}
+inline fun ViewManager.graySquareCell(init: GraySquareCell.() -> Unit) = ankoView({ GraySquareCell(it) }, 0, init)

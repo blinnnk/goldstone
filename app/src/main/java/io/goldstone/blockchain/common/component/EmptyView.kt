@@ -49,7 +49,7 @@ class EmptyView(context: Context) : LinearLayout(context) {
 		orientation = VERTICAL
 		gravity = Gravity.CENTER_HORIZONTAL
 
-		layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), emptyViewHeight)
+		layoutParams = LinearLayout.LayoutParams((ScreenSize.Width * 0.6).toInt(), wrapContent)
 
 		icon = imageView {
 			scaleType = ImageView.ScaleType.FIT_XY

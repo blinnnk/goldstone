@@ -479,23 +479,23 @@ object TokenDetailText {
 	//	EOS资产交易入口
 	@JvmField
 	val delegateCPU = when (currentLanguage) {
-		HoneyLanguage.English.code -> "DELEGATE CPU\nREFUND CPU"
-		HoneyLanguage.Chinese.code -> "代理 CPU\n赎回 CPU"
-		HoneyLanguage.Japanese.code -> "デリゲート CPU\n返金 CPU"
-		HoneyLanguage.Korean.code -> "CPU 를 위임하십시오\nCPU 환불"
-		HoneyLanguage.Russian.code -> "Делегат CPU\nВозврат CPU"
-		HoneyLanguage.TraditionalChinese.code -> "代理 CPU\n贖回 CPU"
+		HoneyLanguage.English.code -> "cpu resource"
+		HoneyLanguage.Chinese.code -> "cpu resource"
+		HoneyLanguage.Japanese.code -> "cpu resource"
+		HoneyLanguage.Korean.code -> "cpu resource"
+		HoneyLanguage.Russian.code -> "cpu resource"
+		HoneyLanguage.TraditionalChinese.code -> "cpu resource"
 		else -> ""
 	}
 
 	@JvmField
 	val delegateNET = when (currentLanguage) {
-		HoneyLanguage.English.code -> "DELEGATE NET\nREFUND NET"
-		HoneyLanguage.Chinese.code -> "代理 NET\n赎回 NET"
-		HoneyLanguage.Japanese.code -> "デリゲート NET\n返金 NET"
-		HoneyLanguage.Korean.code -> "NET 를 위임하십시오\nNET 환불"
-		HoneyLanguage.Russian.code -> "Делегат NET\nВозврат NET"
-		HoneyLanguage.TraditionalChinese.code -> "代理 NET\n贖回 NET"
+		HoneyLanguage.English.code -> "net resource"
+		HoneyLanguage.Chinese.code -> "net resource"
+		HoneyLanguage.Japanese.code -> "net resource"
+		HoneyLanguage.Korean.code -> "net resource"
+		HoneyLanguage.Russian.code -> "net resource"
+		HoneyLanguage.TraditionalChinese.code -> "net resource"
 		else -> ""
 	}
 
@@ -523,12 +523,23 @@ object TokenDetailText {
 
 	@JvmField
 	val buySellRAM = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BUY RAM\nSELL RAM"
-		HoneyLanguage.Chinese.code -> "买入 RAM\n卖出 RAM"
-		HoneyLanguage.Japanese.code -> "RAM を購入する\nRAM を販売する"
-		HoneyLanguage.Korean.code -> "RAM 구입\nRAM  판매"
-		HoneyLanguage.Russian.code -> "Купить RAM\nПродать RAM"
-		HoneyLanguage.TraditionalChinese.code -> "買入 RAM\n賣出 RAM"
+		HoneyLanguage.English.code -> "ram resource"
+		HoneyLanguage.Chinese.code -> "ram resource"
+		HoneyLanguage.Japanese.code -> "ram resource"
+		HoneyLanguage.Korean.code -> "ram resource"
+		HoneyLanguage.Russian.code -> "ram resource"
+		HoneyLanguage.TraditionalChinese.code -> "ram resource"
+		else -> ""
+	}
+
+	@JvmField
+	val accountRegister = when (currentLanguage) {
+		HoneyLanguage.English.code -> "register"
+		HoneyLanguage.Chinese.code -> "register"
+		HoneyLanguage.Japanese.code -> "register"
+		HoneyLanguage.Korean.code -> "register"
+		HoneyLanguage.Russian.code -> "register"
+		HoneyLanguage.TraditionalChinese.code -> "register"
 		else -> ""
 	}
 

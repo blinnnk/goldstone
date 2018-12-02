@@ -87,7 +87,7 @@ class PrivateKeyExportPresenter(
 									generateETHSeriesAddress(mnemonic, path).privateKey.toString(16)
 								hold(privateKey, error)
 							}
-							chainType.isBTC() || (chainType.isBTCSeries() && SharedValue.isTestEnvironment()) -> {
+							chainType.isBTC() || (chainType.isBTCSeries() && SharedValue.isTestEnvironment()) || chainType.isAllTest() -> {
 								val path = if (!SharedValue.isTestEnvironment()) wallet.btcPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.BTC)}")
 								else wallet.btcTestPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.AllTest)}")
 								BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path) { _, secret ->

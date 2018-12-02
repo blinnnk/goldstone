@@ -1,9 +1,13 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.goldstone.blockchain.common.component.title
 
 import android.animation.ArgbEvaluator
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Typeface
 import android.view.Gravity
+import android.view.ViewManager
 import android.widget.LinearLayout
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
@@ -12,10 +16,9 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
-import android.animation.ObjectAnimator
-import android.widget.GridLayout
 
 
 /**
@@ -55,12 +58,17 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		orientation = VERTICAL
 	}
 
-	fun setBlackTitles(titleSize: Float = fontSize(14), lineSpace: Int = 0) {
+	fun setBlackTitles(
+		titleSize: Float = fontSize(14),
+		lineSpace: Int = 0,
+		subtitleSize: Float = fontSize(12)
+	) {
 		title.apply {
 			typeface = GoldStoneFont.heavy(context)
 			textColor = GrayScale.black
 			textSize = titleSize
 		}
+		subtitle.textSize = subtitleSize
 		subtitle.y += lineSpace
 		subtitle.textColor = GrayScale.midGray
 	}
@@ -87,12 +95,6 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.textSize = fontSize(14)
 		val typeface = GoldStoneFont.black(context)
 		subtitle.setTypeface(typeface, Typeface.ITALIC)
-	}
-
-	fun setDialogStyle() {
-		setBlackTitles()
-		title.textSize = fontSize(16)
-		subtitle.y += 5.uiPX()
 	}
 
 	fun setColorStyle(color: Int) {
@@ -159,3 +161,6 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.textColor = Spectrum.opacity3White
 	}
 }
+
+inline fun ViewManager.twoLineTitles() = twoLineTitles {}
+inline fun ViewManager.twoLineTitles(init: TwoLineTitles.() -> Unit) = ankoView({ TwoLineTitles(it) }, 0, init)

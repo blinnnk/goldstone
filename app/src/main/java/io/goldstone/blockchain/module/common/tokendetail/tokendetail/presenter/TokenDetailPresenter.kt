@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
-import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero

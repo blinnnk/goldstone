@@ -33,9 +33,11 @@ object EOSValue {
 	const val defaultRegisterAssignBandWidth = 0.1
 }
 
-enum class EOSTransactionMethod(val value: String) {
-	Transfer("transfer"),
-	Undelegatebw("undelegatebw")
+class EOSTransactionMethod(val value: String) {
+	companion object {
+		fun transfer() = EOSTransactionMethod("transfer")
+		fun undelegatebw() = EOSTransactionMethod("undelegatebw")
+	}
 }
 
 data class EOSTransactionSerialization(

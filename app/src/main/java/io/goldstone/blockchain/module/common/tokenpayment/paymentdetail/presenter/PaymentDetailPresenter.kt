@@ -87,8 +87,11 @@ class PaymentDetailPresenter(
 	}
 
 	companion object {
+		// FOR EOS
 		fun showGetPrivateKeyDashboard(
 			context: Context?,
+			cancelEvent: () -> Unit = {},
+			confirmEvent: () -> Unit = {},
 			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) = GlobalScope.launch(Dispatchers.Main) {
 			Dashboard(context!!) {
@@ -97,8 +100,12 @@ class PaymentDetailPresenter(
 					TransactionText.confirmTransaction,
 					true,
 					// User click cancel button
-					{ hold(null, AccountError.None) }
+					{
+						hold(null, AccountError.None)
+						cancelEvent()
+					}
 				) { passwordInput ->
+					confirmEvent()
 					val password = passwordInput?.text?.toString()
 					if (password?.isNotEmpty() == true) PrivateKeyExportPresenter.getPrivateKey(
 						SharedAddress.getCurrentEOS(),

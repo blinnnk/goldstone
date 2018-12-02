@@ -1,9 +1,12 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
 import com.blinnnk.extension.*
+import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -17,8 +20,10 @@ import io.goldstone.blockchain.crypto.eos.delegate.EOSDelegateTransaction
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
+import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -59,6 +64,21 @@ class TokenAssetPresenter(
 					assetView.setEOSRefunds(info.getRefundDescription())
 				}
 			} else if (error.hasError()) assetView.showError(error)
+		}
+	}
+
+	override fun getLatestActivationDate(contract: TokenContract, hold: (String) -> Unit) {
+		GlobalScope.launch(Dispatchers.Default) {
+			val time = EOSTransactionTable.dao.getMaxDataIndex(
+				account.name,
+				contract.contract,
+				contract.symbol,
+				chainID.id
+			)?.time
+			launchUI {
+				if (time.isNotNull()) hold(HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText()))
+				else hold(CommonText.calculating)
+			}
 		}
 	}
 
@@ -130,21 +150,20 @@ class TokenAssetPresenter(
 		GlobalScope.launch(Dispatchers.Default) {
 			val localData =
 				EOSAccountTable.dao.getAccount(account.name, chainID.id)
-			if (localData.isNull()) {
-				EOSAPI.getAccountInfo(account) { eosAccount, error ->
-					if (eosAccount.isNotNull() && error.isNone()) {
-						// 初始化插入数据
-						EOSAccountTable.preventDuplicateInsert(eosAccount, chainID) {
-							// 如果本地有了那么更新 Refund 信息
-							if (it) updateRefundInfo()
-						}
-						launchUI {
-							eosAccount.updateUIValue()
-						}
-					} else assetView.showError(error)
-				}
-			} else launchUI {
+			// 本地有数据的话优先显示本地数据
+			if (localData.isNotNull()) launchUI {
 				localData.updateUIValue()
+			}
+			// 异步更新网络数据
+			EOSAPI.getAccountInfo(account) { eosAccount, error ->
+				if (eosAccount.isNotNull() && error.isNone()) {
+					// 初始化插入数据
+					EOSAccountTable.updateOrInsert(eosAccount, chainID)
+					updateRefundInfo()
+					launchUI {
+						eosAccount.updateUIValue()
+					}
+				} else assetView.showError(error)
 			}
 		}
 	}

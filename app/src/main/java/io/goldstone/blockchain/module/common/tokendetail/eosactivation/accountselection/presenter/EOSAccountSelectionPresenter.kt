@@ -11,7 +11,6 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
@@ -38,14 +37,13 @@ class EOSAccountSelectionPresenter(
 		}
 	}
 
-	private fun getNewAccountNameFromChain(
-		@WorkerThread hold: (newAccount: List<EOSAccountInfo>) -> Unit
-	) {
+	private fun getNewAccountNameFromChain(@WorkerThread hold: (newAccount: List<EOSAccountInfo>) -> Unit) {
 		EOSAPI.getAccountNameByPublicKey(SharedAddress.getCurrentEOS()) { accounts, error ->
-			val wallet = GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+			val wallet = WalletTable.dao.findWhichIsUsing(true)
 			if (accounts.isNotNull() && error.isNone()) hold(accounts)
 			else wallet?.eosAccountNames?.filter {
-				it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true)
+				it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true) &&
+					it.publicKey.equals(SharedAddress.getCurrentEOS(), true)
 			}?.let(hold)
 		}
 	}
@@ -55,7 +53,7 @@ class EOSAccountSelectionPresenter(
 		// 从链上重新拉取一次该公钥的对应的 AccountNames,
 		getNewAccountNameFromChain { allAccounts ->
 			val localAccounts =
-				GoldStoneDataBase.database.eosAccountDao().getAccounts(allAccounts.map { it.name })
+				EOSAccountTable.dao.getAccounts(allAccounts.map { it.name })
 			val actors = arrayListOf<AccountActor>().apply {
 				addAll(
 					localAccounts.map { localAccount ->

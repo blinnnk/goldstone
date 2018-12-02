@@ -43,7 +43,7 @@ data class EOSAccountTable(
 	val permissions: List<PermissionsInfo>,
 	val recordPublicKey: String,
 	val chainID: String,
-	val totalDelegateBandInfo: List<DelegateBandWidthInfo>
+	var totalDelegateBandInfo: List<DelegateBandWidthInfo>
 ) : Serializable {
 	constructor(
 		data: JSONObject,
@@ -76,11 +76,13 @@ data class EOSAccountTable(
 		val dao = GoldStoneDataBase.database.eosAccountDao()
 
 		@WorkerThread
-		fun preventDuplicateInsert(account: EOSAccountTable, chainID: ChainID, callback: (existed: Boolean) -> Unit) {
+		fun updateOrInsert(account: EOSAccountTable, chainID: ChainID) {
 			GoldStoneDataBase.database.eosAccountDao().apply {
-				val isExisted = getAccount(account.name, chainID.id).isNull()
-				if (isExisted) insert(account)
-				callback(isExisted)
+				val localAccount = getAccount(account.name, chainID.id)
+				if (localAccount.isNull()) insert(account)
+				else {
+					insert(account.apply { totalDelegateBandInfo = localAccount.totalDelegateBandInfo })
+				}
 			}
 		}
 

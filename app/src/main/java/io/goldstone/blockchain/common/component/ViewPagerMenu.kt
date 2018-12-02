@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.common.component
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.view.Gravity
 import android.widget.LinearLayout
@@ -10,6 +12,7 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.backgroundColor
@@ -21,19 +24,25 @@ import org.jetbrains.anko.wrapContent
  * @date 2018/6/25 1:34 PM
  * @author KaySaith
  */
-class ViewPagerMenu(context: Context) : LinearLayout(context) {
-	
-	private var titles: ArrayList<String> by observing(arrayListOf()) {
-		val unitWidth = if (titles.size < 4) ScreenSize.Width / titles.size else 100.uiPX()
+@SuppressLint("ViewConstructor")
+class ViewPagerMenu(
+	context: Context,
+	maxWidth: Int = ScreenSize.Width,
+	titleColor: Int = Spectrum.white,
+	titleSize: Int = 12
+) : LinearLayout(context) {
+
+	private var titles: List<String> by observing(arrayListOf()) {
+		val unitWidth = if (titles.size < 4) maxWidth / titles.size else 100.uiPX()
 		underLineWidth = unitWidth.toFloat()
 		titles.forEachIndexed { index, content ->
 			textView(content) {
 				id = index
-				textSize = fontSize(14)
+				textSize = fontSize(titleSize)
 				typeface = GoldStoneFont.heavy(context)
-				textColor = Spectrum.white
+				textColor = titleColor
 				gravity = Gravity.CENTER
-				layoutParams = LinearLayout.LayoutParams(unitWidth, 43.uiPX())
+				layoutParams = LinearLayout.LayoutParams(unitWidth, HomeSize.menuHeight - 2.uiPX())
 			}
 		}
 		invalidate()
@@ -43,19 +52,25 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 		style = Paint.Style.STROKE
 		strokeWidth = fontSize(7)
 	}
-	private val barHeight = 45.uiPX()
+
+	private val defaultLinePaint = Paint().apply {
+		isAntiAlias = true
+		style = Paint.Style.STROKE
+		strokeWidth = 2f
+	}
+
 	private var underLineLeft = 0f
 	private var underLineWidth = 0f
 	private val borderSize = fontSize(4)
-	
+
 	init {
 		setWillNotDraw(false)
-		layoutParams = LinearLayout.LayoutParams(wrapContent, barHeight)
+		layoutParams = LinearLayout.LayoutParams(wrapContent, HomeSize.menuHeight)
 		backgroundColor = Spectrum.deepBlue
 		elevation = 3.uiPX().toFloat()
 	}
-	
-	fun setMenuTitles(titles: ArrayList<String>, hold: (button: TextView, index: Int) -> Unit) {
+
+	fun setMenuTitles(titles: List<String>, hold: (button: TextView, index: Int) -> Unit) {
 		this.titles = titles
 		(0 until titles.size).forEach { index ->
 			findViewById<TextView>(index)?.let {
@@ -63,10 +78,31 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 			}
 		}
 	}
-	
+
+	private var defaultLineColor: Int? = null
+
+	fun setColor(backgroundColor: Int, lineColor: Int, defaultLineColor: Int) {
+		paint.color = lineColor
+		if (defaultLineColor != Color.TRANSPARENT) {
+			this.defaultLineColor = defaultLineColor
+			defaultLinePaint.color = defaultLineColor
+		}
+		this.backgroundColor = backgroundColor
+	}
+
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		paint.color = Spectrum.lightBlue
+
+		defaultLineColor?.let {
+			canvas?.drawLine(
+				0f,
+				height - 2f,
+				width.toFloat(),
+				height - 2f,
+				defaultLinePaint
+			)
+		}
+
 		canvas?.drawLine(
 			underLineLeft,
 			height - borderSize,
@@ -75,11 +111,11 @@ class ViewPagerMenu(context: Context) : LinearLayout(context) {
 			paint
 		)
 	}
-	
+
 	fun getUnitWidth(): Float {
 		return underLineWidth
 	}
-	
+
 	fun moveUnderLine(distance: Float) {
 		underLineLeft = distance
 		invalidate()

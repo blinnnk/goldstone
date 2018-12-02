@@ -70,9 +70,10 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				presenter.updateChartByMenu(candleChart, MarketTokenDetailChartType.Hour.code)
 
 				currentPriceInfo = CurrentPriceView(context)
-				currentPriceInfo.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
-				}.into(this)
+				currentPriceInfo.into(this)
+				currentPriceInfo.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 20.uiPX()
+				}
 				// 显示从上个界面带进来的值防止出现空数据
 				currencyInfo?.let {
 					currentPriceInfo.model = CurrentPriceModel(it)

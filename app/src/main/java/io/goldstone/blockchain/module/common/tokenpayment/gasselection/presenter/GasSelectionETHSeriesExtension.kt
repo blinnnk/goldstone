@@ -11,7 +11,10 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.ethereum.Address
 import io.goldstone.blockchain.crypto.ethereum.ChainDefinition
 import io.goldstone.blockchain.crypto.ethereum.Transaction
-import io.goldstone.blockchain.crypto.multichain.*
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.getSymbol
+import io.goldstone.blockchain.crypto.multichain.isETC
+import io.goldstone.blockchain.crypto.multichain.isETH
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
@@ -34,7 +37,7 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 	when {
 		// 如果是 `ETH` 或 `ETC` 转账刚好就是判断转账金额加上燃气费费用
 		contract.isETH() || contract.isETC() -> {
-			MyTokenTable.getBalanceByContract(contract, contract.getAddress()) { balance, error ->
+			MyTokenTable.getBalanceByContract(contract) { balance, error ->
 				if (balance.isNotNull() && error.isNone()) {
 					if (
 						balance.toWei(TokenContract.ETH.decimal!!) >=
@@ -48,19 +51,13 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 		else -> {
 			// 如果当前不是 `ETH` 需要额外查询用户的 `ETH` 余额是否够支付当前燃气费用
 			// 首先查询 `Token Balance` 余额
-			MyTokenTable.getBalanceByContract(
-				contract,
-				SharedAddress.getCurrentEthereum()
-			) { tokenBalance, error ->
+			MyTokenTable.getBalanceByContract(contract) { tokenBalance, error ->
 				if (tokenBalance.isNull() || error.isNone()) {
 					callback(error)
 					return@getBalanceByContract
 				}
 				// 查询 `ETH` 余额
-				MyTokenTable.getBalanceByContract(
-					TokenContract.ETH,
-					SharedAddress.getCurrentEthereum()
-				) ethBalance@{ ethBalance, ethError ->
+				MyTokenTable.getBalanceByContract(TokenContract.ETH) ethBalance@{ ethBalance, ethError ->
 					if (ethBalance.isNull() || ethError.isNone()) {
 						callback(error)
 						return@ethBalance

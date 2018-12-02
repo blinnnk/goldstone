@@ -242,7 +242,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumAddressesModel(wallet: WalletTable) {
-		setMultiChainAddresses(wallet)
 		ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
 		ethSeriesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
 		ethSeriesView.currentWallet = wallet
@@ -252,7 +251,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBitcoinCashAddressesModel(wallet: WalletTable) {
 		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.bchAddresses
-		setMultiChainAddresses(wallet)
 		bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashAddress)
 		bchAddressesView.currentWallet = wallet
@@ -260,7 +258,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumClassicAddressesModel(wallet: WalletTable) {
-		setMultiChainAddresses(wallet)
 		etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
 		etcAddressesView.currentWallet = wallet
@@ -271,7 +268,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
 		val title = WalletSettingsText.bitcoinAddress(SharedWallet.getInReviewStatus())
 		val addresses = wallet.btcAddresses
-		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
@@ -281,7 +277,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBTCSeriesTestAddressesModel(wallet: WalletTable) {
 		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
 		val addresses = wallet.btcSeriesTestAddresses
-		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCSeriesTestAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
@@ -291,7 +286,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setLitecoinAddressesModel(wallet: WalletTable) {
 		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.ltcAddresses
-		setMultiChainAddresses(wallet)
 		ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.currentWallet = wallet
@@ -299,7 +293,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEOSAddressesModel(wallet: WalletTable) {
-		setMultiChainAddresses(wallet)
 		eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 		eosAddressesView.setTitle(WalletSettingsText.eosAddress)
 		eosAddressesView.currentWallet = wallet
@@ -406,6 +399,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
 							coinType.isAllTest() -> setBTCSeriesTestAddressesModel(wallet)
 						}
+
+						// 更换默认地址后需要刷新总的默认地址目录
+						setMultiChainAddresses(wallet)
 						toast(CommonText.succeed)
 					}
 				}
