@@ -12,7 +12,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
-import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.language.ProfileText
@@ -58,7 +58,9 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
 				}.into(this)
 
-				SessionTitleView(context).setTitle(ProfileText.contacts).into(this)
+				sessionTitle {
+					setTitle(ProfileText.contacts)
+				}
 
 				ethSeriesAddressInput.apply {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }

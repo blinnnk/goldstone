@@ -15,7 +15,9 @@ class BaseDecoration : RecyclerView.ItemDecoration() {
 	override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
 		super.getItemOffsets(outRect, view, parent, state)
 		val position = parent.getChildAdapterPosition(view)
-		if (position == 0) outRect.left = 10.uiPX()
-		else outRect.left = 3.uiPX()
+		when (position) {
+			0 -> outRect.left = 10.uiPX()
+			else -> outRect.left = 3.uiPX()
+		}
 	}
 }

@@ -127,7 +127,7 @@ class WalletDetailPresenter(
 						// `EOS` 主网的余额从 `EOSPark` 批量获取, 减少低端机型在多 海量 `Token` 下获取
 						// `Balance` 要么限制线程导致缓慢, 要么多线程导致性能下降的问题.
 						completeMark()
-					} else MyTokenTable.getBalanceByContract(get(index).contract, ownerName) { balance, error ->
+					} else MyTokenTable.getBalanceByContract(get(index).contract) { balance, error ->
 						if (balance.isNotNull() && error.isNone()) {
 							MyTokenTable.dao.updateBalanceByContract(
 								balance,

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.component.title
 import android.content.Context
 import android.view.Gravity
 import android.view.View
+import android.view.ViewManager
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
@@ -12,6 +13,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 
 /**
@@ -47,10 +49,9 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 		addView(subtitle)
 	}
 
-	fun setTitle(text: String, color: Int = GrayScale.midGray): SessionTitleView {
+	fun setTitle(text: String, color: Int = GrayScale.midGray) {
 		titleView.text = text
 		titleView.textColor = color
-		return this
 	}
 
 	fun setSubtitle(
@@ -58,10 +59,20 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 		wholeText: String,
 		specificColor: Int,
 		color: Int = GrayScale.midGray
-	): SessionTitleView {
+	) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.textColor = color
 		subtitle.text = CustomTargetTextStyle(specificText, wholeText, specificColor, 11.uiPX(), false, false)
-		return this
 	}
 }
+
+fun ViewManager.sessionTitle(title: String) =
+	ankoView(
+		{ SessionTitleView(it) },
+		0
+	) {
+		setTitle(title)
+	}
+
+inline fun ViewManager.sessionTitle(init: SessionTitleView.() -> Unit) =
+	ankoView({ SessionTitleView(it) }, 0, init)

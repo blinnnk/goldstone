@@ -10,5 +10,6 @@ import java.io.Serializable
 data class DAPPModel(
 	val src: String,
 	val title: String,
-	val description: String
+	val description: String,
+	val tags: List<String>
 ): Serializable

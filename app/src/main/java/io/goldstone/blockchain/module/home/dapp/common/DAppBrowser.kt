@@ -14,12 +14,17 @@ import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.SystemUtils
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.multichain.ChainType
+import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.multichain.getAddress
+import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
@@ -31,15 +36,16 @@ import org.json.JSONObject
  * @author KaySaith
  * @date  2018/11/29
  */
-@SuppressLint("SetJavaScriptEnabled")
-class DAppBrowser(context: Context) : WebView(context) {
+@SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
+class DAppBrowser(context: Context, url: String) : WebView(context) {
 	private val loadingView = LoadingView(context)
+	private val jsInterface = JSInterface()
 
 	init {
 		settings.javaScriptEnabled = true
 		webViewClient = WebViewClient()
-		addJavascriptInterface(JSInterface(), "control")
-		this.loadUrl("http://192.168.64.2/site/dapp/index.html")
+		addJavascriptInterface(jsInterface, "control")
+		this.loadUrl(url)
 		layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		webChromeClient = object : WebChromeClient() {
@@ -52,12 +58,35 @@ class DAppBrowser(context: Context) : WebView(context) {
 		}
 	}
 
+	fun backEvent(callback: () -> Unit) {
+		jsInterface.backEvent(callback)
+	}
 
 	inner class JSInterface {
-
+		/**
+		 * @Important
+		 * 所有 `JSInterface` 的线程发起都在  `Thread JSInterFace` 线程, 所以需要
+		 * 在发起的时候就进行 `UI `展示的时候需要首先声明为 `UI` 线程.
+		 */
 		@JavascriptInterface
 		fun toastMessage(message: String) {
 			Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+		}
+
+		@JavascriptInterface
+		fun alert(title: String, message: String) {
+			launchUI {
+				Dashboard(context!!) {
+					showAlert(
+						title,
+						message,
+						CommonText.confirm,
+						{ dialog.dismiss() }
+					) {
+						evaluateJavascript("javascript:showAlert(\"clickedConfirmButton\")", null)
+					}
+				}
+			}
 		}
 
 		@JavascriptInterface
@@ -85,9 +114,7 @@ class DAppBrowser(context: Context) : WebView(context) {
 			load {
 				AesCrypto.decrypt(data).orEmpty()
 			} then { decryptData ->
-				// 直接返回不成功, 不知道为什么,  这里转换一下就好了
-				val result = decryptData.substring(0, decryptData.length)
-				evaluateJavascript("javascript:decrypt(\"$result\")", null)
+				evaluateJavascript("javascript:decrypt(\"${Uri.encode(decryptData)}\")", null)
 			}
 		}
 
@@ -99,8 +126,34 @@ class DAppBrowser(context: Context) : WebView(context) {
 				val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
 				RequisitionUtil.getSignHeader(goldStoneID, timeStamp, version)
 			} then { signData ->
-				System.out.println("sign$signData")
 				evaluateJavascript("javascript:getSignHeader(\"$signData\")", null)
+			}
+		}
+
+		@JavascriptInterface
+		fun getAccountAddress(contract: String, symbol: String, isEOSAccountName: Boolean) {
+			load {
+				TokenContract(contract, symbol, null).getAddress(isEOSAccountName)
+			} then {
+				evaluateJavascript("javascript:getAccountAddress(\"$it\")", null)
+			}
+		}
+
+		@JavascriptInterface
+		fun getBalance(contract: String, symbol: String) {
+			launchUI {
+				val tokenContract = TokenContract(contract, symbol, null)
+				loadingView.show()
+				MyTokenTable.getBalanceByContract(tokenContract) { balance, error ->
+					launchUI {
+						loadingView.remove()
+						if (balance.isNotNull() && error.isNone()) {
+							evaluateJavascript("javascript:getBalance(\"${Uri.encode(balance.toString())}\")", null)
+						} else {
+							evaluateJavascript("javascript:getBalance(\"${Uri.encode(error.message)}\")", null)
+						}
+					}
+				}
 			}
 		}
 
@@ -113,8 +166,8 @@ class DAppBrowser(context: Context) : WebView(context) {
 			) { privateKey, error ->
 				if (privateKey.isNotNull() && error.isNone()) {
 					EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
-						loadingView.remove()
 						launchUI {
+							loadingView.remove()
 							if (pushJson.isNotNull() && hashError.isNone()) {
 								val result = Uri.encode(pushJson)
 								evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
@@ -127,6 +180,13 @@ class DAppBrowser(context: Context) : WebView(context) {
 					loadingView.remove()
 					evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
 				}
+			}
+		}
+
+		@JavascriptInterface
+		fun backEvent(callback: () -> Unit) {
+			evaluateJavascript("javascript:backEvent()") {
+				if (it.equals("\"finished\"", true)) callback()
 			}
 		}
 	}

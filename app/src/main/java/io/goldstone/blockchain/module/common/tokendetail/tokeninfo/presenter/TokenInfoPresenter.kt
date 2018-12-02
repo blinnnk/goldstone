@@ -51,8 +51,8 @@ class TokenInfoPresenter(
 	override fun start() {
 		showTokenInfo()
 		setBalance()
-		setAddress()
 		setTransactionInfo()
+		setAddress()
 	}
 
 	private fun showTokenInfo() {

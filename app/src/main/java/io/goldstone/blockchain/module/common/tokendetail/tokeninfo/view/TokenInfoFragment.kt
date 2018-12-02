@@ -12,7 +12,8 @@ import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
-import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.cell.graySquareCell
+import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.click
@@ -42,50 +43,13 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 		getParentFragment<TokenDetailCenterFragment>()?.token
 	}
 
-	private val tokenInfoView by lazy {
-		TokenInfoView(context!!)
-	}
-
-	private val balanceCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.balance)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val addressCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.address)
-		}
-	}
-
-	private val hash160Cell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle("HASH160")
-		}
-	}
-
-	private val transactionCountCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.transactionCount)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val totalReceiveCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.totalReceived)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
-	private val totalSentCell by lazy {
-		GraySquareCell(context!!).apply {
-			setTitle(TokenDetailText.totalSent)
-			setSubtitle(CommonText.calculating)
-		}
-	}
-
+	private lateinit var tokenInfoView: TokenInfoView
+	private lateinit var balanceCell: GraySquareCell
+	private lateinit var addressCell: GraySquareCell
+	private lateinit var hash160Cell: GraySquareCell
+	private lateinit var transactionCountCell: GraySquareCell
+	private lateinit var totalReceiveCell: GraySquareCell
+	private lateinit var totalSentCell: GraySquareCell
 	override lateinit var presenter: TokenInfoContract.GSPresenter
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -107,9 +71,11 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 		addressCell.click {
 			it.context.clickToCopy(address)
 		}.setSubtitle(address)
-		hash160Cell.click {
-			it.context.clickToCopy(hash160)
-		}.setSubtitle(hash160)
+		if (token?.contract.isBTCSeries()) {
+			hash160Cell.click {
+				it.context.clickToCopy(hash160)
+			}.setSubtitle(hash160)
+		}
 	}
 
 	override fun showBalance(balance: String) = balanceCell.setSubtitle(balance)
@@ -135,17 +101,39 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 				verticalLayout {
 					lparams(matchParent, wrapContent)
 					gravity = Gravity.CENTER_HORIZONTAL
+
+					tokenInfoView = TokenInfoView(context)
 					tokenInfoView.into(this)
-					SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
-					balanceCell.into(this)
-					SessionTitleView(context).setTitle(TokenDetailText.accountInformation).into(this)
-					addressCell.into(this)
+
+					sessionTitle(TokenDetailText.balance)
+					balanceCell = graySquareCell {
+						setTitle(TokenDetailText.balance)
+						setSubtitle(CommonText.calculating)
+					}
+					sessionTitle(TokenDetailText.accountInformation)
+					addressCell = graySquareCell {
+						setTitle(TokenDetailText.address)
+					}
 					// 只有 bitcoin series coin type 的会额外显示 `hash160` 格式的地址
-					if (token?.contract.isBTCSeries()) hash160Cell.into(this)
-					SessionTitleView(context).setTitle(TokenDetailText.transaction).into(this)
-					transactionCountCell.into(this)
-					totalReceiveCell.into(this)
-					totalSentCell.into(this)
+					if (token?.contract.isBTCSeries()) {
+						hash160Cell = graySquareCell {
+							setTitle("HASH160")
+						}
+					}
+					sessionTitle(TokenDetailText.transaction)
+
+					transactionCountCell = graySquareCell {
+						setTitle(TokenDetailText.transactionCount)
+						setSubtitle(CommonText.calculating)
+					}
+					totalReceiveCell = graySquareCell {
+						setTitle(TokenDetailText.totalReceived)
+						setSubtitle(CommonText.calculating)
+					}
+					totalSentCell = graySquareCell {
+						setTitle(TokenDetailText.totalSent)
+						setSubtitle(CommonText.calculating)
+					}
 				}
 			}
 		}.view

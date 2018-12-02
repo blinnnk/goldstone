@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.button
 
 import android.content.Context
 import android.view.Gravity
+import android.view.ViewManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -17,6 +18,7 @@ import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 /**
  * @date 2018/6/27 1:32 AM
@@ -58,3 +60,6 @@ class IconWithTitle(context: Context) : LinearLayout(context) {
 		title.text = text
 	}
 }
+
+fun ViewManager.titleIcon() = titleIcon {}
+inline fun ViewManager.titleIcon(init: IconWithTitle.() -> Unit) = ankoView({ IconWithTitle(it) }, 0, init)

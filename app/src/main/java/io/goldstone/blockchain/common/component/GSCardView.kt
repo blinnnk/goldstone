@@ -2,10 +2,12 @@ package io.goldstone.blockchain.common.component
 
 import android.content.Context
 import android.support.v7.widget.CardView
+import android.view.ViewManager
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.custom.ankoView
 
 
 /**
@@ -42,3 +44,6 @@ open class GSCard(context: Context) : CardView(context) {
 		this.radius = radius
 	}
 }
+
+fun ViewManager.gsCard() = gsCard {}
+inline fun ViewManager.gsCard(init: GSCard.() -> Unit) = ankoView({ GSCard(it) }, 0, init)

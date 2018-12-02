@@ -16,11 +16,11 @@ import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
-import io.goldstone.blockchain.common.component.button.IconWithTitle
+import io.goldstone.blockchain.common.component.button.titleIcon
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
-import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -104,7 +104,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 					tokenInfoView = TokenInfoView(context)
 					tokenInfoView.into(this)
 					showAccountManagementCells()
-					SessionTitleView(context).setTitle(TokenDetailText.assetTools).into(this)
+
+					sessionTitle(TokenDetailText.assetTools)
+
 					gridLayout {
 						leftPadding = 10.uiPX()
 						rightPadding = 10.uiPX()
@@ -115,14 +117,14 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 							Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM),
 							Pair(R.drawable.register_icon, TokenDetailText.accountRegister)
 						).forEach { info ->
-							IconWithTitle(context).apply {
+							titleIcon {
 								layoutParams = LinearLayout.LayoutParams(iconSize, wrapContent)
 								setContent(info.first, info.second, Spectrum.blue)
 							}.click {
 								if (SharedWallet.isWatchOnlyWallet())
 									safeShowError(Throwable(AlertText.watchOnly))
 								else showTradingFragment(info.second)
-							}.into(this)
+							}
 						}
 					}
 					showTransactionCells()
@@ -236,7 +238,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.showAccountManagementCells() {
-		SessionTitleView(context).setTitle(TokenDetailText.accountManagement).into(this)
+		sessionTitle {
+			setTitle(TokenDetailText.accountManagement)
+		}
 		authorizationCell = GraySquareCell(context).apply {
 			showArrow()
 			setTitle(EOSAccountText.authority)
@@ -266,7 +270,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.showTransactionCells() {
-		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
+		sessionTitle {
+			setTitle(TokenDetailText.balance)
+		}
 		balanceCell = GraySquareCell(context).apply {
 			setTitle(TokenDetailText.balance)
 			setSubtitle(CommonText.calculating)
@@ -294,7 +300,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.showAssetDashboard() {
-		SessionTitleView(context).setTitle(TokenDetailText.resources).into(this)
+		sessionTitle {
+			setTitle(TokenDetailText.resources)
+		}
 		assetCard = GrayCardView(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 255.uiPX())
 		}

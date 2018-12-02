@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.view.ViewManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -10,6 +11,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 
 /**
@@ -38,4 +40,9 @@ class SearchBar(context: Context) : GSCard(context) {
 			}
 		}
 	}
+
+	fun getContent(): String = input.text.toString()
 }
+
+fun ViewManager.searchBar() = searchBar {}
+inline fun ViewManager.searchBar(init: SearchBar.() -> Unit) = ankoView({ SearchBar(it) }, 0, init)

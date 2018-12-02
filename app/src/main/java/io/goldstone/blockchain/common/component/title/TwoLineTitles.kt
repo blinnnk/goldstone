@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 package io.goldstone.blockchain.common.component.title
 
 import android.animation.ArgbEvaluator
@@ -5,6 +7,7 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Typeface
 import android.view.Gravity
+import android.view.ViewManager
 import android.widget.LinearLayout
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
@@ -13,6 +16,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
 
@@ -157,3 +161,6 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		subtitle.textColor = Spectrum.opacity3White
 	}
 }
+
+inline fun ViewManager.twoLineTitles() = twoLineTitles {}
+inline fun ViewManager.twoLineTitles(init: TwoLineTitles.() -> Unit) = ankoView({ TwoLineTitles(it) }, 0, init)

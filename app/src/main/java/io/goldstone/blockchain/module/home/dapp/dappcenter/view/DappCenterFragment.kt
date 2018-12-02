@@ -13,12 +13,14 @@ import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.ViewPagerAdapter
-import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.SearchBar
 import io.goldstone.blockchain.common.component.ViewPagerMenu
-import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.gsCard
+import io.goldstone.blockchain.common.component.searchBar
+import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.GrayScale
@@ -51,7 +53,7 @@ class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
 	private lateinit var recommendDAPP: RecommendDappView
 	private lateinit var menuBar: ViewPagerMenu
 	private lateinit var newAPP: DAPPRecyclerView
-	private lateinit var myLatestAPP: DAPPRecyclerView
+	private lateinit var latestUsed: DAPPRecyclerView
 
 	override fun showError(error: Throwable) {
 		safeShowError(error)
@@ -71,19 +73,19 @@ class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					lparams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					topPadding = 30.uiPX()
-					searchBar = SearchBar(context).apply {
+					searchBar = searchBar {
 						layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
+						clearFocus()
 					}
-					addView(searchBar)
-					SessionTitleView(context)
-						.setTitle("Recommend DAPP", Spectrum.white)
-						.setSubtitle(
+					sessionTitle {
+						setTitle("Recommend DAPP", Spectrum.white)
+						setSubtitle(
 							"(5)",
 							"Check All (5)",
 							Spectrum.opacity5White,
 							Spectrum.white
 						)
-						.into(this)
+					}
 					linearLayout {
 						lparams(matchParent, wrapContent)
 						recommendDAPP = RecommendDappView(context) {
@@ -93,7 +95,7 @@ class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
 						bottomPadding = 10.uiPX()
 					}
 
-					GSCard(context).apply {
+					gsCard {
 						lparams(ScreenSize.card, matchParent)
 						verticalLayout {
 							lparams(matchParent, matchParent)
@@ -109,29 +111,13 @@ class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							newAPP = DAPPRecyclerView(context) {
 
 							}
-							myLatestAPP = DAPPRecyclerView(context) {
+							latestUsed = DAPPRecyclerView(context) {
 
 							}
-							newAPP.setData(
-								arrayListOf(
-									DAPPModel(
-										"https://cloudia.hnonline.sk/r740x/d70a807d25d6d0a760e73bce845753d7.jpg", "Neowin", "today is an amazing sunday"
-									),
-									DAPPModel(
-										"https://img.logonews.cn/uploads/2015/04/2015042406311937.png", "Tumblr", "sharing photos and you videos by you will"
-									),
-									DAPPModel(
-										"https://previews.123rf.com/images/nearbirds/nearbirds1603/nearbirds160300008/53831381-jungle-shamans-mobile-game-user-interface-play-window-screen-vector-illustration-for-web-mobile-vide.jpg", "Snamans", "sharing photos and you videos by you will"
-									),
-									DAPPModel(
-										"https://www.touchtapplay.com/wp-content/uploads/2015/12/Crashlands.png", "Crashlands", "Role Playing Game Crashlands To Launch On The App Store Next Month"
-									)
-								)
-							)
 							viewPager {
-								layoutParams = LinearLayout.LayoutParams(matchParent, 500.uiPX())
-								adapter = ViewPagerAdapter(listOf(newAPP, myLatestAPP))
-								val titles = listOf("NEW DAPP", "MY LATEST USED")
+								layoutParams = LinearLayout.LayoutParams(matchParent, ScreenSize.fullHeight)
+								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
+								val titles = listOf("NEW DAPP", "LATEST USED")
 								menuBar.setMenuTitles(titles) { button, id ->
 									button.onClick {
 										currentItem = id
@@ -147,8 +133,7 @@ class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								}
 							}
 						}
-					}.into(this)
-
+					}
 				}
 			}
 		}.view
@@ -158,8 +143,20 @@ class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		recommendDAPP.setData(data)
 	}
 
+	override fun showNewDAPP(data: ArrayList<DAPPModel>) = launchUI {
+		newAPP.setData(data)
+	}
+
+	override fun showLatestUsed(data: ArrayList<DAPPModel>) {
+		latestUsed.setData(data)
+	}
+
 	private fun showDAppBrowserFragment() {
-		getMainActivity()?.addFragmentAndSetArguments<DAppBrowserFragment>(ContainerID.main)
+		// 测试使用之后完成逻辑需要删除替换
+		val url = searchBar.getContent() isEmptyThen "http://192.168.64.2/site/dapp/index.html"
+		getMainActivity()?.addFragmentAndSetArguments<DAppBrowserFragment>(ContainerID.main) {
+			putString("webURL", url)
+		}
 		getMainActivity()?.hideHomeFragment()
 	}
 

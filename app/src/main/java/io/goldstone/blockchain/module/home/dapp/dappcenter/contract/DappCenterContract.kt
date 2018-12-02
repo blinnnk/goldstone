@@ -12,6 +12,8 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPModel
 interface DAppCenterContract {
 	interface GSView : GoldStoneView<GoldStonePresenter> {
 		fun showRecommendDAPP(data: ArrayList<DAPPModel>)
+		fun showNewDAPP(data: ArrayList<DAPPModel>)
+		fun showLatestUsed(data: ArrayList<DAPPModel>)
 	}
 
 	interface GSPresenter : GoldStonePresenter {
