@@ -340,7 +340,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			launchUI {
 				Dashboard(context!!) {
 					showList(
-						"Delegate Bandwidth Detail",
+						TokenDetailText.delegateBandWidth,
 						DelegateBandwidthAdapter(it) {
 							if (SharedWallet.isWatchOnlyWallet()) {
 								showError(Throwable(AlertText.watchOnly))
@@ -357,7 +357,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			cancelOnTouchOutside(false)
 			setContentView(
 				DelegateEditorView(context).apply {
-					setTitle("Delegate Editor")
+					setTitle(TokenDetailText.delegateDetailTitle)
 					closeEvent = Runnable { dismiss() }
 					confirmEvent = Runnable {
 						showLoading(true)

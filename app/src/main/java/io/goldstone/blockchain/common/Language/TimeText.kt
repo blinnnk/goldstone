@@ -101,12 +101,12 @@ object DateAndTimeText {
 
 	@JvmField
 	val later = when (currentLanguage) {
-		HoneyLanguage.English.code -> "later"
-		HoneyLanguage.Chinese.code -> "later"
-		HoneyLanguage.Japanese.code -> "later"
-		HoneyLanguage.Korean.code -> "later"
-		HoneyLanguage.Russian.code -> " later"
-		HoneyLanguage.TraditionalChinese.code -> "later"
+		HoneyLanguage.English.code -> " later"
+		HoneyLanguage.Chinese.code -> "后"
+		HoneyLanguage.Japanese.code -> "後"
+		HoneyLanguage.Korean.code -> " 후"
+		HoneyLanguage.Russian.code -> " спустя"
+		HoneyLanguage.TraditionalChinese.code -> "後"
 		else -> ""
 	}
 

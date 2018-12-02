@@ -52,7 +52,6 @@ class QRView(context: Context) : LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(size, size)
 			scaleType = ImageView.ScaleType.CENTER_CROP
 		}.into(this)
-
 		address.apply {
 			isCenter()
 			setMargins<LinearLayout.LayoutParams> { topMargin = (-15).uiPX() }
@@ -77,7 +76,7 @@ class QRView(context: Context) : LinearLayout(context) {
 
 	fun showFormattedButton(status: Boolean) {
 		convertToLegacyButton.visibility = if (status) View.VISIBLE else View.GONE
-		convertToLegacyButton.text = "Convert BCH Address Formatted"
+		convertToLegacyButton.text = CommonText.switchBCHAddressFormat
 	}
 
 	fun setAddressText(address: String) {
