@@ -281,10 +281,10 @@ object ErrorText {
 	val error = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Error"
 		HoneyLanguage.Chinese.code -> "出错了"
-		HoneyLanguage.Japanese.code -> "何かが間違っていた"
+		HoneyLanguage.Japanese.code -> "エラー"
 		HoneyLanguage.Korean.code -> "틀린"
-		HoneyLanguage.Russian.code -> "Что-то пошло не так."
-		HoneyLanguage.TraditionalChinese.code -> "出錯了"
+		HoneyLanguage.Russian.code -> "Ошибка"
+		HoneyLanguage.TraditionalChinese.code -> "出错了"
 		else -> ""
 	}
 
@@ -357,6 +357,29 @@ object WalletErrorText {
 		HoneyLanguage.Korean.code -> "자산 조작을 계속하기 전에 니모닉을 백업하십시오."
 		HoneyLanguage.Russian.code -> "Пожалуйста, создайте резервную копию своей мнемоники перед продолжением операций с активами."
 		HoneyLanguage.TraditionalChinese.code -> "請先備份好助記詞再進行資產操作。"
+		else -> ""
+	}
+}
+
+object ChainErrorText {
+	@JvmField
+	val getKeyAccountsError = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Failed to get the EOS account list correctly from chain."
+		HoneyLanguage.Chinese.code -> "未能从链上正确获取EOS账户列表。"
+		HoneyLanguage.Japanese.code -> "チェーンからEOSアカウントリストを正しく取得できませんでした。"
+		HoneyLanguage.Korean.code -> "체인에서 EOS 계정 목록을 제대로 가져 오지 못했습니다."
+		HoneyLanguage.Russian.code -> "Не удалось правильно получить список учетных записей EOS из цепочки."
+		HoneyLanguage.TraditionalChinese.code -> "未能從鏈上正確獲取EOS賬戶列表。"
+		else -> ""
+	}
+	@JvmField
+	val getEOSBalanceError = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Failed to update currency balances from EOS chain."
+		HoneyLanguage.Chinese.code -> "未能从EOS链上正确更新货币余额。"
+		HoneyLanguage.Japanese.code -> "EOSチェーンから通貨バランスを正しく更新できませんでした。"
+		HoneyLanguage.Korean.code -> "EOS 체인의 통화 잔액을 올바르게 업데이트하지 못했습니다."
+		HoneyLanguage.Russian.code -> "Не удалось правильно обновить валютный баланс из сети EOS."
+		HoneyLanguage.TraditionalChinese.code -> "未能從鏈上正確獲取EOS賬戶列表。"
 		else -> ""
 	}
 }

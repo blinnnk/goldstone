@@ -42,8 +42,8 @@ class PasscodeInput(context: Context) : RelativeLayout(context) {
 		titles.apply {
 			layoutParams = RelativeLayout.LayoutParams((ScreenSize.Width * 0.8f).toInt(), 200.uiPX())
 			setBigWhiteStyle()
-			titles.title.text = PincodeText.enterPincode
-			titles.subtitle.text = PincodeText.enterPincodeDescription
+			titles.title.text = PincodeText.enterPinCode
+			titles.subtitle.text = PincodeText.enterPinCodeDescription
 			isCenter = true
 		}.into(this)
 		titles.centerInHorizontal()

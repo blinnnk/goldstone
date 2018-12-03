@@ -1,9 +1,6 @@
 package io.goldstone.blockchain.common.error
 
-import io.goldstone.blockchain.common.language.EosResourceErrorText
-import io.goldstone.blockchain.common.language.ErrorText
-import io.goldstone.blockchain.common.language.TransactionErrorText
-import io.goldstone.blockchain.common.language.WalletErrorText
+import io.goldstone.blockchain.common.language.*
 
 
 /**
@@ -46,6 +43,8 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		val UnavailableAccountName = AccountError(ErrorText.eosNameResultUnavailable)
 		@JvmStatic
 		val InactivatedAccountName = AccountError(ErrorText.inactivatedAccountName)
+		@JvmStatic
+		val inactivitedEosKeyCannotRegister = AccountError(EOSAccountText.inactivitedEosKeyCannotRegister)
 		@JvmStatic
 		val EmptyName = AccountError(ErrorText.emptyName)
 		@JvmStatic

@@ -940,7 +940,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val copyResult = when (currentLanguage) {
-		HoneyLanguage.English.code -> "copy memo information"
+		HoneyLanguage.English.code -> "Copy memo information"
 		HoneyLanguage.Chinese.code -> "复制备注信息"
 		HoneyLanguage.Japanese.code -> "備考情報をコピー"
 		HoneyLanguage.Korean.code -> "준비 메모"
@@ -1044,6 +1044,26 @@ object EOSAccountText {
 		HoneyLanguage.Korean.code -> "Настройте ресурсы, которые вы хотите назначить новой учетной записи."
 		HoneyLanguage.Russian.code -> "새 계정에 할당 할 리소스를 사용자 정의하십시오."
 		HoneyLanguage.TraditionalChinese.code -> "自定義想要為新賬號分配的資源"
+		else -> ""
+	}
+	@JvmField
+	val chooseFromMultipleEosAccounts = when (currentLanguage) {
+		HoneyLanguage.English.code -> "There are multiple accounts under this public key is detected, select the account you want to use."
+		HoneyLanguage.Chinese.code -> "检测到这个公钥下有多个账号，请选择你要使用的账户。"
+		HoneyLanguage.Japanese.code -> "この公開鍵の下に複数のアカウントがある場合は、使用するアカウントを選択してください。"
+		HoneyLanguage.Korean.code -> "Если в этом открытом ключе есть несколько учетных записей, выберите учетную запись, которую вы хотите использовать."
+		HoneyLanguage.Russian.code -> "이 공개 키 아래에 여러 계정이있는 경우 사용하려는 계정을 선택하십시오."
+		HoneyLanguage.TraditionalChinese.code -> "檢測到這個公鑰下有多個賬號，請選擇你要使用的賬戶。"
+		else -> ""
+	}
+	@JvmField
+	val inactivitedEosKeyCannotRegister = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The current wallet's EOS account has not been activated. Unable to activate new account."
+		HoneyLanguage.Chinese.code -> "当前钱包的EOS账号尚未激活。无法激活新账号。"
+		HoneyLanguage.Japanese.code -> "現在のウォレットのEOSアカウントは有効化されていません。 新しいアカウントをアクティブ化できません。"
+		HoneyLanguage.Korean.code -> "Текущая учетная запись кошелька не активирована. Не удалось активировать новую учетную запись."
+		HoneyLanguage.Russian.code -> "현재 지갑의 EOS 계정이 활성화되지 않았습니다. 새 계정을 활성화 할 수 없습니다."
+		HoneyLanguage.TraditionalChinese.code -> "當前錢包的EOS賬號尚未激活。無法激活新賬號。"
 		else -> ""
 	}
 

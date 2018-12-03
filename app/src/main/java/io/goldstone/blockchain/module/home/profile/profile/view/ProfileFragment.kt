@@ -52,7 +52,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 						if (SharedAddress.getCurrentEOSAccount().isValid()) {
 							presenter.showTargetFragment(model.title)
 							preventDuplicateClicks()
-						} else safeShowError(AccountError.InactivatedAccountName)
+						} else safeShowError(AccountError.inactivitedEosKeyCannotRegister)
 					}
 					else -> onClick {
 						presenter.showTargetFragment(model.title)
