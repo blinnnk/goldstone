@@ -1,11 +1,10 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.presenter
 
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramstatistics.contract.RAMStatisticsContract
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigDecimal
 
 /**
@@ -30,12 +29,12 @@ class RAMStatisticsPresenter(private val gsView: RAMStatisticsContract.GSView)
 					val percent = availableAmount.divide(maxAmount, 4, BigDecimal.ROUND_HALF_UP).multiply(BigDecimal("100"))
 					maxAmount = maxAmount.divide(BigDecimal(gbDivider), 2 , BigDecimal.ROUND_HALF_UP)
 					availableAmount = availableAmount.divide(BigDecimal(gbDivider), 2 , BigDecimal.ROUND_HALF_UP)
-					GoldStoneAPI.context.runOnUiThread {
+					launchUI {
 						gsView.setGlobalRAMData(availableAmount.toFloat(), maxAmount.toFloat(), percent.toFloat())
 					}
 				}
 			} else {
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					gsView.showError(requestError)
 				}
 			}
@@ -48,11 +47,11 @@ class RAMStatisticsPresenter(private val gsView: RAMStatisticsContract.GSView)
 				val divider = BigDecimal(Math.pow(1024.toDouble(), 3.toDouble()))
 				val ramBalance = BigDecimal(data.ramBalance).divide(divider, 2, BigDecimal.ROUND_HALF_UP).toPlainString()
 				val ramOfEOS = data.eosBalance.formatCount(4)
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					gsView.setChainRAMData(ramBalance, ramOfEOS)
 				}
 			} else {
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					gsView.showError(error)
 				}
 			}

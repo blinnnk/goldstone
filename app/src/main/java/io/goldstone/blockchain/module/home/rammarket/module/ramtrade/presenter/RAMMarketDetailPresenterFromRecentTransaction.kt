@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -16,7 +17,6 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Tradi
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigDecimal
 
 /**
@@ -29,7 +29,7 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 		GoldStoneAPI.getEOSRAMRecentTransactions { data, error ->
 			if (!data.isNull() && error.isNone()) {
 				recentTransactionModel = data
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					recentTransactionModel?.apply {
 						if (buyList.size > currentTransactionLimitSize)  {
 							val tempList = arrayListOf<TradingInfoModel>().apply {
@@ -49,7 +49,7 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 					}
 				}
 			} else {
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					ramMarketDetailView.showError(error)
 				}
 			}
@@ -62,7 +62,7 @@ fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
 	GlobalScope.launch {
 		EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)?.let { localData ->
 			val ramBalance = ((localData.ramQuota -localData. ramUsed).toDouble() / 1024.0).formatCount(4)
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				ramMarketDetailView.showRAMBalance(ramBalance, if (localData.balance.isEmpty()) "0.0" else localData.balance)
 			}
 		}
@@ -83,7 +83,7 @@ fun RAMMarketDetailPresenter.buyRAM(
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (amount > localData.balance.toDoubleOrZero()) {
-					GoldStoneAPI.context.runOnUiThread {
+					launchUI {
 						callback(null, GoldStoneError(EOSRAMExchangeText.noEnoughEOS))
 					}
 					return@launch
@@ -91,7 +91,7 @@ fun RAMMarketDetailPresenter.buyRAM(
 				BaseTradingPresenter.buyRam( context, currentAccount, amount, callback)
 			}
 		} else {
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				callback(null, GoldStoneError("数据库错误"))
 			}
 		}
@@ -113,7 +113,7 @@ fun RAMMarketDetailPresenter.sellRAM(
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (BigDecimal(amount).toBigInteger() > (localData.ramQuota - localData.ramUsed)) {
-					GoldStoneAPI.context.runOnUiThread {
+					launchUI {
 						callback(null, GoldStoneError(EOSRAMExchangeText.noEnoughEOS))
 					}
 					return@launch
@@ -121,7 +121,7 @@ fun RAMMarketDetailPresenter.sellRAM(
 				BaseTradingPresenter.sellRAM(context, amount, callback)
 			}
 		} else {
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				callback(null, GoldStoneError("数据库错误"))
 			}
 		}

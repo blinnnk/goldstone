@@ -7,11 +7,11 @@ import com.blinnnk.util.saveDataToSharedPreferences
 import com.github.mikephil.charting.data.PieEntry
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.distributed.contract.RAMDistributedContract
-import org.jetbrains.anko.runOnUiThread
 
 /**
  * @date: 2018/9/25.
@@ -73,7 +73,7 @@ class RAMTradePercentPresenter(private val gsView: RAMDistributedContract.GSView
 					}
 				}
 			}
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				updateUI()
 			}
 		}

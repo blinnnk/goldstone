@@ -2,9 +2,9 @@ package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.sharedpreference.*
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.contract.RAMMarketDetailContract
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
@@ -14,7 +14,6 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Recen
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.recentTransactions
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.setAcountInfoFromDatabase
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONObject
 import java.math.BigDecimal
 
@@ -65,7 +64,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 			val price = content.getString("price")
 			val current = BigDecimal.valueOf(price.toDoubleOrNull().orElse(0.0)).divide(BigDecimal(1), 8, BigDecimal.ROUND_HALF_UP)
 			ramInformationModel.currentPrice = current.toDouble()
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				updateCurrentPriceUI()
 			}
 		} else if (type == "eos_ram_new_tx") {
@@ -78,7 +77,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 					buyList.removeAt(0)
 					buyList.add(model)
 				}
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					ramMarketDetailView.notifyTradingViewData()
 				}
 			}

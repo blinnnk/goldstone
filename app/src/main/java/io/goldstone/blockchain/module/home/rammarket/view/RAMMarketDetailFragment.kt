@@ -11,12 +11,12 @@ import com.github.mikephil.charting.data.CandleEntry
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
 import io.goldstone.blockchain.module.home.rammarket.contract.RAMMarketDetailContract
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.saveCandleDataToDatabase
@@ -116,13 +116,13 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 								presenter.updateAccountData {
 									presenter.setAcountInfoFromDatabase()
 								}
-								GoldStoneAPI.context.runOnUiThread {
+								launchUI {
 									loadingView.visibility = View.GONE
 									eosResponse.showDialog(context)
 								}
 							} else {
 								if (!error.isNone()) {
-									GoldStoneAPI.context.runOnUiThread {
+									launchUI {
 										loadingView.visibility = View.GONE
 										this@RAMMarketDetailFragment.context.alert(error.message)
 									}

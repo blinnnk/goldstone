@@ -3,11 +3,12 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isTrue
 import com.blinnnk.extension.toArrayList
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.contract.RAMTransactionSearchContract
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 21/04/2018 4:32 PM
@@ -31,13 +32,13 @@ class RAMTransactionSearchPresenter(
 			callback()
 			return
 		}
-		doAsync {
+		GlobalScope.launch {
 			GoldStoneAPI.getEOSRAMTransactionsByAccount(account!!, endID) { data, error ->
 				if (data != null && error.isNone()) {
 					data.forEach {
 						it.account = account!!
 					}
-					GoldStoneAPI.context.runOnUiThread {
+					launchUI {
 						gsView.notifyUI(endID == 0, data.toArrayList())
 						data.isNotEmpty() isTrue {
 							endID = data[data.lastIndex].id
@@ -45,7 +46,7 @@ class RAMTransactionSearchPresenter(
 						callback()
 					}
 				} else {
-					GoldStoneAPI.context.runOnUiThread {
+					launchUI {
 						gsView.showError(error)
 						callback()
 					}
