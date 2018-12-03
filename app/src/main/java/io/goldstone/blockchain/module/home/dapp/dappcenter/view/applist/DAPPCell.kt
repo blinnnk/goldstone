@@ -103,7 +103,7 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = LinearLayout.LayoutParams(wrapContent, 24.uiPX())
 			setPadding(8.uiPX(), 1.uiPX(), 8.uiPX(), 1.uiPX())
-			textSize = fontSize(10)
+			textSize = fontSize(11)
 			textColor = GrayScale.midGray
 			addCorner(12.uiPX(), GrayScale.whiteGray)
 		}

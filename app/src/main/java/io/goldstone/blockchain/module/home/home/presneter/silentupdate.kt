@@ -329,6 +329,7 @@ abstract class SilentUpdater {
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
 			val nodeDao = ChainNodeTable.dao
 			if (serverNodes.isNotNull() && error.isNone() && serverNodes.isNotEmpty()) {
+				nodeDao.deleteAll()
 				nodeDao.insertAll(serverNodes)
 			}
 		}
