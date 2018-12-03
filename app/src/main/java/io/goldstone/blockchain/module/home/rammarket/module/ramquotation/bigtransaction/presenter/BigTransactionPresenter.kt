@@ -17,8 +17,7 @@ class BigTransactionPresenter(private val gsView: BigTransactionContract.GSView)
 		getBigTransactions()
 	}
 	
-	
-	override fun getBigTransactions() {
+	private fun getBigTransactions() {
 		GoldStoneAPI.getLargeTransactions(1) { data, error ->
 			if (data != null && error.isNone()) {
 				launchUI {

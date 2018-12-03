@@ -19,7 +19,5 @@ interface RAMDistributedContract {
 		)
 		fun updatePieChartData(entries: ArrayList<PieEntry>, colors: List<Int>)
 	}
-	interface GSPresenter: GoldStonePresenter {
-		fun getTradeData()
-	}
+	interface GSPresenter: GoldStonePresenter
 }

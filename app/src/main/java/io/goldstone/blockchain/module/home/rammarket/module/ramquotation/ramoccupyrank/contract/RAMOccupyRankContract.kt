@@ -13,7 +13,5 @@ interface RAMOccupyRankContract {
 	interface GSView: GoldStoneView<GSPresenter>{
 		fun updateUI(data: ArrayList<RAMRankModel>)
 	}
-	interface GSPresenter: GoldStonePresenter {
-		fun getBigTransactions()
-	}
+	interface GSPresenter: GoldStonePresenter
 }

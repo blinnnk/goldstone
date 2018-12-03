@@ -14,8 +14,6 @@ class BigTransactionContract{
 		fun updateUI(data: ArrayList<TradingInfoModel>)
 	}
 	
-	interface GSPresenter: GoldStonePresenter {
-		fun getBigTransactions()
-	}
+	interface GSPresenter: GoldStonePresenter
 
 }

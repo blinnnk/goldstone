@@ -13,8 +13,5 @@ interface RAMStatisticsContract {
 		fun setGlobalRAMData(availableAmount: Float, totalAmount: Float, percent: Float)
 		fun setChainRAMData(ramBalance: String, ramOfEOS: String)
 	}
-	interface GSPresenter: GoldStonePresenter {
-		fun getGlobalRAMData()
-		fun getChainRAMData()
-	}
+	interface GSPresenter: GoldStonePresenter
 }

@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.component.button.ButtonMenu
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
@@ -26,8 +27,12 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  */
 class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  TradingDashboardMenu
-	val ramEditText = RAMPriceRoundInputView(context, "KB")
-	val eosEditText = RAMPriceRoundInputView(context, "EOS")
+	val ramEditText = RoundInput(context).apply {
+		showRightLabel("KB")
+	}
+	val eosEditText = RoundInput(context).apply {
+		showRightLabel("EOS")
+	}
 	val ramBalance = TextView(context)
 	val eosBalance = TextView(context)
 	private val confirmButton = RoundButton(context)

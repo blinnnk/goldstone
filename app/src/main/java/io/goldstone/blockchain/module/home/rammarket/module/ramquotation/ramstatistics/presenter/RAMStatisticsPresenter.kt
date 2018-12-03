@@ -19,7 +19,7 @@ class RAMStatisticsPresenter(private val gsView: RAMStatisticsContract.GSView)
 		getChainRAMData()
 	}
 	
-	override fun getGlobalRAMData() {
+	private fun getGlobalRAMData() {
 		EOSAPI.getGlobalInformation { globalModel, requestError ->
 			if (globalModel != null && requestError.isNone()) {
 				if (!globalModel.maxRamSize.isNull() && !globalModel.totalRamBytesReserved.isNull()) {
@@ -41,7 +41,7 @@ class RAMStatisticsPresenter(private val gsView: RAMStatisticsContract.GSView)
 		}
 	}
 	
-	override fun getChainRAMData() {
+	private fun getChainRAMData() {
 		EOSAPI.getRAMMarket { data, error ->
 			if (data != null && error.isNone()) {
 				val divider = BigDecimal(Math.pow(1024.toDouble(), 3.toDouble()))

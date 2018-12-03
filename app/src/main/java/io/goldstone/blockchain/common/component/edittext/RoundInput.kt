@@ -38,13 +38,15 @@ open class RoundInput(context: Context) : EditText(context) {
 	private val paddingSize = 5.uiPX()
 	private var safeLevel = ""
 	private val paint = Paint()
-	val textPaint = Paint() // RAMPriceRoundInputView 需要用到此paint来进行绘制一个标签
+	private val textPaint = Paint()
 	private val alertPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 14.uiPX().toFloat()
 	private var maxCount = 100
 	private var themeColor = Spectrum.blue
 	private var showAlert = false
+	private var showRightLabel = false
+	private var rightLabel = ""
 
 	init {
 		paint.isAntiAlias = true
@@ -135,7 +137,13 @@ open class RoundInput(context: Context) : EditText(context) {
 		textColor = themeColor
 		invalidate()
 	}
-
+	
+	fun showRightLabel(label: String) {
+		showRightLabel = true
+		rightLabel = label
+		invalidate()
+	}
+	
 	fun setAlertStyle(style: SafeLevel) {
 		showAlert = true
 		when (style) {
@@ -209,6 +217,15 @@ open class RoundInput(context: Context) : EditText(context) {
 				width - alertPaint.measureText(safeLevel) - 25.uiPX(),
 				32.uiPX().toFloat(),
 				alertPaint
+			)
+		}
+		
+		if (showRightLabel) {
+			canvas?.drawText(
+				rightLabel,
+				width - textPaint.measureText(rightLabel) - 25.uiPX(),
+				37.uiPX().toFloat(),
+				textPaint
 			)
 		}
 	}

@@ -15,8 +15,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.comm
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.math.BigDecimal
 
 /**
@@ -25,7 +24,7 @@ import java.math.BigDecimal
  * @description:
  */
 fun RAMMarketDetailPresenter.recentTransactions() {
-	GlobalScope.launch {
+	GlobalScope.launch(Dispatchers.Default) {
 		GoldStoneAPI.getEOSRAMRecentTransactions { data, error ->
 			if (!data.isNull() && error.isNone()) {
 				recentTransactionModel = data
@@ -59,7 +58,7 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 
 
 fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
-	GlobalScope.launch {
+	GlobalScope.launch(Dispatchers.Default) {
 		EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)?.let { localData ->
 			val ramBalance = ((localData.ramQuota -localData. ramUsed).toDouble() / 1024.0).formatCount(4)
 			launchUI {
@@ -78,7 +77,7 @@ fun RAMMarketDetailPresenter.buyRAM(
 	amount: Double,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
-	GlobalScope.launch {
+	GlobalScope.launch(Dispatchers.Default) {
 		val eosAcountTable = EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
@@ -108,7 +107,7 @@ fun RAMMarketDetailPresenter.sellRAM(
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
 	
-	GlobalScope.launch {
+	GlobalScope.launch(Dispatchers.Default) {
 		val eosAcountTable = EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->

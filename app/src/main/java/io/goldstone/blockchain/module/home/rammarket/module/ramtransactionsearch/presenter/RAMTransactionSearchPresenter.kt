@@ -7,8 +7,7 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.contract.RAMTransactionSearchContract
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * @date 21/04/2018 4:32 PM
@@ -32,7 +31,7 @@ class RAMTransactionSearchPresenter(
 			callback()
 			return
 		}
-		GlobalScope.launch {
+		GlobalScope.launch(Dispatchers.Default) {
 			GoldStoneAPI.getEOSRAMTransactionsByAccount(account!!, endID) { data, error ->
 				if (data != null && error.isNone()) {
 					data.forEach {

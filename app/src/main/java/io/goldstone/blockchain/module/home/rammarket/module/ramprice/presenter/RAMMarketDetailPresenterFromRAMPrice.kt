@@ -13,8 +13,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.math.BigDecimal
 
 /**
@@ -24,7 +23,7 @@ import java.math.BigDecimal
  */
 
 fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
-	GlobalScope.launch {
+	GlobalScope.launch(Dispatchers.Default) {
 		val localData = GoldStoneDataBase.database.ramPriceDao().getData()
 		val minuteJson = candleDataMap[EOSRAMChartType.Minute.info]?.let {
 			Gson().toJson(it)
@@ -55,7 +54,7 @@ fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
 
 fun RAMMarketDetailPresenter.getChartDataFromDatabase(dataType: String, callback: () -> Unit) {
 	val type = object : TypeToken<ArrayList<CandleChartModel>>() {}.type
-	GlobalScope.launch {
+	GlobalScope.launch(Dispatchers.Default) {
 		GoldStoneDataBase.database.ramPriceDao().getData()?.apply {
 			candleDataMap[dataType] = when(dataType) {
 				EOSRAMChartType.Minute.info -> {
@@ -80,7 +79,7 @@ fun RAMMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) 
 			calculateCountAndUpdate(ramChartType)
 		}
 	} else {
-		GlobalScope.launch {
+		GlobalScope.launch(Dispatchers.Default) {
 			calculateCountAndUpdate(ramChartType)
 		}
 	}

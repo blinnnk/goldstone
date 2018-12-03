@@ -323,19 +323,17 @@ open class PieChart : PieRadarChartBase<PieData> {
 		
 		radius -= radiusOffset // offset to keep things inside the chart
 		
-		val rotationAngle = rotationAngle
-		
 		val entryIndex = highlight.x.toInt()
 		
 		// offset needed to center the drawn text in the slice
 		val offset = drawAngles[entryIndex] / 2
 		
 		// calculate the text position
-		val x = (radius * Math.cos(Math.toRadians(((rotationAngle + absoluteAngles[entryIndex] - offset) * mAnimator.phaseY).toDouble())) + center.x).toFloat()
-		val y = (radius * Math.sin(Math.toRadians(((rotationAngle + absoluteAngles[entryIndex] - offset) * mAnimator.phaseY).toDouble())) + center.y).toFloat()
+		val markerX = (radius * Math.cos(Math.toRadians(((rotationAngle + absoluteAngles[entryIndex] - offset) * mAnimator.phaseY).toDouble())) + center.x).toFloat()
+		val markerY = (radius * Math.sin(Math.toRadians(((rotationAngle + absoluteAngles[entryIndex] - offset) * mAnimator.phaseY).toDouble())) + center.y).toFloat()
 		
 		MPPointF.recycleInstance(center)
-		return floatArrayOf(x, y)
+		return floatArrayOf(markerX, markerY)
 	}
 	
 	/**
@@ -432,10 +430,10 @@ open class PieChart : PieRadarChartBase<PieData> {
 	override fun getIndexForAngle(angle: Float): Int {
 		
 		// take the current angle of the chart into consideration
-		val angel = Utils.getNormalizedAngle(angle - rotationAngle)
+		val finalAngle = Utils.getNormalizedAngle(angle - rotationAngle)
 		
 		for (index in absoluteAngles.indices) {
-			if (absoluteAngles[index] > angel) return index
+			if (absoluteAngles[index] > finalAngle) return index
 		}
 		
 		return -1 // return -1 if no index found
