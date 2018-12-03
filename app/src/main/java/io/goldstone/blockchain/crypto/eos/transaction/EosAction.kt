@@ -14,13 +14,13 @@ import java.io.Serializable
  */
 
 data class EOSAction(
-	val account: EOSCodeName,
+	val code: EOSCodeName,
 	val cryptoData: String,
 	val methodName: EOSTransactionMethod,
 	val authorizationObjects: String
 ) : Serializable, EOSModel {
 	override fun createObject(): String {
-		return "{\"account\":\"${account.value}\",\"authorization\":$authorizationObjects,\"data\":\"$cryptoData\",\"name\":\"$${methodName.value}\"}"
+		return "{\"account\":\"${code.value}\",\"authorization\":$authorizationObjects,\"data\":\"$cryptoData\",\"name\":\"$${methodName.value}\"}"
 	}
 
 	override fun serialize(): String {

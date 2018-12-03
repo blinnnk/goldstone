@@ -29,6 +29,7 @@ import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter.EOSAccountRegisterPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers
@@ -129,7 +130,9 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
+		if (parent is TokenDetailOverlayFragment) {
+			parent.presenter.popFragmentFrom<EOSAccountRegisterFragment>()
+		} else super.setBaseBackEvent(activity, parent)
 	}
 
 	private fun setExpenditure() {

@@ -261,7 +261,7 @@ open class BaseTradingPresenter(
 								ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
 									hold(null, TransferError.BalanceIsNotEnough)
 								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
-								else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
+								else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
 							}
 						}
 						// 检查代理的资源的余额状态
@@ -280,7 +280,7 @@ open class BaseTradingPresenter(
 									?: 0.0
 							}
 							if (tradingCount is Double && count >= tradingCount) {
-								PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
+								PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
 							} else hold(null, TransferError.BalanceIsNotEnough)
 						}
 						else -> EOSAPI.getAccountBalanceBySymbol(
@@ -291,7 +291,7 @@ open class BaseTradingPresenter(
 							if (balance.isNotNull() && balanceError.isNone() && tradingCount is Double) {
 								// 检查发起账户的余额是否足够
 								if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
-								else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
+								else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
 							} else hold(null, balanceError)
 						}
 					}

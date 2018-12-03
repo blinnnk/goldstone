@@ -48,7 +48,7 @@ class EOSTransaction(
 			val action = EOSAction(
 				EOSCodeName(contract.contract),
 				transactionInfoCode,
-				EOSTransactionMethod.Transfer,
+				EOSTransactionMethod.transfer(),
 				authorizationObjects
 			)
 			if (header.isNotNull() && error.isNone()) {

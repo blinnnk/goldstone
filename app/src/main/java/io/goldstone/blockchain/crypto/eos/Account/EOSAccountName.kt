@@ -40,28 +40,34 @@ class EOSAccount(private val value: String) : Serializable {
 		}
 		val isLegalCharacter =
 		// 如果是普通用户名检查 `12` 位的规则
-			if (isNormalName) value.none { !it.toString().matches(legalCharsIn12) }
-			// 如果是特定用户名检查前 `12` 位的规则并且额外检查第 `13` 位的规则
-			else {
-				if (value.length > EOSValue.maxNameLength)
+			if (isNormalName || value.length == EOSValue.maxNameLength) {
+				value.none { !it.toString().matches(legalCharsIn12) }
+			} else {
+				// 如果是特定用户名检查前 `12` 位的规则并且额外检查第 `13` 位的规则
+				if (value.length > EOSValue.maxNameLength) {
 					value.substring(0, 11).none { !it.toString().matches(legalCharsIn12) } &&
 						value.substring(12).none { !it.toString().matches(legalCharsAt13th) }
-				else value.replace(".", "").none { !it.toString().matches(legalCharsIn12) }
+				} else {
+					value.replace(".", "").none { !it.toString().matches(legalCharsIn12) }
+				}
 			}
 		return if (!isLegalCharacter) {
-			if (value.matches(Regex(".*[6-9].*")) || value.contains("0")) {
-				EOSAccountNameChecker.NumberOtherThan1To5
-			} else if (value.length > EOSValue.maxSpecialNameLength) {
-				if (value.substring(12).matches(Regex(".*[k-z].*")))
-					EOSAccountNameChecker.IllegalCharacterAt13th
-				else EOSAccountNameChecker.IsLongName
-			} else if (value.length < EOSValue.maxNameLength)
-				EOSAccountNameChecker.IsShortName
-			else EOSAccountNameChecker.IsValid
+			when {
+				value.matches(Regex(".*[6-9].*")) || value.contains("0") ->
+					EOSAccountNameChecker.NumberOtherThan1To5
+				value.length > EOSValue.maxSpecialNameLength ->
+					if (value.substring(12).matches(Regex(".*[k-z].*")))
+						EOSAccountNameChecker.IllegalCharacterAt13th
+					else EOSAccountNameChecker.IsLongName
+				value.length < EOSValue.maxNameLength -> EOSAccountNameChecker.IsShortName
+				else -> EOSAccountNameChecker.IsInvalid
+			}
 		} else EOSAccountNameChecker.IsValid
 	}
 
-	fun isValid(onlyNormalName: Boolean = true): Boolean = checker(onlyNormalName).isValid()
+	fun isValid(onlyNormalName: Boolean = true): Boolean {
+		return checker(onlyNormalName).isValid()
+	}
 }
 
 enum class EOSAccountNameChecker(val content: String, val shortDescription: String) {
@@ -73,6 +79,7 @@ enum class EOSAccountNameChecker(val content: String, val shortDescription: Stri
 	IllegalSuffix("Illegal suffix in this account name, it never be allowed that contains '.' in name end", "Illegal Suffix"),
 	IsShortName("Attention this is a special short account name ", "Special Shot Name"),
 	IsLongName("Attention this is a special long account name ", "Special Long Name"),
+	IsInvalid("invalid", "invalid"),
 	IsValid("Is Valid", "Is Valid");
 
 	fun isValid(): Boolean = content.equals(IsValid.content, true)

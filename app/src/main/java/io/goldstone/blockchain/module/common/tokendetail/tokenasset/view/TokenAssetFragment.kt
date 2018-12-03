@@ -1,12 +1,10 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.view
 
-import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -18,21 +16,20 @@ import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.GrayCardView
 import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
+import io.goldstone.blockchain.common.component.button.titleIcon
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
-import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -48,9 +45,9 @@ import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.presenter.TokenInfoPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.view.TokenInfoView
+import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.presenter.QRCodePresenter
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 import java.math.BigInteger
 
@@ -107,22 +104,31 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 					tokenInfoView = TokenInfoView(context)
 					tokenInfoView.into(this)
 					showAccountManagementCells()
-					showTransactionCells()
-					showAssetDashboard()
-					SessionTitleView(context).setTitle(TokenDetailText.assetTools).into(this)
-					linearLayout {
-						lparams {
-							width = ScreenSize.card
-							height = wrapContent
-						}
+
+					sessionTitle(TokenDetailText.assetTools)
+
+					gridLayout {
+						leftPadding = 10.uiPX()
+						rightPadding = 10.uiPX()
+						val iconSize = ScreenSize.card / 4
 						listOf(
 							Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
 							Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
-							Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM)
-						).forEach { pair ->
-							generateCardView(pair)
+							Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM),
+							Pair(R.drawable.register_icon, TokenDetailText.accountRegister)
+						).forEach { info ->
+							titleIcon {
+								layoutParams = LinearLayout.LayoutParams(iconSize, wrapContent)
+								setContent(info.first, info.second, Spectrum.blue)
+							}.click {
+								if (SharedWallet.isWatchOnlyWallet())
+									safeShowError(Throwable(AlertText.watchOnly))
+								else showTradingFragment(info.second)
+							}
 						}
 					}
+					showTransactionCells()
+					showAssetDashboard()
 				}
 			}
 		}.view
@@ -146,6 +152,11 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 				info.second
 			)
 		}
+		token?.apply {
+			presenter.getLatestActivationDate(contract) {
+				tokenInfoView.setLatestActivation(chainName, it)
+			}
+		}
 	}
 
 	private fun showPublicKeyAccountNames() {
@@ -162,15 +173,17 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun showTradingFragment(title: String) {
-		val tokenDetailOverlayPresenter =
+		val parentPresenter =
 			getGrandFather<TokenDetailOverlayFragment>()?.presenter
 		when (title) {
-			TokenDetailText.delegateCPU -> tokenDetailOverlayPresenter
+			TokenDetailText.delegateCPU -> parentPresenter
 				?.showTargetFragment<CPUTradingFragment>(Bundle(), 2)
-			TokenDetailText.delegateNET -> tokenDetailOverlayPresenter
+			TokenDetailText.delegateNET -> parentPresenter
 				?.showTargetFragment<NETTradingFragment>(Bundle(), 2)
-			TokenDetailText.buySellRAM -> tokenDetailOverlayPresenter
+			TokenDetailText.buySellRAM -> parentPresenter
 				?.showTargetFragment<RAMTradingFragment>(Bundle(), 2)
+			TokenDetailText.accountRegister -> parentPresenter
+				?.showTargetFragment<EOSAccountRegisterFragment>(Bundle(), 2)
 		}
 	}
 
@@ -225,7 +238,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.showAccountManagementCells() {
-		SessionTitleView(context).setTitle(TokenDetailText.accountManagement).into(this)
+		sessionTitle {
+			setTitle(TokenDetailText.accountManagement)
+		}
 		authorizationCell = GraySquareCell(context).apply {
 			showArrow()
 			setTitle(EOSAccountText.authority)
@@ -246,7 +261,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			val address =
 				if (SharedAddress.getCurrentEOS().isEmpty()) "Account Name Only"
 				else SharedAddress.getCurrentEOS()
-			setSubtitle(address, true)
+			setSubtitle(address)
 			click {
 				context?.clickToCopy(SharedAddress.getCurrentEOS())
 			}
@@ -255,7 +270,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.showTransactionCells() {
-		SessionTitleView(context).setTitle(TokenDetailText.balance).into(this)
+		sessionTitle {
+			setTitle(TokenDetailText.balance)
+		}
 		balanceCell = GraySquareCell(context).apply {
 			setTitle(TokenDetailText.balance)
 			setSubtitle(CommonText.calculating)
@@ -283,7 +300,9 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun ViewGroup.showAssetDashboard() {
-		SessionTitleView(context).setTitle(TokenDetailText.resources).into(this)
+		sessionTitle {
+			setTitle(TokenDetailText.resources)
+		}
 		assetCard = GrayCardView(context).apply {
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 255.uiPX())
 		}
@@ -364,42 +383,6 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 				},
 				LinearLayout.LayoutParams(matchParent, wrapContent)
 			)
-		}
-	}
-
-	private fun ViewGroup.generateCardView(info: Pair<Int, String>) {
-		val cardWidth = ScreenSize.card / 3 - 4.uiPX()
-		val cardView = GrayCardView(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(cardWidth, 135.uiPX())
-			container.apply {
-				onClick {
-					if (SharedWallet.isWatchOnlyWallet())
-						safeShowError(Throwable(AlertText.watchOnly))
-					else showTradingFragment(info.second)
-					preventDuplicateClicks()
-				}
-				imageView {
-					setColorFilter(GrayScale.gray)
-					scaleType = ImageView.ScaleType.CENTER_INSIDE
-					imageResource = info.first
-					layoutParams = RelativeLayout.LayoutParams(cardWidth, 75.uiPX())
-				}
-				textView(info.second) {
-					textSize = fontSize(11)
-					textColor = GrayScale.midGray
-					typeface = GoldStoneFont.black(context)
-					layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-					gravity = Gravity.CENTER_HORIZONTAL
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-						lineHeight = 13.uiPX()
-					}
-				}
-			}
-		}
-		cardView.into(this)
-		cardView.setMargins<LinearLayout.LayoutParams> {
-			leftMargin = 2.uiPX()
-			rightMargin = 2.uiPX()
 		}
 	}
 }

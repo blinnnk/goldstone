@@ -151,7 +151,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				currentWallet.getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				if (NetworkUtil.hasNetwork(context)) {
-					currentWallet.checkOrUpdateEOSAccount(context, callback)
+					checkOrUpdateEOSAccount(context, currentWallet, callback)
 					SharedValue.updateAccountCheckedStatus(true)
 				} else {
 					// 符合需要检测 Account 条件但是因为没有网络而跳过的情况需要标记
@@ -167,18 +167,18 @@ class SplashPresenter(val activity: SplashActivity) {
 		}
 
 		@WorkerThread
-		private fun WalletTable.checkOrUpdateEOSAccount(context: Context, callback: () -> Unit) {
+		fun checkOrUpdateEOSAccount(context: Context, wallet: WalletTable, callback: () -> Unit) {
 			// 观察钱包的时候会把 account name 存成 address 当删除钱包检测到下一个默认钱包
 			// 刚好是 EOS 观察钱包的时候越过检查 Account Name 的缓解
-			val isEOSWatchOnly = EOSAccount(currentEOSAddress).isValid(false)
-			if (isEOSWatchOnly) cacheDataAndSetNetBy(this, callback)
-			else EOSAPI.getAccountNameByPublicKey(currentEOSAddress) { accounts, error ->
+			val isEOSWatchOnly = EOSAccount(wallet.currentEOSAddress).isValid(false)
+			if (isEOSWatchOnly) cacheDataAndSetNetBy(wallet, callback)
+			else EOSAPI.getAccountNameByPublicKey(wallet.currentEOSAddress) { accounts, error ->
 				if (accounts.isNotNull() && error.isNone()) {
-					if (accounts.isEmpty()) cacheDataAndSetNetBy(this, callback)
+					if (accounts.isEmpty()) cacheDataAndSetNetBy(wallet, callback)
 					else initEOSAccountName(accounts) {
 						// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
 						cacheDataAndSetNetBy(
-							apply { currentEOSAccountName.updateCurrent(accounts.first().name) },
+							wallet.apply { currentEOSAccountName.updateCurrent(accounts.first().name) },
 							callback
 						)
 					}
@@ -190,12 +190,8 @@ class SplashPresenter(val activity: SplashActivity) {
 							title,
 							subtitle,
 							false,
-							{
-								cacheDataAndSetNetBy(this@checkOrUpdateEOSAccount, callback)
-							}
-						) {
-							cacheDataAndSetNetBy(this@checkOrUpdateEOSAccount, callback)
-						}
+							{ cacheDataAndSetNetBy(wallet, callback) }
+						) { cacheDataAndSetNetBy(wallet, callback) }
 					}
 				}
 			}

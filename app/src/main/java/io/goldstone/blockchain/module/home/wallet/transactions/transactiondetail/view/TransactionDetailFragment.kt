@@ -143,15 +143,18 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 							contract,
 							EOSAccount(fromAddress).isValid(false)
 						)
-					RadiusButton(context).apply {
-						setMargins<RelativeLayout.LayoutParams> { topMargin = 10.uiPX() }
+					val exploreButton = RadiusButton(context).apply {
 						setTitle(TokenDetailText.checkDetail suffix explorer.name, false)
 						setIcon(explorer.icon)
 						onClick {
 							showExplorerWebFragment(url[index])
 							preventDuplicateClicks()
 						}
-					}.into(this@addContent)
+					}
+					exploreButton.into(this@addContent)
+					exploreButton.setMargins<LinearLayout.LayoutParams> {
+						topMargin = 10.uiPX()
+					}
 				}
 			}
 		}
@@ -243,6 +246,7 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 						val params =
 							RelativeLayout.LayoutParams(matchParent, matchParent)
 						params.topMargin = 200.uiPX()
+						params.bottomMargin = 20.uiPX()
 						layoutParams = params
 					}
 				}

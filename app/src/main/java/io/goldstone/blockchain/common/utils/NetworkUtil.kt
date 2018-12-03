@@ -17,7 +17,6 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.doAsync
 
 /**
  * @date 2018/5/3 3:33 PM
@@ -45,7 +44,7 @@ object NetworkUtil {
 
 @Suppress("DEPRECATION")
 class ConnectionChangeReceiver : BroadcastReceiver() {
-
+	private var hasShowNetDialog = false
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(context: Context, intent: Intent) {
 		if (NetworkUtil.hasNetwork(context)) GlobalScope.launch(Dispatchers.Default) {
@@ -63,6 +62,13 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			}
-		} else GoldStoneDialog(context).showNetworkStatus()
+		} else {
+			if (!hasShowNetDialog) {
+				GoldStoneDialog(context).showNetworkStatus {
+					hasShowNetDialog = false
+				}
+				hasShowNetDialog = true
+			}
+		}
 	}
 }

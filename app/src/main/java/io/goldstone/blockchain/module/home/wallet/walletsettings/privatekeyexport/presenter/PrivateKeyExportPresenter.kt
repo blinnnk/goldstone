@@ -87,20 +87,20 @@ class PrivateKeyExportPresenter(
 									generateETHSeriesAddress(mnemonic, path).privateKey.toString(16)
 								hold(privateKey, error)
 							}
-							chainType.isBTC() || chainType.isAllTest() -> {
-								val path = if (chainType.isBTC()) wallet.btcPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.BTC)}")
+							chainType.isBTC() || (chainType.isBTCSeries() && SharedValue.isTestEnvironment()) || chainType.isAllTest() -> {
+								val path = if (!SharedValue.isTestEnvironment()) wallet.btcPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.BTC)}")
 								else wallet.btcTestPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.AllTest)}")
 								BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path) { _, secret ->
 									hold(secret, error)
 								}
 							}
 
-							chainType.isLTC() -> {
+							chainType.isLTC() && !SharedValue.isTestEnvironment() -> {
 								val path = wallet.ltcPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.LTC)}")
 								val privateKey = LTCWalletUtils.generateBase58Keypair(mnemonic, path).privateKey
 								hold(privateKey, error)
 							}
-							chainType.isBCH() -> {
+							chainType.isBCH() && !SharedValue.isTestEnvironment() -> {
 								val path = wallet.bchPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, ChainType.BCH)}")
 								val privateKey = BCHWalletUtils.generateBCHKeyPair(mnemonic, path).privateKey
 								hold(privateKey, error)

@@ -160,13 +160,12 @@ data class MyTokenTable(
 
 		fun getBalanceByContract(
 			contract: TokenContract,
-			ownerName: String,
 			@WorkerThread hold: (balance: Double?, error: GoldStoneError) -> Unit
 		) {
 			// 获取选中的 `Symbol` 的 `Token` 对应 `WalletAddress` 的 `Balance`
 			when {
 				contract.isETH() || contract.isETC() -> ETHJsonRPC.getEthBalance(
-					ownerName,
+					contract.getAddress(),
 					contract.getChainURL()
 				) { amount, error ->
 					if (amount.isNotNull() && error.isNone()) {
@@ -178,7 +177,7 @@ data class MyTokenTable(
 				contract.isBTCSeries() -> InsightApi.getBalance(
 					contract.getChainType(),
 					!contract.isBCH(), // 目前 BCH 的自有加密节点暂时不能使用, 这里用的第三方非加密
-					ownerName
+					contract.getAddress()
 				) { balance, error ->
 					hold(balance?.toBTC(), error)
 				}
@@ -205,7 +204,7 @@ data class MyTokenTable(
 				else -> DefaultTokenTable.getCurrentChainToken(contract) { token ->
 					ETHJsonRPC.getTokenBalanceWithContract(
 						token?.contract.orEmpty(),
-						ownerName,
+						contract.getAddress(),
 						SharedChain.getCurrentETH()
 					) { amount, error ->
 						if (amount.isNotNull() && error.isNone()) {

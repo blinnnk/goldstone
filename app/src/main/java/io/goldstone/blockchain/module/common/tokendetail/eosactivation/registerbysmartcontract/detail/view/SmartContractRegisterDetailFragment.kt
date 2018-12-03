@@ -13,10 +13,11 @@ import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.KeyValueView
 import io.goldstone.blockchain.common.component.SpaceSplitLine
 import io.goldstone.blockchain.common.component.button.RoundButton
-import io.goldstone.blockchain.common.component.cell.GraySquareCellWithButtons
+import io.goldstone.blockchain.common.component.cell.buttonSquareCell
 import io.goldstone.blockchain.common.component.title.AttentionView
-import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.sessionTitle
+import io.goldstone.blockchain.common.component.title.twoLineTitles
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -39,8 +40,11 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 
 	override val pageTitle: String
 		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
-	private val accountName by lazy { arguments?.getString(ArgumentKey.eosAccountRegister) }
-	private val smartContractLink by lazy { TwoLineTitles(context!!) }
+	private val accountName by lazy {
+		arguments?.getString(ArgumentKey.eosAccountRegister)
+	}
+
+	private lateinit var smartContractLink: TwoLineTitles
 	private val availableResultView by lazy { KeyValueView(context!!) }
 	private val copyResultButton by lazy { RoundButton(context!!) }
 	override val presenter = SmartContractRegisterDetailPresenter(this)
@@ -53,14 +57,14 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				lparams(matchParent, matchParent)
 				DescriptionView(context).isRegisterBySmartContract().into(this)
 
-				smartContractLink.apply {
+				smartContractLink = twoLineTitles {
 					isCenter = true
 					setDescriptionTitles()
 					title.text = EOSAccountText.smartContract
 					subtitle.text = "https://github.com/Dappub/signupeoseos"
 				}.click {
 					context.clickToCopy(it.subtitle.text.toString())
-				}.into(this)
+				}
 				// 分割线
 				SpaceSplitLine(context).apply {
 					setStyle(GrayScale.whiteGray, BorderSize.default)
@@ -69,8 +73,8 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				// 提醒界面
 				AttentionView(context).isSmartContractRegister().into(this)
 
-				SessionTitleView(context).apply { setTitle(EOSAccountText.transferTo) }.into(this)
-				GraySquareCellWithButtons(context).apply {
+				sessionTitle(EOSAccountText.transferTo)
+				buttonSquareCell {
 					layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 					val contractName = if (SharedValue.isTestEnvironment()) "goldstonenew" else "signupeoseos"
 					setTitle(EOSAccountText.receiver)
@@ -78,9 +82,8 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 					showOnlyCopyButton {
 						context.clickToCopy(contractName)
 					}
-				}.into(this)
-
-				SessionTitleView(context).apply { setTitle(EOSAccountText.memoInfo) }.into(this)
+				}
+				sessionTitle(EOSAccountText.memoInfo)
 				availableResultView.apply {
 					text = accountName + "-" + SharedAddress.getCurrentEOS()
 				}.into(this)

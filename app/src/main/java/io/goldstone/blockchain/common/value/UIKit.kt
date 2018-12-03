@@ -165,6 +165,8 @@ object HomeSize {
 	val sliderHeaderHeight = 65.uiPX()
 	@JvmField
 	val headerHeight = 65.uiPX()
+	@JvmField
+	val menuHeight = 45.uiPX()
 }
 
 object AvatarSize {

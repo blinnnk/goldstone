@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.markettokencenter.view
 
+import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
 import com.blinnnk.extension.into
@@ -10,9 +11,8 @@ import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.presenter.MarketTokenCenterPresenter
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
@@ -31,27 +31,23 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 	val currencyInfo by lazy {
 		arguments?.getSerializable(ArgumentKey.quotationCurrencyDetail) as? QuotationModel
 	}
-
 	override val pageTitle: String get() = currencyInfo?.pairDisplay.orEmpty()
-
-	private val menuBar by lazy {
-		ViewPagerMenu(context!!)
-	}
-	private val viewPager by lazy {
-		MarketTokeCenterViewPager(this)
-	}
-	private val menuTitles =
-		arrayListOf(QuotationText.quotationInfo)
-
+	private lateinit var menuBar: ViewPagerMenu
+	private lateinit var viewPager: MarketTokeCenterViewPager
+	private val menuTitles = listOf(QuotationText.quotationInfo)
 	override val presenter = MarketTokenCenterPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
+			menuBar = ViewPagerMenu(context)
+			menuBar.setColor(Spectrum.deepBlue, Spectrum.lightBlue, Color.TRANSPARENT)
 			menuBar.into(this)
+
+			// `MenuBar` 点击选中动画和内容更换
+			viewPager = MarketTokeCenterViewPager(this@MarketTokenCenterFragment)
 			addView(viewPager, RelativeLayout.LayoutParams(ScreenSize.heightWithOutHeader, matchParent))
 			viewPager.apply {
-				// `MenuBar` 点击选中动画和内容更换
 				menuBar.setMenuTitles(menuTitles) { button, id ->
 					button.onClick {
 						currentItem = id
@@ -72,9 +68,4 @@ class MarketTokenCenterFragment : BaseFragment<MarketTokenCenterPresenter>() {
 			}
 		}
 	}
-
-	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		super.setBaseBackEvent(activity, parent)
-	}
-
 }

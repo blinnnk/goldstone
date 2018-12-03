@@ -61,8 +61,7 @@ class AddressManagerPresenter(
 
 	fun showEOSPublickeyDescription(cell: GraySquareCellWithButtons, key: String, wallet: WalletTable?) {
 		if (wallet?.eosAccountNames?.getTargetKeyName(key).isNull())
-			EOSAPI.getAccountNameByPublicKey(key
-			) { accountNames, error ->
+			EOSAPI.getAccountNameByPublicKey(key) { accountNames, error ->
 				if (accountNames.isNotNull() && error.isNone()) {
 					val description =
 						if (accountNames.isNotEmpty()) WalletSettingsText.activatedPublicKey

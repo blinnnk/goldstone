@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import java.lang.Exception
 
 /**
  * @date 07/04/2018 12:29 AM
