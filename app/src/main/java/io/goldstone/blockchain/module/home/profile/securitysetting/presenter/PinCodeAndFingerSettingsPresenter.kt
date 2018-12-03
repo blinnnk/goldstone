@@ -4,7 +4,6 @@ import android.content.Intent
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.hideChildFragment
-import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -23,10 +22,7 @@ import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeA
 class PinCodeAndFingerSettingsPresenter(
 	val fragment: PinCodeAndFingerSettingsFragment
 ): PinCodeAndFingerContract.GSPresenter {
-	override fun updateFingerStatus(
-		status: Boolean,
-		callback: () -> Unit
-	) {
+	override fun updateFingerStatus(status: Boolean, callback: () -> Unit) {
 		AppConfigTable.setFingerprintUnlockStatus(status) {
 			callback()
 		}
@@ -39,7 +35,6 @@ class PinCodeAndFingerSettingsPresenter(
 	}
 	
 	override fun start() {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 	}
 
 

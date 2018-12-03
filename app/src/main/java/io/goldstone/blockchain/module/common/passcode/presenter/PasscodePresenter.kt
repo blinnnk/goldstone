@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.profile.securitysetting.view.PinCodeAndFingerSettingsFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.runOnUiThread
@@ -175,11 +176,7 @@ class PasscodePresenter(override val fragment: PasscodeFragment): BasePresenter<
 						} else {
 							childFragmentManager.fragments.last()?.apply {
 								when(this) {
-									is BaseFragment<*> -> {
-										showChildFragment(this)
-										recoveryBackEvent()
-									}
-									is GSFragment -> {
+									is PinCodeAndFingerSettingsFragment -> {
 										showChildFragment(this)
 										recoveryBackEvent()
 									}

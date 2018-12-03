@@ -1,17 +1,17 @@
 package io.goldstone.blockchain.module.home.profile.securitysetting.view
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.LinearLayout
-import android.widget.Switch
+import android.widget.RelativeLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.base.basefragment.BaseFragment
+import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.title.AttentionView
+import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.language.FingerprintUnlockText
 import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.language.ProfileText
@@ -29,6 +29,7 @@ import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOv
 import io.goldstone.blockchain.module.home.profile.securitysetting.contract.PinCodeAndFingerContract
 import io.goldstone.blockchain.module.home.profile.securitysetting.presenter.PinCodeAndFingerSettingsPresenter
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 
 /**
@@ -99,32 +100,41 @@ class PinCodeAndFingerSettingsFragment: GSFragment(),PinCodeAndFingerContract.GS
 		pinCodeSwitch.into(this)
 
 		changePinCode.apply {
-			layoutParams = ViewGroup.LayoutParams(
-				ScreenSize.widthWithPadding,
-				wrapContent
-			)
+			layoutParams = ViewGroup.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 			orientation = LinearLayout.VERTICAL
 			textView {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.black(context)
 				textColor = GrayScale.gray
 				text = PincodeText.setPinCode
-				layoutParams = LinearLayout.LayoutParams(
-					wrapContent,
-					wrapContent
-				).apply {
+				layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
 					topMargin = 8.uiPX()
 				}
 			}
-
-			SecuritySwitchView(context).apply {
-				setOnclick {
+			
+			relativeLayout {
+				layoutParams = RelativeLayout.LayoutParams(matchParent, 50.uiPX())
+				leftPadding = 20.uiPX()
+				TwoLineTitles(context).apply {
+					centerInVertical()
+					setBlackTitles()
+					title.text = PincodeText.changePinCode
+					subtitle.text = "sub title"
+				}.into(this)
+				
+				imageView {
+					layoutParams = RelativeLayout.LayoutParams(24.uiPX(), 24.uiPX())
+					centerInVertical()
+					alignParentRight()
+					imageResource = R.drawable.arrow_icon
+					setColorFilter(GrayScale.lightGray)
+				}
+				
+				onClick {
 					// 点击后根据更新的数据库情况显示开关状态
 					presenter.setPassCodeFragment()
 				}
-
-				setTitle(PincodeText.changePinCode, "sub title")
-			}.into(this)
+			}
 		}.into(this)
 	}
 
@@ -202,10 +212,7 @@ class PinCodeAndFingerSettingsFragment: GSFragment(),PinCodeAndFingerContract.GS
 		}
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<ProfileOverlayFragment> {
 			presenter.removeSelfFromActivity()
 		}
