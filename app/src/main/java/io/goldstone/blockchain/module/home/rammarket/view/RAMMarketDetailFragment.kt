@@ -63,6 +63,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 			})
 		}
 	}
+	
 	override lateinit var presenter: RAMMarketDetailPresenter
 	fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
@@ -137,7 +138,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 		}
 	}
 	
-	override fun setCurrentPriceAndPercent(price: Double, percent: Double) {
+	override fun showCurrentPriceAndPercent(price: Double, percent: Double) {
 		val formatCount = when {
 			price < 10.0 -> 4
 			price < 100.0 -> 3
@@ -157,13 +158,13 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 		
 	}
 	
-	override fun setTodayPrice(startPrice: String, highPrice: String, lowPrice: String) {
+	override fun showTodayPrice(startPrice: String, highPrice: String, lowPrice: String) {
 		ramPriceView.todayPriceView.startPrice.text = EOSRAMExchangeText.openPrice(startPrice)
 		ramPriceView.todayPriceView.highPrice.text = EOSRAMExchangeText.highPrice(highPrice)
 		ramPriceView.todayPriceView.lowPrice.text = EOSRAMExchangeText.lowPrice(lowPrice)
 	}
 	
-	override fun setSocketDisconnectedPercentColor(color: Int) {
+	override fun showSocketDisconnectedPercentColor(color: Int) {
 		ramPriceView.currentPriceView.trendcyPercent.textColor = color
 	}
 	
@@ -181,14 +182,14 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	
 	}
 	
-	override fun setTradingViewData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
+	override fun showTradingViewData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
 		tradingView.recentTradingListView.setData(buyList, sellList)
 	}
 	override fun notifyTradingViewData() {
 		tradingView.recentTradingListView.adapter?.notifyDataSetChanged()
 	}
 	
-	override fun setRAMBalance(ramBalance: String, eosBalance: String) {
+	override fun showRAMBalance(ramBalance: String, eosBalance: String) {
 		tradingView.tradingDashboardView.ramBalance.text = EOSRAMExchangeText.ramBalanceDescription(ramBalance)
 		tradingView.tradingDashboardView.eosBalance.text = EOSRAMExchangeText.eosBalanceDescription(eosBalance)
 	}

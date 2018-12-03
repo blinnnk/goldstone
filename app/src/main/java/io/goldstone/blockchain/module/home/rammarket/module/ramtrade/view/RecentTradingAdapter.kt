@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
@@ -36,7 +37,6 @@ class RecentTradingAdapter(
 		TradingHolder(TradingCell(parent.context))
 	}
 	
-	
 	override fun getItemViewType(position: Int): Int {
 		return if (position % (buyList.size + 1) == 0) 0 else 1
 	}
@@ -49,7 +49,7 @@ class RecentTradingAdapter(
 	) {
 		if (holder is TradingTitleHolder) {
 			(holder.itemView as? TitleView)?.apply {
-				title.text = if (position == 0) "买入" else "卖出"
+				title.text = if (position == 0) EOSRAMExchangeText.buy("") else EOSRAMExchangeText.sell("")
 				title.textColor = if (position == 0) Spectrum.green else Spectrum.lightRed
 			}
 		} else if (holder is TradingHolder) {
@@ -69,11 +69,8 @@ class RecentTradingAdapter(
 						hold(model)
 					}
 				}
-				
-				
 			}
 		}
-		
 	}
 	
 	inner class TradingHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

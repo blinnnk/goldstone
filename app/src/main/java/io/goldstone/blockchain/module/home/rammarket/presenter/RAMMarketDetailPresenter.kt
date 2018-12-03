@@ -29,6 +29,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 	val currentAccount = SharedAddress.getCurrentEOSAccount()
 	val currentChainID = SharedChain.getEOSCurrent().chainID.id
 	val isTestEnvironment = SharedValue.isTestEnvironment()
+	val currentTransactionLimitSize = 5 // 最多只展示五个
 	
 	override fun start() {
 		setAcountInfoFromDatabase()
@@ -49,7 +50,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 			
 			override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 				if (isDisconnected) {
-					ramMarketDetailView.setSocketDisconnectedPercentColor(GrayScale.midGray)
+					ramMarketDetailView.showSocketDisconnectedPercentColor(GrayScale.midGray)
 					return
 				}
 				parseSocketResult(content)

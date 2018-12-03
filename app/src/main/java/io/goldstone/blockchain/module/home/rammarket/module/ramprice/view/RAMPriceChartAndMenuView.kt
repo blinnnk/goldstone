@@ -27,14 +27,12 @@ class RAMPriceChartAndMenuView(
 	private val hold: (EOSRAMChartType) -> Unit
 ): LinearLayout(context) {
 	
-	val candleChart by lazy {
-		EOSRAMPriceCandleChart(context)
-	}
-	private val menu by lazy {
-		ButtonMenu(context).apply {
+	val candleChart = EOSRAMPriceCandleChart(context)
+	
+	private val menu = ButtonMenu(context).apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - RAMMarketPadding * 2, 32.uiPX())
 		}
-	}
+	
 	
 	private val loadingView by lazy {
 		TopMiniLoadingView(context)

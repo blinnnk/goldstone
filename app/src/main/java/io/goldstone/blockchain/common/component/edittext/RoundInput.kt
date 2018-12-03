@@ -38,7 +38,7 @@ open class RoundInput(context: Context) : EditText(context) {
 	private val paddingSize = 5.uiPX()
 	private var safeLevel = ""
 	private val paint = Paint()
-	val textPaint = Paint()
+	val textPaint = Paint() // RAMPriceRoundInputView 需要用到此paint来进行绘制一个标签
 	private val alertPaint = Paint()
 	private val backgroundPaint = Paint()
 	private val titleSize = 14.uiPX().toFloat()

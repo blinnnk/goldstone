@@ -131,10 +131,7 @@ open class PieChart : PieRadarChartBase<PieData> {
 	 */
 	var centerText: CharSequence? = ""
 	
-	private val mCenterTextOffset = MPPointF.getInstance(
-		0f,
-		0f
-	)
+	private val mCenterTextOffset = MPPointF.getInstance(0f, 0f)
 	
 	/**
 	 * indicates the size of the hole in the center of the piechart, default:
@@ -236,10 +233,7 @@ open class PieChart : PieRadarChartBase<PieData> {
 	constructor(
 		context: Context,
 		attrs: AttributeSet
-	) : super(
-		context,
-		attrs
-	)
+	) : super(context, attrs)
 	
 	constructor(
 		context: Context,
@@ -321,13 +315,13 @@ open class PieChart : PieRadarChartBase<PieData> {
 		val center = centerCircleBox
 		var radius = this.radius
 		
-		var off = radius / 10f * 3.6f
+		var radiusOffset = radius / 10f * 3.6f
 		
 		if (isDrawHoleEnabled) {
-			off = (radius - radius / 100f * holeRadius) / 2f
+			radiusOffset = (radius - radius / 100f * holeRadius) / 2f
 		}
 		
-		radius -= off // offset to keep things inside the chart
+		radius -= radiusOffset // offset to keep things inside the chart
 		
 		val rotationAngle = rotationAngle
 		
@@ -341,10 +335,7 @@ open class PieChart : PieRadarChartBase<PieData> {
 		val y = (radius * Math.sin(Math.toRadians(((rotationAngle + absoluteAngles[entryIndex] - offset) * mAnimator.phaseY).toDouble())) + center.y).toFloat()
 		
 		MPPointF.recycleInstance(center)
-		return floatArrayOf(
-			x,
-			y
-		)
+		return floatArrayOf(x, y)
 	}
 	
 	/**
@@ -441,10 +432,10 @@ open class PieChart : PieRadarChartBase<PieData> {
 	override fun getIndexForAngle(angle: Float): Int {
 		
 		// take the current angle of the chart into consideration
-		val a = Utils.getNormalizedAngle(angle - rotationAngle)
+		val angel = Utils.getNormalizedAngle(angle - rotationAngle)
 		
 		for (index in absoluteAngles.indices) {
-			if (absoluteAngles[index] > a) return index
+			if (absoluteAngles[index] > angel) return index
 		}
 		
 		return -1 // return -1 if no index found

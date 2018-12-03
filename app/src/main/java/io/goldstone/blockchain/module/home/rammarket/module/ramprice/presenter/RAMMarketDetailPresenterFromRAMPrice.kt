@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.blinnnk.extension.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -12,8 +13,8 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.rammarket.model.EOSRAMChartType
 import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 /**
@@ -23,7 +24,7 @@ import java.math.BigDecimal
  */
 
 fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
-	doAsync {
+	GlobalScope.launch {
 		val localData = GoldStoneDataBase.database.ramPriceDao().getData()
 		val minuteJson = candleDataMap[EOSRAMChartType.Minute.info]?.let {
 			Gson().toJson(it)
@@ -54,7 +55,7 @@ fun RAMMarketDetailPresenter.saveCandleDataToDatabase() {
 
 fun RAMMarketDetailPresenter.getChartDataFromDatabase(dataType: String, callback: () -> Unit) {
 	val type = object : TypeToken<ArrayList<CandleChartModel>>() {}.type
-	doAsync {
+	GlobalScope.launch {
 		GoldStoneDataBase.database.ramPriceDao().getData()?.apply {
 			candleDataMap[dataType] = when(dataType) {
 				EOSRAMChartType.Minute.info -> {
@@ -79,7 +80,7 @@ fun RAMMarketDetailPresenter.updateRAMCandleData(ramChartType: EOSRAMChartType) 
 			calculateCountAndUpdate(ramChartType)
 		}
 	} else {
-		doAsync {
+		GlobalScope.launch {
 			calculateCountAndUpdate(ramChartType)
 		}
 	}
@@ -107,7 +108,7 @@ fun RAMMarketDetailPresenter.calculateCountAndUpdate(ramChartType: EOSRAMChartTy
 				
 				if (size == 0 || size == 1) {
 					// 只能取到前一个时间段的数据，所以size=1的时候，取得数据无效，所以直接更新UI
-					GoldStoneAPI.context.runOnUiThread {
+					launchUI {
 						candleDataMap[ramChartType.info]?.apply {
 							ramMarketDetailView.updateCandleChartUI(ramChartType.dateType, this)
 						}
@@ -146,14 +147,14 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 				}
 			}
 			
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				candleDataMap[period]?.apply {
 					ramMarketDetailView.updateCandleChartUI(dateType, this)
 				}
 			}
 			
 		} else {
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI {
 				// Show the error exception to user
 				ramMarketDetailView.showError(error)
 				candleDataMap[period]?.apply {
@@ -166,7 +167,7 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 
 fun RAMMarketDetailPresenter.updateTodayPriceUI() {
 	ramInformationModel.let {
-		ramMarketDetailView.setTodayPrice(
+		ramMarketDetailView.showTodayPrice(
 			it.openPrice.formatCount(4),
 			it.HighPrice.formatCount(4),
 			it.lowPrice.formatCount(4)
@@ -185,7 +186,7 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 		}
 		updateTodayPriceUI()
 		calculatePricePercent()
-		ramMarketDetailView.setCurrentPriceAndPercent(
+		ramMarketDetailView.showCurrentPriceAndPercent(
 			infoModel.currentPrice,
 			infoModel.pricePercent
 		)
@@ -217,17 +218,17 @@ fun RAMMarketDetailPresenter.getTodayPrice() {
 			}
 			calculatePricePercent()
 		} else {
-			GoldStoneAPI.context.runOnUiThread {
+			launchUI{
 				ramMarketDetailView.showError(error)
 					// 出错了可能长连接已经断了， 需要在此给当前价格赋值
-				ramMarketDetailView.setCurrentPriceAndPercent(
+				ramMarketDetailView.showCurrentPriceAndPercent(
 					ramInformationModel.currentPrice,
 					ramInformationModel.pricePercent
 				)
 				
 			}
 		}
-		GoldStoneAPI.context.runOnUiThread {
+		launchUI {
 			updateTodayPriceUI()
 		}
 	}

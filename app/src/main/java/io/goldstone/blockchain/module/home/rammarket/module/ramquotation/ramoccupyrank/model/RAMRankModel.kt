@@ -8,12 +8,12 @@ import com.google.gson.annotations.SerializedName
  * @description:
  */
 class RAMRankModel(
-	val account: String,
-	val used: String,
+	val account: String = "",
+	val used: String = "",
 	@SerializedName("average_price")
-	val averagePrice: String,
-  val ram: String,
-	val percent: String,
-	val rank: Int,
-	val gain: Double
+	val averagePrice: String = "",
+  val ram: String = "",
+	val percent: String = "",
+	val rank: Int = 0,
+	val gain: Double = 0.0
 )

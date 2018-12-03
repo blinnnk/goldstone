@@ -495,7 +495,7 @@ object GoldStoneAPI {
 		hold: (candleData: List<CandleChartModel>?, error: RequestError) -> Unit
 	) {
 		requestData(
-			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, period, size),
+			APIPath.getEOSRAMPriceTendcyCandle(APIPath.currentUrl, period, size),
 			"ticks",
 			isEncrypt = true,
 			hold = hold
@@ -507,7 +507,7 @@ object GoldStoneAPI {
 		hold: (CandleChartModel?, RequestError) -> Unit
 	) {
 		requestData<CandleChartModel>(
-			APIPath.getEosRamPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
+			APIPath.getEOSRAMPriceTendcyCandle(APIPath.currentUrl, EOSRAMChartType.Day.info, 1),
 			"ticks",
 			isEncrypt = true
 		) { data, error ->
@@ -520,7 +520,7 @@ object GoldStoneAPI {
 	}
 	fun getLargeTransactions(mode: Int, hold: (data: List<TradingInfoModel>?, error: RequestError) -> Unit) {
 		requestData(
-			APIPath.eosRAMBIgTransactions(APIPath.currentUrl, mode),
+			APIPath.eosRAMHugeTransactions(APIPath.currentUrl, mode),
 			"tx_list",
 			justGetData = false,
 			isEncrypt = true,

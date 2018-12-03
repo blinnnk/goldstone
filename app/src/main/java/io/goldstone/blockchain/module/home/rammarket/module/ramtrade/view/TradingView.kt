@@ -16,22 +16,20 @@ import org.jetbrains.anko.*
  * @description:
  */
 class TradingView(context: Context, val fragment: RAMMarketDetailFragment): LinearLayout(context) {
-	val tradingDashboardView by lazy {
-		TradingDashboardView(context).apply {
+	val tradingDashboardView = TradingDashboardView(context).apply {
 			setShowHistoryEvent(Runnable {
 				fragment.getParentFragment<RAMMarketOverlayFragment> {
 					presenter.showTransactionHistoryFragment()
 				}
 			})
 		}
-	}
-	val recentTradingListView  by lazy {
-		RecentTradingListView(context) {
+	
+	val recentTradingListView  = RecentTradingListView(context) {
 			fragment.getParentFragment<RAMMarketOverlayFragment> {
 				presenter.showTransactionHistoryFragment(account)
 			}
 		}
-	}
+	
 	
 	init {
 		orientation = LinearLayout.VERTICAL

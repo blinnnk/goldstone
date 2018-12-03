@@ -34,23 +34,21 @@ class RAMPercentChartView(context: Context) : View(context) {
 	
 	private val bodyPaint = Paint()
 	
-	private val textPaint by lazy {
-		Paint().apply {
+	private val textPaint = Paint().apply {
 			color = Color.BLACK
 			textSize = valueTextSize
 			typeface = GoldStoneFont.medium(context)
 			isAntiAlias = true
 		}
-	}
 	
-	private val labelPaint by lazy {
-		Paint().apply {
+	
+	private val labelPaint = Paint().apply {
 			color = GrayScale.midGray
 			typeface = GoldStoneFont.book(context)
 			textSize = labelTextSize
 			isAntiAlias = true
 		}
-	}
+	
 	
 	private var maxValue = 0f
 	

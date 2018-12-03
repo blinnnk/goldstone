@@ -29,14 +29,13 @@ import java.util.*
  * @description:
  */
 class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fragment.context) {
-	private val menuBar by lazy {
-		ViewPagerMenu(context).apply {
+	private val menuBar = ViewPagerMenu(context).apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 45.uiPX())
 			setBorderLineColor(Spectrum.green)
 			backgroundColor = Spectrum.white
 			elevation = 0f
 		}
-	}
+	
 	private var fragmentList = ArrayList<SubFragment>()
 	private val titles = arrayListOf(
 		EOSRAMExchangeText.bigTransactions,

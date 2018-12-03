@@ -37,7 +37,7 @@ class RAMOccupyRankCell(context: Context): RelativeLayout(context) {
 	private lateinit var ramAmount: TextView
 	private lateinit var percent: TextView
 	
-	var model: RAMRankModel by observing(RAMRankModel("", "", "" ,"", "", 0, 0.toDouble())) {
+	var model: RAMRankModel by observing(RAMRankModel()) {
 		rank.text = model.rank.toString()
 		accountName.text = model.account
 		ramAmount.text = model.ram

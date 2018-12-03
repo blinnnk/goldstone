@@ -44,7 +44,7 @@ object APIPath {
 	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
 		"$header/eos/tokenList?chainid=$chainID&account=$account"
 	}
-	val eosRAMBIgTransactions: (header: String, mode: Int) -> String = { header, mode ->
+	val eosRAMHugeTransactions: (header: String, mode: Int) -> String = { header, mode ->
 		"$header/eosram/lastestTxList?mode=$mode"
 	}
 	val getEOSTokenCountInfo: (
@@ -100,7 +100,7 @@ object APIPath {
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}
-	val getEosRamPriceTendcyCandle: (
+	val getEOSRAMPriceTendcyCandle: (
 		header: String,
 		period: String,
 		size: Int

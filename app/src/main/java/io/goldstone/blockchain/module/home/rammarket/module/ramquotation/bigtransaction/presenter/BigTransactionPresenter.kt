@@ -19,18 +19,17 @@ class BigTransactionPresenter(private val gsView: BigTransactionContract.GSView)
 	
 	
 	override fun getBigTransactions() {
-		doAsync {
-			GoldStoneAPI.getLargeTransactions(1) { data, error ->
-				if (data != null && error.isNone()) {
-					GoldStoneAPI.context.runOnUiThread {
-						gsView.updateUI(data.toArrayList())
-					}
-				} else {
-					GoldStoneAPI.context.runOnUiThread {
-						gsView.showError(error)
-					}
+		GoldStoneAPI.getLargeTransactions(1) { data, error ->
+			if (data != null && error.isNone()) {
+				GoldStoneAPI.context.runOnUiThread {
+					gsView.updateUI(data.toArrayList())
+				}
+			} else {
+				GoldStoneAPI.context.runOnUiThread {
+					gsView.showError(error)
 				}
 			}
 		}
+	
 	}
 }
