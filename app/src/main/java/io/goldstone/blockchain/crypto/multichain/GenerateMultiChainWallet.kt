@@ -2,15 +2,17 @@ package io.goldstone.blockchain.crypto.multichain
 
 import android.content.Context
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
-import io.goldstone.blockchain.crypto.bitcoin.storeBase58PrivateKey
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
-import io.goldstone.blockchain.crypto.keystore.getEthereumWalletByMnemonic
+import io.goldstone.blockchain.crypto.ethereum.getAddress
+import io.goldstone.blockchain.crypto.keystore.generateETHSeriesAddress
+import io.goldstone.blockchain.crypto.keystore.generateMnemonicVerifyKeyStore
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
-import io.goldstone.blockchain.crypto.litecoin.storeLTCBase58PrivateKey
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 
 /**
@@ -48,6 +50,7 @@ object GenerateMultiChainWallet {
 		@WorkerThread hold: (multiChainAddresses: ChainAddresses) -> Unit
 	) {
 		val addresses = ChainAddresses()
+		val targetID = SharedWallet.getMaxWalletID() + 1
 		object : ConcurrentAsyncCombine() {
 			val paths = DefaultPath.allPaths()
 			override var asyncCount: Int = paths.size
@@ -56,75 +59,70 @@ object GenerateMultiChainWallet {
 				context.apply {
 					when (paths[index]) {
 						// Ethereum
-						DefaultPath.ethPath -> getEthereumWalletByMnemonic(mnemonic, path.ethPath, password) { ethAddress, _ ->
-							addresses.eth = Bip44Address(ethAddress!!, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
-							completeMark()
+						DefaultPath.ethPath -> {
+							val ethAddress = generateETHSeriesAddress(mnemonic, path.ethPath).getAddress()
+							addresses.eth = Bip44Address(ethAddress, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
+							// 助记词钱包生成一个定制盐用于校验用户本地权限
+							generateMnemonicVerifyKeyStore(
+								targetID,
+								mnemonic,
+								CryptoValue.verifyPasswordSalt,
+								password
+							) { address, error ->
+								if (address.isNotNull() && error.isNone()) completeMark()
+							}
 						}
 						// Ethereum Classic
-						DefaultPath.etcPath -> getEthereumWalletByMnemonic(
-							mnemonic,
-							path.etcPath,
-							password
-						) { etcAddress, _ ->
-							addresses.etc = Bip44Address(etcAddress!!, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
+						DefaultPath.etcPath -> {
+							val etcAddress = generateETHSeriesAddress(mnemonic, path.etcPath).getAddress()
+							addresses.etc = Bip44Address(etcAddress, getAddressIndexFromPath(path.etcPath), ChainType.ETC.id)
 							completeMark()
 						}
+
 						// Bitcoin
-						DefaultPath.btcPath -> BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path.btcPath) { btcAddress, base58Privatekey ->
-							// 存入 `Btc PrivateKey` 到 `KeyStore`
-							context.storeBase58PrivateKey(
-								base58Privatekey,
+						DefaultPath.btcPath -> BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path.btcPath) { btcAddress, _ ->
+							addresses.btc = Bip44Address(
 								btcAddress,
-								password,
-								false
+								getAddressIndexFromPath(path.btcPath),
+								ChainType.BTC.id
 							)
-							addresses.btc = Bip44Address(btcAddress, getAddressIndexFromPath(path.btcPath), ChainType.BTC.id)
 							completeMark()
 						}
 						// BTC Test
 						DefaultPath.testPath ->
-							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path.testPath) { btcSeriesTestAddress, btcTestBase58Privatekey ->
-								// 存入 `BtcTest PrivateKey` 到 `KeyStore`
-								context.storeBase58PrivateKey(
-									btcTestBase58Privatekey,
+							BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, path.testPath) { btcSeriesTestAddress, _ ->
+								addresses.btcSeriesTest = Bip44Address(
 									btcSeriesTestAddress,
-									password,
-									true
+									getAddressIndexFromPath(path.testPath),
+									ChainType.AllTest.id
 								)
-								addresses.btcSeriesTest = Bip44Address(btcSeriesTestAddress, getAddressIndexFromPath(path.testPath), ChainType.AllTest.id)
 								completeMark()
 							}
 						// Litecoin
 						DefaultPath.ltcPath -> LTCWalletUtils.generateBase58Keypair(mnemonic, path.ltcPath).let { ltcKeyPair ->
-							context.storeLTCBase58PrivateKey(
-								ltcKeyPair.privateKey,
+							addresses.ltc = Bip44Address(
 								ltcKeyPair.address,
-								password
+								getAddressIndexFromPath(path.ltcPath),
+								ChainType.LTC.id
 							)
-							addresses.ltc = Bip44Address(ltcKeyPair.address, getAddressIndexFromPath(path.ltcPath), ChainType.LTC.id)
 							completeMark()
 						}
 						// Bitcoin Cash
 						DefaultPath.bchPath -> BCHWalletUtils.generateBCHKeyPair(mnemonic, path.bchPath).let { bchKeyPair ->
-							context.storeBase58PrivateKey(
-								bchKeyPair.privateKey,
+							addresses.bch = Bip44Address(
 								bchKeyPair.address,
-								password,
-								false
+								getAddressIndexFromPath(path.bchPath),
+								ChainType.BCH.id
 							)
-							addresses.bch = Bip44Address(bchKeyPair.address, getAddressIndexFromPath(path.bchPath), ChainType.BCH.id)
 							completeMark()
 						}
 						// Bitcoin Cash
 						DefaultPath.eosPath -> EOSWalletUtils.generateKeyPair(mnemonic, path.eosPath).let { eosKeyPair ->
-							// `EOS` 的 `Prefix` 使用的 是 `Bitcoin` 的 `Mainnet Prefix` 所以无论是否是测试网这里的 `isTestnet` 都传 `False`
-							context.storeBase58PrivateKey(
-								eosKeyPair.privateKey,
+							addresses.eos = Bip44Address(
 								eosKeyPair.address,
-								password,
-								false
+								getAddressIndexFromPath(path.eosPath),
+								ChainType.EOS.id
 							)
-							addresses.eos = Bip44Address(eosKeyPair.address, getAddressIndexFromPath(path.eosPath), ChainType.EOS.id)
 							completeMark()
 						}
 					}

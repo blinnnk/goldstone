@@ -92,7 +92,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun ramPriceDao(): RAMPriceDao
 
 	companion object {
-		const val databaseVersion = 12
+		const val databaseVersion = 13
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

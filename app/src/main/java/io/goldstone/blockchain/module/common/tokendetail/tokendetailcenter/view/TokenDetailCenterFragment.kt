@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view
 
+import android.graphics.Color
 import android.support.v4.app.Fragment
 import android.widget.RelativeLayout
 import com.blinnnk.extension.getParentFragment
@@ -11,6 +12,7 @@ import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ScreenSize
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.FilterButtonDisplayEvent
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
@@ -30,16 +32,21 @@ import org.jetbrains.anko.support.v4.onPageChangeListener
  */
 class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 
-	val token by lazy { arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel }
+	val token by lazy {
+		arguments?.get(ArgumentKey.tokenDetail) as? WalletDetailCellModel
+	}
 	override val pageTitle: String get() = token?.symbol?.symbol.orEmpty()
-	private val menuBar by lazy { ViewPagerMenu(context!!) }
-	private val viewPager by lazy { TokenDetailCenterViewPager(this) }
+	private lateinit var menuBar: ViewPagerMenu
+	private lateinit var viewPager: TokenDetailCenterViewPager
 	private val menuTitles by lazy {
 		val secondMenuTitle =
 			if (token?.contract.isEOS()) TokenDetailText.assets else TokenDetailText.information
 		arrayListOf(TokenDetailText.transactionList, secondMenuTitle)
 	}
+
 	override val presenter = TokenDetailCenterPresenter(this)
+
+	private var isTokenDetailPage = true
 
 	override fun onResume() {
 		super.onResume()
@@ -51,7 +58,10 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
+			menuBar = ViewPagerMenu(context)
+			menuBar.setColor(Spectrum.deepBlue, Spectrum.lightBlue, Color.TRANSPARENT)
 			menuBar.into(this)
+			viewPager = TokenDetailCenterViewPager(this@TokenDetailCenterFragment)
 			addView(viewPager, RelativeLayout.LayoutParams(ScreenSize.heightWithOutHeader, matchParent))
 			viewPager.apply {
 				// `MenuBar` 点击选中动画和内容更换
@@ -71,6 +81,9 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 					onPageScrolled { position, percent, _ ->
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 					}
+					onPageSelected {
+						isTokenDetailPage = it == 0
+					}
 				}
 			}
 		}
@@ -79,6 +92,6 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		// `TokenDetailFragment` 的 左上角的 `Filter Button` 显示控制
-		EventBus.getDefault().post(FilterButtonDisplayEvent(!hidden))
+		EventBus.getDefault().post(FilterButtonDisplayEvent(!hidden && isTokenDetailPage))
 	}
 }

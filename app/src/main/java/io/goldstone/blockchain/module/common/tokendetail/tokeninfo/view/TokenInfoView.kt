@@ -57,14 +57,21 @@ class TokenInfoView(context: Context) : LinearLayout(context) {
 		action: () -> Unit
 	) {
 		qrImage.glideImage(code)
-		coinInfo.apply {
-			this.title.text = title
-			this.subtitle.text = TokenDetailText.latestActivationTime suffix subtitle
-		}
 		checkDetailButton.setIcon(icon)
 		checkDetailButton.onClick {
 			checkDetailButton.preventDuplicateClicks()
 			action()
+		}
+		coinInfo.apply {
+			this.title.text = title
+			this.subtitle.text = TokenDetailText.latestActivationTime suffix subtitle
+		}
+	}
+
+	fun setLatestActivation(title: String, subtitle: String) {
+		coinInfo.apply {
+			this.title.text = title
+			this.subtitle.text = TokenDetailText.latestActivationTime suffix subtitle
 		}
 	}
 

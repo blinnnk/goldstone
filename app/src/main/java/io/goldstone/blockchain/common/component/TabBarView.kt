@@ -4,13 +4,12 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.Gravity
+import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.alignParentRight
-import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
+import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -21,40 +20,47 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 
+
 /**
  * @date 23/03/2018 12:55 PM
  * @author KaySaith
  */
 
-class TabBarView(context: Context) : RelativeLayout(context) {
+class TabBarView(context: Context) : GridLayout(context) {
 
 	val walletButton by lazy { TabItem(context) }
+	val dAppCenterButton by lazy { TabItem(context) }
 	val marketButton by lazy { TabItem(context) }
 	val settingsButton by lazy { TabItem(context) }
 
 	init {
-
+		columnCount = 4
+		rowCount = 1
 		setWillNotDraw(false)
 		isClickable = true
-		layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight + 2.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.tabBarHeight)
+		val childWidth = ScreenSize.Width / 4
+		useDefaultMargins = true
 
 		walletButton.apply {
 			type = TabItemType.Wallet
-			x += PaddingSize.device
+			layoutParams = LinearLayout.LayoutParams(childWidth, matchParent)
+		}.into(this)
+
+		dAppCenterButton.apply {
+			type = TabItemType.DAppCenter
+			layoutParams = LinearLayout.LayoutParams(childWidth, matchParent)
 		}.into(this)
 
 		marketButton.apply {
 			type = TabItemType.Market
+			layoutParams = LinearLayout.LayoutParams(childWidth, matchParent)
 		}.into(this)
 
 		settingsButton.apply {
 			type = TabItemType.Setting
-			x -= PaddingSize.device
+			layoutParams = LinearLayout.LayoutParams(childWidth, matchParent)
 		}.into(this)
-
-		// 修改位置
-		marketButton.centerInHorizontal()
-		settingsButton.alignParentRight()
 
 		// 默认选中
 		walletButton.setSelectedStyle()
@@ -74,7 +80,9 @@ class TabBarView(context: Context) : RelativeLayout(context) {
 
 }
 
-enum class TabItemType { Market, Wallet, Profile, Setting }
+enum class TabItemType {
+	Market, Wallet, DAppCenter, Setting
+}
 
 class TabItem(context: Context) : LinearLayout(context) {
 
@@ -82,13 +90,13 @@ class TabItem(context: Context) : LinearLayout(context) {
 		iconImage.imageResource = when (type) {
 			TabItemType.Market -> R.drawable.market_icon
 			TabItemType.Wallet -> R.drawable.wallet_detail_icon
-			TabItemType.Profile -> R.drawable.profile_icon
+			TabItemType.DAppCenter -> R.drawable.dapp_center_icon
 			TabItemType.Setting -> R.drawable.setting_icon
 		}
 		titleView.text = when (type) {
 			TabItemType.Market -> QuotationText.market.toLowerCase()
 			TabItemType.Wallet -> WalletText.wallet.toLowerCase()
-			TabItemType.Profile -> ProfileText.profile.toLowerCase()
+			TabItemType.DAppCenter -> ProfileText.dappCenter.toLowerCase()
 			TabItemType.Setting -> ProfileText.settings.toLowerCase()
 		}
 	}

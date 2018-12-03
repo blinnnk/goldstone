@@ -6,7 +6,7 @@ package io.goldstone.blockchain.common.value
  * @Important `Argument Key` 仅用作  `Bundle` 的 `Key `值标记, 本身不能参与任何功能的值
  */
 object ArgumentKey {
-	
+
 	const val walletSettingsTitle = "walletSettingsTitle"
 	const val profileTitle = "profileTitle"
 	const val mnemonicCode = "mnemonicCode"
@@ -65,9 +65,8 @@ object SharesPreference {
 	const val walletType = "walletType"
 	const val goldStoneID = "goldStoneID"
 	const val unregisterGoldStoneID = "unregisterGoldStoneID"
-	const val activityIsResult = "activityIsResult"
 	const val currentEthereumAddress = "currentEthereumAddress"
-	const val currentEOSName= "currentEOSName"
+	const val currentEOSName = "currentEOSName"
 	const val currentETCAddress = "currentETCAddress"
 	const val currentEOSAddress = "currentEOSAddress"
 	const val currentLTCAddress = "currentLTCAddress"
@@ -78,6 +77,7 @@ object SharesPreference {
 	const val currentBalance = "currentBalance"
 	const val currentID = "currentID"
 	const val currentIsWatchOrNot = "currentIsWatchOrNot"
+	const val hasBackUpMnemonic = "hasBackUpMnemonic"
 	const val isNotchScreen = "isNotchScreen"
 	const val isTestEnvironment = "isTestEnvironment"
 	const val yingYongBaoInReview = "yingYongBaoInReview"

@@ -55,6 +55,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	 */
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		asyncData = arrayListOf()
 		presenter = WalletDetailPresenter(this)
 		wrapper.addView(slideHeader)
 		slideHeader.apply {
@@ -67,6 +68,8 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		if (!hidden) {
 			presenter.start()
 			getMainActivity()?.backEvent = null // 恢复回退站
+		} else {
+			headerView?.clearBitmap()
 		}
 	}
 
@@ -137,6 +140,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	/** 这个界面设计到的实时价格非常敏感, 所以更新时机会很频发. eg. 汇率 */
 	override fun onResume() {
 		super.onResume()
+		asyncData = arrayListOf()
 		presenter.start()
 		// 检查是否需要显示 `PIN Code` 界面
 		if (SharedValue.getPincodeDisplayStatus()) PasscodeFragment.show(this)

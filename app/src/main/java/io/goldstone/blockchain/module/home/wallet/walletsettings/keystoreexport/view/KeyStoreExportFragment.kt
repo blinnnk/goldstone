@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.clickToCopy
@@ -68,7 +69,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				button.showLoadingStatus()
 				presenter.getKeystoreJSON(passwordInput.text.toString()) { keystoreFile, error ->
 					launchUI {
-						if (keystoreFile != null && error.isNone()) {
+						if (keystoreFile.isNotNull() && error.isNone()) {
 							privateKeyTextView.text = keystoreFile
 						} else safeShowError(error)
 						button.showLoadingStatus(false)

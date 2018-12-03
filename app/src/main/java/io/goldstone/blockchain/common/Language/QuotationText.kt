@@ -19,8 +19,8 @@ object QuotationText {
 	@JvmField
 	val emptyDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "There isn't description of this token"
-		HoneyLanguage.Chinese.code -> "这个Token没有简介"
-		HoneyLanguage.Japanese.code -> "このTokenには概略がありません"
+		HoneyLanguage.Chinese.code -> "这个 Token 没有简介"
+		HoneyLanguage.Japanese.code -> "この Token には概略がありません"
 		HoneyLanguage.Korean.code -> "이 토큰에 대한 설명이 없습니다."
 		HoneyLanguage.Russian.code -> "Данный Token не имеет описания"
 		HoneyLanguage.TraditionalChinese.code -> "這個Token沒有簡介"
@@ -69,12 +69,12 @@ object QuotationText {
 
 	@JvmField
 	val quotationInfo = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Quotation Info"
-		HoneyLanguage.Chinese.code -> "Quotation Info"
-		HoneyLanguage.Japanese.code -> "Quotation Info"
-		HoneyLanguage.Korean.code -> "Quotation Info"
-		HoneyLanguage.Russian.code -> "Quotation Info"
-		HoneyLanguage.TraditionalChinese.code -> "Quotation Info"
+		HoneyLanguage.English.code->"Quote Information"
+		HoneyLanguage.Chinese.code->"行情信息"
+		HoneyLanguage.Japanese.code->"見積もり情報"
+		HoneyLanguage.Korean.code->"견적 정보"
+		HoneyLanguage.Russian.code->"информация о состоянии рынка"
+		HoneyLanguage.TraditionalChinese.code->"行情信息"
 		else -> ""
 	}
 
@@ -102,7 +102,7 @@ object QuotationText {
 	val tokenDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description"
 		HoneyLanguage.Chinese.code -> "Token 简介"
-		HoneyLanguage.Japanese.code -> "Token概略"
+		HoneyLanguage.Japanese.code -> "Token 概略"
 		HoneyLanguage.Korean.code -> "Token 소개"
 		HoneyLanguage.Russian.code -> "Описание Token"
 		HoneyLanguage.TraditionalChinese.code -> "Token 簡介"
@@ -110,12 +110,12 @@ object QuotationText {
 	}
 	@JvmField
 	val exchangeList = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Select An Exchange"
-		HoneyLanguage.Chinese.code -> "Select An Exchange"
-		HoneyLanguage.Japanese.code -> "Select An Exchange"
-		HoneyLanguage.Korean.code -> "Select An Exchange"
-		HoneyLanguage.Russian.code -> "Select An Exchange"
-		HoneyLanguage.TraditionalChinese.code -> "Select An Exchange"
+		HoneyLanguage.English.code->"Exchanges Filter "
+		HoneyLanguage.Chinese.code->"按市场筛选"
+		HoneyLanguage.Japanese.code->"市場別フィルタリング"
+		HoneyLanguage.Korean.code->"시장 별 필터링"
+		HoneyLanguage.Russian.code->"Фильтровать по рынку"
+		HoneyLanguage.TraditionalChinese.code->"按市場篩選"
 		else -> ""
 	}
 	@JvmField
@@ -132,7 +132,7 @@ object QuotationText {
 	val tokenInfoLink = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Link"
 		HoneyLanguage.Chinese.code -> "Token 链接"
-		HoneyLanguage.Japanese.code -> "Tokenリンク"
+		HoneyLanguage.Japanese.code -> "Token リンク"
 		HoneyLanguage.Korean.code -> "토큰 링크"
 		HoneyLanguage.Russian.code -> "Ссылка Token"
 		HoneyLanguage.TraditionalChinese.code -> "Token 鏈接"
@@ -152,7 +152,7 @@ object QuotationText {
 	val tokenDescriptionPlaceHolder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token Description Content"
 		HoneyLanguage.Chinese.code -> "Token 信息内容"
-		HoneyLanguage.Japanese.code -> "Token情報内容"
+		HoneyLanguage.Japanese.code -> "Token 情報内容"
 		HoneyLanguage.Korean.code -> "Token 정보내용"
 		HoneyLanguage.Russian.code -> "Содержание информации Token"
 		HoneyLanguage.TraditionalChinese.code -> "Token 信息內容"
@@ -161,8 +161,8 @@ object QuotationText {
 	@JvmField
 	val highAndLow = when (currentLanguage) {
 		HoneyLanguage.English.code -> "HIGH / LOW"
-		HoneyLanguage.Chinese.code -> "最高/最低"
-		HoneyLanguage.Japanese.code -> "最高/最低"
+		HoneyLanguage.Chinese.code -> "最高 / 最低"
+		HoneyLanguage.Japanese.code -> "最高 / 最低"
 		HoneyLanguage.Korean.code -> "최고 / 최저"
 		HoneyLanguage.Russian.code -> "Макс./мин."
 		HoneyLanguage.TraditionalChinese.code -> "最高 / 最低"
@@ -195,7 +195,7 @@ object QuotationText {
 		HoneyLanguage.Japanese.code -> "ホワイトペーパー"
 		HoneyLanguage.Korean.code -> "White Paper"
 		HoneyLanguage.Russian.code -> "Белая книга"
-		HoneyLanguage.TraditionalChinese.code -> "White Paper"
+		HoneyLanguage.TraditionalChinese.code -> "白皮書"
 		else -> ""
 	}
 	@JvmField
@@ -231,44 +231,44 @@ object QuotationText {
 	@JvmField
 	val addQuotationChartPlaceholderTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "ADD QUOTATION CHART"
-		HoneyLanguage.Chinese.code -> "添加你感兴趣的Token行情"
+		HoneyLanguage.Chinese.code -> "添加你感兴趣的 Token 行情"
 		HoneyLanguage.Japanese.code -> "カスタム見積もりを追加する"
 		HoneyLanguage.Korean.code -> "관심있는 Token 따옴표 추가"
 		HoneyLanguage.Russian.code -> "Добавить рынок"
-		HoneyLanguage.TraditionalChinese.code -> "添加你感興趣的Token行情"
+		HoneyLanguage.TraditionalChinese.code -> "添加你感興趣的 Token 行情"
 		else -> ""
 	}
 	@JvmField
 	val addQuotationChartPlaceholderSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Search and add a real-time\n token pricing chart from\n exchanges."
-		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的token，\n你可以看到实时价格走势"
-		HoneyLanguage.Japanese.code -> "各マーケットの取引の中から\nを検索して、お客様の注目している\nTokenを追加します。"
+		HoneyLanguage.Chinese.code -> "从各大市场的交易对中\n搜索并添加你关心的 Token，\n你可以看到实时价格走势"
+		HoneyLanguage.Japanese.code -> "各マーケットの取引の中から\nを検索して、お客様の注目している\nToken を追加します。"
 		HoneyLanguage.Korean.code -> "주요 시장의 거래 쌍에서 관심있는\n 토큰을 검색하고 추가하면 실시간\n 가격 동향을 볼 수 있습니다."
 		HoneyLanguage.Russian.code -> "Найдите и добавьте диаграмму\n цен на токены в\n реальном времени из бирж."
-		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的token，\n你可以看到實時價格走勢"
+		HoneyLanguage.TraditionalChinese.code -> "從各大市場的交易對中\n搜索並添加你關心的 Token，\n你可以看到實時價格走勢"
 		else -> ""
 	}
 
 	@JvmField
 	val searchFilterTextDescription: (exchangeNames: String) -> String = {
 		when(currentLanguage) {
-			HoneyLanguage.English.code -> "Show $it search result"
-			HoneyLanguage.Chinese.code -> "Show $it search result"
-			HoneyLanguage.Japanese.code -> "Show $it search result"
-			HoneyLanguage.Korean.code -> "Show $it search result"
-			HoneyLanguage.Russian.code -> "Show $it search result"
-			HoneyLanguage.TraditionalChinese.code -> "Show $it search result"
+			HoneyLanguage.English.code->"Results of $it market"
+			HoneyLanguage.Chinese.code->"为您展示$it 市场的搜索结果"
+			HoneyLanguage.Japanese.code->"$it 市場の結果を見せてください"
+			HoneyLanguage.Korean.code->"$it 시장의 결과를 보여주세요"
+			HoneyLanguage.Russian.code->"Покажите результаты рынка $it"
+			HoneyLanguage.TraditionalChinese.code->"為您展示 $it 市場的搜索結果"
 			else -> ""
 		}
 	}
 	@JvmField
 	val selectAll = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Check All Exchanges"
-		HoneyLanguage.Chinese.code ->  "Check All Exchanges"
-		HoneyLanguage.Japanese.code ->  "Check All Exchanges"
-		HoneyLanguage.Korean.code ->  "Check All Exchanges"
-		HoneyLanguage.Russian.code -> "Check All Exchanges"
-		HoneyLanguage.TraditionalChinese.code ->  "Check All Exchanges"
+		HoneyLanguage.English.code->"Select All"
+		HoneyLanguage.Chinese.code->"全选"
+		HoneyLanguage.Japanese.code->"すべて選択"
+		HoneyLanguage.Korean.code->"모두 선택"
+		HoneyLanguage.Russian.code->"Выбрать все"
+		HoneyLanguage.TraditionalChinese.code->"全選"
 		else -> ""
 	}
 }

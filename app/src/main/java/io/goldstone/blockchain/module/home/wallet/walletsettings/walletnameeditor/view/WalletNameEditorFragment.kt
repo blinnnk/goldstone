@@ -83,8 +83,7 @@ class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 		parent: Fragment?
 	) {
 		getParentFragment<WalletSettingsFragment> {
-			headerTitle = WalletSettingsText.walletSettings
-			presenter.showWalletSettingListFragment()
+			presenter.popFragmentFrom<WalletNameEditorFragment>()
 		}
 	}
 }

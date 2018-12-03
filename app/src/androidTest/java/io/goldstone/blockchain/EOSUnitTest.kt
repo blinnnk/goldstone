@@ -80,7 +80,7 @@ class EOSUnitTest {
 		val action = EOSAction(
 			EOSCodeName.EOSIOToken,
 			"00a6823403ea30550000000000ea3055400d03000000000004454f5300000000026464",
-			EOSTransactionMethod.Transfer,
+			EOSTransactionMethod.transfer(),
 			authorizationObjects
 		)
 		val result = EOSAction.createMultiActionObjects(action, action)
@@ -107,7 +107,7 @@ class EOSUnitTest {
 		val action = EOSAction(
 			EOSCodeName.EOSIOToken,
 			"00a6823403ea30550000000000ea3055400d03000000000004454f5300000000026464",
-			EOSTransactionMethod.Transfer,
+			EOSTransactionMethod.transfer(),
 			authorizationObjects
 		)
 		val transaction = UnSignedTransaction(
@@ -166,7 +166,7 @@ class EOSUnitTest {
 		val data = "302933372dcaa683205c9cce4fe3bae6020000000000000004454f53000000000a74657374207472616e73"
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
-		val action = EOSAction(EOSCodeName.EOSIOToken, data, EOSTransactionMethod.Transfer, authorizationObjects)
+		val action = EOSAction(EOSCodeName.EOSIOToken, data, EOSTransactionMethod.transfer(), authorizationObjects)
 		val serializedExpirationDate = EOSUtils.getExpirationCode(1535958970)
 		val serializedRefBlockNumber = EOSUtils.getRefBlockNumberCode(12873742)
 		val serializeRefBlockPrefix = EOSUtils.getRefBlockPrefixCode(1738495360)
@@ -233,7 +233,7 @@ class EOSUnitTest {
 		val header = TransactionHeader(ExpirationType.FiveMinutes, 12873742, 1738495360)
 		val authorization = EOSAuthorization("kingofdragon", EOSActor.Active)
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
-		val action = EOSAction(EOSCodeName.EOSIOToken, transactionInfoCode, EOSTransactionMethod.Transfer, authorizationObjects)
+		val action = EOSAction(EOSCodeName.EOSIOToken, transactionInfoCode, EOSTransactionMethod.transfer(), authorizationObjects)
 		EOSTransactionUtils.serialize(
 			ChainID.EOSTest,
 			header,

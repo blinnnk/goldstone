@@ -6,11 +6,10 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.alignParentBottom
-import com.blinnnk.extension.into
 import com.blinnnk.extension.toUpperCaseFirstLetter
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.button.IconWithTitle
+import io.goldstone.blockchain.common.component.button.titleIcon
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.click
@@ -32,21 +31,23 @@ import org.jetbrains.anko.wrapContent
 class TokenSocialMedia(context: Context, clickEvent: (url: String) -> Unit) : TopBottomLineCell(context) {
 	var model: TokenInformationModel by observing(TokenInformationModel()) {
 		if (model.socialMedia.isEmpty()) return@observing
-		container.removeAllViewsInLayout()
-		model.socialMedia.forEach { model ->
-			IconWithTitle(context).apply {
-				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding / 3, wrapContent)
-				val iconColor = when {
-					model.name.contains("facebook", true) -> SocialMediaColor.facebook
-					model.name.contains("twitter", true) -> SocialMediaColor.twitter
-					model.name.contains("reddit", true) -> SocialMediaColor.reddit
-					model.name.contains("telegram", true) -> SocialMediaColor.telegram
-					else -> Spectrum.blue
+		container.apply {
+			removeAllViewsInLayout()
+			model.socialMedia.forEach { model ->
+				titleIcon {
+					layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding / 3, wrapContent)
+					val iconColor = when {
+						model.name.contains("facebook", true) -> SocialMediaColor.facebook
+						model.name.contains("twitter", true) -> SocialMediaColor.twitter
+						model.name.contains("reddit", true) -> SocialMediaColor.reddit
+						model.name.contains("telegram", true) -> SocialMediaColor.telegram
+						else -> Spectrum.blue
+					}
+					setContent(model.iconURL, model.name.toUpperCaseFirstLetter(), iconColor)
+				}.click {
+					clickEvent(model.url)
 				}
-				setContent(model.iconURL, model.name.toUpperCaseFirstLetter(), iconColor)
-			}.click {
-				clickEvent(model.url)
-			}.into(container)
+			}
 		}
 	}
 	private var container: GridLayout

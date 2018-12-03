@@ -5,9 +5,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.sharedpreference.*
-import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -61,10 +58,8 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 
 
 fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
-	val account = SharedAddress.getCurrentEOSAccount()
-	val chainId = SharedChain.getEOSCurrent().chainID.id
 	doAsync {
-		GoldStoneDataBase.database.eosAccountDao().getAccount(account.name, chainId)?.let { localData ->
+		GoldStoneDataBase.database.eosAccountDao().getAccount(currentAccount.name, currentChainID)?.let { localData ->
 			val ramBalance = ((localData.ramQuota -localData. ramUsed).toDouble() / 1024.0).formatCount(4)
 			GoldStoneAPI.context.runOnUiThread {
 				ramMarketDetailView.setRAMBalance(ramBalance, if (localData.balance.isEmpty()) "0.0" else localData.balance)
@@ -82,18 +77,8 @@ fun RAMMarketDetailPresenter.buyRAM(
 	amount: Double,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
-	val accountName = SharedAddress.getCurrentEOSAccount().name
-	val chainId = SharedChain.getEOSCurrent().chainID.id
-	if (accountName == "default" || accountName.isEmpty()) {
-		callback(null, GoldStoneError(EOSRAMExchangeText.eosNoAccount))
-		return
-	}
-	if (SharedValue.isTestEnvironment()) {
-		callback(null, GoldStoneError(EOSRAMExchangeText.testNetTradeDisableMessage))
-		return
-	}
 	doAsync {
-		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName, chainId)
+		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(currentAccount.name, currentChainID)
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (amount > localData.balance.toDoubleOrZero()) {
@@ -102,7 +87,7 @@ fun RAMMarketDetailPresenter.buyRAM(
 					}
 					return@doAsync
 				}
-				BaseTradingPresenter.buyRam( context, EOSAccount(accountName), amount, callback)
+				BaseTradingPresenter.buyRam( context, currentAccount, amount, callback)
 			}
 		} else {
 			GoldStoneAPI.context.runOnUiThread {
@@ -121,18 +106,9 @@ fun RAMMarketDetailPresenter.sellRAM(
 	amount: Long,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
-	val accountName = SharedAddress.getCurrentEOSAccount().name
-	val chainId = SharedChain.getEOSCurrent().chainID.id
-	if (accountName == "default" || accountName.isEmpty()) {
-		callback(null, GoldStoneError(EOSRAMExchangeText.eosNoAccount))
-		return
-	}
-	if (SharedValue.isTestEnvironment()) {
-		callback(null, GoldStoneError(EOSRAMExchangeText.testNetTradeDisableMessage))
-		return
-	}
+	
 	doAsync {
-		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(accountName, chainId)
+		val eosAcountTable = GoldStoneDataBase.database.eosAccountDao().getAccount(currentAccount.name, currentChainID)
 		if (eosAcountTable != null) {
 			eosAcountTable.let { localData ->
 				if (BigDecimal(amount).toBigInteger() > (localData.ramQuota - localData.ramUsed)) {
@@ -154,13 +130,22 @@ fun RAMMarketDetailPresenter.sellRAM(
 /**
  * 买卖内存
  */
-
 fun RAMMarketDetailPresenter.tradeRAM(
 	context: Context,
 	amount: Double,
 	staketype: StakeType,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
+	
+	if (!currentAccount.isValid()) {
+		callback(null, GoldStoneError(EOSRAMExchangeText.eosNoAccount))
+		return
+	}
+	if (isTestEnvironment) {
+		callback(null, GoldStoneError(EOSRAMExchangeText.testNetTradeDisableMessage))
+		return
+	}
+	
 	if (staketype.isSellRam()) {
 		sellRAM(context, amount.toLong(), callback)
 	} else {
@@ -169,7 +154,6 @@ fun RAMMarketDetailPresenter.tradeRAM(
 }
 
 fun RAMMarketDetailPresenter.updateAccountData(@WorkerThread callback: () -> Unit) {
-	val currentAccount = SharedAddress.getCurrentEOSAccount()
 	EOSAPI.getAccountInfo(currentAccount) { newData, error ->
 		if (newData.isNotNull() && error.isNone()) {
 			// 新数据标记为老数据的 `主键` 值

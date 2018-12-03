@@ -15,7 +15,6 @@ import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger
 
-
 /**
  * @author KaySaith
  * @date  2018/09/12
@@ -39,13 +38,12 @@ data class EOSAccountTable(
 	val delegateInfo: List<DelegateBandWidthInfo>,
 	@Embedded(prefix = "voterInfo")
 	val voterInfo: VoterInfo?,
-	@Embedded(prefix = "refundInfo")
-	val refundInfo: RefundRequestInfo?,
+	val refundInfo: RefundRequestInfo,
 	@SerializedName("permissions")
 	val permissions: List<PermissionsInfo>,
 	val recordPublicKey: String,
 	val chainID: String,
-	val totalDelegateBandInfo: List<DelegateBandWidthInfo>
+	var totalDelegateBandInfo: List<DelegateBandWidthInfo>
 ) : Serializable {
 	constructor(
 		data: JSONObject,
@@ -78,20 +76,22 @@ data class EOSAccountTable(
 		val dao = GoldStoneDataBase.database.eosAccountDao()
 
 		@WorkerThread
-		fun preventDuplicateInsert(account: EOSAccountTable, chainID: ChainID) {
+		fun updateOrInsert(account: EOSAccountTable, chainID: ChainID) {
 			GoldStoneDataBase.database.eosAccountDao().apply {
-				if (getAccount(account.name, chainID.id).isNull()) {
-					insert(account)
+				val localAccount = getAccount(account.name, chainID.id)
+				if (localAccount.isNull()) insert(account)
+				else {
+					insert(account.apply { totalDelegateBandInfo = localAccount.totalDelegateBandInfo })
 				}
 			}
 		}
 
 
 		// 特殊情况下这几个字段的返回值会是 `null`
-		private fun checkRefundRequestOrGetObject(content: JSONObject): RefundRequestInfo? {
+		private fun checkRefundRequestOrGetObject(content: JSONObject): RefundRequestInfo {
 			val data = content.safeGet("refund_request")
 			val hasData = !data.isNullValue()
-			return if (hasData) RefundRequestInfo(JSONObject(data)) else null
+			return if (hasData) RefundRequestInfo(JSONObject(data)) else RefundRequestInfo()
 		}
 
 		private fun checkDelegateBandWidthDataOrGetObject(content: JSONObject): DelegateBandWidthInfo? {
@@ -118,6 +118,9 @@ interface EOSAccountDao {
 
 	@Query("UPDATE eosAccount SET totalDelegateBandInfo = :data WHERE name = :name AND chainID = :chainID")
 	fun updateDelegateBandwidthData(data: List<DelegateBandWidthInfo>, name: String, chainID: String)
+
+	@Query("UPDATE eosAccount SET refundInfo = :data WHERE name = :name AND chainID = :chainID")
+	fun updateRefundData(data: RefundRequestInfo, name: String, chainID: String)
 
 	@Query("SELECT * FROM eosAccount WHERE name IN (:names) AND chainID = :chainID")
 	fun getAccounts(names: List<String>, chainID: String = SharedChain.getEOSCurrent().chainID.id): List<EOSAccountTable>

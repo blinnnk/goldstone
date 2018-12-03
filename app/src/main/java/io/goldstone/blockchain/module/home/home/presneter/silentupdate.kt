@@ -175,7 +175,7 @@ abstract class SilentUpdater {
 	private fun getERC20TokenTransactions(startBlock: Int) {
 		RequisitionUtil.requestUnCryptoData<ERC20TransactionModel>(
 			EtherScanApi.getTokenTransactions(SharedAddress.getCurrentEthereum(), startBlock),
-			"result"
+			listOf("result")
 		) { transactions, error ->
 			if (transactions?.isNotEmpty() == true && error.isNone()) {
 				val defaultDao =
@@ -326,20 +326,10 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateNodeData() {
-		// 拉取网络数据, 更新本地的选中状态后覆盖本地数据库 TODO 需要增加 MD5 校验减少网络请求
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
 			val nodeDao = ChainNodeTable.dao
 			if (serverNodes.isNotNull() && error.isNone() && serverNodes.isNotEmpty()) {
-				val localNodes = nodeDao.getAll()
-				serverNodes.map { node ->
-					node.apply {
-						isUsed = localNodes.find {
-							it.url.equals(node.url, true)
-						}?.isUsed ?: 0
-					}
-				}.let {
-					nodeDao.insertAll(it)
-				}
+				nodeDao.insertAll(serverNodes)
 			}
 		}
 	}

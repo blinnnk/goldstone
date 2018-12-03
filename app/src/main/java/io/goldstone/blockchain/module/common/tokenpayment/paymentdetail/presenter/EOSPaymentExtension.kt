@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -39,7 +40,7 @@ fun PaymentDetailPresenter.transferEOS(
 		contract
 	).apply {
 		trade(fragment.context) { response, error ->
-			if (error.isNone() && response != null)
+			if (error.isNone() && response.isNotNull())
 				insertPendingDataToDatabase(this, response) {
 					launchUI {
 						getToken()?.let {

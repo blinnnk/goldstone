@@ -373,4 +373,8 @@ class UnlimitedAvatar(
 	fun getBitmap(): Bitmap? {
 		return bitmap ?: generateImage()
 	}
+
+	fun clearBitmap() {
+		bitmap = null
+	}
 }

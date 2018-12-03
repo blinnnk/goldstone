@@ -222,12 +222,13 @@ class WatchOnlyImportPresenter(
 			}
 
 			AddressType.EOSJungle.value -> {
-				if (EOSWalletUtils.isValidAddress(address)) {
-					currentEOSAddress = address
-					SharedValue.updateIsTestEnvironment(true)
-					callback(GoldStoneError.None)
-				} else if (EOSAccount(address).isValid(false)) {
-					EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSTestnet().getURL()) { info, error ->
+				when {
+					EOSWalletUtils.isValidAddress(address) -> {
+						currentEOSAddress = address
+						SharedValue.updateIsTestEnvironment(true)
+						callback(GoldStoneError.None)
+					}
+					EOSAccount(address).isValid(false) -> EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSTestnet().getURL()) { info, error ->
 						if (info.isNotNull() || error.isNone()) {
 							eosTestnetAccountName = address
 							SharedAddress.updateCurrentEOSName(address)
@@ -238,6 +239,7 @@ class WatchOnlyImportPresenter(
 							callback(error)
 						} else callback(AccountError.InvalidAccountName)
 					}
+					else -> callback(AccountError.InactivatedAccountName)
 				}
 			}
 			else -> {

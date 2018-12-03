@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import com.github.mikephil.charting.charts.PieRadarChartBase
 
 import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data .PieData
+import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.MPPointF
 import com.github.mikephil.charting.utils.Utils
@@ -131,7 +131,10 @@ open class PieChart : PieRadarChartBase<PieData> {
 	 */
 	var centerText: CharSequence? = ""
 	
-	private val mCenterTextOffset = MPPointF.getInstance(0f, 0f)
+	private val mCenterTextOffset = MPPointF.getInstance(
+		0f,
+		0f
+	)
 	
 	/**
 	 * indicates the size of the hole in the center of the piechart, default:
@@ -338,7 +341,10 @@ open class PieChart : PieRadarChartBase<PieData> {
 		val y = (radius * Math.sin(Math.toRadians(((rotationAngle + absoluteAngles[entryIndex] - offset) * mAnimator.phaseY).toDouble())) + center.y).toFloat()
 		
 		MPPointF.recycleInstance(center)
-		return floatArrayOf(x, y)
+		return floatArrayOf(
+			x,
+			y
+		)
 	}
 	
 	/**

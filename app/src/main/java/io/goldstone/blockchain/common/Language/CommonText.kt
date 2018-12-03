@@ -41,11 +41,11 @@ object CommonText {
 	@JvmField
 	val calculating = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Calculating ..."
-		HoneyLanguage.Chinese.code -> "正在计算..."
-		HoneyLanguage.Japanese.code -> "計算中..."
+		HoneyLanguage.Chinese.code -> "正在计算 ..."
+		HoneyLanguage.Japanese.code -> "計算中 ..."
 		HoneyLanguage.Korean.code -> "계산 중 ..."
 		HoneyLanguage.Russian.code -> "Расчет ..."
-		HoneyLanguage.TraditionalChinese.code -> "正在計算..."
+		HoneyLanguage.TraditionalChinese.code -> "正在計算 ..."
 		else -> ""
 	}
 	@JvmField
@@ -55,17 +55,17 @@ object CommonText {
 		HoneyLanguage.Japanese.code -> "間違ったチェーンID"
 		HoneyLanguage.Korean.code -> "잘못된 체인 ID"
 		HoneyLanguage.Russian.code -> "Неверный идентификатор цепи"
-		HoneyLanguage.TraditionalChinese.code -> "錯誤的鏈ID"
+		HoneyLanguage.TraditionalChinese.code -> "錯誤的鏈 ID"
 		else -> ""
 	}
 	@JvmField
 	val checkAll = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Check All"
-		HoneyLanguage.Chinese.code -> "Check All"
-		HoneyLanguage.Japanese.code -> "Check All"
-		HoneyLanguage.Korean.code -> "Check All"
-		HoneyLanguage.Russian.code -> "Check All"
-		HoneyLanguage.TraditionalChinese.code -> "Check All"
+		HoneyLanguage.English.code->"Check All"
+		HoneyLanguage.Chinese.code->"查看全部"
+		HoneyLanguage.Japanese.code->"すべて"
+		HoneyLanguage.Korean.code->"모두보기"
+		HoneyLanguage.Russian.code->"Просмотреть все"
+		HoneyLanguage.TraditionalChinese.code->"查看全部"
 		else -> ""
 	}
 
@@ -150,12 +150,23 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "保存到相簿"
 		else -> ""
 	}
+
+	@JvmField
+	val switchBCHAddressFormat = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Switch BCH address format"
+		HoneyLanguage.Chinese.code -> "切换 BCH 地址格式"
+		HoneyLanguage.Japanese.code -> "BCHアドレス形式の切り替え"
+		HoneyLanguage.Korean.code -> "BCH 주소 형식 전환"
+		HoneyLanguage.Russian.code -> "Переключить формат адреса BCH"
+		HoneyLanguage.TraditionalChinese.code -> "切換 BCH 地址格式"
+		else -> ""
+	}
 	@JvmField
 	val shareQRImage = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Share QR Image"
 		HoneyLanguage.Chinese.code -> "分享二维码"
-		HoneyLanguage.Japanese.code -> "QRコードをシェアする"
-		HoneyLanguage.Korean.code -> "QR코드 공유"
+		HoneyLanguage.Japanese.code -> "QR コードをシェアする"
+		HoneyLanguage.Korean.code -> "QR 코드 공유"
 		HoneyLanguage.Russian.code -> "Поделиться QR-кодом"
 		HoneyLanguage.TraditionalChinese.code -> "分享二維碼"
 		else -> ""
@@ -192,11 +203,11 @@ object CommonText {
 	}
 	@JvmField
 	val delete = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Delete"
+		HoneyLanguage.English.code -> "DELETE"
 		HoneyLanguage.Chinese.code -> "删除"
 		HoneyLanguage.Japanese.code -> "削除する"
 		HoneyLanguage.Korean.code -> "삭제"
-		HoneyLanguage.Russian.code -> "Удалить"
+		HoneyLanguage.Russian.code -> "УДАЛЯТЬ"
 		HoneyLanguage.TraditionalChinese.code -> "刪除"
 		else -> ""
 	}
@@ -226,7 +237,7 @@ object CommonText {
 		HoneyLanguage.Chinese.code -> "失败"
 		HoneyLanguage.Japanese.code -> "失敗"
 		HoneyLanguage.Korean.code -> "실패한"
-		HoneyLanguage.Russian.code -> "Ошибка"
+		HoneyLanguage.Russian.code -> "НЕ УДАЛОСЬ"
 		HoneyLanguage.TraditionalChinese.code -> "失敗"
 		else -> ""
 	}
@@ -276,7 +287,7 @@ object CommonText {
 		HoneyLanguage.Chinese.code -> "所有"
 		HoneyLanguage.Japanese.code -> "全て"
 		HoneyLanguage.Korean.code -> "모든"
-		HoneyLanguage.Russian.code -> "Все"
+		HoneyLanguage.Russian.code -> "ВСЕ"
 		HoneyLanguage.TraditionalChinese.code -> "所有"
 		else -> ""
 	}
@@ -286,7 +297,7 @@ object CommonText {
 		HoneyLanguage.Chinese.code -> "升级版本"
 		HoneyLanguage.Japanese.code -> "バージョンアップをする"
 		HoneyLanguage.Korean.code -> "업그레이드"
-		HoneyLanguage.Russian.code -> "Обновить версию"
+		HoneyLanguage.Russian.code -> "ОБНОВИТЬ"
 		HoneyLanguage.TraditionalChinese.code -> "升級版本"
 		else -> ""
 	}

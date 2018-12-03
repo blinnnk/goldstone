@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.into
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
@@ -79,7 +80,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 					passwordInput.text.toString()
 				) { privateKey, error ->
 					launchUI {
-						if (privateKey != null && error.isNone())
+						if (privateKey.isNotNull() && error.isNone())
 							privateKeyTextView.text = privateKey
 						else safeShowError(error)
 						button.showLoadingStatus(false)

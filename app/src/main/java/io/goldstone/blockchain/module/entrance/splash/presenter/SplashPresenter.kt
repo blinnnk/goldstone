@@ -39,7 +39,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
-		if (DefaultTokenTable.dao.getAllTokens().isEmpty()) {
+		if (DefaultTokenTable.dao.rowCount() == 0) {
 			val localDefaultTokens =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list).map { DefaultTokenTable(it) }
 			DefaultTokenTable.dao.insertAll(localDefaultTokens)
@@ -48,7 +48,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun initDefaultExchangeData(context: Context) {
-		if (ExchangeTable.dao.getAll().isEmpty()) {
+		if (ExchangeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list).map { ExchangeTable(it) }
 			ExchangeTable.dao.insertAll(localData)
@@ -57,7 +57,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun initNodeList(context: Context, callback: () -> Unit) {
-		if (ChainNodeTable.dao.getAll().isEmpty()) {
+		if (ChainNodeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.node_list).map { ChainNodeTable(it) }
 			ChainNodeTable.dao.insertAll(localData)
@@ -67,7 +67,7 @@ class SplashPresenter(val activity: SplashActivity) {
 
 	@WorkerThread
 	fun initSupportCurrencyList(context: Context) {
-		if (SupportCurrencyTable.dao.getSupportCurrencies().isEmpty()) {
+		if (SupportCurrencyTable.dao.rowCount() == 0) {
 			val localCurrency =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
 					SupportCurrencyTable(it).apply {
@@ -86,9 +86,9 @@ class SplashPresenter(val activity: SplashActivity) {
 	// 因为密钥都存储在本地的 `Keystore File` 文件里面, 当升级数据库 `FallBack` 数据的情况下
 	// 需要也同时清理本地的 `Keystore File`
 	@WorkerThread
-	fun cleanWhenUpdateDatabaseOrElse(callback: (allWallets: List<WalletTable>) -> Unit) {
-		val allWallets = WalletTable.dao.getAllWallets()
-		if (allWallets.isEmpty()) {
+	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
+		val walletCount = WalletTable.dao.rowCount()
+		if (walletCount == 0) {
 			cleanKeyStoreFile(activity.filesDir)
 			unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 		} else {
@@ -98,7 +98,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				unregisterGoldStoneID(SharedWallet.getNeedUnregisterGoldStoneID())
 			}
 		}
-		callback(allWallets)
+		callback()
 	}
 
 	/**
@@ -150,7 +150,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				currentWallet.getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
 				if (NetworkUtil.hasNetwork(context)) {
-					currentWallet.checkOrUpdateEOSAccount(context, callback)
+					checkOrUpdateEOSAccount(context, currentWallet, callback)
 					SharedValue.updateAccountCheckedStatus(true)
 				} else {
 					// 符合需要检测 Account 条件但是因为没有网络而跳过的情况需要标记
@@ -166,18 +166,18 @@ class SplashPresenter(val activity: SplashActivity) {
 		}
 
 		@WorkerThread
-		private fun WalletTable.checkOrUpdateEOSAccount(context: Context, callback: () -> Unit) {
+		fun checkOrUpdateEOSAccount(context: Context, wallet: WalletTable, callback: () -> Unit) {
 			// 观察钱包的时候会把 account name 存成 address 当删除钱包检测到下一个默认钱包
 			// 刚好是 EOS 观察钱包的时候越过检查 Account Name 的缓解
-			val isEOSWatchOnly = EOSAccount(currentEOSAddress).isValid(false)
-			if (isEOSWatchOnly) cacheDataAndSetNetBy(this, callback)
-			else EOSAPI.getAccountNameByPublicKey(currentEOSAddress) { accounts, error ->
+			val isEOSWatchOnly = EOSAccount(wallet.currentEOSAddress).isValid(false)
+			if (isEOSWatchOnly) cacheDataAndSetNetBy(wallet, callback)
+			else EOSAPI.getAccountNameByPublicKey(wallet.currentEOSAddress) { accounts, error ->
 				if (accounts.isNotNull() && error.isNone()) {
-					if (accounts.isEmpty()) cacheDataAndSetNetBy(this, callback)
+					if (accounts.isEmpty()) cacheDataAndSetNetBy(wallet, callback)
 					else initEOSAccountName(accounts) {
 						// 如果是含有 `DefaultName` 的钱包需要更新临时缓存钱包的内的值
 						cacheDataAndSetNetBy(
-							apply { currentEOSAccountName.updateCurrent(accounts.first().name) },
+							wallet.apply { currentEOSAccountName.updateCurrent(accounts.first().name) },
 							callback
 						)
 					}
@@ -189,12 +189,8 @@ class SplashPresenter(val activity: SplashActivity) {
 							title,
 							subtitle,
 							false,
-							{
-								cacheDataAndSetNetBy(this@checkOrUpdateEOSAccount, callback)
-							}
-						) {
-							cacheDataAndSetNetBy(this@checkOrUpdateEOSAccount, callback)
-						}
+							{ cacheDataAndSetNetBy(wallet, callback) }
+						) { cacheDataAndSetNetBy(wallet, callback) }
 					}
 				}
 			}
@@ -223,6 +219,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		private fun cacheDataAndSetNetBy(wallet: WalletTable, callback: () -> Unit) {
 			val type = wallet.getWalletType()
 			type.updateSharedPreference()
+			SharedWallet.updateBackUpMnemonicStatus(wallet.hasBackUpMnemonic)
 			when {
 				type.isBTCTest() -> NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)

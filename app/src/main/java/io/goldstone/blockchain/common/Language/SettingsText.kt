@@ -17,13 +17,13 @@ object ProfileText {
 		else -> ""
 	}
 	@JvmField
-	val profile = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Profile"
-		HoneyLanguage.Chinese.code -> "个人主页"
-		HoneyLanguage.Japanese.code -> "個人ページ"
-		HoneyLanguage.Korean.code -> "개인 홈"
-		HoneyLanguage.Russian.code -> "Личная страница"
-		HoneyLanguage.TraditionalChinese.code -> "個人檔案"
+	val dappCenter = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DApp Center"
+		HoneyLanguage.Chinese.code -> "DApp Center"
+		HoneyLanguage.Japanese.code -> "DApp Center"
+		HoneyLanguage.Korean.code -> "DApp Center"
+		HoneyLanguage.Russian.code -> "DApp Center"
+		HoneyLanguage.TraditionalChinese.code -> "DApp Center"
 		else -> ""
 	}
 	@JvmField
@@ -143,7 +143,7 @@ object ProfileText {
 		HoneyLanguage.Japanese.code -> "GoldStoneをシェアする"
 		HoneyLanguage.Korean.code -> "공유 GoldStone"
 		HoneyLanguage.Russian.code -> "Поделиться GoldStone"
-		HoneyLanguage.TraditionalChinese.code -> "分享GoldStone"
+		HoneyLanguage.TraditionalChinese.code -> "分享 GoldStone"
 		else -> ""
 	}
 	@JvmField
@@ -159,11 +159,11 @@ object ProfileText {
 	@JvmField
 	val eosAccountRegister = when (currentLanguage) {
 		HoneyLanguage.English.code -> "EOS Account Registration"
-		HoneyLanguage.Chinese.code -> "EOS账号注册"
+		HoneyLanguage.Chinese.code -> "EOS 账号注册"
 		HoneyLanguage.Japanese.code -> "EOSアカウントの登録"
 		HoneyLanguage.Korean.code -> "EOS 계정 등록"
 		HoneyLanguage.Russian.code -> "Регистрация учетной записи EOS"
-		HoneyLanguage.TraditionalChinese.code -> "EOS賬號註冊"
+		HoneyLanguage.TraditionalChinese.code -> "EOS 賬號註冊"
 		else -> ""
 	}
 	@JvmField
@@ -188,12 +188,12 @@ object ProfileText {
 	}
 	@JvmField
 	val shareContent = when (currentLanguage) {
-		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://GoldStone.io"
-		HoneyLanguage.Chinese.code -> "GoldStone\n安全，易用，快捷\nhttps://GoldStone.io"
-		HoneyLanguage.Japanese.code -> "GoldStone/nは安全で使いやすくて便利\nhttps://GoldStone.io"
-		HoneyLanguage.Korean.code -> "GoldStone\n안전하고 사용하기 쉽고 빠름\nhttps://GoldStone.io"
-		HoneyLanguage.Russian.code -> "GoldStone\n цифровой кошелек самый безопасный для вас\nhttps://GoldStone.io"
-		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://GoldStone.io"
+		HoneyLanguage.English.code -> "GoldStone\ncrypto digtal wallet the safest one for you\nhttps://www.goldstone.io"
+		HoneyLanguage.Chinese.code -> "GoldStone\n安全，易用，快捷\nhttps://www.goldstone.io"
+		HoneyLanguage.Japanese.code -> "GoldStone/nは安全で使いやすくて便利\nhttps://www.goldstone.io"
+		HoneyLanguage.Korean.code -> "GoldStone\n안전하고 사용하기 쉽고 빠름\nhttps://www.goldstone.io"
+		HoneyLanguage.Russian.code -> "GoldStone\n цифровой кошелек самый безопасный для вас\nhttps://www.goldstone.io"
+		HoneyLanguage.TraditionalChinese.code -> "GoldStone\n安全，易用，快捷\nhttps://www.goldstone.io"
 		else -> ""
 	}
 	@JvmField
@@ -216,15 +216,47 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "你確定要刪除這個聯繫人和對應的地址嗎？"
 		else -> ""
 	}
+	@JvmField
+	val walletAdvanced = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Wallet Advanced Settings"
+		HoneyLanguage.Chinese.code -> "钱包设置"
+		HoneyLanguage.Japanese.code -> "ウォレットの設定"
+		HoneyLanguage.Korean.code -> "월렛 설정"
+		HoneyLanguage.Russian.code -> "Настройки кошелька"
+		HoneyLanguage.TraditionalChinese.code -> "錢包設置"
+
+		else -> ""
+	}
+	@JvmField
+	val generalPreference = when (currentLanguage) {
+		HoneyLanguage.English.code -> "General Preference"
+		HoneyLanguage.Chinese.code -> "通用设置"
+		HoneyLanguage.Japanese.code -> "一般的な設定"
+		HoneyLanguage.Korean.code -> "일반 특혜"
+		HoneyLanguage.Russian.code -> "Общие предпочтения"
+		HoneyLanguage.TraditionalChinese.code -> "通用設置"
+
+		else -> ""
+	}
+	@JvmField
+	val aboutGoldStone = when (currentLanguage) {
+		HoneyLanguage.English.code -> "About GoldStone"
+		HoneyLanguage.Chinese.code -> "关于 GoldStone"
+		HoneyLanguage.Japanese.code -> "GoldStone について"
+		HoneyLanguage.Korean.code -> "GoldStone 정보"
+		HoneyLanguage.Russian.code -> "О компании GoldStone"
+		HoneyLanguage.TraditionalChinese.code -> "關於 GoldStone"
+		else -> ""
+	}
 
 	@JvmField
 	val editContactAlertTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "EDIT CONTACT"
-		HoneyLanguage.Chinese.code -> "EDIT CONTACT"
-		HoneyLanguage.Japanese.code -> "EDIT CONTACT"
-		HoneyLanguage.Korean.code -> "EDIT CONTACT"
-		HoneyLanguage.Russian.code -> "EDIT CONTACT"
-		HoneyLanguage.TraditionalChinese.code -> "EDIT CONTACT"
+		HoneyLanguage.English.code->"EDIT CONTACT"
+		HoneyLanguage.Chinese.code->"编辑联系人"
+		HoneyLanguage.Japanese.code->"連絡先を編集"
+		HoneyLanguage.Korean.code->"연락처 수정"
+		HoneyLanguage.Russian.code->"Изменить контакт"
+		HoneyLanguage.TraditionalChinese.code->"編輯聯繫人"
 		else -> ""
 	}
 }

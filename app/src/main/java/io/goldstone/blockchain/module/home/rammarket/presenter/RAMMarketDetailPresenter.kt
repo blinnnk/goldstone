@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.sharedpreference.*
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -24,6 +25,10 @@ import java.math.BigDecimal
  */
 class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.GSView)
  : RAMMarketDetailContract.GSPresenter {
+	
+	val currentAccount = SharedAddress.getCurrentEOSAccount()
+	val currentChainID = SharedChain.getEOSCurrent().chainID.id
+	val isTestEnvironment = SharedValue.isTestEnvironment()
 	
 	override fun start() {
 		setAcountInfoFromDatabase()

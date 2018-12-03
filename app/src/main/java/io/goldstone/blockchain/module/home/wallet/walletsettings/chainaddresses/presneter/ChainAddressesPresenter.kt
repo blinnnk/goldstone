@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter
+package io.goldstone.blockchain.module.home.wallet.walletsettings.chainaddresses.presneter
 
 import android.content.Context
 import android.support.annotation.WorkerThread
@@ -18,15 +18,17 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.event.DefaultAddressUpdateEvent
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment.Companion.showMoreDashboard
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.view.AddressManagerFragment.Companion.switchEOSDefaultAddress
-import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesAdapter
-import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view.ChainAddressesFragment
+import io.goldstone.blockchain.module.home.wallet.walletsettings.chainaddresses.view.ChainAddressesAdapter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.chainaddresses.view.ChainAddressesFragment
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import kotlinx.coroutines.Dispatchers
 import org.bitcoinj.params.MainNetParams
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.support.v4.toast
 
 /**
@@ -58,6 +60,8 @@ class ChainAddressesPresenter(
 						fragment.setDefaultAddress(bip44Address)
 						// 更新钱包默认地址, 同时更新首页的数据
 						updateWalletDetail()
+						// 更新 `AddressManager` 界面的默认地址显示
+						EventBus.getDefault().post(DefaultAddressUpdateEvent(coinType))
 						fragment.toast(CommonText.succeed)
 					}
 				}
@@ -71,7 +75,7 @@ class ChainAddressesPresenter(
 				showQRCode(ContactModel(bip44Address.address, symbol))
 			},
 			keystoreCellClickEvent = {
-				showKeystoreExportFragment(bip44Address.address)
+				showKeystoreExportFragment(bip44Address.address, coinType)
 			},
 			exportPrivateKey = {
 				showPrivateKeyExportFragment(bip44Address.address, coinType)
@@ -108,19 +112,33 @@ class ChainAddressesPresenter(
 			if (password.isNullOrEmpty() || verifyError.hasError()) hold(null, verifyError)
 			else when {
 				fragment.coinType.isETH() ->
-					AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
+					AddressManagerPresenter.createETHSeriesAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isETC() ->
-					AddressManagerPresenter.createETCAddress(context, password, hold)
+					AddressManagerPresenter.createETCAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isLTC() ->
-					AddressManagerPresenter.createLTCAddress(context, password, hold)
+					AddressManagerPresenter.createLTCAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isEOS() ->
-					AddressManagerPresenter.createEOSAddress(context, password, hold)
+					AddressManagerPresenter.createEOSAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isBCH() ->
-					AddressManagerPresenter.createBCHAddress(context, password, hold)
+					AddressManagerPresenter.createBCHAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isBTC() ->
-					AddressManagerPresenter.createBTCAddress(context, password, hold)
+					AddressManagerPresenter.createBTCAddress {
+						hold(it, AccountError.None)
+					}
 				fragment.coinType.isAllTest() ->
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress {
+						hold(it, AccountError.None)
+					}
 			}
 		}
 	}
@@ -164,10 +182,7 @@ class ChainAddressesPresenter(
 	private fun showQRCode(addressModel: ContactModel) {
 		// 这个页面不限时 `Header` 上的加号按钮
 		fragment.getParentFragment<WalletSettingsFragment> {
-			AddressManagerPresenter.showQRCodeFragment(
-				addressModel,
-				this
-			)
+			AddressManagerPresenter.showQRCodeFragment(addressModel, this)
 		}
 	}
 
@@ -177,9 +192,9 @@ class ChainAddressesPresenter(
 		}
 	}
 
-	private fun showKeystoreExportFragment(address: String) {
+	private fun showKeystoreExportFragment(address: String, coinType: ChainType) {
 		fragment.getParentFragment<WalletSettingsFragment> {
-			AddressManagerPresenter.showKeystoreExportFragment(address, this)
+			AddressManagerPresenter.showKeystoreExportFragment(address, coinType, this)
 		}
 	}
 

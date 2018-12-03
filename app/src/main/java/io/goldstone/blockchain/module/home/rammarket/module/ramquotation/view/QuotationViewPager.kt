@@ -30,7 +30,7 @@ import java.util.*
  */
 class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fragment.context) {
 	private val menuBar by lazy {
-		ViewPagerMenu(context, ScreenSize.Width / 4).apply {
+		ViewPagerMenu(context).apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 45.uiPX())
 			setBorderLineColor(Spectrum.green)
 			backgroundColor = Spectrum.white

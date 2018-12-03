@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewManager
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -24,6 +25,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
@@ -179,3 +181,6 @@ open class GraySquareCellWithButtons(context: Context) : GSCard(context) {
 		}
 	}
 }
+
+fun ViewManager.buttonSquareCell() = buttonSquareCell {}
+inline fun ViewManager.buttonSquareCell(init: GraySquareCellWithButtons.() -> Unit) = ankoView({ GraySquareCellWithButtons(it) }, 0, init)

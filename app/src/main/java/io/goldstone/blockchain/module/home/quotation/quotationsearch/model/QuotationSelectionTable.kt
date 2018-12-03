@@ -7,14 +7,12 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.runOnUiThread
 import java.io.Serializable
 
 /**
@@ -105,23 +103,23 @@ data class QuotationSelectionTable(
 		}
 
 		fun updateLineChartWeekBy(pair: String, weekLineChart: String, callback: () -> Unit) {
-			doAsync {
-				GoldStoneDataBase.database.quotationSelectionDao().updateWeekLineChartByPair(pair, weekLineChart)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+			GlobalScope.launch(Dispatchers.Default) {
+				QuotationSelectionTable.dao.updateWeekLineChartByPair(pair, weekLineChart)
+				launchUI(callback)
 			}
 		}
 
 		fun updateLineChartMontyBy(pair: String, monthChart: String, callback: () -> Unit) {
-			doAsync {
+			GlobalScope.launch(Dispatchers.Default) {
 				GoldStoneDataBase.database.quotationSelectionDao().updateMonthLineChartByPair(pair, monthChart)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+				launchUI(callback)
 			}
 		}
 
 		fun updateLineChartHourBy(pair: String, hourChart: String, callback: () -> Unit) {
-			doAsync {
+			GlobalScope.launch(Dispatchers.Default) {
 				GoldStoneDataBase.database.quotationSelectionDao().updateHourLineChartByPair(pair, hourChart)
-				GoldStoneAPI.context.runOnUiThread { callback() }
+				launchUI(callback)
 			}
 		}
 	}

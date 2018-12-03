@@ -62,7 +62,7 @@ object EOSTransactionUtils {
 		// 一整个一整个的序列化 `Action` 的子值, 这里只考虑了单一 `Action Child` 的情况
 		var serializedActions = serializedActionSize
 		actions.forEach { action ->
-			serializedActions += EOSUtils.getLittleEndianCode(action.account.value) + EOSUtils.getLittleEndianCode(action.methodName.value)
+			serializedActions += EOSUtils.getLittleEndianCode(action.code.value) + EOSUtils.getLittleEndianCode(action.methodName.value)
 		}
 		val serializedAuthorizationSize = EOSUtils.getVariableUInt(authorizations.size)
 		var serializedAuthorizations = serializedAuthorizationSize

@@ -21,6 +21,7 @@ import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
+import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -80,7 +81,7 @@ data class EOSTransactionInfo(
 				context,
 				amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
 				contract,
-				false
+				StakeType.Trade
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
 					transfer(privateKey, hold)

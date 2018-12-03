@@ -8,12 +8,13 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPres
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListAdapter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.view.TokenManagementListFragment
-import org.jetbrains.anko.doAsync
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 /**
  * @date 25/03/2018 5:11 PM
@@ -73,10 +74,10 @@ class TokenManagementListPresenter(
 
 	companion object {
 		fun addOrCloseMyToken(isChecked: Boolean, token: DefaultTokenTable) {
-			doAsync {
+			GlobalScope.launch(Dispatchers.Default) {
 				// once it is checked then insert this symbol into `MyTokenTable` database
 				if (isChecked) MyTokenTable.addNewOrOpen(TokenContract(token), token.chainID)
-				else GoldStoneDataBase.database.myTokenDao().updateCloseStatus(
+				else MyTokenTable.dao.updateCloseStatus(
 					token.contract,
 					token.symbol,
 					TokenContract(token).getAddress(),

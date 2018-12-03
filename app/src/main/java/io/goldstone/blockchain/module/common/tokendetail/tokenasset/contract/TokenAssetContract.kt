@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.contract
 
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
+import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
@@ -18,6 +20,7 @@ interface TokenAssetContract {
 		fun setEOSBalance(balance: String)
 		fun setEOSRefunds(description: String)
 		fun setEOSDelegateBandWidth(value: String)
+		fun showCenterLoading(status: Boolean)
 		fun setResourcesValue(
 			ramAvailable: BigInteger,
 			ramTotal: BigInteger,
@@ -33,12 +36,14 @@ interface TokenAssetContract {
 
 	interface GSPresenter : GoldStonePresenter {
 		fun getDelegateBandWidthData(hold: (ArrayList<DelegateBandWidthInfo>) -> Unit)
+		fun updateRefundInfo()
+		fun getLatestActivationDate(contract: TokenContract, hold: (String) -> Unit)
 		fun redemptionBandwidth(
 			password: String,
 			receiver: EOSAccount,
 			cpuAmount: BigInteger,
 			netAmount: BigInteger,
-			hold: (response: EOSResponse) -> Unit
+			hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 		)
 	}
 }

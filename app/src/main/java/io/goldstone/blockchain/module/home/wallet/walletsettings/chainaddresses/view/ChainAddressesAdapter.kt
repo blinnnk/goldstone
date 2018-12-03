@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view
+package io.goldstone.blockchain.module.home.wallet.walletsettings.chainaddresses.view
 
 import android.content.Context
 import android.view.View

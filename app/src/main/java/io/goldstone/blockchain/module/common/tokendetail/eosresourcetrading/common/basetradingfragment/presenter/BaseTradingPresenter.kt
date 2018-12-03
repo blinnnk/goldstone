@@ -2,11 +2,10 @@ package io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.com
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import com.blinnnk.extension.suffix
+import com.blinnnk.extension.*
+import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -14,6 +13,7 @@ import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -29,14 +29,16 @@ import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSBandWidthTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSBuyRamTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSSellRamTransaction
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.BaseTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.TradingType
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
+import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -52,30 +54,41 @@ open class BaseTradingPresenter(
 ) : BasePresenter<BaseTradingFragment>() {
 
 	open fun gainConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
-		if (fragment.tradingType == TradingType.RAM)
-			with(fragment) {
-				buyRam(
-					context!!,
-					getInputValue(StakeType.BuyRam).first,
-					getInputValue(StakeType.BuyRam).second,
-					callback
-				)
+		showMnemonicBackUpDialogOrElse { hasBackUp ->
+			when {
+				!hasBackUp -> {
+					callback(null, AccountError.BackUpMnemonic)
+				}
+				fragment.tradingType == TradingType.RAM -> with(fragment) {
+					buyRam(
+						context!!,
+						getInputValue(StakeType.BuyRam).first,
+						getInputValue(StakeType.BuyRam).second,
+						callback
+					)
+				}
+				else -> fragment.stakeResource(fragment.tradingType, StakeType.Delegate, callback)
 			}
-		else fragment.stakeResource(fragment.tradingType, StakeType.Delegate, callback)
+		}
 	}
 
 	open fun refundOrSellConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
-		if (fragment.tradingType == TradingType.RAM) with(fragment) {
-			val sellAmount = getInputValue(StakeType.SellRam).second
-			if (sellAmount.toString().substringBefore(".").toLongOrNull().isNull()) {
-				callback(null, TransferError.InvalidRAMNumber)
-			} else sellRAM(
-				context!!,
-				sellAmount.toLong(),
-				callback
-			)
+		showMnemonicBackUpDialogOrElse { hasBackUp ->
+			when {
+				!hasBackUp -> callback(null, AccountError.BackUpMnemonic)
+				fragment.tradingType == TradingType.RAM -> with(fragment) {
+					val sellAmount = getInputValue(StakeType.SellRam).second
+					if (!sellAmount.toString().substringBefore(".").toLongOrNull().hasValue()) {
+						callback(null, TransferError.InvalidRAMNumber)
+					} else sellRAM(
+						context!!,
+						sellAmount.toLong(),
+						callback
+					)
+				}
+				else -> fragment.stakeResource(fragment.tradingType, StakeType.Refund, callback)
+			}
 		}
-		else fragment.stakeResource(fragment.tradingType, StakeType.Refund, callback)
 	}
 
 	override fun onFragmentViewCreated() {
@@ -87,10 +100,8 @@ open class BaseTradingPresenter(
 
 	@WorkerThread
 	private fun BaseTradingFragment.setUsageValue() {
-		val accountDao =
-			GoldStoneDataBase.database.eosAccountDao()
 		val account =
-			accountDao.getAccount(
+			EOSAccountTable.dao.getAccount(
 				SharedAddress.getCurrentEOSAccount().name,
 				SharedChain.getEOSCurrent().chainID.id
 			)
@@ -134,7 +145,8 @@ open class BaseTradingPresenter(
 			prepareTransaction(
 				context,
 				transferCount,
-				TokenContract.EOS
+				TokenContract.EOS,
+				stakeType
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
 					EOSBandWidthTransaction(
@@ -157,10 +169,21 @@ open class BaseTradingPresenter(
 		EOSAPI.getAccountInfo(currentAccount) { newData, error ->
 			if (newData.isNotNull() && error.isNone()) {
 				// 新数据标记为老数据的 `主键` 值
-				GoldStoneDataBase.database.eosAccountDao().update(newData)
+				EOSAccountTable.dao.update(newData)
 				fragment.setUsageValue()
 			} else fragment.safeShowError(error)
 		}
+	}
+
+	private fun showMnemonicBackUpDialogOrElse(callback: (hasBackUp: Boolean) -> Unit) {
+		if (!SharedWallet.hasBackUpMnemonic()) {
+			GoldStoneDialog(fragment.context!!).showBackUpMnemonicStatus {
+				fragment.getParentFragment<TokenDetailOverlayFragment>()?.apply {
+					TokenDetailOverlayPresenter.showMnemonicBackupFragment(this)
+				}
+			}
+			callback(false)
+		} else callback(true)
 	}
 
 	companion object {
@@ -176,7 +199,7 @@ open class BaseTradingPresenter(
 				context,
 				tradingCount,
 				TokenContract.EOS,
-				true
+				StakeType.SellRam
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
 					EOSSellRamTransaction(
@@ -202,7 +225,7 @@ open class BaseTradingPresenter(
 				context,
 				tradingCount,
 				TokenContract.EOS,
-				false
+				StakeType.BuyRam
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
 					EOSBuyRamTransaction(
@@ -220,34 +243,57 @@ open class BaseTradingPresenter(
 			context: Context?,
 			tradingCount: T,
 			contract: TokenContract,
-			isSellRam: Boolean = false,
+			type: StakeType,
 			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
 		) {
 			val fromAccount = SharedAddress.getCurrentEOSAccount()
+			val chain = SharedChain.getEOSCurrent().chainID
 			// 检出用户的输入值是否合规
-			isValidInputValue(tradingCount, isSellRam) { error ->
-				if (!error.isNone()) hold(null, error) else {
+			isValidInputValue(tradingCount, type.isSellRam()) { error ->
+				if (error.hasError()) hold(null, error) else {
 					// 检查余额
-					if (isSellRam) EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
-						// 检查发起账户的 `RAM` 余额是否足够
-						when {
-							!ramError.isNone() -> hold(null, ramError)
-							ramAvailable.isNull() -> hold(null, ramError)
-							ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
-								hold(null, TransferError.BalanceIsNotEnough)
-							tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
-							else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
+					when {
+						type.isSellRam() -> EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
+							// 检查发起账户的 `RAM` 余额是否足够
+							when {
+								!ramError.isNone() -> hold(null, ramError)
+								ramAvailable.isNull() -> hold(null, ramError)
+								ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
+									hold(null, TransferError.BalanceIsNotEnough)
+								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
+								else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
+							}
 						}
-					} else EOSAPI.getAccountBalanceBySymbol(
-						fromAccount,
-						CoinSymbol(contract.symbol),
-						contract.contract
-					) { balance, balanceError ->
-						if (balance.isNotNull() && balanceError.isNone() && tradingCount is Double) {
-							// 检查发起账户的余额是否足够
-							if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
-							else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold)
-						} else hold(null, balanceError)
+						// 检查代理的资源的余额状态
+						type.isRefund() -> GlobalScope.launch(Dispatchers.Default) {
+							val accountInfo =
+								EOSAccountTable.dao.getAccount(fromAccount.name, chain.id)
+							val selfDelegate =
+								accountInfo?.totalDelegateBandInfo?.filter {
+									it.fromName.equals(fromAccount.name, true)
+								}
+							val count = if (type.isRefundCPU()) {
+								selfDelegate?.sumByDouble { it.cpuWeight.substringBefore(" ").toDoubleOrZero() }
+									?: 0.0
+							} else {
+								selfDelegate?.sumByDouble { it.netWeight.substringBefore(" ").toDoubleOrZero() }
+									?: 0.0
+							}
+							if (tradingCount is Double && count >= tradingCount) {
+								PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
+							} else hold(null, TransferError.BalanceIsNotEnough)
+						}
+						else -> EOSAPI.getAccountBalanceBySymbol(
+							fromAccount,
+							CoinSymbol(contract.symbol),
+							contract.contract
+						) { balance, balanceError ->
+							if (balance.isNotNull() && balanceError.isNone() && tradingCount is Double) {
+								// 检查发起账户的余额是否足够
+								if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
+								else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
+							} else hold(null, balanceError)
+						}
 					}
 				}
 			}
@@ -259,9 +305,9 @@ open class BaseTradingPresenter(
 			callback: (GoldStoneError) -> Unit
 		) {
 			when {
-				tradingNumber == 0 -> callback(TransferError.TradingInputIsEmpty)
+				tradingNumber == 0 || tradingNumber == 0.0 -> callback(TransferError.TradingInputIsEmpty)
 				isSellRam && tradingNumber !is Long -> // 检查输入的卖出的 `EOS` 的值是否正确
-					callback(TransferError.wrongRAMInputValue)
+					callback(TransferError.WrongRAMInputValue)
 				!tradingNumber.toString().isValidDecimal(CryptoValue.eosDecimal) -> // 检查输入值的精度是否正确
 					callback(TransferError.IncorrectDecimal)
 				else -> callback(GoldStoneError.None)

@@ -21,7 +21,6 @@ interface TokenInfoContract {
 		)
 
 		fun showTransactionCount(count: Int)
-		fun showActivationDate(date: String)
 		fun showBalance(balance: String)
 		fun showAddress(address: String, hash160: String)
 		fun showTotalValue(received: String, sent: String)

@@ -41,14 +41,14 @@ class EOSTransaction(
 			contract
 		)
 		val transactionInfoCode = transactionInfo.serialize()
-		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
+		EOSAPI.getTransactionHeader(expirationType) { header, error ->
 			val authorization = fromAccount
 			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
 			val action = EOSAction(
 				EOSCodeName(contract.contract),
 				transactionInfoCode,
-				EOSTransactionMethod.Transfer,
+				EOSTransactionMethod.transfer(),
 				authorizationObjects
 			)
 			if (header.isNotNull() && error.isNone()) {

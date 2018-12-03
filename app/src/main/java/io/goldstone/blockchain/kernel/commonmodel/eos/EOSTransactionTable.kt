@@ -55,7 +55,7 @@ data class EOSTransactionTable(
 		EOSTransactionData(info),
 		0, // 需要在数块的时候获取
 		System.currentTimeMillis(),
-		EOSTransactionMethod.Transfer.value,
+		EOSTransactionMethod.transfer().value,
 		// 这个构造方法用于插入 `Pending Data` 是本地发起才用到, 所以 `RecordAccount` 就是 `FromAccount `
 		info.fromAccount.name,
 		SharedAddress.getCurrentEOS(),

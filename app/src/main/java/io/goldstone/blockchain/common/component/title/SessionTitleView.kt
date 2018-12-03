@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.component.title
 import android.content.Context
 import android.view.Gravity
 import android.view.View
+import android.view.ViewManager
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
@@ -12,6 +13,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 
 /**
@@ -23,7 +25,6 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 
 	private val titleView = TextView(context).apply {
 		textSize = fontSize(12)
-		textColor = GrayScale.midGray
 		typeface = GoldStoneFont.black(context)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
 		setPadding(0, 15.uiPX(), 0, 10.uiPX())
@@ -36,25 +37,42 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 			textColor = GrayScale.midGray
 			typeface = GoldStoneFont.black(context)
 			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-			setPadding(0, 14.uiPX(), 0, 10.uiPX())
+			setPadding(0, 15.uiPX(), 5.uiPX(), 10.uiPX())
 			gravity = Gravity.END
 		}
 	}
 
 	init {
 		leftPadding = 20.uiPX()
-		rightPadding = 20.uiPX()
+		rightPadding = 10.uiPX()
 		addView(titleView)
 		addView(subtitle)
 	}
 
-	fun setTitle(text: String): SessionTitleView {
+	fun setTitle(text: String, color: Int = GrayScale.midGray) {
 		titleView.text = text
-		return this
+		titleView.textColor = color
 	}
 
-	fun setSubtitle(specificText: String, wholeText: String, specificColor: Int) {
+	fun setSubtitle(
+		specificText: String,
+		wholeText: String,
+		specificColor: Int,
+		color: Int = GrayScale.midGray
+	) {
 		subtitle.visibility = View.VISIBLE
+		subtitle.textColor = color
 		subtitle.text = CustomTargetTextStyle(specificText, wholeText, specificColor, 11.uiPX(), false, false)
 	}
 }
+
+fun ViewManager.sessionTitle(title: String) =
+	ankoView(
+		{ SessionTitleView(it) },
+		0
+	) {
+		setTitle(title)
+	}
+
+inline fun ViewManager.sessionTitle(init: SessionTitleView.() -> Unit) =
+	ankoView({ SessionTitleView(it) }, 0, init)

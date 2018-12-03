@@ -6,6 +6,7 @@ import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAppCenterFragment
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
@@ -25,6 +26,12 @@ class HomePresenter(
 		}
 	}
 
+	fun showDAppCenterFragment() {
+		fragment.selectDAppCenter {
+			fragment.showOrAddFragment<DAppCenterFragment>(FragmentTag.dappCenter)
+		}
+	}
+
 	fun showProfileFragment() {
 		fragment.setProfile {
 			fragment.showOrAddFragment<ProfileFragment>(FragmentTag.profile)
@@ -40,7 +47,9 @@ class HomePresenter(
 	override fun onFragmentResume() {
 		super.onFragmentResume()
 		// `App` 频繁的检测更新所有需要使用的数据
-		fragment.context?.let { object : SilentUpdater() {}.star(it) }
+		fragment.context?.let {
+			object : SilentUpdater() {}.star(it)
+		}
 	}
 
 	private inline fun <reified T : Fragment> Fragment.showOrAddFragment(fragmentTag: String) {
@@ -51,7 +60,9 @@ class HomePresenter(
 			it.isNull() isTrue {
 				addFragmentAndSetArgument<T>(ContainerID.home, fragmentTag)
 			} otherwise {
-				it?.let { showChildFragment(it) }
+				it?.let {
+					showChildFragment(it)
+				}
 			}
 		}
 	}

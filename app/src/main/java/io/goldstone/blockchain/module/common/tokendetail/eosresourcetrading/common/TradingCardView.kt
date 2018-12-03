@@ -39,36 +39,28 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 
 	private val contentWidth = ScreenSize.widthWithPadding - 30.uiPX()
 
-	private val processCell by lazy {
-		ProgressView(context).apply {
-			setSubtitle(CommonText.calculating)
-		}
+	private val processCell = ProgressView(context).apply {
+		setSubtitle(CommonText.calculating)
 	}
 
-	private val confirmButton by lazy {
-		RoundButton(context).apply {
-			setBlueStyle(15.uiPX(), contentWidth)
-			text = CommonText.confirm
-		}
+	private val confirmButton = RoundButton(context).apply {
+		setBlueStyle(15.uiPX(), contentWidth)
+		text = CommonText.confirm
 	}
 
-	private val accountNameEditText by lazy {
-		RoundTitleInput(context).apply {
-			layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX())
-			setTitle(TokenDetailText.tradeForAccountTitle)
-			setHint(TokenDetailText.tradeForAccountPlaceholder)
-		}
+	private val accountNameEditText = RoundTitleInput(context).apply {
+		layoutParams = RelativeLayout.LayoutParams(contentWidth, 46.uiPX())
+		setTitle(TokenDetailText.tradeForAccountTitle)
+		setHint(TokenDetailText.tradeForAccountPlaceholder)
 	}
 
 	var amountEditTextChanged: Runnable? = null
-	private val amountEditText by lazy {
-		RoundTitleInput(context).apply {
-			setNumberPadKeyboard()
-			setTitle(TokenDetailText.eosAmountTitle)
-			setHint(TokenDetailText.eosAmountPlaceholder)
-			onTextChanged = Runnable {
-				amountEditTextChanged?.run()
-			}
+	private val amountEditText = RoundTitleInput(context).apply {
+		setNumberPadKeyboard()
+		setTitle(TokenDetailText.eosAmountTitle)
+		setHint(TokenDetailText.eosAmountPlaceholder)
+		onTextChanged = Runnable {
+			amountEditTextChanged?.run()
 		}
 	}
 
@@ -86,9 +78,10 @@ class TradingCardView(context: Context) : GrayCardView(context) {
 		amountEditText.setTitle(TokenDetailText.eosAmountTitle + " ≈ ${amount.formatCount(2)} ${EOSUnit.KB.value}")
 	}
 
-	private val radioCellWidth = 100.uiPX()
+	private val radioCellWidth = 110.uiPX()
 	private val transferResourceRadio by lazy {
-		RadioWithTitle(context).apply { setTitle(TokenDetailText.delegateTypeTransfer) }.apply {
+		RadioWithTitle(context).apply {
+			setTitle(TokenDetailText.delegateTypeTransfer)
 			setRadioStatus(true)
 			layoutParams = LinearLayout.LayoutParams(radioCellWidth, matchParent)
 		}

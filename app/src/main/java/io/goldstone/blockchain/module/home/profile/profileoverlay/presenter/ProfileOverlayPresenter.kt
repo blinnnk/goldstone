@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -80,7 +81,7 @@ class ProfileOverlayPresenter(
 	fun showWalletAddingMethodDashboard() {
 		Dashboard(fragment.context!!) {
 			showGrid(
-				"Wallet Management",
+				ProfileText.walletManager,
 				GridIconTitleAdapter(GridIconTitleModel.getWalletManagementMenu()) {
 					when (it.name) {
 						CreateWalletText.create -> showCreateWalletFragment()

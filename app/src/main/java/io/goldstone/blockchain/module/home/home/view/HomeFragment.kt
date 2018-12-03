@@ -3,13 +3,12 @@ package io.goldstone.blockchain.module.home.home.view
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.view.Gravity
 import android.view.View
 import com.blinnnk.extension.alignParentBottom
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
-import io.goldstone.blockchain.common.component.GradientType
-import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.TabBarView
 import io.goldstone.blockchain.common.component.TabItem
 import io.goldstone.blockchain.common.value.ContainerID
@@ -26,7 +25,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 class HomeFragment : BaseFragment<HomePresenter>() {
 
 	override val pageTitle: String = "Home"
-	private val tabBar by lazy { TabBarView(context!!) }
+	private lateinit var tabBar: TabBarView
 	override val presenter = HomePresenter(this)
 	private val versionManager = VersionManager(this)
 
@@ -35,13 +34,20 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 			lparams(matchParent, matchParent)
 			backgroundColor = Spectrum.blue
 			verticalLayout {
+				lparams(matchParent, matchParent)
+				gravity = Gravity.CENTER_HORIZONTAL
 				id = ContainerID.home
 			}
 
+			tabBar = TabBarView(context)
 			tabBar.apply {
 				walletButton.onClick {
 					presenter.showWalletDetailFragment()
 					walletButton.preventDuplicateClicks()
+				}
+				dAppCenterButton.onClick {
+					presenter.showDAppCenterFragment()
+					dAppCenterButton.preventDuplicateClicks()
 				}
 				marketButton.onClick {
 					presenter.showQuotationFragment()
@@ -84,6 +90,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	private fun TabItem.setStyleAndClick(callback: () -> Unit) {
 		tabBar.apply {
 			walletButton.resetStyle()
+			dAppCenterButton.resetStyle()
 			marketButton.resetStyle()
 			settingsButton.resetStyle()
 		}
@@ -93,6 +100,10 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 
 	fun selectWalletDetail(callback: () -> Unit) {
 		tabBar.walletButton.setStyleAndClick(callback)
+	}
+
+	fun selectDAppCenter(callback: () -> Unit) {
+		tabBar.dAppCenterButton.setStyleAndClick(callback)
 	}
 
 	fun selectQuotation(callback: () -> Unit) {

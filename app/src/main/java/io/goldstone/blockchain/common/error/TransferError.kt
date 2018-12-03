@@ -25,7 +25,9 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val TradingInputIsEmpty = TransferError(ErrorText.tradingInputIsEmpty)
 		@JvmStatic
-		val wrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
+		val WrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
+		@JvmStatic
+		val LessRAMForRegister = TransferError("less RAM for register account")
 	}
 }
 
@@ -33,6 +35,8 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
 		val DecryptKeyStoreError = AccountError(ErrorText.decryptKeyStoreError)
+		@JvmStatic
+		val BackUpMnemonic = AccountError("Please back up you mnemonic first")
 		@JvmStatic
 		val InvalidAccountName = AccountError(ErrorText.invalidAccountName)
 		@JvmStatic

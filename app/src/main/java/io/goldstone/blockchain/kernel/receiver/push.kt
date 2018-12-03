@@ -86,10 +86,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		// Normal Notification
 	}
 
-	override fun onUnregisterResult(
-		context: Context?,
-		p1: Int
-	) {
+	override fun onUnregisterResult(context: Context?, p1: Int) {
 		if (context == null) {
 			return
 		}
@@ -132,12 +129,9 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		clearAppIconReDot()
 	}
 
-	private fun handleTransactionNotification(
-		context: Context?,
-		content: String?
-	) {
+	private fun handleTransactionNotification(context: Context?, content: String?) {
 		val intent = Intent(context, MainActivity::class.java)
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+		intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
 		intent.putExtra(IntentKey.hashFromNotify, content)
 		context?.startActivity(intent)
 	}
@@ -247,7 +241,7 @@ fun Context.registerDeviceForPush() {
 				}
 				// 在本地数据库记录 `Push Token`
 				val currentWallet =
-					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+					WalletTable.dao.findWhichIsUsing(true)
 				XinGePushReceiver.registerAddressesForPush(currentWallet)
 			}
 		}

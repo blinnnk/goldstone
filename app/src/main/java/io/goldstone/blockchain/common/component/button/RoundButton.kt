@@ -50,7 +50,7 @@ class RoundButton(context: Context) : GSCard(context) {
 				visibility = View.GONE
 				id = ElementID.buttonLoading
 				indeterminateDrawable.setColorFilter(
-					Spectrum.white, android.graphics.PorterDuff.Mode.MULTIPLY
+					Spectrum.white, android.graphics.PorterDuff.Mode.SRC_ATOP
 				)
 				layoutParams = RelativeLayout.LayoutParams(30.uiPX(), 30.uiPX())
 			}
@@ -66,7 +66,7 @@ class RoundButton(context: Context) : GSCard(context) {
 		if (needToShow) {
 			isEnabled = false
 			text = ""
-			loadingView.indeterminateDrawable.setColorFilter(Spectrum.white, PorterDuff.Mode.MULTIPLY)
+			loadingView.indeterminateDrawable.setColorFilter(Spectrum.white, PorterDuff.Mode.SRC_ATOP)
 			loadingView.visibility = View.VISIBLE
 		} else {
 			loadingView.visibility = View.GONE

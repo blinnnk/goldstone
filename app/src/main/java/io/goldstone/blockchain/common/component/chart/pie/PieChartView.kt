@@ -20,11 +20,7 @@ class PieChartView(context: Context) : PieChart(context) {
 	
 	override fun init() {
 		super.init()
-		mRenderer = PieChartRenderer(
-			this,
-			mAnimator,
-			mViewPortHandler
-		)
+		mRenderer = PieChartRenderer(this, mAnimator, mViewPortHandler)
 		post {
 			initAttrs()
 		}
@@ -75,11 +71,17 @@ class PieChartView(context: Context) : PieChart(context) {
 		setEntryLabelTextSize(12f)
 	}
 	
-	fun resetData(entries: ArrayList<PieEntry>, colors: List<Int>) {
+	fun resetData(
+		entries: ArrayList<PieEntry>,
+		colors: List<Int>
+	) {
 		if (entries.size != colors.size) {
 			throw RuntimeException("entries size must equals colors size")
 		}
-		val dataSet = PieDataSet(entries, "Election Results")
+		val dataSet = PieDataSet(
+			entries,
+			"Election Results"
+		)
 		dataSet.sliceSpace = 3f
 		dataSet.selectionShift = 5f
 		

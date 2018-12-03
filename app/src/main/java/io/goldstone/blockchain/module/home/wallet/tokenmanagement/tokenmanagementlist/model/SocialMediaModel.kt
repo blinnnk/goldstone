@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model
 
 import android.arch.persistence.room.TypeConverter
-import io.goldstone.blockchain.common.utils.safeGet
+import com.blinnnk.extension.safeGet
 import java.io.Serializable
 
 

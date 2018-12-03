@@ -5,24 +5,25 @@ package io.goldstone.blockchain.common.language
  * @author KaySaith
  */
 object AlertText {
+
 	@JvmField
-	val testnetOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This is a testnet only account, you can't switch to mainnet"
-		HoneyLanguage.Chinese.code -> "This is a testnet only account, you can't switch to mainnet"
-		HoneyLanguage.Japanese.code -> "This is a testnet only account, you can't switch to mainnet"
-		HoneyLanguage.Korean.code -> "This is a testnet only account, you can't switch to mainnet"
-		HoneyLanguage.Russian.code -> "This is a testnet only account, you can't switch to mainnet"
-		HoneyLanguage.TraditionalChinese.code -> "This is a testnet only account, you can't switch to mainnet"
+	val mainnetOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a wallet dedicated to the main network. You can not switch to the test network."
+		HoneyLanguage.Chinese.code -> "这是一个仅限主网使用的钱包。您无法切换到测试网。"
+		HoneyLanguage.Japanese.code -> "これはメインネットワーク専用のウォレットです。 テストネットワークに切り替えることはできません。"
+		HoneyLanguage.Korean.code -> "이것은 기본 네트워크 전용 지갑입니다. 테스트 네트워크로 전환 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "Это кошелек, посвященный основной сети. Вы не можете переключиться на тестовую сеть."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個僅限主網使用的錢包。您無法切換到測試網。"
 		else -> ""
 	}
 	@JvmField
-	val mainnetOnly = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This is a mainnet only account, you can't switch to testnet"
-		HoneyLanguage.Chinese.code -> "This is a mainnet only account, you can't switch to testnet"
-		HoneyLanguage.Japanese.code -> "This is a mainnet only account, you can't switch to testnet"
-		HoneyLanguage.Korean.code -> "This is a mainnet only account, you can't switch to testnet"
-		HoneyLanguage.Russian.code -> "This is a mainnet only account, you can't switch to testnet"
-		HoneyLanguage.TraditionalChinese.code -> "This is a mainnet only account, you can't switch to testnet"
+	val testnetOnly = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a wallet dedicated to the test network. You can not switch to the main network."
+		HoneyLanguage.Chinese.code -> "这是一个仅限测试网使用的钱包。您无法切换到主网。"
+		HoneyLanguage.Japanese.code -> "これは テストネットワーク専用のウォレットです。 メインネットワークに切り替えることはできません。"
+		HoneyLanguage.Korean.code -> "이것은 테스트 네트워크 전용 지갑입니다. 주요 네트워크로 전환 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "Это кошелек, посвященный тестовой сети. Вы не можете переключиться на основную сеть."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個僅限測試網使用的錢包。您無法切換到主網。"
 		else -> ""
 	}
 	@JvmField

@@ -69,11 +69,11 @@ object EmptyText {
 	@JvmField
 	val searchTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token not found"
-		HoneyLanguage.Chinese.code -> "没有找到这个Token"
-		HoneyLanguage.Japanese.code -> "このTokenが見つかりません"
-		HoneyLanguage.Korean.code -> "이 Token을 찾지 못하였습니다"
+		HoneyLanguage.Chinese.code -> "没有找到这个 Token"
+		HoneyLanguage.Japanese.code -> "この Token が見つかりません"
+		HoneyLanguage.Korean.code -> "이 Token 을 찾지 못하였습니다"
 		HoneyLanguage.Russian.code -> "Данный Token не найден"
-		HoneyLanguage.TraditionalChinese.code -> "沒有找到這個Token"
+		HoneyLanguage.TraditionalChinese.code -> "沒有找到這個 Token"
 		else -> ""
 	}
 	@JvmField
@@ -99,11 +99,11 @@ object EmptyText {
 	@JvmField
 	val quotationManagementSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Search for and add tokens in the market by clicking the search icon"
-		HoneyLanguage.Chinese.code -> "点击界面左上角的图标，搜索并添加市场里的token"
+		HoneyLanguage.Chinese.code -> "点击界面左上角的图标，搜索并添加市场里的 Token"
 		HoneyLanguage.Japanese.code -> "左上隅にあるアイコンをクリックして、市場のトークンを検索して追加します"
 		HoneyLanguage.Korean.code -> "인터페이스의 왼쪽 상단 모서리에있는 아이콘을 클릭하여 시장에서 토큰을 검색하고 추가하십시오."
 		HoneyLanguage.Russian.code -> "Найдите и добавьте маркеры на рынок, щелкнув значок в верхнем левом углу интерфейса."
-		HoneyLanguage.TraditionalChinese.code -> "點擊界面左上角的圖標, 搜索並添加市場裡的token"
+		HoneyLanguage.TraditionalChinese.code -> "點擊界面左上角的圖標, 搜索並添加市場裡的 Token"
 		else -> ""
 	}
 	@JvmField

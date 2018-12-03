@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.eos.eosram
 
 import android.support.annotation.UiThread
+import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.eos.EOSCPUUnit
@@ -29,7 +30,7 @@ object EOSResourceUtil {
 		hold: (priceInEOS: Double?, error: RequestError) -> Unit
 	) {
 		EOSAPI.getRAMMarket(isMainThread) { data, error ->
-			if (error.isNone() && data != null) {
+			if (error.isNone() && data.isNotNull()) {
 				val divisor = when (unit.value) {
 					EOSUnit.KB.value -> 1024
 					EOSUnit.MB.value -> 1024 * 1024
@@ -52,7 +53,7 @@ object EOSResourceUtil {
 		@UiThread hold: (amount: Double?, error: RequestError) -> Unit
 	) {
 		EOSAPI.getRAMMarket(true) { data, error ->
-			if (data != null && error.isNone()) {
+			if (data.isNotNull() && error.isNone()) {
 				val ramTotal = data.ramCore
 				val eosBalance = data.eosBalance + pair.first
 				val mi = data.eosWeight / 1000.0
@@ -84,7 +85,7 @@ object EOSResourceUtil {
 		EOSAPI.getAccountInfo(
 			account
 		) { accountInfo, error ->
-			if (accountInfo != null && error.isNone()) {
+			if (accountInfo.isNotNull() && error.isNone()) {
 				val priceInEOS =
 					getCPUPriceByTime(accountInfo.cpuWeight, accountInfo.cpuLimit.max, unit)
 				hold(priceInEOS, GoldStoneError.None)
@@ -100,7 +101,7 @@ object EOSResourceUtil {
 		EOSAPI.getAccountInfo(
 			account
 		) { accountInfo, error ->
-			if (accountInfo != null && error.isNone()) {
+			if (accountInfo.isNotNull() && error.isNone()) {
 				val priceInEOS =
 					getNETPriceByTime(accountInfo.netWeight, accountInfo.netLimit.max, unit)
 				hold(priceInEOS, GoldStoneError.None)

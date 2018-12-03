@@ -106,34 +106,34 @@ object ErrorText {
 
 	@JvmField
 	val emptyRepeatPassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Repeat Password Is Empty Now"
-		HoneyLanguage.Chinese.code -> "请填写重复密码"
-		HoneyLanguage.Japanese.code -> "重複したパスワードを入力してください"
+		HoneyLanguage.English.code -> "Please repeat password to confirm."
+		HoneyLanguage.Chinese.code -> "请填写重复密码。"
+		HoneyLanguage.Japanese.code -> "確認のためにパスワードを繰り返してください。"
 		HoneyLanguage.Korean.code -> "반복 암호가 비어 있습니다."
-		HoneyLanguage.Russian.code -> "Повторить пароль сейчас пуст"
-		HoneyLanguage.TraditionalChinese.code -> "請填寫重複密碼"
+		HoneyLanguage.Russian.code -> "Повторить пароль сейчас пуст."
+		HoneyLanguage.TraditionalChinese.code -> "請填寫重複密碼。"
 		else -> ""
 	}
 
 	@JvmField
 	val differentRepeatPassword = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The password entered twice is inconsistent"
+		HoneyLanguage.English.code -> "Passwords do not match."
 		HoneyLanguage.Chinese.code -> "输入两次的密码不一致"
-		HoneyLanguage.Japanese.code -> "矛盾したパスワードを2度入力してください"
-		HoneyLanguage.Korean.code -> "두 번 입력 한 암호가 일치하지 않습니다."
-		HoneyLanguage.Russian.code -> "Пароль, введенный дважды, является непоследовательным"
-		HoneyLanguage.TraditionalChinese.code -> "輸入兩次的密碼不一致"
+		HoneyLanguage.Japanese.code -> "パスワードが一致しません。"
+		HoneyLanguage.Korean.code -> "일치하지 않는 암호가 두 번 입력되었습니다."
+		HoneyLanguage.Russian.code -> "Неверный пароль вводится дважды."
+		HoneyLanguage.TraditionalChinese.code -> "兩次輸入的密碼不一致。"
 		else -> ""
 	}
 
 	@JvmField
 	val agreeTerms = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Please read and agree to the terms"
-		HoneyLanguage.Chinese.code -> "请阅读并同意这些条款"
-		HoneyLanguage.Japanese.code -> "ユーザー規約を読み、同意してください"
+		HoneyLanguage.English.code -> "Please read and agree to the terms."
+		HoneyLanguage.Chinese.code -> "请阅读并同意用户条款。"
+		HoneyLanguage.Japanese.code -> "ユーザー規約を読み、同意してください。"
 		HoneyLanguage.Korean.code -> "약관을 읽고 동의하십시오."
-		HoneyLanguage.Russian.code -> "Прочтите и согласитесь с условиями"
-		HoneyLanguage.TraditionalChinese.code -> "請閱讀並同意這些條款"
+		HoneyLanguage.Russian.code -> "Прочтите и согласитесь с условиями."
+		HoneyLanguage.TraditionalChinese.code -> "請閱讀並同意用戶條條款。"
 		else -> ""
 	}
 
@@ -151,11 +151,11 @@ object ErrorText {
 	@JvmField
 	val invalidBip44Path = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect Bip44 Path"
-		HoneyLanguage.Chinese.code -> "Bip44路径不正确"
-		HoneyLanguage.Japanese.code -> "Bip44のパスが正しくありません"
+		HoneyLanguage.Chinese.code -> "Bip44 路径不正确"
+		HoneyLanguage.Japanese.code -> "Bip44 のパスが正しくありません"
 		HoneyLanguage.Korean.code -> "잘못된 Bip44 경로"
 		HoneyLanguage.Russian.code -> "Неправильный путь Bip43"
-		HoneyLanguage.TraditionalChinese.code -> "Bip44路徑不正確"
+		HoneyLanguage.TraditionalChinese.code -> "Bip44 路徑不正確"
 		else -> ""
 	}
 
@@ -247,18 +247,18 @@ object ErrorText {
 	}
 	@JvmField
 	val nullResponse = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Return value is null"
+		HoneyLanguage.English.code -> "Not getting a valid return value"
 		HoneyLanguage.Chinese.code -> "未获取有效返回值"
 		HoneyLanguage.Japanese.code -> "有効な戻り値が取得されない"
-		HoneyLanguage.Korean.code -> "반환 값은 null입니다"
-		HoneyLanguage.Russian.code -> "Возвращаемое значение равно нулю"
+		HoneyLanguage.Korean.code -> "유효한 반환 값을 얻지 못했습니다."
+		HoneyLanguage.Russian.code -> "Не получать действительное возвращаемое значение"
 		HoneyLanguage.TraditionalChinese.code -> "返回值為空"
 		else -> ""
 	}
 
 	@JvmField
 	val none = when (currentLanguage) {
-		HoneyLanguage.English.code -> "No error."
+		HoneyLanguage.English.code -> "No error message."
 		HoneyLanguage.Chinese.code -> "没有错误信息"
 		HoneyLanguage.Japanese.code -> "エラーメッセージなし"
 		HoneyLanguage.Korean.code -> "오류 메시지 없음"
@@ -269,11 +269,11 @@ object ErrorText {
 	@JvmField
 	val error = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Error"
-		HoneyLanguage.Chinese.code -> "错误"
-		HoneyLanguage.Japanese.code -> "エラー"
-		HoneyLanguage.Korean.code -> "틀렸어"
-		HoneyLanguage.Russian.code -> "Ошибка"
-		HoneyLanguage.TraditionalChinese.code -> "錯誤"
+		HoneyLanguage.Chinese.code -> "出错了"
+		HoneyLanguage.Japanese.code -> "何かが間違っていた"
+		HoneyLanguage.Korean.code -> "틀린"
+		HoneyLanguage.Russian.code -> "Что-то пошло не так."
+		HoneyLanguage.TraditionalChinese.code -> "出錯了"
 		else -> ""
 	}
 
@@ -288,14 +288,28 @@ object ErrorText {
 		else -> ""
 	}
 
+	// 导入观察钱包时导入了未激活的账号
 	@JvmField
 	val inactivatedAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This account name has not been activated yet"
-		HoneyLanguage.Chinese.code -> "This account name has not been activated yet"
-		HoneyLanguage.Japanese.code -> "This account name has not been activated yet"
-		HoneyLanguage.Korean.code -> "This account name has not been activated yet"
-		HoneyLanguage.Russian.code -> "This account name has not been activated yet"
-		HoneyLanguage.TraditionalChinese.code -> "This account name has not been activated yet"
+		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册。"
+		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません。"
+		HoneyLanguage.Korean.code -> "이 계정은 아직 등록되지 않았습니다."
+		HoneyLanguage.Russian.code -> "Эта учетная запись еще не зарегистрирована."
+		HoneyLanguage.TraditionalChinese.code -> "這個 EOS 賬戶還沒有被註冊。"
+		else -> ""
+	}
+}
+
+object TransactionErrorText {
+	@JvmField
+	val transferToUnactivedEOSAcount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The EOS account you want to transfer to doesn't exist."
+		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活。"
+		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません。"
+		HoneyLanguage.Korean.code -> "전송하려는 EOS 계정이 활성화되지 않았습니다."
+		HoneyLanguage.Russian.code -> "Учетная запись EOS, которую вы хотите передать, не активирована."
+		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活。"
 		else -> ""
 	}
 }

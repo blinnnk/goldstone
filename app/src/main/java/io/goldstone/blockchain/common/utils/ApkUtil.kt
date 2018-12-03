@@ -46,7 +46,7 @@ object ApkUtil {
 		val deviceID = Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID)
 		val registerTime = System.currentTimeMillis()
 		val deviceIDCode = deviceID.toCryptHexString()
-		val registerTimeCode = EOSUtils.convertAmountToCode(BigInteger.valueOf(registerTime))
+		val registerTimeCode = BigInteger.valueOf(registerTime).toString(16)
 		val finalCode = deviceIDCode + registerTimeCode
 		return EOSUtils.toLittleEndian(if (!finalCode.isEvenCount()) finalCode + "0" else finalCode)
 	}

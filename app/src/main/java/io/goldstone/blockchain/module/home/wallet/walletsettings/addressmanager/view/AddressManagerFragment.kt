@@ -19,7 +19,6 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
-import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
@@ -27,13 +26,14 @@ import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blockchain.crypto.keystore.verifyKeystorePassword
+import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
+import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.event.DefaultAddressUpdateEvent
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.model.GridIconTitleModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.addressmanager.presenter.AddressManagerPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -41,6 +41,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.bitcoinj.params.MainNetParams
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.toast
@@ -52,6 +55,33 @@ import org.jetbrains.anko.support.v4.toast
 class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.viewAddresses
+
+	override fun onStart() {
+		super.onStart()
+		EventBus.getDefault().register(this)
+	}
+
+	override fun onStop() {
+		super.onStop()
+		EventBus.getDefault().unregister(this)
+	}
+
+	// Event Bus
+	@Subscribe(threadMode = ThreadMode.POSTING)
+	fun updateAddressEvent(updateEvent: DefaultAddressUpdateEvent) {
+		WalletTable.getCurrent(Dispatchers.Main) {
+			when {
+				updateEvent.chainType.isETH() -> setEthereumAddressesModel(this)
+				updateEvent.chainType.isETC() -> setEthereumClassicAddressesModel(this)
+				updateEvent.chainType.isBTC() -> setBitcoinAddressesModel(this)
+				updateEvent.chainType.isBCH() -> setBitcoinCashAddressesModel(this)
+				updateEvent.chainType.isLTC() -> setLitecoinAddressesModel(this)
+				updateEvent.chainType.isEOS() -> setEOSAddressesModel(this)
+				updateEvent.chainType.isAllTest() -> setBTCSeriesTestAddressesModel(this)
+			}
+		}
+	}
+
 	private val currentMultiChainAddressesView by lazy {
 		AddressesListView(context!!, 7) { cell, data, wallet, isDefault ->
 			val chainType = data.getChainType()
@@ -212,7 +242,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumAddressesModel(wallet: WalletTable) {
-		setMultiChainAddresses(wallet)
 		ethSeriesView.checkAllEvent = presenter.showAllETHSeriesAddresses()
 		ethSeriesView.setTitle(WalletSettingsText.ethereumSeriesAddress)
 		ethSeriesView.currentWallet = wallet
@@ -222,7 +251,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBitcoinCashAddressesModel(wallet: WalletTable) {
 		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.bchAddresses
-		setMultiChainAddresses(wallet)
 		bchAddressesView.checkAllEvent = presenter.showAllBCHAddresses()
 		bchAddressesView.setTitle(WalletSettingsText.bitcoinCashAddress)
 		bchAddressesView.currentWallet = wallet
@@ -230,7 +258,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEthereumClassicAddressesModel(wallet: WalletTable) {
-		setMultiChainAddresses(wallet)
 		etcAddressesView.checkAllEvent = presenter.showAllETCAddresses()
 		etcAddressesView.setTitle(WalletSettingsText.ethereumClassicAddress)
 		etcAddressesView.currentWallet = wallet
@@ -241,7 +268,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
 		val title = WalletSettingsText.bitcoinAddress(SharedWallet.getInReviewStatus())
 		val addresses = wallet.btcAddresses
-		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
@@ -251,7 +277,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setBTCSeriesTestAddressesModel(wallet: WalletTable) {
 		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
 		val addresses = wallet.btcSeriesTestAddresses
-		setMultiChainAddresses(wallet)
 		btcAddressesView.checkAllEvent = presenter.showAllBTCSeriesTestAddresses()
 		btcAddressesView.setTitle(title)
 		btcAddressesView.currentWallet = wallet
@@ -261,7 +286,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	fun setLitecoinAddressesModel(wallet: WalletTable) {
 		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
 		else wallet.ltcAddresses
-		setMultiChainAddresses(wallet)
 		ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.currentWallet = wallet
@@ -269,7 +293,6 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setEOSAddressesModel(wallet: WalletTable) {
-		setMultiChainAddresses(wallet)
 		eosAddressesView.checkAllEvent = presenter.showAllEOSAddresses()
 		eosAddressesView.setTitle(WalletSettingsText.eosAddress)
 		eosAddressesView.currentWallet = wallet
@@ -291,9 +314,8 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
 					verifyMultiChainWalletPassword(context!!) { password, error ->
 						if (!password.isNullOrEmpty() && error.isNone() && it.chainType.isNotNull()) {
-							createChildAddressByButtonTitle(context!!, it.chainType, password) { addresses, createError ->
-								if (addresses.isNullOrEmpty() || error.hasError()) safeShowError(createError)
-								else launchUI {
+							createChildAddressByButtonTitle(it.chainType) { addresses ->
+								launchUI {
 									updateUI(addresses, it.chainType)
 								}
 							}
@@ -306,36 +328,34 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	private fun createChildAddressByButtonTitle(
-		context: Context,
 		chainType: ChainType,
-		password: String,
-		@WorkerThread hold: (addresses: List<Bip44Address>?, error: AccountError) -> Unit
+		@WorkerThread hold: (addresses: List<Bip44Address>) -> Unit
 	) {
 		when {
 			chainType.isETH() ->
-				AddressManagerPresenter.createETHSeriesAddress(context, password, hold)
+				AddressManagerPresenter.createETHSeriesAddress(hold)
 			chainType.isETC() ->
-				AddressManagerPresenter.createETCAddress(context, password, hold)
+				AddressManagerPresenter.createETCAddress(hold)
 
 			chainType.isEOS() ->
-				AddressManagerPresenter.createEOSAddress(context, password, hold)
+				AddressManagerPresenter.createEOSAddress(hold)
 
 			chainType.isLTC() -> {
 				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
-				else AddressManagerPresenter.createLTCAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress(hold)
+				else AddressManagerPresenter.createLTCAddress(hold)
 			}
 
 			chainType.isBCH() -> {
 				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
-				else AddressManagerPresenter.createBCHAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress(hold)
+				else AddressManagerPresenter.createBCHAddress(hold)
 			}
 
 			chainType.isBTC() -> {
 				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(context, password, hold)
-				else AddressManagerPresenter.createBTCAddress(context, password, hold)
+					AddressManagerPresenter.createBTCTestAddress(hold)
+				else AddressManagerPresenter.createBTCAddress(hold)
 			}
 		}
 	}
@@ -379,6 +399,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							coinType.isBTC() -> setBitcoinAddressesModel(wallet)
 							coinType.isAllTest() -> setBTCSeriesTestAddressesModel(wallet)
 						}
+
+						// 更换默认地址后需要刷新总的默认地址目录
+						setMultiChainAddresses(wallet)
 						toast(CommonText.succeed)
 					}
 				}
@@ -401,7 +424,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			},
 			keystoreCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
-					AddressManagerPresenter.showKeystoreExportFragment(address.address, this)
+					AddressManagerPresenter.showKeystoreExportFragment(address.address, coinType, this)
 				}
 			},
 			convertBCHAddressToLegacy = {
@@ -418,7 +441,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<WalletSettingsFragment> {
-			presenter.showWalletSettingListFragment()
+			presenter.popFragmentFrom<AddressManagerFragment>()
 		}
 	}
 
@@ -466,10 +489,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				) { passwordInput ->
 					GlobalScope.launch(Dispatchers.Default) {
 						val password = passwordInput?.text.toString()
-						context.verifyKeystorePassword(
+						context.verifyKeystorePasswordByWalletID(
 							password,
-							SharedAddress.getCurrentBTC(),
-							true
+							SharedWallet.getCurrentWalletID()
 						) {
 							if (it) hold(password, AccountError.None)
 							else hold(null, AccountError.WrongPassword)

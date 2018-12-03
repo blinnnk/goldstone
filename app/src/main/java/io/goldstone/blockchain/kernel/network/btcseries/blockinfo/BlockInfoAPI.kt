@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.btcseries.blockinfo
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.Amount
@@ -20,8 +21,8 @@ object BlockInfoAPI {
 		address: String,
 		@WorkerThread hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.requestUnCryptoData<String>(api, address, true) { data, error ->
-			if (data != null && error.isNone()) {
+		RequisitionUtil.requestUnCryptoData<String>(api, listOf(address), true) { data, error ->
+			if (data.isNotNull() && error.isNone()) {
 				hold(Amount(JSONObject(data.firstOrNull()).safeGet("final_balance").toLong()), error)
 			} else hold(null, error)
 		}
@@ -32,6 +33,6 @@ object BlockInfoAPI {
 		api: String,
 		@WorkerThread hold: (unspents: List<BlockInfoUnspentModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.requestUnCryptoData(api, "unspent_outputs", false, hold)
+		RequisitionUtil.requestUnCryptoData(api, listOf("unspent_outputs"), false, hold)
 	}
 }

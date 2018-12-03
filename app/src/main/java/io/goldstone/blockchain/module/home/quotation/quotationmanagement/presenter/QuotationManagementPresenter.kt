@@ -32,7 +32,9 @@ class QuotationManagementPresenter(
 			val selections =
 				QuotationSelectionTable.dao.getAllByOrderID().toArrayList()
 			if (initDataMD5.isNull()) {
-				initDataMD5 = selections.map { it.pair }.toString().getObjectMD5HexString()
+				initDataMD5 = selections.map {
+					Pair(it.pair, it.isSelecting)
+				}.toString().getObjectMD5HexString()
 			}
 			launchUI {
 				if (fragment.asyncData.isNull()) fragment.asyncData = selections
@@ -51,19 +53,22 @@ class QuotationManagementPresenter(
 	 *  一方面是性能. 所以这里做了一次 `MD5` 比对. 确认数据变化后才执行.
 	 */
 	fun notifyQuotationDataChanged() {
-		val new = fragment.asyncData?.map { it.pair }.toString().getObjectMD5HexString()
+		val new = fragment.asyncData?.map {
+			Pair(it.pair, it.isSelecting)
+		}.toString().getObjectMD5HexString()
 		if (new != initDataMD5) {
 			EventBus.getDefault().post(QuotationUpdateEvent(true))
 		}
 	}
 
-	fun updateQuotationDataChanged() {
+	fun updateQuotationDataChanged(callback: () -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
 			val turnOffData =
 				fragment.asyncData?.filter { !it.isSelecting }
 			if (!turnOffData.isNullOrEmpty()) {
 				QuotationSelectionTable.dao.deleteAll(turnOffData)
-			}
+				callback()
+			} else callback()
 		}
 	}
 

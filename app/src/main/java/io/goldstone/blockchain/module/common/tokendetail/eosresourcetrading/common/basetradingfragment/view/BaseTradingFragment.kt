@@ -11,6 +11,7 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
@@ -47,21 +48,22 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			TradingType.RAM -> TokenDetailText.tradingRAM
 		}
 	private val delegateTitle by lazy {
-		val title = when (tradingType) {
+		when (tradingType) {
 			TradingType.CPU -> TokenDetailText.delegateTitle suffix TokenDetailText.cpu
 			TradingType.NET -> TokenDetailText.delegateTitle suffix TokenDetailText.net
 			TradingType.RAM -> TokenDetailText.buyRam
 		}
-		SessionTitleView(context!!).setTitle(title)
 	}
 	private val refundTitle by lazy {
-		val title = when (tradingType) {
+		when (tradingType) {
 			TradingType.CPU -> TokenDetailText.refundTitle suffix TokenDetailText.cpu
 			TradingType.NET -> TokenDetailText.refundTitle suffix TokenDetailText.net
 			TradingType.RAM -> TokenDetailText.sellRam
 		}
-		SessionTitleView(context!!).setTitle(title)
 	}
+
+	private lateinit var delegateSession: SessionTitleView
+	private lateinit var refundSession: SessionTitleView
 
 	private val incomeTradingCard by lazy {
 		TradingCardView(context!!).apply {
@@ -84,7 +86,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 							// 更新数据库数据并且更新界面的数据
 						}
 						presenter.updateLocalDataAndUI()
-					} else if (error.hasError()) safeShowError(error)
+					} else if (error.hasError() && !error.isIgnoreError()) safeShowError(error)
 					showLoading(false)
 				}
 			}
@@ -118,7 +120,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 						}
 						// 更新数据库数据并且更新界面的数据
 						presenter.updateLocalDataAndUI()
-					} else if (error.hasError()) safeShowError(error)
+					} else if (error.hasError() && !error.isIgnoreError()) safeShowError(error)
 					showLoading(false)
 				}
 			}
@@ -141,11 +143,15 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 				gravity = Gravity.CENTER_HORIZONTAL
 				topPadding = 10.uiPX()
 				bottomPadding = 10.uiPX()
-				delegateTitle.into(this)
-				delegateTitle.setSubtitle(CommonText.calculating, "${QuotationText.currentPrice}: ${CommonText.calculating} EOS/MS/Day", Spectrum.blue)
+				delegateSession = sessionTitle {
+					setTitle(delegateTitle)
+					setSubtitle(CommonText.calculating, "${QuotationText.currentPrice}: ${CommonText.calculating} EOS/MS/Day", Spectrum.blue)
+				}
 				incomeTradingCard.into(this)
-				refundTitle.into(this)
-				refundTitle.setSubtitle(CommonText.calculating, "${QuotationText.currentPrice}: ${CommonText.calculating} EOS/Byte/Day", Spectrum.blue)
+				refundSession = sessionTitle {
+					setTitle(refundTitle)
+					setSubtitle(CommonText.calculating, "${QuotationText.currentPrice}: ${CommonText.calculating} EOS/Byte/Day", Spectrum.blue)
+				}
 				expendTradingCard.into(this)
 			}
 			// 某些行为不需要设置 `租赁或转出` 的选项
@@ -180,8 +186,8 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			else -> ProcessType.Disk
 		}
 		val formattedPriceEOS = "≈ " + priceEOS.formatCount(4)
-		delegateTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
-		refundTitle.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
+		delegateSession.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
+		refundSession.setSubtitle(formattedPriceEOS, "${QuotationText.currentPrice}: $formattedPriceEOS $unitDescription", Spectrum.blue)
 		incomeTradingCard.setProcessValue(title, weight, available, total, processType)
 		expendTradingCard.setProcessValue(title, weight, available, total, processType)
 	}
@@ -208,7 +214,9 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 }
 
 enum class TradingType(val value: String) {
-	CPU("cpu"), NET("net"), RAM("ram");
+	CPU("cpu"),
+	NET("net"),
+	RAM("ram");
 
 	fun isCPU(): Boolean = value.equals(CPU.value, true)
 	fun isNET(): Boolean = value.equals(NET.value, true)
@@ -218,11 +226,20 @@ enum class TradingType(val value: String) {
 enum class StakeType(val value: String) {
 	Delegate("delegatebw"),
 	Refund("undelegatebw"),
+	RefundCPU("undelegatebwCPU"),
+	RefundNET("undelegatebwNET"),
 	BuyRam("buyram"),
-	SellRam("sellram");
+	SellRam("sellram"),
+	Trade("trade"),
+	Register("register");
 
 	fun isBuyRam(): Boolean = value.equals(BuyRam.value, true)
 	fun isSellRam(): Boolean = value.equals(SellRam.value, true)
 	fun isDelegate(): Boolean = value.equals(Delegate.value, true)
-	fun isRefund(): Boolean = value.equals(Refund.value, true)
+	fun isRefundCPU(): Boolean = value.equals(RefundCPU.value, true)
+	fun isRefundNET(): Boolean = value.equals(RefundNET.value, true)
+	fun isRefund(): Boolean =
+		value.equals(RefundCPU.value, true)
+			|| value.equals(RefundNET.value, true)
+			|| value.equals(Refund.value, true)
 }

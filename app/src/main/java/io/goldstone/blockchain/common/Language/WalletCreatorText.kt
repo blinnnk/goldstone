@@ -60,28 +60,28 @@ object CreateWalletText {
 	val agreementName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "GoldStone User Agreement"
 		HoneyLanguage.Chinese.code -> "GoldStone 用户条款"
-		HoneyLanguage.Japanese.code -> "＄ ユーザー規約"
+		HoneyLanguage.Japanese.code -> "GoldStone ユーザー規約"
 		HoneyLanguage.Korean.code -> "GoldStone 이용 약관"
 		HoneyLanguage.Russian.code -> "GoldStone Пользовательские условия"
-		HoneyLanguage.TraditionalChinese.code -> "GoldStone 用戶條款與隱私協議"
+		HoneyLanguage.TraditionalChinese.code -> "GoldStone 用戶條款"
 		else -> ""
 	}
 	@JvmField
 	val agreementPreString = when (currentLanguage) {
-		HoneyLanguage.English.code -> "I have read and agreed to"
-		HoneyLanguage.Chinese.code -> "我已阅读并同意"
-		HoneyLanguage.Japanese.code -> "契約書・規約を読んで同意します"
-		HoneyLanguage.Korean.code -> "나는"
-		HoneyLanguage.Russian.code -> "Я прочитал и принимаю"
-		HoneyLanguage.TraditionalChinese.code -> "我已閱讀并同意"
+		HoneyLanguage.English.code -> "I have read and agreed to "
+		HoneyLanguage.Chinese.code -> "我已阅读并同意 "
+		HoneyLanguage.Japanese.code -> ""
+		HoneyLanguage.Korean.code -> "나는 "
+		HoneyLanguage.Russian.code -> "Я прочитал и принимаю "
+		HoneyLanguage.TraditionalChinese.code -> "我已閱讀并同意 "
 		else -> ""
 	}
 	@JvmField
 	val agreementPostString = when (currentLanguage) {
 		HoneyLanguage.English.code -> ""
 		HoneyLanguage.Chinese.code -> ""
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
+		HoneyLanguage.Japanese.code -> "を読んで同意します"
+		HoneyLanguage.Korean.code -> "을 읽었으며 이에 동의합니다"
 		HoneyLanguage.Russian.code -> ""
 		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""

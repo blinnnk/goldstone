@@ -26,11 +26,11 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  */
 class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  TradingDashboardMenu
-	val ramEditText by lazy { RAMPriceRoundInputView(context, "KB") }
-	val eosEditText by lazy { RAMPriceRoundInputView(context, "EOS") }
-	val ramBalance by lazy { TextView(context) }
-	val eosBalance by lazy { TextView(context) }
-	private val confirmButton by lazy { RoundButton(context) }
+	val ramEditText = RAMPriceRoundInputView(context, "KB")
+	val eosEditText = RAMPriceRoundInputView(context, "EOS")
+	val ramBalance = TextView(context)
+	val eosBalance = TextView(context)
+	private val confirmButton = RoundButton(context)
 	private var showHistoryEvent: Runnable? = null
 	private var confirmEvent: Runnable? = null
 	private val dashboardWidth = ScreenSize.Width / 2 + RAMMarketPadding * 2

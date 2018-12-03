@@ -1,5 +1,7 @@
-package io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.view
+package io.goldstone.blockchain.module.home.wallet.walletsettings.chainaddresses.view
 
+import android.os.Bundle
+import android.view.View
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.util.clickToCopy
@@ -9,7 +11,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.wallet.walletsettings.allsinglechainaddresses.presneter.ChainAddressesPresenter
+import io.goldstone.blockchain.module.home.wallet.walletsettings.chainaddresses.presneter.ChainAddressesPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
@@ -20,7 +22,9 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 class ChainAddressesFragment
 	: BaseRecyclerFragment<ChainAddressesPresenter, Bip44Address>() {
 
-	val coinType by lazy { arguments?.getInt(ArgumentKey.coinType)?.let { ChainType(it) } }
+	val coinType by lazy {
+		arguments?.getInt(ArgumentKey.coinType)?.let { ChainType(it) }
+	}
 	override val pageTitle: String get() = coinType?.getSymbol()?.symbol.orEmpty()
 	override val presenter = ChainAddressesPresenter(this)
 
@@ -42,8 +46,8 @@ class ChainAddressesFragment
 		}
 	}
 
-	override fun onResume() {
-		super.onResume()
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
 		presenter.setAddAddressEvent()
 		presenter.setAddresses()

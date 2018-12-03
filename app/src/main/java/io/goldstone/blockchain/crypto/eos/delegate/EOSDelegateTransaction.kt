@@ -30,7 +30,7 @@ class EOSDelegateTransaction(
 ) : EOSTransactionInterface() {
 
 	override fun serialized(hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
-		EOSAPI.getTransactionHeaderFromChain(expirationType) { header, error ->
+		EOSAPI.getTransactionHeader(expirationType) { header, error ->
 			if (header.isNotNull() && error.isNone()) {
 				val chainID = SharedChain.getEOSCurrent().chainID
 				val transaction = EOSBandwidthInfo(
@@ -43,9 +43,9 @@ class EOSDelegateTransaction(
 				val authorization = EOSAuthorization(from.name, EOSActor.Active)
 				val authorizationObject = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 				val action = EOSAction(
-					EOSCodeName.EOSIOToken,
+					EOSCodeName.EOSIO,
 					transactionCode,
-					EOSTransactionMethod.Undelegatebw,
+					EOSTransactionMethod.undelegatebw(),
 					authorizationObject
 				)
 				val serialization = EOSTransactionUtils.serialize(

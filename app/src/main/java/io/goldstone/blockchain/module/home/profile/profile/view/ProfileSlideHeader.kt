@@ -23,7 +23,7 @@ class ProfileSlideHeader(context: Context) : SliderHeader(context) {
 
 	init {
 		title.apply {
-			text = ProfileText.profile
+			text = ProfileText.settings
 			textColor = Spectrum.white
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
