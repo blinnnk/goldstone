@@ -113,4 +113,7 @@ interface ChainNodeDao {
 
 	@Delete
 	fun delete(chainTable: ChainNodeTable)
+
+	@Query("DELETE FROM chainNode")
+	fun deleteAll()
 }

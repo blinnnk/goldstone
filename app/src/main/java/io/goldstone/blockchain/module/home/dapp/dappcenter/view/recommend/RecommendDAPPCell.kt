@@ -47,7 +47,7 @@ class RecommendDAPPCell(context: Context) : GSCard(context) {
 			titles = TwoLineTitles(context).apply {
 				padding = 10.uiPX()
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-				setBlackTitles(fontSize(10), 2.uiPX(), fontSize(9))
+				setBlackTitles(fontSize(11), 2.uiPX(), fontSize(9))
 			}
 			titles.into(this)
 		}

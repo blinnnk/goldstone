@@ -46,7 +46,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 					walletButton.preventDuplicateClicks()
 				}
 				dAppCenterButton.onClick {
-					presenter.showDAppCenterFragment()
+					presenter.showDAPPCenterFragment()
 					dAppCenterButton.preventDuplicateClicks()
 				}
 				marketButton.onClick {
