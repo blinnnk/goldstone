@@ -32,7 +32,7 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 
 	var model: DAPPModel? by observing(null) {
 		model?.apply {
-			appIcon.glideImage(src)
+			appIcon.glideImage(icon)
 			titles.title.text = title
 			titles.subtitle.text = description
 			tagContainer.removeAllViewsInLayout()

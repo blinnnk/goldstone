@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.profile.contacts.contracts.model
 import android.arch.persistence.room.*
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -22,6 +23,7 @@ data class ContactTable(
 	var ethSeriesAddress: String,
 	var eosAddress: String,
 	var eosJungle: String,
+	var eosKylin: String,
 	var btcMainnetAddress: String,
 	var btcSeriesTestnetAddress: String,
 	var etcAddress: String,
@@ -32,6 +34,7 @@ data class ContactTable(
 	@Ignore
 	constructor() : this(
 		0,
+		"",
 		"",
 		"",
 		"",
@@ -74,6 +77,7 @@ data class ContactTable(
 						it.btcSeriesTestnetAddress,
 						it.btcMainnetAddress,
 						it.eosJungle,
+						it.eosKylin,
 						it.eosAddress,
 						it.etcAddress,
 						it.ethSeriesAddress
@@ -110,9 +114,13 @@ fun List<ContactTable>.getCurrentAddresses(contract: TokenContract): List<Contac
 		}
 		contract.isEOS() || contract.isEOSToken() -> map {
 			it.apply {
+				val chainID = SharedChain.getEOSCurrent().chainID
 				defaultAddress =
-					if (SharedValue.isTestEnvironment()) it.eosJungle
-					else it.eosAddress
+					when {
+						chainID.isEOSKylin() -> eosKylin
+						chainID.isEOSJungle() -> eosJungle
+						else -> eosAddress
+					}
 			}
 		}
 		else -> map {

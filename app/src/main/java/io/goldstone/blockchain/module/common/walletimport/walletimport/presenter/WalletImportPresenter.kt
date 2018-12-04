@@ -59,7 +59,7 @@ class WalletImportPresenter(
 				currentLTCAddress = multiChainAddresses.ltc.address,
 				currentBCHAddress = multiChainAddresses.bch.address,
 				currentEOSAddress = multiChainAddresses.eos.address,
-				currentEOSAccountName = EOSDefaultAllChainName(multiChainAddresses.eos.address, multiChainAddresses.eos.address),
+				currentEOSAccountName = EOSDefaultAllChainName(multiChainAddresses.eos.address, multiChainAddresses.eos.address, multiChainAddresses.eos.address),
 				isUsing = true,
 				hint = hint,
 				isWatchOnly = false,

@@ -5024,7 +5024,7 @@
 		"social_media": "",
 		"start_date": "",
 		"exchange": "",
-		"rank": "5",
+		"rank": "6",
 		"market_cap": ""
 	},
 	{
@@ -5046,7 +5046,29 @@
 		"social_media": "",
 		"start_date": "",
 		"exchange": "",
-		"rank": "5",
+		"rank": "6",
+		"market_cap": ""
+	},
+	{
+		"name": "EOS",
+		"weight": 10000,
+		"total_supply": 1006245120,
+		"type": 194,
+		"symbol": "EOS",
+		"decimals": 4,
+		"address": "eosio.token",
+		"url": "null",
+		"price": "6.08",
+		"force_show": 1,
+		"is_default": 1,
+		"chain_id": "5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191",
+		"website": "",
+		"description": "",
+		"white_paper": "",
+		"social_media": "",
+		"start_date": "",
+		"exchange": "",
+		"rank": "6",
 		"market_cap": ""
 	}
 ]

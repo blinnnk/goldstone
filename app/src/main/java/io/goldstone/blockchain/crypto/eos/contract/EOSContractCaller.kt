@@ -40,7 +40,7 @@ class EOSContractCaller(
 
 	override fun serialized(
 		@WorkerThread hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
-		if (!chainID.isEOS()) {
+		if (!chainID.isEOSSeries()) {
 			hold(null, GoldStoneError("Wrong Chain ID"))
 			return
 		}

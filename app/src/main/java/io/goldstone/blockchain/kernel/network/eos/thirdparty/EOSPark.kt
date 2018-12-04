@@ -15,6 +15,9 @@ object EOSPark {
 	val getAccountBalance: (account: EOSAccount) -> String = {
 		"https://api.eospark.com/api?module=account&action=get_token_list&apikey=${apikey()}&account=${it.name}"
 	}
+	val getTransactionByTXID: (txID: String) -> String = {
+		"https://api.eospark.com/api?module=transaction&action=get_transaction_detail_info&apikey=${apikey()}&trx_id=$it"
+	}
 }
 
 // `EtherScan` 对 `Key` 的限制很大, 用随机的办法临时解决, 降低测试的时候出问题的概率

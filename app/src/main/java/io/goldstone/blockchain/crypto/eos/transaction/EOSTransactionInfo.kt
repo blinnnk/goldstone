@@ -6,6 +6,8 @@ import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -20,6 +22,7 @@ import io.goldstone.blockchain.crypto.utils.toCount
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import java.io.Serializable
@@ -41,6 +44,8 @@ data class EOSTransactionInfo(
 	// 一定是不参与序列化
 	val isTransaction: Boolean
 ) : Serializable, EOSModel {
+
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	constructor(
 		fromAccount: EOSAccount,
@@ -94,15 +99,19 @@ data class EOSTransactionInfo(
 		privateKey: EOSPrivateKey,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		EOSTransaction(
-			EOSAuthorization(fromAccount.name, EOSActor.Active),
-			toAccount.name,
-			amount,
-			memo,
-			// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
-			ExpirationType.FiveMinutes,
-			contract
-		).send(privateKey, hold)
+		val permission =
+			EOSAccountTable.getValidPermission(fromAccount, chainID)
+		if (permission.isNotNull()) {
+			EOSTransaction(
+				EOSAuthorization(fromAccount.name, permission),
+				toAccount.name,
+				amount,
+				memo,
+				// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
+				ExpirationType.FiveMinutes,
+				contract
+			).send(privateKey, hold)
+		} else hold(null, TransferError.WrongPermission)
 	}
 
 	override fun createObject(): String {

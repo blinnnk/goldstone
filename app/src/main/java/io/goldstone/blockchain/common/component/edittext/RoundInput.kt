@@ -10,16 +10,19 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
 import android.text.TextWatcher
+import android.view.ViewManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SafeLevel
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.sdk27.coroutines.onFocusChange
 
 /**
@@ -255,3 +258,6 @@ open class RoundInput(context: Context) : EditText(context) {
 		} else callback()
 	}
 }
+
+fun ViewManager.roundInput() = roundInput {}
+inline fun ViewManager.roundInput(init: RoundInput.() -> Unit) = ankoView({ RoundInput(it) }, 0, init)

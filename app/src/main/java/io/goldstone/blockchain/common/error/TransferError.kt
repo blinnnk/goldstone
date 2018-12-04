@@ -27,6 +27,8 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val WrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
+		val WrongPermission = TransferError("Wrong Keys Permission")
+		@JvmStatic
 		val LessRAMForRegister = TransferError("less RAM for register account")
 	}
 }

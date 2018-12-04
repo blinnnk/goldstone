@@ -92,7 +92,10 @@ class AddressSelectionPresenter(
 				}
 			}
 
-			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
+			AddressType.EOS,
+			AddressType.EOSJungle,
+			AddressType.EOSKylin,
+			AddressType.EOSAccountName -> when {
 				!token.contract.isEOSSeries() ->
 					selectionView.showError(Throwable(AccountError.InvalidAccountName))
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对

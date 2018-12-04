@@ -13,6 +13,7 @@ enum class AddressType(val value: String, val symbol: String) {
 	BTCSeriesTest("${CoinSymbol.btc()} Test", CoinSymbol.pureBTCSymbol),
 	LTC("LTC", CoinSymbol.ltc),
 	EOS("EOS", CoinSymbol.eos),
-	EOSJungle("EOS JUNGLE", CoinSymbol.eos),
+	EOSJungle("EOS Jungle", CoinSymbol.eos),
+	EOSKylin("EOS Kylin", CoinSymbol.eos),
 	EOSAccountName("EOS Account Name", CoinSymbol.eos)
 }

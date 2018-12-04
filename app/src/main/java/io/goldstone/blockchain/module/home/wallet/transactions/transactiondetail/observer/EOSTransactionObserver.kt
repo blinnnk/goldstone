@@ -5,6 +5,7 @@ import android.os.Looper
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,8 @@ abstract class EOSTransactionObserver {
 	open fun checkStatusByTransaction() {
 		GlobalScope.launch(Dispatchers.Default) {
 			// 首先获取线上的最近的不可逆的区块
+			// 首先从 链 获取数据, 如果链有错误那么就从 EOSPark 的第三方 API 获取数据
+			// PS `EOS Park` 目前只支持主网
 			if (transactionBlockNumber.isNull()) {
 				EOSAPI.getBlockNumberByTxID(hash) { blockNumber, error ->
 					if (blockNumber.isNotNull() && error.isNone()) {
@@ -36,13 +39,25 @@ abstract class EOSTransactionObserver {
 						removeObserver()
 						handler.postDelayed(reDo, retryTime)
 					} else {
-						// 出错失败最大重试次数设定
-						if (maxRetryTimes <= 0) removeObserver()
-						else {
-							maxRetryTimes -= 1
-							removeObserver()
-							handler.postDelayed(reDo, retryTime)
+						fun retry() {
+							// 出错失败最大重试次数设定
+							if (maxRetryTimes <= 0) removeObserver()
+							else {
+								maxRetryTimes -= 1
+								removeObserver()
+								handler.postDelayed(reDo, retryTime)
+							}
 						}
+						// 是主网并且在 链数据 `Error` 的时候引入 `EOSPark API` 进行监听
+						if (!SharedValue.isTestEnvironment()) {
+							EOSAPI.getBlockNumberByTxIDFromEOSPark(hash) { number, numberError ->
+								if (number.isNotNull() && numberError.isNone()) {
+									transactionBlockNumber = number
+									removeObserver()
+									handler.postDelayed(reDo, retryTime)
+								} else retry()
+							}
+						} else retry()
 					}
 				}
 			} else EOSAPI.getChainInfo { chainInfo, error ->

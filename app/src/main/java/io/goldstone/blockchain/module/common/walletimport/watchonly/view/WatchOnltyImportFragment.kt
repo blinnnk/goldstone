@@ -12,9 +12,12 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.RoundCell
+import io.goldstone.blockchain.common.component.cell.roundCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
@@ -41,11 +44,11 @@ import org.jetbrains.anko.verticalLayout
 class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
 	override val pageTitle: String = ImportMethodText.watchOnly
-	private val attentionView by lazy { AttentionTextView(context!!) }
-	private val typeSettings by lazy { RoundCell(context!!) }
-	private val nameInput by lazy { RoundInput(context!!) }
-	private val addressInput by lazy { WalletEditText(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var attentionView: AttentionTextView
+	private lateinit var typeSettings: RoundCell
+	private lateinit var nameInput: RoundInput
+	private lateinit var addressInput: WalletEditText
+	private lateinit var confirmButton: RoundButton
 	private var currentType = AddressType.ETHSeries.value
 	override val presenter = WatchOnlyImportPresenter(this)
 
@@ -53,6 +56,8 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
+
+			attentionView = AttentionTextView(context)
 			attentionView.apply {
 				isCenter()
 				setMargins<LinearLayout.LayoutParams> {
@@ -61,12 +66,14 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				text = WatchOnlyText.intro
 			}.into(this)
 
-			typeSettings.click {
-				showWalletTypeDashboard(context) { type ->
-					currentType = type
-					typeSettings.setTitles(ImportWalletText.walletType, type)
+			typeSettings = roundCell {
+				click {
+					showWalletTypeDashboard(context) { type ->
+						currentType = type
+						typeSettings.setTitles(ImportWalletText.walletType, type)
+					}
 				}
-			}.into(this)
+			}
 
 			typeSettings.setTitles(ImportWalletText.walletType, currentType)
 			typeSettings.setMargins<LinearLayout.LayoutParams> {
@@ -74,18 +81,19 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 				bottomMargin = 10.uiPX()
 			}
 
-			nameInput.apply {
+			nameInput = roundInput {
 				hint = UIUtils.generateDefaultName()
 				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				title = CreateWalletText.name
-			}.into(this)
+			}
 
+			addressInput = WalletEditText(context)
 			addressInput.apply {
 				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				hint = WatchOnlyText.enterDescription
 			}.into(this)
 
-			confirmButton.apply {
+			confirmButton = roundButton {
 				setBlueStyle(20.uiPX())
 				text = CommonText.startImporting.toUpperCase()
 			}.click { button ->
@@ -97,7 +105,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 						button.showLoadingStatus(false)
 					}
 				}
-			}.into(this)
+			}
 
 			ExplanationTitle(context).apply {
 				text = QAText.whatIsWatchOnlyWallet.setUnderline()
@@ -122,7 +130,8 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			AddressType.LTC.value,
 			AddressType.BCH.value,
 			AddressType.EOS.value,
-			AddressType.EOSJungle.value
+			AddressType.EOSJungle.value,
+			AddressType.EOSKylin.value
 		)
 		val defaultIndex = data.indexOf(currentType)
 		MaterialDialog(context)

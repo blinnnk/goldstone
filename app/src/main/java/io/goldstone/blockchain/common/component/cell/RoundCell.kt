@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component.cell
 
 import android.content.Context
 import android.view.Gravity
+import android.view.ViewManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 /**
  * @date 2018/7/12 2:29 PM
@@ -68,3 +70,6 @@ class RoundCell(context: Context) : GSCard(context) {
 		subtitleView.text = subTitle
 	}
 }
+
+fun ViewManager.roundCell() = roundCell {}
+inline fun ViewManager.roundCell(init: RoundCell.() -> Unit) = ankoView({ RoundCell(it) }, 0, init)
