@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtransaction.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.ViewGroup
@@ -21,6 +22,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
+@SuppressLint("SetTextI18n")
 class BigTransactionCell(context: Context): RelativeLayout(context) {
 	private lateinit var accountName: TextView
 	private lateinit var timing: TextView

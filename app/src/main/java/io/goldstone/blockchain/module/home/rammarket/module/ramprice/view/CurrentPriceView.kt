@@ -19,7 +19,7 @@ import org.jetbrains.anko.*
  */
 class CurrentPriceView(context: Context) : LinearLayout(context) {
 	lateinit var currentPrice: TextView
-	lateinit var trendcyPercent: TextView
+	lateinit var quoteChangePercent: TextView
 	
 	init {
 		orientation = LinearLayout.VERTICAL
@@ -47,7 +47,7 @@ class CurrentPriceView(context: Context) : LinearLayout(context) {
 				)
 				textColor = GrayScale.black
 			}
-			trendcyPercent = textView {
+			quoteChangePercent = textView {
 				gravity = Gravity.END
 				textSize = fontSize(20)
 				typeface = GoldStoneFont.heavy(context)

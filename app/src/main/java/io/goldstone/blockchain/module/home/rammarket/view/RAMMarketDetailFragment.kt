@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.module.home.rammarket.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
-import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.blinnnk.extension.*
@@ -113,7 +113,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 						) { eosResponse, error ->
 							if (eosResponse.isNotNull() && error.isNone()) {
 								presenter.updateAccountData {
-									presenter.setAcountInfoFromDatabase()
+									presenter.setAccountInfoFromDatabase()
 								}
 								launchUI {
 									loadingView.visibility = View.GONE
@@ -137,6 +137,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 		}
 	}
 	
+	@SuppressLint("SetTextI18n")
 	override fun showCurrentPriceAndPercent(price: Double, percent: Double) {
 		val formatCount = when {
 			price < 10.0 -> 4
@@ -145,7 +146,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 		}
 		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.formatCount(formatCount)} EOS/KB)"
 		ramPriceView.currentPriceView.currentPrice.text = price.formatCount(4)
-		ramPriceView.currentPriceView.trendcyPercent.apply {
+		ramPriceView.currentPriceView.quoteChangePercent.apply {
 			if (percent > 0) {
 				text = "+${BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP)}%"
 				textColor = Spectrum.green
@@ -164,7 +165,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	}
 	
 	override fun showSocketDisconnectedPercentColor(color: Int) {
-		ramPriceView.currentPriceView.trendcyPercent.textColor = color
+		ramPriceView.currentPriceView.quoteChangePercent.textColor = color
 	}
 	
 	override fun updateCandleChartUI(dateType: Int, data: ArrayList<CandleChartModel>) {

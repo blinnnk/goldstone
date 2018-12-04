@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -10,6 +11,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Tradi
  * @author: yanglihai
  * @description:
  */
+@SuppressLint("ViewConstructor")
 class RecentTradingListView(context: Context,
 	private val itemHold: TradingInfoModel.() -> Unit)
 	: RecyclerView(context) {

@@ -56,7 +56,7 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 }
 
 
-fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
+fun RAMMarketDetailPresenter.setAccountInfoFromDatabase() {
 	GlobalScope.launch(Dispatchers.Default) {
 		EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)?.let { localData ->
 			val ramBalance = ((localData.ramQuota -localData. ramUsed).toDouble() / 1024.0).formatCount(4)

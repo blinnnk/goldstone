@@ -13,7 +13,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramprice.presenter.*
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.RecentTransactionModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.recentTransactions
-import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.setAcountInfoFromDatabase
+import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.presenter.setAccountInfoFromDatabase
 import org.json.JSONObject
 import java.math.BigDecimal
 
@@ -31,7 +31,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 	val currentTransactionLimitSize = 5 // 最多只展示五个
 	
 	override fun start() {
-		setAcountInfoFromDatabase()
+		setAccountInfoFromDatabase()
 		getTodayPrice()
 		updateRAMCandleData(EOSRAMChartType.Minute)
 		recentTransactions()

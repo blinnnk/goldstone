@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
@@ -15,6 +16,7 @@ import org.jetbrains.anko.*
  * @author: yanglihai
  * @description:
  */
+@SuppressLint("ViewConstructor")
 class TradingView(context: Context, val fragment: RAMMarketDetailFragment): LinearLayout(context) {
 	val tradingDashboardView = TradingDashboardView(context).apply {
 			setShowHistoryEvent(Runnable {

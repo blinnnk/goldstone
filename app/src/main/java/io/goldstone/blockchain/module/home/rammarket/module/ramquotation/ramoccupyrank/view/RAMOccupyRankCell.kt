@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccupyrank.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.view.ViewGroup
@@ -20,9 +21,10 @@ import org.jetbrains.anko.*
 
 /**
  * @date: 2018/11/5.
- * @author: yanglihai
+ * @author: yangLiHai
  * @description:
  */
+@SuppressLint("SetTextI18n")
 class RAMOccupyRankCell(context: Context): RelativeLayout(context) {
 	private val rank = textView {
 		leftPadding = 7.uiPX()

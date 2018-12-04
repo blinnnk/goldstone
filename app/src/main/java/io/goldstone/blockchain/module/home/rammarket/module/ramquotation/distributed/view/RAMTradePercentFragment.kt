@@ -31,8 +31,7 @@ class RAMTradePercentFragment : GSFragment(), RAMDistributedContract.GSView {
 		ErrorDisplayManager(error).show(context)
 	}
 	
-	override val pageTitle: String
-		get() = ""
+	override val pageTitle: String = ""
 	
 	override val presenter: RAMTradePercentPresenter = RAMTradePercentPresenter(this)
 	

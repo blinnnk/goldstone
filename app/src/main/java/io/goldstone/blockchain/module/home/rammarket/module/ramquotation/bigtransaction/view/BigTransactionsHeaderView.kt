@@ -2,11 +2,8 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.bigtra
 
 import android.content.Context
 import android.graphics.Color
-import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.utils.GoldStoneFont

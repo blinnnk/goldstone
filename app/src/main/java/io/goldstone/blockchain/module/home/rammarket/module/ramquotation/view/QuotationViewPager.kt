@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramquotation.view
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -28,6 +29,7 @@ import java.util.*
  * @author: yanglihai
  * @description:
  */
+@SuppressLint("ViewConstructor")
 class QuotationViewPager(val fragment: RAMMarketDetailFragment): LinearLayout(fragment.context) {
 	private val menuBar = ViewPagerMenu(context).apply {
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width, 45.uiPX())
