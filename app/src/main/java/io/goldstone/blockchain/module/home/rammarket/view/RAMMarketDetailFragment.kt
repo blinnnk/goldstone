@@ -67,6 +67,8 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	override lateinit var presenter: RAMMarketDetailPresenter
 	fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
+			// 防止在返回的时候scrollview自动滑动
+			isFocusableInTouchMode = true
 			scrollView {
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				verticalLayout {
