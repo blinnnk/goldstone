@@ -16,7 +16,6 @@ import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.comm
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
 import io.goldstone.blockchain.module.home.rammarket.presenter.RAMMarketDetailPresenter
 import kotlinx.coroutines.*
-import java.math.BigDecimal
 
 /**
  * @date: 2018/11/1.
@@ -69,88 +68,28 @@ fun RAMMarketDetailPresenter.setAcountInfoFromDatabase() {
 }
 
 /**
- * 买交易
  * 买内存：amount 单位是 EOS
- */
-fun RAMMarketDetailPresenter.buyRAM(
-	context: Context,
-	amount: Double,
-	callback: (response: EOSResponse?, GoldStoneError) -> Unit
-) {
-	GlobalScope.launch(Dispatchers.Default) {
-		val eosAcountTable = EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)
-		if (eosAcountTable != null) {
-			eosAcountTable.let { localData ->
-				if (amount > localData.balance.toDoubleOrZero()) {
-					launchUI {
-						callback(null, GoldStoneError(EOSRAMExchangeText.noEnoughEOS))
-					}
-					return@launch
-				}
-				BaseTradingPresenter.buyRam( context, currentAccount, amount, callback)
-			}
-		} else {
-			launchUI {
-				callback(null, GoldStoneError("数据库错误"))
-			}
-		}
-	}
-}
-
-/**
- * 卖交易
  * 卖内存：amount 单位是 byte
- */
-fun RAMMarketDetailPresenter.sellRAM(
-	context: Context,
-	amount: Long,
-	callback: (response: EOSResponse?, GoldStoneError) -> Unit
-) {
-	
-	GlobalScope.launch(Dispatchers.Default) {
-		val eosAcountTable = EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)
-		if (eosAcountTable != null) {
-			eosAcountTable.let { localData ->
-				if (BigDecimal(amount).toBigInteger() > (localData.ramQuota - localData.ramUsed)) {
-					launchUI {
-						callback(null, GoldStoneError(EOSRAMExchangeText.noEnoughEOS))
-					}
-					return@launch
-				}
-				BaseTradingPresenter.sellRAM(context, amount, callback)
-			}
-		} else {
-			launchUI {
-				callback(null, GoldStoneError("数据库错误"))
-			}
-		}
-	}
-}
-
-/**
- * 买卖内存
  */
 fun RAMMarketDetailPresenter.tradeRAM(
 	context: Context,
 	amount: Double,
-	staketype: StakeType,
+	stakeType: StakeType,
 	callback: (response: EOSResponse?, GoldStoneError) -> Unit
 ) {
-	
-	if (!currentAccount.isValid()) {
-		callback(null, GoldStoneError(EOSRAMExchangeText.eosNoAccount))
-		return
-	}
 	if (isTestEnvironment) {
 		callback(null, GoldStoneError(EOSRAMExchangeText.testNetTradeDisableMessage))
 		return
 	}
 	
-	if (staketype.isSellRam()) {
-		sellRAM(context, amount.toLong(), callback)
-	} else {
-		buyRAM(context, amount, callback)
+	GlobalScope.launch(Dispatchers.Default) {
+		if (stakeType.isSellRam()) {
+			BaseTradingPresenter.sellRAM(context, amount.toLong(), callback)
+		} else {
+			BaseTradingPresenter.buyRam( context, currentAccount, amount, callback)
+		}
 	}
+	
 }
 
 fun RAMMarketDetailPresenter.updateAccountData(@WorkerThread callback: () -> Unit) {

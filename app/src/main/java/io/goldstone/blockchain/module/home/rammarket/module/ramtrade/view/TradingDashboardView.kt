@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.InputFilter
 import android.text.method.DigitsKeyListener
 import android.view.Gravity
+import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.ScreenSize
@@ -29,9 +30,11 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	private val menu:  TradingDashboardMenu
 	val ramEditText = RoundInput(context).apply {
 		showRightLabel("KB")
+		imeOptions = EditorInfo.IME_ACTION_DONE
 	}
 	val eosEditText = RoundInput(context).apply {
 		showRightLabel("EOS")
+		imeOptions = EditorInfo.IME_ACTION_DONE
 	}
 	val ramBalance = TextView(context)
 	val eosBalance = TextView(context)
