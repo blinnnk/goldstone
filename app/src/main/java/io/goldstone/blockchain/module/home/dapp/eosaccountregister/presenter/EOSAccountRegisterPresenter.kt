@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -25,6 +26,7 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
@@ -82,17 +84,23 @@ class EOSAccountRegisterPresenter(
 						TokenContract.EOS,
 						StakeType.Register
 					) { privateKey, privateKeyError ->
-						if (error.isNone() && privateKey.isNotNull()) {
-							EOSRegisterTransaction(
-								SharedChain.getEOSCurrent().chainID,
-								EOSAuthorization(creatorAccount.name, EOSActor.Active),
+						// 首先检测当前私钥的权限, 是单独 `Owner` 或 单独 `Active` 或全包包含,
+						// 首先选择 `Active` 权限, 如果不是选择 `Owner` 如果都没有返回 `error` 权限错误
+						val chainID = SharedChain.getEOSCurrent().chainID
+						val permission = EOSAccountTable.getValidPermission(creatorAccount, chainID)
+						when {
+							permission.isNull() -> callback(null, GoldStoneError("Wrong Permission Keys"))
+							error.isNone() && privateKey.isNotNull() -> EOSRegisterTransaction(
+								chainID,
+								EOSAuthorization(creatorAccount.name, permission),
 								validAccount!!.name,
 								validPublicKey.orEmpty(),
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
 								netAEOSCount.toEOSUnit()
 							).send(privateKey, callback)
-						} else callback(null, privateKeyError)
+							else -> callback(null, privateKeyError)
+						}
 					}
 				}
 			} else callback(null, ramPriceError)

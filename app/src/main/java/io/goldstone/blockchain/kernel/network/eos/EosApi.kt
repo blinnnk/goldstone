@@ -54,6 +54,21 @@ object EOSAPI {
 		)
 	}
 
+	fun getBlockNumberByTxIDFromEOSPark(
+		txID: String,
+		@WorkerThread hold: (blockNumber: Int?, error: GoldStoneError) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			EOSPark.getTransactionByTXID(txID),
+			listOf("data"),
+			true
+		) { data, error ->
+			if (data?.isEmpty() == false && error.isNone()) {
+				hold(JSONObject(data.first()).safeGet("block_num").toIntOrNull(), error)
+			} else hold(null, error)
+		}
+	}
+
 	/**
 	 * 本地转账临时插入的 Pending Data 需要填充, 服务器自定义的 ServerID 格式
 	 * unique_id = block_num * 1000000 + tx_index * 1000 + action_index

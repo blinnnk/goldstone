@@ -10,11 +10,17 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 
 enum class EOSChain(val id: String) {
 	Main(ChainID.eosMain),
-	Test(ChainID.eosTest);
+	Kylin(ChainID.eosKylin),
+	Jungle(ChainID.eosJungle);
 
 	companion object {
 		fun getCurrent(): EOSChain {
-			return if (SharedChain.getEOSCurrent().chainID.isEOSMain()) Main else Test
+			val chainID = SharedChain.getEOSCurrent().chainID
+			return when {
+				chainID.isEOSMain() -> Main
+				chainID.isEOSKylin() -> Kylin
+				else -> Jungle
+			}
 		}
 	}
 }

@@ -85,7 +85,7 @@ data class MyTokenTable(
 					val existingAccount = getByOwnerName(name, chainID)
 					if (pendingAccount.isNull() && existingAccount.isEmpty()) {
 						val defaultToken =
-							GoldStoneDataBase.database.defaultTokenDao().getToken(
+							DefaultTokenTable.dao.getToken(
 								TokenContract.EOS.contract,
 								CoinSymbol.EOS.symbol,
 								SharedChain.getEOSCurrent().chainID.id
@@ -94,6 +94,7 @@ data class MyTokenTable(
 							dao.insert(MyTokenTable(it, name, address))
 						}
 					} else if (!pendingAccount.isNull()) {
+						// TODO 有可能出现 existing Account 不为空, 导入同一个 AccountName 但权限不同的私钥
 						updatePendingAccountName(name, address, chainID)
 					}
 				}

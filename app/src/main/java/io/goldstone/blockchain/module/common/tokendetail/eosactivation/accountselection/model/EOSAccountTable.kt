@@ -2,12 +2,12 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.accounts
 
 import android.arch.persistence.room.*
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.isNullValue
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toBigIntegerOrZero
+import com.blinnnk.extension.*
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONArray
@@ -86,6 +86,23 @@ data class EOSAccountTable(
 			}
 		}
 
+		@WorkerThread
+		fun getValidPermission(account: EOSAccount, chainID: ChainID): EOSActor? {
+			val permission = EOSAccountTable.getPermissions(account, chainID)
+			val targetPermission = permission.find {
+				it.requiredAuthorization.publicKeys.find { publicKey ->
+					JSONObject(publicKey).safeGet("key").equals(SharedAddress.getCurrentEOS(), true)
+				}.isNotNull()
+			}?.permissionName
+			return EOSActor.getActorByValue(targetPermission.orEmpty())
+		}
+
+		@WorkerThread
+		fun getPermissions(account: EOSAccount, chainID: ChainID): List<PermissionsInfo> {
+			val permissions =
+				JSONArray(dao.getPermissions(account.name, chainID.id)).toJSONObjectList()
+			return permissions.map { PermissionsInfo(it) }
+		}
 
 		// 特殊情况下这几个字段的返回值会是 `null`
 		private fun checkRefundRequestOrGetObject(content: JSONObject): RefundRequestInfo {
@@ -105,6 +122,7 @@ data class EOSAccountTable(
 			val hasData = !data.isNullValue()
 			return if (hasData) VoterInfo(JSONObject(data)) else null
 		}
+
 	}
 }
 
@@ -115,6 +133,9 @@ interface EOSAccountDao {
 
 	@Query("SELECT * FROM eosAccount WHERE name = :name AND chainID = :chainID")
 	fun getAccount(name: String, chainID: String): EOSAccountTable?
+
+	@Query("SELECT permissions FROM eosAccount WHERE name = :name AND chainID = :chainID")
+	fun getPermissions(name: String, chainID: String): String
 
 	@Query("UPDATE eosAccount SET totalDelegateBandInfo = :data WHERE name = :name AND chainID = :chainID")
 	fun updateDelegateBandwidthData(data: List<DelegateBandWidthInfo>, name: String, chainID: String)

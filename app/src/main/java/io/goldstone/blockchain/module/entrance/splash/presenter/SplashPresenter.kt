@@ -169,7 +169,8 @@ class SplashPresenter(val activity: SplashActivity) {
 		fun checkOrUpdateEOSAccount(context: Context, wallet: WalletTable, callback: () -> Unit) {
 			// 观察钱包的时候会把 account name 存成 address 当删除钱包检测到下一个默认钱包
 			// 刚好是 EOS 观察钱包的时候越过检查 Account Name 的缓解
-			val isEOSWatchOnly = EOSAccount(wallet.currentEOSAddress).isValid(false)
+			val isEOSWatchOnly =
+				EOSAccount(wallet.currentEOSAddress).isValid(false)
 			if (isEOSWatchOnly) cacheDataAndSetNetBy(wallet, callback)
 			else EOSAPI.getAccountNameByPublicKey(wallet.currentEOSAddress) { accounts, error ->
 				if (accounts.isNotNull() && error.isNone()) {

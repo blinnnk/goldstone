@@ -246,7 +246,6 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 						val params =
 							RelativeLayout.LayoutParams(matchParent, matchParent)
 						params.topMargin = 200.uiPX()
-						params.bottomMargin = 20.uiPX()
 						layoutParams = params
 					}
 				}

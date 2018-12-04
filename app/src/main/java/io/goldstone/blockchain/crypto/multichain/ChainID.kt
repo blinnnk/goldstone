@@ -25,12 +25,11 @@ class ChainID(val id: String) : Serializable {
 	fun isLTCMain(): Boolean = ltcMain.equals(id, true)
 	fun isLTCTest(): Boolean = ltcTest.equals(id, true)
 	fun isEOSMain(): Boolean = eosMain.equals(id, true)
-	fun isEOSTest(): Boolean = eosTest.equals(id, true)
-	fun isEOS(): Boolean = isEOSMain() || isEOSTest()
-
+	fun isEOSJungle(): Boolean = eosJungle.equals(id, true)
+	fun isEOSKylin(): Boolean = eosKylin.equals(id, true)
 
 	fun isEOSSeries(): Boolean {
-		return isEOS() || isEOSTest()
+		return isEOSMain() || isEOSJungle() || isEOSKylin()
 	}
 
 	fun isETHSeries(): Boolean {
@@ -46,7 +45,7 @@ class ChainID(val id: String) : Serializable {
 	}
 
 	fun isTestnet(): Boolean {
-		return isRinkeby() || isRopsten() || isKovan() || isBTCTest() || isBCHTest() || isLTCTest() || isEOSTest() || isETCTest()
+		return isRinkeby() || isRopsten() || isKovan() || isBTCTest() || isBCHTest() || isLTCTest() || isEOSJungle() || isETCTest() || isEOSKylin()
 	}
 
 	@Throws
@@ -56,7 +55,7 @@ class ChainID(val id: String) : Serializable {
 			btcTest, btcMain -> TokenContract.BTC
 			ltcMain, ltcTest -> TokenContract.LTC
 			bchMain, bchTest -> TokenContract.BCH
-			eosMain, eosTest -> TokenContract.EOS
+			eosMain, eosJungle, eosKylin -> TokenContract.EOS
 			ethMain, ropsten, rinkeby, kovan -> TokenContract.ETH
 			else -> throw Throwable("Wrong Chain Token Contract")
 		}
@@ -69,7 +68,7 @@ class ChainID(val id: String) : Serializable {
 			btcTest, btcMain -> ChainType.BTC
 			ltcMain, ltcTest -> ChainType.LTC
 			bchMain, bchTest -> ChainType.BCH
-			eosMain, eosTest -> ChainType.EOS
+			eosMain, eosJungle, eosKylin -> ChainType.EOS
 			ethMain, ropsten, rinkeby, kovan -> ChainType.ETH
 			else -> throw Throwable("Wrong Chain Type")
 		}
@@ -82,7 +81,7 @@ class ChainID(val id: String) : Serializable {
 			btcTest, btcMain -> SharedChain.getBTCCurrent()
 			ltcMain, ltcTest -> SharedChain.getLTCCurrent()
 			bchMain, bchTest -> SharedChain.getBCHCurrent()
-			eosMain, eosTest -> SharedChain.getEOSCurrent()
+			eosMain, eosJungle, eosKylin -> SharedChain.getEOSCurrent()
 			ethMain, ropsten, rinkeby, kovan -> SharedChain.getCurrentETH()
 			else -> throw Throwable("Wrong Chain URL")
 		}
@@ -110,7 +109,8 @@ class ChainID(val id: String) : Serializable {
 		const val ltcMain = "12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2"
 		const val ltcTest = "4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"
 		const val eosMain = "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"
-		const val eosTest = "e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473" // Jungle Testnet
+		const val eosJungle = "e70aaab8997e1dfce58fbfac80cbbb8fecec7b99cf982a9444273cbc64c41473" // Jungle Testnet
+		const val eosKylin = "5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191" // Kylin Testnet
 
 		val ETH = ChainID(ethMain)
 		val Ropsten = ChainID(ropsten)
@@ -125,6 +125,7 @@ class ChainID(val id: String) : Serializable {
 		val LTC = ChainID(ltcMain)
 		val LTCTest = ChainID(ltcTest)
 		val EOS = ChainID(eosMain)
-		val EOSTest = ChainID(eosTest)
+		val EOSJungle = ChainID(eosJungle)
+		val EOSKylin = ChainID(eosKylin)
 	}
 }

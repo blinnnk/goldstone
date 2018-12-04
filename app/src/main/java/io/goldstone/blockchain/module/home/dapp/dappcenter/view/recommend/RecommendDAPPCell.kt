@@ -26,7 +26,7 @@ class RecommendDAPPCell(context: Context) : GSCard(context) {
 
 	var model: DAPPModel? by observing(null) {
 		model?.apply {
-			image.glideImage(src)
+			image.glideImage(icon)
 			titles.title.text = title
 			titles.subtitle.text = description
 		}
