@@ -68,9 +68,6 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			scrollView {
-				// 防止页面抖动（页面跳转回来后recyclerView会抢夺焦点，继而页面抖动）
-				isFocusableInTouchMode = true
-				descendantFocusability = FOCUS_BLOCK_DESCENDANTS
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 				verticalLayout {
 					layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
@@ -229,6 +226,11 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	override fun onHiddenChanged(hidden: Boolean) {
 		super.onHiddenChanged(hidden)
 		if (!hidden) {
+			tradingView.post {
+				activity?.window?.apply {
+					setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+				}
+			}
 			getParentFragment<RAMMarketOverlayFragment> {
 				showCloseButton(true) {
 					presenter.removeSelfFromActivity()

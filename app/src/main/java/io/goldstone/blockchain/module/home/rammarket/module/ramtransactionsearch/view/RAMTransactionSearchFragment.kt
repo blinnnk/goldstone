@@ -2,13 +2,16 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearc
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.base.baserecyclerfragment.*
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.*
+import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailHeaderView
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
@@ -29,7 +32,7 @@ class RAMTransactionSearchFragment:
 		ErrorDisplayManager(error).show(context)
 	}
 	
-	override val pageTitle: String = "Quotation Search"
+	override val pageTitle: String = EOSRAMExchangeText.ramExchange
 	override lateinit var presenter: RAMTransactionSearchPresenter
 	private var bottomLoading: BottomLoadingView? = null
 	
@@ -52,6 +55,9 @@ class RAMTransactionSearchFragment:
 			getContainer().header.setSearchEditor(EditorInfo.IME_ACTION_SEARCH) { accountName ->
 				this@RAMTransactionSearchFragment.presenter.loadFirstPage(accountName)
 			}
+		}
+		activity?.window?.apply {
+			setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
 		}
 	}
 	override fun showLoading(status: Boolean) {
