@@ -40,7 +40,7 @@ class EOSAccount(private val value: String) : Serializable {
 		}
 		val isLegalCharacter =
 		// 如果是普通用户名检查 `12` 位的规则
-			if (isNormalName || value.length == EOSValue.maxNameLength) {
+			if (isNormalName) {
 				value.none { !it.toString().matches(legalCharsIn12) }
 			} else {
 				// 如果是特定用户名检查前 `12` 位的规则并且额外检查第 `13` 位的规则
