@@ -29,7 +29,7 @@ class BigTransactionCell(context: Context): RelativeLayout(context) {
 	private lateinit var price: TextView
 	private lateinit var amount: TextView
 	
-	var model: TradingInfoModel by observing(TradingInfoModel("", 0.0, "", 0, 0, 0.0, 0)) {
+	var model: TradingInfoModel by observing(TradingInfoModel()) {
 		accountName.text = model.account
 		timing.text = TimeUtils.formatYMdHmDate(model.time * 1000)
 		amount.text = if (model.type == 0)  "+${model.quantity} EOS" else "-${model.quantity} EOS"

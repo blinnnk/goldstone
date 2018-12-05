@@ -50,7 +50,7 @@ class TradingView(context: Context, val fragment: RAMMarketDetailFragment): Line
 				layoutParams = LinearLayout.LayoutParams(matchParent, 290.uiPX())
 				setMargins<LinearLayout.LayoutParams> {
 					topMargin = 7.uiPX()
-					leftMargin = 10.uiPX()
+					leftMargin = 5.uiPX()
 				}
 			}.into(this)
 		}

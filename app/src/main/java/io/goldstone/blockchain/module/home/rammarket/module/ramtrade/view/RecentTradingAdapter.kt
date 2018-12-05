@@ -114,7 +114,7 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 		}
 		name = textView {
 			textColor = GrayScale.midGray
-			textSize = fontSize(14)
+			textSize = fontSize(12)
 			typeface = GoldStoneFont.heavy(context)
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				centerVertically()
@@ -123,7 +123,7 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 		}
 		transactionAmount = textView {
 			textColor = GrayScale.midGray
-			textSize = fontSize(14)
+			textSize = fontSize(12)
 			typeface = GoldStoneFont.heavy(context)
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				alignParentRight()
