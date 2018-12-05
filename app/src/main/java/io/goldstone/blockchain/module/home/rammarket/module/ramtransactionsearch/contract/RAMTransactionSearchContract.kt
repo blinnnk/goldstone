@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.module.home.rammarket.module.ramtransactionsearch.contract
 
-import android.support.annotation.UiThread
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
 import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.TradingInfoModel
@@ -20,6 +19,5 @@ interface RAMTransactionSearchContract {
 	interface GSPresenter: GoldStonePresenter {
 		fun loadFirstPage(account: String)
 		fun loadMore()
-		fun searchByName(@UiThread callback: () -> Unit)
 	}
 }

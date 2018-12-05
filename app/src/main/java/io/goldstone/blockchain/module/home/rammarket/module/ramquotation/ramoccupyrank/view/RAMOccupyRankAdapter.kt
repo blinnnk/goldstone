@@ -12,11 +12,11 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramquotation.ramoccu
  */
 class RAMOccupyRankAdapter(
 	override val dataSet: ArrayList<RAMRankModel>,
-	private val hold: RAMOccupyRankCell.() -> Unit)
-	: HoneyBaseAdapterWithHeaderAndFooter<RAMRankModel, RAMOccupyRankHeaderView, RAMOccupyRankCell, View>() {
+	private val hold: RAMOccupyRankCell.() -> Unit
+) : HoneyBaseAdapterWithHeaderAndFooter<RAMRankModel, RAMOccupyRankHeaderView, RAMOccupyRankCell, View>() {
 	
 	override fun generateHeader(context: Context) = RAMOccupyRankHeaderView(context)
-	override fun generateCell(context: Context) =  RAMOccupyRankCell(context)
+	override fun generateCell(context: Context) = RAMOccupyRankCell(context)
 	override fun generateFooter(context: Context) = View(context)
 	
 	override fun RAMOccupyRankCell.bindCell(

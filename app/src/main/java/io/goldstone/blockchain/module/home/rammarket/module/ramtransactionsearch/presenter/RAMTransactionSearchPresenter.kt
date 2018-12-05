@@ -23,7 +23,7 @@ class RAMTransactionSearchPresenter(
 	override fun start() {
 	}
 	
-	override fun searchByName(@UiThread callback: () -> Unit) {
+	private fun searchByName(@UiThread callback: () -> Unit) {
 		if (account == null) {
 			callback()
 			return
