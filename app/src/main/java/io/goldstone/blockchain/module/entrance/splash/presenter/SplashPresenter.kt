@@ -8,6 +8,7 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sandbox.SandBoxUtil
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -51,6 +52,14 @@ class SplashPresenter(val activity: SplashActivity) {
 		if (ExchangeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list).map { ExchangeTable(it) }
+			val sandboxMarketList = SandBoxUtil.getMarketList()
+			if (sandboxMarketList.isNotEmpty()) {
+				localData.forEach {
+					if (sandboxMarketList.contains(it.marketId)) {
+						it.isSelected = true
+					}
+				}
+			}
 			ExchangeTable.dao.insertAll(localData)
 		}
 	}
@@ -70,14 +79,27 @@ class SplashPresenter(val activity: SplashActivity) {
 		if (SupportCurrencyTable.dao.rowCount() == 0) {
 			val localCurrency =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
-					SupportCurrencyTable(it).apply {
-						// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-						if (currencySymbol.equals(CountryCode.currentCurrency, true)) {
-							isUsed = true
-							SharedWallet.updateCurrentRate(rate)
-						}
+					SupportCurrencyTable(it) // 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+				}
+			val sandboxCurrency = SandBoxUtil.getCurrency()
+			var changedStatus = false
+			if (sandboxCurrency.isNotEmpty()) {
+				// 如果沙盒中有数据，那么更新状态
+				localCurrency.forEach {
+					if (sandboxCurrency.equals(it.currencySymbol, true)) {
+						changedStatus = true
+						it.isUsed = true
+						SharedWallet.updateCurrentRate(it.rate)
 					}
 				}
+			}
+			if (!changedStatus) {
+				localCurrency.forEach {
+					if (it.currencySymbol.equals(CountryCode.currentCurrency, true)) {
+						it.isUsed = true
+						SharedWallet.updateCurrentRate(it.rate)
+					} }
+			}
 			SupportCurrencyTable.dao.insertAll(localCurrency)
 		}
 	}

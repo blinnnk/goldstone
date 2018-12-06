@@ -20,6 +20,7 @@ import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sandbox.SandBoxUtil
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.GrayScale
@@ -118,6 +119,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 						exchange.marketId
 					}
 					presenter.updateSelectedExchangeID(selectedIDs)
+					SandBoxUtil.updateMarketList(selectedIDs)
 					updateResultAfterConditionChanged()
 					dialog.dismiss()
 				}

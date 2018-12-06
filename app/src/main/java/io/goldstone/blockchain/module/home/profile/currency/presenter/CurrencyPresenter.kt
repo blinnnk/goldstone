@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.profile.currency.presenter
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
+import io.goldstone.blockchain.common.sandbox.SandBoxUtil
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
 import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
@@ -40,6 +41,7 @@ class CurrencyPresenter(
 			currencyDao.setCurrencyInUse(symbol)
 			val rate = currencyDao.getCurrencyBySymbol(symbol)?.rate
 			AppConfigTable.dao.updateCurrency(symbol)
+			SandBoxUtil.updateCurrency(symbol)
 			rate?.let { SharedWallet.updateCurrentRate(it) }
 			SharedWallet.updateCurrencyCode(symbol)
 		}

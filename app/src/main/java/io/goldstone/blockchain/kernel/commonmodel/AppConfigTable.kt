@@ -11,6 +11,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.sandbox.SandBoxUtil
 import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -67,11 +68,13 @@ data class AppConfigTable(
 
 		@SuppressLint("HardwareIds")
 		fun insertAppConfig(@WorkerThread callback: (AppConfigTable) -> Unit) {
+			val sandBoxModel = SandBoxUtil.getSandBoxModel()
 			val config = AppConfigTable(
 				0,
 				frozenTime = 0L,
 				goldStoneID = ApkUtil.generateGoldStoneID(),
-				language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+				language = if (sandBoxModel.language != -1) sandBoxModel.language else HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+				currencyCode = if (sandBoxModel.currency.isNotEmpty()) sandBoxModel.currency else CountryCode.currentCurrency,
 				terms = getLocalTerms(),
 				isMainnet = true,
 				defaultCoinListMD5 = "",

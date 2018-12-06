@@ -8,8 +8,13 @@ import java.io.Serializable
  * @description:
  */
 class SandBoxModel(
-	var language: String,
-	var tokens: String
+	var language: Int,
+	var currency: String,
+	var marketList: List<Int>
 ) : Serializable {
-	constructor() : this("", "")
+	constructor() : this(
+		-1,
+		"",
+		listOf()
+	)
 }
