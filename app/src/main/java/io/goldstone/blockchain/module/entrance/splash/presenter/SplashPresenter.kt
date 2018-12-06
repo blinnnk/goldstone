@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -111,7 +111,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	private fun unregisterGoldStoneID(targetGoldStoneID: String) {
-		if (NetworkUtil.hasNetwork(activity)) {
+		if (NetworkUtil.hasNetwork()) {
 			GoldStoneAPI.unregisterDevice(targetGoldStoneID) { isSuccessful, error ->
 				if (isSuccessful.isNotNull() && error.isNone()) {
 					// 服务器操作失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`, 成功的话清空.
@@ -149,7 +149,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				!currentWallet.eosAccountNames.hasActivatedOrWatchOnly() &&
 				currentWallet.getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
-				if (NetworkUtil.hasNetwork(context)) {
+				if (NetworkUtil.hasNetwork()) {
 					checkOrUpdateEOSAccount(context, currentWallet, callback)
 					SharedValue.updateAccountCheckedStatus(true)
 				} else {

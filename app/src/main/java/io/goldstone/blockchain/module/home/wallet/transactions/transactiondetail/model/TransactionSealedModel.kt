@@ -7,8 +7,8 @@ import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import java.io.Serializable
 import java.math.BigInteger
 

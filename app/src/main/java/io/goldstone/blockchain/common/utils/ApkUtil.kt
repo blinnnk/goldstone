@@ -7,9 +7,9 @@ import android.os.Build
 import android.provider.Settings
 import android.support.v4.content.FileProvider
 import com.blinnnk.extension.isEvenCount
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.io.File
 import java.math.BigInteger
 
@@ -33,17 +33,17 @@ object ApkUtil {
 			// 添加这一句表示对目标应用临时授权该 Uri 所代表的文件
 			intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 			// 参数 1 上下文, 参数 2 Provider 主机地址和配置文件中保持一致参数 3 共享的文件
-			val apkUri = FileProvider.getUriForFile(GoldStoneAPI.context, "io.goldstone.blockchain.provider", apkFile)
+			val apkUri = FileProvider.getUriForFile(GoldStoneApp.appContext, "io.goldstone.blockchain.provider", apkFile)
 			intent.setDataAndType(apkUri, "application/vnd.android.package-archive")
 		} else {
 			intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive")
 		}
-		GoldStoneAPI.context.startActivity(intent)
+		GoldStoneApp.appContext.startActivity(intent)
 	}
 
 	@SuppressLint("HardwareIds")
 	fun generateGoldStoneID(): String {
-		val deviceID = Settings.Secure.getString(GoldStoneAPI.context.contentResolver, Settings.Secure.ANDROID_ID)
+		val deviceID = Settings.Secure.getString(GoldStoneApp.appContext.contentResolver, Settings.Secure.ANDROID_ID)
 		val registerTime = System.currentTimeMillis()
 		val deviceIDCode = deviceID.toCryptHexString()
 		val registerTimeCode = BigInteger.valueOf(registerTime).toString(16)

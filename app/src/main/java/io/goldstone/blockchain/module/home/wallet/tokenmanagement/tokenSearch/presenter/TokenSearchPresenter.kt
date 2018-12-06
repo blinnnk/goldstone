@@ -17,7 +17,7 @@ import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchAdapter
@@ -47,8 +47,7 @@ class TokenSearchPresenter(
 				fragment.showLoadingView(true)
 				MyTokenTable.getMyTokens { myTokens ->
 					searchInputListener { inputContent ->
-						if (NetworkUtil.hasNetwork(fragment.context))
-							getSearchResult(inputContent, myTokens)
+						if (NetworkUtil.hasNetwork()) getSearchResult(inputContent, myTokens)
 					}
 				}
 			}

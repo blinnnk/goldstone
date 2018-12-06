@@ -3,7 +3,6 @@
 package io.goldstone.blockchain.kernel.network.ethereum
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNullValue
@@ -16,7 +15,7 @@ import io.goldstone.blockchain.crypto.keystore.toJsonObject
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.*
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.callChainBy
@@ -32,7 +31,6 @@ import java.math.BigInteger
  */
 object ETHJsonRPC {
 
-	lateinit var context: Context
 	@JvmStatic
 	val contentType = MediaType.parse("application/json; charset=utf-8")
 

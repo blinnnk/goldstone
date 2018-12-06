@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.language.PincodeText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.value.Count
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.pincode.view.PinCodeEditorFragment
 import kotlinx.coroutines.Dispatchers
 

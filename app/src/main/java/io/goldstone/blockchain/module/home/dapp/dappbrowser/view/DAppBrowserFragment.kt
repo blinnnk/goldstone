@@ -5,11 +5,13 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.removeFragment
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.dapp.common.DAppBrowser
@@ -46,6 +48,12 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 		super.onViewCreated(view, savedInstanceState)
 		presenter = DAppBrowserPresenter()
 		presenter.start()
+		activity?.hideStatusBar()
+	}
+
+	override fun onDestroy() {
+		super.onDestroy()
+		activity?.transparentStatus()
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,7 +63,8 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 				browser = DAppBrowser(context, url!!)
 				addView(browser)
 				button {
-					x += 200.uiPX()
+					x += 100.uiPX()
+					y += 100.uiPX()
 					text = "Close"
 					onClick {
 						removeSelfFromActivity()

@@ -6,7 +6,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
 import io.goldstone.blockchain.module.home.profile.lanaguage.view.LanguageFragment

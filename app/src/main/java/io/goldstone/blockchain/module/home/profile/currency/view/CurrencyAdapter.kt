@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.home.profile.currency.view
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.extension.preventDuplicateClicks
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**

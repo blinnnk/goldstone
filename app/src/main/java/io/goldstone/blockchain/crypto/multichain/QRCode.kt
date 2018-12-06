@@ -3,9 +3,7 @@ package io.goldstone.blockchain.crypto.multichain
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
+import io.goldstone.blockchain.kernel.commontable.model.QRCodeModel
 
 
 /**

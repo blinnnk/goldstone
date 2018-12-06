@@ -16,6 +16,7 @@ object ArgumentKey {
 	const val tokenDetail = "tokenDetail"
 	const val paymentAddress = "paymentAddress"
 	const val paymentCount = "count"
+	const val paymentMemo = "paymentMemo"
 	const val tokenModel = "tokenModel"
 	const val webViewUrl = "webViewUrl"
 	const val webViewName = "webViewName"
@@ -39,6 +40,7 @@ object ArgumentKey {
 	const val contact = "contact"
 	const val eosAccountRegister = "eosAccountRegister"
 	const val contactID = "contactID"
+	const val dappTradingModel = "dappTradingModel"
 }
 
 object IntentKey {

@@ -15,10 +15,10 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import io.goldstone.blockchain.BuildConfig
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.language.QRText
 import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.qrcode.view.ScanCaptureActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.model.ContactModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.qrcodefragment.view.QRCodeFragment
@@ -130,7 +130,7 @@ open class QRCodePresenter(
 				e.printStackTrace()
 			}
 			val providerURI = FileProvider.getUriForFile(
-				GoldStoneAPI.context, BuildConfig.APPLICATION_ID + ".provider", file
+				GoldStoneApp.appContext, BuildConfig.APPLICATION_ID + ".provider", file
 			)
 			hold(providerURI)
 		}

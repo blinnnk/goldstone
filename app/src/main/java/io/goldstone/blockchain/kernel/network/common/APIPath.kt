@@ -95,4 +95,12 @@ object APIPath {
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
 	}
+
+	val getRecommendDAPPs: (header: String) -> String = { header ->
+		"$header/dapp/getRecommendDapp"
+	}
+
+	val getNewDAPPs: (header: String) -> String = { header ->
+		"$header/dapp/getDapps"
+	}
 }

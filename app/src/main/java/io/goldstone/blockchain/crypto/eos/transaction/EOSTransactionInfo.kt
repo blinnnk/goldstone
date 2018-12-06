@@ -4,6 +4,8 @@ import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toDoubleOrZero
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -11,7 +13,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -19,12 +20,14 @@ import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toCount
+import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
+import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -46,6 +49,15 @@ data class EOSTransactionInfo(
 ) : Serializable, EOSModel {
 
 	private val chainID = SharedChain.getEOSCurrent().chainID
+
+	constructor(data: JSONObject) : this(
+		EOSAccount(data.safeGet("from")),
+		EOSAccount(data.safeGet("to")),
+		data.safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
+		TokenContract.EOS,
+		data.safeGet("memo"),
+		true
+	)
 
 	constructor(
 		fromAccount: EOSAccount,

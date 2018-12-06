@@ -21,7 +21,7 @@ import io.goldstone.blockchain.common.language.SplashText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.module.common.webview.presenter.WebViewPresenter
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers

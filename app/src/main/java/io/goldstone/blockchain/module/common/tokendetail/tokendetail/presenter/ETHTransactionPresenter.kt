@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.multichain.isETH
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ETHTransactionModel

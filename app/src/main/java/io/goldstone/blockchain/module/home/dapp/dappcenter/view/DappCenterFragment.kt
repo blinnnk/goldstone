@@ -11,6 +11,7 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.ViewPagerAdapter
 import io.goldstone.blockchain.common.component.SearchBar
@@ -20,16 +21,13 @@ import io.goldstone.blockchain.common.component.searchBar
 import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.DAppBrowserFragment
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
-import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPModel
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.dapp.dappcenter.presenter.DAppCenterPresenter
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.applist.DAPPRecyclerView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.recommend.RecommendDappView
@@ -76,6 +74,10 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					searchBar = searchBar {
 						layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 						clearFocus()
+						enterKeyEvent = Runnable {
+							showDAppBrowserFragment(getContent())
+							activity?.let { SoftKeyboard.hide(it) }
+						}
 					}
 					sessionTitle {
 						setTitle("Recommend DAPP", Spectrum.white)
@@ -89,7 +91,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					linearLayout {
 						lparams(matchParent, wrapContent)
 						recommendDAPP = RecommendDappView(context) {
-							showDAppBrowserFragment()
+							showDAppBrowserFragment(url)
 						}
 						recommendDAPP.into(this)
 						bottomPadding = 10.uiPX()
@@ -109,10 +111,10 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							menuBar.into(this)
 							minimumHeight = 200.uiPX()
 							newAPP = DAPPRecyclerView(context) {
-
+								showDAppBrowserFragment(url)
 							}
 							latestUsed = DAPPRecyclerView(context) {
-
+								showDAppBrowserFragment(url)
 							}
 							viewPager {
 								layoutParams = LinearLayout.LayoutParams(matchParent, ScreenSize.fullHeight)
@@ -139,22 +141,24 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		}.view
 	}
 
-	override fun showRecommendDAPP(data: ArrayList<DAPPModel>) = launchUI {
+	override fun showRecommendDAPP(data: ArrayList<DAPPTable>) = launchUI {
 		recommendDAPP.setData(data)
 	}
 
-	override fun showNewDAPP(data: ArrayList<DAPPModel>) = launchUI {
+	override fun showAllDAPP(data: ArrayList<DAPPTable>) = launchUI {
 		newAPP.setData(data)
 	}
 
-	override fun showLatestUsed(data: ArrayList<DAPPModel>) {
+	override fun showLatestUsed(data: ArrayList<DAPPTable>) {
 		latestUsed.setData(data)
 	}
 
-	private fun showDAppBrowserFragment() {
+	private fun showDAppBrowserFragment(url: String) {
 		// 测试使用之后完成逻辑需要删除替换
-		val url = searchBar.getContent() isEmptyThen "http://192.168.64.2/site/dapp/index.html"
-		getMainActivity()?.addFragmentAndSetArguments<DAppBrowserFragment>(ContainerID.main) {
+		getMainActivity()?.addFragmentAndSetArguments<DAppBrowserFragment>(
+			ContainerID.main,
+			FragmentTag.dappBrowser
+		) {
 			putString("webURL", url)
 		}
 		getMainActivity()?.hideHomeFragment()

@@ -4,8 +4,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionSealedModel
 import kotlinx.coroutines.Dispatchers

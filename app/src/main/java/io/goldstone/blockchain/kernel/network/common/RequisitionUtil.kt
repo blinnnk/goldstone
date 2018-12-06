@@ -8,6 +8,7 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.AesCrypto
@@ -257,7 +258,7 @@ object RequisitionUtil {
 		bold: RequestBody?
 	) -> Request = { path, goldStoneID, body ->
 		val timeStamp = System.currentTimeMillis().toString()
-		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
+		val version = SystemUtils.getVersionCode(GoldStoneApp.appContext).toString()
 		val sign = getSignHeader(goldStoneID, timeStamp, version)
 		Request.Builder()
 			.url(path)

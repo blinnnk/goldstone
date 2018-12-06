@@ -97,7 +97,7 @@ class MarketTokenDetailPresenter(
 				else -> it.lineChartHour
 			}
 			// 更新网络数据
-			if (data.isNullOrBlank() && NetworkUtil.hasNetwork(fragment.context)) {
+			if (data.isNullOrBlank() && NetworkUtil.hasNetwork()) {
 				fragment.showLoadingView()
 				updateCandleChartDataBy(chartView, pair, period, dateType)
 			} else if (!data.isNullOrBlank()) {
@@ -108,7 +108,7 @@ class MarketTokenDetailPresenter(
 				checkDatabaseTimeIsValidBy(period, databaseTime) {
 					chartView.updateCandleChartUI(candleData, dateType)
 					// 不合规且有网络环境就更新网络数据
-					if (!this && NetworkUtil.hasNetwork(fragment.context))
+					if (!this && NetworkUtil.hasNetwork())
 						updateCandleChartDataBy(chartView, pair, period, dateType)
 				}
 			}
@@ -160,7 +160,7 @@ class MarketTokenDetailPresenter(
 				tokenData.marketCap.isEmpty()
 					|| tokenData.rankValue.isEmpty()
 					|| localLanguageCode != SharedWallet.getCurrentLanguageCode()
-			if (NetworkUtil.hasNetwork(fragment.context)) {
+			if (NetworkUtil.hasNetwork()) {
 				var newPriceData = priceData
 				var newTokenData = tokenData
 				// 本地没有数据的话从服务端拉取 `Coin Information`

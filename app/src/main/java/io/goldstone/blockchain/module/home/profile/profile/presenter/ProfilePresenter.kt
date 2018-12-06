@@ -19,7 +19,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.eos.base.TitleCellAdapter
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.receiver.currentVersion
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable

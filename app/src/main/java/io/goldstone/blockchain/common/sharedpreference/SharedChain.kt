@@ -3,10 +3,10 @@ package io.goldstone.blockchain.common.sharedpreference
 import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -19,84 +19,84 @@ object SharedChain {
 	/** Chain Config */
 	fun getCurrentETH(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ethCurrentChain))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.ethCurrentChain))
 		return ChainURL(chainObject)
 	}
 
 	fun updateCurrentETH(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ethCurrentChain, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.ethCurrentChain, chainInfo.generateObject())
 
 	/** LTC ChainID And Chain Name in Shared Preference*/
 	fun getLTCCurrent(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.ltcCurrentChain))
 		return ChainURL(chainObject)
 	}
 
 	fun updateLTCCurrent(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.ltcCurrentChain, chainInfo.generateObject())
 
 	/** BCH ChainID And Chain Name in Shared Preference */
 	fun getBCHCurrent(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.bchCurrentChain))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.bchCurrentChain))
 		return ChainURL(chainObject)
 	}
 
 	fun updateBCHCurrent(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.bchCurrentChain, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.bchCurrentChain, chainInfo.generateObject())
 
 	/** EOS ChainID And ChainName In Shared Preference*/
 	fun getEOSCurrent(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosCurrentChain))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.eosCurrentChain))
 		return ChainURL(chainObject)
 	}
 
 	fun updateEOSCurrent(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosCurrentChain, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosCurrentChain, chainInfo.generateObject())
 
 	fun getEOSMainnet(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosMainnet))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.eosMainnet))
 		return ChainURL(chainObject)
 	}
 
 	fun updateEOSMainnet(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosMainnet, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosMainnet, chainInfo.generateObject())
 
 	fun getEOSTestnet(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.eosTestnet))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.eosTestnet))
 		return ChainURL(chainObject)
 	}
 
 	fun updateEOSTestnet(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.eosTestnet, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosTestnet, chainInfo.generateObject())
 
 
 	/** ETC ChainID And Chain Name in Shared Preference*/
 	fun getETCCurrent(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.etcCurrentChain))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.etcCurrentChain))
 		return ChainURL(chainObject)
 	}
 
 	fun updateETCCurrent(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.etcCurrentChain, chainInfo.generateObject())
 
 	fun getBTCCurrent(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.btcCurrentChain))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.btcCurrentChain))
 		return ChainURL(chainObject)
 	}
 
 	fun updateBTCCurrent(chainInfo: ChainURL) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainInfo.generateObject())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.btcCurrentChain, chainInfo.generateObject())
 
 	fun getAllUsedTestnetChains(): List<ChainURL> {
 		val allTestnetChains =
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.allTestnetChains)
+			GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.allTestnetChains)
 		val jsonArray = JSONArray(allTestnetChains).toJSONObjectList()
 		return jsonArray.map { ChainURL(it) }
 	}
@@ -106,12 +106,12 @@ object SharedChain {
 		chainInfo.forEach {
 			jsonArray.put(ChainURL(it).generateObject())
 		}
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.allTestnetChains, jsonArray.toString())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.allTestnetChains, jsonArray.toString())
 	}
 
 	fun getAllUsedMainnetChains(): List<ChainURL> {
 		val allTestnetChains =
-			GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.allMainnetChains)
+			GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.allMainnetChains)
 		val jsonArray = JSONArray(allTestnetChains).toJSONObjectList()
 		return jsonArray.map { ChainURL(it) }
 	}
@@ -121,7 +121,7 @@ object SharedChain {
 		chainInfo.forEach {
 			jsonArray.put(ChainURL(it).generateObject())
 		}
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.allMainnetChains, jsonArray.toString())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.allMainnetChains, jsonArray.toString())
 	}
 
 }

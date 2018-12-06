@@ -12,8 +12,8 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent

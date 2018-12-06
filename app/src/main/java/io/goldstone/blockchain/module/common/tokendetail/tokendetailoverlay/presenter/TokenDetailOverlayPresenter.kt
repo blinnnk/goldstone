@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.pre
 import android.support.v4.app.Fragment
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.isFalse
+import com.blinnnk.extension.orZero
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
@@ -14,12 +15,15 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
+import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.activationmode.view.EOSActivationModeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.common.tokenpayment.deposit.view.DepositFragment
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.view.PaymentDetailFragment
 import io.goldstone.blockchain.module.home.home.view.findIsItExist
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -36,6 +40,16 @@ class TokenDetailOverlayPresenter(
 		fragment.apply {
 			addFragmentAndSetArgument<TokenDetailCenterFragment>(ContainerID.content) {
 				putSerializable(ArgumentKey.tokenDetail, token)
+			}
+		}
+	}
+
+	fun showPaymentDetailFragment(tradingModel: EOSTransactionInfo?) {
+		fragment.apply {
+			addFragmentAndSetArgument<PaymentDetailFragment>(ContainerID.content) {
+				putString(ArgumentKey.paymentAddress, tradingModel?.toAccount?.name)
+				putString(ArgumentKey.paymentMemo, tradingModel?.memo)
+				putDouble(ArgumentKey.paymentCount, tradingModel?.amount?.toEOSCount().orZero())
 			}
 		}
 	}

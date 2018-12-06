@@ -4,7 +4,7 @@ import android.content.Context
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 
 /**
  * @date 26/03/2018 2:26 PM

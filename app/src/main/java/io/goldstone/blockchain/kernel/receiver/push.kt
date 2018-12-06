@@ -17,6 +17,7 @@ import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import com.tencent.android.tpush.*
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -29,7 +30,7 @@ import io.goldstone.blockchain.common.value.IntentKey
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.keystore.toJsonObject
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.GoldStoneCode
@@ -140,7 +141,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 		fun clearAppIconReDot() {
 			// 清楚所有 `App Icon` 上的小红点
 			val notificationManager =
-				GoldStoneAPI.context.applicationContext?.getSystemService(
+				GoldStoneApp.appContext.applicationContext?.getSystemService(
 					Context.NOTIFICATION_SERVICE
 				) as NotificationManager
 			notificationManager.cancelAll()

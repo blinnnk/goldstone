@@ -23,7 +23,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable

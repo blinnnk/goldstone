@@ -95,7 +95,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 				}.into(this)
 
 				resourceCoast.apply {
-					if (NetworkUtil.hasNetwork(context)) presenter.getEOSCurrencyPrice { currency, error ->
+					if (NetworkUtil.hasNetwork()) presenter.getEOSCurrencyPrice { currency, error ->
 						if (currency.isNotNull() && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 							setSubtitle("2.0 EOS ≈ ${(2 * currency).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
 						} else safeShowError(error)

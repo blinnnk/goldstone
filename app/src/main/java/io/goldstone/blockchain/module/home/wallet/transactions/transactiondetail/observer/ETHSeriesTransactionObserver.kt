@@ -9,7 +9,7 @@ import com.blinnnk.util.TinyNumberUtils
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.ChainID
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
