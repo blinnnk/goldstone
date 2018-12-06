@@ -22,7 +22,7 @@ import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address

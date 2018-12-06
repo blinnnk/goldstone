@@ -3,8 +3,8 @@ package io.goldstone.blockchain.common.sharedpreference
 import com.blinnnk.util.getBooleanFromSharedPreferences
 import com.blinnnk.util.getDoubleFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 
 /**
@@ -14,55 +14,55 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 object SharedValue {
 	// EOS KB
 	fun getRAMUnitPrice(): Double =
-		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.ramUnitPrice)
+		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.ramUnitPrice)
 
 	fun updateRAMUnitPrice(unitPrice: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.ramUnitPrice, unitPrice.toFloat())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.ramUnitPrice, unitPrice.toFloat())
 
 	fun getCPUUnitPrice(): Double =
-		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.cpuUnitPrice)
+		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.cpuUnitPrice)
 
 	fun updateCPUUnitPrice(unitPrice: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.cpuUnitPrice, unitPrice.toFloat())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.cpuUnitPrice, unitPrice.toFloat())
 
 	fun getNETUnitPrice(): Double =
-		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.netUnitPrice)
+		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.netUnitPrice)
 
 	fun updateNETUnitPrice(unitPrice: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.netUnitPrice, unitPrice.toFloat())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.netUnitPrice, unitPrice.toFloat())
 
 	fun isTestEnvironment(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isTestEnvironment)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.isTestEnvironment)
 
 	fun updateIsTestEnvironment(isTest: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.isTestEnvironment,
 			isTest
 		)
 
 	fun getPincodeDisplayStatus(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.needToShowPincode)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.needToShowPincode)
 
 	fun updatePincodeDisplayStatus(status: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.needToShowPincode,
 			status
 		)
 
 	fun getAccountCheckedStatus(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.accountCheckedStatus)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.accountCheckedStatus)
 
 	fun updateAccountCheckedStatus(status: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.accountCheckedStatus,
 			status
 		)
 
 	fun getDeveloperModeStatus(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.developerMode)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.developerMode)
 
 	fun updateDeveloperModeStatus(status: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.developerMode,
 			status
 		)

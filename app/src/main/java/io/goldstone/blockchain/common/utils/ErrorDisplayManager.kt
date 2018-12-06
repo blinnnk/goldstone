@@ -16,6 +16,8 @@ class ErrorDisplayManager(error: Throwable) {
 
 	init {
 		val errorMessage = error.message
+		// 有写被收集的 ERROR 没有执行 Show 的方法, 需要再打印中观察并在这个类里面管理起来
+		println(errorMessage)
 		if (errorMessage.isNotNull()) {
 			displayMessage = when {
 				errorMessage.contains("Timeout", true)

@@ -104,7 +104,7 @@ open class ValueInputView(context: Context) : RelativeLayout(context) {
 	}
 
 	fun setInputValue(count: Double) {
-		valueInput.setText(count.toString())
+		valueInput.setText(count.toBigDecimal().toPlainString())
 	}
 
 	fun inputTextListener(hold: (String) -> Unit) {

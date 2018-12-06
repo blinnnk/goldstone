@@ -20,7 +20,7 @@ import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPModel
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import org.jetbrains.anko.*
 
 
@@ -30,7 +30,7 @@ import org.jetbrains.anko.*
  */
 class DAPPCell(context: Context) : LinearLayout(context) {
 
-	var model: DAPPModel? by observing(null) {
+	var model: DAPPTable? by observing(null) {
 		model?.apply {
 			appIcon.glideImage(icon)
 			titles.title.text = title

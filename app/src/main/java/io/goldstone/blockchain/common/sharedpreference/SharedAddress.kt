@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.sharedpreference
 
 import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -16,56 +17,56 @@ object SharedAddress {
 	/** Coin Address In SharedPreference */
 	// EOS Account Name
 	fun getCurrentEOSAccount(): EOSAccount =
-		EOSAccount(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSName))
+		EOSAccount(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentEOSName))
 
 	fun updateCurrentEOSName(name: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEOSName, name)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentEOSName, name)
 
 	fun getCurrentEthereum(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentEthereumAddress)
 
 	fun updateCurrentEthereum(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.currentEthereumAddress,
 			address
 		)
 
 	fun getCurrentETC(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentETCAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentETCAddress)
 
 	fun updateCurrentETC(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentETCAddress, address)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentETCAddress, address)
 
 	fun getCurrentEOS(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentEOSAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentEOSAddress)
 
 	fun updateCurrentEOS(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentEOSAddress, address)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentEOSAddress, address)
 
 	fun getCurrentBTC(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBTCAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentBTCAddress)
 
 	fun updateCurrentBTC(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentBTCAddress, address)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentBTCAddress, address)
 
 	fun getCurrentBTCSeriesTest(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBTCTestAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentBTCTestAddress)
 
 	fun updateCurrentBTCSeriesTest(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.currentBTCTestAddress,
 			address
 		)
 
 	fun getCurrentLTC(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentLTCAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentLTCAddress)
 
 	fun updateCurrentLTC(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLTCAddress, address)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentLTCAddress, address)
 
 	fun getCurrentBCH(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentBCHAddress)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentBCHAddress)
 
 	fun updateCurrentBCH(address: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentBCHAddress, address)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentBCHAddress, address)
 }

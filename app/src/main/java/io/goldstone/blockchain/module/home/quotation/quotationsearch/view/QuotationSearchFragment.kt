@@ -143,7 +143,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 		initExchangeFDescriptionView()
 		rootFragment?.showFilterImage(true)
 		rootFragment?.searchInputListener {
-			if (NetworkUtil.hasNetwork(context)) presenter.searchToken(it)
+			if (NetworkUtil.hasNetwork()) presenter.searchToken(it)
 		}
 		rootFragment?.setFilterEvent {
 			showExchangeDashboard()

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.component
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.view.KeyEvent
 import android.view.ViewManager
 import android.widget.EditText
 import android.widget.ImageView
@@ -12,6 +13,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
+import org.jetbrains.anko.sdk27.coroutines.onKey
 
 
 /**
@@ -19,6 +21,9 @@ import org.jetbrains.anko.custom.ankoView
  * @date  2018/12/01
  */
 class SearchBar(context: Context) : GSCard(context) {
+
+	var enterKeyEvent: Runnable? = null
+
 	private lateinit var input: EditText
 
 	init {
@@ -37,6 +42,13 @@ class SearchBar(context: Context) : GSCard(context) {
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				hintTextColor = GrayScale.midGray
 				textSize = fontSize(14)
+				setOnKeyListener { _, keyCode, event ->
+					// If the event is a key-down event on the "enter" button
+					if ((event?.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+						enterKeyEvent?.run()
+						true
+					} else false
+				}
 			}
 		}
 	}

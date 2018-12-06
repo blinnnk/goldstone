@@ -49,7 +49,7 @@ class PaymentDetailPresenter(
 	}
 
 	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
-		if (!NetworkUtil.hasNetwork(fragment.context)) {
+		if (!NetworkUtil.hasNetwork()) {
 			callback(NetworkError.WithOutNetwork)
 		} else {
 			val count = fragment.getTransferCount()

@@ -1,12 +1,8 @@
 package io.goldstone.blockchain.kernel.network.common
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toArrayList
-import com.blinnnk.extension.toJSONObjectList
+import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
@@ -20,10 +16,11 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
 import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
-import io.goldstone.blockchain.kernel.commonmodel.ETCTransactionModel
-import io.goldstone.blockchain.kernel.commonmodel.ServerConfigModel
+import io.goldstone.blockchain.kernel.commontable.model.ETCTransactionModel
+import io.goldstone.blockchain.kernel.commontable.model.ServerConfigModel
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil.requestData
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
@@ -51,7 +48,7 @@ import org.json.JSONObject
 object GoldStoneAPI {
 
 	/** 网络请求很多是全台异步所以使用 `Application` 的 `Context` */
-	lateinit var context: Context
+//	lateinit var context: Context
 	private val requestContentType =
 		MediaType.parse("application/json; charset=utf-8")
 
@@ -481,6 +478,32 @@ object GoldStoneAPI {
 					CoinInfoModel(JSONObject(result.first()), symbol, chainID),
 					error
 				)
+			} else hold(null, error)
+		}
+	}
+
+	fun getRecommendDAPPs(@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit) {
+		requestData<DAPPTable>(
+			APIPath.getRecommendDAPPs(APIPath.currentUrl),
+			"data",
+			false,
+			isEncrypt = true
+		) { result, error ->
+			if (result.isNotNull() && error.isNone()) {
+				hold(result, error)
+			} else hold(null, error)
+		}
+	}
+
+	fun getNewDAPPs(@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit) {
+		requestData<DAPPTable>(
+			APIPath.getNewDAPPs(APIPath.currentUrl),
+			"data",
+			false,
+			isEncrypt = true
+		) { result, error ->
+			if (result.isNotNull() && error.isNone()) {
+				hold(result, error)
 			} else hold(null, error)
 		}
 	}

@@ -17,8 +17,10 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.cell.TopBottomLineCell
+import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.ValueInputView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
@@ -27,14 +29,11 @@ import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isTargetDevice
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.ArgumentKey
-import io.goldstone.blockchain.common.value.DeviceName
-import io.goldstone.blockchain.common.value.ElementID
-import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -45,7 +44,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presente
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import kotlin.apply
 
 /**
  * @date 2018/5/15 10:18 PM
@@ -60,16 +58,21 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 	val count by lazy {
 		arguments?.getDouble(ArgumentKey.paymentCount).orElse(0.0)
 	}
+
+	val memo by lazy {
+		arguments?.getString(ArgumentKey.paymentMemo)
+	}
 	val rootFragment by lazy {
 		getParentFragment<TokenDetailOverlayFragment>()
 	}
+
 	private val inputView by lazy { ValueInputView(context!!) }
-	private val sendInfo by lazy { GraySquareCell(context!!) }
-	private val from by lazy { GraySquareCell(context!!) }
-	private val memo by lazy { GraySquareCell(context!!) }
-	private val customChangeAddressCell by lazy { GraySquareCell(context!!) }
-	private val price by lazy { GraySquareCell(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var sendInfo: GraySquareCell
+	private lateinit var from: GraySquareCell
+	private lateinit var memoView: GraySquareCell
+	private lateinit var customChangeAddressCell: GraySquareCell
+	private lateinit var price: GraySquareCell
+	private lateinit var confirmButton: RoundButton
 	private var memoInputView: MemoInputView? = null
 	private var memoData: String = ""
 	private lateinit var changeAddress: String
@@ -83,9 +86,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-
 				inputView.into(this)
-
 				showAccountInfo()
 				// `BTCSeries` 于 ETH, ERC20, ETC 显示不同的配置信息
 				if (rootFragment?.token?.symbol.isBTCSeries())
@@ -94,7 +95,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 
 				showUnitPrice()
 
-				confirmButton.apply {
+				confirmButton = roundButton {
 					setGrayStyle(20.uiPX())
 					text = CommonText.next
 				}.click { button ->
@@ -105,7 +106,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 							button.showLoadingStatus(false)
 						}
 					}
-				}.into(this)
+				}
 				// 扫描二维码进入后的样式判断
 				if (count > 0) {
 					inputView.setInputValue(count)
@@ -206,20 +207,20 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.memoInformation)
-			memo.apply {
+			memoView = graySquareCell {
 				setTitle(PrepareTransferText.memo)
-				setSubtitle(PrepareTransferText.addAMemo.scaleTo(32))
+				setSubtitle(memo ?: PrepareTransferText.addAMemo)
 				showArrow()
 			}.click {
 				getParentContainer()?.showMemoInputView { content ->
 					if (content.isNotEmpty()) {
 						memoData = content
-						memo.setSubtitle(content)
+						memoView.setSubtitle(content)
 					} else {
-						memo.setSubtitle(PrepareTransferText.addAMemo)
+						memoView.setSubtitle(PrepareTransferText.addAMemo)
 					}
 				}
-			}.into(this)
+			}
 		}.into(this)
 	}
 
@@ -228,13 +229,13 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.customChangeAddress)
-			customChangeAddressCell.apply {
+			customChangeAddressCell = graySquareCell {
 				setTitle(PrepareTransferText.changeAddress)
 				setSubtitle(changeAddress.scaleTo(16))
 				showArrow()
 			}.click {
 				showCustomChangeAddressOverlay()
-			}.into(this)
+			}
 		}.into(this)
 	}
 
@@ -272,14 +273,14 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.accountInfo)
 
-			sendInfo.apply {
+			sendInfo = graySquareCell {
 				setTitle(PrepareTransferText.send)
 				setSubtitle(address.orEmpty())
-			}.into(this)
+			}
 
-			from.apply {
+			from = graySquareCell {
 				setTitle(PrepareTransferText.from)
-			}.into(this)
+			}
 
 			setFromAddress()
 		}.into(this)
@@ -290,9 +291,9 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
 			setHorizontalPadding(PaddingSize.device.toFloat())
 			setTitle(PrepareTransferText.currentPrice)
-			price.apply {
+			price = graySquareCell {
 				setTitle(PrepareTransferText.price)
-			}.into(this)
+			}
 		}.into(this)
 	}
 
@@ -310,9 +311,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 						if (isValidMemoByChain(isEOSTransfer)) {
 							removeMemoInputView()
 							hold(getMemoContent())
-						} else {
-							this@apply.context.alert(PrepareTransferText.invalidEOSMemoSize)
-						}
+						} else context.toast(PrepareTransferText.invalidEOSMemoSize)
 						button.preventDuplicateClicks()
 					}
 				}
@@ -346,7 +345,15 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 	private fun resetBackButtonEvent() {
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {
-			showBackButton(true) {
+			// 自带 memo 的场景只存在于  `DAPP` 的快捷操作, 暂时用它作为来源判断
+			if (memo.isNotNull()) showCloseButton(true) {
+				getMainActivity()?.supportFragmentManager?.apply {
+					val browserFragment =
+						findFragmentByTag(FragmentTag.dappBrowser) ?: return@showCloseButton
+					beginTransaction().show(browserFragment).commit()
+					presenter.removeSelfFromActivity()
+				}
+			} else showBackButton(true) {
 				if (memoInputView.isNull()) {
 					presenter.popFragmentFrom<PaymentDetailFragment>()
 				} else {

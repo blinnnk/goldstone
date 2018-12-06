@@ -18,7 +18,7 @@ import io.goldstone.blockchain.crypto.eos.EOSWalletType
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import kotlinx.coroutines.*
 import java.io.Serializable
@@ -238,7 +238,6 @@ data class WalletTable(
 	}
 
 	fun getEOSWalletType(): EOSWalletType {
-		System.out.println(EOSAccount(currentEOSAccountName.getCurrent()).checker(false).content)
 		return when {
 			EOSAccount(currentEOSAccountName.getCurrent()).isValid(false) -> EOSWalletType.Available
 			// 当前 `ChainID` 下的 `Name` 个数大于 `1` 并且越过第一步判断那么为未设置默认账户状态

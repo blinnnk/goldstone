@@ -8,7 +8,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.isBCH
 import io.goldstone.blockchain.crypto.utils.toSatoshi
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.network.bitcoin.model.UnspentModel
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import org.json.JSONArray

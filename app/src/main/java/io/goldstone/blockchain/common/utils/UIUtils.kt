@@ -2,7 +2,6 @@ package io.goldstone.blockchain.common.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.bluetooth.BluetoothAdapter
 import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Shader
@@ -19,11 +18,11 @@ import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import com.blinnnk.util.getSystemModel
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.language.WalletNameText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -86,9 +85,9 @@ object TimeUtils {
 	fun formatDate(timeStamp: Long): String {
 		val time = timeStamp.toMillisecond()
 		return DateUtils.formatDateTime(
-			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_YEAR
+			GoldStoneApp.appContext, time, DateUtils.FORMAT_SHOW_YEAR
 		) + " " + DateUtils.formatDateTime(
-			GoldStoneAPI.context, time, DateUtils.FORMAT_SHOW_TIME
+			GoldStoneApp.appContext, time, DateUtils.FORMAT_SHOW_TIME
 		)
 	}
 
