@@ -53,29 +53,10 @@ object UIUtils {
 	) = (first - second) / 2
 
 	fun generateDefaultName(): String {
-		val name = arrayListOf(
-			WalletNameText.Cat,
-			WalletNameText.Bull,
-			WalletNameText.Elephant,
-			WalletNameText.Deer,
-			WalletNameText.Fox,
-			WalletNameText.Frog,
-			WalletNameText.Giraffle,
-			WalletNameText.Hippo,
-			WalletNameText.Leopard,
-			WalletNameText.Koala,
-			WalletNameText.Lion,
-			WalletNameText.Monkey,
-			WalletNameText.Owl,
-			WalletNameText.Penguin,
-			WalletNameText.Raccoon,
-			WalletNameText.Rhinoceros,
-			WalletNameText.Wolf
-		)
 		val walletID =
 			if (SharedWallet.getMaxWalletID() == 100) 0
 			else SharedWallet.getMaxWalletID()
-		return name[Math.abs(walletID) % name.size]
+		return "$walletID"
 	}
 }
 
