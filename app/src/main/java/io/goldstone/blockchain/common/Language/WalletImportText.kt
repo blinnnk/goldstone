@@ -93,11 +93,11 @@ object ImportWalletText {
 	@JvmField
 	val customEOSPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom EOS Path"
-		HoneyLanguage.Chinese.code -> "自定义EOS路径"
+		HoneyLanguage.Chinese.code -> "自定义 EOS 路径"
 		HoneyLanguage.Japanese.code -> "カスタムEOSパス"
 		HoneyLanguage.Korean.code -> "맞춤 EOS 경로"
 		HoneyLanguage.Russian.code -> "Пользовательский путь EOS"
-		HoneyLanguage.TraditionalChinese.code -> "自定義EOS路徑"
+		HoneyLanguage.TraditionalChinese.code -> "自定義 EOS 路徑"
 		else -> ""
 	}
 	@JvmField
@@ -163,11 +163,11 @@ object ImportWalletText {
 	@JvmField
 	val eosAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account Name"
-		HoneyLanguage.Chinese.code -> "用户名"
+		HoneyLanguage.Chinese.code -> "账户名"
 		HoneyLanguage.Japanese.code -> "アカウント名"
 		HoneyLanguage.Korean.code -> "계정 이름"
 		HoneyLanguage.Russian.code -> "Имя пользователя"
-		HoneyLanguage.TraditionalChinese.code -> "用戶名"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶名"
 		else -> ""
 	}
 	@JvmField

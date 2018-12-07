@@ -307,7 +307,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	private fun showCreatorDashboard() {
 		Dashboard(context!!) {
 			showGrid(
-				"Create New Address",
+				WalletText.createNewAddress,
 				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
 					verifyMultiChainWalletPassword(context!!) { password, error ->
 						if (!password.isNullOrEmpty() && error.isNone() && it.chainType.isNotNull()) {
@@ -511,7 +511,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				GridIconTitleModel.getMenuModels(hasDefaultCell, isCashAddress)
 			Dashboard(context) {
 				showGrid(
-					"More Operation",
+					WalletText.moreOperations,
 					GridIconTitleAdapter(data) {
 						when (it.name) {
 							WalletText.setDefaultAddress -> setDefaultAddressEvent()

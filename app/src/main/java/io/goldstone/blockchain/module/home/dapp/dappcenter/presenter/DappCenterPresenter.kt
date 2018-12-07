@@ -57,7 +57,7 @@ class DAppCenterPresenter(
 					listOf("Game")
 				),
 				DAPPModel(
-					"https://img.logonews.cn/uploads/2015/04/2015042406311937.png",
+					"https://pbs.twimg.com/profile_images/694241544899923968/Yj5sO9P4_400x400.png",
 					"Tumblr",
 					"sharing photos and you videos by you will",
 					listOf("Life Style")

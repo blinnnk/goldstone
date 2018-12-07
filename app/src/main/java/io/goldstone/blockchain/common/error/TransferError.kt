@@ -27,6 +27,8 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val WrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
+		val WrongPermission = TransferError(ErrorText.wrongPermission)
+		@JvmStatic
 		val LessRAMForRegister = TransferError(EosResourceErrorText.ramNotEnoughForNewAccount)
 	}
 }
@@ -42,9 +44,9 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val UnavailableAccountName = AccountError(ErrorText.eosNameResultUnavailable)
 		@JvmStatic
-		val InactivatedAccountName = AccountError(ErrorText.inactivatedAccountName)
+		val InactivatedAccountName = AccountError(ErrorText.inactivedAccountName)
 		@JvmStatic
-		val inactivitedEosKeyCannotRegister = AccountError(EOSAccountText.inactivitedEosKeyCannotRegister)
+		val inactiveEosKeyCannotRegister = AccountError(EOSAccountText.inactiveEosKeyCannotRegister)
 		@JvmStatic
 		val EmptyName = AccountError(ErrorText.emptyName)
 		@JvmStatic

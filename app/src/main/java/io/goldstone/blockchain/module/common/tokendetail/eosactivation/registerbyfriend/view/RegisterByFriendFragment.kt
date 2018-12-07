@@ -83,13 +83,13 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 				}.isAvailableAccountName().into(this)
 				availableSessionTitle.apply {
 					visibility = View.GONE
-					setTitle("AVAILABLE ACCOUNT INFO")
+					setTitle(EOSAccountText.transferAddOn)
 				}.into(this)
 				availableResultView.apply { visibility = View.GONE }.into(this)
 				copyResultButton.apply {
 					visibility = View.GONE
 					setBlueStyle(20.uiPX())
-					text = "Copy The Result"
+					text = EOSAccountText.copyAddOn
 				}.click {
 					availableResultView.apply {
 						context.clickToCopy(getContent())

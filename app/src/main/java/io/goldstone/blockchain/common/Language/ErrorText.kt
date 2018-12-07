@@ -48,6 +48,16 @@ object ErrorText {
 		else -> ""
 	}
 	@JvmField
+	val wrongPermission = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Insufficient current account permissions"
+		HoneyLanguage.Chinese.code -> "当前账户权限不足"
+		HoneyLanguage.Japanese.code -> "アカウントのアクセス許可が不十分です"
+		HoneyLanguage.Korean.code -> "현재 계정 권한이 충분하지 않습니다."
+		HoneyLanguage.Russian.code -> "Недостаточно разрешений текущей учетной записи."
+		HoneyLanguage.TraditionalChinese.code -> "當前賬戶權限不足"
+		else -> ""
+	}
+	@JvmField
 	val getWrongFeeFromChain = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Failed to get the fee information from the chain"
 		HoneyLanguage.Chinese.code -> "从链上获取手续费信息失败"
@@ -301,7 +311,7 @@ object ErrorText {
 
 	// 导入观察钱包时导入了未激活的账号
 	@JvmField
-	val inactivatedAccountName = when (currentLanguage) {
+	val inactivedAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This account name has not been activated yet"
 		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册。"
 		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません。"
@@ -314,7 +324,7 @@ object ErrorText {
 
 object TransactionErrorText {
 	@JvmField
-	val transferToUnactivedEOSAcount = when (currentLanguage) {
+	val transferToInactiveEOSAcount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The EOS account you want to transfer to doesn't exist."
 		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活。"
 		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません。"
@@ -397,11 +407,11 @@ object EosResourceErrorText {
 	}
 	@JvmField
 	val ramNotEnoughForNewAccount = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Your memory (RAM) balance is not sufficient to activate your new account."
+		HoneyLanguage.English.code -> "Your RAM balance is not sufficient to activate your new account."
 		HoneyLanguage.Chinese.code -> "您的内存(RAM)余额不足以激活新账号。"
-		HoneyLanguage.Japanese.code -> "メモリ（RAM）の残高では、新しいアカウントを有効にすることはできません。"
-		HoneyLanguage.Korean.code -> "메모리 (RAM) 잔액만으로는 새 계정을 활성화 할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Баланса вашей памяти (ОЗУ) недостаточно, чтобы активировать новую учетную запись."
+		HoneyLanguage.Japanese.code -> "RAMの残高では、新しいアカウントを有効にすることはできません。"
+		HoneyLanguage.Korean.code -> "RAM 잔액만으로는 새 계정을 활성화 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "При балансе RAM вы не сможете включить новые учетные записи."
 		HoneyLanguage.TraditionalChinese.code -> "您的內存(RAM)餘額不足以激活新賬號。"
 		else -> ""
 	}

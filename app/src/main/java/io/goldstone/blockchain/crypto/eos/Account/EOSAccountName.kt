@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.crypto.eos.account
 
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import java.io.Serializable
@@ -24,7 +25,7 @@ class EOSAccount(private val value: String) : Serializable {
 		// 是否是特殊账号决定长度判断的不同
 		val isLegalLength =
 			if (isNormalName) value.length == EOSValue.maxNameLength
-			else value.length in 2 .. EOSValue.maxSpecialNameLength
+			else value.length in 2..EOSValue.maxSpecialNameLength
 		if (!isLegalLength) {
 			return if (isNormalName) {
 				if (value.length < EOSValue.maxNameLength) EOSAccountNameChecker.TooShort
@@ -71,16 +72,16 @@ class EOSAccount(private val value: String) : Serializable {
 }
 
 enum class EOSAccountNameChecker(val content: String, val shortDescription: String) {
-	TooLong("Wrong length, this account name is longer than 12", "Length Too Long"),
-	TooShort("Wrong Length, this account name is shorter than 12", "Length Too Short"),
-	NumberOtherThan1To5("Illegal number in this account name, Only allowed in 1 ~ 5", "Invalid Number"),
-	IllegalCharacterAt13th("the 13th character is must in a~j or 1~5", "Invalid 13th Value"),
-	ContainsIllegalSymbol("Illegal symbol in this account name, Only allowed '.'", "Illegal Symbol"),
-	IllegalSuffix("Illegal suffix in this account name, it never be allowed that contains '.' in name end", "Illegal Suffix"),
-	IsShortName("Attention this is a special short account name ", "Special Shot Name"),
-	IsLongName("Attention this is a special long account name ", "Special Long Name"),
-	IsInvalid("invalid", "invalid"),
-	IsValid("Is Valid", "Is Valid");
+	TooLong(EOSAccountText.checkNameResultTooLong, EOSAccountText.checkNameResultTooLongShortDescription),
+	TooShort(EOSAccountText.checkNameResultTooShort, EOSAccountText.checkNameResultTooShortShortDescription),
+	NumberOtherThan1To5(EOSAccountText.checkNameResultNumberOtherThan1To5, EOSAccountText.checkNameResultNumberOtherThan1To5ShortDescription),
+	IllegalCharacterAt13th(EOSAccountText.checkNameResultIllegalCharacterAt13th, EOSAccountText.checkNameResultIllegalCharacterAt13thShortDescription),
+	ContainsIllegalSymbol(EOSAccountText.checkNameResultContainsIllegalSymbol, EOSAccountText.checkNameResultContainsIllegalSymbolShortDescription),
+	IllegalSuffix(EOSAccountText.checkNameResultIllegalSuffix, EOSAccountText.checkNameResultIllegalSuffixShortDescription),
+	IsShortName(EOSAccountText.checkNameResultIsShortName, EOSAccountText.checkNameResultIsShortNameShortDescription),
+	IsLongName(EOSAccountText.checkNameResultIsLongName, EOSAccountText.checkNameResultIsLongNameShortDescription),
+	IsInvalid(EOSAccountText.checkNameResultIsInvalid, EOSAccountText.checkNameResultIsInvalidShortDescription),
+	IsValid(EOSAccountText.checkNameResultIsValid, EOSAccountText.checkNameResultIsValidShortDescription);
 
 	fun isValid(): Boolean = content.equals(IsValid.content, true)
 }

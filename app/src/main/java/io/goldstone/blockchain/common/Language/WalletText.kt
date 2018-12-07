@@ -60,12 +60,32 @@ object WalletText {
 	}
 	@JvmField
 	val setDefaultAddress = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Set Default Address"
-		HoneyLanguage.Chinese.code -> "设置默认地址"
-		HoneyLanguage.Japanese.code -> "デフォルトアドレスを設定する"
-		HoneyLanguage.Korean.code -> "기본 주소 설정"
-		HoneyLanguage.Russian.code -> "Установить адрес по умолчанию"
-		HoneyLanguage.TraditionalChinese.code -> "設置默認地址"
+		HoneyLanguage.English.code -> "Set as the default address"
+		HoneyLanguage.Chinese.code -> "设为默认地址"
+		HoneyLanguage.Japanese.code -> "デフォルトアドレスとして設定"
+		HoneyLanguage.Korean.code -> "기본 주소로 설정"
+		HoneyLanguage.Russian.code -> "Установить как адрес по умолчанию"
+		HoneyLanguage.TraditionalChinese.code -> "設為默認地址"
+		else -> ""
+	}
+	@JvmField
+	val createNewAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Add a new subaddress"
+		HoneyLanguage.Chinese.code -> "添加新的子地址"
+		HoneyLanguage.Japanese.code -> "新しいサブアドレスを追加する"
+		HoneyLanguage.Korean.code -> "새 하위 주소 추가"
+		HoneyLanguage.Russian.code -> "Добавить новый субадрес"
+		HoneyLanguage.TraditionalChinese.code -> "添加新的子地址"
+		else -> ""
+	}
+	@JvmField
+	val moreOperations = when (currentLanguage) {
+		HoneyLanguage.English.code -> "More operations"
+		HoneyLanguage.Chinese.code -> "更多操作"
+		HoneyLanguage.Japanese.code -> "その他の操作"
+		HoneyLanguage.Korean.code -> "추가 작업"
+		HoneyLanguage.Russian.code -> "Дополнительные операции"
+		HoneyLanguage.TraditionalChinese.code -> "更多操作"
 		else -> ""
 	}
 	@JvmField

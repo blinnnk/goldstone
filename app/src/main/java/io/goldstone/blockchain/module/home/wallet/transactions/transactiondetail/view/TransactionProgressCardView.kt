@@ -24,7 +24,7 @@ class TransactionProgressCardView(context: Context) : GSCard(context) {
 	private lateinit var progress: ProgressView
 	var model: TransactionProgressModel by observing(TransactionProgressModel()) {
 		progress.setRightValue(BigInteger.valueOf(model.totalCount), TransactionText.irreversible, ProcessType.Value)
-		progress.setLeftValue(BigInteger.valueOf(model.confirmed.toLong()), "confirmed", ProcessType.Value)
+		progress.setLeftValue(BigInteger.valueOf(model.confirmed.toLong()), TransactionText.confirmed, ProcessType.Value)
 	}
 
 	init {

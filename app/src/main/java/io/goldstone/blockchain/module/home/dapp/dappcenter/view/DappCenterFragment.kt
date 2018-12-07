@@ -44,7 +44,7 @@ import org.jetbrains.anko.support.v4.viewPager
  * @author KaySaith
  * @date  2018/11/29
  */
-class DAppCenterFragment : GSFragment(), DAppCenterContract.GSView {
+class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
 	override val pageTitle: String = "Dapp Center"
 

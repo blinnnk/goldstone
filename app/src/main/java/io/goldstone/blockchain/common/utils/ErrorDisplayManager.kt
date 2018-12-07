@@ -56,7 +56,7 @@ class ErrorDisplayManager(error: Throwable) {
 				}
 				// EOS账号已经存在无法注册的错误.
 				errorMessage.contains("3050003", true) -> {
-					TransactionErrorText.transferToUnactivedEOSAcount
+					TransactionErrorText.transferToInactiveEOSAcount
 				}
 				// EOS链json rpc返回出错，写在最后面，先执行上面的具体报错
 				errorMessage.contains("Connection closed by peer", true) -> {
