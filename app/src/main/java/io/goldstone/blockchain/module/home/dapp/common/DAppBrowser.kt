@@ -37,7 +37,6 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import org.jetbrains.anko.matchParent
 import org.json.JSONObject
 
-
 /**
  * @author KaySaith
  * @date  2018/11/29
@@ -71,7 +70,7 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 				val account = SharedAddress.getCurrentEOSAccount()
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0].data))}}}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0]))}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){alert(publicKey+data+whatFor+isHash); return new Promise(function(resolve,reject){resolve(true)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -99,14 +98,14 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 	inner class JSInterface {
 
 		@JavascriptInterface
-		fun transferEOS(data: String) {
+		fun transferEOS(action: String) {
 			context.getMainActivity()?.apply {
 				supportFragmentManager?.apply {
 					fragments.find {
 						it is DAppBrowserFragment
 					}?.let {
 						beginTransaction().hide(it).commit()
-						val tradingModel = EOSTransactionInfo(JSONObject(data))
+						val tradingModel = EOSTransactionInfo(JSONObject(action))
 						val account = SharedAddress.getCurrentEOSAccount()
 						val chainID = SharedChain.getEOSCurrent().chainID
 						MyTokenWithDefaultTable.getTarget(

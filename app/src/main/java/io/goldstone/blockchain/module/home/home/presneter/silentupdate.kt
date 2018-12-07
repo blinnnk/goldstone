@@ -49,6 +49,7 @@ abstract class SilentUpdater {
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
+		updateNodeData()
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -352,6 +353,7 @@ abstract class SilentUpdater {
 
 	private fun updateNodeData() {
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
+			System.out.println("serverNodes ${serverNodes?.filter { ChainID(it.chainID).isEOSMain() }?.map { "${it.name} chainID ${it.url} and ${it.isUsed}" } }")
 			val nodeDao = ChainNodeTable.dao
 			if (serverNodes.isNotNull() && error.isNone() && serverNodes.isNotEmpty()) {
 				nodeDao.deleteAll()

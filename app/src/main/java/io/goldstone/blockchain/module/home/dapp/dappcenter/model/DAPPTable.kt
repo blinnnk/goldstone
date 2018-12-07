@@ -2,6 +2,8 @@ package io.goldstone.blockchain.module.home.dapp.dappcenter.model
 
 import android.arch.persistence.room.*
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.kernel.commontable.value.TableType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
 
@@ -28,7 +30,7 @@ data class DAPPTable(
 	@SerializedName("recommended_status")
 	val isRecommended: Int, // 是否推荐   0 未推荐   1推荐
 	@SerializedName("create_time")
-	val timStamp: String,
+	val timeStamp: String,
 	@SerializedName("weight")
 	val weight: Int,
 	@SerializedName("tags")
@@ -43,11 +45,14 @@ data class DAPPTable(
 
 @Dao
 interface DAPPDao {
-	@Query("SELECT * FROM dappTable WHERE isRecommended = 1 ORDER BY timStamp DESC LIMIT 5")
+	@Query("SELECT * FROM dappTable WHERE isRecommended = 1 ORDER BY timeStamp DESC LIMIT 5")
 	fun getRecommended(): List<DAPPTable>
 
-	@Query("SELECT * FROM dappTable ORDER BY timStamp DESC")
+	@Query("SELECT * FROM dappTable ORDER BY timeStamp DESC")
 	fun getAll(): List<DAPPTable>
+
+	@Query("SELECT dappTable.id AS id, dappTable.icon AS icon, dappTable.banner AS banner, dappTable.url AS url, dappTable.description AS description, dappTable.tags AS tags, dappTable.isRecommended AS isRecommended, favoriteTable.timeStamp AS timeStamp, dappTable.title AS title, dappTable.weight AS weight FROM dappTable, favoriteTable WHERE dappTable.id = favoriteTable.valueID AND favoriteTable.walletID = :walletID AND favoriteTable.type = :tableType  ORDER BY timeStamp DESC")
+	fun getUsed(tableType: Int = TableType.DAPP, walletID: Int = SharedWallet.getCurrentWalletID()): List<DAPPTable>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertAll(dapps: List<DAPPTable>)

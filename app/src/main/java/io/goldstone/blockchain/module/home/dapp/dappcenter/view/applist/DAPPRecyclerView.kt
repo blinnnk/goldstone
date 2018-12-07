@@ -15,6 +15,9 @@ import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import org.jetbrains.anko.matchParent
+import android.view.MotionEvent
+
+
 
 
 /**
@@ -31,6 +34,7 @@ class DAPPRecyclerView(
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+		recyclerView.isNestedScrollingEnabled = false
 		recyclerView.into(this)
 	}
 

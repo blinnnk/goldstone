@@ -209,6 +209,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			setTitle(PrepareTransferText.memoInformation)
 			memoView = graySquareCell {
 				setTitle(PrepareTransferText.memo)
+				memoData = memo ?: ""
 				setSubtitle(memo ?: PrepareTransferText.addAMemo)
 				showArrow()
 			}.click {

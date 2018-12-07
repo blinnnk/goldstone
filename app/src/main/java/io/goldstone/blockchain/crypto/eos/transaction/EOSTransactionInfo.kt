@@ -2,10 +2,7 @@ package io.goldstone.blockchain.crypto.eos.transaction
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toDoubleOrZero
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -50,12 +47,13 @@ data class EOSTransactionInfo(
 
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
-	constructor(data: JSONObject) : this(
-		EOSAccount(data.safeGet("from")),
-		EOSAccount(data.safeGet("to")),
-		data.safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
-		TokenContract.EOS,
-		data.safeGet("memo"),
+	// For DAPP
+	constructor(action: JSONObject) : this(
+		EOSAccount(action.getTargetObject("data").safeGet("from")),
+		EOSAccount(action.getTargetObject("data").safeGet("to")),
+		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
+		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), null),
+		action.getTargetObject("data").safeGet("memo"),
 		true
 	)
 

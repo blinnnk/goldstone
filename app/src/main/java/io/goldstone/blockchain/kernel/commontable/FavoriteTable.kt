@@ -1,11 +1,8 @@
 package io.goldstone.blockchain.kernel.commontable
 
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Entity
-import android.arch.persistence.room.ForeignKey
-import android.arch.persistence.room.ForeignKey.CASCADE
-import android.arch.persistence.room.PrimaryKey
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import android.arch.persistence.room.*
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
 
 
@@ -15,26 +12,31 @@ import java.io.Serializable
  */
 @Entity(
 	tableName = "favoriteTable",
-	foreignKeys = [
-		ForeignKey(
-			entity = WalletTable::class,
-			parentColumns = arrayOf("id"),
-			childColumns = arrayOf("walletID"),
-			onDelete = CASCADE
-		)
-	]
+	primaryKeys = ["walletID", "type", "valueID"]
 )
-
 data class FavoriteTable(
-	@PrimaryKey
 	val walletID: Int,
 	val type: Int,
-	val valueID: Int
+	val valueID: String,
+	val timeStamp: String
 ) : Serializable {
-
+	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.favoriteDao()
+	}
 }
 
 @Dao
 interface FavoriteDao {
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	fun insert(table: FavoriteTable)
 
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
+	fun insertAll(table: List<FavoriteTable>)
+
+	@Query("SELECT count(*) FROM favoriteTable WHERE valueID = :valueID AND type = :type AND walletID = :walletID")
+	fun getDataCount(valueID: String, type: Int, walletID: Int = SharedWallet.getCurrentWalletID()): Int
+	
+	@Query("DELETE FROM favoriteTable WHERE walletID = :walletID" )
+	fun deleteAll(walletID: Int)
 }

@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.base.view.ViewPagerAdapter
 import io.goldstone.blockchain.common.component.SearchBar
 import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.component.gsCard
+import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.searchBar
 import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.thread.launchUI
@@ -24,7 +25,6 @@ import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.DAppBrowserFragment
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
@@ -34,6 +34,7 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.view.recommend.Recomm
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.support.v4.nestedScrollView
 import org.jetbrains.anko.support.v4.onPageChangeListener
 import org.jetbrains.anko.support.v4.viewPager
 
@@ -46,7 +47,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
 	override val pageTitle: String = "Dapp Center"
 
-	override lateinit var presenter: GoldStonePresenter
+	override lateinit var presenter: DAppCenterContract.GSPresenter
 	private lateinit var searchBar: SearchBar
 	private lateinit var recommendDAPP: RecommendDappView
 	private lateinit var menuBar: ViewPagerMenu
@@ -65,7 +66,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
-			scrollView {
+			nestedScrollView {
 				lparams(matchParent, matchParent)
 				verticalLayout {
 					lparams(matchParent, matchParent)
@@ -75,7 +76,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 						layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 						clearFocus()
 						enterKeyEvent = Runnable {
-							showDAppBrowserFragment(getContent())
+							showDAPPBrowserFragment(getContent())
 							activity?.let { SoftKeyboard.hide(it) }
 						}
 					}
@@ -91,7 +92,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					linearLayout {
 						lparams(matchParent, wrapContent)
 						recommendDAPP = RecommendDappView(context) {
-							showDAppBrowserFragment(url)
+							showDAPPBrowserFragment(url)
 						}
 						recommendDAPP.into(this)
 						bottomPadding = 10.uiPX()
@@ -111,13 +112,16 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							menuBar.into(this)
 							minimumHeight = 200.uiPX()
 							newAPP = DAPPRecyclerView(context) {
-								showDAppBrowserFragment(url)
+								showAttentionOrElse(id) {
+									showDAPPBrowserFragment(url)
+									presenter.setUsedDAPPs()
+								}
 							}
 							latestUsed = DAPPRecyclerView(context) {
-								showDAppBrowserFragment(url)
+								showDAPPBrowserFragment(url)
 							}
 							viewPager {
-								layoutParams = LinearLayout.LayoutParams(matchParent, ScreenSize.fullHeight)
+								layoutParams = LinearLayout.LayoutParams(matchParent, 900.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 								val titles = listOf("NEW DAPP", "LATEST USED")
 								menuBar.setMenuTitles(titles) { button, id ->
@@ -153,7 +157,22 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		latestUsed.setData(data)
 	}
 
-	private fun showDAppBrowserFragment(url: String) {
+	private fun showAttentionOrElse(dappID: String, callback: () -> Unit) {
+		presenter.getDAPPUsedStatus(dappID) { isUsed ->
+			if (isUsed) callback()
+			else Dashboard(context!!) {
+				showAlert(
+					"Attention About DAPP Terms",
+					"once you decide to use third-party DAPP, it means you have to read their term/privacy, that will be necessary for you"
+				) {
+					presenter.updateDAPPUsedStatus(dappID)
+					callback()
+				}
+			}
+		}
+	}
+
+	private fun showDAPPBrowserFragment(url: String) {
 		// 测试使用之后完成逻辑需要删除替换
 		getMainActivity()?.addFragmentAndSetArguments<DAppBrowserFragment>(
 			ContainerID.main,
@@ -163,5 +182,4 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		}
 		getMainActivity()?.hideHomeFragment()
 	}
-
 }

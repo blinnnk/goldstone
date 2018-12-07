@@ -41,7 +41,7 @@ data class EOSTransactionData(
 class EOSTransactionDataConverter {
 	@TypeConverter
 	fun revertJSONObject(content: String): EOSTransactionData {
-		val data = JSONObject(content)
+		val data = JSONObject(content.replace("\"{", "{").replace("}\"", "}"))
 		return EOSTransactionData(data)
 	}
 
