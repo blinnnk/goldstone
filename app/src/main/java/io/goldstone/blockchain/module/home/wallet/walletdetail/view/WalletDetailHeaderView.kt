@@ -17,8 +17,7 @@ import io.goldstone.blockchain.common.component.button.StoneButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletDetailSize
@@ -36,7 +35,6 @@ import org.jetbrains.anko.*
  * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
-	private val avatarBitmap = UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context)
 	var model: WalletDetailHeaderModel? by observing(null) {
 		model?.apply {
 			balanceTitle.text = totalBalance.toDouble().formatCurrency()
@@ -50,7 +48,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			balanceSubtitle.text = WalletSlideHeader.setBalanceInfo()
 			// 钱包一样的话每次刷新不用重新加载图片给内存造成压力
 			if (avatar.isNull())
-				currentAccount.avatar.glideImage(avatarBitmap.getBitmap())
+				currentAccount.avatar.glideImage(AvatarManager.getAvatarPath(SharedWallet.getCurrentWalletID()))
 			else currentAccount.avatar.glideImage(avatar)
 		}
 	}
@@ -178,7 +176,6 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	}
 
 	fun clearBitmap() {
-		avatarBitmap.clearBitmap()
 	}
 }
 
