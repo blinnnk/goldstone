@@ -309,8 +309,11 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND (contractAddress LIKE :contract OR isFee = 1) AND blockNumber <= :endBlock ORDER BY timeStamp DESC LIMIT :pageCount")
 	fun getETHAndAllFee(walletAddress: String, contract: String, endBlock: Int, chainID: String, pageCount: Int = DataValue.pageCount): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE blockNumber = (SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID)")
-	fun getMaxBlockNumber(address: String, contract: String, chainID: String): TransactionTable?
+	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID")
+	fun getMaxBlockNumber(address: String, contract: String, chainID: String): Int?
+
+	@Query("SELECT timeStamp FROM transactionList WHERE blockNumber = (SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID)")
+	fun getLatestTimeStamp(address: String, contract: String, chainID: String): String?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(token: TransactionTable)

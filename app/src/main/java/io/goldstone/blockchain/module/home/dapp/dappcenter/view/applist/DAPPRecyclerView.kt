@@ -27,7 +27,8 @@ import android.view.MotionEvent
 @SuppressLint("ViewConstructor")
 class DAPPRecyclerView(
 	context: Context,
-	private val hold: DAPPTable.() -> Unit
+	private val clickCellEvent: DAPPTable.() -> Unit,
+	private val checkAllEvent: () -> Unit
 ) : RelativeLayout(context) {
 	private val recyclerView = BaseRecyclerView(context)
 	private var emptyView: EmptyView? = null
@@ -43,7 +44,8 @@ class DAPPRecyclerView(
 		else {
 			if (emptyView.isNotNull()) removeView(emptyView)
 			recyclerView.visibility = View.VISIBLE
-			recyclerView.adapter = DAPPAdapter(data, hold)
+			val dappAdapter = DAPPAdapter(data, clickCellEvent, checkAllEvent)
+			recyclerView.adapter = dappAdapter
 		}
 	}
 

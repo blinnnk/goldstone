@@ -31,12 +31,11 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
-	@JvmField
 	val client = OkHttpClient
 		.Builder()
 		.connectTimeout(30, TimeUnit.SECONDS)
 		.readTimeout(60, TimeUnit.SECONDS)
-		.build()!!
+		.build()
 
 	fun post(
 		condition: String,

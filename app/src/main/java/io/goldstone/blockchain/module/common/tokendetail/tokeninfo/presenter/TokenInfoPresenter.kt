@@ -92,11 +92,11 @@ class TokenInfoPresenter(
 				}
 				else -> {
 					val time =
-						TransactionTable.dao.getMaxBlockNumber(
+						TransactionTable.dao.getLatestTimeStamp(
 							token.contract.getAddress(),
 							token.contract.contract,
 							token.chainID
-						)?.timeStamp?.toMillisecond()
+						)?.toMillisecond()
 					val date = if (time.isNotNull()) {
 						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
 					} else CommonText.calculating

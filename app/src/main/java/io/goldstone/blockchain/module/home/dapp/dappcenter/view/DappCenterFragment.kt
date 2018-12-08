@@ -31,6 +31,8 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.dapp.dappcenter.presenter.DAppCenterPresenter
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.applist.DAPPRecyclerView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.recommend.RecommendDappView
+import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
+import io.goldstone.blockchain.module.home.dapp.dapplistdetail.view.DAPPOverlayFragment
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
@@ -72,6 +74,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					lparams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					topPadding = 30.uiPX()
+					bottomPadding = 55.uiPX()
 					searchBar = searchBar {
 						layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
 						clearFocus()
@@ -111,15 +114,27 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							menuBar.setColor(Color.TRANSPARENT, Spectrum.blue, GrayScale.lightGray)
 							menuBar.into(this)
 							minimumHeight = 200.uiPX()
-							newAPP = DAPPRecyclerView(context) {
-								showAttentionOrElse(id) {
-									showDAPPBrowserFragment(url)
-									presenter.setUsedDAPPs()
+							newAPP = DAPPRecyclerView(
+								context,
+								clickCellEvent = {
+									showAttentionOrElse(id) {
+										showDAPPBrowserFragment(url)
+										presenter.setUsedDAPPs()
+									}
+								},
+								checkAllEvent = {
+									showDAPPListDetailFragment(DAPPType.New)
 								}
-							}
-							latestUsed = DAPPRecyclerView(context) {
-								showDAPPBrowserFragment(url)
-							}
+							)
+							latestUsed = DAPPRecyclerView(
+								context,
+								clickCellEvent = {
+									showDAPPBrowserFragment(url)
+								},
+								checkAllEvent = {
+									showDAPPListDetailFragment(DAPPType.Latest)
+								}
+							)
 							viewPager {
 								layoutParams = LinearLayout.LayoutParams(matchParent, 900.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
@@ -169,6 +184,15 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					callback()
 				}
 			}
+		}
+	}
+
+	private fun showDAPPListDetailFragment(type: DAPPType) {
+		getMainActivity()?.apply {
+			addFragmentAndSetArguments<DAPPOverlayFragment>(ContainerID.main) {
+				putSerializable(ArgumentKey.dappType, type)
+			}
+			hideHomeFragment()
 		}
 	}
 

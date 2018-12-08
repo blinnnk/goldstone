@@ -23,6 +23,8 @@ class DAppCenterPresenter(
 	private val dappView: DAppCenterContract.GSView
 ) : DAppCenterContract.GSPresenter {
 
+	private val defaultCount = 10
+
 	override fun start() {
 		setDAPPRecommendData()
 		setNewDAPP()
@@ -39,7 +41,7 @@ class DAppCenterPresenter(
 
 	override fun setUsedDAPPs() {
 		load {
-			DAPPTable.dao.getUsed()
+			DAPPTable.dao.getUsed(defaultCount)
 		} then {
 			dappView.showLatestUsed(it.toArrayList())
 		}
@@ -69,7 +71,7 @@ class DAppCenterPresenter(
 
 	private fun setNewDAPP() {
 		load {
-			DAPPTable.dao.getAll()
+			DAPPTable.dao.getAll(defaultCount)
 		} then {
 			dappView.showAllDAPP(it.toArrayList())
 		}

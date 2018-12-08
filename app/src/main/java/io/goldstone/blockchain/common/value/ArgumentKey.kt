@@ -41,6 +41,7 @@ object ArgumentKey {
 	const val eosAccountRegister = "eosAccountRegister"
 	const val contactID = "contactID"
 	const val dappTradingModel = "dappTradingModel"
+	const val dappType = "dappType"
 }
 
 object IntentKey {
