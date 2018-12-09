@@ -21,6 +21,7 @@ class DAPPListPresenter : DAPPListContract.GSPresenter {
 			when (type) {
 				DAPPType.New -> DAPPTable.dao.getAll(10)
 				DAPPType.Latest -> DAPPTable.dao.getUsed(10)
+				DAPPType.Recommend -> DAPPTable.dao.getRecommended(10)
 				else -> throw Throwable("Wrong DAPP Type")
 			}
 		} then (hold)

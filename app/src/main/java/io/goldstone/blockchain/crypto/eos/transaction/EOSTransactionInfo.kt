@@ -19,6 +19,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -102,6 +103,23 @@ data class EOSTransactionInfo(
 					transfer(privateKey, hold)
 				} else hold(null, error)
 			}
+		}
+	}
+
+	fun insertPendingDataToDatabase(
+		response: EOSResponse,
+		callback: () -> Unit
+	) {
+		// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
+		EOSTransactionTable.getMaxDataIndexTable(
+			fromAccount,
+			contract,
+			SharedChain.getEOSCurrent().chainID
+		) {
+			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
+			val transaction = EOSTransactionTable(this, response, dataIndex)
+			EOSTransactionTable.dao.insert(transaction)
+			callback()
 		}
 	}
 

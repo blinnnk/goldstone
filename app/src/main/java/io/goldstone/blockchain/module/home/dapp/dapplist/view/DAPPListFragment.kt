@@ -20,7 +20,13 @@ import io.goldstone.blockchain.module.home.dapp.dapplist.presenter.DAPPListPrese
  */
 class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSView {
 
-	override val pageTitle: String get() = "DAPP List"
+	override val pageTitle: String
+		get() = when (type) {
+			DAPPType.Recommend -> "Recommend DAPP"
+			DAPPType.Latest -> "Latest Used DAPP"
+			DAPPType.New -> "New DAPP"
+			else -> ""
+		}
 	override lateinit var presenter: DAPPListContract.GSPresenter
 
 	private val type by lazy {

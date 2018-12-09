@@ -7,6 +7,7 @@ import android.view.ViewManager
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.CustomTargetTextStyle
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 
 /**
@@ -58,11 +60,16 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 		specificText: String,
 		wholeText: String,
 		specificColor: Int,
-		color: Int = GrayScale.midGray
+		color: Int = GrayScale.midGray,
+		subtitleClickEvent: () -> Unit = {}
 	) {
 		subtitle.visibility = View.VISIBLE
 		subtitle.textColor = color
 		subtitle.text = CustomTargetTextStyle(specificText, wholeText, specificColor, 11.uiPX(), false, false)
+		subtitle.onClick {
+			subtitleClickEvent()
+			subtitle.preventDuplicateClicks()
+		}
 	}
 }
 

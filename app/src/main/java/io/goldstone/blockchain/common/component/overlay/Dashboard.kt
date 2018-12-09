@@ -67,7 +67,13 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		}
 	}
 
-	fun <T : View> showDashboard(title: String, customView: T, message: String, hold: (T) -> Unit, cancelAction: () -> Unit) {
+	fun <T : View> showDashboard(
+		title: String,
+		customView: T,
+		message: String,
+		hold: (T) -> Unit,
+		cancelAction: () -> Unit
+	) {
 		with(dialog) {
 			cancelOnTouchOutside(false)
 			title(text = title)

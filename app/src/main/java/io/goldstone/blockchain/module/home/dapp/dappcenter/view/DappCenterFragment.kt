@@ -11,16 +11,14 @@ import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
-import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.ViewPagerAdapter
-import io.goldstone.blockchain.common.component.SearchBar
 import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.component.gsCard
 import io.goldstone.blockchain.common.component.overlay.Dashboard
-import io.goldstone.blockchain.common.component.searchBar
 import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.*
@@ -66,23 +64,22 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		presenter.start()
 	}
 
+
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			nestedScrollView {
 				lparams(matchParent, matchParent)
 				verticalLayout {
+					isFocusable = true
+					isFocusableInTouchMode = true
 					lparams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					topPadding = 30.uiPX()
 					bottomPadding = 55.uiPX()
-					searchBar = searchBar {
-						layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
-						clearFocus()
-						enterKeyEvent = Runnable {
-							showDAPPBrowserFragment(getContent())
-							activity?.let { SoftKeyboard.hide(it) }
-						}
+					searchBar = SearchBar(context).click {
+						showDAPPExplorerFragment()
 					}
+					searchBar.into(this)
 					sessionTitle {
 						setTitle("Recommend DAPP", Spectrum.white)
 						setSubtitle(
@@ -90,7 +87,9 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							"Check All (5)",
 							Spectrum.opacity5White,
 							Spectrum.white
-						)
+						) {
+							showDAPPListDetailFragment(DAPPType.Recommend)
+						}
 					}
 					linearLayout {
 						lparams(matchParent, wrapContent)
@@ -198,12 +197,23 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
 	private fun showDAPPBrowserFragment(url: String) {
 		// 测试使用之后完成逻辑需要删除替换
-		getMainActivity()?.addFragmentAndSetArguments<DAppBrowserFragment>(
-			ContainerID.main,
-			FragmentTag.dappBrowser
-		) {
-			putString("webURL", url)
+		getMainActivity()?.apply {
+			addFragmentAndSetArguments<DAppBrowserFragment>(
+				ContainerID.main,
+				FragmentTag.dappBrowser
+			) {
+				putString("webURL", url)
+			}
+			hideHomeFragment()
 		}
-		getMainActivity()?.hideHomeFragment()
+	}
+
+	private fun showDAPPExplorerFragment() {
+		getMainActivity()?.apply {
+			addFragmentAndSetArguments<DAPPOverlayFragment>(ContainerID.main) {
+				putSerializable(ArgumentKey.dappType, DAPPType.Explorer)
+			}
+			hideHomeFragment()
+		}
 	}
 }

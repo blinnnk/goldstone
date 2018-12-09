@@ -36,6 +36,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.medium(context)
 		textColor = Spectrum.opacity5White
+		setLineSpacing(2f, 0.8f)
 		y -= 3.uiPX()
 	}
 	var isFloatRight by observing(false) {

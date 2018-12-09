@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.View
 import android.widget.*
 import com.blinnnk.extension.addCorner
@@ -23,6 +24,8 @@ import org.jetbrains.anko.*
  * @description:
  */
 class FilterSearchInput(context: Context) : LinearLayout(context) {
+
+	var enterKeyEvent: Runnable? = null
 	private val filterIcon by lazy {
 		ImageView(context).apply {
 			layoutParams = LinearLayout.LayoutParams(30.uiPX(), matchParent)
@@ -55,7 +58,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			gravity = Gravity.CENTER_VERTICAL
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.Width - 100.uiPX(), 38.uiPX())
 			leftPadding = 10.uiPX()
-			addCorner(CornerSize.default.toInt(), Spectrum.white)
+			addCorner(5.uiPX(), Spectrum.white)
 			addView(filterIcon)
 			editText = editText {
 				textAlignment = EditText.TEXT_ALIGNMENT_GRAVITY
@@ -68,6 +71,13 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				setHorizontallyScrolling(false)
 				setPadding(0, 10.uiPX(), 0, 10.uiPX())
+				setOnKeyListener { _, keyCode, event ->
+					// If the event is a key-down event on the "enter" button
+					if ((event?.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+						enterKeyEvent?.run()
+						true
+					} else false
+				}
 			}
 		}
 		addView(cancelButton)

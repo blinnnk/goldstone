@@ -31,7 +31,6 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		if (!EventBus.getDefault().isRegistered(this)) {
 			EventBus.getDefault().register(this)
 		}
-
 	}
 
 	// 这个页面是常驻在首页通过 `ViewPager` 管理显示的,
