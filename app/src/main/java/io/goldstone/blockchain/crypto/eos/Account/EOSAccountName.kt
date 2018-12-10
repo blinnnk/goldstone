@@ -24,7 +24,7 @@ class EOSAccount(private val value: String) : Serializable {
 		// 是否是特殊账号决定长度判断的不同
 		val isLegalLength =
 			if (isNormalName) value.length == EOSValue.maxNameLength
-			else value.length in 2 .. EOSValue.maxSpecialNameLength
+			else value.length in 1 .. EOSValue.maxSpecialNameLength
 		if (!isLegalLength) {
 			return if (isNormalName) {
 				if (value.length < EOSValue.maxNameLength) EOSAccountNameChecker.TooShort
