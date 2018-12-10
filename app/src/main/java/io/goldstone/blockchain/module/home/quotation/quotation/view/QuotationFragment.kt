@@ -57,9 +57,7 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		asyncData: ArrayList<QuotationModel>?
 	) {
 		recyclerView.adapter = QuotationAdapter(asyncData.orEmptyArray()) {
-			setClickEvent {
-				presenter.showMarketTokenDetailFragment(model)
-			}
+			presenter.showMarketTokenDetailFragment(it)
 		}
 	}
 

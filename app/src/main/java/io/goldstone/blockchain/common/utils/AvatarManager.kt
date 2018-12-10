@@ -31,9 +31,7 @@ object AvatarManager {
       outputStream.flush()
       outputStream.close()
     }
-  
     return file.absolutePath
-    
   }
   
   private fun createAvatar(size: Int, index: Int): Bitmap {

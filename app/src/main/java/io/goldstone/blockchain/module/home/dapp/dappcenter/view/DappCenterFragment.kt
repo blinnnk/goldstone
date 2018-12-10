@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.dapp.dappcenter.view
 
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.base.view.ViewPagerAdapter
@@ -22,8 +24,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
-import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.DAppBrowserFragment
+import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.dapp.dappcenter.presenter.DAppCenterPresenter
@@ -31,12 +32,16 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.view.applist.DAPPRecy
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.recommend.RecommendDappView
 import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
 import io.goldstone.blockchain.module.home.dapp.dapplistdetail.view.DAPPOverlayFragment
-import org.jetbrains.anko.*
+import io.goldstone.blockchain.module.home.home.view.MainActivity
+import org.jetbrains.anko.bottomPadding
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.support.v4.nestedScrollView
 import org.jetbrains.anko.support.v4.onPageChangeListener
 import org.jetbrains.anko.support.v4.viewPager
+import org.jetbrains.anko.topPadding
+import org.jetbrains.anko.verticalLayout
 
 
 /**
@@ -70,8 +75,6 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 			nestedScrollView {
 				lparams(matchParent, matchParent)
 				verticalLayout {
-					isFocusable = true
-					isFocusableInTouchMode = true
 					lparams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					topPadding = 30.uiPX()
@@ -91,15 +94,17 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							showDAPPListDetailFragment(DAPPType.Recommend)
 						}
 					}
-					linearLayout {
-						lparams(matchParent, wrapContent)
-						recommendDAPP = RecommendDappView(context) {
-							showDAPPBrowserFragment(url)
+					recommendDAPP = RecommendDappView(
+						context,
+						clickCellEvent = {
+							getMainActivity()
+								?.showDappBrowserFragment(it, PreviousView.DAPPCenter, this@DAPPCenterFragment)
 						}
-						recommendDAPP.into(this)
-						bottomPadding = 10.uiPX()
+					)
+					recommendDAPP.into(this)
+					recommendDAPP.setMargins<LinearLayout.LayoutParams> {
+						bottomMargin = 5.uiPX()
 					}
-
 					gsCard {
 						lparams(ScreenSize.card, matchParent)
 						verticalLayout {
@@ -117,7 +122,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								context,
 								clickCellEvent = {
 									showAttentionOrElse(id) {
-										showDAPPBrowserFragment(url)
+										getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
 										presenter.setUsedDAPPs()
 									}
 								},
@@ -128,7 +133,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							latestUsed = DAPPRecyclerView(
 								context,
 								clickCellEvent = {
-									showDAPPBrowserFragment(url)
+									getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
 								},
 								checkAllEvent = {
 									showDAPPListDetailFragment(DAPPType.Latest)
@@ -171,6 +176,12 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		latestUsed.setData(data)
 	}
 
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
+		activity?.getHomeFragment()?.apply {
+			presenter.showWalletDetailFragment()
+		}
+	}
+
 	private fun showAttentionOrElse(dappID: String, callback: () -> Unit) {
 		presenter.getDAPPUsedStatus(dappID) { isUsed ->
 			if (isUsed) callback()
@@ -190,19 +201,6 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		getMainActivity()?.apply {
 			addFragmentAndSetArguments<DAPPOverlayFragment>(ContainerID.main) {
 				putSerializable(ArgumentKey.dappType, type)
-			}
-			hideHomeFragment()
-		}
-	}
-
-	private fun showDAPPBrowserFragment(url: String) {
-		// 测试使用之后完成逻辑需要删除替换
-		getMainActivity()?.apply {
-			addFragmentAndSetArguments<DAppBrowserFragment>(
-				ContainerID.main,
-				FragmentTag.dappBrowser
-			) {
-				putString("webURL", url)
 			}
 			hideHomeFragment()
 		}

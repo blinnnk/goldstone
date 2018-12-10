@@ -34,8 +34,9 @@ data class DAPPTable(
 	@SerializedName("weight")
 	val weight: Int,
 	@SerializedName("tags")
-	val tags: List<String>
+	val tags: String
 ) : Serializable {
+	fun getTagList(): List<String> = tags.split(",")
 
 	companion object {
 		@JvmField
@@ -60,6 +61,9 @@ interface DAPPDao {
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insertAll(dapps: List<DAPPTable>)
 
-	@Query("DELETE FROM dappTable")
-	fun deleteAll()
+	@Query("DELETE FROM dappTable WHERE isRecommended = 1")
+	fun deleteAllRecommend()
+
+	@Query("DELETE FROM dappTable WHERE isRecommended = 0")
+	fun deleteAllUnRecommended()
 }

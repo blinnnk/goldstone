@@ -14,12 +14,16 @@ import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.utils.transparentStatus
+import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.dapp.common.DAPPBrowser
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.contract.DAppBrowserContract
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.presenter.DAppBrowserPresenter
+import io.goldstone.blockchain.module.home.dapp.dappexplorer.event.DAPPEXplorerDisplayEvent
+import io.goldstone.blockchain.module.home.dapp.dapplist.event.DAPPListDisplayEvent
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
@@ -37,7 +41,11 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 	private lateinit var progressView: ProgressBar
 
 	private val url by lazy {
-		arguments?.getString("webURL")
+		arguments?.getString(ArgumentKey.webViewUrl)
+	}
+
+	private val fromView by lazy {
+		arguments?.getInt(ArgumentKey.fromView)
 	}
 
 	override fun showError(error: Throwable) {
@@ -53,7 +61,15 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 
 	override fun onDestroy() {
 		super.onDestroy()
-		activity?.transparentStatus()
+		when (fromView) {
+			PreviousView.DAPPList -> EventBus.getDefault().post(DAPPListDisplayEvent(true))
+			PreviousView.DAPPExplorer -> EventBus.getDefault().post(DAPPEXplorerDisplayEvent(true))
+			PreviousView.DAPPCenter -> getMainActivity()?.apply {
+				getDAPPCenterFragment()?.let { showChildFragment(it) }
+				transparentStatus()
+			}
+			else -> activity?.transparentStatus()
+		}
 	}
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -93,4 +109,10 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 			activity?.showHomeFragment()
 		}
 	}
+}
+
+object PreviousView {
+	const val DAPPList = 0
+	const val DAPPExplorer = 1
+	const val DAPPCenter = 2
 }

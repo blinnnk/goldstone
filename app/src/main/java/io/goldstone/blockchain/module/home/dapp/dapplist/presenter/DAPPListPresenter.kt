@@ -1,7 +1,9 @@
 package io.goldstone.blockchain.module.home.dapp.dapplist.presenter
 
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.dapp.dapplist.contract.DAPPListContract
 import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
@@ -11,7 +13,9 @@ import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
  * @author KaySaith
  * @date  2018/12/08
  */
-class DAPPListPresenter : DAPPListContract.GSPresenter {
+class DAPPListPresenter(
+	private val view: DAPPListContract.GSView
+) : DAPPListContract.GSPresenter {
 	override fun start() {
 
 	}
@@ -25,5 +29,25 @@ class DAPPListPresenter : DAPPListContract.GSPresenter {
 				else -> throw Throwable("Wrong DAPP Type")
 			}
 		} then (hold)
+	}
+
+	override fun loadMore(
+		pageIndex: Int,
+		dataType: DAPPType,
+		hold: (List<DAPPTable>) -> Unit
+	) {
+		when (dataType) {
+			DAPPType.Recommend -> GoldStoneAPI.getRecommendDAPPs(pageIndex) { data, error ->
+				if (data.isNotNull() && error.isNone()) {
+					hold(data)
+				} else view.showError(error)
+			}
+			DAPPType.New -> GoldStoneAPI.getNewDAPPs(pageIndex) { data, error ->
+				if (data.isNotNull() && error.isNone()) {
+					hold(data)
+				} else view.showError(error)
+			}
+			else -> return
+		}
 	}
 }

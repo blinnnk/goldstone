@@ -20,6 +20,7 @@ import io.goldstone.blockchain.module.home.dapp.dapplistdetail.presenter.DAPPOve
 class DAPPOverlayFragment : BaseOverlayFragment<DAPPOverlayPresenter>() {
 
 	var cancelSearchEvent: Runnable? = null
+	var enterKeyEvent: Runnable? = null
 
 	private val type by lazy {
 		arguments?.getSerializable(ArgumentKey.dappType) as? DAPPType
@@ -29,20 +30,30 @@ class DAPPOverlayFragment : BaseOverlayFragment<DAPPOverlayPresenter>() {
 	override fun ViewGroup.initView() {
 		if (type == DAPPType.Explorer) {
 			addFragmentAndSetArgument<DAPPExplorerFragment>(ContainerID.content)
-			showSearchInput {
-				cancelSearchEvent?.run()
-				showCloseButton(true) {
-					presenter.removeSelfFromActivity()
-				}
-				showSearchButton(true) {
-					showSearchInput {
-						cancelSearchEvent?.run()
-						showCloseButton(true) {
-							presenter.removeSelfFromActivity()
-						}
+			showSearchInput(
+				cancelEvent = {
+					cancelSearchEvent?.run()
+					showCloseButton(true) {
+						presenter.removeSelfFromActivity()
 					}
+					showSearchButton(true) {
+						showSearchInput(
+							cancelEvent = {
+								cancelSearchEvent?.run()
+								showCloseButton(true) {
+									presenter.removeSelfFromActivity()
+								}
+							},
+							enterKeyEvent = {
+								enterKeyEvent?.run()
+							}
+						)
+					}
+				},
+				enterKeyEvent = {
+					enterKeyEvent?.run()
 				}
-			}
+			)
 
 		} else {
 			addFragmentAndSetArgument<DAPPListFragment>(ContainerID.content) {

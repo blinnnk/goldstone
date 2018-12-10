@@ -9,6 +9,7 @@ import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
@@ -28,7 +29,7 @@ class DAPPAdapter(
 ) : HoneyBaseAdapterWithHeaderAndFooter<DAPPTable, View, DAPPCell, TextView>() {
 
 	override fun generateFooter(context: Context) = TextView(context).apply {
-		visibility = if (dataSet.size == 10) View.VISIBLE else View.GONE
+		visibility = if (dataSet.size == DataValue.dappPageCount) View.VISIBLE else View.GONE
 		onClick {
 			clickFooterEvent()
 			preventDuplicateClicks()

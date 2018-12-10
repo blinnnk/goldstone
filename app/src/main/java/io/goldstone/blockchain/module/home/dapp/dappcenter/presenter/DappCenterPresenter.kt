@@ -6,6 +6,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.kernel.commontable.value.TableType
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
@@ -23,8 +24,6 @@ class DAppCenterPresenter(
 	private val dappView: DAppCenterContract.GSView
 ) : DAppCenterContract.GSPresenter {
 
-	private val defaultCount = 10
-
 	override fun start() {
 		setDAPPRecommendData()
 		setNewDAPP()
@@ -41,7 +40,7 @@ class DAppCenterPresenter(
 
 	override fun setUsedDAPPs() {
 		load {
-			DAPPTable.dao.getUsed(defaultCount)
+			DAPPTable.dao.getUsed(DataValue.dappPageCount)
 		} then {
 			dappView.showLatestUsed(it.toArrayList())
 		}
@@ -71,7 +70,7 @@ class DAppCenterPresenter(
 
 	private fun setNewDAPP() {
 		load {
-			DAPPTable.dao.getAll(defaultCount)
+			DAPPTable.dao.getAll(DataValue.dappPageCount)
 		} then {
 			dappView.showAllDAPP(it.toArrayList())
 		}

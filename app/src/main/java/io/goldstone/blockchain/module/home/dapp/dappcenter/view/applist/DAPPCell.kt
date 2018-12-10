@@ -36,7 +36,7 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			titles.title.text = title
 			titles.subtitle.text = description
 			tagContainer.removeAllViewsInLayout()
-			tags.forEach {
+			getTagList().forEach {
 				val subTag = Tag(context)
 				subTag.text = it
 				subTag.into(tagContainer)

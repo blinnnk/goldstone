@@ -300,16 +300,3 @@ object ErrorText {
 		else -> ""
 	}
 }
-
-object TransactionErrorText {
-	@JvmField
-	val transferToUnactivedEOSAcount = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The EOS account you want to transfer to doesn't exist."
-		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活。"
-		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません。"
-		HoneyLanguage.Korean.code -> "전송하려는 EOS 계정이 활성화되지 않았습니다."
-		HoneyLanguage.Russian.code -> "Учетная запись EOS, которую вы хотите передать, не активирована."
-		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活。"
-		else -> ""
-	}
-}

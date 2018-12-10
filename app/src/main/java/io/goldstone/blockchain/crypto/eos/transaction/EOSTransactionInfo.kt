@@ -49,11 +49,11 @@ data class EOSTransactionInfo(
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	// For DAPP
-	constructor(action: JSONObject) : this(
+	constructor(action: JSONObject, decimal: Int) : this(
 		EOSAccount(action.getTargetObject("data").safeGet("from")),
 		EOSAccount(action.getTargetObject("data").safeGet("to")),
 		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
-		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), null),
+		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), decimal),
 		action.getTargetObject("data").safeGet("memo"),
 		true
 	)
@@ -86,6 +86,8 @@ data class EOSTransactionInfo(
 		true
 	)
 
+	// 转不同的币需要标记 `Decimal` 不然会转账失败, 这里面会有检查函数
+	// 故在此传入 Decimal
 	fun trade(
 		context: Context?,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
@@ -108,7 +110,7 @@ data class EOSTransactionInfo(
 
 	fun insertPendingDataToDatabase(
 		response: EOSResponse,
-		callback: () -> Unit
+		@WorkerThread callback: () -> Unit
 	) {
 		// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
 		EOSTransactionTable.getMaxDataIndexTable(

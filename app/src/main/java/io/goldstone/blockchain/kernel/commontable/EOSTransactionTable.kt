@@ -92,7 +92,7 @@ data class EOSTransactionTable(
 			account: EOSAccount,
 			contract: TokenContract,
 			chainID: ChainID,
-			hold: (EOSTransactionTable?) -> Unit
+			@WorkerThread hold: (EOSTransactionTable?) -> Unit
 		) = GlobalScope.launch(Dispatchers.Default) {
 			val data =
 				GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(

@@ -27,7 +27,8 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 				switch.isClickable = false
 				// 更新内存数据, 防止复用 `UI` 错乱
 				asyncData?.find { data ->
-					data.contract.equals(default.contract, true) }?.isUsed = switch.isChecked
+					data.contract.equals(default.contract, true)
+				}?.isUsed = switch.isChecked
 				presenter.setMyTokenStatus(default, switch.isChecked) {
 					switch.isClickable = true
 				}
@@ -38,7 +39,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenManagementFragment> {
 			presenter.popFragmentFrom<TokenSearchFragment>()
-			showSearchInput(false) {}
+			showSearchInput(false, {}) {}
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.view.Gravity
 import android.view.KeyEvent
@@ -15,7 +14,10 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.GrayScale
+import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 
 /**
@@ -24,7 +26,6 @@ import org.jetbrains.anko.*
  * @description:
  */
 class FilterSearchInput(context: Context) : LinearLayout(context) {
-
 	var enterKeyEvent: Runnable? = null
 	private val filterIcon by lazy {
 		ImageView(context).apply {
@@ -34,9 +35,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			visibility = View.GONE
 		}
 	}
-
 	lateinit var editText: EditText
-
 	private val cancelButton by lazy {
 		TextView(context).apply {
 			text = CommonText.cancel

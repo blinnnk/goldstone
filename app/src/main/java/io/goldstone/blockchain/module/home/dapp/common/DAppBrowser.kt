@@ -15,16 +15,21 @@ import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.safeToJSONObject
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
+import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import org.jetbrains.anko.matchParent
 import org.json.JSONObject
@@ -37,6 +42,8 @@ import org.json.JSONObject
 class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) : WebView(context) {
 	private val loadingView = LoadingView(context)
 	private val jsInterface = JSInterface()
+	private val account = SharedAddress.getCurrentEOSAccount()
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	init {
 		settings.javaScriptEnabled = true
@@ -60,10 +67,9 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 			override fun onProgressChanged(view: WebView?, newProgress: Int) {
 				super.onProgressChanged(view, newProgress)
 				hold(newProgress)
-				val account = SharedAddress.getCurrentEOSAccount()
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:undefined,interval:undefined,eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0]));window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==undefined){return new Promise(function(resolve,reject){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null})}},1000);},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve(true)})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){alert(publicKey+data+whatFor+isHash);return new Promise(function(resolve,reject){resolve(signature)})}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:undefined,arbSignature:undefined,interval:undefined,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));;window.control.transferEOS(JSON.stringify(action.actions[0]));console.log('++++1');return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==undefined){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1000)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve(true)})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){alert(publicKey+data+whatFor+isHash);window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==undefined){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1000)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -75,18 +81,15 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				}
 			}
 
-
 			override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
 				println("GoldStone-DAPP-Browser: ${consoleMessage?.message()}")
 				return super.onConsoleMessage(consoleMessage)
 			}
-
 		}
 	}
 
 	override fun onDetachedFromWindow() {
 		super.onDetachedFromWindow()
-		System.out.println("++++")
 		// 销毁的时候清理用于接收 Promise 而设定的 Interval
 		evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
 	}
@@ -98,10 +101,58 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 	inner class JSInterface {
 
 		@JavascriptInterface
+		fun getEOSAccountPermissions() {
+			load {
+				EOSAccountTable.getPermissions(account, chainID)
+			} then { permissions ->
+				val list = "[${permissions.joinToString(",") { it.generateObject() }}]"
+				callWeb("getPermissions", list)
+			}
+		}
+
+		@JavascriptInterface
+		fun getArbSignature(data: String) {
+			launchUI {
+				Dashboard(context) {
+					showAlert(
+						"Signed Data Request",
+						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+					) {
+						PaymentDetailPresenter.showGetPrivateKeyDashboard(
+							context,
+							confirmEvent = {
+								loadingView.show()
+							}
+						) { privateKey, error ->
+							launchUI {
+								loadingView.remove()
+							}
+							if (privateKey.isNotNull() && error.isNone()) {
+								val signature = privateKey.sign(Sha256.from(data.toByteArray())).toString()
+								launchUI {
+									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
 		fun transferEOS(action: String) {
-			showQuickPaymentDashboard(action.safeToJSONObject()) {
-				System.out.println("hello test $it")
-				evaluateJavascript("javascript:(function(){scatter.txID=\"$it\"})()", null)
+			launchUI {
+				showQuickPaymentDashboard(JSONObject(action)) { response, error ->
+					launchUI {
+						if (response.isNotNull() && error.isNone()) {
+							response.showDialog(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
+						} else {
+							ErrorDisplayManager(error).show(context)
+							evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
+						}
+					}
+				}
 			}
 		}
 
@@ -146,6 +197,15 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				SharedWallet.getCurrentLanguageCode()
 			} then {
 				evaluateJavascript("javascript:getLanguageCode(\"$it\")", null)
+			}
+		}
+
+		@JavascriptInterface
+		fun getVersionName() {
+			load {
+				SystemUtils.getVersionName(context)
+			} then {
+				callWeb("getVersionName", it)
 			}
 		}
 
@@ -241,4 +301,8 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 			}
 		}
 	}
+}
+
+fun WebView.callWeb(methodName: String, value: String) {
+	return evaluateJavascript("javascript:$methodName(\"${Uri.encode(value)}\")", null)
 }

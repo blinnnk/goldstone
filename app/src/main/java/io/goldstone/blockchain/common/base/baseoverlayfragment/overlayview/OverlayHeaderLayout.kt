@@ -27,7 +27,6 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
-
 	private var title: TextView
 	private val closeButton by lazy {
 		HeaderIcon(context).apply {
@@ -215,7 +214,11 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit) {
+	fun showSearchInput(
+		isShow: Boolean = true,
+		cancelEvent: () -> Unit = {},
+		enterKeyAction: () -> Unit
+	) {
 		if (!isShow) {
 			title.visibility = View.VISIBLE
 			removeView(searchInput)
@@ -228,6 +231,9 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 			if (input == null) {
 				searchInput = FilterSearchInput(context)
 				searchInput?.apply {
+					enterKeyEvent = Runnable {
+						enterKeyAction()
+					}
 					setCancelClick {
 						// 取消搜索后自动清空搜索框里面的内容
 						// editText.text.clear()

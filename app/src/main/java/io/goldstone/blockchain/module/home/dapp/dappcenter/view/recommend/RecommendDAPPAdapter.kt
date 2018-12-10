@@ -13,7 +13,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  */
 class RecommendDAPPAdapter(
 	override val dataSet: ArrayList<DAPPTable>,
-	private val hold: DAPPTable.() -> Unit
+	private val hold: (url: String) -> Unit
 ) : HoneyBaseAdapter<DAPPTable, RecommendDAPPCell>() {
 
 	override fun generateCell(context: Context) = RecommendDAPPCell(context)
@@ -21,7 +21,7 @@ class RecommendDAPPAdapter(
 	override fun RecommendDAPPCell.bindCell(data: DAPPTable, position: Int) {
 		model = data
 		onClick {
-			hold(data)
+			hold(data.url)
 			preventDuplicateClicks()
 		}
 	}

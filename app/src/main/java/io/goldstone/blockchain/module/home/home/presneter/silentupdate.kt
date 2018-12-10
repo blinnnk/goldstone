@@ -490,18 +490,18 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateRecommendedDAPP() {
-		GoldStoneAPI.getRecommendDAPPs { dapps, error ->
+		GoldStoneAPI.getRecommendDAPPs(0) { dapps, error ->
 			if (dapps.isNotNull() && error.isNone()) {
-				DAPPTable.dao.deleteAll()
+				DAPPTable.dao.deleteAllRecommend()
 				DAPPTable.dao.insertAll(dapps)
 			} else ErrorDisplayManager(error)
 		}
 	}
 
 	private fun updateNewDAPP() {
-		GoldStoneAPI.getNewDAPPs { dapps, error ->
+		GoldStoneAPI.getNewDAPPs(0) { dapps, error ->
 			if (dapps.isNotNull() && error.isNone()) {
-				DAPPTable.dao.deleteAll()
+				DAPPTable.dao.deleteAllUnRecommended()
 				DAPPTable.dao.insertAll(dapps)
 			} else ErrorDisplayManager(error)
 		}
