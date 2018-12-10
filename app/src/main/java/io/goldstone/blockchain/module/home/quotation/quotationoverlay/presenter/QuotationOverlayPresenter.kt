@@ -6,7 +6,6 @@ import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.MarketTokenCenterFragment
-import io.goldstone.blockchain.module.home.quotation.markettokendetail.view.MarketTokenDetailFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
@@ -34,10 +33,13 @@ class QuotationOverlayPresenter(
 		showTargetFragment<QuotationSearchFragment>()
 		fragment.apply {
 			showBackButton(false) {}
-			showSearchInput {
-				popFragmentFrom<QuotationSearchFragment>()
-				fragment.headerTitle = QuotationText.management
-			}
+			showSearchInput(
+				cancelEvent = {
+					popFragmentFrom<QuotationSearchFragment>()
+					fragment.headerTitle = QuotationText.management
+				},
+				enterKeyEvent = {}
+			)
 		}
 	}
 }

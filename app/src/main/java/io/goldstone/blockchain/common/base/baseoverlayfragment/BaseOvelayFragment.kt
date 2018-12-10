@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import com.blinnnk.extension.hideStatusBar
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
@@ -78,8 +79,9 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		overlayView.header.showSearchButton(isShow, setClickEvent)
 	}
 
-	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit) {
-		overlayView.header.showSearchInput(isShow, cancelEvent)
+	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit, enterKeyEvent: () -> Unit) {
+		overlayView.isNotNull()
+		overlayView.header.showSearchInput(isShow, cancelEvent, enterKeyEvent)
 	}
 
 	fun showAddButton(status: Boolean, isLeft: Boolean = true, clickEvent: () -> Unit) {

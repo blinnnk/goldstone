@@ -101,8 +101,10 @@ class PaymentDetailPresenter(
 					true,
 					// User click cancel button
 					{
-						hold(null, AccountError.None)
-						cancelEvent()
+						GlobalScope.launch(Dispatchers.Default) {
+							hold(null, AccountError.None)
+							cancelEvent()
+						}
 					}
 				) { passwordInput ->
 					confirmEvent()

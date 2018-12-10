@@ -30,6 +30,7 @@ import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
+import io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter.TokenAssetPresenter
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -44,7 +45,8 @@ import kotlinx.coroutines.launch
  */
 abstract class SilentUpdater {
 
-	val account = SharedAddress.getCurrentEOSAccount()
+	private val account = SharedAddress.getCurrentEOSAccount()
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
@@ -111,6 +113,11 @@ abstract class SilentUpdater {
 		// 是 WIFI 的情况下, 才执行静默更新
 		if (Connectivity.isConnectedWifi(GoldStoneApp.appContext)) {
 			updateTokenInfo()
+		}
+
+		//  初始化检查更新 EOS Account Info
+		if (account.isValid(false)) {
+			TokenAssetPresenter.updateEOSAccountInfoFromChain(account, chainID) {}
 		}
 	}
 
@@ -230,7 +237,6 @@ abstract class SilentUpdater {
 	}
 
 	private fun checkAvailableEOSTokenList() {
-		val chainID = SharedChain.getEOSCurrent().chainID
 		if (!account.isValid(false)) return
 		EOSAPI.getEOSTokenList(chainID, account) { tokenList, error ->
 			// 拉取潜在资产的 `Icon Url`
@@ -328,11 +334,7 @@ abstract class SilentUpdater {
 		if (account.isValid(false)) {
 			EOSAPI.getDelegateBandWidthList(account) { data, error ->
 				if (data.isNotNull() && error.isNone()) {
-					EOSAccountTable.dao.updateDelegateBandwidthData(
-						data,
-						account.name,
-						SharedChain.getEOSCurrent().chainID.id
-					)
+					EOSAccountTable.dao.updateDelegateBandwidthData(data, account.name, chainID.id)
 				}
 			}
 		}
@@ -340,7 +342,7 @@ abstract class SilentUpdater {
 
 	private fun updateNETUnitPrice() {
 		if (account.isValid(false)) {
-			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
+			EOSResourceUtil.getNETPrice(account) { priceInEOS, error ->
 				if (priceInEOS.isNotNull() && error.isNone()) {
 					SharedValue.updateNETUnitPrice(priceInEOS)
 				}
@@ -422,7 +424,8 @@ abstract class SilentUpdater {
 		serverTokens: List<DefaultTokenTable>,
 		localTokens: List<DefaultTokenTable>
 	) {
-		val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+		val unManuallyData =
+			localTokens.filter { it.serverTokenID.isNotEmpty() }
 		serverTokens.filter { server ->
 			unManuallyData.find {
 				it.serverTokenID.equals(server.serverTokenID, true)
@@ -437,8 +440,7 @@ abstract class SilentUpdater {
 			}
 		}.apply {
 			if (isEmpty()) return
-			val defaultDao =
-				GoldStoneDataBase.database.defaultTokenDao()
+			val defaultDao = DefaultTokenTable.dao
 			forEach { server ->
 				defaultDao.getToken(server.contract, server.symbol, server.chainID)?.apply {
 					defaultDao.update(
@@ -488,18 +490,18 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateRecommendedDAPP() {
-		GoldStoneAPI.getRecommendDAPPs { dapps, error ->
+		GoldStoneAPI.getRecommendDAPPs(0) { dapps, error ->
 			if (dapps.isNotNull() && error.isNone()) {
-				DAPPTable.dao.deleteAll()
+				DAPPTable.dao.deleteAllRecommend()
 				DAPPTable.dao.insertAll(dapps)
 			} else ErrorDisplayManager(error)
 		}
 	}
 
 	private fun updateNewDAPP() {
-		GoldStoneAPI.getNewDAPPs { dapps, error ->
+		GoldStoneAPI.getNewDAPPs(0) { dapps, error ->
 			if (dapps.isNotNull() && error.isNone()) {
-				DAPPTable.dao.deleteAll()
+				DAPPTable.dao.deleteAllUnRecommended()
 				DAPPTable.dao.insertAll(dapps)
 			} else ErrorDisplayManager(error)
 		}

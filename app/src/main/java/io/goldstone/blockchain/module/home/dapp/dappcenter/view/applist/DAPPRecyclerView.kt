@@ -15,6 +15,9 @@ import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import org.jetbrains.anko.matchParent
+import android.view.MotionEvent
+
+
 
 
 /**
@@ -24,13 +27,15 @@ import org.jetbrains.anko.matchParent
 @SuppressLint("ViewConstructor")
 class DAPPRecyclerView(
 	context: Context,
-	private val hold: DAPPTable.() -> Unit
+	private val clickCellEvent: DAPPTable.() -> Unit,
+	private val checkAllEvent: () -> Unit
 ) : RelativeLayout(context) {
 	private val recyclerView = BaseRecyclerView(context)
 	private var emptyView: EmptyView? = null
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+		recyclerView.isNestedScrollingEnabled = false
 		recyclerView.into(this)
 	}
 
@@ -39,7 +44,8 @@ class DAPPRecyclerView(
 		else {
 			if (emptyView.isNotNull()) removeView(emptyView)
 			recyclerView.visibility = View.VISIBLE
-			recyclerView.adapter = DAPPAdapter(data, hold)
+			val dappAdapter = DAPPAdapter(data, clickCellEvent, checkAllEvent)
+			recyclerView.adapter = dappAdapter
 		}
 	}
 

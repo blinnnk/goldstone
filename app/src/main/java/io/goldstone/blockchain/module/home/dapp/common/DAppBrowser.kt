@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.os.Bundle
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.Toast
@@ -20,32 +19,31 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.common.utils.safeToJSONObject
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
-import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
+import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
-import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
-import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.DAppBrowserFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
 import org.jetbrains.anko.matchParent
 import org.json.JSONObject
-
 
 /**
  * @author KaySaith
  * @date  2018/11/29
  */
 @SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
-class DAppBrowser(context: Context, url: String) : WebView(context) {
+class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) : WebView(context) {
 	private val loadingView = LoadingView(context)
 	private val jsInterface = JSInterface()
+	private val account = SharedAddress.getCurrentEOSAccount()
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	init {
 		settings.javaScriptEnabled = true
@@ -68,10 +66,10 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 		webChromeClient = object : WebChromeClient() {
 			override fun onProgressChanged(view: WebView?, newProgress: Int) {
 				super.onProgressChanged(view, newProgress)
-				val account = SharedAddress.getCurrentEOSAccount()
+				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0].data))}}}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:undefined,arbSignature:undefined,interval:undefined,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));;window.control.transferEOS(JSON.stringify(action.actions[0]));console.log('++++1');return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==undefined){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1000)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve(true)})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){alert(publicKey+data+whatFor+isHash);window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==undefined){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1000)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -83,13 +81,17 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 				}
 			}
 
-
 			override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-				System.out.println("console ${consoleMessage?.message()}")
+				println("GoldStone-DAPP-Browser: ${consoleMessage?.message()}")
 				return super.onConsoleMessage(consoleMessage)
 			}
-
 		}
+	}
+
+	override fun onDetachedFromWindow() {
+		super.onDetachedFromWindow()
+		// 销毁的时候清理用于接收 Promise 而设定的 Interval
+		evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
 	}
 
 	fun backEvent(callback: () -> Unit) {
@@ -99,26 +101,55 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 	inner class JSInterface {
 
 		@JavascriptInterface
-		fun transferEOS(data: String) {
-			context.getMainActivity()?.apply {
-				supportFragmentManager?.apply {
-					fragments.find {
-						it is DAppBrowserFragment
-					}?.let {
-						beginTransaction().hide(it).commit()
-						val tradingModel = EOSTransactionInfo(JSONObject(data))
-						val account = SharedAddress.getCurrentEOSAccount()
-						val chainID = SharedChain.getEOSCurrent().chainID
-						MyTokenWithDefaultTable.getTarget(
-							account.name,
-							CoinSymbol.eos,
-							chainID.id
-						) { token ->
-							val bundle = Bundle().apply {
-								putSerializable(ArgumentKey.dappTradingModel, tradingModel)
-								putSerializable(ArgumentKey.tokenDetail, token)
+		fun getEOSAccountPermissions() {
+			load {
+				EOSAccountTable.getPermissions(account, chainID)
+			} then { permissions ->
+				val list = "[${permissions.joinToString(",") { it.generateObject() }}]"
+				callWeb("getPermissions", list)
+			}
+		}
+
+		@JavascriptInterface
+		fun getArbSignature(data: String) {
+			launchUI {
+				Dashboard(context) {
+					showAlert(
+						"Signed Data Request",
+						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+					) {
+						PaymentDetailPresenter.showGetPrivateKeyDashboard(
+							context,
+							confirmEvent = {
+								loadingView.show()
 							}
-							TokenDetailOverlayFragment.show(context, bundle)
+						) { privateKey, error ->
+							launchUI {
+								loadingView.remove()
+							}
+							if (privateKey.isNotNull() && error.isNone()) {
+								val signature = privateKey.sign(Sha256.from(data.toByteArray())).toString()
+								launchUI {
+									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
+		fun transferEOS(action: String) {
+			launchUI {
+				showQuickPaymentDashboard(JSONObject(action)) { response, error ->
+					launchUI {
+						if (response.isNotNull() && error.isNone()) {
+							response.showDialog(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
+						} else {
+							ErrorDisplayManager(error).show(context)
+							evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
 						}
 					}
 				}
@@ -157,6 +188,24 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 				ChainType(chainType)
 			} then {
 				evaluateJavascript("javascript:getChainID(\"${it.getChainURL().chainID.id}\")", null)
+			}
+		}
+
+		@JavascriptInterface
+		fun getLanguageCode() {
+			load {
+				SharedWallet.getCurrentLanguageCode()
+			} then {
+				evaluateJavascript("javascript:getLanguageCode(\"$it\")", null)
+			}
+		}
+
+		@JavascriptInterface
+		fun getVersionName() {
+			load {
+				SystemUtils.getVersionName(context)
+			} then {
+				callWeb("getVersionName", it)
 			}
 		}
 
@@ -252,4 +301,8 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 			}
 		}
 	}
+}
+
+fun WebView.callWeb(methodName: String, value: String) {
+	return evaluateJavascript("javascript:$methodName(\"${Uri.encode(value)}\")", null)
 }

@@ -26,6 +26,10 @@ data class PermissionsInfo(
 		RequiredAuthorization(JSONObject(data.safeGet("required_auth")))
 	)
 
+	fun generateObject(): String {
+		return "{\"parent\":\"$parent\",\"perm_name\":\"$permissionName\",\"required_auth\":${requiredAuthorization.getObject()}}"
+	}
+
 	companion object {
 		fun getPermissions(data: JSONArray): List<PermissionsInfo> {
 			var permissions = listOf<PermissionsInfo>()
@@ -51,11 +55,6 @@ class PermissionsInfoConverter {
 
 	@TypeConverter
 	fun convertToString(permissions: List<PermissionsInfo>): String {
-		var content = ""
-		permissions.forEach {
-			content += "{\"parent\":\"${it.parent}\",\"perm_name\":\"${it.permissionName}\",\"required_auth\":${it.requiredAuthorization.getObject()}}" + ","
-		}
-		content = content.substringBeforeLast(",")
-		return "[$content]"
+		return "[${permissions.joinToString(",") { it.generateObject() }}]"
 	}
 }

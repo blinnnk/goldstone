@@ -30,10 +30,12 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
-import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.isTargetDevice
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.DeviceName
+import io.goldstone.blockchain.common.value.ElementID
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.formatCurrency
@@ -59,9 +61,6 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 		arguments?.getDouble(ArgumentKey.paymentCount).orElse(0.0)
 	}
 
-	val memo by lazy {
-		arguments?.getString(ArgumentKey.paymentMemo)
-	}
 	val rootFragment by lazy {
 		getParentFragment<TokenDetailOverlayFragment>()
 	}
@@ -209,7 +208,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			setTitle(PrepareTransferText.memoInformation)
 			memoView = graySquareCell {
 				setTitle(PrepareTransferText.memo)
-				setSubtitle(memo ?: PrepareTransferText.addAMemo)
+				setSubtitle(PrepareTransferText.addAMemo)
 				showArrow()
 			}.click {
 				getParentContainer()?.showMemoInputView { content ->
@@ -345,15 +344,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 	private fun resetBackButtonEvent() {
 		// 从下一个页面返回后通过显示隐藏监听重设回退按钮的事件
 		rootFragment?.apply {
-			// 自带 memo 的场景只存在于  `DAPP` 的快捷操作, 暂时用它作为来源判断
-			if (memo.isNotNull()) showCloseButton(true) {
-				getMainActivity()?.supportFragmentManager?.apply {
-					val browserFragment =
-						findFragmentByTag(FragmentTag.dappBrowser) ?: return@showCloseButton
-					beginTransaction().show(browserFragment).commit()
-					presenter.removeSelfFromActivity()
-				}
-			} else showBackButton(true) {
+			showBackButton(true) {
 				if (memoInputView.isNull()) {
 					presenter.popFragmentFrom<PaymentDetailFragment>()
 				} else {

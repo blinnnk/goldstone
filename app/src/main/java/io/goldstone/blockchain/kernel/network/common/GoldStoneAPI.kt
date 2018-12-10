@@ -2,7 +2,10 @@ package io.goldstone.blockchain.kernel.network.common
 
 import android.annotation.SuppressLint
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.orEmpty
+import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
@@ -11,6 +14,7 @@ import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
@@ -482,30 +486,32 @@ object GoldStoneAPI {
 		}
 	}
 
-	fun getRecommendDAPPs(@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit) {
-		requestData<DAPPTable>(
-			APIPath.getRecommendDAPPs(APIPath.currentUrl),
+	fun getRecommendDAPPs(
+		pageIndex: Int,
+		pageSize: Int = DataValue.dappPageCount,
+		@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.getRecommendDAPPs(APIPath.currentUrl, pageIndex, pageSize),
 			"data",
 			false,
-			isEncrypt = true
-		) { result, error ->
-			if (result.isNotNull() && error.isNone()) {
-				hold(result, error)
-			} else hold(null, error)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 
-	fun getNewDAPPs(@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit) {
-		requestData<DAPPTable>(
-			APIPath.getNewDAPPs(APIPath.currentUrl),
+	fun getNewDAPPs(
+		pageIndex: Int,
+		pageSize: Int = DataValue.dappPageCount,
+		@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.getNewDAPPs(APIPath.currentUrl, pageIndex, pageSize),
 			"data",
 			false,
-			isEncrypt = true
-		) { result, error ->
-			if (result.isNotNull() && error.isNone()) {
-				hold(result, error)
-			} else hold(null, error)
-		}
+			isEncrypt = true,
+			hold = hold
+		)
 	}
 }
 

@@ -547,16 +547,18 @@ data class WalletTable(
 			}
 		}
 
-		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable?) -> Unit) {
+		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable) -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
 				val willDeleteWallet = dao.findWhichIsUsing(true)
-				willDeleteWallet?.let { dao.delete(it) }
 				dao.getAllWallets().let { wallets ->
 					if (wallets.isNotEmpty()) {
 						dao.update(wallets.first().apply { isUsing = true })
 						SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
 					}
-					callback(willDeleteWallet)
+					willDeleteWallet?.let {
+						dao.delete(it)
+						callback(it)
+					}
 				}
 			}
 		}

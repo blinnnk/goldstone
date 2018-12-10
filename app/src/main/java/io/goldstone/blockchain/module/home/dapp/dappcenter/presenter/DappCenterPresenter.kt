@@ -1,10 +1,19 @@
 package io.goldstone.blockchain.module.home.dapp.dappcenter.presenter
 
+import android.support.annotation.UiThread
+import com.blinnnk.extension.hasValue
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.value.DataValue
+import io.goldstone.blockchain.kernel.commontable.FavoriteTable
+import io.goldstone.blockchain.kernel.commontable.value.TableType
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 /**
@@ -18,7 +27,7 @@ class DAppCenterPresenter(
 	override fun start() {
 		setDAPPRecommendData()
 		setNewDAPP()
-		setLatestUsedDAPP()
+		setUsedDAPPs()
 	}
 
 	private fun setDAPPRecommendData() {
@@ -29,18 +38,39 @@ class DAppCenterPresenter(
 		}
 	}
 
-	private fun setLatestUsedDAPP() {
-		// TODO
+	override fun setUsedDAPPs() {
 		load {
-			DAPPTable.dao.getAll()
+			DAPPTable.dao.getUsed(DataValue.dappPageCount)
 		} then {
 			dappView.showLatestUsed(it.toArrayList())
 		}
 	}
 
+	override fun getDAPPUsedStatus(dappID: String, @UiThread hold: (Boolean) -> Unit) {
+		load {
+			FavoriteTable.dao.getDataCount(dappID, TableType.DAPP).hasValue()
+		} then {
+			hold(it)
+		}
+	}
+
+	override fun updateDAPPUsedStatus(dappID: String) {
+		GlobalScope.launch(Dispatchers.Default) {
+			FavoriteTable.dao.insert(
+				FavoriteTable(
+					SharedWallet.getCurrentWalletID(),
+					TableType.DAPP,
+					dappID,
+					"${System.currentTimeMillis()}"
+				)
+			)
+			setUsedDAPPs()
+		}
+	}
+
 	private fun setNewDAPP() {
 		load {
-			DAPPTable.dao.getAll()
+			DAPPTable.dao.getAll(DataValue.dappPageCount)
 		} then {
 			dappView.showAllDAPP(it.toArrayList())
 		}

@@ -36,7 +36,7 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			titles.title.text = title
 			titles.subtitle.text = description
 			tagContainer.removeAllViewsInLayout()
-			tags.forEach {
+			getTagList().forEach {
 				val subTag = Tag(context)
 				subTag.text = it
 				subTag.into(tagContainer)
@@ -67,7 +67,10 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			lparams(ScreenSize.card - 130.uiPX(), wrapContent)
 			titles = twoLineTitles {
 				leftPadding = 10.uiPX()
-				setBlackTitles(subtitleSize = fontSize(12))
+				setBlackTitles(
+					lineSpace = 1.uiPX(),
+					subtitleSize = fontSize(12)
+				)
 			}
 			tagContainer = linearLayout {
 				lparams(matchParent, wrapContent)

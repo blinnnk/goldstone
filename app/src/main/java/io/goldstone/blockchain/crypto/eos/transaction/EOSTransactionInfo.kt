@@ -2,10 +2,7 @@ package io.goldstone.blockchain.crypto.eos.transaction
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toDoubleOrZero
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -22,6 +19,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -50,12 +48,13 @@ data class EOSTransactionInfo(
 
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
-	constructor(data: JSONObject) : this(
-		EOSAccount(data.safeGet("from")),
-		EOSAccount(data.safeGet("to")),
-		data.safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
-		TokenContract.EOS,
-		data.safeGet("memo"),
+	// For DAPP
+	constructor(action: JSONObject, decimal: Int) : this(
+		EOSAccount(action.getTargetObject("data").safeGet("from")),
+		EOSAccount(action.getTargetObject("data").safeGet("to")),
+		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
+		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), decimal),
+		action.getTargetObject("data").safeGet("memo"),
 		true
 	)
 
@@ -87,6 +86,8 @@ data class EOSTransactionInfo(
 		true
 	)
 
+	// 转不同的币需要标记 `Decimal` 不然会转账失败, 这里面会有检查函数
+	// 故在此传入 Decimal
 	fun trade(
 		context: Context?,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
@@ -104,6 +105,23 @@ data class EOSTransactionInfo(
 					transfer(privateKey, hold)
 				} else hold(null, error)
 			}
+		}
+	}
+
+	fun insertPendingDataToDatabase(
+		response: EOSResponse,
+		@WorkerThread callback: () -> Unit
+	) {
+		// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
+		EOSTransactionTable.getMaxDataIndexTable(
+			fromAccount,
+			contract,
+			SharedChain.getEOSCurrent().chainID
+		) {
+			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
+			val transaction = EOSTransactionTable(this, response, dataIndex)
+			EOSTransactionTable.dao.insert(transaction)
+			callback()
 		}
 	}
 

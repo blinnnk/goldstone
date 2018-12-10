@@ -27,7 +27,6 @@ import org.jetbrains.anko.*
  * @author KaySaith
  */
 class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
-
 	private var title: TextView
 	private val closeButton by lazy {
 		HeaderIcon(context).apply {
@@ -112,11 +111,17 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 		if (currentButton == null) {
 			if (isShow) {
-				addView(closeButton.click { clickEvent() })
+				addView(
+					closeButton.click {
+						clickEvent()
+					}
+				)
 			}
 		} else if (isShow) {
 			closeButton.click { clickEvent() }
-		} else removeView(currentButton)
+		} else {
+			removeView(currentButton)
+		}
 	}
 
 	fun showFilterIcon(isShow: Boolean, action: () -> Unit) {
@@ -209,19 +214,26 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		}
 	}
 
-	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit) {
-		showCloseButton(!isShow) {}
+	fun showSearchInput(
+		isShow: Boolean = true,
+		cancelEvent: () -> Unit = {},
+		enterKeyAction: () -> Unit
+	) {
 		if (!isShow) {
 			title.visibility = View.VISIBLE
 			removeView(searchInput)
 			searchInput = null
 		} else {
+			showCloseButton(false) {}
 			title.visibility = View.GONE
 			val input =
 				findViewById<FilterSearchInput>(ElementID.searchInput)
 			if (input == null) {
 				searchInput = FilterSearchInput(context)
 				searchInput?.apply {
+					enterKeyEvent = Runnable {
+						enterKeyAction()
+					}
 					setCancelClick {
 						// 取消搜索后自动清空搜索框里面的内容
 						// editText.text.clear()
@@ -234,7 +246,6 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 						editText.requestFocus()
 						SoftKeyboard.show(context as Activity, editText)
 					}
-
 					editText.addTextChangedListener(object : TextWatcher {
 						override fun afterTextChanged(content: Editable?) {
 							if (!content.isNullOrBlank()) searchTextChangedEvent?.run()

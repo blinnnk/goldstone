@@ -17,6 +17,8 @@ interface DAppCenterContract {
 	}
 
 	interface GSPresenter : GoldStonePresenter {
-
+		fun setUsedDAPPs()
+		fun getDAPPUsedStatus(dappID: String, hold: (Boolean) -> Unit)
+		fun updateDAPPUsedStatus(dappID: String)
 	}
 }
