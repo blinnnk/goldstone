@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.Toast
@@ -38,6 +39,7 @@ import org.json.JSONObject
  * @author KaySaith
  * @date  2018/11/29
  */
+@Suppress("DEPRECATION")
 @SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
 class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) : WebView(context) {
 	private val loadingView = LoadingView(context)
@@ -46,20 +48,20 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	init {
-		settings.javaScriptEnabled = true
 		webViewClient = WebViewClient()
+		settings.javaScriptEnabled = true
 		addJavascriptInterface(jsInterface, "control")
-		settings.domStorageEnabled = true
 		settings.javaScriptCanOpenWindowsAutomatically = true
-		settings.cacheMode = WebSettings.LOAD_NO_CACHE
 		settings.domStorageEnabled = true
 		settings.databaseEnabled = true
-		settings.setAppCacheEnabled(true)
 		settings.allowFileAccess = true
-		settings.setSupportZoom(true)
-		settings.builtInZoomControls = true
 		settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NARROW_COLUMNS
 		settings.useWideViewPort = true
+		setLayerType(View.LAYER_TYPE_HARDWARE, null)
+		settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
+		settings.setAppCacheEnabled(true)
+		settings.setAppCacheMaxSize( 5 * 1024 * 1024)
+		settings.cacheMode = WebSettings.LOAD_DEFAULT
 
 		this.loadUrl(url)
 		layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
@@ -69,7 +71,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:undefined,arbSignature:undefined,interval:undefined,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));;window.control.transferEOS(JSON.stringify(action.actions[0]));console.log('++++1');return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==undefined){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1000)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve(true)})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){alert(publicKey+data+whatFor+isHash);window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==undefined){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1000)})}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -142,14 +144,48 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		@JavascriptInterface
 		fun transferEOS(action: String) {
 			launchUI {
-				showQuickPaymentDashboard(JSONObject(action)) { response, error ->
+				showQuickPaymentDashboard(
+					JSONObject(action),
+					true,
+					cancelEvent = {
+						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+					}
+				) { response, error ->
 					launchUI {
 						if (response.isNotNull() && error.isNone()) {
 							response.showDialog(context)
 							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
 						} else {
 							ErrorDisplayManager(error).show(context)
-							evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+						}
+					}
+				}
+			}
+		}
+
+		/**
+		 * action like {"from":"beautifulleo","to":"betlottoinst","quantity":"0.1000 EOS","memo":"1|1029338"}
+		 */
+		@JavascriptInterface
+		fun simpleTransfer(action: String) {
+			launchUI {
+				System.out.println("action $action")
+				showQuickPaymentDashboard(
+					JSONObject(action),
+					false,
+					cancelEvent = {
+						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+					}
+				) { response, error ->
+					System.out.println("response $response")
+					launchUI {
+						if (response.isNotNull() && error.isNone()) {
+							response.showDialog(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
+						} else {
+							ErrorDisplayManager(error).show(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
 						}
 					}
 				}

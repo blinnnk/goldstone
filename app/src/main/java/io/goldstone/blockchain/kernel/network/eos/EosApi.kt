@@ -244,6 +244,7 @@ object EOSAPI {
 			EOSUrl.pushTransaction(),
 			false
 		) { result, error ->
+			System.out.println("hello 6")
 			if (result.isNullOrEmpty() || error.hasError()) {
 				hold(null, error)
 			} else {
