@@ -1,9 +1,9 @@
 package io.goldstone.blockchain.common.sharedpreference
 
 import com.blinnnk.util.*
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
 import io.goldstone.blockchain.crypto.multichain.WalletType
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 
 
 /**
@@ -12,101 +12,101 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
  */
 object SharedWallet {
 	fun getCurrencyCode(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currencyCode)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currencyCode)
 
 	fun updateCurrencyCode(code: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currencyCode, code)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currencyCode, code)
 
 	fun getCurrentRate(): Double =
-		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.rate)
+		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.rate)
 
 	fun updateCurrentRate(rate: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.rate, rate.toFloat())
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.rate, rate.toFloat())
 
 	fun updateWalletCount(count: Int) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletCount, count)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.walletCount, count)
 
 	fun getMaxWalletID(): Int {
-		val default = GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.maxWalletID)
+		val default = GoldStoneApp.appContext.getIntFromSharedPreferences(SharesPreference.maxWalletID)
 		return if (default == -1) 0 else default
 	}
 
 	fun updateMaxWalletID(id: Int) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.maxWalletID, id)
 
 	fun getCurrentWalletType(): WalletType =
-		WalletType(GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.walletType))
+		WalletType(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.walletType))
 
 	fun updateCurrentWalletType(type: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.walletType, type)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.walletType, type)
 
 	fun getGoldStoneID(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.goldStoneID)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.goldStoneID)
 
 	fun updateGoldStoneID(goldStoneID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.goldStoneID, goldStoneID)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.goldStoneID, goldStoneID)
 
 	// Configs For Review Or UpdateDatabase ETC.
 	fun getNeedUnregisterGoldStoneID(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.unregisterGoldStoneID)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.unregisterGoldStoneID)
 
 	fun updateUnregisterGoldStoneID(goldStoneID: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.unregisterGoldStoneID, goldStoneID)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.unregisterGoldStoneID, goldStoneID)
 
 	fun getInReviewStatus(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.yingYongBaoInReview)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.yingYongBaoInReview)
 
 	fun updateInReviewStatus(status: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.yingYongBaoInReview, status)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.yingYongBaoInReview, status)
 
 	fun getCurrentName(): String =
-		GoldStoneAPI.context.getStringFromSharedPreferences(SharesPreference.currentName)
+		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentName)
 
 	fun updateCurrentName(name: String) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentName, name)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentName, name)
 
 	fun getCurrentWalletID(): Int =
-		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentID)
+		GoldStoneApp.appContext.getIntFromSharedPreferences(SharesPreference.currentID)
 
 	fun updateCurrentWalletID(id: Int) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentID, id)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentID, id)
 
 	fun isWatchOnlyWallet(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.currentIsWatchOrNot)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.currentIsWatchOrNot)
 
 	fun updateCurrentIsWatchOnlyOrNot(isWatchOnly: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.currentIsWatchOrNot,
 			isWatchOnly
 		)
 
 	fun hasBackUpMnemonic(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.hasBackUpMnemonic)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.hasBackUpMnemonic)
 
 	fun updateBackUpMnemonicStatus(hasBackUp: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.hasBackUpMnemonic,
 			hasBackUp
 		)
 
 	fun getCurrentBalance(): Double =
-		GoldStoneAPI.context.getDoubleFromSharedPreferences(SharesPreference.currentBalance)
+		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.currentBalance)
 
 	fun updateCurrentBalance(balance: Double) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(
+		GoldStoneApp.appContext.saveDataToSharedPreferences(
 			SharesPreference.currentBalance,
 			balance.toFloat()
 		)
 
 	fun getCurrentLanguageCode(): Int =
-		GoldStoneAPI.context.getIntFromSharedPreferences(SharesPreference.currentLanguage)
+		GoldStoneApp.appContext.getIntFromSharedPreferences(SharesPreference.currentLanguage)
 
 	fun updateCurrentLanguageCode(languageCode: Int) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.currentLanguage, languageCode)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currentLanguage, languageCode)
 
 	fun isNotchScreen(): Boolean =
-		GoldStoneAPI.context.getBooleanFromSharedPreferences(SharesPreference.isNotchScreen)
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.isNotchScreen)
 
 	fun updateNotchScreenStatus(isNotchScreen: Boolean) =
-		GoldStoneAPI.context.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.isNotchScreen, isNotchScreen)
 }

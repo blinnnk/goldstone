@@ -2,8 +2,7 @@ package io.goldstone.blockchain.crypto.eos.transaction
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orElse
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
@@ -11,7 +10,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -19,12 +17,15 @@ import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toCount
+import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
+import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger
 
@@ -46,6 +47,25 @@ data class EOSTransactionInfo(
 ) : Serializable, EOSModel {
 
 	private val chainID = SharedChain.getEOSCurrent().chainID
+
+	// For DAPP
+	constructor(action: JSONObject, decimal: Int) : this(
+		EOSAccount(action.getTargetObject("data").safeGet("from")),
+		EOSAccount(action.getTargetObject("data").safeGet("to")),
+		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
+		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), decimal),
+		action.getTargetObject("data").safeGet("memo"),
+		true
+	)
+
+	constructor(data: JSONObject) : this(
+		EOSAccount(data.safeGet("from")),
+		EOSAccount(data.safeGet("to")),
+		data.safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
+		TokenContract.EOS,
+		data.safeGet("memo"),
+		true
+	)
 
 	constructor(
 		fromAccount: EOSAccount,
@@ -75,6 +95,8 @@ data class EOSTransactionInfo(
 		true
 	)
 
+	// 转不同的币需要标记 `Decimal` 不然会转账失败, 这里面会有检查函数
+	// 故在此传入 Decimal
 	fun trade(
 		context: Context?,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
@@ -82,12 +104,14 @@ data class EOSTransactionInfo(
 		if (!toAccount.isValid(false)) {
 			hold(null, AccountError.InvalidAccountName)
 		} else {
+			System.out.println("hello 1")
 			BaseTradingPresenter.prepareTransaction(
 				context,
 				amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
 				contract,
 				StakeType.Trade
 			) { privateKey, error ->
+				System.out.println("hello 2 $privateKey")
 				if (error.isNone() && privateKey.isNotNull()) {
 					transfer(privateKey, hold)
 				} else hold(null, error)
@@ -95,10 +119,28 @@ data class EOSTransactionInfo(
 		}
 	}
 
+	fun insertPendingDataToDatabase(
+		response: EOSResponse,
+		@WorkerThread callback: () -> Unit
+	) {
+		// 把这条转账数据插入本地数据库作为 `Pending Data` 进行检查
+		EOSTransactionTable.getMaxDataIndexTable(
+			fromAccount,
+			contract,
+			SharedChain.getEOSCurrent().chainID
+		) {
+			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
+			val transaction = EOSTransactionTable(this, response, dataIndex)
+			EOSTransactionTable.dao.insert(transaction)
+			callback()
+		}
+	}
+
 	private fun transfer(
 		privateKey: EOSPrivateKey,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
+		System.out.println("hello 3")
 		val permission =
 			EOSAccountTable.getValidPermission(fromAccount, chainID)
 		if (permission.isNotNull()) {

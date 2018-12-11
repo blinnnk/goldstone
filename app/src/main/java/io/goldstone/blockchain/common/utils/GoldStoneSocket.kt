@@ -111,8 +111,8 @@ abstract class GoldStoneWebSocket : WebSocketListener() {
 				.retryOnConnectionFailure(true)
 				.build()
 		getCryptoGetRequest(serverURL, true) {
-			client?.newWebSocket(it, this)
-			client?.dispatcher()?.executorService()?.shutdown()
+			client.newWebSocket(it, this)
+			client.dispatcher().executorService().shutdown()
 		}
 	}
 

@@ -18,7 +18,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -77,29 +77,30 @@ class SplashPresenter(val activity: SplashActivity) {
 	@WorkerThread
 	fun initSupportCurrencyList(context: Context) {
 		if (SupportCurrencyTable.dao.rowCount() == 0) {
-			val localCurrency =
-				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
-					SupportCurrencyTable(it) // 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
-				}
 			val sandboxCurrency = SandBoxUtil.getCurrency()
-			var changedStatus = false
-			if (sandboxCurrency.isNotEmpty()) {
-				// 如果沙盒中有数据，那么更新状态
-				localCurrency.forEach {
-					if (sandboxCurrency.equals(it.currencySymbol, true)) {
-						changedStatus = true
-						it.isUsed = true
-						SharedWallet.updateCurrentRate(it.rate)
+			var changedStatus = false // 是否设置了选中的status，只命中一次，如果从沙盒中获取到了，那么就不用默认的货币了
+			var baseNeedChangePosition = -1 // 需要将本地的默认货币更改状态的下标
+			val localCurrency =
+				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).mapIndexed { index, it ->
+					 // 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+					SupportCurrencyTable(it).apply {
+						if (sandboxCurrency.isNotEmpty()
+							&& sandboxCurrency.equals(this.currencySymbol, true)) {
+							// 如果沙盒中有数据，那么更新状态
+							changedStatus = true
+							this.isUsed = true
+							SharedWallet.updateCurrentRate(this.rate)
+						}
+						if (this.currencySymbol.equals(CountryCode.currentCurrency, true)) {
+							baseNeedChangePosition = index
+						}
 					}
 				}
+			if (!changedStatus && baseNeedChangePosition != -1) {
+				localCurrency[baseNeedChangePosition].isUsed = true
+				SharedWallet.updateCurrentRate(localCurrency[baseNeedChangePosition].rate)
 			}
-			if (!changedStatus) {
-				localCurrency.forEach {
-					if (it.currencySymbol.equals(CountryCode.currentCurrency, true)) {
-						it.isUsed = true
-						SharedWallet.updateCurrentRate(it.rate)
-					} }
-			}
+			
 			SupportCurrencyTable.dao.insertAll(localCurrency)
 		}
 	}
@@ -133,7 +134,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	}
 
 	private fun unregisterGoldStoneID(targetGoldStoneID: String) {
-		if (NetworkUtil.hasNetwork(activity)) {
+		if (NetworkUtil.hasNetwork()) {
 			GoldStoneAPI.unregisterDevice(targetGoldStoneID) { isSuccessful, error ->
 				if (isSuccessful.isNotNull() && error.isNone()) {
 					// 服务器操作失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`, 成功的话清空.
@@ -171,7 +172,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				!currentWallet.eosAccountNames.hasActivatedOrWatchOnly() &&
 				currentWallet.getCurrentBip44Addresses().any { it.getChainType().isEOS() }
 			) {
-				if (NetworkUtil.hasNetwork(context)) {
+				if (NetworkUtil.hasNetwork()) {
 					checkOrUpdateEOSAccount(context, currentWallet, callback)
 					SharedValue.updateAccountCheckedStatus(true)
 				} else {

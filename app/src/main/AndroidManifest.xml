@@ -28,12 +28,14 @@
 	<application
 		android:name=".GoldStoneApp"
 		android:allowBackup="true"
+		android:hardwareAccelerated="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="GoldStone"
 		android:roundIcon="@mipmap/ic_launcher"
 		android:screenOrientation="portrait"
 		android:supportsRtl="true"
 		android:theme="@style/MainTheme"
+		android:usesCleartextTraffic="true"
 		tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
 		tools:replace="icon, label"
 		tools:targetApi="donut">

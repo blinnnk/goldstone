@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import com.google.zxing.*
 import com.google.zxing.common.GlobalHistogramBinarizer
 import com.google.zxing.qrcode.QRCodeReader
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.io.FileInputStream
 import kotlin.concurrent.thread
@@ -77,7 +78,7 @@ object QRCodeUtil {
 			val uri = data.data
 			uri?.apply {
 				val filePathColumn = arrayOf(MediaStore.Images.Media.DATA)
-				val cursor = GoldStoneAPI.context.contentResolver.query(
+				val cursor = GoldStoneApp.appContext.contentResolver.query(
 					uri,
 					filePathColumn,
 					null,

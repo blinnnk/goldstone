@@ -12,9 +12,9 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.bitcoinCashTransactionDetail

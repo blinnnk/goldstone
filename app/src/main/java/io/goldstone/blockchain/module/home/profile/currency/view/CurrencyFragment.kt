@@ -5,7 +5,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.module.home.profile.currency.presenter.CurrencyPresenter
 import org.jetbrains.anko.toast
 

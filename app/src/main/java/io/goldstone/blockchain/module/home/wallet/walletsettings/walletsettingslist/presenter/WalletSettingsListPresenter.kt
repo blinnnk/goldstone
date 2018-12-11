@@ -22,7 +22,8 @@ import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -158,6 +159,8 @@ class WalletSettingsListPresenter(
 			override fun mergeCallBack() {
 				deleteWalletByWalletID(walletID, password) {
 					if (it.isNone()) WalletTable.deleteCurrentWallet { wallet ->
+						// 删除 DAPP 使用记录
+						FavoriteTable.dao.deleteAll(wallet.id)
 						// 删除 `push` 监听包地址不再监听用户删除的钱包地址
 						XinGePushReceiver.registerAddressesForPush(wallet, true)
 						launchUI { getMainActivity()?.jump<SplashActivity>() }
@@ -207,7 +210,7 @@ class WalletSettingsListPresenter(
 
 	private fun deleteWatchOnlyWallet() {
 		WalletTable.deleteCurrentWallet { wallet ->
-			val bip44Address = wallet!!.getCurrentBip44Addresses().firstOrNull() ?: Bip44Address()
+			val bip44Address = wallet.getCurrentBip44Addresses().firstOrNull() ?: Bip44Address()
 			// 检测钱包里是否存在着这个地址的其他钱包, 如果存在就不删除数据只删除 Wallet
 			AddressUtils.hasExistAddress(listOf(bip44Address.address)) {
 				if (!it) deleteAllLocalDataByAddress(bip44Address.address, bip44Address.getChainType())

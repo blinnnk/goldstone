@@ -2,12 +2,11 @@ package io.goldstone.blockchain
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import com.blinnnk.extension.isNull
 import com.google.android.gms.analytics.GoogleAnalytics
 import com.google.android.gms.analytics.Tracker
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
-import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 
 /**
  * @date 22/03/2018 3:02 PM
@@ -25,10 +24,8 @@ class GoldStoneApp : Application() {
 		sAnalytics = GoogleAnalytics.getInstance(this)
 		// Create and init database
 		GoldStoneDataBase.initDatabase(applicationContext)
-		// Init ethereum utils `Context`
-		ETHJsonRPC.context = this
 		// Init `Api` context
-		GoldStoneAPI.context = this
+		appContext = this
 	}
 
 	/**
@@ -43,6 +40,7 @@ class GoldStoneApp : Application() {
 	}
 
 	companion object {
+		lateinit var appContext: Context
 		@JvmField
 		var hasShownMobileAlert = false
 	}

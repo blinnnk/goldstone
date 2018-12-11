@@ -14,7 +14,7 @@ import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPModel
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import org.jetbrains.anko.*
 
 
@@ -24,9 +24,9 @@ import org.jetbrains.anko.*
  */
 class RecommendDAPPCell(context: Context) : GSCard(context) {
 
-	var model: DAPPModel? by observing(null) {
+	var model: DAPPTable? by observing(null) {
 		model?.apply {
-			image.glideImage(icon)
+			image.glideImage(banner)
 			titles.title.text = title
 			titles.subtitle.text = description
 		}

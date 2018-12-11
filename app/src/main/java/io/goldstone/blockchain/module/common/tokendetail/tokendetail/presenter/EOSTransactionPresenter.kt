@@ -11,8 +11,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.multichain.isEOS
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 
@@ -108,12 +107,14 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 
 fun TokenDetailPresenter.getEOSSeriesData() {
 	// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
+	val account = SharedAddress.getCurrentEOSAccount()
+	val chainID = SharedChain.getEOSCurrent().chainID
 	val codeName = token.contract.contract
-	if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+	if (!NetworkUtil.hasNetwork()) {
 		EOSTransactionTable.getMaxDataIndexTable(
-			SharedAddress.getCurrentEOSAccount(),
+			account,
 			token.contract,
-			SharedChain.getEOSCurrent().chainID
+			chainID
 		) {
 			launchUI {
 				totalCount = it?.dataIndex
@@ -126,8 +127,8 @@ fun TokenDetailPresenter.getEOSSeriesData() {
 			}
 		}
 	} else EOSAPI.getTransactionCount(
-		SharedChain.getEOSCurrent().chainID,
-		SharedAddress.getCurrentEOSAccount(),
+		chainID,
+		account,
 		codeName,
 		token.symbol
 	) { count, error ->

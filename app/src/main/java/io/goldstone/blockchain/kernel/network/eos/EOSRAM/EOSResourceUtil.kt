@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.kernel.network.eos.eosram
 
-import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
@@ -9,9 +9,7 @@ import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.toEOSCount
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 
@@ -26,10 +24,9 @@ object EOSResourceUtil {
 	// `Price` 是 `RAM` 在指定单位下对应的 `EOS` 个数
 	fun getRAMPrice(
 		unit: EOSUnit,
-		isMainThread: Boolean = true,
-		hold: (priceInEOS: Double?, error: RequestError) -> Unit
+		@WorkerThread hold: (priceInEOS: Double?, error: RequestError) -> Unit
 	) {
-		EOSAPI.getRAMMarket(isMainThread) { data, error ->
+		EOSAPI.getRAMMarket { data, error ->
 			if (error.isNone() && data.isNotNull()) {
 				val divisor = when (unit.value) {
 					EOSUnit.KB.value -> 1024
@@ -38,21 +35,17 @@ object EOSResourceUtil {
 					else -> 0
 				}
 				val price = 1 * data.eosBalance / (1 + (data.ramBalance.toDouble() / divisor))
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(price, RequestError.None) }
-				else hold(price, RequestError.None)
-			} else {
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread { hold(null, error) }
-				else hold(null, error)
-			}
+				hold(price, RequestError.None)
+			} else hold(null, error)
 		}
 	}
 
 	fun getRAMAmountByCoin(
 		pair: Pair<Double, CoinSymbol>,
 		unit: EOSUnit,
-		@UiThread hold: (amount: Double?, error: RequestError) -> Unit
+		@WorkerThread hold: (amount: Double?, error: RequestError) -> Unit
 	) {
-		EOSAPI.getRAMMarket(true) { data, error ->
+		EOSAPI.getRAMMarket { data, error ->
 			if (data.isNotNull() && error.isNone()) {
 				val ramTotal = data.ramCore
 				val eosBalance = data.eosBalance + pair.first

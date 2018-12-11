@@ -3,10 +3,12 @@ package io.goldstone.blockchain.module.home.home.view
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AppCompatActivity
 import android.view.WindowManager
 import com.blinnnk.extension.addFragment
+import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.isNull
 import com.google.android.gms.analytics.HitBuilders
@@ -18,11 +20,10 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFrag
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.ConnectionChangeReceiver
 import io.goldstone.blockchain.common.utils.transparentStatus
-import io.goldstone.blockchain.common.value.ContainerID
-import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.common.value.IntentKey
-import io.goldstone.blockchain.common.value.currentChannel
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
+import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.DAppBrowserFragment
+import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAPPCenterFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -85,6 +86,14 @@ class MainActivity : AppCompatActivity() {
 		)
 	}
 
+	fun showDappBrowserFragment(url: String, previousView: Int, currentFragment: Fragment) {
+		hideChildFragment(currentFragment)
+		addFragmentAndSetArguments<DAppBrowserFragment>(ContainerID.main) {
+			putString(ArgumentKey.webViewUrl, url)
+			putInt(ArgumentKey.fromView, previousView)
+		}
+	}
+
 	override fun onBackPressed() {
 		recoveryBackEventFromOtherApp()
 		if (backEvent.isNull()) {
@@ -128,6 +137,18 @@ class MainActivity : AppCompatActivity() {
 
 	fun getQuotationFragment(): QuotationFragment? {
 		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.quotation)
+	}
+
+	fun getDAPPCenterFragment(): DAPPCenterFragment? {
+		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.dappCenter)
+	}
+
+	fun showChildFragment(child: Fragment) {
+		supportFragmentManager?.beginTransaction()?.show(child)?.commit()
+	}
+
+	private fun hideChildFragment(child: Fragment) {
+		supportFragmentManager?.beginTransaction()?.hide(child)?.commit()
 	}
 
 	private fun recoveryBackEventFromOtherApp() {

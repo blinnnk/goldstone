@@ -22,6 +22,7 @@ object FragmentTag {
 	const val tokenDetail = "tokenDetail"
 	const val tokenAsset = "tokenAsset"
 	const val tokenInfo = "tokenInfo"
+	const val dappBrowser = "dappBrowser"
 }
 
 object LogTag {

@@ -28,10 +28,14 @@ import java.util.*
 @Suppress("UNCHECKED_CAST")
 open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 
+	private var recyclerLayoutManager: RecyclerView.LayoutManager =
+		LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+
 	init {
-		layoutManager = LinearLayoutManager(context, LinearLayout.VERTICAL, false)
+		layoutManager = recyclerLayoutManager
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		itemAnimator?.changeDuration = 0
+		this.setHasFixedSize(true)
 	}
 
 	fun <T> addSwipeEvent(
@@ -78,7 +82,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 				if (!initiated) init()
 				// draw red background
 				val adapterStartDistance = if (isMovingToLeft) directionX.toInt() else 0
-				val adapterEndDistance = if (isMovingToLeft)  0 else directionX.toInt()
+				val adapterEndDistance = if (isMovingToLeft) 0 else directionX.toInt()
 				background?.setBounds(
 					boundsStart + adapterStartDistance,
 					itemView.top,

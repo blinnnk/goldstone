@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.common.sandbox
 
 import com.google.gson.Gson
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import java.io.*
 import java.lang.Exception
@@ -13,7 +14,7 @@ import java.lang.Exception
  * @description:
  */
 object SandBoxUtil {
-	private val storagePath = GoldStoneAPI.context.getExternalFilesDir(null).absolutePath
+	private val storagePath = GoldStoneApp.appContext.getExternalFilesDir(null).absolutePath
 	private const val sandBoxName = "sandbox"
 	
 	private fun getFile(): File {

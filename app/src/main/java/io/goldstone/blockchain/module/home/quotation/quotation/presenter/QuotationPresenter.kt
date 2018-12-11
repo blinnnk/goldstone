@@ -59,7 +59,7 @@ class QuotationPresenter(
 				linechart = convertDataToChartData(selection.lineChartDay)
 			// 如果有网络的情况下检查 `LineData` 是否有效
 			if (
-				NetworkUtil.hasNetwork(fragment.context) &&
+				NetworkUtil.hasNetwork() &&
 				linechart.isNotEmpty() &&
 				!hasCheckedPairDate
 			) {

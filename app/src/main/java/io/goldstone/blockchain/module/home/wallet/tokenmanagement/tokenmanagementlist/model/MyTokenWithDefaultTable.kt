@@ -2,7 +2,9 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Query
+import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -20,6 +22,7 @@ import kotlinx.coroutines.launch
  *  为了优化性能和代码整洁, 这里封装一个连表查询类.
  */
 
+@Suppress("LABEL_NAME_CLASH")
 data class MyTokenWithDefaultTable(
 	var iconUrl: String,
 	var symbol: String,
@@ -42,6 +45,19 @@ data class MyTokenWithDefaultTable(
 				GoldStoneDataBase.database.myTokenDefaultTableDao().getData(addresses)
 			hold(data.map { WalletDetailCellModel(it, eosWalletType) })
 		}
+
+		@UiThread
+		fun getTarget(ownerNames: String, symbol: String, chainID: String, hold: (WalletDetailCellModel) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
+			GlobalScope.launch(Dispatchers.Default) {
+				val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@launch
+				val eosWalletType = wallet.getEOSWalletType()
+				val data =
+					GoldStoneDataBase.database.myTokenDefaultTableDao().getTarget(ownerNames, symbol, chainID)
+				launchUI {
+					hold(WalletDetailCellModel(data, eosWalletType))
+				}
+			}
+		}
 	}
 }
 
@@ -49,4 +65,7 @@ data class MyTokenWithDefaultTable(
 interface MyTokenDefaultTableDao {
 	@Query("SELECT defaultTokens.iconUrl AS iconUrl, defaultTokens.symbol AS symbol, defaultTokens.name AS tokenName, defaultTokens.decimals AS decimal, defaultTokens.price AS price, defaultTokens.weight AS weight,  myTokens.balance * defaultTokens.price AS currency, myTokens.balance AS count, myTokens.contract AS contract, myTokens.chainID AS chainID FROM defaultTokens, myTokens WHERE defaultTokens.contract = myTokens.contract AND defaultTokens.chainID = myTokens.chainID AND defaultTokens.symbol = myTokens.symbol AND myTokens.isClosed = :isClose AND myTokens.chainID IN (:currentChainIDs) AND myTokens.ownerName IN (:ownerNames)")
 	fun getData(ownerNames: List<String>, isClose: Boolean = false, currentChainIDs: List<String> = Current.chainIDs()): List<MyTokenWithDefaultTable>
+
+	@Query("SELECT defaultTokens.iconUrl AS iconUrl, defaultTokens.symbol AS symbol, defaultTokens.name AS tokenName, defaultTokens.decimals AS decimal, defaultTokens.price AS price, defaultTokens.weight AS weight,  myTokens.balance * defaultTokens.price AS currency, myTokens.balance AS count, myTokens.contract AS contract, myTokens.chainID AS chainID FROM defaultTokens, myTokens WHERE defaultTokens.contract = myTokens.contract AND defaultTokens.chainID = myTokens.chainID AND defaultTokens.symbol = myTokens.symbol AND myTokens.isClosed = 0 AND myTokens.chainID = :currentChainID AND myTokens.ownerName = :ownerNames AND myTokens.symbol = :symbol")
+	fun getTarget(ownerNames: String, symbol: String, currentChainID: String): MyTokenWithDefaultTable
 }
