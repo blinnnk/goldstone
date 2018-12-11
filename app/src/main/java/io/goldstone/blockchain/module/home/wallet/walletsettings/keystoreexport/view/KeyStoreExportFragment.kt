@@ -52,7 +52,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				layoutParams.height = 200.uiPX()
 			}.click {
 				// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
-				if (it.text.isNotEmpty()) context.clickToCopy(privateKeyTextView.text.toString())
+				if (it.getContent().isNotEmpty()) context.clickToCopy(it.getContent())
 			}
 
 			passwordInput.apply {
@@ -71,7 +71,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				presenter.getKeystoreJSON(passwordInput.text.toString()) { keystoreFile, error ->
 					launchUI {
 						if (keystoreFile.isNotNull() && error.isNone()) {
-							privateKeyTextView.text = keystoreFile
+							privateKeyTextView.setContent(keystoreFile)
 						} else safeShowError(error)
 						button.showLoadingStatus(false)
 					}

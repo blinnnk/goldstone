@@ -211,7 +211,7 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 				setSubtitle(PrepareTransferText.addAMemo)
 				showArrow()
 			}.click {
-				getParentContainer()?.showMemoInputView { content ->
+				getParentContainer()?.showMemoInputView(memoData) { content ->
 					if (content.isNotEmpty()) {
 						memoData = content
 						memoView.setSubtitle(content)
@@ -300,11 +300,11 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 		from.setSubtitle(CryptoUtils.scaleMiddleAddress(presenter.getToken()?.contract.getAddress()))
 	}
 
-	private fun ViewGroup.showMemoInputView(hold: (String) -> Unit) {
+	private fun ViewGroup.showMemoInputView(content: String, hold: (String) -> Unit) {
 		val isEOSTransfer = rootFragment?.token?.contract.isEOSSeries()
 		if (memoInputView.isNull()) {
-			// 禁止上下滚动
 			memoInputView = MemoInputView(context).apply {
+				setMemoContent(content)
 				updateConfirmButtonEvent { button ->
 					button.onClick {
 						if (isValidMemoByChain(isEOSTransfer)) {

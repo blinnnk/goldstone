@@ -202,7 +202,7 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 		expendTradingCard.clearInput()
 	}
 
-	fun isSelectedTransfer(stakeType: StakeType): Boolean =
+	fun isTransfer(stakeType: StakeType): Boolean =
 		if (stakeType.isDelegate()) incomeTradingCard.isSelectedTransfer()
 		else expendTradingCard.isSelectedTransfer()
 

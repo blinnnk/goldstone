@@ -58,7 +58,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			DescriptionView(context).isExportPrivateKey().into(this)
 			// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
 			privateKeyTextView = valueView().click {
-				if (it.text.isNotEmpty()) context.clickToCopy(privateKeyTextView.text.toString())
+				if (it.getContent().isNotEmpty()) context.clickToCopy(it.getContent())
 			}
 
 			passwordInput.apply {
@@ -81,7 +81,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				) { privateKey, error ->
 					launchUI {
 						if (privateKey.isNotNull() && error.isNone())
-							privateKeyTextView.text = privateKey
+							privateKeyTextView.setContent(privateKey)
 						else safeShowError(error)
 						button.showLoadingStatus(false)
 						activity?.apply { SoftKeyboard.hide(this) }

@@ -49,6 +49,17 @@ object WalletText {
 	}
 
 	@JvmField
+	val isUsing = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Using Now"
+		HoneyLanguage.Chinese.code -> "Using Now"
+		HoneyLanguage.Japanese.code -> "Using Now"
+		HoneyLanguage.Korean.code -> "Using Now"
+		HoneyLanguage.Russian.code -> "Using Now"
+		HoneyLanguage.TraditionalChinese.code -> "Using Now"
+		else -> ""
+	}
+
+	@JvmField
 	val notifyButton = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Notifications"
 		HoneyLanguage.Chinese.code -> "通知"

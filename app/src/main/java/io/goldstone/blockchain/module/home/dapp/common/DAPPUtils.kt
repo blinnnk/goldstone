@@ -33,12 +33,17 @@ fun ViewGroup.showQuickPaymentDashboard(
 	data: JSONObject,
 	isTransactionObject: Boolean, // 如果是 `isTransactionObject` 传入的 `JSONObject` 是含有全量信息的
 	cancelEvent: () -> Unit,
+	confirmEvent: () -> Unit,
 	callback: (EOSResponse?, GoldStoneError) -> Unit
 ) {
 	// 如果是转账操作那么 `DAPP` 都会把具体信息放在 `memo` 里面
 	// 解除 `memo` 里面的 `count` 计算出当前需要转账的货币的 `Decimal` 作为参数
 	val info = if (isTransactionObject) data.getTargetObject("data") else data
-	val decimal = CryptoValue.eosDecimal
+	/**
+	 * `quantity`:`0.000 IQ` 通过截取小数点后的数字计算出 Decimal
+	 */
+	val decimal =
+		info.safeGet("quantity").substringBefore(" ").substringAfterLast(".").length
 	val transaction =
 		if (isTransactionObject) EOSTransactionInfo(data, decimal)
 		else EOSTransactionInfo(data)
@@ -64,7 +69,7 @@ fun ViewGroup.showQuickPaymentDashboard(
 		valueView {
 			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
 			layoutParams.width = matchParent
-			text = info.safeGet("memo")
+			setContent(info.safeGet("memo"))
 		}.setMargins<LinearLayout.LayoutParams> {
 			topMargin = PaddingSize.content
 		}
@@ -75,6 +80,7 @@ fun ViewGroup.showQuickPaymentDashboard(
 			contentLayout,
 			"confirmation the transaction from current DAPP, then sign the data",
 			hold = {
+				confirmEvent()
 				transaction.trade(context, callback)
 			},
 			cancelAction = cancelEvent

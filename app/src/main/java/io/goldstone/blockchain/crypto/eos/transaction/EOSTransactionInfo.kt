@@ -15,10 +15,7 @@ import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toCount
-import io.goldstone.blockchain.crypto.utils.toEOSUnit
-import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
@@ -52,7 +49,7 @@ data class EOSTransactionInfo(
 	constructor(action: JSONObject, decimal: Int) : this(
 		EOSAccount(action.getTargetObject("data").safeGet("from")),
 		EOSAccount(action.getTargetObject("data").safeGet("to")),
-		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
+		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toAmount(decimal),
 		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), decimal),
 		action.getTargetObject("data").safeGet("memo"),
 		true
@@ -106,7 +103,7 @@ data class EOSTransactionInfo(
 		} else {
 			BaseTradingPresenter.prepareTransaction(
 				context,
-				amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
+				amount.toCount(contract.decimal ?: CryptoValue.eosDecimal),
 				contract,
 				StakeType.Trade
 			) { privateKey, error ->

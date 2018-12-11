@@ -162,6 +162,10 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		title.textSize = fontSize(18)
 		subtitle.textColor = Spectrum.opacity3White
 	}
+
+	fun setSubtitleLineCount(lineCount: Int) {
+		subtitle.maxLines = lineCount
+	}
 }
 
 inline fun ViewManager.twoLineTitles() = twoLineTitles {}

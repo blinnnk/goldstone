@@ -79,12 +79,8 @@ object EOSUtils {
 	}
 
 	fun convertMemoToCode(memo: String): String {
-		val lengthCode = memo.removeSlash().toUtf8Bytes().size.toString(16)
-		return lengthCode + memo
-			.replace("\"{", "{")
-			.replace("}\"", "}")
-			.replace("\\", "")
-			.toByteArray().toNoPrefixHexString()
+		val lengthCode = EOSUtils.getVariableUInt(memo.removeSlash().length)
+		return lengthCode + memo.removeSlash().toUtf8Bytes().toNoPrefixHexString()
 	}
 
 	private fun String.completeToEven(): String {

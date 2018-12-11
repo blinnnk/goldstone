@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.ImportWalletText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicconfirmation.view.MnemonicConfirmationFragment
@@ -25,13 +26,11 @@ class MnemonicConfirmationPresenter(
 	override val fragment: MnemonicConfirmationFragment
 ) : BasePresenter<MnemonicConfirmationFragment>() {
 
-	fun clickConfirmationButton(
-		correct: String,
-		current: String
-	) {
+	fun clickConfirmationButton(correct: String, current: String) {
 		compareMnemonicCode(correct, current) isTrue {
 			WalletTable.updateHasBackupMnemonic {
 				validAndContinue()
+				SharedWallet.updateBackUpMnemonicStatus(true)
 			}
 		} otherwise {
 			fragment.context?.alert(ImportWalletText.mnemonicAlert)

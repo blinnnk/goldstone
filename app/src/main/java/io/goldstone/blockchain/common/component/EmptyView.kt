@@ -12,6 +12,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.container.BorderCardView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.twoLineTitles
 import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.*
@@ -41,7 +42,7 @@ enum class EmptyType {
 class EmptyView(context: Context) : LinearLayout(context) {
 
 	private val imageSize = (ScreenSize.Width * 0.4).toInt()
-	private val introTitles = TwoLineTitles(context)
+	private var introTitles: TwoLineTitles
 	private var icon: ImageView
 	private val emptyViewHeight = imageSize + 60.uiPX()
 
@@ -57,11 +58,12 @@ class EmptyView(context: Context) : LinearLayout(context) {
 			layoutParams = LinearLayout.LayoutParams(imageSize, imageSize)
 		}
 
-		introTitles.apply {
+		introTitles = twoLineTitles {
+			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			setGrayTitles()
 			y -= 30.uiPX().toFloat()
 			isCenter = true
-		}.into(this)
+		}
 	}
 
 	fun setStyle(type: EmptyType) {

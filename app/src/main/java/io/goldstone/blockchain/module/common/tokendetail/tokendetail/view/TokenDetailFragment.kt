@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.Dashboard
+import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.isEmptyThen
@@ -84,6 +85,12 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	override fun flipPage() {
 		super.flipPage()
 		presenter.loadMore()
+	}
+
+	override fun showNetworkAlert() {
+		context?.let {
+			GoldStoneDialog(it).showNetworkStatus {}
+		}
 	}
 
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<TransactionListModel>?) {
