@@ -17,8 +17,8 @@ import io.goldstone.blockchain.crypto.multichain.isETC
 import io.goldstone.blockchain.crypto.multichain.isETH
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.crypto.utils.*
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC.sendRawTransaction
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee

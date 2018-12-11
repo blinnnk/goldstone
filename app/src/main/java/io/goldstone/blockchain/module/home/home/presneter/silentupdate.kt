@@ -4,6 +4,7 @@ import android.content.Context
 import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.Connectivity
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -11,14 +12,15 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.SupportCurrencyTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.BackupServerChecker
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
@@ -28,6 +30,8 @@ import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
 import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
+import io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter.TokenAssetPresenter
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
@@ -41,9 +45,11 @@ import kotlinx.coroutines.launch
  */
 abstract class SilentUpdater {
 
-	val account = SharedAddress.getCurrentEOSAccount()
+	private val account = SharedAddress.getCurrentEOSAccount()
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
+		updateNewDAPP()// todo
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -58,7 +64,14 @@ abstract class SilentUpdater {
 			updateDelegateBandwidthData()
 		}
 		AppConfigTable.dao.getAppConfig()?.let {
-			checkMD5Info(it) { hasNewDefaultTokens, hasNewChainNodes, hasNewExchanges, hasNewTerm, hasNewConfig, hasNewShareContent ->
+			checkMD5Info(it) { hasNewDefaultTokens,
+												 hasNewChainNodes,
+												 hasNewExchanges,
+												 hasNewTerm,
+												 hasNewConfig,
+												 hasNewShareContent,
+												 hasNewRecommendedDAPP,
+												 hasNewDAPP ->
 				fun updateData() {
 					if (hasNewDefaultTokens) updateLocalDefaultTokens()
 					if (hasNewChainNodes) updateNodeData()
@@ -66,25 +79,30 @@ abstract class SilentUpdater {
 					if (hasNewTerm) updateAgreement()
 					if (hasNewShareContent) updateShareContent()
 					if (hasNewConfig) {
+						// TODO
 					}
+					if (hasNewRecommendedDAPP) updateRecommendedDAPP()
+					if (hasNewDAPP) updateNewDAPP()
+					// 确认后更新 MD5 值到数据库
+					AppConfigTable.dao.updateMD5Info(
+						newDefaultTokenListMD5,
+						newChainNodesMD5,
+						newExchangeListMD5,
+						newTermMD5,
+						newConfigMD5,
+						newShareContentMD5,
+						newRecommendedDAPPMD5,
+						newDAPPMD5
+					)
 				}
 				when {
-					Connectivity.isConnectedWifi(GoldStoneAPI.context) -> updateData()
-					Connectivity.isConnectedMobile(GoldStoneAPI.context) -> {
+					Connectivity.isConnectedWifi(GoldStoneApp.appContext) -> updateData()
+					Connectivity.isConnectedMobile(GoldStoneApp.appContext) -> {
 						launchUI {
 							GoldStoneDialog(context).showMobile4GConfirm {
 								GlobalScope.launch(Dispatchers.Default) {
 									updateData()
 									updateTokenInfo()
-									// 确认后更新 MD5 值到数据库
-									AppConfigTable.dao.updateMD5Info(
-										newDefaultTokenListMD5,
-										newChainNodesMD5,
-										newExchangeListMD5,
-										newTermMD5,
-										newConfigMD5,
-										newShareContentMD5
-									)
 								}
 							}
 						}
@@ -94,8 +112,13 @@ abstract class SilentUpdater {
 			updateCurrencyRateFromServer(it)
 		}
 		// 是 WIFI 的情况下, 才执行静默更新
-		if (Connectivity.isConnectedWifi(GoldStoneAPI.context)) {
+		if (Connectivity.isConnectedWifi(GoldStoneApp.appContext)) {
 			updateTokenInfo()
+		}
+
+		//  初始化检查更新 EOS Account Info
+		if (account.isValid(false)) {
+			TokenAssetPresenter.updateEOSAccountInfoFromChain(account, chainID) {}
 		}
 	}
 
@@ -105,6 +128,8 @@ abstract class SilentUpdater {
 	private var newTermMD5 = ""
 	private var newConfigMD5 = ""
 	private var newShareContentMD5 = ""
+	private var newRecommendedDAPPMD5 = ""
+	private var newDAPPMD5 = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -113,7 +138,9 @@ abstract class SilentUpdater {
 			hasNewExchanges: Boolean,
 			hasNewTerm: Boolean,
 			hasNewConfig: Boolean,
-			hasNewShareContent: Boolean
+			hasNewShareContent: Boolean,
+			hasNewRecommendedDAPP: Boolean,
+			hasNewDAPP: Boolean
 		) -> Unit
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
@@ -124,13 +151,17 @@ abstract class SilentUpdater {
 				newTermMD5 = md5s.safeGet("agreement_md5")
 				newConfigMD5 = md5s.safeGet("config_list_md5")
 				newShareContentMD5 = md5s.safeGet("share_content_md5")
+				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
+				newDAPPMD5 = md5s.safeGet("dapps_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
 					config.exchangeListMD5 != newExchangeListMD5,
 					config.termMD5 != newTermMD5,
 					config.configMD5 != newConfigMD5,
-					config.shareContentMD5 != newShareContentMD5
+					config.shareContentMD5 != newShareContentMD5,
+					config.dappRecommendMD5 != newRecommendedDAPPMD5,
+					config.newDAPPMD5 != newDAPPMD5
 				)
 			}
 		}
@@ -207,7 +238,6 @@ abstract class SilentUpdater {
 	}
 
 	private fun checkAvailableEOSTokenList() {
-		val chainID = SharedChain.getEOSCurrent().chainID
 		if (!account.isValid(false)) return
 		EOSAPI.getEOSTokenList(chainID, account) { tokenList, error ->
 			// 拉取潜在资产的 `Icon Url`
@@ -284,7 +314,7 @@ abstract class SilentUpdater {
 	}
 
 	private fun updateRAMUnitPrice() {
-		EOSResourceUtil.getRAMPrice(EOSUnit.KB, false) { priceInEOS, error ->
+		EOSResourceUtil.getRAMPrice(EOSUnit.KB) { priceInEOS, error ->
 			if (priceInEOS.isNotNull() && error.isNone()) {
 				SharedValue.updateRAMUnitPrice(priceInEOS)
 			}
@@ -305,11 +335,7 @@ abstract class SilentUpdater {
 		if (account.isValid(false)) {
 			EOSAPI.getDelegateBandWidthList(account) { data, error ->
 				if (data.isNotNull() && error.isNone()) {
-					EOSAccountTable.dao.updateDelegateBandwidthData(
-						data,
-						account.name,
-						SharedChain.getEOSCurrent().chainID.id
-					)
+					EOSAccountTable.dao.updateDelegateBandwidthData(data, account.name, chainID.id)
 				}
 			}
 		}
@@ -317,7 +343,7 @@ abstract class SilentUpdater {
 
 	private fun updateNETUnitPrice() {
 		if (account.isValid(false)) {
-			EOSResourceUtil.getNETPrice(SharedAddress.getCurrentEOSAccount()) { priceInEOS, error ->
+			EOSResourceUtil.getNETPrice(account) { priceInEOS, error ->
 				if (priceInEOS.isNotNull() && error.isNone()) {
 					SharedValue.updateNETUnitPrice(priceInEOS)
 				}
@@ -358,20 +384,25 @@ abstract class SilentUpdater {
 			}
 			// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
 			// 线程开启太多的内存溢出. 限制每 `500ms` 检查一个 `Symbol` 的价格
-			object : ConcurrentAsyncCombine() {
-				val eosTokens =
-					myTokens.filter {
-						ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
-					}
-				override val delayTime: Long? = 500
-				override var asyncCount: Int = eosTokens.size
-				override fun doChildTask(index: Int) {
-					EOSAPI.updateLocalTokenPrice(
-						TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null)
-					)
-					completeMark()
+			EOSAPI.getPairsFromNewDex { pairs, error ->
+				if (pairs.isNotNull() && error.isNone()) {
+					object : ConcurrentAsyncCombine() {
+						val eosTokens =
+							myTokens.filter {
+								ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
+							}
+						override val delayTime: Long? = 500
+						override var asyncCount: Int = eosTokens.size
+						override fun doChildTask(index: Int) {
+							EOSAPI.updateTokenPriceFromNewDex(
+								TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null),
+								pairs
+							)
+							completeMark()
+						}
+					}.start()
 				}
-			}.start()
+			}
 		}
 	}
 
@@ -399,7 +430,8 @@ abstract class SilentUpdater {
 		serverTokens: List<DefaultTokenTable>,
 		localTokens: List<DefaultTokenTable>
 	) {
-		val unManuallyData = localTokens.filter { it.serverTokenID.isNotEmpty() }
+		val unManuallyData =
+			localTokens.filter { it.serverTokenID.isNotEmpty() }
 		serverTokens.filter { server ->
 			unManuallyData.find {
 				it.serverTokenID.equals(server.serverTokenID, true)
@@ -414,8 +446,7 @@ abstract class SilentUpdater {
 			}
 		}.apply {
 			if (isEmpty()) return
-			val defaultDao =
-				GoldStoneDataBase.database.defaultTokenDao()
+			val defaultDao = DefaultTokenTable.dao
 			forEach { server ->
 				defaultDao.getToken(server.contract, server.symbol, server.chainID)?.apply {
 					defaultDao.update(
@@ -461,6 +492,24 @@ abstract class SilentUpdater {
 			if (!term.isNullOrBlank() && error.isNone()) {
 				AppConfigTable.dao.updateTerms(term)
 			}
+		}
+	}
+
+	private fun updateRecommendedDAPP() {
+		GoldStoneAPI.getRecommendDAPPs(0) { dapps, error ->
+			if (dapps.isNotNull() && error.isNone()) {
+				DAPPTable.dao.deleteAllRecommend()
+				DAPPTable.dao.insertAll(dapps)
+			} else ErrorDisplayManager(error)
+		}
+	}
+
+	private fun updateNewDAPP() {
+		GoldStoneAPI.getNewDAPPs(0) { dapps, error ->
+			if (dapps.isNotNull() && error.isNone()) {
+				DAPPTable.dao.deleteAllUnRecommended()
+				DAPPTable.dao.insertAll(dapps)
+			} else ErrorDisplayManager(error)
 		}
 	}
 }

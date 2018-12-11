@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -14,12 +15,12 @@ import com.github.mikephil.charting.data.Entry
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.twoLineTitles
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.textColor
 
 @SuppressLint("SetTextI18n")
@@ -27,7 +28,7 @@ import org.jetbrains.anko.textColor
  * @date 20/04/2018 8:18 PM
  * @author KaySaith
  */
-class QuotationCell(context: Context) : LinearLayout(context) {
+class QuotationCell(context: Context) : GSCard(context) {
 
 	// 判断标价是否需要刷新价格及 `LineChart` 的标记
 	private var previousPrice: Double? = null
@@ -72,21 +73,8 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		}
 		previousPrice = price?.toDoubleOrNull().orZero()
 	}
-	private val tokenInfo by lazy {
-		TwoLineTitles(context).apply {
-			x += 20.uiPX()
-			setBlackTitles()
-			setQuotationStyle()
-		}
-	}
-	private val tokenPrice by lazy {
-		TwoLineTitles(context).apply {
-			x -= 20.uiPX()
-			setQuotationStyle()
-			setColorStyle(Spectrum.green)
-			isFloatRight = true
-		}
-	}
+	private var tokenInfo: TwoLineTitles
+	private var tokenPrice: TwoLineTitles
 	private val exchangeName by lazy {
 		TextView(context).apply {
 			textSize = fontSize(12)
@@ -107,35 +95,36 @@ class QuotationCell(context: Context) : LinearLayout(context) {
 		override fun lineLabelCount(): Int = 5
 	}
 
-	private var cardView: GSCard
-
 	init {
-		orientation = VERTICAL
-		gravity = Gravity.CENTER_HORIZONTAL
-		layoutParams = LinearLayout.LayoutParams(matchParent, 185.uiPX())
-		cardView = GSCard(context).apply {
-			resetCardElevation(ShadowSize.Cell)
-			layoutParams = LinearLayout.LayoutParams(ScreenSize.card, matchParent)
-			addView(tokenInfo)
-			addView(tokenPrice)
-			addView(exchangeName)
-			tokenPrice.alignParentRight()
-			lineChart.apply {
-				id = ElementID.chartView
-				layoutParams = RelativeLayout.LayoutParams(matchParent, 110.uiPX())
-				y = 45.uiPX().toFloat()
-			}.into(this)
-			lineChart.setMargins<FrameLayout.LayoutParams> {
-				margin = 10.uiPX()
-			}
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, 165.uiPX())
+		resetCardElevation(ShadowSize.Cell)
+		tokenInfo = twoLineTitles {
+			x += 20.uiPX()
+			setBlackTitles()
+			setQuotationStyle()
 		}
-		cardView.into(this)
+		tokenPrice = twoLineTitles {
+			x -= 20.uiPX()
+			setQuotationStyle()
+			setColorStyle(Spectrum.green)
+			isFloatRight = true
+		}
+		addView(exchangeName)
+		tokenPrice.alignParentRight()
+		lineChart.apply {
+			id = ElementID.chartView
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+			y = 45.uiPX().toFloat()
+		}.into(this)
+		lineChart.setMargins<FrameLayout.LayoutParams> {
+			margin = 10.uiPX()
+		}
 	}
 
-	fun setClickEvent(action: () -> Unit) {
-		cardView.onClick {
-			action()
-			cardView.preventDuplicateClicks()
+	override fun onAttachedToWindow() {
+		super.onAttachedToWindow()
+		setMargins<RecyclerView.LayoutParams> {
+			leftMargin = PaddingSize.content
 		}
 	}
 }

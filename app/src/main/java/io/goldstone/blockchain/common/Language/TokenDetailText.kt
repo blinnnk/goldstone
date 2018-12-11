@@ -480,22 +480,22 @@ object TokenDetailText {
 	@JvmField
 	val delegateCPU = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CPU"
-		HoneyLanguage.Chinese.code -> "CPU"
+		HoneyLanguage.Chinese.code -> "CPU (计算)"
 		HoneyLanguage.Japanese.code -> "CPU"
 		HoneyLanguage.Korean.code -> "CPU"
 		HoneyLanguage.Russian.code -> "CPU"
-		HoneyLanguage.TraditionalChinese.code -> "CPU"
+		HoneyLanguage.TraditionalChinese.code -> "CPU (計算)"
 		else -> ""
 	}
 
 	@JvmField
 	val delegateNET = when (currentLanguage) {
 		HoneyLanguage.English.code -> "NET"
-		HoneyLanguage.Chinese.code -> "NET"
+		HoneyLanguage.Chinese.code -> "NET (网络)"
 		HoneyLanguage.Japanese.code -> "NET"
 		HoneyLanguage.Korean.code -> "NET"
 		HoneyLanguage.Russian.code -> "NET"
-		HoneyLanguage.TraditionalChinese.code -> "NET"
+		HoneyLanguage.TraditionalChinese.code -> "NET (網絡)"
 		else -> ""
 	}
 
@@ -523,23 +523,23 @@ object TokenDetailText {
 
 	@JvmField
 	val buySellRAM = when (currentLanguage) {
-		HoneyLanguage.English.code -> "ram resource"
-		HoneyLanguage.Chinese.code -> "ram resource"
-		HoneyLanguage.Japanese.code -> "ram resource"
-		HoneyLanguage.Korean.code -> "ram resource"
-		HoneyLanguage.Russian.code -> "ram resource"
-		HoneyLanguage.TraditionalChinese.code -> "ram resource"
+		HoneyLanguage.English.code -> "RAM"
+		HoneyLanguage.Chinese.code -> "RAM (内存)"
+		HoneyLanguage.Japanese.code -> "RAM"
+		HoneyLanguage.Korean.code -> "RAM"
+		HoneyLanguage.Russian.code -> "RAM (Баран)"
+		HoneyLanguage.TraditionalChinese.code -> "RAM (內存)"
 		else -> ""
 	}
 
 	@JvmField
 	val accountRegister = when (currentLanguage) {
-		HoneyLanguage.English.code -> "register"
-		HoneyLanguage.Chinese.code -> "register"
-		HoneyLanguage.Japanese.code -> "register"
-		HoneyLanguage.Korean.code -> "register"
-		HoneyLanguage.Russian.code -> "register"
-		HoneyLanguage.TraditionalChinese.code -> "register"
+		HoneyLanguage.English.code -> "Register"
+		HoneyLanguage.Chinese.code -> "注册账号"
+		HoneyLanguage.Japanese.code -> "登録"
+		HoneyLanguage.Korean.code -> "등록 된 계정"
+		HoneyLanguage.Russian.code -> "Регистрация"
+		HoneyLanguage.TraditionalChinese.code -> "註冊賬號"
 		else -> ""
 	}
 
@@ -570,18 +570,18 @@ object TokenDetailText {
 		HoneyLanguage.Chinese.code -> "EOS 数量"
 		HoneyLanguage.Japanese.code -> "EOS の数"
 		HoneyLanguage.Korean.code -> "EOS 의 수"
-		HoneyLanguage.Russian.code -> "Количество EOS"
+		HoneyLanguage.Russian.code -> "EOS"
 		HoneyLanguage.TraditionalChinese.code -> "EOS 數量"
 		else -> ""
 	}
 	@JvmField
 	val eosAmountPlaceholder = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter EOS amount"
-		HoneyLanguage.Chinese.code -> "想要兑换的数量 (EOS)"
-		HoneyLanguage.Japanese.code -> "EOS 額を入力"
-		HoneyLanguage.Korean.code -> "EOS 금액 입력"
-		HoneyLanguage.Russian.code -> "Введите сумму EOS"
-		HoneyLanguage.TraditionalChinese.code -> "想要兌換的數量 (EOS)"
+		HoneyLanguage.Chinese.code -> "点此输入"
+		HoneyLanguage.Japanese.code -> "額を入力"
+		HoneyLanguage.Korean.code -> "값 입력"
+		HoneyLanguage.Russian.code -> "Введите значение"
+		HoneyLanguage.TraditionalChinese.code -> "點此輸入"
 		else -> ""
 	}
 	@JvmField
@@ -596,12 +596,12 @@ object TokenDetailText {
 	}
 	@JvmField
 	val tradeRamByBytesPlaceholder = when (currentLanguage) {
-		HoneyLanguage.English.code -> "RAM Amount (Byte)"
-		HoneyLanguage.Chinese.code -> "RAM 数量(Byte)"
-		HoneyLanguage.Japanese.code -> "RAM量 (バイト)"
-		HoneyLanguage.Korean.code -> "RAM 양 (바이트)"
-		HoneyLanguage.Russian.code -> "Объем ОЗУ (байт)"
-		HoneyLanguage.TraditionalChinese.code -> "RAM 數量(Byte)"
+		HoneyLanguage.English.code -> "Enter EOS amount"
+		HoneyLanguage.Chinese.code -> "点此输入"
+		HoneyLanguage.Japanese.code -> "額を入力"
+		HoneyLanguage.Korean.code -> "값 입력"
+		HoneyLanguage.Russian.code -> "Введите значение"
+		HoneyLanguage.TraditionalChinese.code -> "點此輸入"
 		else -> ""
 	}
 

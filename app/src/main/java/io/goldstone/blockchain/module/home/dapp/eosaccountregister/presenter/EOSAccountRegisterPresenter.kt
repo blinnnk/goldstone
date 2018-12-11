@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.eosaccountregister.presenter
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -11,11 +12,11 @@ import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -25,10 +26,10 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSRegisterTransaction
 import io.goldstone.blockchain.kernel.network.eos.eosram.EOSResourceUtil
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.presenter.BaseTradingPresenter
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.dapp.eosaccountregister.view.EOSAccountRegisterFragment
-import org.jetbrains.anko.runOnUiThread
 import java.math.BigInteger
 
 
@@ -62,7 +63,7 @@ class EOSAccountRegisterPresenter(
 		ramAmount: BigInteger,
 		cpuEOSCount: Double,
 		netAEOSCount: Double,
-		callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
+		@WorkerThread callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		if (ramAmount < BigInteger.valueOf(4096)) {
 			callback(null, TransferError.LessRAMForRegister)
@@ -82,17 +83,23 @@ class EOSAccountRegisterPresenter(
 						TokenContract.EOS,
 						StakeType.Register
 					) { privateKey, privateKeyError ->
-						if (error.isNone() && privateKey.isNotNull()) {
-							EOSRegisterTransaction(
-								SharedChain.getEOSCurrent().chainID,
-								EOSAuthorization(creatorAccount.name, EOSActor.Active),
+						// 首先检测当前私钥的权限, 是单独 `Owner` 或 单独 `Active` 或全包包含,
+						// 首先选择 `Active` 权限, 如果不是选择 `Owner` 如果都没有返回 `error` 权限错误
+						val chainID = SharedChain.getEOSCurrent().chainID
+						val permission = EOSAccountTable.getValidPermission(creatorAccount, chainID)
+						when {
+							permission.isNull() -> callback(null, GoldStoneError("Wrong Permission Keys"))
+							error.isNone() && privateKey.isNotNull() -> EOSRegisterTransaction(
+								chainID,
+								EOSAuthorization(creatorAccount.name, permission),
 								validAccount!!.name,
 								validPublicKey.orEmpty(),
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
 								netAEOSCount.toEOSUnit()
 							).send(privateKey, callback)
-						} else callback(null, privateKeyError)
+							else -> callback(null, privateKeyError)
+						}
 					}
 				}
 			} else callback(null, ramPriceError)
@@ -143,7 +150,7 @@ class EOSAccountRegisterPresenter(
 				newAccount,
 				EOSCodeName.EOSIO
 			) { resource, error ->
-				GoldStoneAPI.context.runOnUiThread {
+				launchUI {
 					if (resource.isNotNull())
 						hold(null, RequestError.RPCResult(EOSAccountText.checkNameResultUnavailable))
 					else hold(true, error)

@@ -39,6 +39,8 @@ object ArgumentKey {
 	const val contact = "contact"
 	const val eosAccountRegister = "eosAccountRegister"
 	const val contactID = "contactID"
+	const val dappType = "dappType"
+	const val fromView = "fromView"
 }
 
 object IntentKey {

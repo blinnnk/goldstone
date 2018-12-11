@@ -14,22 +14,25 @@ import org.json.JSONObject
 
 data class EOSDefaultAllChainName(
 	var main: String,
-	var jungle: String
+	var jungle: String,
+	var kylin: String
 ) : RoomModel {
 	constructor(data: JSONObject) : this(
 		data.safeGet("main"),
-		data.safeGet("jungle")
+		data.safeGet("jungle"),
+		data.safeGet("kylin")
 	)
 
 	override fun getObject(): String {
-		return "{\"main\":\"$main\",\"jungle\":\"$jungle\"}"
+		return "{\"main\":\"$main\",\"jungle\":\"$jungle\",\"kylin\":\"$kylin\"}"
 	}
 
 	fun getCurrent(): String {
 		val currentChainID = SharedChain.getEOSCurrent()
 		return when {
 			currentChainID.chainID.isEOSMain() -> main
-			currentChainID.chainID.isEOSTest() -> jungle
+			currentChainID.chainID.isEOSJungle() -> jungle
+			currentChainID.chainID.isEOSKylin() -> kylin
 			else -> main
 		}
 	}
@@ -43,7 +46,8 @@ data class EOSDefaultAllChainName(
 		return apply {
 			when {
 				currentChainID.chainID.isEOSMain() -> main = name
-				currentChainID.chainID.isEOSTest() -> jungle = name
+				currentChainID.chainID.isEOSJungle() -> jungle = name
+				currentChainID.chainID.isEOSKylin() -> kylin = name
 				else -> main = name
 			}
 		}

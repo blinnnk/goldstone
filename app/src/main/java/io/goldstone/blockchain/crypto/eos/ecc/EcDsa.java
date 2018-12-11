@@ -108,17 +108,13 @@ public class EcDsa {
   public static EcSignature sign(Sha256 hash, EOSPrivateKey key) {
     BigInteger privateKeyAsBI = key.getAsBigInteger();
     SigChecker checker = new SigChecker(hash.getBytes(), privateKeyAsBI);
-
     CurveParam curveParam = key.getCurveParam();
-
     int nonce = 0;
     do {
       deterministicGenerateK(curveParam, hash.getBytes(), privateKeyAsBI, checker, nonce++);
-
       if (checker.s.compareTo(curveParam.halfCurveOrder()) > 0) {
         checker.s = curveParam.n().subtract(checker.s);
       }
-
     } while (!checker.isRSEachLength());
 
     EcSignature signature = new EcSignature(checker.r, checker.s, curveParam);

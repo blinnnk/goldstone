@@ -3,59 +3,96 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.view.View
 import android.view.ViewGroup
-import android.webkit.JavascriptInterface
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.LinearLayout
+import android.webkit.*
 import android.widget.Toast
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.SystemUtils
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
+import io.goldstone.blockchain.crypto.eos.ecc.Sha256
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import org.jetbrains.anko.matchParent
 import org.json.JSONObject
-
 
 /**
  * @author KaySaith
  * @date  2018/11/29
  */
+@Suppress("DEPRECATION")
 @SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
-class DAppBrowser(context: Context, url: String) : WebView(context) {
+class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) : WebView(context) {
 	private val loadingView = LoadingView(context)
 	private val jsInterface = JSInterface()
+	private val account = SharedAddress.getCurrentEOSAccount()
+	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	init {
-		settings.javaScriptEnabled = true
 		webViewClient = WebViewClient()
+		settings.javaScriptEnabled = true
 		addJavascriptInterface(jsInterface, "control")
+		settings.javaScriptCanOpenWindowsAutomatically = true
+		settings.domStorageEnabled = true
+		settings.databaseEnabled = true
+		settings.allowFileAccess = true
+		settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NARROW_COLUMNS
+		settings.useWideViewPort = true
+		setLayerType(View.LAYER_TYPE_HARDWARE, null)
+		settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
+		settings.setAppCacheEnabled(true)
+		settings.setAppCacheMaxSize(15 * 1024 * 1024)
+		settings.cacheMode = WebSettings.LOAD_DEFAULT
+
 		this.loadUrl(url)
 		layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
-		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		webChromeClient = object : WebChromeClient() {
 			override fun onProgressChanged(view: WebView?, newProgress: Int) {
 				super.onProgressChanged(view, newProgress)
+				hold(newProgress)
+				fun evaluateJS() {
+					view?.evaluateJavascript("javascript:(function(){" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
+						"event=document.createEvent('HTMLEvents');" +
+						"event.initEvent('scatterLoaded',true,true);" +
+						"document.dispatchEvent(event);" +
+						"})()", null)
+				}
+				evaluateJS() // for auto login
 				if (newProgress == 100) {
-
+					evaluateJS() // for totally
 				}
 			}
+
+			override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+				println("GoldStone-DAPP-Browser: ${consoleMessage?.message()}")
+				return super.onConsoleMessage(consoleMessage)
+			}
 		}
+	}
+
+	override fun onDetachedFromWindow() {
+		super.onDetachedFromWindow()
+		// 销毁的时候清理用于接收 Promise 而设定的 Interval
+		evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
 	}
 
 	fun backEvent(callback: () -> Unit) {
@@ -63,6 +100,96 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 	}
 
 	inner class JSInterface {
+
+		@JavascriptInterface
+		fun getEOSAccountPermissions() {
+			load {
+				EOSAccountTable.getPermissions(account, chainID)
+			} then { permissions ->
+				val list = "[${permissions.joinToString(",") { it.generateObject() }}]"
+				callWeb("getPermissions", list)
+			}
+		}
+
+		@JavascriptInterface
+		fun getArbSignature(data: String) {
+			launchUI {
+				Dashboard(context) {
+					showAlert(
+						"Signed Data Request",
+						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+					) {
+						PaymentDetailPresenter.showGetPrivateKeyDashboard(
+							context,
+							confirmEvent = {
+								loadingView.show()
+							}
+						) { privateKey, error ->
+							launchUI {
+								loadingView.remove()
+							}
+							if (privateKey.isNotNull() && error.isNone()) {
+								val signature = privateKey.sign(Sha256.from(data.toByteArray())).toString()
+								launchUI {
+									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
+		fun transferEOS(action: String) {
+			launchUI {
+				System.out.println("action$action")
+				showQuickPaymentDashboard(
+					JSONObject(action),
+					true,
+					cancelEvent = {
+						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+					}
+				) { response, error ->
+					launchUI {
+						if (response.isNotNull() && error.isNone()) {
+							response.showDialog(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
+						} else {
+							ErrorDisplayManager(error).show(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+						}
+					}
+				}
+			}
+		}
+
+		/**
+		 * action like {"from":"beautifulleo","to":"betlottoinst","quantity":"0.1000 EOS","memo":"1|1029338"}
+		 */
+		@JavascriptInterface
+		fun simpleTransfer(action: String) {
+			launchUI {
+				showQuickPaymentDashboard(
+					JSONObject(action),
+					false,
+					cancelEvent = {
+						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+					}
+				) { response, error ->
+					launchUI {
+						if (response.isNotNull() && error.isNone()) {
+							response.showDialog(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
+						} else {
+							ErrorDisplayManager(error).show(context)
+							evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+						}
+					}
+				}
+			}
+		}
+
 		/**
 		 * @Important
 		 * 所有 `JSInterface` 的线程发起都在  `Thread JSInterFace` 线程, 所以需要
@@ -99,6 +226,24 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 		}
 
 		@JavascriptInterface
+		fun getLanguageCode() {
+			load {
+				SharedWallet.getCurrentLanguageCode()
+			} then {
+				evaluateJavascript("javascript:getLanguageCode(\"$it\")", null)
+			}
+		}
+
+		@JavascriptInterface
+		fun getVersionName() {
+			load {
+				SystemUtils.getVersionName(context)
+			} then {
+				callWeb("getVersionName", it)
+			}
+		}
+
+		@JavascriptInterface
 		fun encrypt(data: String) {
 			load {
 				AesCrypto.encrypt(data).orEmpty()
@@ -119,11 +264,10 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 		}
 
 		@JavascriptInterface
-		fun getSignHeader() {
+		fun getSignHeader(timeStamp: String) {
 			load {
 				val goldStoneID = SharedWallet.getGoldStoneID()
-				val timeStamp = System.currentTimeMillis().toString()
-				val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
+				val version = SystemUtils.getVersionCode(GoldStoneApp.appContext).toString()
 				RequisitionUtil.getSignHeader(goldStoneID, timeStamp, version)
 			} then { signData ->
 				evaluateJavascript("javascript:getSignHeader(\"$signData\")", null)
@@ -190,4 +334,8 @@ class DAppBrowser(context: Context, url: String) : WebView(context) {
 			}
 		}
 	}
+}
+
+fun WebView.callWeb(methodName: String, value: String) {
+	return evaluateJavascript("javascript:$methodName(\"${Uri.encode(value)}\")", null)
 }

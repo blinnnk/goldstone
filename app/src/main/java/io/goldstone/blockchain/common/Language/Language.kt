@@ -466,7 +466,7 @@ object ImportMethodText {
 object SplashText {
 	@JvmField
 	val slogan = when (currentLanguage) {
-		HoneyLanguage.English.code -> "The safest, most useful wallet in the world"
+		HoneyLanguage.English.code -> "The safest, most useful multiple blockchain wallet"
 		HoneyLanguage.Chinese.code -> "好用又安全的区块链钱包"
 		HoneyLanguage.Japanese.code -> "使いやすくセキュリティのしっかりしたブロックチェーンウォレット"
 		HoneyLanguage.Korean.code -> "사용하기 편리하고 안전한 블록체인 지갑"

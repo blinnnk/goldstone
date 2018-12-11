@@ -4,7 +4,6 @@ import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.eosram.EOSBuyRamModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
@@ -22,15 +21,15 @@ import java.math.BigInteger
  */
 class EOSBuyRamTransaction(
 	private val chainID: ChainID,
-	private val payerName: String,
+	private val payerName: EOSAuthorization,
 	private val receiverName: String,
 	private val eosAmount: BigInteger,
 	private val expirationType: ExpirationType
 ) : Serializable, EOSTransactionInterface() {
 	override fun serialized(hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
 		val model = EOSBuyRamModel(
-			listOf(EOSAuthorization(payerName, EOSActor.Active)),
-			payerName,
+			listOf(payerName),
+			payerName.actor,
 			receiverName,
 			eosAmount
 		)

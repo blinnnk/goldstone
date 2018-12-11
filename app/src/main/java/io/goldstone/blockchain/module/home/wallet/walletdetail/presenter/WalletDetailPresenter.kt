@@ -20,7 +20,7 @@ import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.crypto.multichain.isEOSToken
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -44,7 +44,7 @@ class WalletDetailPresenter(
 	override fun start() {
 		detailView.showLoading(true)
 		updateData()
-		if (NetworkUtil.hasNetwork(GoldStoneAPI.context)) {
+		if (NetworkUtil.hasNetwork()) {
 			updateUnreadCount()
 		}
 	}
@@ -117,7 +117,7 @@ class WalletDetailPresenter(
 	) {
 		var balanceError = GoldStoneError.None
 		// 没有网络直接返回
-		if (!NetworkUtil.hasNetwork(GoldStoneAPI.context)) hold(this, GoldStoneError.None)
+		if (!NetworkUtil.hasNetwork()) hold(this, GoldStoneError.None)
 		else {
 			object : ConcurrentJobs() {
 				override var asyncCount: Int = size

@@ -11,7 +11,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
-import io.goldstone.blockchain.kernel.commonmodel.QRCodeModel
+import io.goldstone.blockchain.kernel.commontable.model.QRCodeModel
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.contract.AddressSelectionContract
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -92,7 +92,10 @@ class AddressSelectionPresenter(
 				}
 			}
 
-			AddressType.EOS, AddressType.EOSJungle, AddressType.EOSAccountName -> when {
+			AddressType.EOS,
+			AddressType.EOSJungle,
+			AddressType.EOSKylin,
+			AddressType.EOSAccountName -> when {
 				!token.contract.isEOSSeries() ->
 					selectionView.showError(Throwable(AccountError.InvalidAccountName))
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对

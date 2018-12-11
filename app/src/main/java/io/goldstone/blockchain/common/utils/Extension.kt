@@ -17,6 +17,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.json.JSONObject
 import java.math.BigInteger
 
 /**
@@ -82,4 +83,14 @@ infix fun <T> List<T>.isEmptyThen(other: List<T>): List<T> = if (this.isEmpty())
 @UiThread
 fun Fragment.safeShowError(error: Throwable) {
 	ErrorDisplayManager(error).show(context)
+}
+
+fun String.safeToJSONObject(): JSONObject {
+	val formattedData =
+	replace("\\\"", "\"").replace("\"{", "{").replace("}\"", "}")
+	return JSONObject(formattedData)
+}
+
+fun String.removeSlash(): String {
+	return replace("\\\"", "\"").replace("\"{", "{").replace("}\"", "}")
 }

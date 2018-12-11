@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter
 
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.load
@@ -18,12 +19,13 @@ import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.delegate.EOSDelegateTransaction
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.crypto.utils.toEOSCount
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -154,16 +156,11 @@ class TokenAssetPresenter(
 			if (localData.isNotNull()) launchUI {
 				localData.updateUIValue()
 			}
-			// 异步更新网络数据
-			EOSAPI.getAccountInfo(account) { eosAccount, error ->
-				if (eosAccount.isNotNull() && error.isNone()) {
-					// 初始化插入数据
-					EOSAccountTable.updateOrInsert(eosAccount, chainID)
-					updateRefundInfo()
-					launchUI {
-						eosAccount.updateUIValue()
-					}
-				} else assetView.showError(error)
+			updateEOSAccountInfoFromChain(account, chainID) {
+				updateRefundInfo()
+				launchUI {
+					it.updateUIValue()
+				}
 			}
 		}
 	}
@@ -205,5 +202,22 @@ class TokenAssetPresenter(
 			netLimit.max,
 			netEOSValue
 		)
+	}
+
+	companion object {
+		fun updateEOSAccountInfoFromChain(
+			account: EOSAccount,
+			chainID: ChainID,
+			@WorkerThread callback: (account: EOSAccountTable) -> Unit
+		) {
+			// 异步更新网络数据
+			EOSAPI.getAccountInfo(account) { eosAccount, error ->
+				if (eosAccount.isNotNull() && error.isNone()) {
+					// 初始化插入数据
+					EOSAccountTable.updateOrInsert(eosAccount, chainID)
+					callback(eosAccount)
+				}
+			}
+		}
 	}
 }

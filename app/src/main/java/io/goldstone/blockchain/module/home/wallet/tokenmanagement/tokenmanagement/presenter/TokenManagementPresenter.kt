@@ -21,9 +21,11 @@ class TokenManagementPresenter(
 			addFragmentAndSetArgument<TokenManagementListFragment>(ContainerID.content)
 			showSearchButton(true) {
 				showTokenSearchFragment()
-				showSearchInput {
-					popFragmentFrom<TokenSearchFragment>()
-				}
+				showSearchInput(
+					false,
+					cancelEvent = { popFragmentFrom<TokenSearchFragment>() },
+					enterKeyEvent = {}
+				)
 			}
 		}
 	}

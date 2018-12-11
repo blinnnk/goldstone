@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.DialogText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -34,8 +35,8 @@ object NetworkUtil {
 		return status
 	}
 
-	fun hasNetwork(context: Context?): Boolean {
-		val connection = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
+	fun hasNetwork(): Boolean {
+		val connection = GoldStoneApp.appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager
 		val activeNetwork = connection?.activeNetworkInfo
 		return activeNetwork != null && activeNetwork.isConnectedOrConnecting
 	}
@@ -47,7 +48,7 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 	private var hasShowNetDialog = false
 	@SuppressLint("UnsafeProtectedBroadcastReceiver")
 	override fun onReceive(context: Context, intent: Intent) {
-		if (NetworkUtil.hasNetwork(context)) GlobalScope.launch(Dispatchers.Default) {
+		if (NetworkUtil.hasNetwork()) GlobalScope.launch(Dispatchers.Default) {
 			// 如果还没有检测过账号状态那么在网络恢复的时候检测并更新钱包的资产状态
 			if (!SharedValue.getAccountCheckedStatus()) {
 				SplashPresenter.updateAccountInformation(context) {
