@@ -87,6 +87,10 @@ fun Fragment.safeShowError(error: Throwable) {
 
 fun String.safeToJSONObject(): JSONObject {
 	val formattedData =
-		replace("\"{", "{").replace("}\"", "")
+	replace("\\\"", "\"").replace("\"{", "{").replace("}\"", "}")
 	return JSONObject(formattedData)
+}
+
+fun String.removeSlash(): String {
+	return replace("\\\"", "\"").replace("\"{", "{").replace("}\"", "}")
 }

@@ -21,7 +21,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
-import io.goldstone.blockchain.common.utils.safeToJSONObject
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
@@ -60,7 +59,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		setLayerType(View.LAYER_TYPE_HARDWARE, null)
 		settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
 		settings.setAppCacheEnabled(true)
-		settings.setAppCacheMaxSize( 5 * 1024 * 1024)
+		settings.setAppCacheMaxSize(15 * 1024 * 1024)
 		settings.cacheMode = WebSettings.LOAD_DEFAULT
 
 		this.loadUrl(url)
@@ -71,7 +70,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){resolve(window.scatter.txID);clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -144,6 +143,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		@JavascriptInterface
 		fun transferEOS(action: String) {
 			launchUI {
+				System.out.println("action$action")
 				showQuickPaymentDashboard(
 					JSONObject(action),
 					true,
@@ -170,7 +170,6 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		@JavascriptInterface
 		fun simpleTransfer(action: String) {
 			launchUI {
-				System.out.println("action $action")
 				showQuickPaymentDashboard(
 					JSONObject(action),
 					false,
@@ -178,7 +177,6 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
 					}
 				) { response, error ->
-					System.out.println("response $response")
 					launchUI {
 						if (response.isNotNull() && error.isNone()) {
 							response.showDialog(context)
@@ -266,10 +264,9 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		}
 
 		@JavascriptInterface
-		fun getSignHeader() {
+		fun getSignHeader(timeStamp: String) {
 			load {
 				val goldStoneID = SharedWallet.getGoldStoneID()
-				val timeStamp = System.currentTimeMillis().toString()
 				val version = SystemUtils.getVersionCode(GoldStoneApp.appContext).toString()
 				RequisitionUtil.getSignHeader(goldStoneID, timeStamp, version)
 			} then { signData ->

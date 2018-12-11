@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream
  * @reWriter KaySaith
  */
 fun String.toCryptHexString(): String {
+
 	val hexStringRegular = "0123456789ABCDEF".toCharArray()
 	if (isEmpty()) return ""
 	val stringBuilder = StringBuilder("")

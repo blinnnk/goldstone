@@ -2,13 +2,19 @@ package io.goldstone.blockchain.module.home.dapp.common
 
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.getTargetObject
 import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
+import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
+import io.goldstone.blockchain.common.value.CornerSize
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
@@ -55,10 +61,12 @@ fun ViewGroup.showQuickPaymentDashboard(
 			setTitle("Quantity")
 			setSubtitle(info.safeGet("quantity"))
 		}
-		graySquareCell {
+		valueView {
+			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
 			layoutParams.width = matchParent
-			setTitle(TransactionText.memo)
-			setSubtitle(info.safeGet("memo"))
+			text = info.safeGet("memo")
+		}.setMargins<LinearLayout.LayoutParams> {
+			topMargin = PaddingSize.content
 		}
 	}
 	Dashboard(context) {

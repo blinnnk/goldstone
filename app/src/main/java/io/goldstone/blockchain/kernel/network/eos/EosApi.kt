@@ -244,7 +244,6 @@ object EOSAPI {
 			EOSUrl.pushTransaction(),
 			false
 		) { result, error ->
-			System.out.println("hello 6")
 			if (result.isNullOrEmpty() || error.hasError()) {
 				hold(null, error)
 			} else {
@@ -594,33 +593,27 @@ object EOSAPI {
 		}
 	}
 
-	fun updateLocalTokenPrice(contract: TokenContract) {
-		EOSAPI.getPairsFromNewDex { data, error ->
-			if (data.isNotNull() && error.isNone()) {
-				val pair = data.find {
-					it.symbol.equals(contract.symbol, true) &&
-						it.contract.equals(contract.contract, true)
-				}?.pair
-				if (pair?.isNotEmpty() == true) {
-					EOSAPI.getPriceByPair(pair) { priceInEOS, pairError ->
-						if (priceInEOS.isNotNull() && pairError.isNone()) {
-							val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-							val eosToken = defaultDao.getToken(
-								TokenContract.eosContract,
-								TokenContract.EOS.symbol,
-								EOSChain.Main.id
-							)
-							val priceInUSD = priceInEOS * eosToken?.price.orZero()
-							if (priceInUSD > 0.0) {
-								defaultDao.updateTokenPrice(
-									priceInUSD,
-									contract.contract.orEmpty(),
-									contract.symbol,
-									EOSChain.Main.id
-								)
-							}
-						}
-					}
+	fun updateTokenPriceFromNewDex(contract: TokenContract, pairs: List<NewDexPair>) {
+		val pair = pairs.find {
+			it.symbol.equals(contract.symbol, true) &&
+				it.contract.equals(contract.contract, true)
+		}?.pair ?: return
+		EOSAPI.getPriceByPair(pair) { priceInEOS, pairError ->
+			if (priceInEOS.isNotNull() && pairError.isNone()) {
+				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
+				val eosToken = defaultDao.getToken(
+					TokenContract.eosContract,
+					TokenContract.EOS.symbol,
+					EOSChain.Main.id
+				)
+				val priceInUSD = priceInEOS * eosToken?.price.orZero()
+				if (priceInUSD > 0.0) {
+					defaultDao.updateTokenPrice(
+						priceInUSD,
+						contract.contract.orEmpty(),
+						contract.symbol,
+						EOSChain.Main.id
+					)
 				}
 			}
 		}

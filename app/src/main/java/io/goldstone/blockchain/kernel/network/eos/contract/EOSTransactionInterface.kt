@@ -28,9 +28,7 @@ abstract class EOSTransactionInterface {
 		privateKey: EOSPrivateKey,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		System.out.println("hello 4")
 		serialized { data, error ->
-			System.out.println("hello 5")
 			if (data.isNotNull() && error.isNone()) {
 				val signature = privateKey.sign(Sha256.from(Hex.decode(data.serialized))).toString()
 				EOSAPI.pushTransaction(listOf(signature), data.packedTX, hold)

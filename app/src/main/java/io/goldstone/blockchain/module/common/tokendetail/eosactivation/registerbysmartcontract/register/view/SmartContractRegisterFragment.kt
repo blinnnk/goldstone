@@ -11,11 +11,11 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.ColumnSectionTitle
 import io.goldstone.blockchain.common.component.DescriptionView
-import io.goldstone.blockchain.common.component.KeyValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
@@ -81,12 +81,12 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 				}.into(this)
 				// 显示公钥地址
 				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
-				KeyValueView(context).apply {
+				valueView {
 					gravity = Gravity.CENTER
 					text = SharedAddress.getCurrentEOS()
 				}.click {
 					it.context.clickToCopy(SharedAddress.getCurrentEOS())
-				}.into(this)
+				}
 
 				DescriptionView(context).isRegisterResource().into(this)
 				// 显示 `EOS` 分配的明细

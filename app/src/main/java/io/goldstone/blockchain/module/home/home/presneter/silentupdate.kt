@@ -49,6 +49,7 @@ abstract class SilentUpdater {
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
+		updateNewDAPP()// todo
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -383,20 +384,25 @@ abstract class SilentUpdater {
 			}
 			// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
 			// 线程开启太多的内存溢出. 限制每 `500ms` 检查一个 `Symbol` 的价格
-			object : ConcurrentAsyncCombine() {
-				val eosTokens =
-					myTokens.filter {
-						ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
-					}
-				override val delayTime: Long? = 500
-				override var asyncCount: Int = eosTokens.size
-				override fun doChildTask(index: Int) {
-					EOSAPI.updateLocalTokenPrice(
-						TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null)
-					)
-					completeMark()
+			EOSAPI.getPairsFromNewDex { pairs, error ->
+				if (pairs.isNotNull() && error.isNone()) {
+					object : ConcurrentAsyncCombine() {
+						val eosTokens =
+							myTokens.filter {
+								ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
+							}
+						override val delayTime: Long? = 500
+						override var asyncCount: Int = eosTokens.size
+						override fun doChildTask(index: Int) {
+							EOSAPI.updateTokenPriceFromNewDex(
+								TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null),
+								pairs
+							)
+							completeMark()
+						}
+					}.start()
 				}
-			}.start()
+			}
 		}
 	}
 

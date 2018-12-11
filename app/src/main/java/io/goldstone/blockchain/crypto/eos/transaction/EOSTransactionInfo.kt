@@ -104,14 +104,12 @@ data class EOSTransactionInfo(
 		if (!toAccount.isValid(false)) {
 			hold(null, AccountError.InvalidAccountName)
 		} else {
-			System.out.println("hello 1")
 			BaseTradingPresenter.prepareTransaction(
 				context,
 				amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
 				contract,
 				StakeType.Trade
 			) { privateKey, error ->
-				System.out.println("hello 2 $privateKey")
 				if (error.isNone() && privateKey.isNotNull()) {
 					transfer(privateKey, hold)
 				} else hold(null, error)
@@ -140,7 +138,6 @@ data class EOSTransactionInfo(
 		privateKey: EOSPrivateKey,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		System.out.println("hello 3")
 		val permission =
 			EOSAccountTable.getValidPermission(fromAccount, chainID)
 		if (permission.isNotNull()) {

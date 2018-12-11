@@ -15,9 +15,10 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.DescriptionView
-import io.goldstone.blockchain.common.component.KeyValueView
+import io.goldstone.blockchain.common.component.ValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
@@ -40,7 +41,7 @@ import org.jetbrains.anko.verticalLayout
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.exportPrivateKey
-	private val privateKeyTextView by lazy { KeyValueView(context!!) }
+	private lateinit var privateKeyTextView: ValueView
 	private val passwordInput by lazy { RoundInput(context!!) }
 	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyExportPresenter(this)
@@ -56,10 +57,9 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			lparams(matchParent, matchParent)
 			DescriptionView(context).isExportPrivateKey().into(this)
 			// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
-			privateKeyTextView.click {
-				if (it.text.isNotEmpty())
-					context.clickToCopy(privateKeyTextView.text.toString())
-			}.into(this)
+			privateKeyTextView = valueView().click {
+				if (it.text.isNotEmpty()) context.clickToCopy(privateKeyTextView.text.toString())
+			}
 
 			passwordInput.apply {
 				setPasswordInput()

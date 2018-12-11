@@ -54,7 +54,7 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
-		presenter = DAPPExplorerPresenter()
+		presenter = DAPPExplorerPresenter(this)
 		presenter.start()
 		overlayFragment?.let {
 			it.searchInputListener { condition ->
