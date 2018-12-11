@@ -64,11 +64,10 @@ class RAMPriceChartAndMenuView(
 		relativeLayout {
 			gravity = Gravity.CENTER
 			addView(candleChart)
-			addView(loadingView.apply {
-				setMargins<RelativeLayout.LayoutParams> {
+			addView(loadingView)
+			loadingView.setMargins<RelativeLayout.LayoutParams> {
 					topMargin = 100.uiPX()
-				}
-			})
+			}
 			removeLoadingView()
 		}
 	}

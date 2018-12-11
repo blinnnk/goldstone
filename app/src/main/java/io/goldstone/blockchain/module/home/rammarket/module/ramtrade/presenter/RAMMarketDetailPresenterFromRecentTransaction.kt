@@ -82,12 +82,10 @@ fun RAMMarketDetailPresenter.tradeRAM(
 		return
 	}
 	
-	GlobalScope.launch(Dispatchers.Default) {
-		if (stakeType.isSellRam()) {
-			BaseTradingPresenter.sellRAM(context, amount.toLong(), callback)
-		} else {
-			BaseTradingPresenter.buyRam( context, currentAccount, amount, callback)
-		}
+	if (stakeType.isSellRam()) {
+		BaseTradingPresenter.sellRAM(context, amount.toLong(), callback)
+	} else {
+		BaseTradingPresenter.buyRam( context, currentAccount, amount, callback)
 	}
 	
 }

@@ -58,8 +58,8 @@ class TransactionOfNameCell(context: Context): RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				centerVertically()
 			}
-			setMargins<RelativeLayout.LayoutParams> { leftMargin = 135.uiPX() }
 		}
+		accountName.setMargins<RelativeLayout.LayoutParams> { leftMargin = 135.uiPX() }
 		
 		amount = textView {
 			textColor = Spectrum.green

@@ -96,10 +96,6 @@ class RAMTradePercentFragment : GSFragment(), RAMDistributedContract.GSView {
 					addView(ramPercentChartIn)
 					linearLayout {
 						layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
-							setMargins<LinearLayout.LayoutParams> {
-								topMargin = 10.uiPX()
-								bottomMargin = 10.uiPX()
-							}
 							gravity = Gravity.CENTER_HORIZONTAL
 						}
 						textView {
@@ -109,16 +105,15 @@ class RAMTradePercentFragment : GSFragment(), RAMDistributedContract.GSView {
 							text = EOSRAMExchangeText.buy("    ")
 						}
 						addView(buy)
+					}.setMargins<LinearLayout.LayoutParams> {
+						topMargin = 10.uiPX()
+						bottomMargin = 10.uiPX()
 					}
 				}
 				verticalLayout {
 					addView(ramPercentChartOut)
 					linearLayout {
 						layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
-							setMargins<LinearLayout.LayoutParams> {
-								topMargin = 10.uiPX()
-								bottomMargin = 10.uiPX()
-							}
 							gravity = Gravity.CENTER_HORIZONTAL
 						}
 						textView {
@@ -128,6 +123,9 @@ class RAMTradePercentFragment : GSFragment(), RAMDistributedContract.GSView {
 							text = EOSRAMExchangeText.sell("    ")
 						}
 						addView(sell)
+					}.setMargins<LinearLayout.LayoutParams> {
+						topMargin = 10.uiPX()
+						bottomMargin = 10.uiPX()
 					}
 				}
 				

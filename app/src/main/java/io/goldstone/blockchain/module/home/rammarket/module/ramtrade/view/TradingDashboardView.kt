@@ -81,10 +81,6 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		menu.into(this)
 		ramEditText.apply {
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-			setMargins<LinearLayout.LayoutParams> {
-				topMargin = 10.uiPX()
-				leftMargin = 5.uiPX()
-			}
 			title = EOSRAMExchangeText.ram
 			hint = EOSRAMExchangeText.enterCountHint
 			singleLine = true
@@ -92,6 +88,10 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			filters = arrayOf(InputFilter.LengthFilter(10))
 			
 		}.into(this)
+		ramEditText.setMargins<LinearLayout.LayoutParams> {
+			topMargin = 10.uiPX()
+			leftMargin = 5.uiPX()
+		}
 		
 		ramBalance.apply {
 			leftPadding = RAMMarketPadding
@@ -105,13 +105,13 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			title = EOSRAMExchangeText.eos
 			hint = EOSRAMExchangeText.enterCountHint
 			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
-			setMargins<LinearLayout.LayoutParams> {
-				leftMargin = 5.uiPX()
-			}
 			singleLine = true
 			keyListener = DigitsKeyListener.getInstance("1234567890.")
 			filters = arrayOf(InputFilter.LengthFilter(10))
 		}.into(this)
+		eosEditText.setMargins<LinearLayout.LayoutParams> {
+			leftMargin = 5.uiPX()
+		}
 		
 		eosBalance.apply {
 			leftPadding = RAMMarketPadding

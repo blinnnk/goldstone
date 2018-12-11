@@ -92,10 +92,10 @@ class TitleView(context: Context) : RelativeLayout(context) {
 			).apply {
 				alignParentRight()
 			}
-			setMargins<RelativeLayout.LayoutParams> {
-				topMargin = 8.uiPX()
-				bottomMargin = 8.uiPX()
-			}
+		}
+		title.setMargins<RelativeLayout.LayoutParams> {
+			topMargin = 8.uiPX()
+			bottomMargin = 8.uiPX()
 		}
 	}
 }
@@ -119,8 +119,8 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				centerVertically()
 			}
-			setMargins<RelativeLayout.LayoutParams> { leftMargin = 5.uiPX() }
 		}
+		name.setMargins<RelativeLayout.LayoutParams> { leftMargin = 5.uiPX() }
 		transactionAmount = textView {
 			textColor = GrayScale.midGray
 			textSize = fontSize(12)
@@ -129,8 +129,8 @@ class TradingCell(context: Context) : RelativeLayout(context) {
 				alignParentRight()
 				centerVertically()
 			}
-			setMargins<RelativeLayout.LayoutParams> { rightMargin = 5.uiPX() }
 		}
+		transactionAmount.setMargins<RelativeLayout.LayoutParams> { rightMargin = 5.uiPX() }
 	}
 	
 	fun setData(accountName: String, quantity: Double, maxValue:Double, backgroundColor: Int) {

@@ -27,7 +27,7 @@ class TradingInfoModel(
 	
 	constructor() : this(
 		"",
-		0.toDouble(),
+		0.0,
 		0,
 		0,
 		0.0,

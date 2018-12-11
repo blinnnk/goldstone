@@ -78,38 +78,35 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 					addView(priceMenuCandleChart)
 					addView(tradingView)
 					addView(quotationViewParent)
-					tradingView.tradingDashboardView.ramEditText.apply {
-						afterTextChanged = Runnable {
-							if (hasFocus() && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
-								val ram = text.toString().trim().toFloat() * presenter.ramInformationModel.currentPrice
-								if (ram != 0.0) {
-									tradingView.tradingDashboardView.eosEditText.setText(ram.formatCount(3))
-								}
+					tradingView.setRAMTextChangedRunnable(Runnable {
+						if (tradingView.isRAMEditTextFocus() && tradingView.getRAMEditText().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
+							val ram =tradingView.getRAMEditText().toFloat() * presenter.ramInformationModel.currentPrice
+							if (ram != 0.0) {
+								tradingView.setEOSEditText(ram.formatCount(3))
 							}
 						}
-					}
+					})
 					
-					tradingView.tradingDashboardView.eosEditText.apply {
-						afterTextChanged = Runnable {
-							if (hasFocus() && text.toString().trim().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
-								val eos = text.toString().trim().toFloat() / presenter.ramInformationModel.currentPrice
-								if (eos != 0.0) {
-									tradingView.tradingDashboardView.ramEditText.setText(eos.formatCount(3))
-								}
+					tradingView.setEOSTextChangedRunnable(
+						Runnable {
+						if (tradingView.isEOSEditTextFocus() && tradingView.getEOSEditText().isNotEmpty() && presenter.ramInformationModel.currentPrice != 0.0) {
+							val eos = tradingView.getEOSEditText().toFloat() / presenter.ramInformationModel.currentPrice
+							if (eos != 0.0) {
+								tradingView.setRAMEditText(eos.formatCount(3))
 							}
 						}
-					}
+					})
 					
-					tradingView.tradingDashboardView.setConfirmEvent(Runnable {
-						val amount = if (tradingView.tradingDashboardView.stakeType.isSellRam())
-							tradingView.tradingDashboardView.ramEditText.text.toString().trim().toDoubleOrZero() * 1024.0 // kb 转换成byte
-						else tradingView.tradingDashboardView.eosEditText.text.toString().trim().toDoubleOrZero()
+					tradingView.setConfirmEvent(Runnable {
+						val amount = if (tradingView.getStakeType().isSellRam())
+							tradingView.getRAMEditText().toDoubleOrZero() * 1024.0 // kb 转换成byte
+						else tradingView.getEOSEditText().toDoubleOrZero()
 						if (amount == 0.0) return@Runnable
 						loadingView.visibility = View.VISIBLE
 						presenter.tradeRAM(
 							context,
 							amount,
-							tradingView.tradingDashboardView.stakeType
+							tradingView.getStakeType()
 						) { eosResponse, error ->
 							if (eosResponse.isNotNull() && error.isNone()) {
 								presenter.updateAccountData {
@@ -129,6 +126,8 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 							}
 						}
 					})
+					
+					
 				}
 			}
 			
@@ -144,7 +143,7 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 			price < 100.0 -> 3
 			else -> 2
 		}
-		tradingView.tradingDashboardView.ramEditText.title = "${EOSRAMExchangeText.ram}(${price.formatCount(formatCount)} EOS/KB)"
+		tradingView.setRAMEditTextTitle("${EOSRAMExchangeText.ram}(${price.formatCount(formatCount)} EOS/KB)")
 		ramPriceView.currentPriceView.currentPrice.text = price.formatCount(4)
 		ramPriceView.currentPriceView.quoteChangePercent.apply {
 			if (percent > 0) {
@@ -183,15 +182,15 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 	}
 	
 	override fun showTradingViewData(buyList: List<TradingInfoModel>, sellList: List<TradingInfoModel>) {
-		tradingView.recentTradingListView.setData(buyList, sellList)
+		tradingView.setTradingListData(buyList, sellList)
 	}
 	override fun notifyTradingViewData() {
-		tradingView.recentTradingListView.adapter?.notifyDataSetChanged()
+		tradingView.notifyTradingListData()
 	}
 	
 	override fun showRAMBalance(ramBalance: String, eosBalance: String) {
-		tradingView.tradingDashboardView.ramBalance.text = EOSRAMExchangeText.ramBalanceDescription(ramBalance)
-		tradingView.tradingDashboardView.eosBalance.text = EOSRAMExchangeText.eosBalanceDescription(eosBalance)
+		tradingView.setRAMBalance(EOSRAMExchangeText.ramBalanceDescription(ramBalance))
+		tradingView.setEOSBalance(EOSRAMExchangeText.eosBalanceDescription(eosBalance))
 	}
 	override fun showError(error: Throwable) {
 		ErrorDisplayManager(error).show(context)

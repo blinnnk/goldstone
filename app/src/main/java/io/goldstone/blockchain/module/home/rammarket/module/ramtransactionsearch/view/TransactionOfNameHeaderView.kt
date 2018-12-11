@@ -53,8 +53,8 @@ class TransactionOfNameHeaderView(context: Context): RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent).apply {
 				centerVertically()
 			}
-			setMargins<RelativeLayout.LayoutParams> { leftMargin = 155.uiPX() }
 		}
+		accountName.setMargins<RelativeLayout.LayoutParams> { leftMargin = 155.uiPX() }
 		
 		amount = textView {
 			textColor = GrayScale.midGray

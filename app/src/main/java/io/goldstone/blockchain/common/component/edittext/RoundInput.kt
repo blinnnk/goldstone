@@ -141,9 +141,9 @@ open class RoundInput(context: Context) : EditText(context) {
 		invalidate()
 	}
 	
-	fun showRightLabel(label: String) {
+	fun showRightLabel(content: String) {
 		showRightLabel = true
-		rightLabel = label
+		rightLabel = content
 		invalidate()
 	}
 	
