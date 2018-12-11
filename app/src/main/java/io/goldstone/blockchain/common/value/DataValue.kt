@@ -10,6 +10,7 @@ object DataValue {
 	const val pageCount = 20
 	const val quotationDataCount = 10
 	const val candleChartCount = 100
+	const val dappPageCount = 10
 }
 
 object Count {

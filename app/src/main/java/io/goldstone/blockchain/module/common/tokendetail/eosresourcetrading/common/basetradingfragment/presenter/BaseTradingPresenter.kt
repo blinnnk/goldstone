@@ -18,7 +18,6 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
@@ -148,10 +147,13 @@ open class BaseTradingPresenter(
 				TokenContract.EOS,
 				stakeType
 			) { privateKey, error ->
-				if (error.isNone() && privateKey.isNotNull()) {
-					EOSBandWidthTransaction(
-						SharedChain.getEOSCurrent().chainID,
-						EOSAuthorization(fromAccount.name, EOSActor.Active),
+				val chainID = SharedChain.getEOSCurrent().chainID
+				val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
+				when {
+					permission.isNull() -> callback(null, TransferError.WrongPermission)
+					error.isNone() && privateKey.isNotNull() -> EOSBandWidthTransaction(
+						chainID,
+						EOSAuthorization(fromAccount.name, permission),
 						toAccount.name,
 						transferCount.toEOSUnit(),
 						tradingType,
@@ -159,7 +161,8 @@ open class BaseTradingPresenter(
 						fragment.isSelectedTransfer(stakeType),
 						ExpirationType.FiveMinutes
 					).send(privateKey, callback)
-				} else callback(null, error)
+					else -> callback(null, error)
+				}
 			}
 		} else callback(null, AccountError.InvalidAccountName)
 	}
@@ -201,14 +204,17 @@ open class BaseTradingPresenter(
 				TokenContract.EOS,
 				StakeType.SellRam
 			) { privateKey, error ->
-				if (error.isNone() && privateKey.isNotNull()) {
-					EOSSellRamTransaction(
+				val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
+				when {
+					permission.isNull() -> callback(null, TransferError.WrongPermission)
+					error.isNone() && privateKey.isNotNull() -> EOSSellRamTransaction(
 						chainID,
-						fromAccount.name,
+						EOSAuthorization(fromAccount.name, permission),
 						BigInteger.valueOf(tradingCount),
 						ExpirationType.FiveMinutes
 					).send(privateKey, callback)
-				} else callback(null, error)
+					else -> callback(null, error)
+				}
 			}
 		}
 
@@ -227,15 +233,18 @@ open class BaseTradingPresenter(
 				TokenContract.EOS,
 				StakeType.BuyRam
 			) { privateKey, error ->
-				if (error.isNone() && privateKey.isNotNull()) {
-					EOSBuyRamTransaction(
+				val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
+				when {
+					permission.isNull() -> callback(null, TransferError.WrongPermission)
+					error.isNone() && privateKey.isNotNull() -> EOSBuyRamTransaction(
 						chainID,
-						fromAccount.name,
+						EOSAuthorization(fromAccount.name, permission),
 						toAccount.name,
 						tradingCount.toEOSUnit(),
 						ExpirationType.FiveMinutes
 					).send(privateKey, callback)
-				} else callback(null, error)
+					else -> callback(null, error)
+				}
 			} else callback(null, AccountError.InvalidAccountName)
 		}
 

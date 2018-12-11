@@ -7,6 +7,7 @@ import com.blinnnk.util.saveDataToSharedPreferences
 import com.github.mikephil.charting.data.PieEntry
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Spectrum
@@ -28,7 +29,7 @@ class RAMTradePercentPresenter(private val gsView: RAMDistributedContract.GSView
 	
 	private fun showLocalData() {
 		try {
-			val jsonData = GoldStoneAPI.context.getStringFromSharedPreferences(tradePercentKey)
+			val jsonData = GoldStoneApp.appContext.getStringFromSharedPreferences(tradePercentKey)
 			val type = object : TypeToken<ArrayList<Float>>() {}.type
 			tradeDistributeList.addAll(
 				Gson().fromJson(jsonData, type)
@@ -56,7 +57,7 @@ class RAMTradePercentPresenter(private val gsView: RAMDistributedContract.GSView
 	
 	
 	fun onFragmentDestroy() {
-		if (tradeDistributeList.isNotEmpty()) GoldStoneAPI.context.saveDataToSharedPreferences(
+		if (tradeDistributeList.isNotEmpty()) GoldStoneApp.appContext.saveDataToSharedPreferences(
 			tradePercentKey,
 			Gson().toJson(tradeDistributeList)
 		)

@@ -5,6 +5,7 @@ import android.graphics.PorterDuff
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -14,11 +15,13 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GSCard
+import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.common.value.ScreenSize
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 /**
  * @date 21/03/2018 11:00 PM
@@ -115,3 +118,6 @@ class RoundButton(context: Context) : GSCard(context) {
 		setCardBackgroundColor(Spectrum.green)
 	}
 }
+
+fun ViewManager.roundButton() = roundButton {}
+inline fun ViewManager.roundButton(init: RoundButton.() -> Unit) = ankoView({ RoundButton(it) }, 0, init)

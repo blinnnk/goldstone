@@ -42,7 +42,7 @@ class RAMTransactionSearchFragment:
 		presenter = RAMTransactionSearchPresenter(this, account)
 		getParentFragment<RAMMarketOverlayFragment> {
 			searchInputListener {
-				if (it.length == 12 && NetworkUtil.hasNetwork(context)) {
+				if (it.length == 12 && NetworkUtil.hasNetwork()) {
 					this@RAMTransactionSearchFragment.presenter.loadFirstPage(it)
 				}
 			}
@@ -100,7 +100,7 @@ class RAMTransactionSearchFragment:
 		getParentFragment<RAMMarketOverlayFragment> {
 			headerTitle = QuotationText.management
 			presenter.popFragmentFrom<RAMTransactionSearchFragment>()
-			showSearchInput(false) {}
+			showSearchInput(false, { }) { }
 		}
 	}
 }

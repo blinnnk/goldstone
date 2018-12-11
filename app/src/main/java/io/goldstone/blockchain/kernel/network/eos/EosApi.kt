@@ -17,11 +17,10 @@ import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
@@ -37,7 +36,6 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.model.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import okhttp3.RequestBody
-import org.jetbrains.anko.runOnUiThread
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger
@@ -53,6 +51,21 @@ object EOSAPI {
 			listOf("data", "symbol_list"),
 			hold = hold
 		)
+	}
+
+	fun getBlockNumberByTxIDFromEOSPark(
+		txID: String,
+		@WorkerThread hold: (blockNumber: Int?, error: GoldStoneError) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			EOSPark.getTransactionByTXID(txID),
+			listOf("data"),
+			true
+		) { data, error ->
+			if (data?.isEmpty() == false && error.isNone()) {
+				hold(JSONObject(data.first()).safeGet("block_num").toIntOrNull(), error)
+			} else hold(null, error)
+		}
 	}
 
 	/**
@@ -232,6 +245,7 @@ object EOSAPI {
 			EOSUrl.pushTransaction(),
 			false
 		) { result, error ->
+			System.out.println("hello 6")
 			if (result.isNullOrEmpty() || error.hasError()) {
 				hold(null, error)
 			} else {
@@ -530,7 +544,6 @@ object EOSAPI {
 	}
 
 	fun getRAMMarket(
-		isMainThread: Boolean = false,
 		hold: (data: EOSRAMMarket?, error: RequestError) -> Unit) {
 		RequisitionUtil.postString(
 			ParameterUtil.prepareObjectContent(
@@ -545,11 +558,7 @@ object EOSAPI {
 		) { result, error ->
 			if (result?.isNotEmpty() == true && error.isNone()) {
 				val data = JSONObject(JSONArray(result).get(0).toString())
-				if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-					hold(EOSRAMMarket(data), RequestError.None)
-				} else hold(EOSRAMMarket(data), RequestError.None)
-			} else if (isMainThread) GoldStoneAPI.context.runOnUiThread {
-				hold(null, error)
+				hold(EOSRAMMarket(data), RequestError.None)
 			} else hold(null, error)
 		}
 	}

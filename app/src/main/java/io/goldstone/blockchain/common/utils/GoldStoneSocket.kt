@@ -110,8 +110,8 @@ abstract class GoldStoneWebSocket(private val closeMessage: String) : WebSocketL
 				.retryOnConnectionFailure(true)
 				.build()
 		getCryptoGetRequest(serverURL, true) {
-			client?.newWebSocket(it, this)
-			client?.dispatcher()?.executorService()?.shutdown()
+			client.newWebSocket(it, this)
+			client.dispatcher().executorService().shutdown()
 		}
 	}
 	

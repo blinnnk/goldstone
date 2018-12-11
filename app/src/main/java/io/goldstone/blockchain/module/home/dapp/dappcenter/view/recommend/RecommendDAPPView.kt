@@ -7,7 +7,7 @@ import android.view.MotionEvent
 import android.widget.LinearLayout
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseDecoration
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
-import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPModel
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import org.jetbrains.anko.matchParent
 
 
@@ -18,7 +18,7 @@ import org.jetbrains.anko.matchParent
 @SuppressLint("ViewConstructor")
 class RecommendDappView(
 	context: Context,
-	private val hold: DAPPModel.() -> Unit
+	private val clickCellEvent: (url: String) -> Unit
 ) : BaseRecyclerView(context) {
 	init {
 		layoutManager = LinearLayoutManager(context).apply {
@@ -35,7 +35,7 @@ class RecommendDappView(
 		}
 	}
 
-	fun setData(data: ArrayList<DAPPModel>) {
-		adapter = RecommendDAPPAdapter(data, hold)
+	fun setData(data: ArrayList<DAPPTable>) {
+		adapter = RecommendDAPPAdapter(data, clickCellEvent)
 	}
 }

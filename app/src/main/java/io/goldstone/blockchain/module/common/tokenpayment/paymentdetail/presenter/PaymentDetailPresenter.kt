@@ -49,7 +49,7 @@ class PaymentDetailPresenter(
 	}
 
 	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
-		if (!NetworkUtil.hasNetwork(fragment.context)) {
+		if (!NetworkUtil.hasNetwork()) {
 			callback(NetworkError.WithOutNetwork)
 		} else {
 			val count = fragment.getTransferCount()
@@ -101,8 +101,10 @@ class PaymentDetailPresenter(
 					true,
 					// User click cancel button
 					{
-						hold(null, AccountError.None)
-						cancelEvent()
+						GlobalScope.launch(Dispatchers.Default) {
+							hold(null, AccountError.None)
+							cancelEvent()
+						}
 					}
 				) { passwordInput ->
 					confirmEvent()

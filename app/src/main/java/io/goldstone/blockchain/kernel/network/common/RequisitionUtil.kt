@@ -8,7 +8,10 @@ import com.blinnnk.extension.safeGet
 import com.blinnnk.util.SystemUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.LogUtil
@@ -30,12 +33,11 @@ import java.util.concurrent.TimeUnit
  */
 object RequisitionUtil {
 
-	@JvmField
 	val client = OkHttpClient
 		.Builder()
 		.connectTimeout(30, TimeUnit.SECONDS)
 		.readTimeout(60, TimeUnit.SECONDS)
-		.build()!!
+		.build()
 
 	fun post(
 		condition: String,
@@ -257,7 +259,7 @@ object RequisitionUtil {
 		bold: RequestBody?
 	) -> Request = { path, goldStoneID, body ->
 		val timeStamp = System.currentTimeMillis().toString()
-		val version = SystemUtils.getVersionCode(GoldStoneAPI.context).toString()
+		val version = SystemUtils.getVersionCode(GoldStoneApp.appContext).toString()
 		val sign = getSignHeader(goldStoneID, timeStamp, version)
 		Request.Builder()
 			.url(path)
@@ -268,6 +270,7 @@ object RequisitionUtil {
 			.addHeader("device", goldStoneID)
 			.addHeader("timestamp", timeStamp)
 			.addHeader("os", "0")
+			.addHeader("language", HoneyLanguage.getLanguageSymbol(currentLanguage))
 			.addHeader("version", version)
 			.addHeader("sign", sign)
 			.addHeader("channel", currentChannel.value)

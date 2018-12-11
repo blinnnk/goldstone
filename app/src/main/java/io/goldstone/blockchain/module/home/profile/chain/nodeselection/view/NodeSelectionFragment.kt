@@ -13,6 +13,7 @@ import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.language.ChainText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -23,7 +24,6 @@ import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.model.NodeCell
@@ -45,9 +45,7 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 	private val fromMainnetSetting by lazy {
 		arguments?.getBoolean(ArgumentKey.isMainnet)
 	}
-	private val confirmButton by lazy {
-		RoundButton(context!!)
-	}
+	private lateinit var confirmButton: RoundButton
 	// ChainType and Node URL -  "194/https://www.eos.com"
 	private var selectedNode: ArrayList<ChainNodeTable> = arrayListOf()
 	private lateinit var container: LinearLayout
@@ -61,12 +59,12 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 				lparams(matchParent, matchParent)
 				bottomPadding = PaddingSize.device
 				showNodeList(fromMainnetSetting.orFalse()) {
-					confirmButton.apply {
+					confirmButton = roundButton {
 						text = CommonText.confirm
 						setBlueStyle(30.uiPX())
 					}.click {
 						confirmNodeSelection()
-					}.into(this)
+					}
 				}
 			}
 		}
@@ -151,17 +149,15 @@ class NodeSelectionFragment : BaseFragment<NodeSelectionPresenter>() {
 			}
 		}
 		updateLocalNodeSelectedStatus {
-			Runtime.getRuntime().gc()
 			activity?.jump<SplashActivity>()
 		}
 	}
 
 	private fun updateLocalNodeSelectedStatus(callback: () -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
-			val dao = GoldStoneDataBase.database.chainNodeDao()
-			dao.clearIsUsedStatus(if (fromMainnetSetting.orFalse()) 0 else 1)
+			ChainNodeTable.dao.clearIsUsedStatus(if (fromMainnetSetting.orFalse()) 0 else 1)
 			selectedNode.forEach {
-				dao.updateIsUsedByURL(it.url, 1, it.chainID)
+				ChainNodeTable.dao.updateIsUsed(it.id, 1, it.chainID)
 			}
 			launchUI(callback)
 		}

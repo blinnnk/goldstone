@@ -6,6 +6,7 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Typeface
+import android.os.Build
 import android.view.Gravity
 import android.view.ViewManager
 import android.widget.LinearLayout
@@ -35,6 +36,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 		textSize = fontSize(12)
 		typeface = GoldStoneFont.medium(context)
 		textColor = Spectrum.opacity5White
+		setLineSpacing(2f, 0.8f)
 		y -= 3.uiPX()
 	}
 	var isFloatRight by observing(false) {

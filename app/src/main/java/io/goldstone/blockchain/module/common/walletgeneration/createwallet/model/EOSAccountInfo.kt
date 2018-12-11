@@ -38,7 +38,7 @@ data class EOSAccountInfo(
 	}
 
 	fun hasActivated(): Boolean {
-		return if (SharedWallet.isWatchOnlyWallet() && name.isNotEmpty()) isCurrent()
+		return if (name.isNotEmpty() && SharedWallet.isWatchOnlyWallet()) isCurrent()
 		else {
 			isCurrent() && publicKey.equals(SharedAddress.getCurrentEOS(), true)
 		}

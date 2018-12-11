@@ -3,7 +3,6 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
-import io.goldstone.blockchain.common.language.TransactionErrorText
 import io.goldstone.blockchain.common.thread.launchUI
 
 
@@ -16,6 +15,8 @@ class ErrorDisplayManager(error: Throwable) {
 
 	init {
 		val errorMessage = error.message
+		// 有写被收集的 ERROR 没有执行 Show 的方法, 需要再打印中观察并在这个类里面管理起来
+		println(errorMessage)
 		if (errorMessage.isNotNull()) {
 			displayMessage = when {
 				errorMessage.contains("Timeout", true)
@@ -35,10 +36,6 @@ class ErrorDisplayManager(error: Throwable) {
 				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
 				errorMessage.contains("64: dust", true) -> {
 					"amount too small to be recognised as legitimate on the bitcoin network."
-				}
-				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
-				errorMessage.contains("3050003", true) -> {
-					TransactionErrorText.transferToUnactivedEOSAcount
 				}
 				else -> error.message
 			}

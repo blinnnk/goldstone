@@ -50,6 +50,7 @@ class ContactInputPresenter(
 	private var ethSeriesAddressText = ""
 	private var eosAccountNameText = ""
 	private var eosJungleAccountNameText = ""
+	private var eosKylinAccountNameText = ""
 	private var btcMainnetAddressText = ""
 	private var btcTestnetAddressText = ""
 	private var etcAddressText = ""
@@ -71,6 +72,7 @@ class ContactInputPresenter(
 		ethSeriesInput: EditText,
 		eosInput: EditText,
 		eosJungleInput: EditText,
+		eosKylinInput: EditText,
 		btcMainnetInput: EditText,
 		bchInput: EditText,
 		btcSeriesTestnetInput: EditText,
@@ -78,19 +80,28 @@ class ContactInputPresenter(
 	) {
 		fragment.getParentFragment<ProfileOverlayFragment>()?.apply {
 			contactAddressModel?.let {
-				when (MultiChainUtils.isValidMultiChainAddress(it.address, CoinSymbol(it.symbol))) {
+				val addressType = MultiChainUtils.isValidMultiChainAddress(it.address, CoinSymbol(it.symbol))
+				when (addressType) {
 					AddressType.ETHSeries -> {
 						ethSeriesInput.setText(it.address)
 						ethSeriesAddressText = it.address
 					}
 
-					AddressType.EOSJungle, AddressType.EOS, AddressType.EOSAccountName -> {
+					AddressType.EOSJungle,
+					AddressType.EOSKylin,
+					AddressType.EOS,
+					AddressType.EOSAccountName -> {
 						if (!SharedValue.isTestEnvironment()) {
 							eosInput.setText(it.address)
 							eosAccountNameText = it.address
 						} else {
-							eosJungleInput.setText(it.address)
-							eosJungleAccountNameText = it.address
+							if (addressType == AddressType.EOSKylin) {
+								eosKylinInput.setText(it.address)
+
+							} else {
+								eosJungleInput.setText(it.address)
+								eosKylinAccountNameText = it.address
+							}
 						}
 					}
 
@@ -139,6 +150,7 @@ class ContactInputPresenter(
 				ethSeriesAddressText.count()
 					+ eosAccountNameText.count()
 					+ eosJungleAccountNameText.count()
+					+ eosKylinAccountNameText.count()
 					+ btcMainnetAddressText.count()
 					+ btcTestnetAddressText.count()
 					+ ltcAddressText.count()
@@ -149,31 +161,37 @@ class ContactInputPresenter(
 			return
 		}
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!Address(ethSeriesAddressText).isValid() && ethSeriesAddressText.isNotEmpty()) {
+		if (ethSeriesAddressText.isNotEmpty() && !Address(ethSeriesAddressText).isValid()) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("ETH/ERC20"))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!EOSAccount(eosAccountNameText).isValid(false) && eosAccountNameText.isNotEmpty()) {
+		if (eosAccountNameText.isNotEmpty() && !EOSAccount(eosAccountNameText).isValid(false)) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!EOSAccount(eosJungleAccountNameText).isValid(false) && eosJungleAccountNameText.isNotEmpty()) {
+		if (eosJungleAccountNameText.isNotEmpty() && !EOSAccount(eosJungleAccountNameText).isValid(false)) {
 			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!LTCWalletUtils.isValidAddress(ltcAddressText) && ltcAddressText.isNotEmpty()) {
+		if (eosKylinAccountNameText.isNotEmpty() && !EOSAccount(eosKylinAccountNameText).isValid(false)) {
+			fragment.context?.alert(ContactText.wrongAddressFormat("EOS"))
+			return
+		}
+
+		// 检查是否是合规的以太坊或以太经典的地址格式
+		if (ltcAddressText.isNotEmpty() && !LTCWalletUtils.isValidAddress(ltcAddressText)) {
 			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.ltc))
 			return
 		}
 
 		// 检查是否是合规的以太坊或以太经典的地址格式
-		if (!BCHWalletUtils.isValidAddress(bchAddressText) && bchAddressText.isNotEmpty()) {
+		if (bchAddressText.isNotEmpty() && !BCHWalletUtils.isValidAddress(bchAddressText)) {
 			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.bch))
 			return
 		}
@@ -203,6 +221,7 @@ class ContactInputPresenter(
 				ethSeriesAddressText,
 				eosAccountNameText,
 				eosJungleAccountNameText,
+				eosKylinAccountNameText,
 				btcMainnetAddressText,
 				formattedBTCSeriesTestAddress(btcTestnetAddressText),
 				etcAddressText,
@@ -234,6 +253,7 @@ class ContactInputPresenter(
 		ethETHSeriesInput: EditText,
 		eosInput: EditText,
 		eosJungleInput: EditText,
+		eosKylinInput: EditText,
 		btcMainnetInput: EditText,
 		btcTestnetInput: EditText,
 		ltcInput: EditText,
@@ -312,6 +332,29 @@ class ContactInputPresenter(
 		eosJungleInput.addTextChangedListener(object : TextWatcher {
 			override fun afterTextChanged(text: Editable?) {
 				eosJungleAccountNameText = text.toString().orElse("")
+				setStyle(confirmButton)
+			}
+
+			override fun beforeTextChanged(
+				text: CharSequence?,
+				start: Int,
+				count: Int,
+				after: Int
+			) {
+			}
+
+			override fun onTextChanged(
+				text: CharSequence?,
+				start: Int,
+				before: Int,
+				count: Int
+			) {
+			}
+		})
+
+		eosKylinInput.addTextChangedListener(object : TextWatcher {
+			override fun afterTextChanged(text: Editable?) {
+				eosKylinAccountNameText = text.toString().orElse("")
 				setStyle(confirmButton)
 			}
 
@@ -431,6 +474,7 @@ class ContactInputPresenter(
 			* (
 				ethSeriesAddressText.count()
 					+ eosJungleAccountNameText.count()
+					+ eosKylinAccountNameText.count()
 					+ eosAccountNameText.count()
 					+ btcMainnetAddressText.count()
 					+ btcTestnetAddressText.count()

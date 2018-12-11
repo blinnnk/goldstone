@@ -57,6 +57,16 @@ object EmptyText {
 		else -> ""
 	}
 	@JvmField
+	val latestUsedDAPP = when (currentLanguage) {
+		HoneyLanguage.English.code -> "None latest used dapp now"
+		HoneyLanguage.Chinese.code -> "None latest used dapp now"
+		HoneyLanguage.Japanese.code -> "None latest used dapp now"
+		HoneyLanguage.Korean.code -> "None latest used dapp now"
+		HoneyLanguage.Russian.code -> "None latest used dapp now"
+		HoneyLanguage.TraditionalChinese.code -> "None latest used dapp now"
+		else -> ""
+	}
+	@JvmField
 	val notificationListSubtitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "We will remind you when there are new transfers or other notifications."
 		HoneyLanguage.Chinese.code -> "当有新的转账或其他通知消息时我们会在这里提醒您"
@@ -64,6 +74,16 @@ object EmptyText {
 		HoneyLanguage.Korean.code -> "새로운 전송이나 기타 알림이있을 때 알려드립니다."
 		HoneyLanguage.Russian.code -> "Напоминаем, когда появляются новые переводы или другие уведомления."
 		HoneyLanguage.TraditionalChinese.code -> "當有新的轉賬或其他通知消息時我們會在這裡提醒您"
+		else -> ""
+	}
+	@JvmField
+	val latestUsedDAPPSubtitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "once you used any dapp, it will appear here and convenience for you next to use"
+		HoneyLanguage.Chinese.code -> "once you used any dapp, it will appear here and convenience for you next to use"
+		HoneyLanguage.Japanese.code -> "once you used any dapp, it will appear here and convenience for you next to use"
+		HoneyLanguage.Korean.code -> "once you used any dapp, it will appear here and convenience for you next to use"
+		HoneyLanguage.Russian.code -> "once you used any dapp, it will appear here and convenience for you next to use"
+		HoneyLanguage.TraditionalChinese.code -> "once you used any dapp, it will appear here and convenience for you next to use"
 		else -> ""
 	}
 	@JvmField

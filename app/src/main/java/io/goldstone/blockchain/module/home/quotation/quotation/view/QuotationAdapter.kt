@@ -4,9 +4,11 @@ import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 20/04/2018 8:17 PM
@@ -14,7 +16,7 @@ import org.jetbrains.anko.matchParent
  */
 class QuotationAdapter(
 	override var dataSet: ArrayList<QuotationModel>,
-	private val hold: QuotationCell.() -> Unit
+	private val clickEvent: (QuotationModel) -> Unit
 ) :
 	HoneyBaseAdapterWithHeaderAndFooter<QuotationModel, View, QuotationCell, View>() {
 
@@ -35,6 +37,9 @@ class QuotationAdapter(
 		position: Int
 	) {
 		model = data
-		hold(this)
+		onClick {
+			clickEvent(data)
+			preventDuplicateClicks()
+		}
 	}
 }

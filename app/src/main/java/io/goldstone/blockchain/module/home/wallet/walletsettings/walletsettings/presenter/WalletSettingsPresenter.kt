@@ -7,15 +7,12 @@ import com.blinnnk.extension.isNull
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.common.component.UnlimitedAvatar
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.common.utils.alert
-import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.utils.glideImage
+import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -159,7 +156,7 @@ class WalletSettingsPresenter(
 				}
 			}
 			avatarImage.glideImage(
-				UnlimitedAvatar(SharedWallet.getCurrentWalletID(), context).getBitmap()
+				AvatarManager.getAvatarPath(SharedWallet.getCurrentWalletID())
 			)
 		}
 	}

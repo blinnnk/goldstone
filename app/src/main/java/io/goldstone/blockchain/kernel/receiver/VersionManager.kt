@@ -21,6 +21,7 @@ import com.blinnnk.extension.*
 import com.blinnnk.util.CheckPermission
 import com.blinnnk.util.PermissionCategory
 import com.blinnnk.util.SystemUtils
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.error.RequestError
@@ -56,10 +57,10 @@ class VersionManager(val fragment: Fragment) {
 	private var downloadId = 0L
 	private var filepath = ""
 	private val notifyManager =
-		GoldStoneAPI.context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+		GoldStoneApp.appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 	private val builder by lazy {
-		NotificationCompat.Builder(GoldStoneAPI.context, "channel_1")
-			.setLargeIcon(BitmapFactory.decodeResource(GoldStoneAPI.context.resources, R.mipmap.ic_launcher))
+		NotificationCompat.Builder(GoldStoneApp.appContext, "channel_1")
+			.setLargeIcon(BitmapFactory.decodeResource(GoldStoneApp.appContext.resources, R.mipmap.ic_launcher))
 			.setSmallIcon(R.drawable.version_icon)
 			.setContentTitle("GoldStone")
 	}
@@ -192,7 +193,7 @@ class VersionManager(val fragment: Fragment) {
 
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-		val packageURI = Uri.parse("package:" + GoldStoneAPI.context.packageName)
+		val packageURI = Uri.parse("package:" + GoldStoneApp.appContext.packageName)
 		val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, packageURI)
 		fragment.startActivityForResult(intent, installPermissionRequestCode)
 	}
@@ -254,7 +255,7 @@ class VersionManager(val fragment: Fragment) {
 			filepath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath + "/" + "GoldStone$title.apk"
 		}
 		// get download service and enqueue file
-		val manager = GoldStoneAPI.context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+		val manager = GoldStoneApp.appContext.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 		showNotification(description)
 		return manager.enqueue(request)
 	}

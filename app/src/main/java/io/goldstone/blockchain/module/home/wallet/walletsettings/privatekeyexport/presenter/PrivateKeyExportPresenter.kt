@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexpo
 import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -15,7 +16,6 @@ import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.view.PrivateKeyExportFragment
 import kotlinx.coroutines.Dispatchers
@@ -49,13 +49,13 @@ class PrivateKeyExportPresenter(
 			if (password.isEmpty()) hold(null, AccountError.WrongPassword)
 			else {
 				val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@launch
-				if (wallet.getWalletType().isMultiChain()) GoldStoneAPI.context.getPrivateKeyByWalletID(
+				if (wallet.getWalletType().isMultiChain()) GoldStoneApp.appContext.getPrivateKeyByWalletID(
 					password,
 					wallet.id,
 					chainType,
 					hold
 				) else getPrivateKeyByPath(
-					GoldStoneAPI.context,
+					GoldStoneApp.appContext,
 					wallet,
 					address,
 					chainType,

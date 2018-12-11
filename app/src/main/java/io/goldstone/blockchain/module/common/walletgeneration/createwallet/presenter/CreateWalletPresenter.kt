@@ -3,7 +3,10 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.pres
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.WorkerThread
-import com.blinnnk.util.*
+import com.blinnnk.util.ConcurrentJobs
+import com.blinnnk.util.ReasonText
+import com.blinnnk.util.UnsafeReasons
+import com.blinnnk.util.checkPasswordInRules
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.error.AccountError
@@ -20,7 +23,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
@@ -66,7 +69,7 @@ class CreateWalletPresenter(
 				multiChainAddresses.ltc.address,
 				multiChainAddresses.bch.address,
 				multiChainAddresses.eos.address,
-				EOSDefaultAllChainName(multiChainAddresses.eos.address, multiChainAddresses.eos.address),
+				EOSDefaultAllChainName(multiChainAddresses.eos.address, multiChainAddresses.eos.address, multiChainAddresses.eos.address),
 				ethAddresses = listOf(multiChainAddresses.eth),
 				etcAddresses = listOf(multiChainAddresses.etc),
 				btcAddresses = listOf(multiChainAddresses.btc),
@@ -178,7 +181,9 @@ class CreateWalletPresenter(
 								MyTokenTable.dao.insert(MyTokenTable(localTokens[index], addresses.etc.address))
 						}
 
-						ChainID.eosMain, ChainID.eosTest -> {
+						ChainID.eosMain,
+						ChainID.eosJungle,
+						ChainID.eosKylin -> {
 							if (addresses.eos.isNotEmpty())
 								if (EOSWalletUtils.isValidAddress(addresses.eos.address)) {
 									MyTokenTable.dao.insert(MyTokenTable(localTokens[index], addresses.eos.address))

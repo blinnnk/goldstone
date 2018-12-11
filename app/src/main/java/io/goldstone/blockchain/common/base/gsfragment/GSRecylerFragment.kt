@@ -12,8 +12,10 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
-import com.blinnnk.extension.*
-import com.blinnnk.uikit.ScreenSize
+import com.blinnnk.extension.centerInParent
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
@@ -22,7 +24,6 @@ import io.goldstone.blockchain.common.component.EmptyType
 import io.goldstone.blockchain.common.component.EmptyView
 import io.goldstone.blockchain.common.component.overlay.TopMiniLoadingView
 import io.goldstone.blockchain.common.utils.getMainActivity
-import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.view.TokenDetailFragment
 import io.goldstone.blockchain.module.common.tokenpayment.addressselection.view.AddressSelectionFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity

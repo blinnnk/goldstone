@@ -4,14 +4,15 @@ import android.arch.persistence.room.*
 import android.content.Context
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeDao
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
-import io.goldstone.blockchain.kernel.commonmodel.*
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDao
 import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionDataConverter
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.*
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.*
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceDao
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPDao
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeDao
@@ -50,7 +51,9 @@ import java.math.BigInteger
 		(ExchangeTable::class),
 		(EOSAccountTable::class),
 		(ChainNodeTable::class),
-		(RAMPriceTable::class)
+		(RAMPriceTable::class),
+		(DAPPTable::class),
+		(FavoriteTable::class)
 	],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
@@ -90,9 +93,11 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
 	abstract fun chainNodeDao(): ChainNodeDao
 	abstract fun ramPriceDao(): RAMPriceDao
+	abstract fun dappDao(): DAPPDao
+	abstract fun favoriteDao(): FavoriteDao
 
 	companion object {
-		const val databaseVersion = 13
+		const val databaseVersion = 14
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

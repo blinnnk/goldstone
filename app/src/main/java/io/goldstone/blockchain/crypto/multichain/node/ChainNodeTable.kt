@@ -96,8 +96,8 @@ interface ChainNodeDao {
 	@Query("SELECT * FROM chainNode WHERE netType LIKE 1 AND isUsed = 1 ORDER BY chainType")
 	fun getUsedTestnet(): List<ChainNodeTable>
 
-	@Query("UPDATE chainNode SET isUsed = :isUsed WHERE url = :url AND chainID = :chainID")
-	fun updateIsUsedByURL(url: String, isUsed: Int, chainID: String)
+	@Query("UPDATE chainNode SET isUsed = :isUsed WHERE id = :id AND chainID = :chainID")
+	fun updateIsUsed(id: String, isUsed: Int, chainID: String)
 
 	@Query("UPDATE chainNode SET isUsed = 0 WHERE netType = :netType")
 	fun clearIsUsedStatus(netType: Int)
@@ -113,4 +113,7 @@ interface ChainNodeDao {
 
 	@Delete
 	fun delete(chainTable: ChainNodeTable)
+
+	@Query("DELETE FROM chainNode")
+	fun deleteAll()
 }

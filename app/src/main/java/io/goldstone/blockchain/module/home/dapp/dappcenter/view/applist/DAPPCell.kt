@@ -20,7 +20,7 @@ import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPModel
+import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import org.jetbrains.anko.*
 
 
@@ -30,13 +30,13 @@ import org.jetbrains.anko.*
  */
 class DAPPCell(context: Context) : LinearLayout(context) {
 
-	var model: DAPPModel? by observing(null) {
+	var model: DAPPTable? by observing(null) {
 		model?.apply {
-			appIcon.glideImage(src)
+			appIcon.glideImage(icon)
 			titles.title.text = title
 			titles.subtitle.text = description
 			tagContainer.removeAllViewsInLayout()
-			tags.forEach {
+			getTagList().forEach {
 				val subTag = Tag(context)
 				subTag.text = it
 				subTag.into(tagContainer)
@@ -67,7 +67,10 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			lparams(ScreenSize.card - 130.uiPX(), wrapContent)
 			titles = twoLineTitles {
 				leftPadding = 10.uiPX()
-				setBlackTitles(subtitleSize = fontSize(12))
+				setBlackTitles(
+					lineSpace = 1.uiPX(),
+					subtitleSize = fontSize(12)
+				)
 			}
 			tagContainer = linearLayout {
 				lparams(matchParent, wrapContent)
@@ -103,7 +106,7 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = LinearLayout.LayoutParams(wrapContent, 24.uiPX())
 			setPadding(8.uiPX(), 1.uiPX(), 8.uiPX(), 1.uiPX())
-			textSize = fontSize(10)
+			textSize = fontSize(11)
 			textColor = GrayScale.midGray
 			addCorner(12.uiPX(), GrayScale.whiteGray)
 		}

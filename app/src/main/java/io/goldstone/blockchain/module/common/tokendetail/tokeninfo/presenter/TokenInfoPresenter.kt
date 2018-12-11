@@ -17,11 +17,11 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commonmodel.ExplorerModel
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -92,11 +92,11 @@ class TokenInfoPresenter(
 				}
 				else -> {
 					val time =
-						TransactionTable.dao.getMaxBlockNumber(
+						TransactionTable.dao.getLatestTimeStamp(
 							token.contract.getAddress(),
 							token.contract.contract,
 							token.chainID
-						)?.timeStamp?.toMillisecond()
+						)?.toMillisecond()
 					val date = if (time.isNotNull()) {
 						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
 					} else CommonText.calculating

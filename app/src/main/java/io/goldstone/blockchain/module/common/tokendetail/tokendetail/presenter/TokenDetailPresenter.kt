@@ -10,10 +10,10 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
-import io.goldstone.blockchain.kernel.commonmodel.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.MyTokenTable
-import io.goldstone.blockchain.kernel.commonmodel.TransactionTable
-import io.goldstone.blockchain.kernel.commonmodel.eos.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
+import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.MyTokenTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.contract.TokenDetailContract
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.model.TokenBalanceTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -81,7 +81,7 @@ class TokenDetailPresenter(
 			token.contract.getAddress(),
 			token.contract.contract,
 			token.chainID
-		)?.blockNumber ?: 99999999
+		) ?: 99999999
 	}
 
 	private fun loadLocalData(isRefresh: Boolean) {

@@ -7,7 +7,7 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.view.NodeSelectionFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

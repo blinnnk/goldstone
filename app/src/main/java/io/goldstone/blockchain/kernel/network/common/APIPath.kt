@@ -115,4 +115,12 @@ object APIPath {
 		size: Int) -> String = { header, account, endID, size ->
 		"$header/eosram/txListByAccount?account=$account&end=$endID&size=$size"
 	}
+
+	val getRecommendDAPPs: (header: String, page: Int, pageSize: Int) -> String = { header, pageIndex, pageSize ->
+		"$header/dapp/getRecommendDapp?page=$pageIndex&size=$pageSize"
+	}
+
+	val getNewDAPPs: (header: String, page: Int, pageSize: Int) -> String = { header, pageIndex, pageSize ->
+		"$header/dapp/getDapps?page=$pageIndex&size=$pageSize"
+	}
 }

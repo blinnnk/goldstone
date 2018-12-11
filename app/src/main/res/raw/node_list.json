@@ -105,13 +105,13 @@
 		"is_default": 1
 	},
 	{
-		"id": "5bc437bbe3387b62f5ae8b1d",
+		"id": "5c049700e3387b102a3b5121",
 		"key_list": [],
 		"net_type": 0,
 		"chain_type": 194,
 		"chain_id": "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906",
-		"node_name": "Mainnet (EOSAsia)",
-		"url": "https://api1.eosasia.one",
+		"node_name": "Mainnet (EOSNode)",
+		"url": "https://proxy.eosnode.tools",
 		"encrypt_status": 0,
 		"weight": 0,
 		"is_default": 1
@@ -127,6 +127,18 @@
 		"encrypt_status": 0,
 		"weight": 0,
 		"is_default": 1
+	},
+	{
+		"id": "5bbef2e4e3387b38dffd8ea5",
+		"key_list": [],
+		"net_type": 1,
+		"chain_type": 194,
+		"chain_id": "5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191",
+		"node_name": "Kylin(EosAsia)",
+		"url": "https://api-kylin.eosasia.one",
+		"encrypt_status": 0,
+		"weight": 0,
+		"is_default": 0
 	},
 	{
 		"id": "5bc43aa6e3387b62f5ae8b23",

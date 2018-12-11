@@ -4,14 +4,13 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
-import android.widget.LinearLayout
 import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ContactText
@@ -35,15 +34,16 @@ import org.jetbrains.anko.verticalLayout
 class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 
 	override val pageTitle: String = ProfileText.contacts
-	private val nameInput by lazy { RoundInput(context!!) }
-	private val ethSeriesAddressInput by lazy { RoundInput(context!!) }
-	private val eosAddressInput by lazy { RoundInput(context!!) }
-	private val btcMainnetAddressInput by lazy { RoundInput(context!!) }
-	private val bchAddressInput by lazy { RoundInput(context!!) }
-	private val ltcAddressInput by lazy { RoundInput(context!!) }
-	private val btcTestnetAddressInput by lazy { RoundInput(context!!) }
-	private val eosJungleAddressInput by lazy { RoundInput(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var nameInput: RoundInput
+	private lateinit var ethSeriesAddressInput: RoundInput
+	private lateinit var eosAddressInput: RoundInput
+	private lateinit var btcMainnetAddressInput: RoundInput
+	private lateinit var bchAddressInput: RoundInput
+	private lateinit var ltcAddressInput: RoundInput
+	private lateinit var btcTestnetAddressInput: RoundInput
+	private lateinit var eosJungleAddressInput: RoundInput
+	private lateinit var eosKylinAddressInput: RoundInput
+	private lateinit var confirmButton: RoundButton
 	override val presenter = ContactInputPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -52,72 +52,87 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-				nameInput.apply {
+				nameInput = roundInput {
 					title = ContactText.contactName
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-				}.into(this)
-
+				}.lparams {
+					topMargin = 40.uiPX()
+				}
 				sessionTitle {
 					setTitle(ProfileText.contacts)
 				}
 
-				ethSeriesAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
+				ethSeriesAddressInput = roundInput {
 					title = CoinSymbol.eth
 					hint = ContactText.ethERCAndETHint
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-				eosAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+				eosAddressInput = roundInput {
 					title = CoinSymbol.eos
 					hint = ContactText.eosHint
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-				btcMainnetAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+				btcMainnetAddressInput = roundInput {
 					title = CoinSymbol.btc()
 					hint = ContactText.btcMainnetAddress
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-				bchAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+				bchAddressInput = roundInput {
 					title = CoinSymbol.bch
 					hint = ContactText.bchAddress
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-				ltcAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+				ltcAddressInput = roundInput {
 					title = CoinSymbol.ltc
 					hint = ContactText.ltcAddress
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-				eosJungleAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+				eosJungleAddressInput = roundInput {
 					title = "${CoinSymbol.eos} JUNGLE"
 					hint = ContactText.eosJungleHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-				btcTestnetAddressInput.apply {
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
+				eosKylinAddressInput = roundInput {
+					title = "${CoinSymbol.eos} JUNGLE"
+					hint = ContactText.eosJungleHint
+					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
+
+				btcTestnetAddressInput = roundInput {
 					title = "${CoinSymbol.btc()} Series TEST"
 					hint = ContactText.btcTestnetAddress
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
-				}.into(this)
+				}.lparams {
+					topMargin = 5.uiPX()
+				}
 
-
-				confirmButton.apply {
+				confirmButton = roundButton {
 					text = CommonText.confirm
 					setGrayStyle(20.uiPX())
 				}.click {
 					presenter.addContact()
-				}.into(this)
+				}
 
 				presenter.getAddressIfExist(
 					ethSeriesAddressInput,
 					eosAddressInput,
 					eosJungleAddressInput,
+					eosKylinAddressInput,
 					btcMainnetAddressInput,
 					bchAddressInput,
 					btcTestnetAddressInput,
@@ -132,6 +147,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		ethSeriesAddressInput.setText(data.ethSeriesAddress)
 		eosAddressInput.setText(data.eosAddress)
 		eosJungleAddressInput.setText(data.eosJungle)
+		eosKylinAddressInput.setText(data.eosKylin)
 		btcMainnetAddressInput.setText(data.btcMainnetAddress)
 		btcTestnetAddressInput.setText(data.btcSeriesTestnetAddress)
 		ltcAddressInput.setText(data.ltcAddress)
@@ -148,6 +164,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			ethSeriesAddressInput,
 			eosAddressInput,
 			eosJungleAddressInput,
+			eosKylinAddressInput,
 			btcMainnetAddressInput,
 			btcTestnetAddressInput,
 			ltcAddressInput,
@@ -156,10 +173,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		)
 	}
 
-	override fun setBaseBackEvent(
-		activity: MainActivity?,
-		parent: Fragment?
-	) {
+	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		getParentFragment<ProfileOverlayFragment> {
 			if (childFragmentManager.fragments.size <= 1) {
 				// 从账单详情添加快捷通讯录跳转过来, 是没有上级入口的. 这里直接销毁。

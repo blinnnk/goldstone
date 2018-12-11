@@ -10,15 +10,20 @@ import io.goldstone.blockchain.module.home.rammarket.view.RAMMarketOverlayFragme
  * @author: yanglihai
  * @description:
  */
-class RAMMarketPresenter(override val fragment: RAMMarketOverlayFragment)
-	: BaseOverlayPresenter<RAMMarketOverlayFragment>() {
-
+class RAMMarketPresenter(override val fragment: RAMMarketOverlayFragment) : BaseOverlayPresenter<RAMMarketOverlayFragment>() {
+	
 	fun showTransactionHistoryFragment(account: String? = null) {
-		showTargetFragment<RAMTransactionSearchFragment>(Bundle().apply { putString("account", account) })
+		showTargetFragment<RAMTransactionSearchFragment>(Bundle().apply {
+			putString(
+				"account",
+				account
+			)
+		})
 		fragment.getSearchContent().apply {
-			fragment.showSearchInput {
-				popFragmentFrom<RAMTransactionSearchFragment>()
-			}
+			fragment.showSearchInput(true,
+				{
+					popFragmentFrom<RAMTransactionSearchFragment>()
+				}) { }
 		}
 	}
 	

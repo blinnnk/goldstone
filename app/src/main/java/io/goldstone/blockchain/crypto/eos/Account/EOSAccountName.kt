@@ -24,7 +24,7 @@ class EOSAccount(private val value: String) : Serializable {
 		// 是否是特殊账号决定长度判断的不同
 		val isLegalLength =
 			if (isNormalName) value.length == EOSValue.maxNameLength
-			else value.length in 2 .. EOSValue.maxSpecialNameLength
+			else value.length in 1 .. EOSValue.maxSpecialNameLength
 		if (!isLegalLength) {
 			return if (isNormalName) {
 				if (value.length < EOSValue.maxNameLength) EOSAccountNameChecker.TooShort
@@ -40,7 +40,7 @@ class EOSAccount(private val value: String) : Serializable {
 		}
 		val isLegalCharacter =
 		// 如果是普通用户名检查 `12` 位的规则
-			if (isNormalName || value.length == EOSValue.maxNameLength) {
+			if (isNormalName) {
 				value.none { !it.toString().matches(legalCharsIn12) }
 			} else {
 				// 如果是特定用户名检查前 `12` 位的规则并且额外检查第 `13` 位的规则
