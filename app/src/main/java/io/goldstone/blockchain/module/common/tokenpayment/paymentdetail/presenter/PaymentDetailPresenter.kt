@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.present
 import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.Dashboard
@@ -114,8 +115,8 @@ class PaymentDetailPresenter(
 						ChainType.EOS,
 						password
 					) { privateKey, error ->
-						if (!privateKey.isNullOrEmpty() && error.isNone()) hold(EOSPrivateKey(privateKey), error)
-						else hold(null, AccountError.WrongPassword)
+						if (privateKey.isNotNull() && error.isNone()) hold(EOSPrivateKey(privateKey), error)
+						else hold(null, error)
 					} else hold(null, PasswordError.InputIsEmpty)
 				}
 			}

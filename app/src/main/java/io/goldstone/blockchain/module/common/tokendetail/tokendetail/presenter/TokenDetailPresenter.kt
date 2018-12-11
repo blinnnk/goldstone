@@ -7,6 +7,7 @@ import com.blinnnk.extension.toArrayList
 import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.ConcurrentAsyncCombine
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.daysAgoInMills
@@ -36,9 +37,14 @@ class TokenDetailPresenter(
 ) : TokenDetailContract.GSPresenter {
 
 	override fun start() {
-		detailView.showLoading(true)
 		updateEmptyCharData()
-		checkNewDataFromChain()
+		if (!NetworkUtil.hasNetwork()) {
+			detailView.showNetworkAlert()
+			loadLocalData(false)
+		} else {
+			checkNewDataFromChain()
+			detailView.showLoading(true)
+		}
 	}
 
 	override fun refreshData() {

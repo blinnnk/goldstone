@@ -68,6 +68,8 @@ class EOSAccount(private val value: String) : Serializable {
 	fun isValid(onlyNormalName: Boolean = true): Boolean {
 		return checker(onlyNormalName).isValid()
 	}
+
+	fun isSame(account: EOSAccount) : Boolean = name.equals(account.name, true)
 }
 
 enum class EOSAccountNameChecker(val content: String, val shortDescription: String) {

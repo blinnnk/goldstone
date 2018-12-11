@@ -37,6 +37,9 @@ class ErrorDisplayManager(error: Throwable) {
 				errorMessage.contains("64: dust", true) -> {
 					"amount too small to be recognised as legitimate on the bitcoin network."
 				}
+				errorMessage.contains("insufficient staked", true) -> {
+					"target account doesn't have enough bandwidth to refund"
+				}
 				else -> error.message
 			}
 		}

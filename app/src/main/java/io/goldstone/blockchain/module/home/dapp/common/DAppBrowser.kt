@@ -70,7 +70,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},forgetIdentity:function(){currentAccount=null;return new Promise(function(resolve,reject){accounts=null;resolve()})},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -143,15 +143,23 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		@JavascriptInterface
 		fun transferEOS(action: String) {
 			launchUI {
-				System.out.println("action$action")
+				val actionObject = try {
+					JSONObject(action)
+				} catch (error: Exception) {
+					evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
+					return@launchUI
+				}
 				showQuickPaymentDashboard(
-					JSONObject(action),
+					actionObject,
 					true,
 					cancelEvent = {
 						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
-					}
+					},
+					confirmEvent = { loadingView.show() }
 				) { response, error ->
 					launchUI {
+						loadingView.remove()
 						if (response.isNotNull() && error.isNone()) {
 							response.showDialog(context)
 							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
@@ -170,12 +178,20 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		@JavascriptInterface
 		fun simpleTransfer(action: String) {
 			launchUI {
+				val actionObject = try {
+					JSONObject(action)
+				} catch (error: Exception) {
+					evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
+					return@launchUI
+				}
 				showQuickPaymentDashboard(
-					JSONObject(action),
+					actionObject,
 					false,
 					cancelEvent = {
 						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
-					}
+					},
+					confirmEvent = { loadingView.show() }
 				) { response, error ->
 					launchUI {
 						if (response.isNotNull() && error.isNone()) {

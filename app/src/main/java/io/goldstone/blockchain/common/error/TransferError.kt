@@ -13,6 +13,8 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val BalanceIsNotEnough = TransferError(ErrorText.balanceIsNotEnough)
 		@JvmStatic
+		val RefundMoreThenExisted = TransferError("The count you decide to refund is more than you have")
+		@JvmStatic
 		val SellRAMTooLess = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
 		val IncorrectDecimal = TransferError(ErrorText.incorrectDecimal)

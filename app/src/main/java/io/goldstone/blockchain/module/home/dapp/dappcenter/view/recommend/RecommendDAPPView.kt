@@ -18,7 +18,7 @@ import org.jetbrains.anko.matchParent
 @SuppressLint("ViewConstructor")
 class RecommendDappView(
 	context: Context,
-	private val clickCellEvent: (url: String) -> Unit
+	private val clickCellEvent: DAPPTable.() -> Unit
 ) : BaseRecyclerView(context) {
 	init {
 		layoutManager = LinearLayoutManager(context).apply {

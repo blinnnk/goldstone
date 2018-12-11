@@ -36,10 +36,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.support.v4.UI
-import org.jetbrains.anko.support.v4.nestedScrollView
-import org.jetbrains.anko.support.v4.onPageChangeListener
-import org.jetbrains.anko.support.v4.viewPager
+import org.jetbrains.anko.support.v4.*
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.verticalLayout
 
@@ -97,8 +94,10 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					recommendDAPP = RecommendDappView(
 						context,
 						clickCellEvent = {
-							getMainActivity()
-								?.showDappBrowserFragment(it, PreviousView.DAPPCenter, this@DAPPCenterFragment)
+							showAttentionOrElse(id) {
+								getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
+								presenter.setUsedDAPPs()
+							}
 						}
 					)
 					recommendDAPP.into(this)
@@ -139,8 +138,8 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 									showDAPPListDetailFragment(DAPPType.Latest)
 								}
 							)
-							viewPager {
-								layoutParams = LinearLayout.LayoutParams(matchParent, 990.uiPX())
+							themedViewPager {
+								layoutParams = LinearLayout.LayoutParams(matchParent, 985.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 								val titles = listOf("NEW DAPP", "LATEST USED")
 								menuBar.setMenuTitles(titles) { button, id ->

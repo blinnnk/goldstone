@@ -66,6 +66,7 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 		verticalLayout {
 			lparams(ScreenSize.card - 130.uiPX(), wrapContent)
 			titles = twoLineTitles {
+				setSubtitleLineCount(2)
 				leftPadding = 10.uiPX()
 				setBlackTitles(
 					lineSpace = 1.uiPX(),

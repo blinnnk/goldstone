@@ -86,7 +86,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				}
 				sessionTitle(EOSAccountText.memoInfo)
 				availableResultView = valueView {
-					text = accountName + "-" + SharedAddress.getCurrentEOS()
+					setContent(accountName + "-" + SharedAddress.getCurrentEOS())
 				}
 
 				copyResultButton.apply {

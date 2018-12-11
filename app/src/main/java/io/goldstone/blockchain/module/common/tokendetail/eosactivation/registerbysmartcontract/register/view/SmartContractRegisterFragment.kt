@@ -83,7 +83,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
 				valueView {
 					gravity = Gravity.CENTER
-					text = SharedAddress.getCurrentEOS()
+					setContent(SharedAddress.getCurrentEOS())
 				}.click {
 					it.context.clickToCopy(SharedAddress.getCurrentEOS())
 				}
