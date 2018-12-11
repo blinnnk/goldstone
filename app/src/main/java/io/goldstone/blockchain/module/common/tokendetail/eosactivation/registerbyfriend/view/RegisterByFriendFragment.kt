@@ -12,10 +12,11 @@ import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.DescriptionView
-import io.goldstone.blockchain.common.component.KeyValueView
+import io.goldstone.blockchain.common.component.ValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.title.SessionTitleView
+import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -44,7 +45,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 	private val confirmButton by lazy { RoundButton(context!!) }
 	private val copyResultButton by lazy { RoundButton(context!!) }
 	private val availableDescriptionView by lazy { DescriptionView(context!!) }
-	private val availableResultView by lazy { KeyValueView(context!!) }
+	private lateinit var availableResultView: ValueView
 	private val availableSessionTitle by lazy { SessionTitleView(context!!) }
 	private var isValidAccountName = false
 	override val presenter = RegisterByFriendPresenter(this)
@@ -70,12 +71,13 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 					}
 				}.into(this)
 				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
-				KeyValueView(context).apply {
+
+				valueView {
 					gravity = Gravity.CENTER
 					text = SharedAddress.getCurrentEOS()
 				}.click {
 					it.context.clickToCopy(SharedAddress.getCurrentEOS())
-				}.into(this)
+				}
 
 				// 检测成功后这个会显示出来, 默认是隐藏的
 				availableDescriptionView.apply {

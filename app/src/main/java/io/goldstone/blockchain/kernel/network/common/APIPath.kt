@@ -103,4 +103,8 @@ object APIPath {
 	val getNewDAPPs: (header: String, page: Int, pageSize: Int) -> String = { header, pageIndex, pageSize ->
 		"$header/dapp/getDapps?page=$pageIndex&size=$pageSize"
 	}
+
+	val searchDAPP: (header: String, condition: String) -> String = { header, condition ->
+		"$header/dapp/searchDapp?dapp=$condition"
+	}
 }
