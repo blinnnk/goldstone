@@ -69,9 +69,14 @@ class QuotationSearchPresenter(
 
 	override fun searchToken(symbol: String) {
 		with(detailView) {
+			// 如果搜索内容为空就直接返回
+			if (symbol.isEmpty()) {
+				updateUI(arrayListOf())
+				return@with
+			}
 			showLoading(true)
 			GoldStoneAPI.getMarketSearchList(symbol, selectedIds.joinToString(",")) { searchList, error ->
-				if (!searchList.isNullOrEmpty() && error.isNone()) {
+				if (searchList.isNotNull() && error.isNone()) {
 					val targetData =
 						QuotationSelectionTable.dao.getTargetMarketTables(selectedIds)
 					// 如果本地没有已经选中的直接返回搜索的数据展示在界面

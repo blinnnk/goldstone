@@ -46,12 +46,20 @@ data class EOSTransactionInfo(
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	// For DAPP
-	constructor(action: JSONObject, decimal: Int) : this(
+	constructor(action: JSONObject, customMemo: String) : this(
 		EOSAccount(action.getTargetObject("data").safeGet("from")),
 		EOSAccount(action.getTargetObject("data").safeGet("to")),
-		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toAmount(decimal),
-		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), decimal),
-		action.getTargetObject("data").safeGet("memo"),
+		action.getTargetObject("data")
+			.safeGet("quantity")
+			.substringBeforeLast(" ")
+			.toDoubleOrZero()
+			.toAmount(action.getDecimalFromData()),
+		TokenContract(
+			action.safeGet("account"),
+			action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "),
+			action.getDecimalFromData()
+		),
+		customMemo,
 		true
 	)
 
@@ -181,6 +189,16 @@ data class EOSTransactionInfo(
 			val symbolCode = CoinSymbol.eos.toByteArray().toNoPrefixHexString()
 			val completeZero = "00000000"
 			return amountCode + decimalCode + symbolCode + completeZero
+		}
+
+		/**
+		 * `quantity`:`0.000 IQ` 通过截取小数点后的数字计算出 Decimal
+		 */
+		fun JSONObject.getDecimalFromData(): Int {
+			return getTargetObject("data")
+				.safeGet("quantity")
+				.substringBefore(" ")
+				.substringAfterLast(".").length
 		}
 	}
 }

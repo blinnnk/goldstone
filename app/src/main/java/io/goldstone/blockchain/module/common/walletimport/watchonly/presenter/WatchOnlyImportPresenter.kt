@@ -94,7 +94,7 @@ class WatchOnlyImportPresenter(
 					return@launch
 				}
 			}
-			AddressType.EOSJungle.value -> {
+			AddressType.EOSJungle.value, AddressType.EOSKylin.value -> {
 				chainID = ChainID.EOSJungle
 				if (!EOSWalletUtils.isValidAddress(address) && !EOSAccount(address).isValid(false)) {
 					callback(AccountError.InvalidAddress)
@@ -249,19 +249,25 @@ class WatchOnlyImportPresenter(
 						currentEOSAddress = address
 						SharedValue.updateIsTestEnvironment(true)
 						callback(GoldStoneError.None)
+						ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSJungle.id)
 					}
-					EOSAccount(address).isValid(false) ->
-						EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSTestnet().getURL()) { info, error ->
+					EOSAccount(address).isValid(false) -> {
+						EOSAPI.getAccountInfo(
+							EOSAccount(address),
+							SharedChain.getJungleEOSTestnet().getURL()
+						) { info, error ->
 							if (info.isNotNull() || error.isNone()) {
 								eosJungleAccountName = address
 								SharedAddress.updateCurrentEOSName(address)
 								SharedChain.updateEOSCurrent(
-									ChainURL(GoldStoneDataBase.database.chainNodeDao().getTestnetEOSNode())
+									ChainURL(GoldStoneDataBase.database.chainNodeDao().getJungleEOSNode())
 								)
 								SharedValue.updateIsTestEnvironment(true)
+								ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSJungle.id)
 								callback(error)
 							} else callback(AccountError.InvalidAccountName)
 						}
+					}
 					else -> callback(AccountError.InactivatedAccountName)
 				}
 			}
@@ -270,17 +276,19 @@ class WatchOnlyImportPresenter(
 					EOSWalletUtils.isValidAddress(address) -> {
 						currentEOSAddress = address
 						SharedValue.updateIsTestEnvironment(true)
+						ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSKylin.id)
 						callback(GoldStoneError.None)
 					}
 					EOSAccount(address).isValid(false) ->
-						EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getEOSTestnet().getURL()) { info, error ->
+						EOSAPI.getAccountInfo(EOSAccount(address), SharedChain.getKylinEOSTestnet().getURL()) { info, error ->
 							if (info.isNotNull() || error.isNone()) {
 								eosKylinAccountName = address
 								SharedAddress.updateCurrentEOSName(address)
 								SharedChain.updateEOSCurrent(
-									ChainURL(GoldStoneDataBase.database.chainNodeDao().getTestnetEOSNode())
+									ChainURL(GoldStoneDataBase.database.chainNodeDao().getKylinEOSNode())
 								)
 								SharedValue.updateIsTestEnvironment(true)
+								ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSKylin.id)
 								callback(error)
 							} else callback(AccountError.InvalidAccountName)
 						}

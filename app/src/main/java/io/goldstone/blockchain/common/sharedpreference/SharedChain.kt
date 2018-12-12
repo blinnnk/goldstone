@@ -65,14 +65,23 @@ object SharedChain {
 	fun updateEOSMainnet(chainInfo: ChainURL) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosMainnet, chainInfo.generateObject())
 
-	fun getEOSTestnet(): ChainURL {
+	fun getJungleEOSTestnet(): ChainURL {
 		val chainObject =
-			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.eosTestnet))
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.eosJungle))
 		return ChainURL(chainObject)
 	}
 
-	fun updateEOSTestnet(chainInfo: ChainURL) =
-		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosTestnet, chainInfo.generateObject())
+	fun updateJungleEOSTestnet(chainInfo: ChainURL) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosJungle, chainInfo.generateObject())
+
+	fun getKylinEOSTestnet(): ChainURL {
+		val chainObject =
+			JSONObject(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.eosKylin))
+		return ChainURL(chainObject)
+	}
+
+	fun updateKylinEOSTestnet(chainInfo: ChainURL) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.eosKylin, chainInfo.generateObject())
 
 
 	/** ETC ChainID And Chain Name in Shared Preference*/

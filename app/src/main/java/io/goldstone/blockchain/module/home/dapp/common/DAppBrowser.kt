@@ -3,11 +3,14 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import android.widget.Toast
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toIntOrZero
 import com.blinnnk.util.SystemUtils
 import com.blinnnk.util.load
 import com.blinnnk.util.then
@@ -21,6 +24,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
@@ -29,6 +33,7 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import org.jetbrains.anko.matchParent
@@ -70,13 +75,12 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){resolve({accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]})})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},forgetIdentity:function(){currentAccount=null;return new Promise(function(resolve,reject){accounts=null;resolve()})},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,interval:null,eos:function(){return{transaction:function(action){console.log(JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){console.log('+++++'+JSON.stringify(data))},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(fromAccount+toAccount+quantity+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};console.log(JSON.stringify(transferAction));window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.txID);if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){identity={accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]};resolve(identity)})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},forgetIdentity:function(){currentAccount=null;return new Promise(function(resolve,reject){accounts=null;resolve()})},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};console.log(\"hey 1\");clearInterval(window.scatter.interval);window.scatter.tableRow=null}},1500)})},getAccount:function(data){console.log(data);window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};clearInterval(window.scatter.interval);window.scatter.accountInfo=null}},1500)})},getCurrencyBalance:function(code,name){window.control.getEOSAccountBalance(code,name);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance)};clearInterval(window.scatter.interval);window.scatter.balance=null}},2000)})},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"+++&&&\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){alert(window.scatter.arbSignature);resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
 						"})()", null)
 				}
-				evaluateJS() // for auto login
 				if (newProgress == 100) {
 					evaluateJS() // for totally
 				}
@@ -93,6 +97,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		super.onDetachedFromWindow()
 		// 销毁的时候清理用于接收 Promise 而设定的 Interval
 		evaluateJavascript("javascript:(function(){clearInterval(window.scatter.interval);})()", null)
+		destroy()
 	}
 
 	fun backEvent(callback: () -> Unit) {
@@ -102,12 +107,89 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 	inner class JSInterface {
 
 		@JavascriptInterface
+		fun getEOSAccountBalance(code: String, accountName: String) {
+			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+			Log.d("Scatter", code)
+			EOSAPI.getAccountEOSBalance(EOSAccount(accountName)) { balance, error ->
+				launchUI {
+					if (balance.isNotNull() && error.isNone()) {
+						evaluateJavascript("javascript:(function(){scatter.balance=\"$balance\"})()", null)
+					} else {
+						evaluateJavascript("javascript:(function(){scatter.balance=\"failed\"})()", null)
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
+		fun getEOSAccountInfo(accountName: String) {
+			System.out.println("*********** $accountName")
+			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+			EOSAPI.getStringAccountInfo(SharedAddress.getCurrentEOSAccount()) { accountInfo, error ->
+				System.out.println("accoutn $accountInfo")
+				launchUI {
+					if (accountInfo.isNotNull() && error.isNone()) {
+						evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
+					} else {
+						evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
 		fun getEOSAccountPermissions() {
 			load {
 				EOSAccountTable.getPermissions(account, chainID)
 			} then { permissions ->
 				val list = "[${permissions.joinToString(",") { it.generateObject() }}]"
 				callWeb("getPermissions", list)
+			}
+		}
+
+		@JavascriptInterface
+		fun getTableRows(data: String) {
+			System.out.println("+++$data")
+			launchUI {
+				val tableObject = try {
+					JSONObject(data)
+				} catch (error: Exception) {
+					evaluateJavascript("javascript:(function(){scatter.tableRow=\"failed\"})()", null)
+					println("GoldStone-DAPP Get Table Row ERROR: ${error.message}\n DATA: $data")
+					return@launchUI
+				}
+				val option =
+					if (tableObject.safeGet("lower_bound").isNotEmpty()) Pair("lower_bound", tableObject.safeGet("lower_bound"))
+					else null
+				val limit =
+					if (tableObject.safeGet("limit").isNotEmpty()) Pair("limit", tableObject.safeGet("limit").toIntOrZero())
+					else null
+
+				val indexPosition =
+					if (tableObject.safeGet("index_position").isNotEmpty()) Pair("index_position", tableObject.safeGet("index_position").toIntOrZero())
+					else null
+
+				val keyType =
+					if (tableObject.safeGet("key_type").isNotEmpty()) Pair("key_type", tableObject.safeGet("key_type"))
+					else null
+
+				EOSAPI.getTableRows(
+					tableObject.safeGet("scope"),
+					tableObject.safeGet("code"),
+					tableObject.safeGet("table"),
+					option,
+					limit,
+					indexPosition,
+					keyType
+				) { result, error ->
+					launchUI {
+						if (result.isNotNull() && error.isNone()) {
+							evaluateJavascript("javascript:(function(){scatter.tableRow=$result})()", null)
+						} else {
+							evaluateJavascript("javascript:(function(){scatter.tableRow=\"failed\"})()", null)
+						}
+					}
+				}
 			}
 		}
 

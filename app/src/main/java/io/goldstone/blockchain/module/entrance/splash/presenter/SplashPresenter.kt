@@ -234,6 +234,9 @@ class SplashPresenter(val activity: SplashActivity) {
 				type.isEOSJungle() -> NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)
 				}
+				type.isEOSKylin() -> NodeSelectionPresenter.setAllTestnet {
+					cacheWalletData(wallet, callback)
+				}
 				type.isEOSMainnet() -> NodeSelectionPresenter.setAllMainnet {
 					cacheWalletData(wallet, callback)
 				}

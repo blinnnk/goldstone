@@ -44,7 +44,6 @@ class TokenSearchPresenter(
 			if (SharedWallet.getCurrentWalletType().isBTCSeries())
 				showSearchButton(false) {}
 			else {
-				fragment.showLoadingView(true)
 				MyTokenTable.getMyTokens { myTokens ->
 					searchInputListener { inputContent ->
 						if (NetworkUtil.hasNetwork()) getSearchResult(inputContent, myTokens)
@@ -55,6 +54,7 @@ class TokenSearchPresenter(
 	}
 
 	private fun getSearchResult(searchContent: String, myTokens: List<MyTokenTable>) {
+		fragment.showLoadingView(true)
 		myTokens.searchTokenByContractOrSymbol(searchContent) { result, error ->
 			launchUI {
 				if (result.isNotNull() && error.isNone()) {

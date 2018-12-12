@@ -42,7 +42,7 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 		val type = SharedWallet.getCurrentWalletType()
 		when {
 			type.isBTCTest() -> context.alert(AlertText.testnetOnly)
-			type.isEOSJungle() -> context.alert(AlertText.testnetOnly)
+			type.isEOSJungle() || type.isEOSKylin() -> context.alert(AlertText.testnetOnly)
 			type.isEOSMainnet() -> context.alert(AlertText.mainnetOnly)
 			type.isBTC() -> context.alert(AlertText.mainnetOnly)
 			type.isLTC() -> context.alert(AlertText.mainnetOnly)

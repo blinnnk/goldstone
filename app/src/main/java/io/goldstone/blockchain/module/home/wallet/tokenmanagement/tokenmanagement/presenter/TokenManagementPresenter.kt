@@ -22,7 +22,7 @@ class TokenManagementPresenter(
 			showSearchButton(true) {
 				showTokenSearchFragment()
 				showSearchInput(
-					false,
+					true,
 					cancelEvent = { popFragmentFrom<TokenSearchFragment>() },
 					enterKeyEvent = {}
 				)

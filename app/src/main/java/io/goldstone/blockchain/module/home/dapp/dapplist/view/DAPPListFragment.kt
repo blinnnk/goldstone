@@ -81,9 +81,7 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 			presenter.loadMore(pageIndex, type!!) { newData ->
 				noMoreData = newData.size < DataValue.dappPageCount
 				if (newData.isEmpty()) {
-					launchUI {
-						showBottomLoading(false)
-					}
+					showBottomLoading(false)
 					return@loadMore
 				}
 				// 如果初始化的页面有数据, 但是不足一页的数量, 那么清楚内存数据
@@ -112,11 +110,7 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 				bottomLoadingView = it
 			},
 			clickEvent = {
-				getMainActivity()?.showDappBrowserFragment(
-					it,
-					PreviousView.DAPPList,
-					this
-				)
+				getMainActivity()?.showDappBrowserFragment(it, PreviousView.DAPPList, this)
 			}
 		)
 	}
@@ -125,7 +119,7 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 		ErrorDisplayManager(error).show(context)
 	}
 
-	private fun showBottomLoading(status: Boolean) {
+	private fun showBottomLoading(status: Boolean) = launchUI {
 		if (status) bottomLoadingView?.show()
 		else {
 			isLoadingData = false

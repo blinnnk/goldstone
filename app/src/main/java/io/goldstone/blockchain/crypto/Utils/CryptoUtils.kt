@@ -35,11 +35,12 @@ object CryptoUtils {
 	}
 
 	fun toTargetUnit(
-		value: BigInteger,
+		value: BigDecimal,
 		decimal: Double,
 		hexadecimal: Double
 	): Double {
-		return value.toDouble() / Math.pow(hexadecimal, decimal)
+		val isNegative = value < BigDecimal.ZERO
+		return (Math.abs(value.toDouble()) / Math.pow(hexadecimal, decimal)) * if (isNegative) -1 else 1
 	}
 
 	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean): String {
@@ -154,9 +155,10 @@ fun Double.formatCurrency(): String {
 }
 
 fun Double.formatCount(count: Int = 9): String {
+	val isNegative = this < 0
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = count
-	return formatEditor.format(this).toBigDecimal().toPlainString()
+	return if (isNegative) "-" else "" + formatEditor.format(Math.abs(this)).toBigDecimal().toPlainString()
 }
 
 fun Double.formatDecimal(count: Int = 9): Double {

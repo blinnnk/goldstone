@@ -174,6 +174,17 @@ object WalletText {
 	}
 
 	@JvmField
+	val eosKylin = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS Kylin"
+		HoneyLanguage.Chinese.code -> "EOS Kylin 测试网"
+		HoneyLanguage.Japanese.code -> "EOS Kylin"
+		HoneyLanguage.Korean.code -> "EOS Kylin"
+		HoneyLanguage.Russian.code -> "EOS Kylin"
+		HoneyLanguage.TraditionalChinese.code -> "EOS Kylin 測試網"
+		else -> ""
+	}
+
+	@JvmField
 	val bchMainnet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BCH Mainnet"
 		HoneyLanguage.Chinese.code -> "BCH (比特币现金) 主网"

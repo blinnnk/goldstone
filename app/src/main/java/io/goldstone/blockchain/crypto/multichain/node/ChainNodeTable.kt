@@ -4,6 +4,7 @@ import android.arch.persistence.room.*
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toList
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import org.json.JSONArray
 import org.json.JSONObject
@@ -66,38 +67,44 @@ interface ChainNodeDao {
 	@Query("SELECT count(*) FROM chainNode")
 	fun rowCount(): Int
 
-	@Query("SELECT * FROM chainNode WHERE netType LIKE 0 ORDER BY chainType")
+	@Query("SELECT * FROM chainNode WHERE netType = 0 ORDER BY chainType")
 	fun getMainnet(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE netType LIKE 1 ORDER BY chainType")
+	@Query("SELECT * FROM chainNode WHERE netType = 1 ORDER BY chainType")
 	fun getTestnet(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194")
+	@Query("SELECT * FROM chainNode WHERE chainType = 194")
 	fun getEOSNodes(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND isUsed = 1")
+	@Query("SELECT * FROM chainNode WHERE chainType = 194 AND isUsed = 1")
 	fun getCurrentEOSNode(): ChainNodeTable
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND netType LIKE 0")
+	@Query("SELECT * FROM chainNode WHERE chainType = 194 AND netType = 0")
 	fun getMainnetEOSNode(): ChainNodeTable
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 194 AND netType LIKE 1")
-	fun getTestnetEOSNode(): ChainNodeTable
+	@Query("SELECT * FROM chainNode WHERE chainType = 194 AND netType = 1 AND chainID = :chainID")
+	fun getJungleEOSNode(chainID: String = ChainID.EOSJungle.id): ChainNodeTable
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 61")
+	@Query("SELECT * FROM chainNode WHERE chainType = 194 AND netType = 1 AND chainID = :chainID")
+	fun getKylinEOSNode(chainID: String = ChainID.EOSKylin.id): ChainNodeTable
+
+	@Query("SELECT * FROM chainNode WHERE chainType = 61")
 	fun getETCNodes(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE chainType LIKE 60")
+	@Query("SELECT * FROM chainNode WHERE chainType = 60")
 	fun getETHNodes(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE netType LIKE 0 AND isUsed = 1 ORDER BY chainType")
+	@Query("SELECT * FROM chainNode WHERE netType = 0 AND isUsed = 1 ORDER BY chainType")
 	fun getUsedMainnet(): List<ChainNodeTable>
 
-	@Query("SELECT * FROM chainNode WHERE netType LIKE 1 AND isUsed = 1 ORDER BY chainType")
+	@Query("SELECT * FROM chainNode WHERE netType = 1 AND isUsed = 1 ORDER BY chainType")
 	fun getUsedTestnet(): List<ChainNodeTable>
 
 	@Query("UPDATE chainNode SET isUsed = :isUsed WHERE id = :id AND chainID = :chainID")
 	fun updateIsUsed(id: String, isUsed: Int, chainID: String)
+
+	@Query("UPDATE chainNode SET isUsed = 1 WHERE id = (SELECT id FROM chainNode WHERE chainID = :chainID LIMIT 1) AND chainID = :chainID")
+	fun updateUsedEOSChain(chainID: String)
 
 	@Query("UPDATE chainNode SET isUsed = 0 WHERE netType = :netType")
 	fun clearIsUsedStatus(netType: Int)

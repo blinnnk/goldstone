@@ -17,7 +17,7 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.json.JSONObject
+import java.math.BigDecimal
 import java.math.BigInteger
 
 /**
@@ -57,24 +57,29 @@ fun BigInteger.convertToDiskUnit(): String {
 		1 -> EOSUnit.KB.value
 		else -> EOSUnit.MB.value
 	}
-	val result = CryptoUtils.toTargetUnit(this, convertValue.toDouble(), 1024.0).formatCount(5)
+	val result = CryptoUtils.toTargetUnit(toBigDecimal(), convertValue.toDouble(), 1024.0).formatCount(5)
 	return result suffix diskUnit
 }
 
-fun BigInteger.convertToTimeUnit(): String {
-	val convertValue = ("$this".length / 3.0).toInt()
-	val sixtyHexadecimal = if (convertValue > 2) (this.toDouble() / 1000 * 1000 / 60).toInt() else 0
-	val diskUnit = when {
-		convertValue == 0 -> EOSCPUUnit.MUS.value
-		convertValue == 1 -> EOSCPUUnit.MS.value
-		sixtyHexadecimal == 0 -> EOSCPUUnit.SEC.value
-		else -> EOSCPUUnit.MIN.value
+/**
+ * 这里需要处理的是, 因为我们的业务在 CPU 价格膨胀的时候
+ * 用户余额 CPU 可能出现负值, 这也是我们的需求.
+ * 所以这里需要处理负值的一部分显示问题.
+ */
+fun BigInteger.musTimeStampConverter(): String {
+	val isNegative = toDouble() < 0.0
+	val decimalValue = Math.abs(toDouble())
+	val msValue = decimalValue / 1000.0
+	val secValue = msValue / 1000.0
+	val minValue = secValue / 60.0
+	val prefix = if (isNegative) "-" else ""
+	return when {
+		msValue < 0.1 -> "$prefix$decimalValue" suffix EOSCPUUnit.MUS.value
+		msValue >= 0.1 -> "$prefix$msValue" suffix EOSCPUUnit.MS.value
+		secValue >= 0.1 -> "$prefix${secValue.formatCount(5)}" suffix EOSCPUUnit.SEC.value
+		minValue >= 0.1 -> "$prefix${minValue.formatCount(5)}" suffix EOSCPUUnit.MIN.value
+		else -> "$prefix${minValue.formatCount(5)}" suffix EOSCPUUnit.MIN.value
 	}
-	val value = if (convertValue > 2) this / BigInteger.valueOf(1000) * BigInteger.valueOf(1000) else this
-	val hexadecimal = if (convertValue > 2) 60.0 else 1000.0
-	val decimal = if (convertValue > 2) sixtyHexadecimal else convertValue
-	val result = CryptoUtils.toTargetUnit(value, decimal.toDouble(), hexadecimal).formatCount(5)
-	return result suffix diskUnit
 }
 
 infix fun String.isEmptyThen(other: String): String = if (this.isEmpty()) other else this
@@ -85,18 +90,11 @@ fun Fragment.safeShowError(error: Throwable) {
 	ErrorDisplayManager(error).show(context)
 }
 
-fun String.safeToJSONObject(): JSONObject {
-	val formattedData =
-		replace("\\\"", "\"").replace("\"{", "{").replace("}\"", "}")
-	return JSONObject(formattedData)
-}
-
 fun String.removeSlash(): String {
 	// 有些数据会出现 "{" 前面有多个 "\""
-	val data = replace("\"{", "{")
+	return replace("\"{", "{")
 		.replace("\"{", "{")
 		.replace("}\"", "}")
 		.replace("}\"", "}")
 		.replace("\\\"", "\"")
-	return data
 }

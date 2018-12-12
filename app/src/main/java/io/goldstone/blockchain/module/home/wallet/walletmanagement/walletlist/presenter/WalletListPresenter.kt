@@ -10,6 +10,7 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
@@ -39,6 +40,8 @@ class WalletListPresenter(
 		}
 	}
 
+	// EOS 的 测试网没有办法直接用 主网 和 测试网两个状态区分. 所以需要额外单独传递
+	// EOS ChainID 作为标识
 	private fun switchWalletInDatabase(address: String, isMainnet: Boolean) {
 		WalletTable.switchCurrentWallet(address) { it ->
 			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
@@ -100,8 +103,18 @@ class WalletListPresenter(
 				}
 
 				walletType.isEOSJungle() -> {
-					if (!SharedValue.isTestEnvironment()) {
+					if (!SharedValue.isTestEnvironment() || SharedWallet.getCurrentWalletType().isEOSKylin()) {
 						showTestnetConfirmationAlertView(WalletText.eosJungle) {
+							switchWalletInDatabase(address, false)
+						}
+					} else {
+						switchWalletInDatabase(address, false)
+					}
+				}
+
+				walletType.isEOSKylin() -> {
+					if (!SharedValue.isTestEnvironment() || SharedWallet.getCurrentWalletType().isEOSJungle()) {
+						showTestnetConfirmationAlertView(WalletText.eosKylin) {
 							switchWalletInDatabase(address, false)
 						}
 					} else {

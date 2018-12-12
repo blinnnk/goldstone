@@ -20,8 +20,8 @@ import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.home.dapp.common.DAPPBrowser
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.contract.DAppBrowserContract
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.presenter.DAppBrowserPresenter
-import io.goldstone.blockchain.module.home.dapp.dappexplorer.event.DAPPEXplorerDisplayEvent
 import io.goldstone.blockchain.module.home.dapp.dapplist.event.DAPPListDisplayEvent
+import io.goldstone.blockchain.module.home.dapp.dappoverlay.event.DAPPExplorerDisplayEvent
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.*
@@ -63,7 +63,7 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 		super.onDestroy()
 		when (fromView) {
 			PreviousView.DAPPList -> EventBus.getDefault().post(DAPPListDisplayEvent(true))
-			PreviousView.DAPPExplorer -> EventBus.getDefault().post(DAPPEXplorerDisplayEvent(true))
+			PreviousView.DAPPExplorer -> EventBus.getDefault().post(DAPPExplorerDisplayEvent(true))
 			PreviousView.DAPPCenter -> getMainActivity()?.apply {
 				getDAPPCenterFragment()?.let { showChildFragment(it) }
 				transparentStatus()

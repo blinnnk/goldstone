@@ -4,6 +4,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -31,7 +32,7 @@ fun PaymentDetailPresenter.transferEOS(
 	@WorkerThread callback: (error: GoldStoneError) -> Unit
 ) {
 	val inputValueDecimal = count.toBigDecimal().toPlainString().substringAfter(".").length
-	if (inputValueDecimal != contract.decimal) GlobalScope.launch {
+	if (inputValueDecimal > contract.decimal.orZero()) GlobalScope.launch {
 		callback(TransferError.IncorrectDecimal)
 	} else EOSTransactionInfo(
 		SharedAddress.getCurrentEOSAccount(),

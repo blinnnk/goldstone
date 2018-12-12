@@ -1,4 +1,4 @@
-package io.goldstone.blockchain.module.home.dapp.dappexplorer.event
+package io.goldstone.blockchain.module.home.dapp.dappoverlay.event
 
 
 /**
@@ -9,4 +9,4 @@ package io.goldstone.blockchain.module.home.dapp.dappexplorer.event
  *  `DAPPListDisplayEvent` 在这个页面打开 `DAPPBrowser`
  *  再在 `DAPPBrowser` 关闭界面返回后的 `栈` 显示控制
  */
-data class DAPPEXplorerDisplayEvent(val isShown: Boolean)
+data class DAPPExplorerDisplayEvent(val isShown: Boolean)
