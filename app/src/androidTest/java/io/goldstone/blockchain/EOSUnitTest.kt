@@ -235,7 +235,7 @@ class EOSUnitTest {
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 		val action = EOSAction(EOSCodeName.EOSIOToken, transactionInfoCode, EOSTransactionMethod.transfer(), authorizationObjects)
 		EOSTransactionUtils.serialize(
-			ChainID.EOSTest,
+			ChainID.EOSJungle,
 			header,
 			listOf(action),
 			listOf(authorization),
@@ -349,7 +349,7 @@ class EOSUnitTest {
 			StakeType.Delegate,
 			false
 		)
-		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(ChainID.EOSTest, header, accountInfo, buyRamModel, netCPUModel)
+		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(ChainID.EOSJungle, header, accountInfo, buyRamModel, netCPUModel)
 		LogUtil.debug("$position serializeRegisterModels", serializedRegister.serialized)
 	}
 

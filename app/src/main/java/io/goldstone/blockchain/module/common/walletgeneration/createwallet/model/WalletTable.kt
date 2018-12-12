@@ -258,8 +258,12 @@ data class WalletTable(
 			walletType.isBTCTest() -> currentBTCSeriesTestAddress
 			walletType.isBTC() -> currentBTCAddress
 			walletType.isEOS() -> currentEOSAddress
-			walletType.isEOSMainnet() || walletType.isEOSJungle() ->
-				currentEOSAccountName.getCurrent()
+			walletType.isEOSMainnet() ->
+				currentEOSAccountName.getTarget(ChainID.EOS)
+			walletType.isEOSJungle() ->
+				currentEOSAccountName.getTarget(ChainID.EOSJungle)
+			walletType.isEOSKylin() ->
+				currentEOSAccountName.getTarget(ChainID.EOSKylin)
 			walletType.isBIP44() -> WalletText.bip44MultiChain
 			else -> WalletText.multiChain
 		}
@@ -272,9 +276,10 @@ data class WalletTable(
 			Pair(WalletType.ethSeries, currentETHSeriesAddress),
 			Pair(WalletType.ltcOnly, currentLTCAddress),
 			Pair(WalletType.bchOnly, currentBCHAddress),
+			Pair(WalletType.eosOnly, currentEOSAddress),
 			Pair(WalletType.eosMainnetOnly, currentEOSAccountName.main),
 			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle),
-			Pair(WalletType.eosOnly, currentEOSAddress)
+			Pair(WalletType.eosKylinOnly, currentEOSAccountName.kylin)
 		).filter {
 			it.second.isNotEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
 		}
@@ -550,14 +555,14 @@ data class WalletTable(
 		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable) -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
 				val willDeleteWallet = dao.findWhichIsUsing(true)
+				willDeleteWallet?.let {
+					dao.delete(it)
+					callback(it)
+				}
 				dao.getAllWallets().let { wallets ->
 					if (wallets.isNotEmpty()) {
 						dao.update(wallets.first().apply { isUsing = true })
 						SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
-					}
-					willDeleteWallet?.let {
-						dao.delete(it)
-						callback(it)
 					}
 				}
 			}

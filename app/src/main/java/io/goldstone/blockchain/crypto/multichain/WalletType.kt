@@ -19,6 +19,7 @@ class WalletType(val type: String?) : Serializable {
 	fun isEOS(): Boolean = type.equals(eosOnly, true)
 	fun isEOSMainnet(): Boolean = type.equals(eosMainnetOnly, true)
 	fun isEOSJungle(): Boolean = type.equals(eosJungleOnly, true)
+	fun isEOSKylin(): Boolean = type.equals(eosKylinOnly, true)
 	fun isBIP44(): Boolean = type.equals(bip44MultiChain, true)
 	fun isMultiChain(): Boolean = type.equals(multiChain, true)
 	fun isBTCSeries(): Boolean = isBTCSeriesType(type!!)
@@ -39,6 +40,7 @@ class WalletType(val type: String?) : Serializable {
 			isEOS() -> WalletText.eosWallet
 			isEOSMainnet() -> WalletText.eosMainnet
 			isEOSJungle() -> WalletText.eosJungle
+			isEOSKylin() -> WalletText.eosKylin
 			isBTCTest() -> WalletText.btcTestnet
 			else -> ""
 		}
@@ -54,6 +56,7 @@ class WalletType(val type: String?) : Serializable {
 		const val eosOnly = "eosOnly"
 		const val eosMainnetOnly = "eosMainnetOnly"
 		const val eosJungleOnly = "eosJungleOnly"
+		const val eosKylinOnly = "eosKylinOnly"
 		const val bip44MultiChain = "bip44MultiChain"
 		const val multiChain = "multiChain"
 		fun isBTCSeriesType(type: String): Boolean {
@@ -83,9 +86,11 @@ class WalletType(val type: String?) : Serializable {
 		@JvmStatic
 		val EOS = WalletType(eosOnly)
 		@JvmStatic
-		val EOSMainnet = WalletType(eosJungleOnly)
+		val EOSMainnet = WalletType(eosMainnetOnly)
 		@JvmStatic
 		val EOSJungle = WalletType(eosJungleOnly)
+		@JvmStatic
+		val EOSKylin = WalletType(eosKylinOnly)
 		@JvmStatic
 		val BIP44 = WalletType(bip44MultiChain)
 		@JvmStatic

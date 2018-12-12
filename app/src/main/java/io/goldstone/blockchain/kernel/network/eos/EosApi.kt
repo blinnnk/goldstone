@@ -158,6 +158,24 @@ object EOSAPI {
 		}
 	}
 
+	// 服务 Javascript DAPP, 只查主网
+	fun getStringAccountInfo(
+		account: EOSAccount,
+		@WorkerThread hold: (result: String?, error: GoldStoneError) -> Unit
+	) {
+		RequestBody.create(
+			ETHJsonRPC.contentType,
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.name))
+		).let { requestBody ->
+			RequisitionUtil.postRequest(
+				requestBody,
+				EOSUrl.getAccountInfo(),
+				false,
+				hold
+			)
+		}
+	}
+
 	fun getAvailableRamBytes(
 		accountName: EOSAccount,
 		@WorkerThread hold: (ramAvailable: BigInteger?, error: GoldStoneError) -> Unit
@@ -195,11 +213,7 @@ object EOSAPI {
 			// 生成指定的包含链信息的结果类型
 			val accountNames =
 				names.map {
-					EOSAccountInfo(
-						it,
-						SharedChain.getEOSCurrent().chainID.id,
-						publicKey
-					)
+					EOSAccountInfo(it, SharedChain.getEOSCurrent().chainID.id, publicKey)
 				}
 			hold(accountNames, RequestError.None)
 		}
@@ -352,6 +366,36 @@ object EOSAPI {
 			),
 			EOSUrl.getTableRows(),
 			"rows",
+			false,
+			hold
+		)
+	}
+
+	fun getTableRows(
+		scope: String,
+		code: String,
+		tableName: String,
+		option: Pair<String, String>?,
+		limit: Pair<String, Int>?,
+		indexPosition: Pair<String, Int>?,
+		keyType: Pair<String, String>?,
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
+	) {
+		val params = arrayListOf(
+			Pair("scope", scope),
+			Pair("code", code),
+			Pair("table", tableName),
+			Pair("json", true)
+		)
+		if (option.isNotNull()) params.add(option)
+		if (limit.isNotNull()) params.add(limit)
+		if (indexPosition.isNotNull()) params.add(indexPosition)
+		if (keyType.isNotNull()) params.add(keyType)
+
+		RequisitionUtil.postString(
+			ParameterUtil.prepareObjectContent(params),
+			EOSUrl.getTableRows(),
+			"",
 			false,
 			hold
 		)

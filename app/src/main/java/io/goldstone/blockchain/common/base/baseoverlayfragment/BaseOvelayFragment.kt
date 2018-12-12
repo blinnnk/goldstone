@@ -118,9 +118,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
 	fun searchInputListener(action: (String) -> Unit) {
 		overlayView.header.apply {
-			searchTextChangedEvent = Runnable {
-				action(overlayView.header.getSearchContent())
-			}
+			searchTextChangedEvent = Runnable { action(getSearchContent()) }
 		}
 	}
 

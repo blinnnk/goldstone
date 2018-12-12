@@ -6,15 +6,15 @@ import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.convertToDiskUnit
-import io.goldstone.blockchain.common.utils.convertToTimeUnit
+import io.goldstone.blockchain.common.utils.musTimeStampConverter
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
 import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
-import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.network.ChainExplorer
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi.bitcoinCashTransactionDetail
@@ -164,7 +164,7 @@ data class TransactionListModel(
 	companion object {
 
 		fun generateEOSMinerContent(cpuUsage: BigInteger, netUsage: BigInteger): String {
-			return "cpu usage: ${cpuUsage.convertToTimeUnit()}, net usage: ${netUsage.convertToDiskUnit()}"
+			return "cpu usage: ${cpuUsage.musTimeStampConverter()}, net usage: ${netUsage.convertToDiskUnit()}"
 		}
 
 		fun generateAddressInfo(data: TransactionTable): String {

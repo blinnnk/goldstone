@@ -1,8 +1,13 @@
 package io.goldstone.blockchain.module.home.dapp.dappcenter.model
 
 import android.arch.persistence.room.*
+import android.support.annotation.UiThread
+import com.blinnnk.extension.hasValue
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import com.google.gson.annotations.SerializedName
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.kernel.commontable.value.TableType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import java.io.Serializable
@@ -41,6 +46,14 @@ data class DAPPTable(
 	companion object {
 		@JvmField
 		val dao = GoldStoneDataBase.database.dappDao()
+
+		fun getDAPPUsedStatus(dappID: String, @UiThread hold: (Boolean) -> Unit) {
+			load {
+				FavoriteTable.dao.getDataCount(dappID, TableType.DAPP).hasValue()
+			} then {
+				hold(it)
+			}
+		}
 	}
 }
 

@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.dapp.dappcenter.view
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -24,6 +25,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
@@ -31,12 +33,18 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.presenter.DAppCenterP
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.applist.DAPPRecyclerView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.recommend.RecommendDappView
 import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
-import io.goldstone.blockchain.module.home.dapp.dapplistdetail.view.DAPPOverlayFragment
+import io.goldstone.blockchain.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.support.v4.*
+import org.jetbrains.anko.support.v4.UI
+import org.jetbrains.anko.support.v4.nestedScrollView
+import org.jetbrains.anko.support.v4.onPageChangeListener
+import org.jetbrains.anko.support.v4.themedViewPager
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.verticalLayout
 
@@ -66,7 +74,6 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		presenter.start()
 	}
 
-
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			nestedScrollView {
@@ -94,7 +101,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					recommendDAPP = RecommendDappView(
 						context,
 						clickCellEvent = {
-							showAttentionOrElse(id) {
+							showAttentionOrElse(context, id) {
 								getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
 								presenter.setUsedDAPPs()
 							}
@@ -120,7 +127,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							newAPP = DAPPRecyclerView(
 								context,
 								clickCellEvent = {
-									showAttentionOrElse(id) {
+									showAttentionOrElse(context, id) {
 										getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
 										presenter.setUsedDAPPs()
 									}
@@ -139,7 +146,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								}
 							)
 							themedViewPager {
-								layoutParams = LinearLayout.LayoutParams(matchParent, 985.uiPX())
+								layoutParams = LinearLayout.LayoutParams(matchParent, 990.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 								val titles = listOf("NEW DAPP", "LATEST USED")
 								menuBar.setMenuTitles(titles) { button, id ->
@@ -171,28 +178,18 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		newAPP.setData(data)
 	}
 
-	override fun showLatestUsed(data: ArrayList<DAPPTable>) {
+	override fun showLatestUsed( data: ArrayList<DAPPTable>) {
 		latestUsed.setData(data)
+	}
+
+	// 这个会报漏给搜索界面的点击更新事件
+	override fun refreshLatestUsed() {
+		presenter.setUsedDAPPs()
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		activity?.getHomeFragment()?.apply {
 			presenter.showWalletDetailFragment()
-		}
-	}
-
-	private fun showAttentionOrElse(dappID: String, callback: () -> Unit) {
-		presenter.getDAPPUsedStatus(dappID) { isUsed ->
-			if (isUsed) callback()
-			else Dashboard(context!!) {
-				showAlert(
-					"Attention About DAPP Terms",
-					"once you decide to use third-party DAPP, it means you have to read their term/privacy, that will be necessary for you"
-				) {
-					presenter.updateDAPPUsedStatus(dappID)
-					callback()
-				}
-			}
 		}
 	}
 
@@ -211,6 +208,26 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 				putSerializable(ArgumentKey.dappType, DAPPType.Explorer)
 			}
 			hideHomeFragment()
+		}
+	}
+
+	companion object {
+		fun showAttentionOrElse(context: Context, dappID: String, callback: () -> Unit) {
+			DAPPTable.getDAPPUsedStatus(dappID) { isUsed ->
+				if (isUsed) callback()
+				else Dashboard(context) {
+					showAlert(
+						"Attention About DAPP Terms",
+						"once you decide to use third-party DAPP, it means you have to read their term/privacy, that will be necessary for you"
+					) {
+						GlobalScope.launch(Dispatchers.Default) {
+							FavoriteTable.updateDAPPUsedStatus(dappID) {
+								launchUI(callback)
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
