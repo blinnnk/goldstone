@@ -21,7 +21,11 @@ class CoinRankFragment: GSRecyclerFragment<CoinRankModel>(), CoinRankContract.GS
 	
 	private var coinRankHeader: CoinRankHeader? = null
 	
-	override val presenter: CoinRankContract.GSPresenter = CoinRankPresenter()
+	override val presenter: CoinRankContract.GSPresenter = CoinRankPresenter(this)
+	
+	override fun showLoadingView(status: Boolean) {
+		super.showLoadingView(status)
+	}
 	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,

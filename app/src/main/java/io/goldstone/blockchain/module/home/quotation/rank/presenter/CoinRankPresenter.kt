@@ -8,7 +8,11 @@ import io.goldstone.blockchain.module.home.quotation.rank.contract.CoinRankContr
  * @author: yangLiHai
  * @description:
  */
-class CoinRankPresenter: CoinRankContract.GSPresenter {
+class CoinRankPresenter(private val gsView: CoinRankContract.GSView
+): CoinRankContract.GSPresenter {
+	
+	private var lastRank = 0
+	
 	override fun start() {
 		getGlobalData()
 	
@@ -16,8 +20,28 @@ class CoinRankPresenter: CoinRankContract.GSPresenter {
 	
 	private fun getGlobalData() {
 		GoldStoneAPI.getGlobalData { model, error ->
-		
+			if (model != null && !error.isNone()) {
+				gsView.showHeaderData(model)
+			} else {
+				gsView.showError(error)
+			}
 		}
+	}
+	
+	private fun getRankList() {
+		GoldStoneAPI.getCoinRank(lastRank) { data, error ->
+			
+		}
+	}
+	
+	
+	override fun loadFirstPage() {
+		gsView.showLoadingView(true)
+		lastRank = -1
+	}
+	
+	override fun loadMore() {
+	
 	}
 	
 }
