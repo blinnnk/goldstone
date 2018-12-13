@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.dapplist.presenter
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.dapp.dapplist.contract.DAPPListContract
@@ -23,9 +24,9 @@ class DAPPListPresenter(
 	override fun getData(type: DAPPType, hold: (List<DAPPTable>) -> Unit) {
 		load {
 			when (type) {
-				DAPPType.New -> DAPPTable.dao.getAll(10)
-				DAPPType.Latest -> DAPPTable.dao.getUsed(10)
-				DAPPType.Recommend -> DAPPTable.dao.getRecommended(10)
+				DAPPType.New -> DAPPTable.dao.getAll(DataValue.dappPageCount)
+				DAPPType.Latest -> DAPPTable.dao.getUsed(DataValue.dappPageCount)
+				DAPPType.Recommend -> DAPPTable.dao.getRecommended(DataValue.dappPageCount)
 				else -> throw Throwable("Wrong DAPP Type")
 			}
 		} then (hold)

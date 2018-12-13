@@ -65,7 +65,10 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 			PreviousView.DAPPList -> EventBus.getDefault().post(DAPPListDisplayEvent(true))
 			PreviousView.DAPPExplorer -> EventBus.getDefault().post(DAPPExplorerDisplayEvent(true))
 			PreviousView.DAPPCenter -> getMainActivity()?.apply {
-				getDAPPCenterFragment()?.let { showChildFragment(it) }
+				getDAPPCenterFragment()?.let {
+					showChildFragment(it)
+					setBaseBackEvent(this, getHomeFragment())
+				}
 				transparentStatus()
 			}
 			else -> activity?.transparentStatus()
@@ -80,7 +83,7 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 					z = 1f
 				}
 				lparams(matchParent, matchParent)
-				browser = DAPPBrowser(context, url.orEmpty()) {
+				browser = DAPPBrowser(context, formattedURL(url.orEmpty())) {
 					progressView.progress = it
 					if (it == 100) removeView(progressView)
 				}
@@ -96,6 +99,12 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 				backgroundColor = Spectrum.white
 			}
 		}.view
+	}
+
+	private fun formattedURL(url: String): String {
+		return if (!url.contains("http", true)) {
+			"http://$url"
+		} else url
 	}
 
 	private fun removeSelfFromActivity() {

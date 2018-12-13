@@ -59,10 +59,10 @@ data class DAPPTable(
 
 @Dao
 interface DAPPDao {
-	@Query("SELECT * FROM dappTable WHERE isRecommended = 1 ORDER BY timeStamp DESC LIMIT :limit")
+	@Query("SELECT * FROM dappTable WHERE isRecommended = 1 ORDER BY weight DESC, timeStamp DESC LIMIT :limit")
 	fun getRecommended(limit: Int = 5): List<DAPPTable>
 
-	@Query("SELECT * FROM dappTable ORDER BY timeStamp DESC LIMIT :limit")
+	@Query("SELECT * FROM dappTable ORDER BY weight DESC, timeStamp DESC LIMIT :limit")
 	fun getAll(limit: Int): List<DAPPTable>
 
 	@Query("SELECT * FROM dappTable WHERE title LIKE '%' || :name || '%'")

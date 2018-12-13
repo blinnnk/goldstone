@@ -106,6 +106,9 @@ interface ChainNodeDao {
 	@Query("UPDATE chainNode SET isUsed = 1 WHERE id = (SELECT id FROM chainNode WHERE chainID = :chainID LIMIT 1) AND chainID = :chainID")
 	fun updateUsedEOSChain(chainID: String)
 
+	@Query("UPDATE chainNode SET isUsed = 0 WHERE chainID = :chainID")
+	fun setUnused(chainID: String)
+
 	@Query("UPDATE chainNode SET isUsed = 0 WHERE netType = :netType")
 	fun clearIsUsedStatus(netType: Int)
 

@@ -114,6 +114,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					gsCard {
 						lparams(ScreenSize.card, matchParent)
 						verticalLayout {
+							isFocusableInTouchMode = true
 							lparams(matchParent, matchParent)
 							menuBar = ViewPagerMenu(
 								context,
