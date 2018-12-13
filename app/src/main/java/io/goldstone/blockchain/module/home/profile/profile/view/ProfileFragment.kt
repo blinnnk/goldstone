@@ -2,8 +2,7 @@ package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
@@ -14,11 +13,11 @@ import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
-import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
+import io.goldstone.blockchain.module.home.quotation.rank.view.CoinRankFragment
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
@@ -53,6 +52,11 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 							presenter.showTargetFragment(model.title)
 							preventDuplicateClicks()
 						} else safeShowError(AccountError.InactivatedAccountName)
+					}
+					model.title.equals("rank", true) -> onClick {
+						activity?.apply {
+							addFragmentAndSetArguments<CoinRankFragment>(ContainerID.content, "")
+						}
 					}
 					else -> onClick {
 						presenter.showTargetFragment(model.title)

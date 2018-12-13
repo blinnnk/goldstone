@@ -31,6 +31,8 @@ import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.Can
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.quotation.rank.model.CoinGlobalModel
+import io.goldstone.blockchain.module.home.quotation.rank.model.CoinRankModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
@@ -521,6 +523,33 @@ object GoldStoneAPI {
 		requestData(
 			APIPath.searchDAPP(APIPath.currentUrl, condition),
 			"data",
+			false,
+			isEncrypt = true,
+			hold = hold
+		)
+	}
+	
+	fun getGlobalData(@WorkerThread hold: (model: CoinGlobalModel?, error: RequestError) -> Unit) {
+		requestData<String>(
+			APIPath.coinGlobalData(APIPath.currentUrl),
+			"",
+			true,
+			 isEncrypt = true
+		) { result, error ->
+			if (result?.firstOrNull() != null && error.isNone()) {
+				val type =  object : TypeToken<CoinGlobalModel>() {}.type
+				hold(
+					Gson().fromJson(result.first(), type),
+					error
+				)
+			} else hold(null, error)
+		}
+	}
+	
+	fun getCoinRank(rank: Int, @WorkerThread hold: (data: List<CoinRankModel>?, error: RequestError) -> Unit) {
+		requestData(
+			APIPath.coinRank(APIPath.currentUrl, rank, 20),
+			"list",
 			false,
 			isEncrypt = true,
 			hold = hold

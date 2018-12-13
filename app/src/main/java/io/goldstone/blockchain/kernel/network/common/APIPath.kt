@@ -107,4 +107,17 @@ object APIPath {
 	val searchDAPP: (header: String, condition: String) -> String = { header, condition ->
 		"$header/dapp/searchDapp?dapp=$condition"
 	}
+	
+	val coinGlobalData: (header: String) -> String = {
+		"$it/market/globalData"
+	}
+	
+	val coinRank:(header: String, rank: Int, size: Int) -> String = { header, rank, size ->
+		"$header/market/coinRank?rank=$rank&size=$size"
+	}
+	
+	
 }
+
+
+
