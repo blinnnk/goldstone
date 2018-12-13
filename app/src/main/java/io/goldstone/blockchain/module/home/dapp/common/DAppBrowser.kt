@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.support.annotation.UiThread
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -24,16 +25,19 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSMethod
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import org.jetbrains.anko.matchParent
@@ -156,7 +160,6 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 
 		@JavascriptInterface
 		fun getTableRows(data: String) {
-			System.out.println("+++$data")
 			launchUI {
 				val tableObject = try {
 					JSONObject(data)
@@ -239,23 +242,64 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
 					return@launchUI
 				}
-				showQuickPaymentDashboard(
-					actionObject,
-					true,
-					cancelEvent = {
-						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
-					},
-					confirmEvent = { loadingView.show() }
-				) { response, error ->
-					launchUI {
-						loadingView.remove()
-						if (response.isNotNull() && error.isNone()) {
-							response.showDialog(context)
-							evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
-						} else {
-							ErrorDisplayManager(error).show(context)
+				if (actionObject.safeGet("name").equals(EOSTransactionMethod.Transfer.value, true)) {
+					scatterEOSTransaction(actionObject)
+				} else {
+					scatterSignOperation(actionObject)
+				}
+			}
+		}
+
+		private val scatterSignOperation: (action: JSONObject) -> Unit = { action ->
+			showOperationDashboard(
+				action,
+				cancelEvent = {
+					loadingView.remove()
+					evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+				},
+				confirmEvent = {
+					PaymentDetailPresenter.showGetPrivateKeyDashboard(
+						context,
+						cancelEvent = { loadingView.remove() },
+						confirmEvent = { loadingView.show() }
+					) { privateKey, error ->
+						if (privateKey.isNotNull() && error.isNone()) {
+							EOSContractCaller(action, ChainID.EOS).send(privateKey) { response, pushTransactionError ->
+								launchUI {
+									loadingView.remove()
+									if (response.isNotNull() && pushTransactionError.isNone()) {
+										response.showDialog(context)
+									} else {
+										ErrorDisplayManager(pushTransactionError).show(context)
+									}
+								}
+							}
+						} else launchUI {
+							loadingView.remove()
 							evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
 						}
+					}
+				}
+			)
+		}
+
+		private val scatterEOSTransaction: (action: JSONObject) -> Unit = { action ->
+			showQuickPaymentDashboard(
+				action,
+				false,
+				cancelEvent = {
+					evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
+				},
+				confirmEvent = { loadingView.show() }
+			) { response, error ->
+				launchUI {
+					loadingView.remove()
+					if (response.isNotNull() && error.isNone()) {
+						response.showDialog(context)
+						evaluateJavascript("javascript:(function(){scatter.txID=\"${response.transactionID}\"})()", null)
+					} else {
+						ErrorDisplayManager(error).show(context)
+						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
 					}
 				}
 			}
@@ -276,7 +320,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				}
 				showQuickPaymentDashboard(
 					actionObject,
-					false,
+					true,
 					cancelEvent = {
 						evaluateJavascript("javascript:(function(){scatter.txID=\"failed\"})()", null)
 					},

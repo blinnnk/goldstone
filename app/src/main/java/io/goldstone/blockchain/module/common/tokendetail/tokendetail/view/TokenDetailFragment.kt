@@ -66,8 +66,8 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 	}
 
 	override fun showBottomLoading(status: Boolean) = launchUI {
+		isLoadingData = status
 		if (status) bottomLoading?.show() else bottomLoading?.hide()
-		isLoadingData = false
 	}
 
 	override fun setChartData(data: ArrayList<ChartPoint>) = launchUI {

@@ -2,7 +2,9 @@ package io.goldstone.blockchain.kernel.network.btcseries.insight
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.toJSONObjectList
 import io.goldstone.blockchain.common.error.RequestError
+import io.goldstone.blockchain.common.utils.removeSlash
 import io.goldstone.blockchain.crypto.multichain.Amount
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.ChainType
@@ -77,12 +79,10 @@ object InsightApi {
 		) { result, error ->
 			if (result.isNotNull() && error.isNone()) {
 				val jsonArray = JSONArray(result.firstOrNull())
-				var data = listOf<JSONObject>()
-				(0 until jsonArray.length()).forEach {
-					data += JSONObject(jsonArray[it].toString())
-				}
-				hold(data, error)
-			} else hold(null, error)
+				hold(jsonArray.toJSONObjectList(), error)
+			} else {
+				hold(null, error)
+			}
 		}
 	}
 

@@ -77,6 +77,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			nestedScrollView {
+				isFocusableInTouchMode = true
 				lparams(matchParent, matchParent)
 				verticalLayout {
 					lparams(matchParent, matchParent)
@@ -114,7 +115,6 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					gsCard {
 						lparams(ScreenSize.card, matchParent)
 						verticalLayout {
-							isFocusableInTouchMode = true
 							lparams(matchParent, matchParent)
 							menuBar = ViewPagerMenu(
 								context,

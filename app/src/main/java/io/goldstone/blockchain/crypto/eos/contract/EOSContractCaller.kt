@@ -1,8 +1,7 @@
 package io.goldstone.blockchain.crypto.eos.contract
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
@@ -16,7 +15,9 @@ import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
+import org.json.JSONArray
 import org.json.JSONObject
+import java.math.BigInteger
 
 
 /**
@@ -30,6 +31,20 @@ class EOSContractCaller(
 	private val chainID: ChainID,
 	private val data: String
 ) : EOSTransactionInterface() {
+
+	// JSON Object 结构
+	//  {"account":"prochaintech","name":"click","authorization":[{"actor":"beautifulleo","permission":"active"}],"data":{"clickRequest":{"account":"beautifulleo","candyId":10,"ref":""}}}
+	constructor(data: JSONObject, chainID: ChainID) : this(
+		EOSAuthorization(
+			JSONArray(data.safeGet("authorization")).toJSONObjectList()[0].safeGet("actor"),
+			EOSActor.getActorByValue(JSONArray(data.safeGet("authorization")).toJSONObjectList()[0].safeGet("permission"))!!
+		),
+		EOSCodeName(data.safeGet("account")),
+		EOSTransactionMethod(data.safeGet("name")),
+		chainID,
+		data.safeGet("data")
+	)
+
 	constructor(data: JSONObject) : this(
 		EOSAuthorization(data.safeGet("actor"), EOSActor.Active),
 		EOSCodeName(data.safeGet("code")),
@@ -46,7 +61,19 @@ class EOSContractCaller(
 		}
 		EOSAPI.getTransactionHeader(ExpirationType.FiveMinutes) { header, error ->
 			if (header.isNotNull() && error.isNone()) {
-				val dataCode = EOSUtils.convertMemoToCode(data)
+				val dataObject = JSONObject(data)
+				val coreObject =
+					if (dataObject.names().length() == 1 && data.substringAfter(":").contains("{")) dataObject.getTargetObject(dataObject.names()[0].toString())
+					else dataObject
+				val dataCode =
+					coreObject.names().toList().map {
+						val value = coreObject.get(it)
+						if (value is Int) {
+							EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
+						} else {
+							EOSUtils.getLittleEndianCode(coreObject.safeGet(it))
+						}
+					}.joinToString("") { it }
 				val authorizationObject = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 				val action = EOSAction(
 					code,
