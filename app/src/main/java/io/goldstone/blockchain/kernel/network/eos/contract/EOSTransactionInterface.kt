@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey

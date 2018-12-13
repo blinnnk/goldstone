@@ -312,6 +312,9 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
 	fun getToken(contract: String, symbol: String, chainID: String): DefaultTokenTable?
 
+	@Query("SELECT price FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
+	fun getTokenPrice(contract: String, symbol: String, chainID: String): Double?
+
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND chainID LIKE :chainID")
 	fun getERC20Token(contract: String, chainID: String): DefaultTokenTable?
 
