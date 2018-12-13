@@ -375,6 +375,15 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		}
 
 		@JavascriptInterface
+		fun getGoldStoneID() {
+			load {
+				SharedWallet.getGoldStoneID()
+			} then {
+				evaluateJavascript("javascript:getGoldStoneID(\"$it\")", null)
+			}
+		}
+
+		@JavascriptInterface
 		fun getLanguageCode() {
 			load {
 				SharedWallet.getCurrentLanguageCode()
@@ -386,9 +395,9 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 		@JavascriptInterface
 		fun getVersionName() {
 			load {
-				SystemUtils.getVersionName(context)
+				SystemUtils.getVersionCode(context)
 			} then {
-				callWeb("getVersionName", it)
+				callWeb("getVersionName", "$it")
 			}
 		}
 
