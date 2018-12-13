@@ -123,15 +123,22 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 
 		@JavascriptInterface
 		fun getEOSAccountInfo(accountName: String) {
-			System.out.println("*********** $accountName")
-			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
-			EOSAPI.getStringAccountInfo(SharedAddress.getCurrentEOSAccount()) { accountInfo, error ->
-				System.out.println("accoutn $accountInfo")
-				launchUI {
-					if (accountInfo.isNotNull() && error.isNone()) {
-						evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
-					} else {
-						evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
+			launchUI {
+				val accountObject = try {
+					JSONObject(accountName)
+				} catch (error: Exception) {
+					evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
+					println("GoldStone-DAPP Get AccountERROR: ${error.message}\n DATA: $accountName")
+					return@launchUI
+				}
+				// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+				EOSAPI.getStringAccountInfo(EOSAccount(accountObject.safeGet("account_name"))) { accountInfo, error ->
+					launchUI {
+						if (accountInfo.isNotNull() && error.isNone()) {
+							evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
+						} else {
+							evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
+						}
 					}
 				}
 			}

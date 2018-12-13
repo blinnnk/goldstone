@@ -3,7 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.dappoverlay.view
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.getChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -44,8 +44,10 @@ class DAPPOverlayFragment : BaseOverlayFragment<DAPPOverlayPresenter>() {
 
 	@Subscribe(threadMode = ThreadMode.POSTING)
 	fun updateDisplayEvent(displayEvent: DAPPExplorerDisplayEvent) {
-		if (displayEvent.isShown) getMainActivity()?.showChildFragment(this)
-		else getMainActivity()?.supportFragmentManager?.beginTransaction()?.hide(this)?.commitNow()
+		if (displayEvent.isShown) {
+			getChildFragment<DAPPExplorerFragment>()?.recoveryBackEvent()
+			getMainActivity()?.showChildFragment(this)
+		} else getMainActivity()?.supportFragmentManager?.beginTransaction()?.hide(this)?.commitNow()
 	}
 
 	override val presenter = DAPPOverlayPresenter(this)

@@ -249,6 +249,7 @@ class WatchOnlyImportPresenter(
 						currentEOSAddress = address
 						SharedValue.updateIsTestEnvironment(true)
 						callback(GoldStoneError.None)
+						ChainNodeTable.dao.setUnused(ChainID.EOSKylin.id)
 						ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSJungle.id)
 					}
 					EOSAccount(address).isValid(false) -> {
@@ -263,6 +264,7 @@ class WatchOnlyImportPresenter(
 									ChainURL(GoldStoneDataBase.database.chainNodeDao().getJungleEOSNode())
 								)
 								SharedValue.updateIsTestEnvironment(true)
+								ChainNodeTable.dao.setUnused(ChainID.EOSKylin.id)
 								ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSJungle.id)
 								callback(error)
 							} else callback(AccountError.InvalidAccountName)
@@ -276,6 +278,7 @@ class WatchOnlyImportPresenter(
 					EOSWalletUtils.isValidAddress(address) -> {
 						currentEOSAddress = address
 						SharedValue.updateIsTestEnvironment(true)
+						ChainNodeTable.dao.setUnused(ChainID.EOSJungle.id)
 						ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSKylin.id)
 						callback(GoldStoneError.None)
 					}
@@ -288,6 +291,7 @@ class WatchOnlyImportPresenter(
 									ChainURL(GoldStoneDataBase.database.chainNodeDao().getKylinEOSNode())
 								)
 								SharedValue.updateIsTestEnvironment(true)
+								ChainNodeTable.dao.setUnused(ChainID.EOSJungle.id)
 								ChainNodeTable.dao.updateUsedEOSChain(ChainID.EOSKylin.id)
 								callback(error)
 							} else callback(AccountError.InvalidAccountName)

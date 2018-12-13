@@ -18,6 +18,10 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		val SellRAMTooLess = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
 		val IncorrectDecimal = TransferError(ErrorText.incorrectDecimal)
+
+		// EOS Only
+		@JvmStatic
+		val TransferToSelf = TransferError("Can't transfer to your self in eos blockchain")
 		@JvmStatic
 		val InvalidBigNumber = TransferError("Invalid Number, Value is too big")
 		@JvmStatic

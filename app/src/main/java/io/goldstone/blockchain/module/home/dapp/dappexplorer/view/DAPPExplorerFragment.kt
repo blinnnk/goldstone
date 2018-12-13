@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.dapp.dappexplorer.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
@@ -17,8 +16,6 @@ import io.goldstone.blockchain.module.home.dapp.dappexplorer.presenter.DAPPExplo
 import io.goldstone.blockchain.module.home.dapp.dappoverlay.event.DAPPExplorerDisplayEvent
 import io.goldstone.blockchain.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 
 /**

@@ -56,7 +56,10 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 
 	@Subscribe(threadMode = ThreadMode.POSTING)
 	fun updateDisplayEvent(displayEvent: DAPPListDisplayEvent) {
-		if (displayEvent.isShown) getMainActivity()?.showChildFragment(this)
+		if (displayEvent.isShown) {
+			getMainActivity()?.showChildFragment(this)
+			recoveryBackEvent()
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

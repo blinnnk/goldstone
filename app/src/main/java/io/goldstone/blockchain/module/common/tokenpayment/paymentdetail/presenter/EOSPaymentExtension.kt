@@ -31,27 +31,32 @@ fun PaymentDetailPresenter.transferEOS(
 	contract: TokenContract,
 	@WorkerThread callback: (error: GoldStoneError) -> Unit
 ) {
-	val inputValueDecimal = count.toBigDecimal().toPlainString().substringAfter(".").length
-	if (inputValueDecimal > contract.decimal.orZero()) GlobalScope.launch {
-		callback(TransferError.IncorrectDecimal)
-	} else EOSTransactionInfo(
-		SharedAddress.getCurrentEOSAccount(),
-		EOSAccount(fragment.address.orEmpty()),
-		count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
-		fragment.getMemoContent(),
-		contract
-	).apply {
-		trade(fragment.context) { response, error ->
-			if (error.isNone() && response.isNotNull())
-				insertPendingDataToDatabase(response) {
-					launchUI {
-						getToken()?.let {
-							val receiptModel = ReceiptModel(this, response, it)
-							GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+	val inputValueDecimal = count.toString().substringAfter(".").length
+	when {
+		inputValueDecimal > contract.decimal.orZero() -> GlobalScope.launch {
+			callback(TransferError.IncorrectDecimal)
+		}
+		SharedAddress.getCurrentEOSAccount().isSame(EOSAccount(fragment.address.orEmpty())) ->
+			callback(TransferError.TransferToSelf)
+		else -> EOSTransactionInfo(
+			SharedAddress.getCurrentEOSAccount(),
+			EOSAccount(fragment.address.orEmpty()),
+			count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
+			fragment.getMemoContent(),
+			contract
+		).apply {
+			trade(fragment.context) { response, error ->
+				if (error.isNone() && response.isNotNull())
+					insertPendingDataToDatabase(response) {
+						launchUI {
+							getToken()?.let {
+								val receiptModel = ReceiptModel(this, response, it)
+								GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+							}
 						}
 					}
-				}
-			else callback(error)
+				else callback(error)
+			}
 		}
 	}
 }
