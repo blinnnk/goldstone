@@ -6,6 +6,7 @@ import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.getTargetObject
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.setMargins
+import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.valueView
@@ -28,25 +29,32 @@ import org.json.JSONObject
  */
 fun ViewGroup.showQuickPaymentDashboard(
 	data: JSONObject,
-	isTransactionObject: Boolean, // 如果是 `isTransactionObject` 传入的 `JSONObject` 是含有全量信息的
+	isSampleTransfer: Boolean, // 如果是 `isTransactionObject` 传入的 `JSONObject` 是含有全量信息的
 	cancelEvent: () -> Unit,
 	confirmEvent: () -> Unit,
 	callback: (EOSResponse?, GoldStoneError) -> Unit
 ) {
 	// 如果是转账操作那么 `DAPP` 都会把具体信息放在 `memo` 里面
 	// 解除 `memo` 里面的 `count` 计算出当前需要转账的货币的 `Decimal` 作为参数
-	val info = if (isTransactionObject) data.getTargetObject("data") else data
+	val info = if (!isSampleTransfer) data.getTargetObject("data") else data
 	// 渠道分成需要在 `memo` 标记渠道, 一些 `DAPP` 会自动添加在 `memo` 里, 但是 `BetDice` 需要手动添加
 	val memo = if (info.safeGet("to").equals("betdicebacca", true))
 		"${info.safeGet("memo")},ref:goldstonebet"
 	else info.safeGet("memo")
 	val transaction =
-		if (isTransactionObject) EOSTransactionInfo(data, memo)
+		if (!isSampleTransfer) EOSTransactionInfo(data, memo)
 		else EOSTransactionInfo(data)
 	val contentLayout = LinearLayout(context).apply {
 		orientation = LinearLayout.VERTICAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		padding = PaddingSize.content
+		valueView {
+			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
+			layoutParams.width = matchParent
+			setContent(memo)
+		}.setMargins<LinearLayout.LayoutParams> {
+			bottomMargin = 10.uiPX()
+		}
 		graySquareCell {
 			layoutParams.width = matchParent
 			setTitle(CommonText.from)
@@ -62,13 +70,6 @@ fun ViewGroup.showQuickPaymentDashboard(
 			setTitle("Quantity")
 			setSubtitle(info.safeGet("quantity"))
 		}
-		valueView {
-			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
-			layoutParams.width = matchParent
-			setContent(memo)
-		}.setMargins<LinearLayout.LayoutParams> {
-			topMargin = PaddingSize.content
-		}
 	}
 	Dashboard(context) {
 		showDashboard(
@@ -78,6 +79,43 @@ fun ViewGroup.showQuickPaymentDashboard(
 			hold = {
 				confirmEvent()
 				transaction.trade(context, callback)
+			},
+			cancelAction = cancelEvent
+		)
+	}
+}
+
+fun ViewGroup.showOperationDashboard(
+	data: JSONObject,
+	cancelEvent: () -> Unit,
+	confirmEvent: () -> Unit
+) {
+	val contentLayout = LinearLayout(context).apply {
+		orientation = LinearLayout.VERTICAL
+		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+		padding = PaddingSize.content
+		graySquareCell {
+			layoutParams.width = matchParent
+			setTitle("Contract")
+			setSubtitle(data.safeGet("account"))
+		}
+
+		valueView {
+			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
+			layoutParams.width = matchParent
+			setContent(data.safeGet("data"))
+		}.setMargins<LinearLayout.LayoutParams> {
+			topMargin = PaddingSize.content
+		}
+	}
+	Dashboard(context) {
+		dialog.cancelOnTouchOutside(false)
+		showDashboard(
+			"Contract Operation",
+			contentLayout,
+			"contract need you to sign the data, and proof it is valid operation",
+			hold = {
+				confirmEvent()
 			},
 			cancelAction = cancelEvent
 		)

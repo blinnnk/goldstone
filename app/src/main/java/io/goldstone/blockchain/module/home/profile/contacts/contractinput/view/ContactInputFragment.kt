@@ -17,15 +17,13 @@ import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 16/04/2018 1:13 PM
@@ -52,10 +50,13 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
+				leftPadding = PaddingSize.content
+				rightPadding = PaddingSize.content
 				nameInput = roundInput {
 					title = ContactText.contactName
 					setTextInput()
 				}.lparams {
+					width = matchParent
 					topMargin = 40.uiPX()
 				}
 				sessionTitle {
