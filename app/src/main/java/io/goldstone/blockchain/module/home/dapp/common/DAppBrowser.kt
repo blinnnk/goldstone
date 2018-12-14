@@ -234,7 +234,6 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 
 		@JavascriptInterface
 		fun transferEOS(action: String) {
-			System.out.println("+++$action")
 			launchUI {
 				val actionObject = try {
 					JSONObject(action)
@@ -462,26 +461,28 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
-			PaymentDetailPresenter.showGetPrivateKeyDashboard(
-				context,
-				cancelEvent = { loadingView.remove() },
-				confirmEvent = { loadingView.show() }
-			) { privateKey, error ->
-				if (privateKey.isNotNull() && error.isNone()) {
-					EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
-						launchUI {
-							loadingView.remove()
-							if (pushJson.isNotNull() && hashError.isNone()) {
-								val result = Uri.encode(pushJson)
-								evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
-							} else {
-								evaluateJavascript("javascript:getEOSSignedData(\"${hashError.message}\")", null)
+			launchUI {
+				PaymentDetailPresenter.showGetPrivateKeyDashboard(
+					context,
+					cancelEvent = { loadingView.remove() },
+					confirmEvent = { loadingView.show() }
+				) { privateKey, error ->
+					if (privateKey.isNotNull() && error.isNone()) {
+						EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
+							launchUI {
+								loadingView.remove()
+								if (pushJson.isNotNull() && hashError.isNone()) {
+									val result = Uri.encode(pushJson)
+									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+								} else {
+									evaluateJavascript("javascript:getEOSSignedData(\"${hashError.message}\")", null)
+								}
 							}
 						}
+					} else launchUI {
+						loadingView.remove()
+						evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
 					}
-				} else launchUI {
-					loadingView.remove()
-					evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
 				}
 			}
 		}

@@ -59,10 +59,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					width = matchParent
 					topMargin = 40.uiPX()
 				}
-				sessionTitle {
-					setTitle(ProfileText.contacts)
-				}
-
+				sessionTitle(ProfileText.contacts)
 				ethSeriesAddressInput = roundInput {
 					title = CoinSymbol.eth
 					hint = ContactText.ethERCAndETHint

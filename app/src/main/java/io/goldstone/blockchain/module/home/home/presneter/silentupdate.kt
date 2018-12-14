@@ -277,7 +277,6 @@ abstract class SilentUpdater {
 
 		// 优先从 `EOSPark` 获取 `Token List`, 如果出错或测试网替换为 `GoldStone` 的接口
 		if (!SharedValue.isTestEnvironment()) EOSAPI.getTokenBalance(account) { tokens, error ->
-			System.out.println("tokens $tokens")
 			if (tokens.isNotNull() && error.isNone()) {
 				updateData(tokens.map { TokenContract(it.codeName, it.symbol, it.getDecimal()) })
 			} else EOSAPI.getEOSTokenList(chainID, account) { tokenList, tokenListError ->

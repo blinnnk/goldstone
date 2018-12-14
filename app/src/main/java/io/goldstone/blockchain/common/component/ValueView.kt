@@ -38,7 +38,7 @@ class ValueView(context: Context) : LinearLayout(context) {
 				movementMethod = ScrollingMovementMethod()
 				padding = 20.uiPX()
 				gravity = Gravity.CENTER_VERTICAL
-				textSize = fontSize(16)
+				textSize = fontSize(14)
 				textColor = GrayScale.black
 				typeface = GoldStoneFont.heavy(context)
 			}
