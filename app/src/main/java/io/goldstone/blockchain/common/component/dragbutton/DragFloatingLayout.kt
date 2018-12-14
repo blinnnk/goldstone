@@ -76,8 +76,8 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 
 	private fun animateAfterTouchUp(event: MotionEvent) {
 		val startX = (mainButton.layoutParams as? RelativeLayout.LayoutParams)?.leftMargin ?: 0
-		val endX = if (event.x > this@DragFloatingLayout.width / 2) {
-			this@DragFloatingLayout.width - mainButton.layoutParams.width - framePadding
+		val endX = if (event.x > viewWidth / 2) {
+			viewWidth - mainButton.layoutParams.width - framePadding
 		} else {
 			framePadding
 		}
