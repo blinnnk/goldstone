@@ -5,9 +5,7 @@ import android.content.Context
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.blinnnk.extension.addCorner
 import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.setMargins
@@ -21,7 +19,7 @@ import org.jetbrains.anko.*
  * @author: yangLiHai
  * @description:
  */
-class DragFloatingButton(context: Context) : RelativeLayout(context) {
+class DragFloatingButton(context: Context) : LinearLayout(context) {
 
 	var isTouching = false
 	var xDistance = 0f // 按下的点距离左侧的距离
@@ -42,7 +40,7 @@ class DragFloatingButton(context: Context) : RelativeLayout(context) {
 			icon.centerInParent()
 			elevation = 6.uiPX().toFloat()
 		}
-		container.setMargins<RelativeLayout.LayoutParams> {
+		container.setMargins<LinearLayout.LayoutParams> {
 			margin = 15.uiPX()
 		}
 		isClickable = true
