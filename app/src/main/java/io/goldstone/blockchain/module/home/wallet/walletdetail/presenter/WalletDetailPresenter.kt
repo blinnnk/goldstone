@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.presenter
 import android.support.annotation.UiThread
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.ConcurrentJobs
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.isSameToken
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.MyTokenWithDefaultTable
@@ -146,17 +148,31 @@ class WalletDetailPresenter(
 
 				override fun mergeCallBack() {
 					val account = SharedAddress.getCurrentEOSAccount()
+					val myAllEOSToken = filter { it.contract.isEOSToken() }
 					if (!SharedValue.isTestEnvironment() && any { it.contract.isEOSToken() }) {
 						EOSAPI.getTokenBalance(account) { data, error ->
 							if (data.isNotNull() && error.isNone()) {
 								data.forEachOrEnd { item, isEnd ->
-									MyTokenTable.dao.updateBalanceByContract(item.balance, item.codeName, item.symbol, account.name)
-									this@getChainModels.find {
-										it.contract.contract.equals(item.codeName, true) &&
-											it.symbol.symbol.equals(item.symbol, true)
-									}?.count = item.balance
+									MyTokenTable.dao.updateBalanceByContract(
+										item.balance,
+										item.codeName,
+										item.symbol,
+										account.name
+									)
+									this@getChainModels.find { it.contract isSameToken item }?.count = item.balance
 									if (isEnd) launchUI {
 										hold(this@getChainModels, balanceError)
+									}
+								}
+								// 如果从 `EOSPark` 批量拉取的 Balance 为空那么意味这这个余额是 `0`
+								myAllEOSToken.forEach { mine ->
+									if (data.find { mine.contract isSameToken it}.isNull()) {
+										MyTokenTable.dao.updateBalanceByContract(
+											0.0,
+											mine.contract.contract,
+											mine.symbol.symbol,
+											account.name
+										)
 									}
 								}
 							}

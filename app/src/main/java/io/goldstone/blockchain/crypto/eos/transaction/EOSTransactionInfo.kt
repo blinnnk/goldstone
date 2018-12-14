@@ -154,7 +154,7 @@ data class EOSTransactionInfo(
 				// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
 				ExpirationType.FiveMinutes,
 				contract
-			).send(privateKey, hold)
+			).apply { System.out.println("this$memo") }.send(privateKey, hold)
 		} else hold(null, TransferError.WrongPermission)
 	}
 

@@ -147,7 +147,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								}
 							)
 							themedViewPager {
-								layoutParams = LinearLayout.LayoutParams(matchParent, 990.uiPX())
+								layoutParams = LinearLayout.LayoutParams(matchParent, 960.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 								val titles = listOf("NEW DAPP", "LATEST USED")
 								menuBar.setMenuTitles(titles) { button, id ->

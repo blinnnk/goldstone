@@ -68,10 +68,11 @@ class EOSContractCaller(
 				val dataCode =
 					coreObject.names().toList().map {
 						val value = coreObject.get(it)
-						if (value is Int) {
-							EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
-						} else {
-							EOSUtils.getLittleEndianCode(coreObject.safeGet(it))
+						when {
+							value is Int -> EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
+							value.toString().contains("ref", true) ->
+								EOSUtils.convertMemoToCode(value.toString())
+							else -> EOSUtils.getLittleEndianCode(value.toString())
 						}
 					}.joinToString("") { it }
 				val authorizationObject = EOSAuthorization.createMultiAuthorizationObjects(authorization)

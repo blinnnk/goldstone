@@ -34,6 +34,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.TotalResources
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.model.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
@@ -644,15 +645,14 @@ object EOSAPI {
 		}?.pair ?: return
 		EOSAPI.getPriceByPair(pair) { priceInEOS, pairError ->
 			if (priceInEOS.isNotNull() && pairError.isNone()) {
-				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-				val eosToken = defaultDao.getToken(
+				val eosPrice = DefaultTokenTable.dao.getTokenPrice(
 					TokenContract.eosContract,
 					TokenContract.EOS.symbol,
 					EOSChain.Main.id
 				)
-				val priceInUSD = priceInEOS * eosToken?.price.orZero()
+				val priceInUSD = priceInEOS * eosPrice.orZero()
 				if (priceInUSD > 0.0) {
-					defaultDao.updateTokenPrice(
+					DefaultTokenTable.dao.updateTokenPrice(
 						priceInUSD,
 						contract.contract.orEmpty(),
 						contract.symbol,
