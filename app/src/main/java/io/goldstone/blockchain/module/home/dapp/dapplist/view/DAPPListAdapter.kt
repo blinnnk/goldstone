@@ -17,7 +17,7 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
 class DAPPListAdapter(
 	override val dataSet: ArrayList<DAPPTable>,
 	private val hold: (BottomLoadingView) -> Unit,
-	private val clickEvent: (url: String) -> Unit
+	private val clickEvent: (DAPPTable) -> Unit
 ) : HoneyBaseAdapterWithHeaderAndFooter<DAPPTable, View, DAPPCell, BottomLoadingView>() {
 
 	override fun generateCell(context: Context) = DAPPCell(context)
@@ -27,7 +27,7 @@ class DAPPListAdapter(
 	override fun DAPPCell.bindCell(data: DAPPTable, position: Int) {
 		model = data
 		onClick {
-			clickEvent(data.url)
+			clickEvent(data)
 			preventDuplicateClicks()
 		}
 	}

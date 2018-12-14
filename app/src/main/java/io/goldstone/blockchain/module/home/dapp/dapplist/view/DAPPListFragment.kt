@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
+import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAPPCenterFragment
 import io.goldstone.blockchain.module.home.dapp.dapplist.contract.DAPPListContract
 import io.goldstone.blockchain.module.home.dapp.dapplist.event.DAPPListDisplayEvent
 import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
@@ -113,7 +114,9 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 				bottomLoadingView = it
 			},
 			clickEvent = {
-				getMainActivity()?.showDappBrowserFragment(it, PreviousView.DAPPList, this)
+				DAPPCenterFragment.showAttentionOrElse(context!!, it.id) {
+					getMainActivity()?.showDappBrowserFragment(it.url, PreviousView.DAPPList, this)
+				}
 			}
 		)
 	}

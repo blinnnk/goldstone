@@ -1,8 +1,5 @@
 package io.goldstone.blockchain.crypto.utils
 
-import com.blinnnk.extension.getDecimalCount
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.*
@@ -216,13 +213,5 @@ fun String.getObjectMD5HexString(): String {
 	} catch (error: Exception) {
 		println(error)
 		"error"
-	}
-}
-
-fun String.isValidDecimal(decimal: Int): Boolean {
-	return when {
-		getDecimalCount().isNull() -> return true
-		getDecimalCount().orZero() > decimal.orZero() -> false
-		else -> true
 	}
 }

@@ -60,6 +60,9 @@ class DAPPCell(context: Context) : RelativeLayout(context) {
 			layoutParams = RelativeLayout.LayoutParams(60.uiPX(), 60.uiPX())
 		}.into(this)
 		appIcon.centerInVertical()
+		appIcon.setMargins<RelativeLayout.LayoutParams> {
+			margin = 5.uiPX()
+		}
 		verticalLayout {
 			leftPadding = 70.uiPX()
 			rightPadding = 30.uiPX()
@@ -75,7 +78,7 @@ class DAPPCell(context: Context) : RelativeLayout(context) {
 			tagContainer = linearLayout {
 				lparams(matchParent, wrapContent)
 			}
-		}
+		}.centerInVertical()
 		imageView {
 			imageResource = R.drawable.arrow_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE

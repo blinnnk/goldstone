@@ -25,7 +25,6 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.formatCount
-import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toEOSCount
 import io.goldstone.blockchain.crypto.utils.toEOSUnit
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -345,7 +344,7 @@ open class BaseTradingPresenter(
 				}
 				isSellRam && tradingNumber !is Long -> // 检查输入的卖出的 `EOS` 的值是否正确
 					callback(TransferError.WrongRAMInputValue)
-				!tradingNumber.toString().isValidDecimal(CryptoValue.eosDecimal) -> // 检查输入值的精度是否正确
+				tradingNumber.toDouble().getDecimalCount().orZero() > CryptoValue.eosDecimal -> // 检查输入值的精度是否正确
 					callback(TransferError.IncorrectDecimal)
 				else -> callback(GoldStoneError.None)
 			}

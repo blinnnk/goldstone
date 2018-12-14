@@ -154,12 +154,12 @@ class WalletDetailPresenter(
 							if (data.isNotNull() && error.isNone()) {
 								data.forEachOrEnd { item, isEnd ->
 									MyTokenTable.dao.updateBalanceByContract(
-										item.balance,
+										item.balance.toDouble(),
 										item.codeName,
 										item.symbol,
 										account.name
 									)
-									this@getChainModels.find { it.contract isSameToken item }?.count = item.balance
+									this@getChainModels.find { it.contract isSameToken item }?.count = item.balance.toDouble()
 									if (isEnd) launchUI {
 										hold(this@getChainModels, balanceError)
 									}

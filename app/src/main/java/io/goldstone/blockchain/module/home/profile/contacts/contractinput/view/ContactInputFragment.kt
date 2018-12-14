@@ -67,6 +67,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.eth
 					hint = ContactText.ethERCAndETHint
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -74,6 +75,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.eos
 					hint = ContactText.eosHint
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -81,6 +83,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.btc()
 					hint = ContactText.btcMainnetAddress
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -88,6 +91,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.bch
 					hint = ContactText.bchAddress
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -95,6 +99,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.ltc
 					hint = ContactText.ltcAddress
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -103,6 +108,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					hint = ContactText.eosJungleHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -111,6 +117,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					hint = ContactText.eosJungleHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -119,6 +126,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					hint = ContactText.btcTestnetAddress
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 

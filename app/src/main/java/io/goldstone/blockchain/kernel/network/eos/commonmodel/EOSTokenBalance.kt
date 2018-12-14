@@ -16,7 +16,7 @@ data class EOSTokenBalance(
 	@SerializedName("code")
 	val codeName: String,
 	@SerializedName("balance")
-	val balance: Double
+	val balance: String
 ) : Serializable {
 	fun getDecimal(): Int? = balance.getDecimalCount()
 }
