@@ -1,10 +1,8 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -16,8 +14,6 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.toAmount
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 /**
@@ -31,11 +27,7 @@ fun PaymentDetailPresenter.transferEOS(
 	contract: TokenContract,
 	@WorkerThread callback: (error: GoldStoneError) -> Unit
 ) {
-	val inputValueDecimal = count.toString().substringAfter(".").length
 	when {
-		inputValueDecimal > contract.decimal.orZero() -> GlobalScope.launch {
-			callback(TransferError.IncorrectDecimal)
-		}
 		SharedAddress.getCurrentEOSAccount().isSame(EOSAccount(fragment.address.orEmpty())) ->
 			callback(TransferError.TransferToSelf)
 		else -> EOSTransactionInfo(

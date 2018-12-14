@@ -28,7 +28,7 @@ class DragFloatingButton(context: Context) : LinearLayout(context) {
 	private var container: RelativeLayout
 
 	init {
-		layoutParams = RelativeLayout.LayoutParams(90.uiPX(), 90.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(80.uiPX(), 80.uiPX())
 		container = relativeLayout {
 			lparams(66.uiPX(), 66.uiPX())
 			centerInParent()
@@ -38,10 +38,10 @@ class DragFloatingButton(context: Context) : LinearLayout(context) {
 				visibility = View.GONE
 			}
 			icon.centerInParent()
-			elevation = 6.uiPX().toFloat()
+			elevation = 5.uiPX().toFloat()
 		}
 		container.setMargins<LinearLayout.LayoutParams> {
-			margin = 15.uiPX()
+			margin = 6.uiPX()
 		}
 		isClickable = true
 	}

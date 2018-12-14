@@ -79,7 +79,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){identity={accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]};resolve(identity)})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},forgetIdentity:function(){currentAccount=null;return new Promise(function(resolve,reject){accounts=null;resolve()})},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};clearInterval(window.scatter.interval);window.scatter.tableRow=null}},1500)})},getAccount:function(data){window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};clearInterval(window.scatter.interval);window.scatter.accountInfo=null}},1500)})},getCurrencyBalance:function(code,name){window.control.getEOSAccountBalance(code,name);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance)};clearInterval(window.scatter.interval);window.scatter.balance=null}},2000)})},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
+						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){identity={accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]};resolve(identity)})},identity:{accounts:[{'authority':'active','blockchain':'eos','name':'${account.name}'}]},forgetIdentity:function(){currentAccount=null;return new Promise(function(resolve,reject){accounts=null;resolve()})},suggestNetwork:function(data){return new Promise(function(resolve,reject){resolve(true)})},txID:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,socketInterval:null,eos:function(){return{transaction:function(action){window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})},getTableRows:function(data){window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};clearInterval(window.scatter.interval);window.scatter.tableRow=null}},1500)})},getAccount:function(data){window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};clearInterval(window.scatter.interval);window.scatter.accountInfo=null}},1500)})},getCurrencyBalance:function(code,name){window.control.getEOSAccountBalance(code,name);return new Promise(function(resolve,reject){window.scatter.socketInterval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance)};clearInterval(window.scatter.socketInterval);window.scatter.balance=null}},2000)})},contract:function(data){return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.txID!==null){if(window.scatter.txID==='failed'){reject(window.scatter.txID)}else{resolve(window.scatter.txID)};clearInterval(window.scatter.interval);window.scatter.txID=null}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){console.log(window.scatter.arbSignature);if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);clearInterval(window.scatter.interval);window.scatter.arbSignature=null}},1500)})}};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -461,26 +461,28 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
-			PaymentDetailPresenter.showGetPrivateKeyDashboard(
-				context,
-				cancelEvent = { loadingView.remove() },
-				confirmEvent = { loadingView.show() }
-			) { privateKey, error ->
-				if (privateKey.isNotNull() && error.isNone()) {
-					EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
-						launchUI {
-							loadingView.remove()
-							if (pushJson.isNotNull() && hashError.isNone()) {
-								val result = Uri.encode(pushJson)
-								evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
-							} else {
-								evaluateJavascript("javascript:getEOSSignedData(\"${hashError.message}\")", null)
+			launchUI {
+				PaymentDetailPresenter.showGetPrivateKeyDashboard(
+					context,
+					cancelEvent = { loadingView.remove() },
+					confirmEvent = { loadingView.show() }
+				) { privateKey, error ->
+					if (privateKey.isNotNull() && error.isNone()) {
+						EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
+							launchUI {
+								loadingView.remove()
+								if (pushJson.isNotNull() && hashError.isNone()) {
+									val result = Uri.encode(pushJson)
+									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+								} else {
+									evaluateJavascript("javascript:getEOSSignedData(\"${hashError.message}\")", null)
+								}
 							}
 						}
+					} else launchUI {
+						loadingView.remove()
+						evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
 					}
-				} else launchUI {
-					loadingView.remove()
-					evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
 				}
 			}
 		}

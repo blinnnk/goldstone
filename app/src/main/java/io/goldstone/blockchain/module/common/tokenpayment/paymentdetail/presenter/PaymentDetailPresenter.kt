@@ -2,8 +2,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.present
 
 import android.content.Context
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.overlay.Dashboard
@@ -58,8 +60,10 @@ class PaymentDetailPresenter(
 			if (count == 0.0) {
 				callback(TransferError.TradingInputIsEmpty)
 				return
-			}
-			if (!token?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
+			} else if (count.getDecimalCount().orZero() > token?.contract?.decimal.orZero()) {
+				callback(TransferError.IncorrectDecimal)
+				return
+			} else if (!token?.contract.isEOS()) fragment.toast(LoadingText.calculateGas)
 			when {
 				/** 准备 BTCSeries 转账需要的参数 */
 				token?.contract.isBTCSeries() -> prepareBTCSeriesPaymentModel(

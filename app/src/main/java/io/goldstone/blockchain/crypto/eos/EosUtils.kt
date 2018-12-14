@@ -77,7 +77,6 @@ object EOSUtils {
 
 	fun convertMemoToCode(memo: String): String {
 		val lengthCode = EOSUtils.getVariableUInt(memo.length)
-		System.out.println("length $lengthCode")
 		return lengthCode + memo.toCryptHexString()
 	}
 

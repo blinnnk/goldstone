@@ -154,7 +154,7 @@ data class EOSTransactionInfo(
 				// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
 				ExpirationType.FiveMinutes,
 				contract
-			).apply { System.out.println("this$memo") }.send(privateKey, hold)
+			).send(privateKey, hold)
 		} else hold(null, TransferError.WrongPermission)
 	}
 
@@ -173,13 +173,11 @@ data class EOSTransactionInfo(
 		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount.name)
 		val amountCode = EOSUtils.convertAmountToCode(amount)
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(contract.decimal.orElse(CryptoValue.eosDecimal))
-		var symbolCode = contract.symbol.toByteArray().toNoPrefixHexString()
-		// `Symbol` 编码后的 `Count` 不能少于 `6` 位 不足的补 `0`
-		if (symbolCode.length < 6) symbolCode = symbolCode.completeZero(6 - symbolCode.count())
-		// `EOS Token` 的 `Memo` 不用补位
-		val completeZero = "00000000"
+		var symbolCode = contract.symbol.toCryptHexString()
+		// `symbol` 长度为固定 `7` 字节，`ASCII` 编码, 就是固定长度 `14` 个字符
+		symbolCode = symbolCode.completeZero(14 - symbolCode.count())
 		val memoCode = if (isTransaction) EOSUtils.convertMemoToCode(memo) else ""
-		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + completeZero + memoCode
+		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + memoCode
 	}
 
 	companion object {

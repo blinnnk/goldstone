@@ -7,5 +7,6 @@ package io.goldstone.blockchain.common.component.dragbutton
  */
 data class DragButtonModel(
 	val icon: Int,
-	val event: () -> Unit
+	val event: () -> Unit,
+	val color: Int
 )

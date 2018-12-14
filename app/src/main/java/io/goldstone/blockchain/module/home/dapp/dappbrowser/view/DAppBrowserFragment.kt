@@ -85,11 +85,13 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 				floatingButton.addSubButton(
 					DragButtonModel(
 						R.drawable.refresh_icon,
-						event = { browser.loadUrl(url) }
+						event = { browser.loadUrl(url) },
+						color = Spectrum.green
 					),
 					DragButtonModel(
 						R.drawable.close_web_icon,
-						event = { removeSelfFromActivity()}
+						event = { removeSelfFromActivity()},
+						color = Spectrum.lightRed
 					)
 				)
 				addView(floatingButton)
