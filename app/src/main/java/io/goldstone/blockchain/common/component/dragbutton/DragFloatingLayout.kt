@@ -71,7 +71,14 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 				animateAfterTouchUp(event)
 			}
 		}
-		return super.dispatchTouchEvent(event)
+		
+		val dispatchResult = super.dispatchTouchEvent(event)
+		
+		if (event.action == MotionEvent.ACTION_DOWN && !mainButton.isTouching) {
+			hideChildFloatingButton()
+		}
+		
+		return dispatchResult
 	}
 
 	private fun animateAfterTouchUp(event: MotionEvent) {
@@ -137,13 +144,13 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 			|| childStatus == FloatingButtonStatus.MOVING
 			|| childLayout.childCount == 0
 			|| childLayout.visibility == View.VISIBLE) {
-			childLayout.visibility = View.GONE
+			hideChildFloatingButton()
 			return
 		}
 		// 做动画之前先要让他们全部隐藏
 		val hideMargin = when (childStatus) {
-			FloatingButtonStatus.LEFT -> -buttonWidth
-			FloatingButtonStatus.RIGHT -> buttonWidth * childLayout.childCount
+			FloatingButtonStatus.LEFT -> 0
+			FloatingButtonStatus.RIGHT -> buttonWidth * (childLayout.childCount + 1)
 			else -> 0
 		}
 		for (index in 0 until childLayout.childCount) {
@@ -157,24 +164,24 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 		childLayout.visibility = View.VISIBLE
 		var finallyLeftMargin = 0
 		if (childStatus == FloatingButtonStatus.LEFT) {
-			finallyLeftMargin = framePadding + mainButton.width
+			finallyLeftMargin = framePadding
 		} else if (childStatus == FloatingButtonStatus.RIGHT) {
-			finallyLeftMargin = viewWidth - framePadding - mainButton.width - buttonWidth * childLayout.childCount
+			finallyLeftMargin = viewWidth - framePadding - mainButton.width - buttonWidth * (childLayout.childCount + 1)
 		}
 		(childLayout.layoutParams as? RelativeLayout.LayoutParams)?.apply {
-			width = buttonWidth * childLayout.childCount
+			width = buttonWidth * (childLayout.childCount + 2)
 			setMargins(finallyLeftMargin, mainButton.y.toInt(), 0, 0)
 			childLayout.layoutParams = this
 		}
 
 		val startX = when (childStatus) {
-			FloatingButtonStatus.LEFT -> -buttonWidth
-			FloatingButtonStatus.RIGHT -> buttonWidth * childLayout.childCount
+			FloatingButtonStatus.LEFT -> 0
+			FloatingButtonStatus.RIGHT -> buttonWidth * (childLayout.childCount + 1)
 			else -> 0
 		}
 
 		for (index in 0 until childLayout.childCount) {
-			val endX = buttonWidth * index
+			val endX =  buttonWidth * (index + 1)
 			val child = childLayout.getChildAt(index)
 			val animator = ValueAnimator.ofInt(startX, endX)
 			animator.duration = animatorDuration + index * 100
@@ -189,6 +196,38 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 			animator.start()
 		}
 
+	}
+	
+	private fun hideChildFloatingButton() {
+		if (childLayout.visibility != View.VISIBLE) {
+			return
+		}
+		
+		val endX = when (childStatus) {
+			FloatingButtonStatus.LEFT -> 0
+			FloatingButtonStatus.RIGHT -> buttonWidth * (childLayout.childCount + 1)
+			else -> 0
+		}
+		
+		for (index  in 0 until childLayout.childCount) {
+			val child = childLayout.getChildAt(index)
+			val startX =  buttonWidth * (index + 1)
+			val animator = ValueAnimator.ofInt(startX, endX)
+			animator.duration = animatorDuration + index * 100
+			animator.addUpdateListener {
+				(child?.layoutParams as? RelativeLayout.LayoutParams)?.apply {
+					val leftMargin = it.animatedValue as Int
+					setMargins(leftMargin, 0, 0, 0)
+					child.layoutParams = this
+				}
+			}
+			animator.start()
+		}
+		
+		childLayout.postDelayed( {
+			childLayout.visibility = View.GONE
+		}, animatorDuration + (childLayout.childCount - 1) * 100)
+		
 	}
 
 	private enum class FloatingButtonStatus {
