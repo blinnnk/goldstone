@@ -81,5 +81,15 @@ object SandBoxUtil {
 		updateSandBoxModel(model)
 	}
 	
+	fun getQuotationPairs(): List<String> {
+		return getSandBoxModel().quotationPairs
+	}
+	
+	fun updateQuotationPairs(newPairs: List<String>) {
+		val model = getSandBoxModel()
+		model.quotationPairs = newPairs
+		updateSandBoxModel(model)
+	}
+	
 	
 }

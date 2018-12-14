@@ -7,6 +7,7 @@ import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sandbox.SandBoxUtil
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -74,12 +75,20 @@ class QuotationPresenter(
 		}.sortedByDescending {
 			it.orderID
 		}.toList().let { quotations ->
-			if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
-				launchUI {
-					updateData()
+			if (!hasCheckedPairDate) {
+				if (invalidDatePairs.size() == 0) {
+					SandBoxUtil.getQuotationPairs().forEach {
+						invalidDatePairs.add(it)
+					}
 				}
-				hasCheckedPairDate = true
+				updateInvalidDatePair(invalidDatePairs) {
+					launchUI {
+						updateData()
+					}
+					hasCheckedPairDate = true
+				}
 			}
+			
 			launchUI {
 				// 更新 `UI`
 				diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
@@ -119,6 +128,24 @@ class QuotationPresenter(
 		/** 服务端传入的最近的时间会做 `减1` 处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull() ?: 0L
 		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
+	}
+	
+	private fun insertInvalidDataPair(pairList: JsonArray, @WorkerThread callback: () -> Unit) {
+		GoldStoneAPI.getCurrencyLineChartData(pairList) { newChart, error ->
+			if (!newChart.isNullOrEmpty() && error.isNone()) {
+				// 更新数据库的数据
+				newChart.forEachIndexed { index, model ->
+					QuotationSelectionTable.insertSelection(
+						QuotationSelectionTable(
+							,
+							newChart.firstOrNull()?.pointList?.toString().orEmpty(),
+							true
+						)
+					)
+				}
+				callback()
+			}
+		}
 	}
 
 	private fun updateInvalidDatePair(pairList: JsonArray, @WorkerThread callback: () -> Unit) {

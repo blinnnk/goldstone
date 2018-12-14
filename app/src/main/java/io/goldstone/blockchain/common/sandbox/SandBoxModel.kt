@@ -10,11 +10,13 @@ import java.io.Serializable
 class SandBoxModel(
 	var language: Int,
 	var currency: String,
-	var marketList: List<Int>
+	var marketList: List<Int>,
+	var quotationPairs: List<String>
 ) : Serializable {
 	constructor() : this(
 		-1,
 		"",
+		listOf(),
 		listOf()
 	)
 }
