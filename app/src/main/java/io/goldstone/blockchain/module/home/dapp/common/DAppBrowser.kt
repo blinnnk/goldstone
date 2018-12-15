@@ -85,6 +85,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 						"document.dispatchEvent(event);" +
 						"})()", null)
 				}
+				evaluateJS()
 				if (newProgress == 100) {
 					evaluateJS() // for totally
 				}
@@ -461,6 +462,7 @@ class DAPPBrowser(context: Context, url: String, hold: (progress: Int) -> Unit) 
 
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
+			System.out.println(data)
 			launchUI {
 				PaymentDetailPresenter.showGetPrivateKeyDashboard(
 					context,
