@@ -61,20 +61,28 @@ class EOSContractCaller(
 		}
 		EOSAPI.getTransactionHeader(ExpirationType.FiveMinutes) { header, error ->
 			if (header.isNotNull() && error.isNone()) {
-				val dataObject = JSONObject(data)
-				val coreObject =
-					if (dataObject.names().length() == 1 && data.substringAfter(":").contains("{")) dataObject.getTargetObject(dataObject.names()[0].toString())
-					else dataObject
-				val dataCode =
-					coreObject.names().toList().map {
-						val value = coreObject.get(it)
-						when {
-							value is Int -> EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
-							value.toString().contains("ref", true) ->
-								EOSUtils.convertMemoToCode(value.toString())
-							else -> EOSUtils.getLittleEndianCode(value.toString())
-						}
-					}.joinToString("") { it }
+				// data 和 memo 不同, 对 data 数据签名还要对对象的具体类型做判断
+				// 如果 data 没有对象化, 那么就做简单的编码处理
+				val dataCode: String
+				if(data.contains("{")) {
+					val dataObject = JSONObject(data)
+					val coreObject =
+						if (dataObject.names().length() == 1 && data.substringAfter(":").contains("{"))
+							dataObject.getTargetObject(dataObject.names()[0].toString())
+						else dataObject
+					dataCode =
+						coreObject.names().toList().map {
+							val value = coreObject.get(it)
+							when {
+								value is Int -> EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
+								value.toString().contains("ref", true) ->
+									EOSUtils.convertMemoToCode(value.toString())
+								else -> EOSUtils.getLittleEndianCode(value.toString())
+							}
+						}.joinToString("") { it }
+				} else {
+					dataCode = EOSUtils.getLittleEndianCode(data)
+				}
 				val authorizationObject = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 				val action = EOSAction(
 					code,

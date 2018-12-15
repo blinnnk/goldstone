@@ -27,7 +27,7 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 	private val viewHeight = ScreenSize.Height
 	private val mainButton = DragFloatingButton(context)
 	private val childLayout = RelativeLayout(context)
-	private val buttonWidth = 80.uiPX()
+	private val buttonWidth = 70.uiPX()
 	private val framePadding = 20.uiPX() // floatingButton 距离边距的距离
 	private var childStatus = FloatingButtonStatus.CENTER
 	private var animatorDuration: Long = 500
