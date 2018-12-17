@@ -9,9 +9,9 @@ import android.widget.RelativeLayout
 import com.blinnnk.animation.scale
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
-import com.blinnnk.uikit.ScreenSize
-import com.blinnnk.uikit.uiPX
+import com.blinnnk.uikit.*
 import io.goldstone.blockchain.common.utils.click
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.wrapContent
 
@@ -23,7 +23,7 @@ import org.jetbrains.anko.wrapContent
  */
 class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 	private val viewWidth = ScreenSize.Width
-	private val viewHeight = ScreenSize.Height
+	private var viewHeight = ScreenSize.Height + ScreenSize.statusBarHeight
 	private val mainButton = DragFloatingButton(context)
 	private val childLayout = RelativeLayout(context)
 	private val buttonWidth = 60.uiPX()
@@ -36,7 +36,11 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 	
 	init {
 		z = 1f
-		layoutParams = ViewGroup.LayoutParams(viewWidth, viewHeight)
+		layoutParams = LayoutParams(viewWidth, matchParent)
+		post {
+			viewHeight = height
+		}
+		
 		mainButton.layoutParams = RelativeLayout.LayoutParams(buttonWidth, buttonWidth)
 		mainButton.setMargins<RelativeLayout.LayoutParams> {
 			leftMargin = framePadding
@@ -80,13 +84,18 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 		
 		val dispatchResult = super.dispatchTouchEvent(event)
 		
+		var childTouching = false
+		for (index in 0 until childLayout.childCount) {
+			if (!childTouching) childTouching = (childLayout.getChildAt(index) as DragFloatingButton).isTouching
+		}
+		
 		if (event.action == MotionEvent.ACTION_DOWN
 			&& !mainButton.isTouching
-			&& childLayout.visibility == View.VISIBLE) {
+			&& childLayout.visibility == View.VISIBLE
+			&& !childTouching) {
 			hideChildFloatingButton()
 			return true
 		}
-		
 		return dispatchResult
 	}
 
@@ -223,7 +232,7 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 			val child = childLayout.getChildAt(index)
 			val startX =  buttonWidth * (index + 1)
 			val animator = ValueAnimator.ofInt(startX, endX)
-			animator.duration = animatorDuration + (index -1) * 100
+			animator.duration = animatorDuration - 100
 			animator.addUpdateListener {
 				(child?.layoutParams as? RelativeLayout.LayoutParams)?.apply {
 					val leftMargin = it.animatedValue as Int
