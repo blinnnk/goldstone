@@ -60,18 +60,24 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			attentionView = AttentionTextView(context)
 			attentionView.apply {
 				isCenter()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 30.uiPX()
-				}
 				text = WatchOnlyText.intro
 			}.into(this)
+			attentionView.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 30.uiPX()
+			}
 
-			typeSettings = roundCell {
-				click {
-					showWalletTypeDashboard(context) { type ->
-						currentType = type
-						typeSettings.setTitles(ImportWalletText.walletType, type)
-					}
+			addressInput = WalletEditText(context)
+			addressInput.apply {
+				hint = WatchOnlyText.enterDescription
+			}.into(this)
+			addressInput.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 30.uiPX()
+			}
+
+			typeSettings = roundCell().click {
+				showWalletTypeDashboard(context) { type ->
+					currentType = type
+					typeSettings.setTitles(ImportWalletText.walletType, type)
 				}
 			}
 
@@ -83,15 +89,11 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 
 			nameInput = roundInput {
 				hint = UIUtils.generateDefaultName()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				title = CreateWalletText.name
 			}
-
-			addressInput = WalletEditText(context)
-			addressInput.apply {
-				setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
-				hint = WatchOnlyText.enterDescription
-			}.into(this)
+			nameInput.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 20.uiPX()
+			}
 
 			confirmButton = roundButton {
 				setBlueStyle(20.uiPX())

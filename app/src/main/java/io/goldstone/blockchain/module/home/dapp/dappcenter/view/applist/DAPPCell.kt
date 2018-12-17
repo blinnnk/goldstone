@@ -6,10 +6,9 @@ import android.graphics.Paint
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -28,7 +27,7 @@ import org.jetbrains.anko.*
  * @author KaySaith
  * @date  2018/12/02
  */
-class DAPPCell(context: Context) : LinearLayout(context) {
+class DAPPCell(context: Context) : RelativeLayout(context) {
 
 	var model: DAPPTable? by observing(null) {
 		model?.apply {
@@ -58,13 +57,16 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			scaleType = ImageView.ScaleType.CENTER_CROP
 			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
 			elevation = 3.uiPX().toFloat()
-			layoutParams = LinearLayout.LayoutParams(60.uiPX(), 60.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(60.uiPX(), 60.uiPX())
 		}.into(this)
-		appIcon.setMargins<LinearLayout.LayoutParams> {
-			margin = 6.uiPX()
+		appIcon.centerInVertical()
+		appIcon.setMargins<RelativeLayout.LayoutParams> {
+			margin = 5.uiPX()
 		}
 		verticalLayout {
-			lparams(ScreenSize.card - 130.uiPX(), wrapContent)
+			leftPadding = 70.uiPX()
+			rightPadding = 30.uiPX()
+			lparams(matchParent, wrapContent)
 			titles = twoLineTitles {
 				setSubtitleLineCount(2)
 				leftPadding = 10.uiPX()
@@ -76,12 +78,15 @@ class DAPPCell(context: Context) : LinearLayout(context) {
 			tagContainer = linearLayout {
 				lparams(matchParent, wrapContent)
 			}
-		}
+		}.centerInVertical()
 		imageView {
 			imageResource = R.drawable.arrow_icon
 			scaleType = ImageView.ScaleType.CENTER_INSIDE
-			layoutParams = LinearLayout.LayoutParams(30.uiPX(), matchParent)
+			layoutParams = RelativeLayout.LayoutParams(30.uiPX(), matchParent)
 			setColorFilter(GrayScale.midGray)
+		}.apply {
+			alignParentRight()
+			centerInVertical()
 		}
 	}
 

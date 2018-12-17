@@ -75,7 +75,7 @@ class WalletListCardCell(context: Context) : GSCard(context) {
 		// Avatar
 		verticalLayout {
 			addCorner(AvatarSize.middle, Spectrum.white)
-			x = ScreenSize.card - AvatarSize.middle - 40.uiPX() * 1f
+			x = ScreenSize.card - AvatarSize.middle - 45.uiPX() * 1f
 			lparams {
 				width = AvatarSize.middle
 				height = AvatarSize.middle
@@ -131,7 +131,7 @@ class WalletListCardCell(context: Context) : GSCard(context) {
 	override fun onAttachedToWindow() {
 		super.onAttachedToWindow()
 		setMargins<RecyclerView.LayoutParams> {
-			leftMargin = 10.uiPX()
+			leftMargin = PaddingSize.gsCard
 		}
 	}
 

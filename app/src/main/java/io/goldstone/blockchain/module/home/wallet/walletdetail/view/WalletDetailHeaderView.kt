@@ -29,9 +29,6 @@ import org.jetbrains.anko.*
 /**
  * @date 23/03/2018 4:21 PM
  * @author KaySaith
- * @rewriteDate 26/07/2018 3:30 PM
- * @reWriter wcx
- * @description 修改获取头像方法 UnlimitedAvatar创建bitmap
  */
 class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 	var model: WalletDetailHeaderModel? by observing(null) {
@@ -132,16 +129,14 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			y -= 10.uiPX()
 		}.apply {
 			alignParentBottom()
-			x += PaddingSize.device
+			x += PaddingSize.content
 		}
 
+		addTokenButton.into(this)
 		addTokenButton.apply {
 			setTitle(WalletText.addToken.toUpperCase())
-			x -= PaddingSize.device
+			x -= PaddingSize.content
 			y -= 10.uiPX()
-		}.into(this)
-
-		addTokenButton.apply {
 			removeIcon()
 			layoutParams.height = 24.uiPX()
 			alignParentRight()

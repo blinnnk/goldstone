@@ -8,10 +8,7 @@ import io.goldstone.blockchain.common.utils.removeSlash
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
 import io.goldstone.blockchain.crypto.eos.transaction.completeZero
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.hexToDecimal
-import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
-import io.goldstone.blockchain.crypto.utils.toUtf8Bytes
+import io.goldstone.blockchain.crypto.utils.*
 import java.math.BigInteger
 import java.text.SimpleDateFormat
 import java.util.*
@@ -79,8 +76,8 @@ object EOSUtils {
 	}
 
 	fun convertMemoToCode(memo: String): String {
-		val lengthCode = EOSUtils.getVariableUInt(memo.removeSlash().length)
-		return lengthCode + memo.removeSlash().toUtf8Bytes().toNoPrefixHexString()
+		val lengthCode = EOSUtils.getVariableUInt(memo.length)
+		return lengthCode + memo.toCryptHexString()
 	}
 
 	private fun String.completeToEven(): String {

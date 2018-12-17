@@ -10,6 +10,9 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
@@ -39,17 +42,23 @@ class WalletListPresenter(
 		}
 	}
 
-	private fun switchWalletInDatabase(address: String, isMainnet: Boolean) {
+	// EOS 的 测试网没有办法直接用 主网 和 测试网两个状态区分. 所以需要额外单独传递
+	// EOS ChainID 作为标识
+	private fun switchWalletInDatabase(address: String, isMainnet: Boolean, eosChainID: ChainID?) {
 		WalletTable.switchCurrentWallet(address) { it ->
 			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly)
 			if (isMainnet) NodeSelectionPresenter.setAllMainnet(true) {
 				SharedValue.updateIsTestEnvironment(false)
-				Runtime.getRuntime().gc()
 				fragment.activity?.jump<SplashActivity>()
-			} else NodeSelectionPresenter.setAllTestnet(true) {
+			} else NodeSelectionPresenter.setAllTestnet {
 				SharedValue.updateIsTestEnvironment(true)
-				Runtime.getRuntime().gc()
-				fragment.activity?.jump<SplashActivity>()
+				eosChainID?.apply {
+					ChainNodeTable.dao.setUnused(if (isEOSKylin()) ChainID.EOSJungle.id else ChainID.EOSKylin.id)
+					ChainNodeTable.dao.updateUsedEOSChain(id)
+				}
+				launchUI {
+					fragment.activity?.jump<SplashActivity>()
+				}
 			}
 		}
 	}
@@ -62,75 +71,85 @@ class WalletListPresenter(
 				walletType.isBTC() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showMainnetConfirmationAlertView(WalletText.btcMainnet) {
-							switchWalletInDatabase(address, true)
+							switchWalletInDatabase(address, true, null)
 						}
 					} else {
-						switchWalletInDatabase(address, true)
+						switchWalletInDatabase(address, true, null)
 					}
 				}
 
 				walletType.isBTCTest() -> {
 					if (!SharedValue.isTestEnvironment()) {
 						showTestnetConfirmationAlertView(WalletText.btcTestnet) {
-							switchWalletInDatabase(address, false)
+							switchWalletInDatabase(address, false, null)
 						}
 					} else {
-						switchWalletInDatabase(address, false)
+						switchWalletInDatabase(address, false, null)
 					}
 				}
 
 				walletType.isLTC() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showMainnetConfirmationAlertView(WalletText.ltcMainnet) {
-							switchWalletInDatabase(address, true)
+							switchWalletInDatabase(address, true, null)
 						}
 					} else {
-						switchWalletInDatabase(address, true)
+						switchWalletInDatabase(address, true, null)
 					}
 				}
 
 				walletType.isBCH() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showMainnetConfirmationAlertView(WalletText.bchMainnet) {
-							switchWalletInDatabase(address, true)
+							switchWalletInDatabase(address, true, null)
 						}
 					} else {
-						switchWalletInDatabase(address, true)
+						switchWalletInDatabase(address, true, null)
 					}
 				}
 
 				walletType.isEOSJungle() -> {
-					if (!SharedValue.isTestEnvironment()) {
+					if (!SharedValue.isTestEnvironment() || SharedWallet.getCurrentWalletType().isEOSKylin()) {
 						showTestnetConfirmationAlertView(WalletText.eosJungle) {
-							switchWalletInDatabase(address, false)
+							switchWalletInDatabase(address, false, ChainID.EOSJungle)
 						}
 					} else {
-						switchWalletInDatabase(address, false)
+						switchWalletInDatabase(address, false, ChainID.EOSJungle)
+					}
+				}
+
+				walletType.isEOSKylin() -> {
+					if (!SharedValue.isTestEnvironment() || SharedWallet.getCurrentWalletType().isEOSJungle()) {
+						showTestnetConfirmationAlertView(WalletText.eosKylin) {
+							switchWalletInDatabase(address, false, ChainID.EOSKylin)
+						}
+					} else {
+						switchWalletInDatabase(address, false, ChainID.EOSKylin)
 					}
 				}
 
 				walletType.isEOSMainnet() -> {
 					if (SharedValue.isTestEnvironment()) {
 						showTestnetConfirmationAlertView(WalletText.eosMainnet) {
-							switchWalletInDatabase(address, true)
+							switchWalletInDatabase(address, true, null)
 						}
 					} else {
-						switchWalletInDatabase(address, true)
+						switchWalletInDatabase(address, true, null)
 					}
 				}
 				// 观察钱包只导入地址就会是这个属性
 				walletType.isEOS() -> {
-					switchWalletInDatabase(address, true)
+					switchWalletInDatabase(address, true, null)
 				}
 
 				walletType.isETHSeries() -> {
-					switchWalletInDatabase(address, true)
+					switchWalletInDatabase(address, true, null)
 				}
 
 				walletType.isBIP44() || walletType.isMultiChain() -> {
 					if (SharedValue.isTestEnvironment())
-						switchWalletInDatabase(address, false)
-					else switchWalletInDatabase(address, true)
+						switchWalletInDatabase(address, false, null)
+					else switchWalletInDatabase(address, true, null)
 				}
 			}
 		}

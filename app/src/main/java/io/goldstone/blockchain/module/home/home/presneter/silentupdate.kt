@@ -239,10 +239,10 @@ abstract class SilentUpdater {
 
 	private fun checkAvailableEOSTokenList() {
 		if (!account.isValid(false)) return
-		EOSAPI.getEOSTokenList(chainID, account) { tokenList, error ->
+		fun updateData(tokens: List<TokenContract>) {
 			// 拉取潜在资产的 `Icon Url`
-			if (tokenList.isNotNull() && error.isNone()) GoldStoneAPI.getIconURL(tokenList) { tokenIcons, getIconError ->
-				if (tokenIcons.isNotNull() && getIconError.isNone()) tokenList.forEach { contract ->
+			GoldStoneAPI.getIconURL(tokens) { tokenIcons, getIconError ->
+				if (tokenIcons.isNotNull() && getIconError.isNone()) tokens.forEach { contract ->
 					//  这个接口只服务主网下的 `Token` 插入 `DefaultToken`
 					// EOS 的价格不再这里更新
 					if (!CoinSymbol(contract.symbol).isEOS()) DefaultTokenTable.dao.insert(
@@ -252,7 +252,6 @@ abstract class SilentUpdater {
 							chainID
 						)
 					)
-
 					val targetToken = MyTokenTable.dao.getTokenByContractAndAddress(
 						contract.contract,
 						contract.symbol,
@@ -274,6 +273,17 @@ abstract class SilentUpdater {
 					)
 				}
 			}
+		}
+
+		// 优先从 `EOSPark` 获取 `Token List`, 如果出错或测试网替换为 `GoldStone` 的接口
+		if (!SharedValue.isTestEnvironment()) EOSAPI.getTokenBalance(account) { tokens, error ->
+			if (tokens.isNotNull() && error.isNone()) {
+				updateData(tokens.map { TokenContract(it.codeName, it.symbol, it.getDecimal()) })
+			} else EOSAPI.getEOSTokenList(chainID, account) { tokenList, tokenListError ->
+				if (tokenList.isNotNull() && tokenListError.isNone()) updateData(tokenList)
+			}
+		} else EOSAPI.getEOSTokenList(chainID, account) { tokenList, tokenListError ->
+			if (tokenList.isNotNull() && tokenListError.isNone()) updateData(tokenList)
 		}
 	}
 
@@ -391,7 +401,7 @@ abstract class SilentUpdater {
 							myTokens.filter {
 								ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
 							}
-						override val delayTime: Long? = 500
+						override val delayTime: Long? = 300
 						override var asyncCount: Int = eosTokens.size
 						override fun doChildTask(index: Int) {
 							EOSAPI.updateTokenPriceFromNewDex(

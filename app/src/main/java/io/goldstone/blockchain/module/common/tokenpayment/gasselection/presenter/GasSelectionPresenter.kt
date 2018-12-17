@@ -10,7 +10,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.contract.GasSelectionContract
@@ -151,7 +150,7 @@ class GasSelectionPresenter(
 	}
 
 	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
-		val isValid = isValidDecimal(token?.decimal.orZero())
+		val isValid = toDoubleOrZero().getDecimalCount().orZero() > token?.decimal.orZero()
 		if (!isValid) gasView.showError(Throwable(AlertText.transferWrongDecimal))
 		return isValid
 	}

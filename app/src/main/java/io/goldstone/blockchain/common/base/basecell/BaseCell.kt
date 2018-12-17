@@ -49,7 +49,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 	}
 
 	private var paddingSize = 0
-	fun setHorizontalPadding(paddingSize: Int = PaddingSize.device) {
+	fun setHorizontalPadding(paddingSize: Int = PaddingSize.content) {
 		this.paddingSize = paddingSize
 		leftPadding = paddingSize
 		rightPadding = paddingSize

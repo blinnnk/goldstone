@@ -10,13 +10,12 @@ import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
+import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAPPCenterFragment
 import io.goldstone.blockchain.module.home.dapp.dappexplorer.contract.DAPPExplorerContract
-import io.goldstone.blockchain.module.home.dapp.dappexplorer.event.DAPPEXplorerDisplayEvent
 import io.goldstone.blockchain.module.home.dapp.dappexplorer.presenter.DAPPExplorerPresenter
-import io.goldstone.blockchain.module.home.dapp.dapplistdetail.view.DAPPOverlayFragment
+import io.goldstone.blockchain.module.home.dapp.dappoverlay.event.DAPPExplorerDisplayEvent
+import io.goldstone.blockchain.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
 import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 
 /**
@@ -27,21 +26,6 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 
 	override val pageTitle: String get() = "DAPP Explorer"
 	override lateinit var presenter: DAPPExplorerContract.GSPresenter
-
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		EventBus.getDefault().register(this)
-	}
-
-	override fun onDestroy() {
-		super.onDestroy()
-		EventBus.getDefault().unregister(this)
-	}
-
-	@Subscribe(threadMode = ThreadMode.POSTING)
-	fun updateDisplayEvent(displayEvent: DAPPEXplorerDisplayEvent) {
-		if (displayEvent.isShown) getMainActivity()?.showChildFragment(this)
-	}
 
 	override fun showError(error: Throwable) {
 		ErrorDisplayManager(error).show(context)
@@ -69,13 +53,30 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				getMainActivity()?.showDappBrowserFragment(
 					it.getSearchContent(),
 					PreviousView.DAPPExplorer,
+					"FFFFFF",
 					this
 				)
 			}
 		}
 	}
 
-	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<DAPPTable>?) {
-		recyclerView.adapter = DAPPExplorerAdapter(asyncData.orEmptyArray())
+	override fun setRecyclerViewAdapter(
+		recyclerView: BaseRecyclerView,
+		asyncData: ArrayList<DAPPTable>?
+	) {
+		recyclerView.adapter = DAPPExplorerAdapter(asyncData.orEmptyArray()) {
+			DAPPCenterFragment.showAttentionOrElse(context!!, id) {
+				getMainActivity()?.apply {
+					showDappBrowserFragment(
+						url,
+						PreviousView.DAPPExplorer,
+						backgroundColor,
+						null
+					)
+					EventBus.getDefault().post(DAPPExplorerDisplayEvent(false))
+					getDAPPCenterFragment()?.refreshLatestUsed()
+				}
+			}
+		}
 	}
 }

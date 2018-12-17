@@ -25,6 +25,7 @@ import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.alert
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbyfriend.presenter.RegisterByFriendPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -62,6 +63,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 				gravity = Gravity.CENTER_HORIZONTAL
 				DescriptionView(context).isRegisterByFriend().into(this)
 				accountNameInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					title = ImportWalletText.eosAccountName
 					afterTextChanged = Runnable {
 						if (hasResultView) {

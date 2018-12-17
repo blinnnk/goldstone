@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
@@ -15,8 +14,6 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.utils.toAmount
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.GasSelectionFragment
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 /**
@@ -30,27 +27,28 @@ fun PaymentDetailPresenter.transferEOS(
 	contract: TokenContract,
 	@WorkerThread callback: (error: GoldStoneError) -> Unit
 ) {
-	val inputValueDecimal = count.toBigDecimal().toPlainString().substringAfter(".").length
-	if (inputValueDecimal != contract.decimal) GlobalScope.launch {
-		callback(TransferError.IncorrectDecimal)
-	} else EOSTransactionInfo(
-		SharedAddress.getCurrentEOSAccount(),
-		EOSAccount(fragment.address.orEmpty()),
-		count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
-		fragment.getMemoContent(),
-		contract
-	).apply {
-		trade(fragment.context) { response, error ->
-			if (error.isNone() && response.isNotNull())
-				insertPendingDataToDatabase(response) {
-					launchUI {
-						getToken()?.let {
-							val receiptModel = ReceiptModel(this, response, it)
-							GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+	when {
+		SharedAddress.getCurrentEOSAccount().isSame(EOSAccount(fragment.address.orEmpty())) ->
+			callback(TransferError.TransferToSelf)
+		else -> EOSTransactionInfo(
+			SharedAddress.getCurrentEOSAccount(),
+			EOSAccount(fragment.address.orEmpty()),
+			count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
+			fragment.getMemoContent(),
+			contract
+		).apply {
+			trade(fragment.context) { response, error ->
+				if (error.isNone() && response.isNotNull())
+					insertPendingDataToDatabase(response) {
+						launchUI {
+							getToken()?.let {
+								val receiptModel = ReceiptModel(this, response, it)
+								GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+							}
 						}
 					}
-				}
-			else callback(error)
+				else callback(error)
+			}
 		}
 	}
 }

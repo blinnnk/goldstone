@@ -75,9 +75,9 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 			val sessionHeight = 30.uiPX()
 			setTextColor(Spectrum.opacity3White)
 			sessionData = listOf(
-				RecyclerViewSessionModel(1, ProfileText.walletAdvanced, sessionHeight, PaddingSize.device.toFloat()),
-				RecyclerViewSessionModel(5, ProfileText.generalPreference, sessionHeight, PaddingSize.device.toFloat()),
-				RecyclerViewSessionModel(8, ProfileText.aboutGoldStone, sessionHeight, PaddingSize.device.toFloat())
+				RecyclerViewSessionModel(1, ProfileText.walletAdvanced, sessionHeight, PaddingSize.content.toFloat()),
+				RecyclerViewSessionModel(5, ProfileText.generalPreference, sessionHeight, PaddingSize.content.toFloat()),
+				RecyclerViewSessionModel(8, ProfileText.aboutGoldStone, sessionHeight, PaddingSize.content.toFloat())
 			)
 			recyclerView.addItemDecoration(this)
 		}

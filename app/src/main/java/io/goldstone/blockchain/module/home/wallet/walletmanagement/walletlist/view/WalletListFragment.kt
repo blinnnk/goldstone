@@ -23,10 +23,7 @@ class WalletListFragment : BaseRecyclerFragment<WalletListPresenter, WalletListM
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletListModel>?) {
 		asyncData?.let { it ->
 			recyclerView.adapter = WalletListAdapter(it) {
-				onClick {
-					presenter.switchWallet(model.address)
-					preventDuplicateClicks()
-				}
+				presenter.switchWallet(it)
 			}
 		}
 	}
