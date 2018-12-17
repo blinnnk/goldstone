@@ -10,10 +10,10 @@ import com.blinnnk.animation.scale
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.*
+import com.blinnnk.uikit.ScreenSize
 import io.goldstone.blockchain.common.utils.click
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-import org.jetbrains.anko.wrapContent
 
 
 /**
@@ -41,10 +41,12 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 			viewHeight = height
 		}
 		
-		mainButton.layoutParams = RelativeLayout.LayoutParams(buttonWidth, buttonWidth)
+		mainButton.layoutParams = RelativeLayout.LayoutParams(buttonWidth, buttonWidth).apply {
+			alignParentBottom()
+		}
 		mainButton.setMargins<RelativeLayout.LayoutParams> {
 			leftMargin = framePadding
-			topMargin = framePadding
+			bottomMargin = framePadding
 		}
 		mainButton.showIcon()
 		childLayout.visibility = View.GONE
@@ -73,6 +75,7 @@ class DragFloatingLayout(context: Context) : RelativeLayout(context) {
 					(mainButton.layoutParams as? RelativeLayout.LayoutParams)?.apply {
 						val leftMargin = (event.x - mainButton.xDistance).toInt()
 						val topMargin = (event.y - mainButton.yDistance).toInt()
+						removeRule(ALIGN_PARENT_BOTTOM)
 						setMargins(leftMargin, topMargin, 0, 0)
 						mainButton.layoutParams = this
 					}
