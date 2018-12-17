@@ -12,8 +12,10 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
@@ -23,6 +25,7 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.walletimport.keystoreimport.presenter.KeystoreImportPresenter
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
@@ -74,29 +77,29 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					hint = ImportWalletText.keystoreHint
 				}.into(this)
 
-				nameInput = RoundInput(context)
-				nameInput.apply {
+				nameInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					hint = UIUtils.generateDefaultName()
 					title = CreateWalletText.name
-				}.into(this)
+				}
 				nameInput.setMargins<LinearLayout.LayoutParams> {
 					topMargin = 20.uiPX()
 				}
 
-				passwordInput = RoundInput(context)
-				passwordInput.apply {
+				passwordInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setPasswordInput()
 					title = CreateWalletText.password
-				}.into(this)
+				}
 				passwordInput.setMargins<LinearLayout.LayoutParams> {
 					topMargin = 5.uiPX()
 				}
 
-				hintInput = RoundInput(context)
-				hintInput.apply {
+				hintInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setTextInput()
 					title = CreateWalletText.hint
-				}.into(this)
+				}
 				hintInput.setMargins<LinearLayout.LayoutParams> {
 					topMargin = 5.uiPX()
 				}
@@ -114,8 +117,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 					topMargin = 20.uiPX()
 				}
 
-				confirmButton = RoundButton(context)
-				confirmButton.apply {
+				confirmButton = roundButton {
 					setBlueStyle(10.uiPX())
 					text = CommonText.confirm.toUpperCase()
 				}.click { button ->
@@ -135,7 +137,7 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 							}
 						}
 					}
-				}.into(this)
+				}
 
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsKeystore.setUnderline()

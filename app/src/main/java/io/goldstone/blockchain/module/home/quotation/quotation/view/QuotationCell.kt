@@ -96,7 +96,7 @@ class QuotationCell(context: Context) : GSCard(context) {
 	}
 
 	init {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, 165.uiPX())
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, 162.uiPX())
 		resetCardElevation(ShadowSize.Cell)
 		tokenInfo = twoLineTitles {
 			x += 20.uiPX()

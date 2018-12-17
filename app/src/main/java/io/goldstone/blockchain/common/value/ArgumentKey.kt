@@ -92,4 +92,6 @@ object SharesPreference {
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"
 	const val netUnitPrice = "netUnitPrice"
+
+	const val jsCode = "jsCode"
 }

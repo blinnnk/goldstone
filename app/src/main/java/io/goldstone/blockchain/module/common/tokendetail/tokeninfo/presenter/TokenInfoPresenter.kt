@@ -262,10 +262,11 @@ class TokenInfoPresenter(
 				contract.isBTC() -> ChainExplorer.btcAddressDetail(contract.getAddress())
 				contract.isLTC() -> ChainExplorer.ltcAddressDetail(contract.getAddress())
 				contract.isBCH() -> ChainExplorer.bchAddressDetail(contract.getAddress())
-				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(contract.getAddress())
+				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(contract.getAddress(true))
 				contract.isETC() -> ChainExplorer.etcAddressDetail(contract.getAddress())
 				else -> ChainExplorer.ethAddressDetail(contract.getAddress())
 			}
+			System.out.println("url $url")
 			return Pair(getExplorerInfo(contract).first().icon, url)
 		}
 
