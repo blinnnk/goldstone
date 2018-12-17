@@ -12,9 +12,10 @@ import io.goldstone.blockchain.module.home.quotation.rank.model.CoinRankModel
  */
 interface CoinRankContract {
 	interface GSView: GoldStoneView<GSPresenter> {
-		fun showLoadingView(isShow: Boolean)
+		fun showLoadingView(status: Boolean)
+		fun showBottomLoading(isShow: Boolean)
 		fun showHeaderData(model: CoinGlobalModel)
-		fun showListData(data: List<CoinRankModel>)
+		fun showListData(isClear: Boolean,data: List<CoinRankModel>)
 	}
 	interface GSPresenter: GoldStonePresenter {
 		fun loadFirstPage()

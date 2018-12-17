@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.quotation.rank.view
 import android.content.Context
 import android.view.View
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.module.home.quotation.rank.model.CoinRankModel
 
 /**
@@ -13,11 +14,12 @@ import io.goldstone.blockchain.module.home.quotation.rank.model.CoinRankModel
 class CoinRankAdapter(
 	override val dataSet: ArrayList<CoinRankModel>,
 	private val holdHeader: CoinRankHeader.() -> Unit,
+	private val holdFooter: BottomLoadingView.() -> Unit,
 	private val hold: CoinRankCell.() -> Unit
 ) : HoneyBaseAdapterWithHeaderAndFooter<CoinRankModel, CoinRankHeader, CoinRankCell, View>() {
 	override fun generateCell(context: Context) = CoinRankCell(context)
 	
-	override fun generateFooter(context: Context) = View(context)
+	override fun generateFooter(context: Context) = BottomLoadingView(context)
 	
 	override fun generateHeader(context: Context) = CoinRankHeader(context).apply(holdHeader)
 	

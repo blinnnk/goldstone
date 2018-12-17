@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.view.*
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.module.home.quotation.rank.contract.CoinRankContract
 import io.goldstone.blockchain.module.home.quotation.rank.model.CoinGlobalModel
 import io.goldstone.blockchain.module.home.quotation.rank.model.CoinRankModel
@@ -21,10 +23,18 @@ class CoinRankFragment: GSRecyclerFragment<CoinRankModel>(), CoinRankContract.GS
 	
 	private var coinRankHeader: CoinRankHeader? = null
 	
+	private var bottomLoadingView: BottomLoadingView? = null
+	
 	override val presenter: CoinRankContract.GSPresenter = CoinRankPresenter(this)
 	
 	override fun showLoadingView(status: Boolean) {
 		super.showLoadingView(status)
+	}
+	
+	override fun showBottomLoading(isShow: Boolean) {
+		if (isShow) bottomLoadingView?.show()
+		else bottomLoadingView?.hide()
+		isLoadingData = false
 	}
 	
 	override fun setRecyclerViewAdapter(
@@ -34,6 +44,9 @@ class CoinRankFragment: GSRecyclerFragment<CoinRankModel>(), CoinRankContract.GS
 		recyclerView.adapter = CoinRankAdapter(asyncData.orEmptyArray(),
 			{
 				coinRankHeader = this
+			},
+			{
+				bottomLoadingView = this
 			}) {
 			
 		}
@@ -46,17 +59,28 @@ class CoinRankFragment: GSRecyclerFragment<CoinRankModel>(), CoinRankContract.GS
 	}
 	
 	override fun showError(error: Throwable) {
-	
+		ErrorDisplayManager(error).show(context)
 	}
 	
 	override fun showHeaderData(model: CoinGlobalModel) {
-		coinRankHeader?.apply {
-		
-		}
+		coinRankHeader?.model = model
 	}
 	
-	override fun showListData(data: List<CoinRankModel>) {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	override fun flipPage() {
+		super.flipPage()
+		presenter.loadMore()
+	}
+	
+	override fun showListData(isClear: Boolean, data: List<CoinRankModel>) {
+		if (isClear) asyncData!!.clear()
+		asyncData!!.addAll(data)
+		recyclerView.adapter?.notifyDataSetChanged()
+		if (asyncData!!.size > 0) {
+			removeEmptyView()
+		} else {
+			showEmptyView()
+		}
+		
 	}
 	
 	

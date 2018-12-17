@@ -13,7 +13,7 @@ class CoinRankModel(
 	@SerializedName("market_cap")
 	val marketCap: String,
 	@SerializedName("change_percent_24h")
-	val changePercent24h,
+	val changePercent24h: String,
 	val name: String,
 	val color: String,
 	val symbol: String,

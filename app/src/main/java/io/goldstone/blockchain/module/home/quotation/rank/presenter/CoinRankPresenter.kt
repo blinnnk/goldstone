@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.quotation.rank.presenter
 
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.rank.contract.CoinRankContract
 
@@ -15,21 +16,35 @@ class CoinRankPresenter(private val gsView: CoinRankContract.GSView
 	
 	override fun start() {
 		getGlobalData()
-	
+		loadFirstPage()
 	}
 	
 	private fun getGlobalData() {
 		GoldStoneAPI.getGlobalData { model, error ->
-			if (model != null && !error.isNone()) {
-				gsView.showHeaderData(model)
-			} else {
-				gsView.showError(error)
+			launchUI {
+				if (model != null && error.isNone()) {
+					gsView.showHeaderData(model)
+				} else {
+					gsView.showError(error)
+				}
 			}
 		}
 	}
 	
-	private fun getRankList() {
+	private fun getNextPage(callback: () -> Unit) {
 		GoldStoneAPI.getCoinRank(lastRank) { data, error ->
+			launchUI {
+				if (data != null && error.isNone()) {
+					gsView.showListData(lastRank == 0, data)
+					if (data.isNotEmpty()) {
+						lastRank = data[data.lastIndex].rank
+					}
+				} else {
+					gsView.showError(error)
+				}
+				callback()
+			}
+			
 			
 		}
 	}
@@ -37,11 +52,17 @@ class CoinRankPresenter(private val gsView: CoinRankContract.GSView
 	
 	override fun loadFirstPage() {
 		gsView.showLoadingView(true)
-		lastRank = -1
+		lastRank = 0
+		getNextPage {
+			gsView.showLoadingView(false)
+		}
 	}
 	
 	override fun loadMore() {
-	
+		gsView.showBottomLoading(true)
+		getNextPage {
+			gsView.showBottomLoading(false)
+		}
 	}
 	
 }

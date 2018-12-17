@@ -7,6 +7,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.observing
+import io.goldstone.blockchain.module.home.quotation.rank.model.CoinGlobalModel
 import org.jetbrains.anko.*
 
 /**
@@ -15,9 +17,26 @@ import org.jetbrains.anko.*
  * @description:
  */
 class CoinRankHeader(context: Context): LinearLayout(context) {
-	private val marketCap = TextView(context)
-	private val volume24h = TextView(context)
-	private val btcDominance = TextView(context)
+	private val marketCap = TextView(context).apply {
+		layoutParams = LayoutParams(matchParent, wrapContent)
+		gravity = Gravity.CENTER
+	}
+	private val volume24h = TextView(context).apply {
+		layoutParams = LayoutParams(matchParent, wrapContent)
+		gravity = Gravity.CENTER
+	}
+	private val btcDominance = TextView(context).apply {
+		layoutParams = LayoutParams(matchParent, wrapContent)
+		gravity = Gravity.CENTER
+	}
+	
+	var model: CoinGlobalModel? by observing(null) {
+		model?.apply {
+			marketCap.text = "$${this.totalMarketCap}"
+			volume24h.text = "$${this.totalVolume}"
+			btcDominance.text = "${this.btcPercentageMarketCap}%"
+		}
+	}
 	
 	init {
 		layoutParams = ViewGroup.LayoutParams(matchParent, 100.uiPX())
@@ -27,9 +46,9 @@ class CoinRankHeader(context: Context): LinearLayout(context) {
 			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			textView {
 				text = "market cap"
-			}
+				gravity = Gravity.CENTER
+			}.lparams(matchParent, wrapContent)
 			addView(marketCap)
-			marketCap.text = "marketCap"
 		}
 		
 		verticalLayout {
@@ -37,9 +56,9 @@ class CoinRankHeader(context: Context): LinearLayout(context) {
 			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			textView {
 				text = "volume 24h"
-			}
+				gravity = Gravity.CENTER
+			}.lparams(matchParent, wrapContent)
 			addView(volume24h)
-			volume24h.text = "valume"
 		}
 		
 		verticalLayout {
@@ -47,9 +66,9 @@ class CoinRankHeader(context: Context): LinearLayout(context) {
 			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			textView {
 				text = "btc dominance"
-			}
+				gravity = Gravity.CENTER
+			}.lparams(matchParent, wrapContent)
 			addView(btcDominance)
-			btcDominance.text = "btcDominance"
 		}
 		
 		
