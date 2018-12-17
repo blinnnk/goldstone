@@ -4,6 +4,7 @@ import android.graphics.Rect
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.value.PaddingSize
 
 
 /**
@@ -16,7 +17,7 @@ class BaseDecoration : RecyclerView.ItemDecoration() {
 		super.getItemOffsets(outRect, view, parent, state)
 		val position = parent.getChildAdapterPosition(view)
 		when (position) {
-			0 -> outRect.left = 10.uiPX()
+			0 -> outRect.left = PaddingSize.gsCard
 			else -> outRect.left = 3.uiPX()
 		}
 	}

@@ -131,7 +131,7 @@ class WalletListCardCell(context: Context) : GSCard(context) {
 	override fun onAttachedToWindow() {
 		super.onAttachedToWindow()
 		setMargins<RecyclerView.LayoutParams> {
-			leftMargin = 10.uiPX()
+			leftMargin = PaddingSize.gsCard
 		}
 	}
 

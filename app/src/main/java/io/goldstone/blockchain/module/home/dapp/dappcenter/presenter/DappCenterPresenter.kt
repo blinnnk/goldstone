@@ -20,14 +20,7 @@ class DAppCenterPresenter(
 		setDAPPRecommendData()
 		setNewDAPP()
 		setUsedDAPPs()
-	}
-
-	private fun setDAPPRecommendData() {
-		load {
-			DAPPTable.dao.getRecommended()
-		} then {
-			dappView.showRecommendDAPP(it.toArrayList())
-		}
+		getRecommendDappCount()
 	}
 
 	override fun setUsedDAPPs() {
@@ -35,6 +28,20 @@ class DAppCenterPresenter(
 			DAPPTable.dao.getUsed(DataValue.dappPageCount)
 		} then {
 			dappView.showLatestUsed(it.toArrayList())
+		}
+	}
+
+	private fun getRecommendDappCount() {
+		load { DAPPTable.dao.getRecommendedCount() } then {
+			dappView.showRecommendedSession(it)
+		}
+	}
+
+	private fun setDAPPRecommendData() {
+		load {
+			DAPPTable.dao.getRecommended()
+		} then {
+			dappView.showRecommendDAPP(it.toArrayList())
 		}
 	}
 

@@ -11,10 +11,13 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletnameeditor.presenter.WalletNameEditorPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -29,52 +32,36 @@ import org.jetbrains.anko.verticalLayout
 class WalletNameEditorFragment : BaseFragment<WalletNameEditorPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.walletName
-	val confirmButton by lazy { RoundButton(context!!) }
-	private val nameInput by lazy { RoundInput(context!!) }
+	lateinit var confirmButton: RoundButton
+	private lateinit var nameInput: RoundInput
 	override val presenter = WalletNameEditorPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			nameInput.apply {
+			nameInput = roundInput {
+				horizontalPaddingSize = PaddingSize.gsCard
 				title = WalletSettingsText.walletNameSettings
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 40.uiPX()
-					bottomMargin = 30.uiPX()
-				}
-
 				addTextChangedListener(object : TextWatcher {
-					override fun beforeTextChanged(
-						p0: CharSequence?,
-						p1: Int,
-						p2: Int,
-						p3: Int
-					) {
-					}
-
-					override fun onTextChanged(
-						p0: CharSequence?,
-						p1: Int,
-						p2: Int,
-						p3: Int
-					) {
-					}
-
+					override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+					override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 					override fun afterTextChanged(p0: Editable?) {
 						presenter.updateConfirmButtonStyle(nameInput)
 					}
 				})
-			}.into(this)
-
+			}
+			nameInput.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 40.uiPX()
+				bottomMargin = 30.uiPX()
+			}
 			presenter.showCurrentNameHint(nameInput)
-
-			confirmButton.apply {
+			confirmButton = roundButton {
 				text = CommonText.confirm
 				setGrayStyle()
 			}.click {
 				presenter.changeWalletName(nameInput)
-			}.into(this)
+			}
 		}
 	}
 

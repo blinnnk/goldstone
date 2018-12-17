@@ -53,6 +53,7 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				getMainActivity()?.showDappBrowserFragment(
 					it.getSearchContent(),
 					PreviousView.DAPPExplorer,
+					"FFFFFF",
 					this
 				)
 			}
@@ -66,7 +67,12 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 		recyclerView.adapter = DAPPExplorerAdapter(asyncData.orEmptyArray()) {
 			DAPPCenterFragment.showAttentionOrElse(context!!, id) {
 				getMainActivity()?.apply {
-					showDappBrowserFragment(url, PreviousView.DAPPExplorer, null)
+					showDappBrowserFragment(
+						url,
+						PreviousView.DAPPExplorer,
+						backgroundColor,
+						null
+					)
 					EventBus.getDefault().post(DAPPExplorerDisplayEvent(false))
 					getDAPPCenterFragment()?.refreshLatestUsed()
 				}

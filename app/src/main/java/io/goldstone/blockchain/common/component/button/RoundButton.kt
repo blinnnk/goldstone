@@ -79,7 +79,7 @@ class RoundButton(context: Context) : GSCard(context) {
 	}
 
 	fun setGrayStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, buttonHeight).apply {
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
@@ -87,7 +87,7 @@ class RoundButton(context: Context) : GSCard(context) {
 		setCardBackgroundColor(GrayScale.whiteGray)
 	}
 
-	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.card, height: Int = buttonHeight) {
+	fun setBlueStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding, height: Int = buttonHeight) {
 		layoutParams = LinearLayout.LayoutParams(width, height).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
@@ -96,7 +96,7 @@ class RoundButton(context: Context) : GSCard(context) {
 	}
 
 	fun setDarkStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, buttonHeight).apply {
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
@@ -104,7 +104,7 @@ class RoundButton(context: Context) : GSCard(context) {
 	}
 
 	fun setGreenStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, buttonHeight).apply {
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}

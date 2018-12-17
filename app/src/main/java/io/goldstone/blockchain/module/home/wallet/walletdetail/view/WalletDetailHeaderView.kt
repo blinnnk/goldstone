@@ -132,16 +132,14 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			y -= 10.uiPX()
 		}.apply {
 			alignParentBottom()
-			x += PaddingSize.device
+			x += PaddingSize.content
 		}
 
+		addTokenButton.into(this)
 		addTokenButton.apply {
 			setTitle(WalletText.addToken.toUpperCase())
-			x -= PaddingSize.device
+			x -= PaddingSize.content
 			y -= 10.uiPX()
-		}.into(this)
-
-		addTokenButton.apply {
 			removeIcon()
 			layoutParams.height = 24.uiPX()
 			alignParentRight()

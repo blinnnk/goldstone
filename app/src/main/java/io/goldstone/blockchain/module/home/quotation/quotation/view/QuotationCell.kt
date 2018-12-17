@@ -124,7 +124,7 @@ class QuotationCell(context: Context) : GSCard(context) {
 	override fun onAttachedToWindow() {
 		super.onAttachedToWindow()
 		setMargins<RecyclerView.LayoutParams> {
-			leftMargin = PaddingSize.content
+			leftMargin = PaddingSize.gsCard
 		}
 	}
 }

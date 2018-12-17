@@ -16,7 +16,9 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.ValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
@@ -24,6 +26,7 @@ import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.presenter.KeystoreExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -39,8 +42,8 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.exportKeystore
 	private lateinit var privateKeyTextView: ValueView
-	private val passwordInput by lazy { RoundInput(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var passwordInput: RoundInput
+	private lateinit var confirmButton: RoundButton
 	override val presenter = KeystoreExportPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -55,15 +58,16 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				if (it.getContent().isNotEmpty()) context.clickToCopy(it.getContent())
 			}
 
-			passwordInput.apply {
+			passwordInput = roundInput {
+				horizontalPaddingSize = PaddingSize.gsCard
 				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> {
-					topMargin = 30.uiPX()
-				}
 				title = CreateWalletText.password
-			}.into(this)
+			}
+			passwordInput.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 30.uiPX()
+			}
 
-			confirmButton.apply {
+			confirmButton = roundButton {
 				text = CommonText.confirm
 				setBlueStyle(15.uiPX())
 			}.click { button ->
@@ -76,7 +80,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 						button.showLoadingStatus(false)
 					}
 				}
-			}.into(this)
+			}
 		}
 	}
 

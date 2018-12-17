@@ -50,7 +50,7 @@ class TokenInfoLink(
 	private val whitePaper = GraySquareCell(context).apply { showArrow() }
 	
 	init {
-		setHorizontalPadding(PaddingSize.device.toFloat())
+		setHorizontalPadding(PaddingSize.content.toFloat())
 		setTitle(QuotationText.tokenInfoLink)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 150.uiPX())
 		verticalLayout {

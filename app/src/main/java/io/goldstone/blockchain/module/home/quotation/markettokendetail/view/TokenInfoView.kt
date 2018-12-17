@@ -32,7 +32,7 @@ class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 	}
 	
 	init {
-		setHorizontalPadding(PaddingSize.device.toFloat())
+		setHorizontalPadding(PaddingSize.content.toFloat())
 		setTitle(QuotationText.tokenDescription)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 160.uiPX())
 		contentView.into(this)
