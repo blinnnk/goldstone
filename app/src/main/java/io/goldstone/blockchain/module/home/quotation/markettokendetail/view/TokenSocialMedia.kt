@@ -53,7 +53,7 @@ class TokenSocialMedia(context: Context, clickEvent: (url: String) -> Unit) : To
 	private var container: GridLayout
 
 	init {
-		setHorizontalPadding(PaddingSize.device.toFloat())
+		setHorizontalPadding(PaddingSize.content.toFloat())
 		setTitle(QuotationText.socimalMedia)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, wrapContent)
 		minimumHeight = 140.uiPX()

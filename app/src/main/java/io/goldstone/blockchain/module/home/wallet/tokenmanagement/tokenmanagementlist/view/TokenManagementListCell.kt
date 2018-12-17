@@ -7,6 +7,7 @@ import android.widget.Switch
 import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.isDefaultStyle
+import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -46,7 +47,11 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				else -> icon.image.glideImage(iconUrl)
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol.symbol else tokenName)
+			tokenInfo.subtitle.text = when {
+				contract.isERC20Token() -> "contract address:" suffix contract.contract
+				contract.isEOSToken() -> "code name:" suffix contract.contract
+				else -> CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol.symbol else tokenName)
+			}
 		}
 	}
 
@@ -67,7 +72,11 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				else -> icon.image.glideImage(iconUrl)
 			}
 			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(CoinSymbol(symbol))
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
+			tokenInfo.subtitle.text = when {
+				TokenContract(this).isERC20Token() -> "contract address:" suffix contract
+				TokenContract(this).isEOSToken() -> "code name:" suffix contract
+				else -> CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
+			}
 			switch.isChecked = isUsed
 		}
 	}

@@ -50,8 +50,8 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
-				leftPadding = PaddingSize.content
-				rightPadding = PaddingSize.content
+				leftPadding = PaddingSize.device
+				rightPadding = PaddingSize.device
 				nameInput = roundInput {
 					title = ContactText.contactName
 					setTextInput()

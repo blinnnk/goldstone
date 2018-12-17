@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.dapp.dappbrowser.view
 
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.dragbutton.DragButtonModel
 import io.goldstone.blockchain.common.component.dragbutton.DragFloatingLayout
 import io.goldstone.blockchain.common.utils.getMainActivity
+import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.utils.transparentStatus
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -44,6 +46,12 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 
 	private val url by lazy {
 		arguments?.getString(ArgumentKey.webViewUrl)
+	}
+
+	private val webColor by lazy {
+		var color = arguments?.getString(ArgumentKey.webColor)?.isEmptyThen("FFFFFF") ?: "FFFFFF"
+		color = if (color.contains("#")) color.substringAfter("#") else color
+		Color.parseColor("#FF$color")
 	}
 
 	private val fromView by lazy {
@@ -81,16 +89,17 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 		return UI {
 			relativeLayout {
 				lparams(matchParent, matchParent)
+				backgroundColor = webColor
 				floatingButton = DragFloatingLayout(context)
 				floatingButton.addSubButton(
 					DragButtonModel(
 						R.drawable.refresh_icon,
-						event = { browser.loadUrl(url) },
+						event = { browser.refresh() },
 						color = Spectrum.green
 					),
 					DragButtonModel(
 						R.drawable.close_web_icon,
-						event = { removeSelfFromActivity()},
+						event = { removeSelfFromActivity() },
 						color = Spectrum.lightRed
 					)
 				)
@@ -101,10 +110,13 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 				}
 				browser = DAPPBrowser(context, url.orEmpty()) {
 					progressView.progress = it
-					if (it == 100) removeView(progressView)
+					if (it == 100) {
+						removeView(progressView)
+						browser.alpha = 1f
+					}
 				}
+				browser.alpha = 0f
 				addView(browser)
-				backgroundColor = Spectrum.white
 			}
 		}.view
 	}

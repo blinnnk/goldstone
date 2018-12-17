@@ -91,7 +91,7 @@ class AddressesListView(
 	}
 
 	init {
-		setHorizontalPadding(PaddingSize.device.toFloat())
+		setHorizontalPadding(PaddingSize.content.toFloat())
 		cellLayout.gravity = Gravity.CENTER_HORIZONTAL
 		showTopLine = true
 		layoutParams = LinearLayout.LayoutParams(matchParent, 0)

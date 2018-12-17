@@ -39,7 +39,9 @@ data class DAPPTable(
 	@SerializedName("weight")
 	val weight: Int,
 	@SerializedName("tags")
-	val tags: String
+	val tags: String,
+	@SerializedName("background_color")
+	val backgroundColor: String
 ) : Serializable {
 	fun getTagList(): List<String> = tags.split(",")
 
@@ -62,13 +64,16 @@ interface DAPPDao {
 	@Query("SELECT * FROM dappTable WHERE isRecommended = 1 ORDER BY weight DESC, timeStamp DESC LIMIT :limit")
 	fun getRecommended(limit: Int = 5): List<DAPPTable>
 
+	@Query("SELECT count(*) FROM dappTable WHERE isRecommended = 1")
+	fun getRecommendedCount(): Int
+
 	@Query("SELECT * FROM dappTable ORDER BY weight DESC, timeStamp DESC LIMIT :limit")
 	fun getAll(limit: Int): List<DAPPTable>
 
 	@Query("SELECT * FROM dappTable WHERE title LIKE '%' || :name || '%'")
 	fun getBy(name: String): List<DAPPTable>
 
-	@Query("SELECT dappTable.id AS id, dappTable.icon AS icon, dappTable.banner AS banner, dappTable.url AS url, dappTable.description AS description, dappTable.tags AS tags, dappTable.isRecommended AS isRecommended, favoriteTable.timeStamp AS timeStamp, dappTable.title AS title, dappTable.weight AS weight FROM dappTable, favoriteTable WHERE dappTable.id = favoriteTable.valueID AND favoriteTable.walletID = :walletID AND favoriteTable.type = :tableType  ORDER BY timeStamp DESC LIMIT :limit")
+	@Query("SELECT dappTable.id AS id, dappTable.icon AS icon, dappTable.banner AS banner, dappTable.url AS url, dappTable.backgroundColor AS backgroundColor, dappTable.description AS description, dappTable.tags AS tags, dappTable.isRecommended AS isRecommended, favoriteTable.timeStamp AS timeStamp, dappTable.title AS title, dappTable.weight AS weight FROM dappTable, favoriteTable WHERE dappTable.id = favoriteTable.valueID AND favoriteTable.walletID = :walletID AND favoriteTable.type = :tableType  ORDER BY timeStamp DESC LIMIT :limit")
 	fun getUsed(limit: Int, tableType: Int = TableType.DAPP, walletID: Int = SharedWallet.getCurrentWalletID()): List<DAPPTable>
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -28,9 +28,9 @@ class DragFloatingButton(context: Context) : LinearLayout(context) {
 	private var container: RelativeLayout
 
 	init {
-		layoutParams = RelativeLayout.LayoutParams(70.uiPX(), 70.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(60.uiPX(), 60.uiPX())
 		container = relativeLayout {
-			lparams(58.uiPX(), 58.uiPX())
+			lparams(48.uiPX(), 48.uiPX())
 			centerInParent()
 			icon = imageView {
 				scaleType = ImageView.ScaleType.CENTER_INSIDE

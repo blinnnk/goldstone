@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.base.view.ViewPagerAdapter
 import io.goldstone.blockchain.common.component.ViewPagerMenu
 import io.goldstone.blockchain.common.component.gsCard
 import io.goldstone.blockchain.common.component.overlay.Dashboard
+import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
@@ -63,6 +64,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 	private lateinit var menuBar: ViewPagerMenu
 	private lateinit var newAPP: DAPPRecyclerView
 	private lateinit var latestUsed: DAPPRecyclerView
+	private lateinit var recommendedSession: SessionTitleView
 
 	override fun showError(error: Throwable) {
 		safeShowError(error)
@@ -88,11 +90,11 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 						showDAPPExplorerFragment()
 					}
 					searchBar.into(this)
-					sessionTitle {
+					recommendedSession = sessionTitle {
 						setTitle("Recommend DAPP", Spectrum.white)
 						setSubtitle(
-							"(5)",
-							"Check All (5)",
+							"(--)",
+							"Check All (--)",
 							Spectrum.opacity5White,
 							Spectrum.white
 						) {
@@ -103,7 +105,12 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 						context,
 						clickCellEvent = {
 							showAttentionOrElse(context, id) {
-								getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
+								getMainActivity()?.showDappBrowserFragment(
+									url,
+									PreviousView.DAPPCenter,
+									backgroundColor,
+									this@DAPPCenterFragment
+								)
 								presenter.setUsedDAPPs()
 							}
 						}
@@ -129,7 +136,12 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								context,
 								clickCellEvent = {
 									showAttentionOrElse(context, id) {
-										getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
+										getMainActivity()?.showDappBrowserFragment(
+											url,
+											PreviousView.DAPPCenter,
+											backgroundColor,
+											this@DAPPCenterFragment
+										)
 										presenter.setUsedDAPPs()
 									}
 								},
@@ -140,14 +152,19 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							latestUsed = DAPPRecyclerView(
 								context,
 								clickCellEvent = {
-									getMainActivity()?.showDappBrowserFragment(url, PreviousView.DAPPCenter, this@DAPPCenterFragment)
+									getMainActivity()?.showDappBrowserFragment(
+										url,
+										PreviousView.DAPPCenter,
+										backgroundColor,
+										this@DAPPCenterFragment
+									)
 								},
 								checkAllEvent = {
 									showDAPPListDetailFragment(DAPPType.Latest)
 								}
 							)
 							themedViewPager {
-								layoutParams = LinearLayout.LayoutParams(matchParent, 990.uiPX())
+								layoutParams = LinearLayout.LayoutParams(matchParent, 986.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 								val titles = listOf("NEW DAPP", "LATEST USED")
 								menuBar.setMenuTitles(titles) { button, id ->
@@ -175,11 +192,22 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 		recommendDAPP.setData(data)
 	}
 
+	override fun showRecommendedSession(count: Int) {
+		recommendedSession.setSubtitle(
+			"($count)",
+			"Check All ($count)",
+			Spectrum.opacity5White,
+			Spectrum.white
+		) {
+			showDAPPListDetailFragment(DAPPType.Recommend)
+		}
+	}
+
 	override fun showAllDAPP(data: ArrayList<DAPPTable>) = launchUI {
 		newAPP.setData(data)
 	}
 
-	override fun showLatestUsed( data: ArrayList<DAPPTable>) {
+	override fun showLatestUsed(data: ArrayList<DAPPTable>) {
 		latestUsed.setData(data)
 	}
 

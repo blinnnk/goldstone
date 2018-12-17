@@ -30,7 +30,7 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 		addTokenButton.apply {
 			title = QuotationText.addToken
 			src = R.drawable.add_token_icon
-			x += PaddingSize.device
+			x += PaddingSize.content
 			y = 15.uiPX().toFloat()
 		}.into(this)
 

@@ -15,6 +15,7 @@ interface DAppCenterContract {
 		fun showAllDAPP(data: ArrayList<DAPPTable>)
 		fun showLatestUsed(data: ArrayList<DAPPTable>)
 		fun refreshLatestUsed()
+		fun showRecommendedSession(count: Int)
 	}
 
 	interface GSPresenter : GoldStonePresenter {

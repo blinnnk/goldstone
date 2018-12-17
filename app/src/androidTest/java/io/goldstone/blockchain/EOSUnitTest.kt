@@ -19,10 +19,14 @@ import io.goldstone.blockchain.crypto.eos.eosram.EOSBuyRamModel
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.*
+import io.goldstone.blockchain.crypto.ethereum.toByteArray
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.utils.toAscii
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
+import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
@@ -358,6 +362,11 @@ class EOSUnitTest {
 		val packedData = "038f4b0fc8ff18a4f0842a8f0564611f6e96e8535901dd45e43ac8691a1c4dca8cad8f5b363393c1da1a00000000030000000000ea305500409e9a2264b89a01302933372dcaa68300000000a8ed323266302933372dcaa6831002551163076fef01000000010002a5bd18039fb67451d9c192fba2b64fe988284cce252b7ff0840604ad9c21bb450100000001000000010002a5bd18039fb67451d9c192fba2b64fe988284cce252b7ff0840604ad9c21bb45010000000000000000ea3055000000004873bd3e01302933372dcaa68300000000a8ed323220302933372dcaa6831002551163076fef50c300000000000004454f53000000000000000000ea305500003f2a1ba6a24a01302933372dcaa68300000000a8ed323231302933372dcaa6831002551163076fef50c300000000000004454f530000000050c300000000000004454f530000000000000000000000000000000000000000000000000000000000000000000000000000"
 		val signed = EOSPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv").sign(Sha256.from(Hex.decode(packedData)))
 		LogUtil.debug("$position signPackedData", signed.toString())
+	}
+
+	@Test
+	fun unitConverter() {
+		System.out.println("5626521".toCryptHexString())
 	}
 }
 

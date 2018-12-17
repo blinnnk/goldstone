@@ -18,7 +18,6 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
@@ -268,7 +267,7 @@ object EOSAPI {
 						val data = JSONObject(response.safeGet("processed"))
 						val transactionID = response.safeGet("transaction_id")
 						val receipt = JSONObject(data.safeGet("receipt"))
-						hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
+						hold(EOSResponse(transactionID, receipt, result), GoldStoneError.None)
 					}
 					else -> hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
 				}

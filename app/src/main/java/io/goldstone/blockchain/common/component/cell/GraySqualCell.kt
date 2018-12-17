@@ -73,7 +73,7 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 			addView(title)
 			addView(subtitle)
 		}
-		layoutParams = RelativeLayout.LayoutParams(ScreenSize.card, 52.uiPX())
+		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 52.uiPX())
 		resetCardElevation(5f)
 	}
 
