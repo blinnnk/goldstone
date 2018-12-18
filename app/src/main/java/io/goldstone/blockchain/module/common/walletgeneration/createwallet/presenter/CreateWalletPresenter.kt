@@ -23,6 +23,7 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.KeystoreInfo
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
@@ -89,7 +90,7 @@ class CreateWalletPresenter(
 				hint = hint,
 				isUsing = true,
 				// 防止用户跳过助记词, 把使用 `RSA` 加密后的助记词存入数据库
-				encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
+				encryptMnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).encryptData(mnemonic)
 			) insert { wallet ->
 				// 本地没有数据从服务器获取数据
 				insertNewAccount(multiChainAddresses) {

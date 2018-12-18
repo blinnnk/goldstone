@@ -20,12 +20,14 @@ import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
@@ -35,6 +37,10 @@ import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.matchParent
 import org.json.JSONObject
 
@@ -77,7 +83,7 @@ class DAPPBrowser(
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){console.log(JSON.stringify(data));identity={accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":\"${account.name}\"}]};return new Promise(function(resolve,reject){resolve(identity)})},getIdentityFromPermissions:function(data){console.log(\"getIdentityFromPermissions***\"+JSON.stringify(data))},requestSignature:function(data){console.log(\"requestSignature***\"+JSON.stringify(data))},identity:{accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":\"${account.name}\"}]},forgetIdentity:function(){currentAccount=null;identity=null;return new Promise(function(resolve,reject){resolve()})},linkAccount:function(publicKey,network){console.log(\"linkAccount***\"+publicKey)},suggestNetwork:function(data){console.log(\"suggestNetwork***\");return new Promise(function(resolve,reject){resolve(true)})},isConnected:function(){return new Promise(function(resolve,reject){resolve(true)})},authenticate:function(nonce){console.log(\"authenticate***\"+nonce)},getOrRequestIdentity:function(data){console.log(\"getOrRequestIdentity***\"+JSON.stringify(data))},transactionResult:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,tableRowInterval:null,accountInterval:null,balanceInterval:null,eos:function(data){console.log(\"scatter.eos\"+JSON.stringify(data));return{transaction:function(action, action1){console.log(\"eos.transaction\");console.log(\"eos.transaction\" + JSON.stringify(action) + JSON.stringify(action1));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})},getAbi:function(data){console.log(\"eos.getAbi\");console.log(JSON.stringify(data));return new Promise(function(resolve,reject){resolve(\"get abi to do\")})},getTableRows:function(data){console.log(\"eos.getTableRows\");window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.tableRowInterval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};window.scatter.tableRow=null;clearInterval(window.scatter.tableRowInterval)}},1500)})},getAccount:function(data){console.log(\"eos.getAccount\");window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.accountInterval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};window.scatter.accountInfo=null;clearInterval(window.scatter.accountInterval)}},1500)})},getCurrencyBalance:function(code,name,symbol){console.log(\"eos.getCurrencyBalance\");window.control.getEOSAccountBalance(code,name,symbol);return new Promise(function(resolve,reject){window.scatter.balanceInterval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance.split(\",\"))};window.scatter.balance=null;clearInterval(window.scatter.balanceInterval)}},2000)})},contract:function(data){console.log(\"eos.contract\");console.log(JSON.stringify(data)+\"eos.contract\");return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){console.log(\"eos.getArbitrarySignature\");window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);window.scatter.arbSignature=null;clearInterval(window.scatter.interval)}},1500)})}};" +
+						"scatter=${SharedValue.getJSCode()};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -114,16 +120,32 @@ class DAPPBrowser(
 	inner class JSInterface {
 
 		@JavascriptInterface
-		fun getEOSAccountBalance(code: String, accountName: String, symbol: String) {
+		fun getEOSAccountBalance(code: String, account: String, symbol: String) {
 			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
 			Log.d("Scatter", code)
-			EOSAPI.getAccountBalanceBySymbol(EOSAccount(accountName), CoinSymbol(symbol), code) { balance, error ->
+			EOSAPI.getCurrencyBalance(
+				EOSAccount(account),
+				CoinSymbol(symbol),
+				code
+			) { balance, error ->
 				launchUI {
 					if (balance.isNotNull() && error.isNone()) {
-						evaluateJavascript("javascript:(function(){scatter.balance=\"$balance\"})()", null)
+						evaluateJavascript("javascript:(function(){scatter.balance=$balance})()", null)
 					} else {
 						evaluateJavascript("javascript:(function(){scatter.balance=\"failed\"})()", null)
 					}
+				}
+			}
+		}
+
+		@JavascriptInterface
+		fun getIdentity(data: String) {
+			Log.d("getIdentity", data)
+			GlobalScope.launch(Dispatchers.Default) {
+				val identity = "{ accounts: [{ \"authority\": \"active\", \"blockchain\": 'eos', \"name\": \"${account.name}\" }] }"
+				delay(1000L)
+				launchUI {
+					evaluateJavascript("javascript:(function(){scatter.getIdentityResult=${JSONObject(identity)}})()", null)
 				}
 			}
 		}
@@ -164,7 +186,6 @@ class DAPPBrowser(
 		@JavascriptInterface
 		fun getTableRows(data: String) {
 			launchUI {
-				System.out.println("data $data")
 				val tableObject = try {
 					JSONObject(data)
 				} catch (error: Exception) {
@@ -215,8 +236,9 @@ class DAPPBrowser(
 						"Signed Data Request",
 						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
 					) {
-						PaymentDetailPresenter.showGetPrivateKeyDashboard(
+						PaymentDetailPresenter.getPrivatekey(
 							context,
+							ChainType.EOS,
 							confirmEvent = {
 								loadingView.show()
 							}
@@ -225,7 +247,7 @@ class DAPPBrowser(
 								loadingView.remove()
 							}
 							if (privateKey.isNotNull() && error.isNone()) {
-								val signature = privateKey.sign(Sha256.from(data.toByteArray())).toString()
+								val signature = EOSPrivateKey(privateKey).sign(Sha256.from(data.toByteArray())).toString()
 								launchUI {
 									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
 								}
@@ -262,13 +284,14 @@ class DAPPBrowser(
 					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 				},
 				confirmEvent = {
-					PaymentDetailPresenter.showGetPrivateKeyDashboard(
+					PaymentDetailPresenter.getPrivatekey(
 						context,
+						ChainType.EOS,
 						cancelEvent = { loadingView.remove() },
 						confirmEvent = { loadingView.show() }
 					) { privateKey, error ->
 						if (privateKey.isNotNull() && error.isNone()) {
-							EOSContractCaller(action, ChainID.EOS).send(privateKey) { response, pushTransactionError ->
+							EOSContractCaller(action, ChainID.EOS).send(EOSPrivateKey(privateKey)) { response, pushTransactionError ->
 								launchUI {
 									loadingView.remove()
 									if (response.isNotNull() && pushTransactionError.isNone()) {
@@ -467,15 +490,15 @@ class DAPPBrowser(
 
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
-			System.out.println(data)
 			launchUI {
-				PaymentDetailPresenter.showGetPrivateKeyDashboard(
+				PaymentDetailPresenter.getPrivatekey(
 					context,
+					ChainType.EOS,
 					cancelEvent = { loadingView.remove() },
 					confirmEvent = { loadingView.show() }
 				) { privateKey, error ->
 					if (privateKey.isNotNull() && error.isNone()) {
-						EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
+						EOSContractCaller(JSONObject(data)).getPushTransactionObject(EOSPrivateKey(privateKey)) { pushJson, hashError ->
 							launchUI {
 								loadingView.remove()
 								if (pushJson.isNotNull() && hashError.isNone()) {

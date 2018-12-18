@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -78,7 +79,7 @@ class EOSAccountRegisterPresenter(
 				checkNewAccountInfo(newAccountName, publicKey) { validAccount, validPublicKey, error ->
 					if (error.hasError()) callback(null, error)
 					else BaseTradingPresenter.prepareTransaction(
-						fragment.context,
+						fragment.context!!,
 						totalSpent,
 						TokenContract.EOS,
 						StakeType.Register
@@ -97,7 +98,7 @@ class EOSAccountRegisterPresenter(
 								ramAmount,
 								cpuEOSCount.toEOSUnit(),
 								netAEOSCount.toEOSUnit()
-							).send(privateKey, callback)
+							).send(EOSPrivateKey(privateKey), callback)
 							else -> callback(null, privateKeyError)
 						}
 					}

@@ -62,6 +62,9 @@ data class WalletTable(
 	var isWatchOnly: Boolean = false,
 	var balance: Double? = 0.0,
 	var encryptMnemonic: String? = null,
+	// 这个是服务指纹支付的加密, 因为指纹是在系统层面设置, 以及用户也会更改本地的 Keystore 密码,
+	// 所以这个值本身是不可靠的, 故此没有复用 encryptMnemonic 这个字段而是开了新字段支持这个功能.
+	var encryptFingerPrinterKey: String? = null,
 	var hasBackUpMnemonic: Boolean = false
 ) : Serializable {
 
@@ -294,9 +297,12 @@ data class WalletTable(
 
 	@WorkerThread
 	infix fun insert(callback: (wallet: WalletTable) -> Unit) {
-		dao.findWhichIsUsing(true)?.let { dao.update(it.apply { isUsing = false }) }
+		dao.updateLastUsingWalletOff()
 		dao.insert(this@WalletTable)
-		dao.findWhichIsUsing(true)?.let {
+		// 如果直接返回 `Wallet` 那么 `ID` 不会显示为 `Room` 的自增 `ID`
+		// 所以再插入之后在此查询获取最新的 `ID` 的 `Wallet`
+		// 创建或导入钱包都需要用 ID 作为 Keystore 的标识位
+		dao.findWhichIsUsing()?.let {
 			SharedWallet.updateCurrentIsWatchOnlyOrNot(it.isWatchOnly.orFalse())
 			callback(it)
 		}
@@ -308,7 +314,7 @@ data class WalletTable(
 		callback: (ethSeriesAddresses: List<Bip44Address>) -> Unit
 	) {
 		ethAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateETHAddress(ethAddresses)
+		dao.updateETHAddress(ethAddresses)
 		callback(ethAddresses)
 	}
 
@@ -318,7 +324,7 @@ data class WalletTable(
 		callback: (etcAddresses: List<Bip44Address>) -> Unit
 	) {
 		etcAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateETCAddress(etcAddresses)
+		dao.updateETCAddress(etcAddresses)
 		callback(etcAddresses)
 	}
 
@@ -328,7 +334,7 @@ data class WalletTable(
 		callback: (bitcoinAddresses: List<Bip44Address>) -> Unit
 	) {
 		btcAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateBTCAddress(btcAddresses)
+		dao.updateBTCAddress(btcAddresses)
 		callback(btcAddresses)
 	}
 
@@ -338,7 +344,7 @@ data class WalletTable(
 		callback: (bitcoinCashAddresses: List<Bip44Address>) -> Unit
 	) {
 		bchAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateBCHAddress(bchAddresses)
+		dao.updateBCHAddress(bchAddresses)
 		callback(bchAddresses)
 	}
 
@@ -348,7 +354,7 @@ data class WalletTable(
 		callback: (bitcoinAddresses: List<Bip44Address>) -> Unit
 	) {
 		btcSeriesTestAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateBTCSeriesTestAddress(btcSeriesTestAddresses)
+		dao.updateBTCSeriesTestAddress(btcSeriesTestAddresses)
 		callback(btcSeriesTestAddresses)
 	}
 
@@ -358,7 +364,7 @@ data class WalletTable(
 		callback: (litecoinAddresses: List<Bip44Address>) -> Unit
 	) {
 		ltcAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateLTCAddress(ltcAddresses)
+		dao.updateLTCAddress(ltcAddresses)
 		callback(ltcAddresses)
 	}
 
@@ -367,7 +373,7 @@ data class WalletTable(
 		callback: (eosAddresses: List<Bip44Address>) -> Unit
 	) {
 		eosAddresses += newAddress
-		GoldStoneDataBase.database.walletDao().updateEOSAddress(eosAddresses)
+		WalletTable.dao.updateEOSAddress(eosAddresses)
 		callback(eosAddresses)
 	}
 
@@ -408,62 +414,49 @@ data class WalletTable(
 		}
 
 		fun getAll(hold: List<WalletTable>.() -> Unit) {
-			load {
-				dao.getAllWallets()
-			} then (hold)
+			load { dao.getAllWallets() } then (hold)
 		}
 
 		fun getAllETHSeriesAddresses(hold: List<String>.() -> Unit) {
-			load {
-				dao.getAllWallets()
-			} then { it ->
+			load { dao.getAllWallets() } then { it ->
 				hold(it.map { it.currentETHSeriesAddress })
 			}
 		}
 
 		fun getAllBTCMainnetAddresses(hold: List<String>.() -> Unit) {
-			load {
-				dao.getAllWallets()
-			} then { it ->
+			load { dao.getAllWallets() } then { it ->
 				hold(it.map { it.currentBTCAddress })
 			}
 		}
 
 		fun getAllLTCAddresses(hold: List<String>.() -> Unit) {
-			load {
-				dao.getAllWallets()
-			} then { it ->
+			load { dao.getAllWallets() } then { it ->
 				hold(it.map { it.currentLTCAddress })
 			}
 		}
 
 		fun getAllEOSAccountNames(hold: List<String>.() -> Unit) {
 			load {
-				val allWallets =
-					dao.getAllWallets()
+				val allWallets = dao.getAllWallets()
 				allWallets.map { it.currentEOSAccountName.getCurrent() }
 			} then (hold)
 		}
 
 		fun getAllBCHAddresses(hold: List<String>.() -> Unit) {
-			load {
-				dao.getAllWallets()
-			} then { it ->
+			load { dao.getAllWallets() } then { it ->
 				hold(it.map { it.currentBCHAddress })
 			}
 		}
 
 		fun getAllBTCSeriesTestnetAddresses(hold: List<String>.() -> Unit) {
-			load {
-				dao.getAllWallets()
-			} then { it ->
+			load { dao.getAllWallets() } then { it ->
 				hold(it.map { it.currentBTCSeriesTestAddress })
 			}
 		}
 
 		fun getCurrent(thread: CoroutineDispatcher, hold: WalletTable.() -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
-				val currentWallet = dao.findWhichIsUsing(true) ?: return@launch
+				val currentWallet = dao.findWhichIsUsing() ?: return@launch
 				dao.update(currentWallet.apply { balance = SharedWallet.getCurrentBalance() })
 				withContext(thread) {
 					hold(currentWallet)
@@ -483,7 +476,7 @@ data class WalletTable(
 			hold: (wallet: WalletTable, ethAddressIndex: Int) -> Unit
 		) {
 			val currentWallet =
-				dao.findWhichIsUsing(true)
+				dao.findWhichIsUsing()
 			currentWallet?.apply {
 				// 清理数据格式
 				val latestIndex = when {
@@ -533,7 +526,7 @@ data class WalletTable(
 		fun updateEOSDefaultName(defaultName: String, @UiThread callback: () -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
 				// 更新钱包数据库的 `Default EOS Address`
-				dao.findWhichIsUsing(true)?.apply {
+				dao.findWhichIsUsing()?.apply {
 					dao.update(apply { currentEOSAccountName.updateCurrent(defaultName) })
 					// 同时更新 `MyTokenTable` 里面的 `OwnerName`
 					MyTokenTable.updateOrInsertOwnerName(defaultName, currentEOSAddress)
@@ -554,7 +547,7 @@ data class WalletTable(
 
 		fun deleteCurrentWallet(@WorkerThread callback: (WalletTable) -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
-				val willDeleteWallet = dao.findWhichIsUsing(true)
+				val willDeleteWallet = dao.findWhichIsUsing()
 				willDeleteWallet?.let {
 					dao.delete(it)
 					callback(it)
@@ -583,20 +576,29 @@ data class WalletTable(
 @Dao
 interface WalletDao {
 
-	@Query("UPDATE wallet SET hasBackUpMnemonic = :hasBackUp WHERE isUsing LIKE :isUsing")
-	fun updateHasBackUp(hasBackUp: Boolean = true, isUsing: Boolean = true)
+	@Query("UPDATE wallet SET hasBackUpMnemonic = 1 WHERE isUsing = 1")
+	fun updateHasBackUp()
 
-	@Query("UPDATE wallet SET hint = :hint WHERE isUsing LIKE :isUsing")
-	fun updateHint(hint: String, isUsing: Boolean = true)
+	@Query("UPDATE wallet SET hint = :hint WHERE isUsing = 1")
+	fun updateHint(hint: String)
 
-	@Query("UPDATE wallet SET name = :walletName WHERE isUsing LIKE :isUsing")
-	fun updateWalletName(walletName: String, isUsing: Boolean = true)
+	@Query("UPDATE wallet SET encryptFingerPrinterKey = null WHERE isUsing = 1")
+	fun turnOffFingerprint()
 
-	@Query("SELECT * FROM wallet WHERE isUsing LIKE :status ORDER BY id DESC")
-	fun findWhichIsUsing(status: Boolean): WalletTable?
+	@Query("UPDATE wallet SET name = :walletName WHERE isUsing = 1")
+	fun updateWalletName(walletName: String)
 
-	@Query("UPDATE wallet SET isUsing = :status WHERE isUsing LIKE :lastUsing")
-	fun updateLastUsingWalletOff(status: Boolean = false, lastUsing: Boolean = true)
+	@Query("SELECT * FROM wallet WHERE isUsing = 1")
+	fun findWhichIsUsing(): WalletTable?
+
+	@Query("SELECT encryptFingerPrinterKey FROM wallet WHERE isUsing LIKE 1")
+	fun getEncryptFingerprintKey(): String?
+
+	@Query("SELECT encryptMnemonic FROM wallet WHERE isUsing LIKE 1")
+	fun getEncryptMnemonic(): String?
+
+	@Query("UPDATE wallet SET isUsing = 0 WHERE isUsing LIKE 1")
+	fun updateLastUsingWalletOff()
 
 	@Query("SELECT * FROM wallet WHERE currentETHSeriesAddress LIKE :address OR currentEOSAddress LIKE :address OR currentBCHAddress LIKE :address OR currentLTCAddress LIKE :address OR currentBTCAddress LIKE :address OR currentBTCSeriesTestAddress LIKE :address")
 	fun getWalletByAddress(address: String): WalletTable?
@@ -622,27 +624,30 @@ interface WalletDao {
 	@Update
 	fun update(wallet: WalletTable)
 
-	@Query("UPDATE wallet SET eosAccountNames = :accounts  WHERE isUsing = :status")
-	fun updateCurrentEOSAccountNames(accounts: List<EOSAccountInfo>, status: Boolean = true)
+	@Query("UPDATE wallet SET encryptFingerPrinterKey = :encryptKey  WHERE isUsing = 1")
+	fun updateFingerEncryptKey(encryptKey: String)
 
-	@Query("UPDATE wallet SET ethAddresses = :ethAddresses  WHERE isUsing = :status")
-	fun updateETHAddress(ethAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET eosAccountNames = :accounts  WHERE isUsing = 1")
+	fun updateCurrentEOSAccountNames(accounts: List<EOSAccountInfo>)
 
-	@Query("UPDATE wallet SET etcAddresses = :etcAddresses  WHERE isUsing = :status")
-	fun updateETCAddress(etcAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET ethAddresses = :ethAddresses  WHERE isUsing = 1")
+	fun updateETHAddress(ethAddresses: List<Bip44Address>)
 
-	@Query("UPDATE wallet SET btcAddresses = :btcAddresses  WHERE isUsing = :status")
-	fun updateBTCAddress(btcAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET etcAddresses = :etcAddresses  WHERE isUsing = 1")
+	fun updateETCAddress(etcAddresses: List<Bip44Address>)
 
-	@Query("UPDATE wallet SET btcSeriesTestAddresses = :btcSeriesTestAddresses  WHERE isUsing = :status")
-	fun updateBTCSeriesTestAddress(btcSeriesTestAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET btcAddresses = :btcAddresses  WHERE isUsing = 1")
+	fun updateBTCAddress(btcAddresses: List<Bip44Address>)
 
-	@Query("UPDATE wallet SET ltcAddresses = :ltcAddresses  WHERE isUsing = :status")
-	fun updateLTCAddress(ltcAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET btcSeriesTestAddresses = :btcSeriesTestAddresses  WHERE isUsing = 1")
+	fun updateBTCSeriesTestAddress(btcSeriesTestAddresses: List<Bip44Address>)
 
-	@Query("UPDATE wallet SET bchAddresses = :bchAddresses  WHERE isUsing = :status")
-	fun updateBCHAddress(bchAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET ltcAddresses = :ltcAddresses  WHERE isUsing = 1")
+	fun updateLTCAddress(ltcAddresses: List<Bip44Address>)
 
-	@Query("UPDATE wallet SET eosAddresses = :eosAddresses  WHERE isUsing = :status")
-	fun updateEOSAddress(eosAddresses: List<Bip44Address>, status: Boolean = true)
+	@Query("UPDATE wallet SET bchAddresses = :bchAddresses  WHERE isUsing = 1")
+	fun updateBCHAddress(bchAddresses: List<Bip44Address>)
+
+	@Query("UPDATE wallet SET eosAddresses = :eosAddresses  WHERE isUsing = 1")
+	fun updateEOSAddress(eosAddresses: List<Bip44Address>)
 }

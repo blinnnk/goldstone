@@ -11,6 +11,13 @@ import io.goldstone.blockchain.crypto.multichain.WalletType
  * @date  2018/09/27
  */
 object SharedWallet {
+
+	fun hasFingerprint(): Boolean =
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.hasFingerprint)
+
+	fun updateFingerprint(has: Boolean) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.hasFingerprint, has)
+
 	fun getCurrencyCode(): String =
 		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currencyCode)
 

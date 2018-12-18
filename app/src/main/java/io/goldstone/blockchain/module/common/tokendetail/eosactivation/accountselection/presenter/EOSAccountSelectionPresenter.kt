@@ -39,7 +39,7 @@ class EOSAccountSelectionPresenter(
 
 	private fun getNewAccountNameFromChain(@WorkerThread hold: (newAccount: List<EOSAccountInfo>) -> Unit) {
 		EOSAPI.getAccountNameByPublicKey(SharedAddress.getCurrentEOS()) { accounts, error ->
-			val wallet = WalletTable.dao.findWhichIsUsing(true)
+			val wallet = WalletTable.dao.findWhichIsUsing()
 			if (accounts.isNotNull() && error.isNone()) hold(accounts)
 			else wallet?.eosAccountNames?.filter {
 				it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true) &&

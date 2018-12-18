@@ -71,7 +71,8 @@ abstract class SilentUpdater {
 												 hasNewConfig,
 												 hasNewShareContent,
 												 hasNewRecommendedDAPP,
-												 hasNewDAPP ->
+												 hasNewDAPP,
+												 hasNewDAPPJSCode ->
 				fun updateData() {
 					if (hasNewDefaultTokens) updateLocalDefaultTokens()
 					if (hasNewChainNodes) updateNodeData()
@@ -83,6 +84,7 @@ abstract class SilentUpdater {
 					}
 					if (hasNewRecommendedDAPP) updateRecommendedDAPP()
 					if (hasNewDAPP) updateNewDAPP()
+					if (hasNewDAPPJSCode) updateDAPPJSCode()
 					// 确认后更新 MD5 值到数据库
 					AppConfigTable.dao.updateMD5Info(
 						newDefaultTokenListMD5,
@@ -92,7 +94,8 @@ abstract class SilentUpdater {
 						newConfigMD5,
 						newShareContentMD5,
 						newRecommendedDAPPMD5,
-						newDAPPMD5
+						newDAPPMD5,
+						newDAPPJSCode
 					)
 				}
 				when {
@@ -130,6 +133,7 @@ abstract class SilentUpdater {
 	private var newShareContentMD5 = ""
 	private var newRecommendedDAPPMD5 = ""
 	private var newDAPPMD5 = ""
+	private var newDAPPJSCode = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -140,7 +144,8 @@ abstract class SilentUpdater {
 			hasNewConfig: Boolean,
 			hasNewShareContent: Boolean,
 			hasNewRecommendedDAPP: Boolean,
-			hasNewDAPP: Boolean
+			hasNewDAPP: Boolean,
+			hasNewDAPPCode: Boolean
 		) -> Unit
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
@@ -153,6 +158,7 @@ abstract class SilentUpdater {
 				newShareContentMD5 = md5s.safeGet("share_content_md5")
 				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
 				newDAPPMD5 = md5s.safeGet("dapps_md5")
+				newDAPPJSCode = md5s.safeGet("get_js_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
@@ -161,7 +167,8 @@ abstract class SilentUpdater {
 					config.configMD5 != newConfigMD5,
 					config.shareContentMD5 != newShareContentMD5,
 					config.dappRecommendMD5 != newRecommendedDAPPMD5,
-					config.newDAPPMD5 != newDAPPMD5
+					config.newDAPPMD5 != newDAPPMD5,
+					config.dappJSCodeMD5 != newDAPPJSCode
 				)
 			}
 		}
@@ -519,6 +526,15 @@ abstract class SilentUpdater {
 			if (dapps.isNotNull() && error.isNone()) {
 				DAPPTable.dao.deleteAllUnRecommended()
 				DAPPTable.dao.insertAll(dapps)
+			} else ErrorDisplayManager(error)
+		}
+	}
+
+	private fun updateDAPPJSCode() {
+		GoldStoneAPI.getDAPPJSCode { code, error ->
+			if (code.isNotNull() && error.isNone()) {
+				AppConfigTable.dao.updateJSCode(code)
+				SharedValue.updateJSCode(code)
 			} else ErrorDisplayManager(error)
 		}
 	}

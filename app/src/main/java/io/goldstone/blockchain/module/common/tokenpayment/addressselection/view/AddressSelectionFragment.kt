@@ -177,7 +177,7 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 						textColor = Spectrum.white
 						addTouchRippleAnimation(Spectrum.green, Spectrum.yellow, RippleMode.Square)
 						click {
-							presenter.showPaymentDetail(address.orEmpty(), 0.0)
+							presenter.showPaymentDetail(address.replace(" ", "").orEmpty(), 0.0)
 						}
 					}
 				} else confirmButton.apply {

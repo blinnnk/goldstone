@@ -74,8 +74,8 @@ fun ViewGroup.showQuickPaymentDashboard(
 	Dashboard(context) {
 		showDashboard(
 			"Quick Payment",
-			contentLayout,
 			"confirmation the transaction from current DAPP, then sign the data",
+			contentLayout,
 			hold = {
 				confirmEvent()
 				transaction.trade(context, callback)
@@ -112,8 +112,8 @@ fun ViewGroup.showOperationDashboard(
 		dialog.cancelOnTouchOutside(false)
 		showDashboard(
 			"Contract Operation",
-			contentLayout,
 			"contract need you to sign the data, and proof it is valid operation",
+			contentLayout,
 			hold = {
 				confirmEvent()
 			},

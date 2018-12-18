@@ -33,7 +33,7 @@ interface GasSelectionContract {
 		fun addCustomFeeCell()
 		fun transfer(
 			contract: TokenContract,
-			password: String,
+			privateKey: String,
 			paymentModel: Serializable,
 			gasFee: GasFee,
 			@WorkerThread callback: (receiptModel: ReceiptModel?, error: GoldStoneError) -> Unit

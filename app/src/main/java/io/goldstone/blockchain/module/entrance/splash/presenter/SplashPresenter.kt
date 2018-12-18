@@ -143,7 +143,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	companion object {
 		@WorkerThread
 		fun updateAccountInformation(context: Context, callback: () -> Unit) {
-			val currentWallet = WalletTable.dao.findWhichIsUsing(true) ?: return
+			val currentWallet = WalletTable.dao.findWhichIsUsing() ?: return
 			if (
 				!currentWallet.eosAccountNames.currentPublicKeyIsActivated() &&
 				!currentWallet.eosAccountNames.hasActivatedOrWatchOnly() &&
@@ -221,6 +221,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			val type = wallet.getWalletType()
 			type.updateSharedPreference()
 			SharedWallet.updateBackUpMnemonicStatus(wallet.hasBackUpMnemonic)
+			SharedWallet.updateFingerprint(wallet.encryptFingerPrinterKey.isNotNull())
 			when {
 				type.isBTCTest() -> NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)

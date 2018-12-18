@@ -2,6 +2,7 @@ package io.goldstone.blockchain.common.sharedpreference
 
 import com.blinnnk.util.getBooleanFromSharedPreferences
 import com.blinnnk.util.getDoubleFromSharedPreferences
+import com.blinnnk.util.getStringFromSharedPreferences
 import com.blinnnk.util.saveDataToSharedPreferences
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
@@ -18,6 +19,16 @@ object SharedValue {
 
 	fun updateRAMUnitPrice(unitPrice: Double) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.ramUnitPrice, unitPrice.toFloat())
+
+	// DAPP JS Code
+	fun getJSCode(): String {
+		// 做了 `JSCode` 备份, `Account Name` 是约定好需要替换的变量
+		val localData = GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jsCode)
+		return localData.replace("goldStoneAccountName", "\"${SharedAddress.getCurrentEOSAccount().name}\"")
+	}
+
+	fun updateJSCode(code: String) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.jsCode, code)
 
 	fun getCPUUnitPrice(): Double =
 		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.cpuUnitPrice)
