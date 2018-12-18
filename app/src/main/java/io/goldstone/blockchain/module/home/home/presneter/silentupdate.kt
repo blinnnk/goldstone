@@ -534,6 +534,7 @@ abstract class SilentUpdater {
 		GoldStoneAPI.getDAPPJSCode { code, error ->
 			if (code.isNotNull() && error.isNone()) {
 				AppConfigTable.dao.updateJSCode(code)
+				SharedValue.updateJSCode(code)
 			} else ErrorDisplayManager(error)
 		}
 	}

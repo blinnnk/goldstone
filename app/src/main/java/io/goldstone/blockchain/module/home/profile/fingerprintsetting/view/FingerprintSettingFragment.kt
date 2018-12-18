@@ -23,6 +23,7 @@ import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.FingerPrintManager
@@ -142,6 +143,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 												val fingerEncryptKey =
 													JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).encryptData(secret)
 												presenter.updateFingerEncryptKey(fingerEncryptKey) {
+													SharedWallet.updateFingerprint(true)
 													context.alert(CommonText.succeed)
 												}
 											} else if (cipher.isNull() && error.isNone()) {
@@ -150,6 +152,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 												val fingerEncryptKey =
 													JavaKeystoreUtil(KeystoreInfo.isMnemonic()).encryptData(secret)
 												presenter.updateFingerEncryptKey(fingerEncryptKey) {
+													SharedWallet.updateFingerprint(true)
 													context.alert(CommonText.succeed)
 												}
 											} else showError(error)

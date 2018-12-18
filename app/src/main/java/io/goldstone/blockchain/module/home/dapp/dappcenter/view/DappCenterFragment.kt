@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into
@@ -79,9 +80,11 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			nestedScrollView {
-				isFocusableInTouchMode = true
 				lparams(matchParent, matchParent)
 				verticalLayout {
+					isFocusableInTouchMode = true
+					isFocusable = true
+					descendantFocusability = FOCUS_BEFORE_DESCENDANTS
 					lparams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					topPadding = 30.uiPX()

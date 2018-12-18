@@ -64,6 +64,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		slideHeader.apply {
 			notifyButton.onClick { showNotificationListFragment() }
 		}
+		System.out.println(SharedValue.getJSCode())
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {

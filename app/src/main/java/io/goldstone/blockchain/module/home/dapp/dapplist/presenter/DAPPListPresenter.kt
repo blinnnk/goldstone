@@ -25,7 +25,8 @@ class DAPPListPresenter(
 		load {
 			when (type) {
 				DAPPType.New -> DAPPTable.dao.getAll(DataValue.dappPageCount)
-				DAPPType.Latest -> DAPPTable.dao.getUsed(DataValue.dappPageCount)
+				// 本地的数据加载全部
+				DAPPType.Latest -> DAPPTable.dao.getUsed(999)
 				DAPPType.Recommend -> DAPPTable.dao.getRecommended(DataValue.dappPageCount)
 				else -> throw Throwable("Wrong DAPP Type")
 			}
