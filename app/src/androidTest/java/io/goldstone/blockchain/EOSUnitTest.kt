@@ -363,11 +363,6 @@ class EOSUnitTest {
 		val signed = EOSPrivateKey("5KQXER65zxzRcN1zsJpx6JjdP2kfHcPdrhendoXYY9MTyrLnXDv").sign(Sha256.from(Hex.decode(packedData)))
 		LogUtil.debug("$position signPackedData", signed.toString())
 	}
-
-	@Test
-	fun unitConverter() {
-		System.out.println("5626521".toCryptHexString())
-	}
 }
 
 

@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.crypto.eos.base
 
 import android.content.Context
-import android.view.ViewGroup
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.util.clickToCopy
 import io.goldstone.blockchain.common.base.view.CardTitleCell

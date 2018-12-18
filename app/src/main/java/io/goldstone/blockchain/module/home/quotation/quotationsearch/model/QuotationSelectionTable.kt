@@ -131,6 +131,9 @@ interface QuotationSelectionDao {
 	@Query("SELECT * FROM quotationSelection")
 	fun getAll(): List<QuotationSelectionTable>
 
+	@Query("SELECT pair FROM quotationSelection")
+	fun getAllPair(): List<String>
+
 	@Query("SELECT * FROM quotationSelection ORDER BY orderID DESC")
 	fun getAllByOrderID(): List<QuotationSelectionTable>
 

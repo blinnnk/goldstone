@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.blinnnk.base.HoneyBaseAdapter
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.*
@@ -69,8 +70,8 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 
 	fun <T : View> showDashboard(
 		title: String,
-		customView: T,
 		message: String,
+		customView: T,
 		hold: (T) -> Unit,
 		cancelAction: () -> Unit
 	) {
@@ -79,10 +80,30 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 			title(text = title)
 			message(text = message)
 			customView(view = customView)
-			positiveButton(text = CommonText.confirm) {
-				hold(customView)
-				dialog.dismiss()
+			if (hold.isNotNull()) {
+				positiveButton(text = CommonText.confirm) {
+					hold(customView)
+					dialog.dismiss()
+				}
 			}
+			negativeButton(text = CommonText.cancel) {
+				cancelAction()
+			}
+			show()
+		}
+	}
+
+	fun <T : View> showAttentionDashboard(
+		title: String,
+		message: String,
+		customView: T,
+		cancelAction: () -> Unit
+	) {
+		with(dialog) {
+			cancelOnTouchOutside(false)
+			title(text = title)
+			message(text = message)
+			customView(view = customView)
 			negativeButton(text = CommonText.cancel) {
 				cancelAction()
 			}
@@ -159,8 +180,8 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 			}
 			if (showEditText) showDashboard(
 				title,
-				input,
 				subtitle,
+				input,
 				{ action(it.findViewById(ElementID.passwordInput)) },
 				cancelAction
 			)

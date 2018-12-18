@@ -160,7 +160,7 @@ class SplashActivity : AppCompatActivity() {
 			} else {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
 				if (config.isRegisteredAddresses) {
-					val currentWallet = WalletTable.dao.findWhichIsUsing(true)
+					val currentWallet = WalletTable.dao.findWhichIsUsing()
 					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
 				config.let(callback)

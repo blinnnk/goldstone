@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
@@ -19,10 +22,6 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.FragmentTag
-import io.goldstone.blockchain.crypto.eos.EOSCodeName
-import io.goldstone.blockchain.crypto.eos.account.EOSAccount
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
-import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
@@ -52,11 +51,11 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
 	private var headerView: WalletDetailHeaderView? = null
 	override lateinit var presenter: WalletDetailContract.GSPresenter
-
 	/**
 	 * this `slideHeader` will show or hide depends on the distance that user sliding the
 	 * recyclerView, and not in the same layer with `RecyclerView's headerView`
 	 */
+	@SuppressLint("MissingPermission")
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()

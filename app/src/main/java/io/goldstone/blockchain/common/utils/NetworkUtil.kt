@@ -60,7 +60,7 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 				GoldStoneDataBase.database.appConfigDao().getAppConfig()
 			if (config?.isRegisteredAddresses == false) {
 				val wallet =
-					GoldStoneDataBase.database.walletDao().findWhichIsUsing(true)
+					GoldStoneDataBase.database.walletDao().findWhichIsUsing()
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			}
 		} else {

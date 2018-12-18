@@ -5,10 +5,7 @@ import android.support.v4.app.Fragment
 import android.view.Gravity
 import android.view.View
 import android.widget.LinearLayout
-import com.blinnnk.extension.getParentFragment
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.clickToCopy
@@ -29,6 +26,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
@@ -44,12 +42,14 @@ import org.jetbrains.anko.verticalLayout
 class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.exportPrivateKey
-	private lateinit var privateKeyTextView: ValueView
+	private lateinit var privateKeyValue: ValueView
 	private lateinit var passwordInput: RoundInput
 	private lateinit var confirmButton: RoundButton
 	override val presenter = PrivateKeyExportPresenter(this)
 
-	private val address by lazy { arguments?.getString(ArgumentKey.address) }
+	private val address by lazy {
+		arguments?.getString(ArgumentKey.address)
+	}
 	private val chainType by lazy {
 		arguments?.getInt(ArgumentKey.chainType)?.let { ChainType(it) }
 	}
@@ -60,8 +60,10 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 			lparams(matchParent, matchParent)
 			DescriptionView(context).isExportPrivateKey().into(this)
 			// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
-			privateKeyTextView = valueView().click {
-				if (it.getContent().isNotEmpty()) context.clickToCopy(it.getContent())
+			privateKeyValue = valueView {
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 120.uiPX())
+			}.click {
+				context.clickToCopy(privateKeyValue.getContent())
 			}
 
 			passwordInput = roundInput {
@@ -69,6 +71,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				setPasswordInput()
 				title = CreateWalletText.password
 			}
+
 			passwordInput.setMargins<LinearLayout.LayoutParams> {
 				topMargin = 30.uiPX()
 			}
@@ -85,7 +88,7 @@ class PrivateKeyExportFragment : BaseFragment<PrivateKeyExportPresenter>() {
 				) { privateKey, error ->
 					launchUI {
 						if (privateKey.isNotNull() && error.isNone())
-							privateKeyTextView.setContent(privateKey)
+							privateKeyValue.setContent(privateKey)
 						else safeShowError(error)
 						button.showLoadingStatus(false)
 						activity?.apply { SoftKeyboard.hide(this) }

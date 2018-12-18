@@ -48,7 +48,7 @@ class PasswordSettingsPresenter(
 		) { password, _, error ->
 			if (password.isNullOrEmpty() || error.hasError()) callback(error)
 			else {
-				val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@checkInputValue
+				val wallet = WalletTable.dao.findWhichIsUsing() ?: return@checkInputValue
 				fragment.context?.verifyKeystorePasswordByWalletID(oldPassword, wallet.id) { isCorrect ->
 					if (isCorrect) updateKeystorePasswordByWalletID(
 						wallet.id,

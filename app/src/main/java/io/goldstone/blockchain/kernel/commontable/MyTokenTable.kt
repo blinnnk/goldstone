@@ -104,7 +104,7 @@ data class MyTokenTable(
 		fun getMyTokens(@WorkerThread hold: (List<MyTokenTable>) -> Unit) {
 			GlobalScope.launch(Dispatchers.Default) {
 				WalletTable.dao
-					.findWhichIsUsing(true)?.getCurrentAddresses(true)?.let { addresses ->
+					.findWhichIsUsing()?.getCurrentAddresses(true)?.let { addresses ->
 						dao.getTokensByAddress(addresses).let(hold)
 					}
 			}

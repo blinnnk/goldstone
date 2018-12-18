@@ -27,6 +27,7 @@ import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
@@ -128,7 +129,6 @@ class DAPPBrowser(
 				code
 			) { balance, error ->
 				launchUI {
-					System.out.println("balance $balance")
 					if (balance.isNotNull() && error.isNone()) {
 						evaluateJavascript("javascript:(function(){scatter.balance=$balance})()", null)
 					} else {
@@ -236,8 +236,9 @@ class DAPPBrowser(
 						"Signed Data Request",
 						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
 					) {
-						PaymentDetailPresenter.showGetPrivateKeyDashboard(
+						PaymentDetailPresenter.getPrivatekey(
 							context,
+							ChainType.EOS,
 							confirmEvent = {
 								loadingView.show()
 							}
@@ -246,7 +247,7 @@ class DAPPBrowser(
 								loadingView.remove()
 							}
 							if (privateKey.isNotNull() && error.isNone()) {
-								val signature = privateKey.sign(Sha256.from(data.toByteArray())).toString()
+								val signature = EOSPrivateKey(privateKey).sign(Sha256.from(data.toByteArray())).toString()
 								launchUI {
 									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
 								}
@@ -283,13 +284,14 @@ class DAPPBrowser(
 					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 				},
 				confirmEvent = {
-					PaymentDetailPresenter.showGetPrivateKeyDashboard(
+					PaymentDetailPresenter.getPrivatekey(
 						context,
+						ChainType.EOS,
 						cancelEvent = { loadingView.remove() },
 						confirmEvent = { loadingView.show() }
 					) { privateKey, error ->
 						if (privateKey.isNotNull() && error.isNone()) {
-							EOSContractCaller(action, ChainID.EOS).send(privateKey) { response, pushTransactionError ->
+							EOSContractCaller(action, ChainID.EOS).send(EOSPrivateKey(privateKey)) { response, pushTransactionError ->
 								launchUI {
 									loadingView.remove()
 									if (response.isNotNull() && pushTransactionError.isNone()) {
@@ -488,15 +490,15 @@ class DAPPBrowser(
 
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
-			System.out.println(data)
 			launchUI {
-				PaymentDetailPresenter.showGetPrivateKeyDashboard(
+				PaymentDetailPresenter.getPrivatekey(
 					context,
+					ChainType.EOS,
 					cancelEvent = { loadingView.remove() },
 					confirmEvent = { loadingView.show() }
 				) { privateKey, error ->
 					if (privateKey.isNotNull() && error.isNone()) {
-						EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
+						EOSContractCaller(JSONObject(data)).getPushTransactionObject(EOSPrivateKey(privateKey)) { pushJson, hashError ->
 							launchUI {
 								loadingView.remove()
 								if (pushJson.isNotNull() && hashError.isNone()) {

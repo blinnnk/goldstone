@@ -95,7 +95,7 @@ abstract class SilentUpdater {
 						newShareContentMD5,
 						newRecommendedDAPPMD5,
 						newDAPPMD5,
-						"" // TODO newDAPPJSCode
+						newDAPPJSCode
 					)
 				}
 				when {
@@ -533,7 +533,6 @@ abstract class SilentUpdater {
 	private fun updateDAPPJSCode() {
 		GoldStoneAPI.getDAPPJSCode { code, error ->
 			if (code.isNotNull() && error.isNone()) {
-				System.out.println("code $code")
 				AppConfigTable.dao.updateJSCode(code)
 			} else ErrorDisplayManager(error)
 		}

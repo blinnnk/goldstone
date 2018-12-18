@@ -3,6 +3,7 @@
 package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ImportWalletText
@@ -140,12 +141,13 @@ fun Context.generateTemporaryKeyStore(
 	}
 }
 
+// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
+@WorkerThread
 fun Context.getBigIntegerPrivateKeyByWalletID(
 	password: String,
 	walletID: Int,
 	hold: (privateKey: BigInteger?, error: AccountError) -> Unit
 ) = getKeystoreFileByWalletID(password, walletID) { keyStoreFile, error ->
-	// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
 	if (keyStoreFile.isNotNull() && error.isNone()) {
 		val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
 		if (keyPair == null) hold(null, AccountError.WrongPassword)
@@ -200,10 +202,7 @@ fun Context.updatePasswordByWalletID(
 	newPassword: String,
 	callback: (AccountError) -> Unit
 ) = GlobalScope.launch(Dispatchers.Default) {
-	getBigIntegerPrivateKeyByWalletID(
-		oldPassword,
-		walletID
-	) { privateKey, error ->
+	getBigIntegerPrivateKeyByWalletID(oldPassword, walletID) { privateKey, error ->
 		if (privateKey.isNotNull() && error.isNone()) {
 			deleteWalletByWalletID(walletID, oldPassword) { deleteError ->
 				if (deleteError.isNone()) {

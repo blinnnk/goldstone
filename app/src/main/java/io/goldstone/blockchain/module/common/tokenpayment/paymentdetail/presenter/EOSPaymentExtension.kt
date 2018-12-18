@@ -37,7 +37,7 @@ fun PaymentDetailPresenter.transferEOS(
 			fragment.getMemoContent(),
 			contract
 		).apply {
-			trade(fragment.context) { response, error ->
+			trade(fragment.context!!) { response, error ->
 				if (error.isNone() && response.isNotNull())
 					insertPendingDataToDatabase(response) {
 						launchUI {

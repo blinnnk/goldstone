@@ -22,6 +22,7 @@ object SharedValue {
 
 	// DAPP JS Code
 	fun getJSCode(): String {
+		// 做了 `JSCode` 备份, `Account Name` 是约定好需要替换的变量
 		val localData = GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jsCode)
 		return localData.replace("goldStoneAccountName", "\"${SharedAddress.getCurrentEOSAccount().name}\"")
 	}

@@ -187,8 +187,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 		Dashboard(context) {
 			showDashboard(
 				EOSAccountText.customizeResource,
-				settingInputs,
 				EOSAccountText.customizeNewAccountResourceDescription,
+				settingInputs,
 				{ it.updateSettingValue() }
 			) {}
 		}

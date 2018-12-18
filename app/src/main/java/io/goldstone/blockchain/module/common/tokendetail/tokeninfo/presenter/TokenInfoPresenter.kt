@@ -64,12 +64,12 @@ class TokenInfoPresenter(
 		GlobalScope.launch(Dispatchers.Default) {
 			when {
 				token.contract.isEOSToken() -> {
-					val time = EOSTransactionTable.dao.getMaxDataIndex(
+					val time = EOSTransactionTable.dao.getMaxDataIndexTime(
 						SharedAddress.getCurrentEOSAccount().name,
 						token.contract.contract,
 						token.contract.symbol,
 						token.chainID
-					)?.time
+					)
 					val date = if (time.isNotNull()) {
 						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
 					} else CommonText.calculating
@@ -266,7 +266,6 @@ class TokenInfoPresenter(
 				contract.isETC() -> ChainExplorer.etcAddressDetail(contract.getAddress())
 				else -> ChainExplorer.ethAddressDetail(contract.getAddress())
 			}
-			System.out.println("url $url")
 			return Pair(getExplorerInfo(contract).first().icon, url)
 		}
 

@@ -115,12 +115,15 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 			},
 			clickEvent = {
 				DAPPCenterFragment.showAttentionOrElse(context!!, it.id) {
-					getMainActivity()?.showDappBrowserFragment(
-						it.url,
-						PreviousView.DAPPList,
-						it.backgroundColor,
-						this
-					)
+					getMainActivity()?.apply {
+						showDappBrowserFragment(
+							it.url,
+							PreviousView.DAPPList,
+							it.backgroundColor,
+							this@DAPPListFragment
+						)
+						getDAPPCenterFragment()?.presenter?.setUsedDAPPs()
+					}
 				}
 			}
 		)

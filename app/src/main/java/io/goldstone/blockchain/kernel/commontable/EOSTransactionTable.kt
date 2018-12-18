@@ -92,7 +92,7 @@ data class EOSTransactionTable(
 			account: EOSAccount,
 			contract: TokenContract,
 			chainID: ChainID,
-			@WorkerThread hold: (EOSTransactionTable?) -> Unit
+			@WorkerThread hold: (Int?) -> Unit
 		) = GlobalScope.launch(Dispatchers.Default) {
 			val data =
 				GoldStoneDataBase.database.eosTransactionDao().getMaxDataIndex(
@@ -143,8 +143,11 @@ interface EOSTransactionDao {
 	@Query("UPDATE eosTransactions SET isPending = :pendingStatus, serverID = :serverID WHERE txID LIKE :txID")
 	fun updatePendingDataByTxID(txID: String, serverID: Long, pendingStatus: Boolean = false)
 
-	@Query("SELECT * FROM eosTransactions WHERE dataIndex = (SELECT MAX(dataIndex) FROM eosTransactions WHERE recordAccountName LIKE :accountName AND codeName = :codeName AND symbol = :symbol AND chainID = :chainID)")
-	fun getMaxDataIndex(accountName: String, codeName: String, symbol: String, chainID: String): EOSTransactionTable?
+	@Query("SELECT MAX(dataIndex) FROM eosTransactions WHERE recordAccountName LIKE :accountName AND codeName = :codeName AND symbol = :symbol AND chainID = :chainID")
+	fun getMaxDataIndex(accountName: String, codeName: String, symbol: String, chainID: String): Int?
+
+	@Query("SELECT time FROM eosTransactions WHERE dataIndex = (SELECT MAX(dataIndex) FROM eosTransactions WHERE recordAccountName LIKE :accountName AND codeName = :codeName AND symbol = :symbol AND chainID = :chainID)")
+	fun getMaxDataIndexTime(accountName: String, codeName: String, symbol: String, chainID: String): Long?
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName LIKE :recordAccountName")
 	fun getDataByRecordAccount(recordAccountName: String): List<EOSTransactionTable>
