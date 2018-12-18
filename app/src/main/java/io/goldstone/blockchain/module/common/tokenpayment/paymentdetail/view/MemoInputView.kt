@@ -84,6 +84,10 @@ class MemoInputView(context: Context) : RelativeLayout(context) {
 		return inputView.text.toString()
 	}
 
+	fun setMemoContent(content: String) {
+		inputView.setText(content)
+	}
+
 	fun updateConfirmButtonEvent(hold: (Button) -> Unit) {
 		hold(confirmButton)
 	}

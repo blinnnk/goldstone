@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.walletgeneration.createwallet.mode
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.databaseinterface.RoomModel
 import org.json.JSONObject
 
@@ -28,11 +29,14 @@ data class EOSDefaultAllChainName(
 	}
 
 	fun getCurrent(): String {
-		val currentChainID = SharedChain.getEOSCurrent()
+		return getTarget(SharedChain.getEOSCurrent().chainID)
+	}
+
+	fun getTarget(chaiID: ChainID): String {
 		return when {
-			currentChainID.chainID.isEOSMain() -> main
-			currentChainID.chainID.isEOSJungle() -> jungle
-			currentChainID.chainID.isEOSKylin() -> kylin
+			chaiID.isEOSMain() -> main
+			chaiID.isEOSJungle() -> jungle
+			chaiID.isEOSKylin() -> kylin
 			else -> main
 		}
 	}

@@ -118,7 +118,8 @@ class SplashActivity : AppCompatActivity() {
 	@WorkerThread
 	private fun prepareNodeInfo(callback: () -> Unit) {
 		val chainDao = GoldStoneDataBase.database.chainNodeDao()
-		val eosTest = chainDao.getTestnetEOSNode()
+		val eosKylin = chainDao.getKylinEOSNode()
+		val eosJungle = chainDao.getJungleEOSNode()
 		val eosMain = chainDao.getMainnetEOSNode()
 		val allTestnetChains = chainDao.getUsedTestnet()
 		val allMainnetChains = chainDao.getUsedMainnet()
@@ -138,7 +139,8 @@ class SplashActivity : AppCompatActivity() {
 				ChainType(it.chainType).isBCH() -> SharedChain.updateBCHCurrent(ChainURL(it))
 				ChainType(it.chainType).isEOS() -> {
 					SharedChain.updateEOSCurrent(ChainURL(it))
-					SharedChain.updateEOSTestnet(ChainURL(eosTest))
+					SharedChain.updateKylinEOSTestnet(ChainURL(eosKylin))
+					SharedChain.updateJungleEOSTestnet(ChainURL(eosJungle))
 					SharedChain.updateEOSMainnet(ChainURL(eosMain))
 				}
 				ChainType(it.chainType).isETC() -> SharedChain.updateETCCurrent(ChainURL(it))

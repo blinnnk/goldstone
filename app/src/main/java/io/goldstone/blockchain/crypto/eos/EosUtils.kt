@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.blinnnk.extension.getDecimalCount
 import com.blinnnk.extension.isEvenCount
 import com.subgraph.orchid.encoders.Hex
+import io.goldstone.blockchain.common.utils.removeSlash
 import io.goldstone.blockchain.crypto.eos.eostypes.EosByteWriter
 import io.goldstone.blockchain.crypto.eos.transaction.completeZero
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -65,22 +66,21 @@ object EOSUtils {
 
 	fun convertAmountToCode(amount: BigInteger): String {
 		val amountHex = amount.toString(16)
-		val evenCountHex = amountHex.completeToEvent()
+		val evenCountHex = amountHex.completeToEven()
 		val littleEndianAmountHex = toLittleEndian(evenCountHex)
 		return littleEndianAmountHex.completeZero(16 - littleEndianAmountHex.count())
 	}
 
 	fun getEvenHexOfDecimal(decimal: Int): String {
-		return decimal.toString(16).completeToEvent()
+		return decimal.toString(16).completeToEven()
 	}
 
 	fun convertMemoToCode(memo: String): String {
-		val lengthCode = memo.toUtf8Bytes().size.toString(16).completeToEvent()
+		val lengthCode = EOSUtils.getVariableUInt(memo.length)
 		return lengthCode + memo.toCryptHexString()
 	}
 
-
-	private fun String.completeToEvent(): String {
+	private fun String.completeToEven(): String {
 		return if (!isEvenCount()) "0$this"
 		else this
 	}
@@ -208,3 +208,4 @@ object EOSUtils {
 		return memo.toUtf8Bytes().size <= EOSValue.memoMaxCharacterSize
 	}
 }
+

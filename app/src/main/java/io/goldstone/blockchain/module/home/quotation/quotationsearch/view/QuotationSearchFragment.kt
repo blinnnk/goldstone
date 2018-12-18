@@ -132,7 +132,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 
 	private fun updateResultAfterConditionChanged() {
 		val textForSearch = rootFragment?.getSearchContent().orEmpty()
-		if (NetworkUtil.hasNetworkWithAlert(context) && textForSearch.isNotEmpty()) {
+		if (NetworkUtil.hasNetworkWithAlert(context)) {
 			presenter.searchToken(textForSearch)
 		}
 	}

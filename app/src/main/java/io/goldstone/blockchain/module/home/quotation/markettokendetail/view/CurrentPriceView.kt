@@ -76,7 +76,7 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 	private val percent by lazy { TextView(context) }
 
 	init {
-		setHorizontalPadding(PaddingSize.device.toFloat())
+		setHorizontalPadding(PaddingSize.content.toFloat())
 		orientation = VERTICAL
 		setTitle(QuotationText.currentPrice)
 		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())

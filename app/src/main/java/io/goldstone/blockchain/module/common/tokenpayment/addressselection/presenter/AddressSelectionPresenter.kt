@@ -97,7 +97,7 @@ class AddressSelectionPresenter(
 			AddressType.EOSKylin,
 			AddressType.EOSAccountName -> when {
 				!token.contract.isEOSSeries() ->
-					selectionView.showError(Throwable(AccountError.InvalidAccountName))
+					selectionView.showError(Throwable(AccountError.InvalidAddress))
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
 				else -> WalletTable.getAllEOSAccountNames {
 					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)

@@ -126,7 +126,7 @@ object RequisitionUtil {
 						else response.body()?.string().orEmpty()
 					try {
 						val dataObject = data?.toJsonObject() ?: JSONObject("")
-						val jsonData = dataObject[keyName].toString()
+						val jsonData = if (keyName.isEmpty()) data else dataObject[keyName].toString()
 						if (justData) {
 							hold(listOf(jsonData as T), RequestError.None)
 							return

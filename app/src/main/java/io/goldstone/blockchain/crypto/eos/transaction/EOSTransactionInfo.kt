@@ -15,10 +15,7 @@ import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
-import io.goldstone.blockchain.crypto.utils.CryptoUtils
-import io.goldstone.blockchain.crypto.utils.toCount
-import io.goldstone.blockchain.crypto.utils.toEOSUnit
-import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
+import io.goldstone.blockchain.crypto.utils.*
 import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSTransaction
@@ -49,12 +46,20 @@ data class EOSTransactionInfo(
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	// For DAPP
-	constructor(action: JSONObject, decimal: Int) : this(
+	constructor(action: JSONObject, customMemo: String) : this(
 		EOSAccount(action.getTargetObject("data").safeGet("from")),
 		EOSAccount(action.getTargetObject("data").safeGet("to")),
-		action.getTargetObject("data").safeGet("quantity").substringBeforeLast(" ").toDoubleOrZero().toEOSUnit(),
-		TokenContract(action.safeGet("account"), action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "), decimal),
-		action.getTargetObject("data").safeGet("memo"),
+		action.getTargetObject("data")
+			.safeGet("quantity")
+			.substringBeforeLast(" ")
+			.toDoubleOrZero()
+			.toAmount(action.getDecimalFromData()),
+		TokenContract(
+			action.safeGet("account"),
+			action.getTargetObject("data").safeGet("quantity").substringAfterLast(" "),
+			action.getDecimalFromData()
+		),
+		customMemo,
 		true
 	)
 
@@ -104,14 +109,12 @@ data class EOSTransactionInfo(
 		if (!toAccount.isValid(false)) {
 			hold(null, AccountError.InvalidAccountName)
 		} else {
-			System.out.println("hello 1")
 			BaseTradingPresenter.prepareTransaction(
 				context,
-				amount.toCount(contract.decimal.orElse(CryptoValue.eosDecimal)),
+				amount.toCount(contract.decimal ?: CryptoValue.eosDecimal),
 				contract,
 				StakeType.Trade
 			) { privateKey, error ->
-				System.out.println("hello 2 $privateKey")
 				if (error.isNone() && privateKey.isNotNull()) {
 					transfer(privateKey, hold)
 				} else hold(null, error)
@@ -140,7 +143,6 @@ data class EOSTransactionInfo(
 		privateKey: EOSPrivateKey,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		System.out.println("hello 3")
 		val permission =
 			EOSAccountTable.getValidPermission(fromAccount, chainID)
 		if (permission.isNotNull()) {
@@ -171,13 +173,11 @@ data class EOSTransactionInfo(
 		val encryptToAccount = EOSUtils.getLittleEndianCode(toAccount.name)
 		val amountCode = EOSUtils.convertAmountToCode(amount)
 		val decimalCode = EOSUtils.getEvenHexOfDecimal(contract.decimal.orElse(CryptoValue.eosDecimal))
-		var symbolCode = contract.symbol.toByteArray().toNoPrefixHexString()
-		// `Symbol` 编码后的 `Count` 不能少于 `6` 位 不足的补 `0`
-		if (symbolCode.length < 6) symbolCode = symbolCode.completeZero(6 - symbolCode.count())
-		// `EOS Token` 的 `Memo` 不用补位
-		val completeZero = "00000000"
+		var symbolCode = contract.symbol.toCryptHexString()
+		// `symbol` 长度为固定 `7` 字节，`ASCII` 编码, 就是固定长度 `14` 个字符
+		symbolCode = symbolCode.completeZero(14 - symbolCode.count())
 		val memoCode = if (isTransaction) EOSUtils.convertMemoToCode(memo) else ""
-		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + completeZero + memoCode
+		return encryptFromAccount + encryptToAccount + amountCode + decimalCode + symbolCode + memoCode
 	}
 
 	companion object {
@@ -187,6 +187,16 @@ data class EOSTransactionInfo(
 			val symbolCode = CoinSymbol.eos.toByteArray().toNoPrefixHexString()
 			val completeZero = "00000000"
 			return amountCode + decimalCode + symbolCode + completeZero
+		}
+
+		/**
+		 * `quantity`:`0.000 IQ` 通过截取小数点后的数字计算出 Decimal
+		 */
+		fun JSONObject.getDecimalFromData(): Int {
+			return getTargetObject("data")
+				.safeGet("quantity")
+				.substringBefore(" ")
+				.substringAfterLast(".").length
 		}
 	}
 }

@@ -19,12 +19,12 @@ var currentLanguage = when {
 object WatchOnlyText {
 	@JvmField
 	val enterDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enter the address of the wallet to be observed"
-		HoneyLanguage.Chinese.code -> "请输入想观察的钱包地址"
-		HoneyLanguage.Japanese.code -> "確認したいウォレットのアドレスを入力して下さい"
-		HoneyLanguage.Korean.code -> "관찰하고 싶은 지갑 주소를 입력하세요."
-		HoneyLanguage.Russian.code -> "Пожалуйста, введите адрес кошелька, который Вы хотите просмотреть"
-		HoneyLanguage.TraditionalChinese.code -> "輸入要觀察的錢包地址"
+		HoneyLanguage.English.code -> "Enter the address or account name of the wallet to be observed"
+		HoneyLanguage.Chinese.code -> "Enter the address or account name of the wallet to be observed"
+		HoneyLanguage.Japanese.code -> "Enter the address or account name of the wallet to be observed"
+		HoneyLanguage.Korean.code -> "Enter the address or account name of the wallet to be observed"
+		HoneyLanguage.Russian.code -> "Enter the address or account name of the wallet to be observed"
+		HoneyLanguage.TraditionalChinese.code -> "Enter the address or account name of the wallet to be observed"
 		else -> ""
 	}
 	@JvmField

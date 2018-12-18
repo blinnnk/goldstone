@@ -4,6 +4,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orElse
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -26,25 +27,28 @@ fun PaymentDetailPresenter.transferEOS(
 	contract: TokenContract,
 	@WorkerThread callback: (error: GoldStoneError) -> Unit
 ) {
-	// 准备转账信息
-	EOSTransactionInfo(
-		SharedAddress.getCurrentEOSAccount(),
-		EOSAccount(fragment.address!!),
-		count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
-		fragment.getMemoContent(),
-		contract
-	).apply {
-		trade(fragment.context) { response, error ->
-			if (error.isNone() && response.isNotNull())
-				insertPendingDataToDatabase(response) {
-					launchUI {
-						getToken()?.let {
-							val receiptModel = ReceiptModel(this, response, it)
-							GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+	when {
+		SharedAddress.getCurrentEOSAccount().isSame(EOSAccount(fragment.address.orEmpty())) ->
+			callback(TransferError.TransferToSelf)
+		else -> EOSTransactionInfo(
+			SharedAddress.getCurrentEOSAccount(),
+			EOSAccount(fragment.address.orEmpty()),
+			count.toAmount(contract.decimal.orElse(CryptoValue.eosDecimal)),
+			fragment.getMemoContent(),
+			contract
+		).apply {
+			trade(fragment.context) { response, error ->
+				if (error.isNone() && response.isNotNull())
+					insertPendingDataToDatabase(response) {
+						launchUI {
+							getToken()?.let {
+								val receiptModel = ReceiptModel(this, response, it)
+								GasSelectionFragment.goToTransactionDetailFragment(rootFragment, fragment, receiptModel)
+							}
 						}
 					}
-				}
-			else callback(error)
+				else callback(error)
+			}
 		}
 	}
 }

@@ -13,9 +13,15 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val BalanceIsNotEnough = TransferError(ErrorText.balanceIsNotEnough)
 		@JvmStatic
+		val RefundMoreThenExisted = TransferError("The count you decide to refund is more than you have")
+		@JvmStatic
 		val SellRAMTooLess = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
 		val IncorrectDecimal = TransferError(ErrorText.incorrectDecimal)
+
+		// EOS Only
+		@JvmStatic
+		val TransferToSelf = TransferError("Can't transfer to your self in eos blockchain")
 		@JvmStatic
 		val InvalidBigNumber = TransferError("Invalid Number, Value is too big")
 		@JvmStatic
@@ -36,13 +42,9 @@ class TransferError(val content: String) : GoldStoneError(content) {
 open class AccountError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val DecryptKeyStoreError = AccountError(ErrorText.decryptKeyStoreError)
-		@JvmStatic
 		val BackUpMnemonic = AccountError("Please back up you mnemonic first")
 		@JvmStatic
 		val InvalidAccountName = AccountError(ErrorText.invalidAccountName)
-		@JvmStatic
-		val UnavailableAccountName = AccountError(ErrorText.eosNameResultUnavailable)
 		@JvmStatic
 		val InactivatedAccountName = AccountError(ErrorText.inactivatedAccountName)
 		@JvmStatic

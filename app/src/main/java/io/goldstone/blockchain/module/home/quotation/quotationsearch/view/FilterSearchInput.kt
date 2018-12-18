@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
 import android.graphics.PorterDuff
+import android.text.InputType
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
@@ -19,6 +20,10 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
+import android.view.inputmethod.EditorInfo
+import android.widget.TextView
+
+
 
 /**
  * @date: 2018/8/28.
@@ -60,6 +65,9 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			addCorner(5.uiPX(), Spectrum.white)
 			addView(filterIcon)
 			editText = editText {
+				singleLine = true
+				imeOptions = EditorInfo.IME_ACTION_SEARCH
+				inputType = InputType.TYPE_CLASS_TEXT
 				textAlignment = EditText.TEXT_ALIGNMENT_GRAVITY
 				hint = EmptyText.searchInput
 				backgroundTintMode = PorterDuff.Mode.CLEAR
@@ -70,14 +78,14 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				setHorizontallyScrolling(false)
 				setPadding(0, 10.uiPX(), 0, 10.uiPX())
-				setOnKeyListener { _, keyCode, event ->
-					// If the event is a key-down event on the "enter" button
-					if ((event?.action == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
-						enterKeyEvent?.run()
-						true
-					} else false
-				}
 			}
+			editText.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
+				if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+					enterKeyEvent?.run()
+					return@OnEditorActionListener true
+				}
+				false
+			})
 		}
 		addView(cancelButton)
 	}

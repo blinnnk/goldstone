@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.orZero
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
+import com.blinnnk.extension.toJSONObjectList
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.bitcoincash.BCHUtil
 import io.goldstone.blockchain.crypto.bitcoincash.BCHWalletUtils
@@ -112,17 +113,24 @@ data class BTCSeriesTransactionTable(
 		}
 
 		private fun getFromAddress(data: JSONObject): String {
-			val inputs = JSONArray(data.safeGet("vin"))
-			return JSONObject(inputs[0].toString()).safeGet("addr")
+			val inputs = JSONArray(data.safeGet("vin")).toJSONObjectList()
+			return inputs.first().safeGet("addr")
 		}
 
 		private fun getToAddresses(
 			data: JSONObject
 		): List<String> {
-			val out = JSONArray(data.safeGet("vout"))
+			val out = JSONArray(data.safeGet("vout")).toJSONObjectList()
 			var toAddresses = listOf<String>()
-			(0 until out.length()).forEach {
-				toAddresses += JSONArray(JSONObject(JSONObject(out[it].toString()).safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
+			/**
+			 * 个别的账单会出现 `BCH` 的 `VOut ScriptPubKey` 出现没有 `Addresses` 的 `Key` 值, 这里额外做处理判断一下
+			 *  E.G. TXID: 961a13441cd57c89b9d04bb259cf72b74c5e8c8163322d06c064cd7290b8cd6b
+			 * */
+			(0 until out.size).forEach {
+				val scriptPubKeyObject = out[it].safeGet("scriptPubKey")
+				if (scriptPubKeyObject.contains("addresses")) {
+					toAddresses += JSONArray(JSONObject(scriptPubKeyObject).safeGet("addresses"))[0].toString()
+				}
 			}
 			// 如果发起地址里面有我的地址, 那么接收地址就是 `Out` 里面不等于我的及找零地址的地址.
 			val finalToAddress = toAddresses.filterNot {
@@ -133,8 +141,7 @@ data class BTCSeriesTransactionTable(
 
 		private fun getTransactionValue(data: JSONObject, myAddress: String): String {
 			val totalWithoutFee = data.safeGet("valueOut").toDoubleOrNull().orZero()
-			return (
-				totalWithoutFee - getChangeValue(myAddress, data).toDoubleOrNull().orZero()).toString()
+			return (totalWithoutFee - getChangeValue(myAddress, data).toDoubleOrNull().orZero()).toString()
 		}
 
 		/**
@@ -146,26 +153,32 @@ data class BTCSeriesTransactionTable(
 			toAddress: String,
 			data: JSONObject
 		): String {
-			val out = JSONArray(data.safeGet("vout"))
+			val out = JSONArray(data.safeGet("vout")).toJSONObjectList()
 			var changeValue = 0.0
 			val formatToAddress = convertToBCHOrDefaultAddress(toAddress, getFromAddress(data))
 			val mineIsTo = getFromAddress(data).equals(formatToAddress, true)
-			val outCount = out.length()
-			var countForCalculateTransferToMySelf = out.length()
-			(0 until outCount).forEach {
+			var countForCalculateTransferToMySelf = out.size
+			(0 until out.size).forEach {
 				val child = JSONObject(out[it].toString())
-				val childAddress = JSONArray(JSONObject(child.safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
-				changeValue +=
-					if (childAddress.equals(formatToAddress, true) == mineIsTo) {
-						countForCalculateTransferToMySelf -= 1
-						// 如果 `countForCalculateTransferToMySelf` 的值是 `0` 那么意味着是自己转给自己
-						//  这种情况留一个值作为 `TransferValue`
-						if (countForCalculateTransferToMySelf != 0) {
-							child.safeGet("value").toDoubleOrNull().orZero()
-						} else 0.0
-					} else {
-						0.0
-					}
+				/**
+				 * 个别的账单会出现 `BCH` 的 `VOut ScriptPubKey` 出现没有 `Addresses` 的 `Key` 值, 这里额外做处理判断一下
+				 *  E.G. TXID: 961a13441cd57c89b9d04bb259cf72b74c5e8c8163322d06c064cd7290b8cd6b
+				 * */
+				val scriptPubKeyObject = child.safeGet("scriptPubKey")
+				if (scriptPubKeyObject.contains("addresses")) {
+					val childAddress = JSONArray(JSONObject(child.safeGet("scriptPubKey")).safeGet("addresses"))[0].toString()
+					changeValue +=
+						if (childAddress.equals(formatToAddress, true) == mineIsTo) {
+							countForCalculateTransferToMySelf -= 1
+							// 如果 `countForCalculateTransferToMySelf` 的值是 `0` 那么意味着是自己转给自己
+							//  这种情况留一个值作为 `TransferValue`
+							if (countForCalculateTransferToMySelf != 0) {
+								child.safeGet("value").toDoubleOrNull().orZero()
+							} else 0.0
+						} else {
+							0.0
+						}
+				}
 			}
 			return changeValue.toString()
 		}

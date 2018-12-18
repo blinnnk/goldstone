@@ -1,8 +1,5 @@
 package io.goldstone.blockchain.crypto.utils
 
-import com.blinnnk.extension.getDecimalCount
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.*
@@ -35,11 +32,12 @@ object CryptoUtils {
 	}
 
 	fun toTargetUnit(
-		value: BigInteger,
+		value: BigDecimal,
 		decimal: Double,
 		hexadecimal: Double
 	): Double {
-		return value.toDouble() / Math.pow(hexadecimal, decimal)
+		val isNegative = value < BigDecimal.ZERO
+		return (Math.abs(value.toDouble()) / Math.pow(hexadecimal, decimal)) * if (isNegative) -1 else 1
 	}
 
 	fun toGasUsedEther(gas: String?, gasPrice: String?, isHex: Boolean): String {
@@ -154,9 +152,10 @@ fun Double.formatCurrency(): String {
 }
 
 fun Double.formatCount(count: Int = 9): String {
+	val isNegative = this < 0
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = count
-	return formatEditor.format(this).toBigDecimal().toPlainString()
+	return (if (isNegative) "-" else "") + formatEditor.format(Math.abs(this)).toBigDecimal().toPlainString()
 }
 
 fun Double.formatDecimal(count: Int = 9): Double {
@@ -214,13 +213,5 @@ fun String.getObjectMD5HexString(): String {
 	} catch (error: Exception) {
 		println(error)
 		"error"
-	}
-}
-
-fun String.isValidDecimal(decimal: Int): Boolean {
-	return when {
-		getDecimalCount().isNull() -> return true
-		getDecimalCount().orZero() > decimal.orZero() -> false
-		else -> true
 	}
 }

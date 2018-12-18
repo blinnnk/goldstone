@@ -513,6 +513,19 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
+
+	fun searchDAPP(
+		condition: String,
+		@WorkerThread hold: (data: List<DAPPTable>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.searchDAPP(APIPath.currentUrl, condition),
+			"data",
+			false,
+			isEncrypt = true,
+			hold = hold
+		)
+	}
 }
 
 
