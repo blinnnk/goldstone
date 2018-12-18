@@ -350,6 +350,22 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
+	
+	fun getPairsByExactKey(
+		pairList: JsonArray,
+		@WorkerThread hold: (lineData: List<QuotationSelectionTable>?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.postRequest(
+			RequestBody.create(
+				requestContentType,
+				AesCrypto.encrypt(pairList.toString()).orEmpty()
+			),
+			"pair_list",
+			APIPath.searchPairByExactKey(APIPath.currentUrl),
+			isEncrypt = true,
+			hold = hold
+		)
+	}
 
 	fun registerWalletAddresses(
 		content: String,

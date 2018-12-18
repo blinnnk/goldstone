@@ -80,6 +80,10 @@ class QuotationPresenter(
 					SandBoxUtil.getQuotationPairs().forEach {
 						invalidDatePairs.add(it)
 					}
+					getSandboxPairs(invalidDatePairs) {
+						updateData()
+					}
+					return
 				}
 				updateInvalidDatePair(invalidDatePairs) {
 					launchUI {
@@ -130,20 +134,28 @@ class QuotationPresenter(
 		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
 	}
 	
-	private fun insertInvalidDataPair(pairList: JsonArray, @WorkerThread callback: () -> Unit) {
-		GoldStoneAPI.getCurrencyLineChartData(pairList) { newChart, error ->
-			if (!newChart.isNullOrEmpty() && error.isNone()) {
-				// 更新数据库的数据
-				newChart.forEachIndexed { index, model ->
-					QuotationSelectionTable.insertSelection(
-						QuotationSelectionTable(
-							,
-							newChart.firstOrNull()?.pointList?.toString().orEmpty(),
-							true
-						)
-					)
+	private fun getSandboxPairs(pairList: JsonArray, @WorkerThread callback: () -> Unit) {
+		GoldStoneAPI.getPairsByExactKey(pairList) { selectionTables, error ->
+			if (selectionTables != null && error.isNone()) {
+				if (selectionTables.isNotEmpty()) {
+					GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChartDataSet, lineChartError ->
+						if (lineChartDataSet != null && lineChartError.isNone()) {
+							lineChartDataSet.forEach { lineChartData ->
+								selectionTables.find { it.pair ==  lineChartData.pair}?.apply {
+									QuotationSelectionTable.insertSelection(
+										QuotationSelectionTable(
+											this,
+											lineChartData.pointList.toString(),
+											true
+										)
+									)
+								}
+							}
+							callback()
+						}
+					}
 				}
-				callback()
+				
 			}
 		}
 	}
