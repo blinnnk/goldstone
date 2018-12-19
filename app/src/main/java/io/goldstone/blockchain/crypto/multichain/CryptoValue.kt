@@ -11,6 +11,7 @@ import com.blinnnk.util.TinyNumberUtils
 object CryptoValue {
 	private const val bitcoinAddressLength = 34
 	const val bitcoinAddressClassicLength = 33
+	private val btcSeriesLengthRange = 33 .. 35
 	const val eosAddressLength = 53
 	const val contractAddressLength = 42 // 包含 `0x`
 	const val taxHashLength = 66
@@ -27,10 +28,7 @@ object CryptoValue {
 	const val ltcMainnetSignedSecret = "T99eF7JUK83YfnCBqcdsUP7pBPeLqYLmAW477PHdRX67g82MgQLk"
 
 	val isBitcoinAddressLength: (address: String) -> Boolean = {
-		TinyNumberUtils.hasTrue(
-			it.length == bitcoinAddressLength,
-			it.length == bitcoinAddressClassicLength
-		)
+		TinyNumberUtils.hasTrue(it.length in btcSeriesLengthRange)
 	}
 	val filename: (
 		walletAddress: String,

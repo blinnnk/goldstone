@@ -30,7 +30,7 @@ object ChainExplorer {
 	private const val ethKovanWeb = "https://kovan.etherscan.io"
 	private const val ethRinkebyWeb = "https://rinkeby.etherscan.io"
 	// EOS
-	private const val eosMainnetWeb = "https://bloks.asia"
+	private const val eosMainnetWeb = "https://bloks.io"
 	private const val eosJungleWeb = "https://jungle.bloks.io"
 	// EOS Park
 	private const val eosParkMainnetWeb = "https://eospark.com/MainNet"

@@ -13,9 +13,12 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.ColumnSectionTitle
 import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -23,6 +26,7 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.eos.EOSValue
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.base.showDialog
@@ -47,11 +51,11 @@ import java.math.BigInteger
 class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 
 	override val pageTitle: String = ProfileText.eosAccountRegister
-	private val confirmButton by lazy { RoundButton(context!!) }
-	private val accountNameInput by lazy { RoundInput(context!!) }
+	private lateinit var confirmButton: RoundButton
+	private lateinit var accountNameInput: RoundInput
 	private val publickeyInput by lazy { WalletEditText(context!!) }
-	private val settingButton by lazy { GraySquareCell(context!!) }
-	private val resourceCoast by lazy { GraySquareCell(context!!) }
+	private lateinit var settingButton: GraySquareCell
+	private lateinit var resourceCoast: GraySquareCell
 	private val gridSessionTitle by lazy { ColumnSectionTitle(context!!) }
 	private var assignResources =
 		listOf(
@@ -68,14 +72,15 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 				lparams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL
 				DescriptionView(context).isNameRule().into(this)
-				accountNameInput.apply {
+				accountNameInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					title = ImportWalletText.eosAccountName
 					afterTextChanged = Runnable {
 						val checker = EOSAccount(getContent()).checker()
 						if (checker.isValid()) setValidStatus(true, "Valid")
 						else setValidStatus(false, checker.shortDescription)
 					}
-				}.into(this)
+				}
 
 				DescriptionView(context).isRegisterResource().into(this)
 
@@ -89,19 +94,19 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 				}.into(this)
 
-				settingButton.apply {
+				settingButton = graySquareCell {
 					showArrow()
 					setTitle(EOSAccountText.advancedSettings)
 				}.click {
 					getParentContainer()?.showCustomDashboard(assignResources)
-				}.into(this)
+				}
 
-				resourceCoast.apply {
+				resourceCoast = graySquareCell {
 					setTitle(EOSAccountText.estimatedSpentOfActiveAccount)
 					setSubtitle(CommonText.calculating)
-				}.into(this)
+				}
 
-				confirmButton.apply {
+				confirmButton = roundButton {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(20.uiPX())
 				}.click { button ->
@@ -119,7 +124,7 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 							button.showLoadingStatus(false)
 						}
 					}
-				}.into(this)
+				}
 			}
 		}
 	}
@@ -182,8 +187,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 		Dashboard(context) {
 			showDashboard(
 				EOSAccountText.customizeResource,
-				settingInputs,
 				EOSAccountText.customizeNewAccountResourceDescription,
+				settingInputs,
 				{ it.updateSettingValue() }
 			) {}
 		}

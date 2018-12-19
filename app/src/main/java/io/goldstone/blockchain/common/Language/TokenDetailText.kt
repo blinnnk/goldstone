@@ -17,6 +17,26 @@ object TokenDetailText {
 		else -> ""
 	}
 	@JvmField
+	val contract = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Contract"
+		HoneyLanguage.Chinese.code -> "Token Contract"
+		HoneyLanguage.Japanese.code -> "Token Contract"
+		HoneyLanguage.Korean.code -> "Token Contract"
+		HoneyLanguage.Russian.code -> "Token Contract"
+		HoneyLanguage.TraditionalChinese.code -> "Token Contract"
+		else -> ""
+	}
+	@JvmField
+	val code = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Code"
+		HoneyLanguage.Chinese.code -> "Token Code"
+		HoneyLanguage.Japanese.code -> "Token Code"
+		HoneyLanguage.Korean.code -> "Token Code"
+		HoneyLanguage.Russian.code -> "Token Code"
+		HoneyLanguage.TraditionalChinese.code -> "Token Code"
+		else -> ""
+	}
+	@JvmField
 	val deposit = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Deposit"
 		HoneyLanguage.Chinese.code -> "接收"
@@ -183,6 +203,17 @@ object TokenDetailText {
 		HoneyLanguage.Korean.code -> "균형"
 		HoneyLanguage.Russian.code -> "баланс"
 		HoneyLanguage.TraditionalChinese.code -> "餘額"
+		else -> ""
+	}
+
+	@JvmField
+	val tokenInfo = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Token Information"
+		HoneyLanguage.Chinese.code -> "Token Information"
+		HoneyLanguage.Japanese.code -> "Token Information"
+		HoneyLanguage.Korean.code -> "Token Information"
+		HoneyLanguage.Russian.code -> "Token Information"
+		HoneyLanguage.TraditionalChinese.code -> "Token Information"
 		else -> ""
 	}
 

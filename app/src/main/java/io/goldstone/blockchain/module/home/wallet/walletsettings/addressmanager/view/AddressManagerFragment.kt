@@ -87,11 +87,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				presenter.showEOSPublickeyDescription(cell, data.address, wallet)
 			}
 			cell.moreButton.onClick {
-				showCellMoreDashboard(
-					data,
-					chainType,
-					!isDefault
-				)
+				showCellMoreDashboard(data, chainType, !isDefault)
 				cell.moreButton.preventDuplicateClicks()
 			}
 		}

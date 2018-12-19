@@ -10,12 +10,14 @@ import android.widget.TextView
 import com.blinnnk.extension.alignParentBottom
 import com.blinnnk.extension.centerInHorizontal
 import com.blinnnk.extension.into
+import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.button.RoundShadowIcon
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.component.title.twoLineTitles
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -32,7 +34,7 @@ import org.jetbrains.anko.*
  */
 class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 
-	private val info = TwoLineTitles(context)
+	private lateinit var info: TwoLineTitles
 	private val gradientView = GradientView(context)
 	private val statusIcon = RoundShadowIcon(context)
 	private val conformationBar by lazy { TextView(context) }
@@ -46,13 +48,14 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			statusIcon.into(this)
-			info.apply {
-				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent).apply {
-					topMargin = 20.uiPX()
-				}
+			info = twoLineTitles {
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				isCenter = true
 				setWildStyle()
-			}.into(this)
+			}
+			info.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 20.uiPX()
+			}
 		}.apply {
 			val params = RelativeLayout.LayoutParams(matchParent, wrapContent)
 			params.margin = 50.uiPX()

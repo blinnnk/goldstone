@@ -1,7 +1,7 @@
-package io.goldstone.blockchain.module.home.dapp.dapplistdetail.presenter
+package io.goldstone.blockchain.module.home.dapp.dappoverlay.presenter
 
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
-import io.goldstone.blockchain.module.home.dapp.dapplistdetail.view.DAPPOverlayFragment
+import io.goldstone.blockchain.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
 
 
 /**

@@ -29,7 +29,7 @@ class DAPPAdapter(
 ) : HoneyBaseAdapterWithHeaderAndFooter<DAPPTable, View, DAPPCell, TextView>() {
 
 	override fun generateFooter(context: Context) = TextView(context).apply {
-		visibility = if (dataSet.size == DataValue.dappPageCount) View.VISIBLE else View.GONE
+		visibility = if (dataSet.size >= DataValue.dappPageCount) View.VISIBLE else View.GONE
 		onClick {
 			clickFooterEvent()
 			preventDuplicateClicks()

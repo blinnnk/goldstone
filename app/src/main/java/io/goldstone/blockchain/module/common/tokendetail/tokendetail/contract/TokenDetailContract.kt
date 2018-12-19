@@ -23,6 +23,7 @@ interface TokenDetailContract {
 		fun flipPage()
 		fun filterData(data: List<TransactionListModel>?): List<TransactionListModel>
 		fun showFilterLoadMoreAttention(dataSize: Int)
+		fun showNetworkAlert()
 	}
 
 	interface GSPresenter : GoldStonePresenter {

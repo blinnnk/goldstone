@@ -86,11 +86,19 @@ class MainActivity : AppCompatActivity() {
 		)
 	}
 
-	fun showDappBrowserFragment(url: String, previousView: Int, currentFragment: Fragment) {
-		hideChildFragment(currentFragment)
+	fun showDappBrowserFragment(
+		url: String,
+		previousView: Int,
+		webColor: String,
+		currentFragment: Fragment?
+	) {
+		currentFragment?.let {
+			hideChildFragment(it)
+		}
 		addFragmentAndSetArguments<DAppBrowserFragment>(ContainerID.main) {
 			putString(ArgumentKey.webViewUrl, url)
 			putInt(ArgumentKey.fromView, previousView)
+			putString(ArgumentKey.webColor, webColor)
 		}
 	}
 

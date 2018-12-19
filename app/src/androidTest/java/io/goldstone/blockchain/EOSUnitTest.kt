@@ -19,10 +19,14 @@ import io.goldstone.blockchain.crypto.eos.eosram.EOSBuyRamModel
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.*
+import io.goldstone.blockchain.crypto.ethereum.toByteArray
 import io.goldstone.blockchain.crypto.litecoin.BaseKeyPair
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.crypto.multichain.TokenContract
+import io.goldstone.blockchain.crypto.utils.toAscii
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
+import io.goldstone.blockchain.crypto.utils.toDecimalFromHex
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import junit.framework.Assert
@@ -235,7 +239,7 @@ class EOSUnitTest {
 		val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 		val action = EOSAction(EOSCodeName.EOSIOToken, transactionInfoCode, EOSTransactionMethod.transfer(), authorizationObjects)
 		EOSTransactionUtils.serialize(
-			ChainID.EOSTest,
+			ChainID.EOSJungle,
 			header,
 			listOf(action),
 			listOf(authorization),
@@ -349,7 +353,7 @@ class EOSUnitTest {
 			StakeType.Delegate,
 			false
 		)
-		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(ChainID.EOSTest, header, accountInfo, buyRamModel, netCPUModel)
+		val serializedRegister = EOSRegisterUtil.getRegisterSerializedCode(ChainID.EOSJungle, header, accountInfo, buyRamModel, netCPUModel)
 		LogUtil.debug("$position serializeRegisterModels", serializedRegister.serialized)
 	}
 

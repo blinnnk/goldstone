@@ -5,8 +5,10 @@ import android.annotation.SuppressLint
 import android.support.v4.app.Fragment
 import android.text.Html
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.LinearLayout
@@ -75,8 +77,19 @@ class WebViewFragment : BaseFragment<WebViewPresenter>() {
 		// 当 `webView`加载完毕后清除 `loading`
 		webView = WebView(context).apply {
 			alpha = 0.1f
-			settings.javaScriptEnabled = true
 			webViewClient = WebViewClient()
+			settings.javaScriptEnabled = true
+			settings.javaScriptCanOpenWindowsAutomatically = true
+			settings.domStorageEnabled = true
+			settings.databaseEnabled = true
+			settings.allowFileAccess = true
+			settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NARROW_COLUMNS
+			settings.useWideViewPort = true
+			setLayerType(View.LAYER_TYPE_HARDWARE, null)
+			settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
+			settings.setAppCacheEnabled(true)
+			settings.setAppCacheMaxSize(15 * 1024 * 1024)
+			settings.cacheMode = WebSettings.LOAD_DEFAULT
 			this.loadUrl(urlPath)
 			layoutParams = ViewGroup.LayoutParams(matchParent, matchParent)
 

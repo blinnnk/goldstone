@@ -176,6 +176,29 @@ object ProfileText {
 		HoneyLanguage.TraditionalChinese.code -> "選擇節點"
 		else -> ""
 	}
+
+	@JvmField
+	val fingerprintSettings = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Fingerprint Settings"
+		HoneyLanguage.Chinese.code -> "Fingerprint Settings"
+		HoneyLanguage.Japanese.code -> "Fingerprint Settings"
+		HoneyLanguage.Korean.code -> "Fingerprint Settings"
+		HoneyLanguage.Russian.code -> "Fingerprint Settings"
+		HoneyLanguage.TraditionalChinese.code -> "Fingerprint Settings"
+		else -> ""
+	}
+
+	@JvmField
+	val fingerprintDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		HoneyLanguage.Chinese.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		HoneyLanguage.Japanese.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		HoneyLanguage.Korean.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		HoneyLanguage.Russian.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		HoneyLanguage.TraditionalChinese.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		else -> ""
+	}
+
 	@JvmField
 	val walletManager = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Wallet Manage"
@@ -251,12 +274,12 @@ object ProfileText {
 
 	@JvmField
 	val editContactAlertTitle = when (currentLanguage) {
-		HoneyLanguage.English.code->"EDIT CONTACT"
-		HoneyLanguage.Chinese.code->"编辑联系人"
-		HoneyLanguage.Japanese.code->"連絡先を編集"
-		HoneyLanguage.Korean.code->"연락처 수정"
-		HoneyLanguage.Russian.code->"Изменить контакт"
-		HoneyLanguage.TraditionalChinese.code->"編輯聯繫人"
+		HoneyLanguage.English.code -> "EDIT CONTACT"
+		HoneyLanguage.Chinese.code -> "编辑联系人"
+		HoneyLanguage.Japanese.code -> "連絡先を編集"
+		HoneyLanguage.Korean.code -> "연락처 수정"
+		HoneyLanguage.Russian.code -> "Изменить контакт"
+		HoneyLanguage.TraditionalChinese.code -> "編輯聯繫人"
 		else -> ""
 	}
 	@JvmField

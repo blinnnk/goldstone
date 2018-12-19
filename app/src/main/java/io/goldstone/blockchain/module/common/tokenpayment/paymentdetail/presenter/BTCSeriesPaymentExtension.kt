@@ -17,7 +17,6 @@ import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.litecoin.LitecoinNetParams
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toSatoshi
 import io.goldstone.blockchain.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blockchain.kernel.network.btcseries.insight.InsightApi
@@ -40,9 +39,7 @@ fun PaymentDetailPresenter.prepareBTCSeriesPaymentModel(
 	changeAddress: String,
 	@UiThread callback: (GoldStoneError) -> Unit
 ) {
-	if (!count.toString().isValidDecimal(CryptoValue.btcSeriesDecimal))
-		callback(TransferError.IncorrectDecimal)
-	else generateBTCSeriesPaymentModel(chainType, count, changeAddress) { paymentModel, error ->
+	generateBTCSeriesPaymentModel(chainType, count, changeAddress) { paymentModel, error ->
 		GlobalScope.launch(Dispatchers.Main) {
 			if (paymentModel.isNotNull()) fragment.rootFragment?.apply {
 				presenter.showTargetFragment<GasSelectionFragment>(

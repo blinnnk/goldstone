@@ -17,15 +17,13 @@ import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.click
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.presenter.ContactInputPresenter
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.profileoverlay.view.ProfileOverlayFragment
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 16/04/2018 1:13 PM
@@ -52,20 +50,21 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
+				leftPadding = PaddingSize.device
+				rightPadding = PaddingSize.device
 				nameInput = roundInput {
 					title = ContactText.contactName
 					setTextInput()
 				}.lparams {
+					width = matchParent
 					topMargin = 40.uiPX()
 				}
-				sessionTitle {
-					setTitle(ProfileText.contacts)
-				}
-
+				sessionTitle(ProfileText.contacts)
 				ethSeriesAddressInput = roundInput {
 					title = CoinSymbol.eth
 					hint = ContactText.ethERCAndETHint
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -73,6 +72,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.eos
 					hint = ContactText.eosHint
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -80,6 +80,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.btc()
 					hint = ContactText.btcMainnetAddress
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -87,6 +88,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.bch
 					hint = ContactText.bchAddress
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -94,6 +96,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					title = CoinSymbol.ltc
 					hint = ContactText.ltcAddress
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -102,6 +105,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					hint = ContactText.eosJungleHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -110,6 +114,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					hint = ContactText.eosJungleHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 
@@ -118,6 +123,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 					hint = ContactText.btcTestnetAddress
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
+					width = matchParent
 					topMargin = 5.uiPX()
 				}
 

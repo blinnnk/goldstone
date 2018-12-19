@@ -18,7 +18,6 @@ import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
@@ -34,6 +33,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.TotalResources
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.model.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
+import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
@@ -158,6 +158,24 @@ object EOSAPI {
 		}
 	}
 
+	// 服务 Javascript DAPP, 只查主网
+	fun getStringAccountInfo(
+		account: EOSAccount,
+		@WorkerThread hold: (result: String?, error: GoldStoneError) -> Unit
+	) {
+		RequestBody.create(
+			ETHJsonRPC.contentType,
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.name))
+		).let { requestBody ->
+			RequisitionUtil.postRequest(
+				requestBody,
+				EOSUrl.getAccountInfo(),
+				false,
+				hold
+			)
+		}
+	}
+
 	fun getAvailableRamBytes(
 		accountName: EOSAccount,
 		@WorkerThread hold: (ramAvailable: BigInteger?, error: GoldStoneError) -> Unit
@@ -195,11 +213,7 @@ object EOSAPI {
 			// 生成指定的包含链信息的结果类型
 			val accountNames =
 				names.map {
-					EOSAccountInfo(
-						it,
-						SharedChain.getEOSCurrent().chainID.id,
-						publicKey
-					)
+					EOSAccountInfo(it, SharedChain.getEOSCurrent().chainID.id, publicKey)
 				}
 			hold(accountNames, RequestError.None)
 		}
@@ -253,7 +267,7 @@ object EOSAPI {
 						val data = JSONObject(response.safeGet("processed"))
 						val transactionID = response.safeGet("transaction_id")
 						val receipt = JSONObject(data.safeGet("receipt"))
-						hold(EOSResponse(transactionID, receipt), GoldStoneError.None)
+						hold(EOSResponse(transactionID, receipt, result), GoldStoneError.None)
 					}
 					else -> hold(null, RequestError.ResolveDataError(GoldStoneError(result)))
 				}
@@ -296,6 +310,25 @@ object EOSAPI {
 				hold(null, error)
 			}
 		}
+	}
+
+	/** 这个方法直接返回链数据没有做任何处理, 服务 `Scatter` 的调用 */
+	fun getCurrencyBalance(
+		account: EOSAccount,
+		symbol: CoinSymbol,
+		code: String,
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(
+				Pair("code", code),
+				Pair("account", account.name),
+				Pair("symbol", symbol.symbol)
+			),
+			EOSUrl.getAccountEOSBalance(),
+			false,
+			hold
+		)
 	}
 
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
@@ -352,6 +385,36 @@ object EOSAPI {
 			),
 			EOSUrl.getTableRows(),
 			"rows",
+			false,
+			hold
+		)
+	}
+
+	fun getTableRows(
+		scope: String,
+		code: String,
+		tableName: String,
+		option: Pair<String, String>?,
+		limit: Pair<String, Int>?,
+		indexPosition: Pair<String, Int>?,
+		keyType: Pair<String, String>?,
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
+	) {
+		val params = arrayListOf(
+			Pair("scope", scope),
+			Pair("code", code),
+			Pair("table", tableName),
+			Pair("json", true)
+		)
+		if (option.isNotNull()) params.add(option)
+		if (limit.isNotNull()) params.add(limit)
+		if (indexPosition.isNotNull()) params.add(indexPosition)
+		if (keyType.isNotNull()) params.add(keyType)
+
+		RequisitionUtil.postString(
+			ParameterUtil.prepareObjectContent(params),
+			EOSUrl.getTableRows(),
+			"",
 			false,
 			hold
 		)
@@ -600,15 +663,14 @@ object EOSAPI {
 		}?.pair ?: return
 		EOSAPI.getPriceByPair(pair) { priceInEOS, pairError ->
 			if (priceInEOS.isNotNull() && pairError.isNone()) {
-				val defaultDao = GoldStoneDataBase.database.defaultTokenDao()
-				val eosToken = defaultDao.getToken(
+				val eosPrice = DefaultTokenTable.dao.getTokenPrice(
 					TokenContract.eosContract,
 					TokenContract.EOS.symbol,
 					EOSChain.Main.id
 				)
-				val priceInUSD = priceInEOS * eosToken?.price.orZero()
+				val priceInUSD = priceInEOS * eosPrice.orZero()
 				if (priceInUSD > 0.0) {
-					defaultDao.updateTokenPrice(
+					DefaultTokenTable.dao.updateTokenPrice(
 						priceInUSD,
 						contract.contract.orEmpty(),
 						contract.symbol,

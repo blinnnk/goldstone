@@ -4,9 +4,11 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 24/03/2018 8:57 PM
@@ -14,7 +16,7 @@ import org.jetbrains.anko.matchParent
  */
 class WalletListAdapter(
 	override val dataSet: ArrayList<WalletListModel>,
-	private val callback: WalletListCardCell.() -> Unit
+	private val clickEvent: (address: String) -> Unit
 ) : HoneyBaseAdapterWithHeaderAndFooter<WalletListModel, View, WalletListCardCell, View>() {
 
 	override fun generateCell(context: Context) = WalletListCardCell(context)
@@ -27,6 +29,9 @@ class WalletListAdapter(
 
 	override fun WalletListCardCell.bindCell(data: WalletListModel, position: Int) {
 		model = data
-		callback(this)
+		onClick {
+			clickEvent(data.address)
+			preventDuplicateClicks()
+		}
 	}
 }

@@ -16,12 +16,10 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragme
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
-import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.PrepareTransferText
 import io.goldstone.blockchain.common.language.QAText
 import io.goldstone.blockchain.common.language.TokenDetailText
-import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.click
@@ -29,6 +27,7 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.common.value.WebUrl
+import io.goldstone.blockchain.crypto.multichain.getChainType
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
 import io.goldstone.blockchain.crypto.multichain.orEmpty
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -39,6 +38,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.model.Min
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter.GasSelectionPresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
@@ -197,19 +197,11 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 		presenter.checkIsValidTransfer { error ->
 			launchUI {
 				if (error.isNone()) {
-					Dashboard(context!!) {
-						showAlertView(
-							TransactionText.confirmTransactionTitle,
-							TransactionText.confirmTransaction,
-							true,
-							// 点击取消按钮
-							{ showLoadingStatus(false) }
-						) { input ->
-							// request keystore password from user
-							val password = input?.text.toString()
+					PaymentDetailPresenter.getPrivatekey(context!!, token?.contract.getChainType()) { privateKey, privateKeyError ->
+						if (privateKey.isNotNull() && privateKeyError.isNone()) {
 							presenter.transfer(
 								token?.contract.orEmpty(),
-								password,
+								privateKey,
 								paymentModel!!,
 								getCustomFee()
 							) { receiptModel, error ->
@@ -223,15 +215,15 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 										)
 									} else {
 										// 用户取消输入密码会返回 `model null`  和 `error none` 所以不用提示
-										if (error.hasError()) safeShowError(error)
+										if (error.hasError()) showError(error)
 										showLoadingStatus(false)
 									}
 								}
 							}
-						}
+						} else showError(error)
 					}
 				} else {
-					safeShowError(error)
+					showError(error)
 					showLoadingStatus(false)
 				}
 			}

@@ -2,15 +2,15 @@ package io.goldstone.blockchain.module.common.tokenpayment.gasselection.presente
 
 import android.support.annotation.WorkerThread
 import android.widget.LinearLayout
-import com.blinnnk.extension.*
+import com.blinnnk.extension.into
+import com.blinnnk.extension.orElse
+import com.blinnnk.extension.orZero
+import com.blinnnk.extension.suffix
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.TransferError
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.formatCurrency
-import io.goldstone.blockchain.crypto.utils.isValidDecimal
 import io.goldstone.blockchain.crypto.utils.toBTCCount
 import io.goldstone.blockchain.module.common.tokenpayment.gaseditor.presenter.GasFee
 import io.goldstone.blockchain.module.common.tokenpayment.gasselection.contract.GasSelectionContract
@@ -22,7 +22,6 @@ import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.Pa
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import io.goldstone.blockchain.module.home.wallet.walletsettings.privatekeyexport.presenter.PrivateKeyExportPresenter
 import java.io.Serializable
 
 /**
@@ -81,9 +80,7 @@ class GasSelectionPresenter(
 
 	override fun checkIsValidTransfer(@WorkerThread callback: (GoldStoneError) -> Unit) {
 		// 如果输入的 `Decimal` 不合规就提示并返回
-		if (!gasView.getTransferCount().toString().checkDecimalIsValid(token)) {
-			callback(TransferError.IncorrectDecimal)
-		} else when {
+		when {
 			token.contract.isBTCSeries() ->
 				checkBTCSeriesBalance(token.contract, callback)
 			else -> checkBalanceIsValid(token.contract, callback)
@@ -92,34 +89,26 @@ class GasSelectionPresenter(
 
 	override fun transfer(
 		contract: TokenContract,
-		password: String,
+		privateKey: String,
 		paymentModel: Serializable,
 		gasFee: GasFee,
 		@WorkerThread callback: (receiptModel: ReceiptModel?, error: GoldStoneError) -> Unit
 	) {
-		PrivateKeyExportPresenter.getPrivateKey(
-			contract.getAddress(),
-			contract.getChainType(),
-			password
-		) { privateKey, error ->
-			if (privateKey.isNotNull() && error.isNone()) {
-				when {
-					contract.isBTCSeries() -> transferBTCSeries(
-						paymentModel as PaymentBTCSeriesModel,
-						contract.getChainType(),
-						privateKey,
-						gasFee,
-						callback
-					)
-					else -> transferETHSeries(
-						paymentModel as PaymentDetailModel,
-						privateKey,
-						contract.getChainURL(),
-						gasFee,
-						callback
-					)
-				}
-			} else callback(null, error)
+		when {
+			contract.isBTCSeries() -> transferBTCSeries(
+				paymentModel as PaymentBTCSeriesModel,
+				contract.getChainType(),
+				privateKey,
+				gasFee,
+				callback
+			)
+			else -> transferETHSeries(
+				paymentModel as PaymentDetailModel,
+				privateKey,
+				contract.getChainURL(),
+				gasFee,
+				callback
+			)
 		}
 	}
 
@@ -148,12 +137,6 @@ class GasSelectionPresenter(
 			System.currentTimeMillis(),
 			gasView.getMemo()
 		)
-	}
-
-	private fun String.checkDecimalIsValid(token: WalletDetailCellModel?): Boolean {
-		val isValid = isValidDecimal(token?.decimal.orZero())
-		if (!isValid) gasView.showError(Throwable(AlertText.transferWrongDecimal))
-		return isValid
 	}
 
 	private fun clearSelectedStatus(container: LinearLayout) {

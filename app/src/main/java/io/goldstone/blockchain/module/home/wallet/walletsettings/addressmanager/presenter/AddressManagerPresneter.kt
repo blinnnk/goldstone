@@ -27,6 +27,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.KeystoreInfo
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -187,7 +188,7 @@ class AddressManagerPresenter(
 		fun createETHSeriesAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.ETH) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
-					val mnemonic = JavaKeystoreUtil().decryptData(seed)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ethPath.substringBeforeLast("/") + "/" + newAddressIndex
 					val address = generateETHSeriesAddress(mnemonic, newChildPath).getAddress()
@@ -222,7 +223,7 @@ class AddressManagerPresenter(
 		fun createETCAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.ETC) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { seed ->
-					val mnemonic = JavaKeystoreUtil().decryptData(seed)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(seed)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.etcPath.substringBeforeLast("/") + "/" + newAddressIndex
 					val address = generateETHSeriesAddress(mnemonic, newChildPath).getAddress()
@@ -256,7 +257,7 @@ class AddressManagerPresenter(
 		fun createEOSAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.EOS) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { encryptMnemonic ->
-					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptMnemonic)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.eosPath.substringBeforeLast("/") + "/" + newAddressIndex
 					EOSWalletUtils.generateKeyPair(mnemonic, newChildPath).let { eosKeyPair ->
@@ -290,7 +291,7 @@ class AddressManagerPresenter(
 		fun createBTCAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.BTC) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { encryptMnemonic ->
-					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptMnemonic)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.btcPath.substringBeforeLast("/") + "/" + newAddressIndex
 					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
@@ -320,7 +321,7 @@ class AddressManagerPresenter(
 		fun createBTCTestAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.AllTest) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { encryptMnemonic ->
-					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptMnemonic)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.btcTestPath.substringBeforeLast("/") + "/" + newAddressIndex
 					BTCWalletUtils.getBitcoinWalletByMnemonic(mnemonic, newChildPath) { address, _ ->
@@ -364,7 +365,7 @@ class AddressManagerPresenter(
 		fun createBCHAddress(@UiThread hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.BCH) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { encryptMnemonic ->
-					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptMnemonic)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.bchPath.substringBeforeLast("/") + "/" + newAddressIndex
 					BCHWalletUtils.generateBCHKeyPair(mnemonic, newChildPath).let { bchKeyPair ->
@@ -394,7 +395,7 @@ class AddressManagerPresenter(
 		fun createLTCAddress(hold: (addresses: List<Bip44Address>) -> Unit) {
 			WalletTable.getLatestAddressIndex(ChainType.LTC) { wallet, childAddressIndex ->
 				wallet.encryptMnemonic?.let { encryptMnemonic ->
-					val mnemonic = JavaKeystoreUtil().decryptData(encryptMnemonic)
+					val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptMnemonic)
 					val newAddressIndex = childAddressIndex + 1
 					val newChildPath = wallet.ltcPath.substringBeforeLast("/") + "/" + newAddressIndex
 					LTCWalletUtils.generateBase58Keypair(

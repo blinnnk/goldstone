@@ -41,18 +41,18 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		this.addView(title)
 		title.centerInVertical()
 		radioButton = radioButton().apply {
-			x -= PaddingSize.device
 			isDefaultStyle(Spectrum.blue)
 			isClickable = false
 			alignParentRight()
 			centerInVertical()
 		}
+		setHorizontalPadding()
 		layoutParams.height = 50.uiPX()
 	}
 
 	override fun onAttachedToWindow() {
 		super.onAttachedToWindow()
-		if (icon.isNull()) title.x = PaddingSize.device.toFloat()
+		if (icon.isNull()) title.x = 0f
 	}
 
 	fun setSwitchStatusBy(isSelected: Boolean) {
@@ -65,7 +65,6 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 				layoutParams = RelativeLayout.LayoutParams(35.uiPX(), 35.uiPX())
 				addCorner(17.uiPX(), color)
 				elevation = 2.uiPX().toFloat()
-				x = PaddingSize.device.toFloat()
 			}
 			icon?.into(this)
 			icon?.centerInVertical()

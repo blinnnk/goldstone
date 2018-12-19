@@ -12,8 +12,11 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.view.ColumnSectionTitle
 import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.language.CommonText
@@ -24,6 +27,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.registerbysmartcontract.register.presenter.SmartContractRegisterPresenter
@@ -45,11 +49,11 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 
 	override val pageTitle: String
 		get() = getParentFragment<TokenDetailOverlayFragment>()?.token?.symbol?.symbol.orEmpty()
-	private val accountNameInput by lazy { RoundInput(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var accountNameInput: RoundInput
+	private lateinit var confirmButton: RoundButton
 	private var isValidAccountName = false
 	private val gridSessionTitle by lazy { ColumnSectionTitle(context!!) }
-	private val resourceCoast by lazy { GraySquareCell(context!!) }
+	private lateinit var resourceCoast: GraySquareCell
 	private var assignResources = listOf(
 		MutablePair("RAM (EOS)", "1.8"),
 		MutablePair("CPU (EOS)", "0.1"),
@@ -66,7 +70,8 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams(matchParent, matchParent)
 				DescriptionView(context).isRegisterBySmartContract().into(this)
-				accountNameInput.apply {
+				accountNameInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					title = ImportWalletText.eosAccountName
 					afterTextChanged = Runnable {
 						val checker = EOSAccount(getContent()).checker()
@@ -78,12 +83,12 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 							setValidStatus(false, checker.shortDescription)
 						}
 					}
-				}.into(this)
+				}
 				// 显示公钥地址
 				SessionTitleView(context).apply { setTitle(EOSAccountText.copyPublicKey) }.into(this)
 				valueView {
 					gravity = Gravity.CENTER
-					text = SharedAddress.getCurrentEOS()
+					setContent(SharedAddress.getCurrentEOS())
 				}.click {
 					it.context.clickToCopy(SharedAddress.getCurrentEOS())
 				}
@@ -94,7 +99,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 					showTitles(assignResources)
 				}.into(this)
 
-				resourceCoast.apply {
+				resourceCoast = graySquareCell {
 					if (NetworkUtil.hasNetwork()) presenter.getEOSCurrencyPrice { currency, error ->
 						if (currency.isNotNull() && error.isNone()) GlobalScope.launch(Dispatchers.Main) {
 							setSubtitle("2.0 EOS ≈ ${(2 * currency).formatCurrency() suffix SharedWallet.getCurrencyCode()}")
@@ -102,9 +107,9 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 					}
 					setTitle(EOSAccountText.estimatedSpentOfActiveAccount)
 					setSubtitle("2.0 EOS ${CommonText.calculating}")
-				}.into(this)
+				}
 
-				confirmButton.apply {
+				confirmButton = roundButton {
 					setBlueStyle(20.uiPX())
 					text = EOSAccountText.checkNameAvailability
 				}.click {
@@ -124,7 +129,7 @@ class SmartContractRegisterFragment : BaseFragment<SmartContractRegisterPresente
 						account.name.isEmpty() -> safeShowError(Throwable(EOSAccountText.checkNameResultEmpty))
 						else -> safeShowError(Throwable(EOSAccountText.checkNameResultInvalid))
 					}
-				}.into(this)
+				}
 			}
 		}
 	}

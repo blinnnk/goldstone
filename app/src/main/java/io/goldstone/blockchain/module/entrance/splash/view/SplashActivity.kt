@@ -77,6 +77,7 @@ class SplashActivity : AppCompatActivity() {
 		prepareAppConfig {
 			SharedValue.updatePincodeDisplayStatus(showPincode)
 			SharedWallet.updateCurrencyCode(currencyCode)
+			SharedValue.updateJSCode(jsCode)
 			// 如果本地的钱包数量不为空那么才开始注册设备
 			// 把 `GoldStoneID` 存储到 `SharePreference` 里面
 			SharedWallet.updateGoldStoneID(goldStoneID)
@@ -118,7 +119,8 @@ class SplashActivity : AppCompatActivity() {
 	@WorkerThread
 	private fun prepareNodeInfo(callback: () -> Unit) {
 		val chainDao = GoldStoneDataBase.database.chainNodeDao()
-		val eosTest = chainDao.getTestnetEOSNode()
+		val eosKylin = chainDao.getKylinEOSNode()
+		val eosJungle = chainDao.getJungleEOSNode()
 		val eosMain = chainDao.getMainnetEOSNode()
 		val allTestnetChains = chainDao.getUsedTestnet()
 		val allMainnetChains = chainDao.getUsedMainnet()
@@ -138,7 +140,8 @@ class SplashActivity : AppCompatActivity() {
 				ChainType(it.chainType).isBCH() -> SharedChain.updateBCHCurrent(ChainURL(it))
 				ChainType(it.chainType).isEOS() -> {
 					SharedChain.updateEOSCurrent(ChainURL(it))
-					SharedChain.updateEOSTestnet(ChainURL(eosTest))
+					SharedChain.updateKylinEOSTestnet(ChainURL(eosKylin))
+					SharedChain.updateJungleEOSTestnet(ChainURL(eosJungle))
 					SharedChain.updateEOSMainnet(ChainURL(eosMain))
 				}
 				ChainType(it.chainType).isETC() -> SharedChain.updateETCCurrent(ChainURL(it))
@@ -157,8 +160,7 @@ class SplashActivity : AppCompatActivity() {
 			} else {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
 				if (config.isRegisteredAddresses) {
-					val currentWallet =
-						WalletTable.dao.findWhichIsUsing(true)
+					val currentWallet = WalletTable.dao.findWhichIsUsing()
 					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
 				config.let(callback)

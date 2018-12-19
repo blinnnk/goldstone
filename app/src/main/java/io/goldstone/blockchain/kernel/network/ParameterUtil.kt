@@ -83,4 +83,14 @@ object ParameterUtil {
 		}
 		return "{${content.substringBeforeLast(",")}}"
 	}
+	fun <T> prepareObjectContent(params: List<Pair<String, T>>): String {
+		var content = ""
+		params.forEach {
+			val value = if (it.second is String) {
+				"\"${it.second}\""
+			} else it.second
+			content += "\"${it.first}\":$value,"
+		}
+		return "{${content.substringBeforeLast(",")}}"
+	}
 }

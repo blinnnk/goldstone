@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.TransactionDetailModel
-import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel.Companion.convertMultiToOrFromAddresses
 import org.jetbrains.anko.*
 
 
@@ -39,7 +38,7 @@ class TransactionAddressCardView(context: Context, addAction: (address: String) 
 						typeface = GoldStoneFont.black(context)
 						text = it.description
 					}
-					val addresses = convertMultiToOrFromAddresses(it.info)
+					val addresses = it.info.split(",")
 					addresses.forEach { address ->
 						buttonSquareCell {
 							val isExisted = contacts.any { contact ->

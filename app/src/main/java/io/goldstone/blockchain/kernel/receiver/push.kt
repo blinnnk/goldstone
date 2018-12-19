@@ -242,7 +242,7 @@ fun Context.registerDeviceForPush() {
 				}
 				// 在本地数据库记录 `Push Token`
 				val currentWallet =
-					WalletTable.dao.findWhichIsUsing(true)
+					WalletTable.dao.findWhichIsUsing()
 				XinGePushReceiver.registerAddressesForPush(currentWallet)
 			}
 		}

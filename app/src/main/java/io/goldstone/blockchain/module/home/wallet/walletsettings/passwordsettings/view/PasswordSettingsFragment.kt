@@ -9,13 +9,16 @@ import com.blinnnk.extension.setMargins
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.CreateWalletText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.passwordsettings.presenter.PasswordSettingsPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
@@ -30,44 +33,55 @@ import org.jetbrains.anko.verticalLayout
 class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.passwordSettings
-	private val oldPassword by lazy { RoundInput(context!!) }
-	private val newPassword by lazy { RoundInput(context!!) }
-	private val passwordHint by lazy { RoundInput(context!!) }
-	private val repeatPassword by lazy { RoundInput(context!!) }
-	val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var oldPassword: RoundInput
+	private lateinit var newPassword: RoundInput
+	private lateinit var passwordHint: RoundInput
+	private lateinit var repeatPassword: RoundInput
+	lateinit var confirmButton: RoundButton
 	override val presenter = PasswordSettingsPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
 		verticalLayout {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
-			oldPassword.apply {
+			oldPassword = roundInput {
+				horizontalPaddingSize = PaddingSize.gsCard
 				title = WalletSettingsText.oldPassword
 				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 40.uiPX() }
-			}.into(this)
+			}
+			oldPassword.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 40.uiPX()
+			}
 
-			newPassword.apply {
+			newPassword = roundInput {
+				horizontalPaddingSize = PaddingSize.gsCard
 				title = WalletSettingsText.newPassword
 				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-			}.into(this)
+			}
+			newPassword.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 10.uiPX()
+			}
 
-			repeatPassword.apply {
+			repeatPassword = roundInput {
+				horizontalPaddingSize = PaddingSize.gsCard
 				title = CreateWalletText.repeatPassword
 				setPasswordInput()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-			}.into(this)
+			}
+			repeatPassword.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 10.uiPX()
+			}
 
-			passwordHint.apply {
+			passwordHint = roundInput {
+				horizontalPaddingSize = PaddingSize.gsCard
 				title = CreateWalletText.hint
-				setMargins<LinearLayout.LayoutParams> { topMargin = 10.uiPX() }
-			}.into(this)
+			}
+			passwordHint.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 10.uiPX()
+			}
 
-			confirmButton.apply {
+			confirmButton = roundButton {
 				text = CommonText.confirm
-				setBlueStyle()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
+				setBlueStyle(15.uiPX())
 			}.click { button ->
 				button.showLoadingStatus()
 				presenter.checkOrUpdatePassword(
@@ -81,7 +95,7 @@ class PasswordSettingsFragment : BaseFragment<PasswordSettingsPresenter>() {
 						button.showLoadingStatus(false)
 					}
 				}
-			}.into(this)
+			}
 		}
 	}
 

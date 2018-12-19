@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.component.DescriptionView
 import io.goldstone.blockchain.common.component.SpaceSplitLine
 import io.goldstone.blockchain.common.component.ValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.buttonSquareCell
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
@@ -47,7 +48,7 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 
 	private lateinit var smartContractLink: TwoLineTitles
 	private lateinit var availableResultView: ValueView
-	private val copyResultButton by lazy { RoundButton(context!!) }
+	private lateinit var copyResultButton: RoundButton
 	override val presenter = SmartContractRegisterDetailPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -86,17 +87,17 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 				}
 				sessionTitle(EOSAccountText.memoInfo)
 				availableResultView = valueView {
-					text = accountName + "-" + SharedAddress.getCurrentEOS()
+					setContent(accountName + "-" + SharedAddress.getCurrentEOS())
 				}
 
-				copyResultButton.apply {
+				copyResultButton = roundButton {
 					setBlueStyle(20.uiPX())
 					text = EOSAccountText.copyResult
 				}.click {
 					availableResultView.apply {
 						context.clickToCopy(getContent())
 					}
-				}.into(this)
+				}
 			}
 		}
 	}
