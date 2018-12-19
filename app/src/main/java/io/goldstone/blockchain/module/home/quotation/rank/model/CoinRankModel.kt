@@ -19,5 +19,6 @@ class CoinRankModel(
 	val symbol: String,
 	val price: Float,
 	val rank: Int,
-	val icon: String
+	val icon: String,
+	val volume: String
 )

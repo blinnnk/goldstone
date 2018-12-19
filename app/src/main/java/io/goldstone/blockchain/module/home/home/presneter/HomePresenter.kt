@@ -10,6 +10,7 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAPPCenterFragme
 import io.goldstone.blockchain.module.home.home.view.HomeFragment
 import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
+import io.goldstone.blockchain.module.home.quotation.rank.view.CoinRankFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 
 /**
@@ -40,7 +41,7 @@ class HomePresenter(
 
 	fun showQuotationFragment() {
 		fragment.selectQuotation {
-			fragment.showOrAddFragment<QuotationFragment>(FragmentTag.quotation)
+			fragment.showOrAddFragment<CoinRankFragment>(FragmentTag.quotation)
 		}
 	}
 
