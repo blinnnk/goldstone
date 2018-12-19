@@ -182,6 +182,16 @@ object WalletText {
 		else -> ""
 	}
 
+	val eosKylin = when (currentLanguage) {
+		HoneyLanguage.English.code -> "EOS KYLIN"
+		HoneyLanguage.Chinese.code -> "EOS KYLIN 测试网"
+		HoneyLanguage.Japanese.code -> "EOS KYLIN"
+		HoneyLanguage.Korean.code -> "EOS KYLIN"
+		HoneyLanguage.Russian.code -> "EOS KYLIN"
+		HoneyLanguage.TraditionalChinese.code -> "EOS KYLIN 測試網"
+		else -> ""
+	}
+
 	@JvmField
 	val bchMainnet = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BCH Mainnet"
@@ -234,176 +244,4 @@ object WalletText {
 		else -> ""
 	}
 }
-
-object WalletNameText {
-	@JvmField
-	val Owl = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Owl"
-		HoneyLanguage.Chinese.code -> "猫头鹰"
-		HoneyLanguage.Japanese.code -> "フクロウ"
-		HoneyLanguage.Korean.code -> "올빼미"
-		HoneyLanguage.Russian.code -> "Сова"
-		HoneyLanguage.TraditionalChinese.code -> "貓頭鷹"
-		else -> ""
-	}
-	@JvmField
-	val Cat = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Cat"
-		HoneyLanguage.Chinese.code -> "招财猫"
-		HoneyLanguage.Japanese.code -> "ラッキーな猫"
-		HoneyLanguage.Korean.code -> "럭키 고양이"
-		HoneyLanguage.Russian.code -> "Счастливая кошка"
-		HoneyLanguage.TraditionalChinese.code -> "招財貓"
-		else -> ""
-	}
-	@JvmField
-	val Elephant = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Elephant"
-		HoneyLanguage.Chinese.code -> "象先生"
-		HoneyLanguage.Japanese.code -> "象"
-		HoneyLanguage.Korean.code -> "코끼리"
-		HoneyLanguage.Russian.code -> "слон"
-		HoneyLanguage.TraditionalChinese.code -> "象先生"
-		else -> ""
-	}
-	@JvmField
-	val Rhinoceros = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Rhinoceros"
-		HoneyLanguage.Chinese.code -> "鮨牛"
-		HoneyLanguage.Japanese.code -> "Rhinoceros"
-		HoneyLanguage.Korean.code -> "코뿔소"
-		HoneyLanguage.Russian.code -> "Носорог"
-		HoneyLanguage.TraditionalChinese.code -> "红犀牛"
-		else -> ""
-	}
-	@JvmField
-	val Frog = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Frog"
-		HoneyLanguage.Chinese.code -> "青蛙"
-		HoneyLanguage.Japanese.code -> "カエル"
-		HoneyLanguage.Korean.code -> "개구리"
-		HoneyLanguage.Russian.code -> "Лягушка"
-		HoneyLanguage.TraditionalChinese.code -> "青蛙"
-		else -> ""
-	}
-	@JvmField
-	val Koala = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Koala"
-		HoneyLanguage.Chinese.code -> "考拉宝宝"
-		HoneyLanguage.Japanese.code -> "コアラ"
-		HoneyLanguage.Korean.code -> "코알라"
-		HoneyLanguage.Russian.code -> "Коала"
-		HoneyLanguage.TraditionalChinese.code -> "考拉寶寶"
-		else -> ""
-	}
-	@JvmField
-	val Fox = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Fox"
-		HoneyLanguage.Chinese.code -> "火狐狸"
-		HoneyLanguage.Japanese.code -> "狐"
-		HoneyLanguage.Korean.code -> "여우"
-		HoneyLanguage.Russian.code -> "Лиса"
-		HoneyLanguage.TraditionalChinese.code -> "火狐狸"
-		else -> ""
-	}
-	@JvmField
-	val Monkey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Monkey"
-		HoneyLanguage.Chinese.code -> "猕猴"
-		HoneyLanguage.Japanese.code -> "モンキー"
-		HoneyLanguage.Korean.code -> "원숭이"
-		HoneyLanguage.Russian.code -> "Обезьяна"
-		HoneyLanguage.TraditionalChinese.code -> "獼猴"
-		else -> ""
-	}
-	@JvmField
-	val Giraffle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Giraffle"
-		HoneyLanguage.Chinese.code -> "长颈鹿"
-		HoneyLanguage.Japanese.code -> "キリン"
-		HoneyLanguage.Korean.code -> "기린"
-		HoneyLanguage.Russian.code -> "Жирафа"
-		HoneyLanguage.TraditionalChinese.code -> "長頸鹿"
-		else -> ""
-	}
-	@JvmField
-	val Penguin = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Penguin"
-		HoneyLanguage.Chinese.code -> "企鹅"
-		HoneyLanguage.Japanese.code -> "ペンギン"
-		HoneyLanguage.Korean.code -> "펭귄"
-		HoneyLanguage.Russian.code -> "пингвин"
-		HoneyLanguage.TraditionalChinese.code -> "企鵝"
-		else -> ""
-	}
-	@JvmField
-	val Wolf = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Wolf"
-		HoneyLanguage.Chinese.code -> "小灰狼"
-		HoneyLanguage.Japanese.code -> "狼"
-		HoneyLanguage.Korean.code -> "늑대"
-		HoneyLanguage.Russian.code -> "волк"
-		HoneyLanguage.TraditionalChinese.code -> "小灰狼"
-		else -> ""
-	}
-	@JvmField
-	val Bull = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Bull"
-		HoneyLanguage.Chinese.code -> "牛魔王"
-		HoneyLanguage.Japanese.code -> "ブル"
-		HoneyLanguage.Korean.code -> "황소"
-		HoneyLanguage.Russian.code -> "бык"
-		HoneyLanguage.TraditionalChinese.code -> "牛魔王"
-		else -> ""
-	}
-	@JvmField
-	val Leopard = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Leopard"
-		HoneyLanguage.Chinese.code -> "黑豹"
-		HoneyLanguage.Japanese.code -> "ヒョウ"
-		HoneyLanguage.Korean.code -> "표범"
-		HoneyLanguage.Russian.code -> "леопард"
-		HoneyLanguage.TraditionalChinese.code -> "黑豹"
-		else -> ""
-	}
-	@JvmField
-	val Deer = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Deer"
-		HoneyLanguage.Chinese.code -> "梅花鹿"
-		HoneyLanguage.Japanese.code -> "鹿"
-		HoneyLanguage.Korean.code -> "사슴"
-		HoneyLanguage.Russian.code -> "олень"
-		HoneyLanguage.TraditionalChinese.code -> "梅花鹿"
-		else -> ""
-	}
-	@JvmField
-	val Raccoon = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Raccoon"
-		HoneyLanguage.Chinese.code -> "小浣熊"
-		HoneyLanguage.Japanese.code -> "ラクーン"
-		HoneyLanguage.Korean.code -> "너구리"
-		HoneyLanguage.Russian.code -> "енот"
-		HoneyLanguage.TraditionalChinese.code -> "小浣熊"
-		else -> ""
-	}
-	@JvmField
-	val Lion = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Lion"
-		HoneyLanguage.Chinese.code -> "狮子王"
-		HoneyLanguage.Japanese.code -> "ライオン"
-		HoneyLanguage.Korean.code -> "사자"
-		HoneyLanguage.Russian.code -> "лев"
-		HoneyLanguage.TraditionalChinese.code -> "獅子王"
-		else -> ""
-	}
-	@JvmField
-	val Hippo = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Hippo"
-		HoneyLanguage.Chinese.code -> "河马"
-		HoneyLanguage.Japanese.code -> "カバ"
-		HoneyLanguage.Korean.code -> "하마"
-		HoneyLanguage.Russian.code -> "Бегемот"
-		HoneyLanguage.TraditionalChinese.code -> "河馬君"
-		else -> ""
-	}
 }

@@ -260,6 +260,17 @@ object ContactText {
 	}
 
 	@JvmField
+	val eosKylinHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter EOS Kylin address that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的 EOS Kylin 测试网账户名"
+		HoneyLanguage.Japanese.code -> "保存したい EOS Kylinテストネットワークアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장할 EOS Kylin 테스트 계정 이름을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите имя тестовой учетной записи EOS Kylin, которое вы хотите сохранить."
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的 EOS Kylin 測試網網賬戶名"
+		else -> ""
+	}
+
+	@JvmField
 	val btcMainnetAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Bitcoin Mainnet address that you want to store"
 		HoneyLanguage.Chinese.code -> "输入您要存储的比特币主网地址"
