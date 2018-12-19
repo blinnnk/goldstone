@@ -18,12 +18,12 @@ object ProfileText {
 	}
 	@JvmField
 	val dappCenter = when (currentLanguage) {
-		HoneyLanguage.English.code -> "DApp Center"
-		HoneyLanguage.Chinese.code -> "DApp Center"
-		HoneyLanguage.Japanese.code -> "DApp Center"
-		HoneyLanguage.Korean.code -> "DApp Center"
-		HoneyLanguage.Russian.code -> "DApp Center"
-		HoneyLanguage.TraditionalChinese.code -> "DApp Center"
+		HoneyLanguage.English.code->"Dapp Center"
+		HoneyLanguage.Chinese.code->"Dapp 中心"
+		HoneyLanguage.Japanese.code->"Dapp センター"
+		HoneyLanguage.Korean.code->"Dapp 센터"
+		HoneyLanguage.Russian.code->"DAPP Центр"
+		HoneyLanguage.TraditionalChinese.code->"Dapp 中心"
 		else -> ""
 	}
 	@JvmField
@@ -179,23 +179,23 @@ object ProfileText {
 
 	@JvmField
 	val fingerprintSettings = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Fingerprint Settings"
-		HoneyLanguage.Chinese.code -> "Fingerprint Settings"
-		HoneyLanguage.Japanese.code -> "Fingerprint Settings"
-		HoneyLanguage.Korean.code -> "Fingerprint Settings"
-		HoneyLanguage.Russian.code -> "Fingerprint Settings"
-		HoneyLanguage.TraditionalChinese.code -> "Fingerprint Settings"
+		HoneyLanguage.English.code->"Fingerprint payment"
+		HoneyLanguage.Chinese.code->"指纹支付"
+		HoneyLanguage.Japanese.code->"指紋支払い"
+		HoneyLanguage.Korean.code->"지문 지불"
+		HoneyLanguage.Russian.code->"Оплата отпечатков пальцев"
+		HoneyLanguage.TraditionalChinese.code->"指紋支付"
 		else -> ""
 	}
 
 	@JvmField
 	val fingerprintDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
-		HoneyLanguage.Chinese.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
-		HoneyLanguage.Japanese.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
-		HoneyLanguage.Korean.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
-		HoneyLanguage.Russian.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
-		HoneyLanguage.TraditionalChinese.code -> "Literally your fingerprint can replace the cash and plastic that we carry around on a daily basis. With added security and ease, MyTouch gives you the opportunity of linking your fingerprint to your methods of payment in a free and safe process.  "
+		HoneyLanguage.English.code->"After you open the fingerprint payment, you can confirm the transfer and signature by fingerprint. At the same time, you can still transfer or sign using the previously set password."
+		HoneyLanguage.Chinese.code->"开启指纹支付后，你可以通过指纹来确认转账及签名。同时您仍旧可以使用之前设置的密码来转账或签名。"
+		HoneyLanguage.Japanese.code->"指紋支払いを開いた後、指紋で転送と署名を確認することができます。 同時に、以前に設定したパスワードを使用して転送または署名することもできます。"
+		HoneyLanguage.Korean.code->"지문 지불을 시작하면 지문을 통해 전송 및 서명을 확인할 수 있습니다. 동시에 이전에 설정된 비밀번호를 사용하여 이전하거나 서명 할 수 있습니다."
+		HoneyLanguage.Russian.code->"После открытия оплаты по отпечатку пальца вы можете подтвердить перевод и подпись по отпечатку пальца. В то же время вы можете передавать или подписывать, используя ранее установленный пароль."
+		HoneyLanguage.TraditionalChinese.code->"開啟指紋支付後，你可以通過指紋來確認轉賬及簽名。同時您仍舊可以使用之前設置的密碼來轉賬或簽名。"
 		else -> ""
 	}
 
