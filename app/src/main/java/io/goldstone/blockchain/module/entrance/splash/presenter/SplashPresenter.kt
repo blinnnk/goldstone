@@ -8,7 +8,7 @@ import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.currentLanguage
-import io.goldstone.blockchain.common.sandbox.SandBoxUtil
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -52,7 +52,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		if (ExchangeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list).map { ExchangeTable(it) }
-			val sandboxMarketList = SandBoxUtil.getMarketList()
+			val sandboxMarketList = SandBoxManager.getMarketList()
 			if (sandboxMarketList.isNotEmpty()) {
 				localData.forEach {
 					if (sandboxMarketList.contains(it.marketId)) {
@@ -77,7 +77,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	@WorkerThread
 	fun initSupportCurrencyList(context: Context) {
 		if (SupportCurrencyTable.dao.rowCount() == 0) {
-			val sandboxCurrency = SandBoxUtil.getCurrency()
+			val sandboxCurrency = SandBoxManager.getCurrency()
 			var changedStatus = false // 是否设置了选中的status，只命中一次，如果从沙盒中获取到了，那么就不用默认的货币了
 			var baseNeedChangePosition = -1 // 需要将本地的默认货币更改状态的下标
 			val localCurrency =

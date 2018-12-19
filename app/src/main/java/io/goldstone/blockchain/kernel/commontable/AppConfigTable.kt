@@ -12,7 +12,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.R.raw.terms
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.sandbox.SandBoxUtil
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.utils.ApkUtil
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -72,7 +72,7 @@ data class AppConfigTable(
 
 		@SuppressLint("HardwareIds")
 		fun insertAppConfig(@WorkerThread callback: (AppConfigTable) -> Unit) {
-			val sandBoxModel = SandBoxUtil.getSandBoxModel()
+			val sandBoxModel = SandBoxManager.getSandBoxModel()
 			val config = AppConfigTable(
 				0,
 				frozenTime = 0L,

@@ -77,10 +77,12 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
-			frameLayout {
-				isFocusable = true
-				isFocusableInTouchMode = true
-				nestedScrollView {
+			nestedScrollView {
+				lparams(matchParent, matchParent)
+				verticalLayout {
+					isFocusableInTouchMode = true
+					isFocusable = true
+					descendantFocusability = FOCUS_BEFORE_DESCENDANTS
 					lparams(matchParent, matchParent)
 					verticalLayout {
 						lparams(matchParent, matchParent)

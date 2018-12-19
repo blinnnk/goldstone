@@ -7,7 +7,7 @@ import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
-import io.goldstone.blockchain.common.sandbox.SandBoxUtil
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -77,10 +77,7 @@ class QuotationPresenter(
 		}.toList().let { quotations ->
 			if (!hasCheckedPairDate) {
 				if (invalidDatePairs.size() == 0) {
-					SandBoxUtil.getQuotationPairs().forEach {
-						invalidDatePairs.add(it)
-					}
-					getSandboxPairs(invalidDatePairs) {
+					SandBoxManager.updateSelectionsFromSandboxPairs {
 						updateData()
 					}
 					return
@@ -89,8 +86,8 @@ class QuotationPresenter(
 					launchUI {
 						updateData()
 					}
-					hasCheckedPairDate = true
 				}
+				hasCheckedPairDate = true
 			}
 			
 			launchUI {
@@ -132,32 +129,6 @@ class QuotationPresenter(
 		/** 服务端传入的最近的时间会做 `减1` 处理, 从服务器获取的事件是昨天的事件. */
 		val maxDate = maxBy { it.label.toLong() }?.label?.toLongOrNull() ?: 0L
 		if (maxDate < 0.daysAgoInMills()) invalidDatePairs.add(pair)
-	}
-	
-	private fun getSandboxPairs(pairList: JsonArray, @WorkerThread callback: () -> Unit) {
-		GoldStoneAPI.getPairsByExactKey(pairList) { selectionTables, error ->
-			if (selectionTables != null && error.isNone()) {
-				if (selectionTables.isNotEmpty()) {
-					GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChartDataSet, lineChartError ->
-						if (lineChartDataSet != null && lineChartError.isNone()) {
-							lineChartDataSet.forEach { lineChartData ->
-								selectionTables.find { it.pair ==  lineChartData.pair}?.apply {
-									QuotationSelectionTable.insertSelection(
-										QuotationSelectionTable(
-											this,
-											lineChartData.pointList.toString(),
-											true
-										)
-									)
-								}
-							}
-							callback()
-						}
-					}
-				}
-				
-			}
-		}
 	}
 
 	private fun updateInvalidDatePair(pairList: JsonArray, @WorkerThread callback: () -> Unit) {

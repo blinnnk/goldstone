@@ -2,9 +2,12 @@
 
 package io.goldstone.blockchain.common.sandbox
 
+import android.support.annotation.WorkerThread
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import java.io.*
 import java.lang.Exception
 
@@ -13,7 +16,7 @@ import java.lang.Exception
  * @author: yangLiHai
  * @description:
  */
-object SandBoxUtil {
+object SandBoxManager {
 	private val storagePath = GoldStoneApp.appContext.getExternalFilesDir(null).absolutePath
 	private const val sandBoxName = "sandbox"
 	
@@ -81,14 +84,44 @@ object SandBoxUtil {
 		updateSandBoxModel(model)
 	}
 	
-	fun getQuotationPairs(): List<String> {
-		return getSandBoxModel().quotationPairs
-	}
-	
 	fun updateQuotationPairs(newPairs: List<String>) {
 		val model = getSandBoxModel()
 		model.quotationPairs = newPairs
 		updateSandBoxModel(model)
+	}
+	
+	
+	fun updateSelectionsFromSandboxPairs( @WorkerThread callback: () -> Unit) {
+		val pairList = JsonArray().apply {
+			getSandBoxModel().quotationPairs.forEach { add(it) }
+		}
+		if (pairList.size() == 0) {
+			callback()
+			return
+		}
+		GoldStoneAPI.getPairsByExactKey(pairList) { selectionTables, error ->
+			if (selectionTables != null && error.isNone()) {
+				if (selectionTables.isNotEmpty()) {
+					GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChartDataSet, lineChartError ->
+						if (lineChartDataSet != null && lineChartError.isNone()) {
+							lineChartDataSet.forEach { lineChartData ->
+								selectionTables.find { it.pair ==  lineChartData.pair}?.apply {
+									QuotationSelectionTable.insertSelection(
+										QuotationSelectionTable(
+											this,
+											lineChartData.pointList.toString(),
+											true
+										)
+									)
+								}
+							}
+							callback()
+						}
+					}
+				}
+				
+			}
+		}
 	}
 	
 	
