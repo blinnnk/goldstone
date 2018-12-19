@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.present
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getDecimalCount
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import com.blinnnk.util.load
 import com.blinnnk.util.then
@@ -12,6 +15,7 @@ import io.goldstone.blockchain.common.error.*
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -119,26 +123,20 @@ class PaymentDetailPresenter(
 				usePasswordEvent = {
 					PaymentDetailPresenter.getPrivatekeyByPassword(context, ChainType.EOS, hold = hold)
 				}
-			) { cipher, error ->
+			) { cipher ->
 				load {
 					WalletTable.dao.getEncryptFingerprintKey()
 				} then { encryptKey ->
-					val decryptKey = when {
-						cipher.isNotNull() && error.isNone() ->
-							JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).decryptData(encryptKey!!)
-						cipher.isNull() && error.isNone() ->
-							JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptKey!!)
-						else -> null
+					val decryptKey =
+						if (cipher.isNotNull()) JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).decryptData(encryptKey!!)
+						else JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptKey!!)
+					PrivateKeyExportPresenter.getPrivateKeyByRootData(
+						chainType.getContract().getAddress(false),
+						chainType,
+						decryptKey
+					) {
+						hold(it, GoldStoneError.None)
 					}
-					if (decryptKey.isNotNull()) {
-						PrivateKeyExportPresenter.getPrivateKeyByRootData(
-							chainType.getContract().getAddress(false),
-							chainType,
-							decryptKey
-						) {
-							hold(it, GoldStoneError.None)
-						}
-					} else hold(null, error)
 				}
 			}
 		}
@@ -158,7 +156,7 @@ class PaymentDetailPresenter(
 					cancelAction = {
 						GlobalScope.launch(Dispatchers.Default) {
 							hold(null, AccountError.None)
-							cancelEvent()
+							launchUI(cancelEvent)
 						}
 					}
 				) { passwordInput ->

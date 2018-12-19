@@ -26,7 +26,9 @@ class DAPPListPresenter(
 			when (type) {
 				DAPPType.New -> DAPPTable.dao.getAll(DataValue.dappPageCount)
 				// 本地的数据加载全部
-				DAPPType.Latest -> DAPPTable.dao.getUsed(999)
+				DAPPType.Latest -> {
+					DAPPTable.dao.getUsed(20)
+				}
 				DAPPType.Recommend -> DAPPTable.dao.getRecommended(DataValue.dappPageCount)
 				else -> throw Throwable("Wrong DAPP Type")
 			}
@@ -49,7 +51,7 @@ class DAPPListPresenter(
 					hold(data)
 				} else view.showError(error)
 			}
-			else -> return
+			else -> hold(listOf())
 		}
 	}
 }

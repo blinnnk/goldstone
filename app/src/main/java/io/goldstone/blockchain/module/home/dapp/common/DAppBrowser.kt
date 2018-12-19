@@ -35,6 +35,7 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI.getStringAccountInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import kotlinx.coroutines.Dispatchers
@@ -142,7 +143,7 @@ class DAPPBrowser(
 		fun getIdentity(data: String) {
 			Log.d("getIdentity", data)
 			GlobalScope.launch(Dispatchers.Default) {
-				val identity = "{ accounts: [{ \"authority\": \"active\", \"blockchain\": 'eos', \"name\": \"${account.name}\" }] }"
+				val identity = "{ accounts: [{ \"authority\": \"active\", \"blockchain\": \"eos\", \"name\": \"${account.name}\" }] }"
 				delay(1000L)
 				launchUI {
 					evaluateJavascript("javascript:(function(){scatter.getIdentityResult=${JSONObject(identity)}})()", null)
@@ -150,24 +151,22 @@ class DAPPBrowser(
 			}
 		}
 
+		/** *
+		 * 这里遇到了有些 DAPP 传入的是  {"account_name":"beautifulleo"}
+		 * 有些直接传入了 "\"beautifulleo\""
+		 */
 		@JavascriptInterface
-		fun getEOSAccountInfo(accountName: String) {
-			launchUI {
-				val accountObject = try {
-					JSONObject(accountName)
-				} catch (error: Exception) {
-					evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
-					println("GoldStone-DAPP Get AccountERROR: ${error.message}\n DATA: $accountName")
-					return@launchUI
-				}
-				// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
-				EOSAPI.getStringAccountInfo(EOSAccount(accountObject.safeGet("account_name"))) { accountInfo, error ->
-					launchUI {
-						if (accountInfo.isNotNull() && error.isNone()) {
-							evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
-						} else {
-							evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
-						}
+		fun getEOSAccountInfo(account: String) {
+			val accountName =
+				if (account.contains("{")) JSONObject(account).safeGet("account_name")
+				else account.replace("\"", "")
+			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+			getStringAccountInfo(EOSAccount(accountName)) { accountInfo, error ->
+				launchUI {
+					if (accountInfo.isNotNull() && error.isNone()) {
+						evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
+					} else {
+						evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
 					}
 				}
 			}
@@ -521,6 +520,7 @@ class DAPPBrowser(
 		fun backEvent(callback: () -> Unit) {
 			evaluateJavascript("javascript:backEvent()") {
 				if (it.equals("\"finished\"", true)) callback()
+				else callback()
 			}
 		}
 	}
