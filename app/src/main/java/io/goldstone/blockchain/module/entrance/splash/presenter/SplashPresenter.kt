@@ -52,14 +52,7 @@ class SplashPresenter(val activity: SplashActivity) {
 		if (ExchangeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list).map { ExchangeTable(it) }
-			val sandboxMarketList = SandBoxManager.getMarketList()
-			if (sandboxMarketList.isNotEmpty()) {
-				localData.forEach {
-					if (sandboxMarketList.contains(it.marketId)) {
-						it.isSelected = true
-					}
-				}
-			}
+			SandBoxManager.notifyDefaultMarketSelected(localData)
 			ExchangeTable.dao.insertAll(localData)
 		}
 	}

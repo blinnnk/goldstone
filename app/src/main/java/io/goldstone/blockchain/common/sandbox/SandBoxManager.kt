@@ -7,6 +7,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import java.io.*
 import java.lang.Exception
@@ -34,7 +35,7 @@ object SandBoxManager {
 		val inputStream = FileInputStream(getFile())
 		val buffer = ByteArray(size = 1024)
 		var length = inputStream.read(buffer)
-		while(length > 0){
+		while(length > 0) {
 			stringBuilder.append(String(buffer, 0, length))
 			length = inputStream.read(buffer)
 		}
@@ -54,10 +55,6 @@ object SandBoxManager {
 		outputStream.close()
 	}
 	
-	fun getLanguage(): Int {
-		return getSandBoxModel().language
-	}
-	
 	fun updateLanguage(language: Int) {
 		val model = getSandBoxModel()
 		model.language = language
@@ -74,9 +71,17 @@ object SandBoxManager {
 		updateSandBoxModel(model)
 	}
 	
-	fun getMarketList(): List<Int> {
-		return getSandBoxModel().marketList
+	fun notifyDefaultMarketSelected(defaultMarketList: List<ExchangeTable>) {
+		val sandboxMarketList = getSandBoxModel().marketList
+		if (sandboxMarketList.isNotEmpty()) {
+			defaultMarketList.forEach {
+				if (sandboxMarketList.contains(it.marketId)) {
+					it.isSelected = true
+				}
+			}
+		}
 	}
+	
 	
 	fun updateMarketList(newMarketList: List<Int>) {
 		val model = getSandBoxModel()
