@@ -27,12 +27,14 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.presenter.KeystoreExportPresenter
 import io.goldstone.blockchain.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import org.jetbrains.anko.AnkoContext
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.wrapContent
 
 /**
  * @date 06/04/2018 1:46 AM
@@ -41,7 +43,7 @@ import org.jetbrains.anko.verticalLayout
 class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 
 	override val pageTitle: String = WalletSettingsText.exportKeystore
-	private lateinit var privateKeyTextView: ValueView
+	private lateinit var privateKeyValue: ValueView
 	private lateinit var passwordInput: RoundInput
 	private lateinit var confirmButton: RoundButton
 	override val presenter = KeystoreExportPresenter(this)
@@ -51,11 +53,10 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 			gravity = Gravity.CENTER_HORIZONTAL
 			lparams(matchParent, matchParent)
 			DescriptionView(context).isExportKeyStore().into(this)
-			privateKeyTextView = valueView {
-				layoutParams.height = 200.uiPX()
+			privateKeyValue = valueView {
+				layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 150.uiPX())
 			}.click {
-				// 如果 `textView` 的内容不是默认的 `placeholder` 就可以支持点击复制
-				if (it.getContent().isNotEmpty()) context.clickToCopy(it.getContent())
+				context.clickToCopy(privateKeyValue.getContent())
 			}
 
 			passwordInput = roundInput {
@@ -75,7 +76,7 @@ class KeystoreExportFragment : BaseFragment<KeystoreExportPresenter>() {
 				presenter.getKeystoreJSON(passwordInput.text.toString()) { keystoreFile, error ->
 					launchUI {
 						if (keystoreFile.isNotNull() && error.isNone()) {
-							privateKeyTextView.setContent(keystoreFile)
+							privateKeyValue.setContent(keystoreFile)
 						} else safeShowError(error)
 						button.showLoadingStatus(false)
 					}

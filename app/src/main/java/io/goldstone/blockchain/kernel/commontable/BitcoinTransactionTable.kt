@@ -57,7 +57,7 @@ data class BTCSeriesTransactionTable(
 		data.safeGet("time"),
 		data.safeGet("txid"),
 		getFromAddress(data),
-		getToAddresses(data).toString(),
+		getToAddresses(data).joinToString(",") { it },
 		myAddress,
 		isReceive(getFromAddress(data), myAddress),
 		getTransactionValue(data, myAddress),

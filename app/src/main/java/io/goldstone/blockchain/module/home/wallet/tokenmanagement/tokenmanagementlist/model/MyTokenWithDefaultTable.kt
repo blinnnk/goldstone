@@ -38,25 +38,12 @@ data class MyTokenWithDefaultTable(
 	companion object {
 		@WorkerThread
 		fun getMyDefaultTokens(hold: (List<WalletDetailCellModel>) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
-			val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@launch
+			val wallet = WalletTable.dao.findWhichIsUsing() ?: return@launch
 			val addresses = wallet.getCurrentAddresses(true)
 			val eosWalletType = wallet.getEOSWalletType()
 			val data =
 				GoldStoneDataBase.database.myTokenDefaultTableDao().getData(addresses)
 			hold(data.map { WalletDetailCellModel(it, eosWalletType) })
-		}
-
-		@UiThread
-		fun getTarget(ownerNames: String, symbol: String, chainID: String, hold: (WalletDetailCellModel) -> Unit) = GlobalScope.launch(Dispatchers.Default) {
-			GlobalScope.launch(Dispatchers.Default) {
-				val wallet = WalletTable.dao.findWhichIsUsing(true) ?: return@launch
-				val eosWalletType = wallet.getEOSWalletType()
-				val data =
-					GoldStoneDataBase.database.myTokenDefaultTableDao().getTarget(ownerNames, symbol, chainID)
-				launchUI {
-					hold(WalletDetailCellModel(data, eosWalletType))
-				}
-			}
 		}
 	}
 }

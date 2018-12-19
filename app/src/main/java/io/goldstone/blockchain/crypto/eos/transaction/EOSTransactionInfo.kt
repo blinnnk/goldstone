@@ -103,7 +103,7 @@ data class EOSTransactionInfo(
 	// 转不同的币需要标记 `Decimal` 不然会转账失败, 这里面会有检查函数
 	// 故在此传入 Decimal
 	fun trade(
-		context: Context?,
+		context: Context,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		if (!toAccount.isValid(false)) {
@@ -116,7 +116,7 @@ data class EOSTransactionInfo(
 				StakeType.Trade
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
-					transfer(privateKey, hold)
+					transfer(EOSPrivateKey(privateKey), hold)
 				} else hold(null, error)
 			}
 		}
@@ -132,7 +132,7 @@ data class EOSTransactionInfo(
 			contract,
 			SharedChain.getEOSCurrent().chainID
 		) {
-			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
+			val dataIndex = if (it.isNull()) 0 else it + 1
 			val transaction = EOSTransactionTable(this, response, dataIndex)
 			EOSTransactionTable.dao.insert(transaction)
 			callback()

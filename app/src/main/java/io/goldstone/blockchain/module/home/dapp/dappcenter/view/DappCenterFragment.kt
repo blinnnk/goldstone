@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into

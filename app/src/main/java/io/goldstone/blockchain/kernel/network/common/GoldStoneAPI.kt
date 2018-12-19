@@ -20,6 +20,7 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
 import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.model.ETCTransactionModel
 import io.goldstone.blockchain.kernel.commontable.model.ServerConfigModel
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -528,6 +529,19 @@ object GoldStoneAPI {
 			isEncrypt = true,
 			hold = hold
 		)
+	}
+
+	fun getDAPPJSCode(
+		@WorkerThread hold: (data: String?, error: RequestError) -> Unit
+	) {
+		requestData<String>(
+			APIPath.getDAPPJSCode(APIPath.currentUrl),
+			"data",
+			true,
+			isEncrypt = true
+		) { result, error ->
+			hold(result?.firstOrNull(), error)
+		}
 	}
 
 	fun searchDAPP(

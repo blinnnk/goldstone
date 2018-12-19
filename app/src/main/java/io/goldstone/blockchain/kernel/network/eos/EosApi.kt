@@ -312,6 +312,25 @@ object EOSAPI {
 		}
 	}
 
+	/** 这个方法直接返回链数据没有做任何处理, 服务 `Scatter` 的调用 */
+	fun getCurrencyBalance(
+		account: EOSAccount,
+		symbol: CoinSymbol,
+		code: String,
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(
+				Pair("code", code),
+				Pair("account", account.name),
+				Pair("symbol", symbol.symbol)
+			),
+			EOSUrl.getAccountEOSBalance(),
+			false,
+			hold
+		)
+	}
+
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountResource(
 		account: EOSAccount,

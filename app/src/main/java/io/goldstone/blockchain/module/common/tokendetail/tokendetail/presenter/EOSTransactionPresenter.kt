@@ -52,7 +52,9 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 			) { data, error ->
 				if (data?.isNotEmpty() == true && error.isNone()) {
 					dao.insertAll(data.mapIndexed { index, eosTransactionTable ->
-						eosTransactionTable.apply { dataIndex = currentMaxCount.orZero() - (index + 1) }
+						eosTransactionTable.apply {
+							dataIndex = currentMaxCount.orZero() - (index + 1)
+						}
 					})
 					flipPage(data.plus(localData), callback)
 					currentMaxCount = currentMaxCount.orZero() - pageSize
@@ -82,7 +84,6 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 			localData.size < DataValue.pageCount
 				&& localData.size != totalCount
 				&& localData.minBy { it.dataIndex }?.dataIndex ?: 0 > 1 -> {
-				val pageSize = DataValue.pageCount - localData.size
 				loadTargetRangeData(
 					// 本地片段存在不足的情况
 					if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
@@ -93,7 +94,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 						token.symbol.symbol,
 						codeName
 					)?.serverID ?: 0L,
-					pageSize
+					DataValue.pageCount
 				)
 			}
 			// 本地有数据
@@ -117,8 +118,8 @@ fun TokenDetailPresenter.getEOSSeriesData() {
 			chainID
 		) {
 			launchUI {
-				totalCount = it?.dataIndex
-				currentMaxCount = it?.dataIndex
+				totalCount = it
+				currentMaxCount = it
 				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
 				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
 				detailView.getDetailAdapter()?.dataSet?.clear()

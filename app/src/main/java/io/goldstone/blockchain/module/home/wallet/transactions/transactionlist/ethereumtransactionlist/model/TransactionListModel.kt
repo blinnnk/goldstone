@@ -199,16 +199,6 @@ data class TransactionListModel(
 			return formattedAddresses
 		}
 
-		fun convertMultiToOrFromAddresses(content: String): List<String> {
-			return if (content.contains("[")) {
-				if (content.contains(","))
-					content.substring(1, content.lastIndex).split(",")
-				else listOf(content.substring(1, content.lastIndex))
-			} else {
-				listOf(content)
-			}
-		}
-
 		fun generateTransactionURL(taxHash: String, contract: TokenContract, isEOSSeries: Boolean): List<String> {
 			return when {
 				contract.isETC() ->

@@ -107,6 +107,11 @@ object APIPath {
 		"$header/dapp/getDapps?page=$pageIndex&size=$pageSize"
 	}
 
+	// 从服务器动态更新注入 `Scatter` 的 `JS Code`
+	val getDAPPJSCode: (header: String) -> String = { header ->
+		"$header/index/getJSCode"
+	}
+
 	val searchDAPP: (header: String, condition: String) -> String = { header, condition ->
 		"$header/dapp/searchDapp?dapp=$condition"
 	}
