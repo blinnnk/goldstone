@@ -415,4 +415,27 @@ object EosResourceErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "您的內存(RAM)餘額不足以激活新賬號。"
 		else -> ""
 	}
+
+	@JvmField
+	val cpuNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your CPU balance is insufficient."
+		HoneyLanguage.Chinese.code -> "您的 CPU (计算) 余额不足。"
+		HoneyLanguage.Japanese.code -> "CPU（計算）の残高が不足しています。"
+		HoneyLanguage.Korean.code -> "CPU (계산) 잔액이 부족합니다."
+		HoneyLanguage.Russian.code -> "Ваш CPU (расчетный) баланс недостаточен."
+		HoneyLanguage.TraditionalChinese.code -> "您的 CPU (計算) 餘額不足。"
+		else -> ""
+	}
+
+	@JvmField
+	val netNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your NET balance is insufficient."
+		HoneyLanguage.Chinese.code -> "您的 NET (计算) 余额不足。"
+		HoneyLanguage.Japanese.code -> "NET（計算）の残高が不足しています。"
+		HoneyLanguage.Korean.code -> "NET (계산) 잔액이 부족합니다."
+		HoneyLanguage.Russian.code -> "Ваш NET (расчетный) баланс недостаточен."
+		HoneyLanguage.TraditionalChinese.code -> "您的 NET (計算) 餘額不足。"
+		else -> ""
+	}
+
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.language.ChainErrorText
+import io.goldstone.blockchain.common.language.EosResourceErrorText
 import io.goldstone.blockchain.common.language.TransactionErrorText
 import io.goldstone.blockchain.common.thread.launchUI
 
@@ -47,6 +48,14 @@ class ErrorDisplayManager(error: Throwable) {
 
 				errorMessage.contains("insufficient staked", true) -> {
 					"target account doesn't have enough bandwidth to refund"
+				}
+				// EOS交易时CPU不足
+				errorMessage.contains("tx_cpu_usage_exceeded", true) -> {
+					EosResourceErrorText.cpuNotEnough
+				}
+				// EOS交易时CPU不足
+				errorMessage.contains("tx_net_usage_exceeded", true) -> {
+					EosResourceErrorText.netNotEnough
 				}
 				else -> error.message
 			}
