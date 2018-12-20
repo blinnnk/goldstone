@@ -49,11 +49,22 @@ object DialogText {
 	@JvmField
 	val mobileNetwork = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Mobile Network"
-		HoneyLanguage.Chinese.code->"手机网络"
-		HoneyLanguage.Japanese.code->"モバイルネットワーク"
-		HoneyLanguage.Korean.code->"모바일 네트워크"
-		HoneyLanguage.Russian.code->"Мобильная сеть"
-		HoneyLanguage.TraditionalChinese.code->"手機網絡"
+		HoneyLanguage.Chinese.code -> "手机网络"
+		HoneyLanguage.Japanese.code -> "モバイルネットワーク"
+		HoneyLanguage.Korean.code -> "모바일 네트워크"
+		HoneyLanguage.Russian.code -> "Мобильная сеть"
+		HoneyLanguage.TraditionalChinese.code -> "手機網絡"
+		else -> ""
+	}
+
+	@JvmField
+	val mobileNetworkDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Are you willing to update resources in 4g environment?"
+		HoneyLanguage.Chinese.code -> "您正在使用手机网络，您是否愿意使用手机网络更新数据？"
+		HoneyLanguage.Japanese.code -> "モバイルネットワーク"
+		HoneyLanguage.Korean.code -> "모바일 네트워크"
+		HoneyLanguage.Russian.code -> "Мобильная сеть"
+		HoneyLanguage.TraditionalChinese.code -> "手機網絡"
 		else -> ""
 	}
 
