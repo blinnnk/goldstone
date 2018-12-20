@@ -71,12 +71,12 @@ class TokenAssetPresenter(
 
 	override fun getLatestActivationDate(contract: TokenContract, hold: (String) -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
-			val time = EOSTransactionTable.dao.getMaxDataIndex(
+			val time = EOSTransactionTable.dao.getMaxDataIndexTime(
 				account.name,
 				contract.contract,
 				contract.symbol,
 				chainID.id
-			)?.time
+			)
 			launchUI {
 				if (time.isNotNull()) hold(HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText()))
 				else hold(CommonText.calculating)

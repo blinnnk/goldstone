@@ -14,11 +14,11 @@ interface DAppCenterContract {
 		fun showRecommendDAPP(data: ArrayList<DAPPTable>)
 		fun showAllDAPP(data: ArrayList<DAPPTable>)
 		fun showLatestUsed(data: ArrayList<DAPPTable>)
+		fun refreshLatestUsed()
+		fun showRecommendedSession(count: Int)
 	}
 
 	interface GSPresenter : GoldStonePresenter {
 		fun setUsedDAPPs()
-		fun getDAPPUsedStatus(dappID: String, hold: (Boolean) -> Unit)
-		fun updateDAPPUsedStatus(dappID: String)
 	}
 }

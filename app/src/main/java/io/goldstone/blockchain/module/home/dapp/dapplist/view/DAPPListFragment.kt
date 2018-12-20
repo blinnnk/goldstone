@@ -15,6 +15,7 @@ import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
+import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAPPCenterFragment
 import io.goldstone.blockchain.module.home.dapp.dapplist.contract.DAPPListContract
 import io.goldstone.blockchain.module.home.dapp.dapplist.event.DAPPListDisplayEvent
 import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
@@ -56,7 +57,10 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 
 	@Subscribe(threadMode = ThreadMode.POSTING)
 	fun updateDisplayEvent(displayEvent: DAPPListDisplayEvent) {
-		if (displayEvent.isShown) getMainActivity()?.showChildFragment(this)
+		if (displayEvent.isShown) {
+			getMainActivity()?.showChildFragment(this)
+			recoveryBackEvent()
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,9 +85,7 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 			presenter.loadMore(pageIndex, type!!) { newData ->
 				noMoreData = newData.size < DataValue.dappPageCount
 				if (newData.isEmpty()) {
-					launchUI {
-						showBottomLoading(false)
-					}
+					showBottomLoading(false)
 					return@loadMore
 				}
 				// 如果初始化的页面有数据, 但是不足一页的数量, 那么清楚内存数据
@@ -112,11 +114,17 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 				bottomLoadingView = it
 			},
 			clickEvent = {
-				getMainActivity()?.showDappBrowserFragment(
-					it,
-					PreviousView.DAPPList,
-					this
-				)
+				DAPPCenterFragment.showAttentionOrElse(context!!, it.id) {
+					getMainActivity()?.apply {
+						showDappBrowserFragment(
+							it.url,
+							PreviousView.DAPPList,
+							it.backgroundColor,
+							this@DAPPListFragment
+						)
+						getDAPPCenterFragment()?.presenter?.setUsedDAPPs()
+					}
+				}
 			}
 		)
 	}
@@ -125,7 +133,7 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 		ErrorDisplayManager(error).show(context)
 	}
 
-	private fun showBottomLoading(status: Boolean) {
+	private fun showBottomLoading(status: Boolean) = launchUI {
 		if (status) bottomLoadingView?.show()
 		else {
 			isLoadingData = false

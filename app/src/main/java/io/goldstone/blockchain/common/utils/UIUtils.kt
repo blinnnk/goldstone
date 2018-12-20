@@ -19,7 +19,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.TinyNumberUtils
 import com.blinnnk.util.getSystemModel
 import io.goldstone.blockchain.GoldStoneApp
-import io.goldstone.blockchain.common.language.WalletNameText
+import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
@@ -54,9 +54,9 @@ object UIUtils {
 
 	fun generateDefaultName(): String {
 		val walletID =
-			if (SharedWallet.getMaxWalletID() == 100) 0
-			else SharedWallet.getMaxWalletID()
-		return "$walletID"
+			if (SharedWallet.getMaxWalletID() == 100) 1
+			else SharedWallet.getMaxWalletID() + 1
+		return "${WalletText.wallet} $walletID"
 	}
 }
 

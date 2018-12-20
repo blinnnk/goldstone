@@ -106,9 +106,11 @@ object ShadowSize {
 
 object PaddingSize {
 	@JvmField
-	val device = 15.uiPX()
+	val device = 10.uiPX()
 	@JvmField
-	val content = 10.uiPX()
+	val gsCard = 5.uiPX()
+	@JvmField
+	val content = 15.uiPX()
 	@JvmField
 	val overlay = 15.uiPX()
 	@JvmField
@@ -135,7 +137,7 @@ object BorderSize {
 
 object ScreenSize {
 	@JvmStatic
-	val card = Resources.getSystem().displayMetrics.widthPixels - 10.uiPX() * 2
+	val card = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.gsCard * 2
 	@JvmStatic
 	val widthWithPadding = Resources.getSystem().displayMetrics.widthPixels - PaddingSize.device * 2
 	@JvmStatic

@@ -29,11 +29,8 @@ data class EOSAction(
 
 	companion object {
 		fun createMultiActionObjects(vararg actions: EOSAction): String {
-			var actionObjects = ""
-			actions.forEach {
-				actionObjects += it.createObject() + ","
-			}
-			return "[${actionObjects.substringBeforeLast(",")}]"
+			val actionObjects = actions.joinToString(",") { it.createObject() }
+			return "[$actionObjects]"
 		}
 	}
 }

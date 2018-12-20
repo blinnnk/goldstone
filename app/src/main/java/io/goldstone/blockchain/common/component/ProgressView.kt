@@ -12,7 +12,7 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.convertToDiskUnit
-import io.goldstone.blockchain.common.utils.convertToTimeUnit
+import io.goldstone.blockchain.common.utils.musTimeStampConverter
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -101,7 +101,7 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 	fun setLeftValue(value: BigInteger, description: String, type: ProcessType) {
 		leftValue = value
 		val convertedValue = when (type) {
-			ProcessType.Time -> value.convertToTimeUnit()
+			ProcessType.Time -> value.musTimeStampConverter()
 			ProcessType.Disk -> value.convertToDiskUnit()
 			else -> value.toString()
 		}
@@ -114,7 +114,7 @@ class ProgressView(context: Context) : RelativeLayout(context) {
 	fun setRightValue(value: BigInteger, description: String, type: ProcessType) {
 		rightValue = value
 		val convertedValue = when (type) {
-			ProcessType.Time -> value.convertToTimeUnit()
+			ProcessType.Time -> value.musTimeStampConverter()
 			ProcessType.Disk -> value.convertToDiskUnit()
 			else -> value.toString()
 		}

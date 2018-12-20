@@ -58,7 +58,7 @@ class ProfilePresenter(
 				),
 				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
-				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
+				ProfileModel(R.drawable.fingerprint_icon, ProfileText.fingerprintSettings, ""),
 				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
 				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
 				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),

@@ -13,6 +13,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
@@ -41,7 +42,7 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 
 	override val pageTitle: String = CreateWalletText.mnemonicConfirmation
 	private val mnemonicCode by lazy { arguments?.getString(ArgumentKey.mnemonicCode) }
-	private val confirmButton by lazy { RoundButton(context!!) }
+	private lateinit var confirmButton: RoundButton
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
 	private val attentionTextView by lazy { AttentionTextView(context!!) }
 	override val presenter = MnemonicConfirmationPresenter(this)
@@ -94,13 +95,13 @@ class MnemonicConfirmationFragment : BaseFragment<MnemonicConfirmationPresenter>
 				}
 			}
 
-			confirmButton.apply {
+			confirmButton = roundButton {
 				text = CommonText.confirm.toUpperCase()
 				marginTop = 20.uiPX()
 				setBlueStyle()
 			}.click {
 				presenter.clickConfirmationButton(mnemonicCode.orEmpty(), mnemonicInput.text.toString())
-			}.into(this)
+			}
 
 			ExplanationTitle(context).apply {
 				text = QAText.whatIsMnemonic.setUnderline()

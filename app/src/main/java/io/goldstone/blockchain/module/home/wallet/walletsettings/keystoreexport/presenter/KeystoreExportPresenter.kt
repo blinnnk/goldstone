@@ -11,6 +11,7 @@ import io.goldstone.blockchain.crypto.keystore.getKeystoreFileByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.KeystoreInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.wallet.walletsettings.keystoreexport.view.KeystoreExportFragment
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +74,7 @@ class KeystoreExportPresenter(
 	) {
 		verifyKeystorePasswordByWalletID(password, wallet.id) { isCorrect ->
 			if (isCorrect) {
-				val mnemonic = JavaKeystoreUtil().decryptData(wallet.encryptMnemonic!!)
+				val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(wallet.encryptMnemonic!!)
 				val path = when {
 					chainType.isETH() -> wallet.ethPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, chainType)}")
 					chainType.isETC() -> wallet.etcPath.replaceAfterLast("/", "${wallet.getAddressPathIndex(address, chainType)}")

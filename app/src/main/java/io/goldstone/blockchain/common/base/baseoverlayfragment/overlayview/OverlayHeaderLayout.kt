@@ -259,7 +259,7 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 					}
 					editText.addTextChangedListener(object : TextWatcher {
 						override fun afterTextChanged(content: Editable?) {
-							if (!content.isNullOrBlank()) searchTextChangedEvent?.run()
+							searchTextChangedEvent?.run()
 						}
 
 						override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

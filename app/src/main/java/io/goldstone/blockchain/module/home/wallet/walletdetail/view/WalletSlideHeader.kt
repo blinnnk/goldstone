@@ -35,7 +35,7 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		notifyButton.apply {
 			title = WalletText.notifyButton
 			src = R.drawable.notifications_icon
-			x += PaddingSize.device
+			x += PaddingSize.content
 			y = 15.uiPX().toFloat()
 		}.into(this)
 

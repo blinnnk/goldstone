@@ -92,7 +92,7 @@ private fun loadDataFromChain(
 		// Calculate All Inputs to get transfer value
 		// 转换数据格式
 		val dataIndex: (index: Int) -> Int = {
-			if (pageInfo.maxDataIndex == 0) pageInfo.total
+			if (pageInfo.maxDataIndex == 0) pageInfo.total + it * -1
 			else pageInfo.maxDataIndex + (it + 1) * if (loadNew) 1 else -1
 		}
 		if (!transactions.isNullOrEmpty() && error.isNone()) {

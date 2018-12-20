@@ -10,8 +10,10 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
@@ -21,6 +23,7 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.presenter.PrivateKeyImportPresenter
@@ -38,15 +41,15 @@ import org.jetbrains.anko.*
 class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
 	override val pageTitle: String = ImportMethodText.privateKey
+	private lateinit var passwordHintInput: RoundInput
+	private lateinit var nameInput: RoundInput
+	private lateinit var passwordInput: RoundInput
+	private lateinit var repeatPassword: RoundInput
+	private lateinit var confirmButton: RoundButton
 	private val attentionText by lazy { AttentionTextView(context!!) }
 	private val supportedChainMenu by lazy { SupportedChainMenu(context!!) }
 	private val privateKeyInput by lazy { WalletEditText(context!!) }
-	private val passwordHintInput by lazy { RoundInput(context!!) }
-	private val nameInput by lazy { RoundInput(context!!) }
-	private val passwordInput by lazy { RoundInput(context!!) }
-	private val repeatPassword by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
-	private val confirmButton by lazy { RoundButton(context!!) }
 	override val presenter = PrivateKeyImportPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -61,34 +64,39 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					text = ImportWalletText.importWalletDescription
 				}.into(this)
 				supportedChainMenu.into(this)
+
 				privateKeyInput.apply {
 					hint = ImportWalletText.privateKeyHint
 				}.into(this)
 
-				nameInput.apply {
+				nameInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					hint = UIUtils.generateDefaultName()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 20.uiPX() }
 					title = CreateWalletText.name
-				}.into(this)
+				}
 
-				passwordInput.apply {
+				passwordInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
-				}.into(this)
+				}
 
-				repeatPassword.apply {
+				repeatPassword = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setPasswordInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.repeatPassword
-				}.into(this)
+				}
 
-				passwordHintInput.apply {
+				passwordHintInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					title = CreateWalletText.hint
 					setTextInput()
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
-				}.into(this)
+				}
 
 				agreementView
 					.click {
@@ -103,10 +111,9 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					}
 					.into(this)
 
-				confirmButton.apply {
+				confirmButton = roundButton {
 					text = CommonText.confirm.toUpperCase()
-					setBlueStyle()
-					y += 10.uiPX()
+					setBlueStyle(10.uiPX())
 				}.click { button ->
 					button.showLoadingStatus()
 					presenter.importWalletByPrivateKey(
@@ -123,7 +130,7 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 							else activity?.jump<SplashActivity>()
 						}
 					}
-				}.into(this)
+				}
 
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsPrivateKey.setUnderline()

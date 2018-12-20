@@ -3,6 +3,7 @@ package io.goldstone.blockchain.kernel.commonmodel.eos
 import android.arch.persistence.room.TypeConverter
 import com.blinnnk.extension.orElse
 import com.blinnnk.extension.safeGet
+import io.goldstone.blockchain.common.utils.removeSlash
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionInfo
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.utils.CryptoUtils
@@ -41,7 +42,8 @@ data class EOSTransactionData(
 class EOSTransactionDataConverter {
 	@TypeConverter
 	fun revertJSONObject(content: String): EOSTransactionData {
-		val data = JSONObject(content.replace("\"{", "{").replace("}\"", "}"))
+		val data =
+			if (!content.contains("{")) JSONObject(content) else JSONObject(content.removeSlash())
 		return EOSTransactionData(data)
 	}
 

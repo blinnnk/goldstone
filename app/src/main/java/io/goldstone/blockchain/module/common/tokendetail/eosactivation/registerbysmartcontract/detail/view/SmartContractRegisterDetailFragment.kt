@@ -10,14 +10,16 @@ import com.blinnnk.util.clickToCopy
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.DescriptionView
-import io.goldstone.blockchain.common.component.KeyValueView
 import io.goldstone.blockchain.common.component.SpaceSplitLine
+import io.goldstone.blockchain.common.component.ValueView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.buttonSquareCell
 import io.goldstone.blockchain.common.component.title.AttentionView
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.component.title.twoLineTitles
+import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -45,8 +47,8 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 	}
 
 	private lateinit var smartContractLink: TwoLineTitles
-	private val availableResultView by lazy { KeyValueView(context!!) }
-	private val copyResultButton by lazy { RoundButton(context!!) }
+	private lateinit var availableResultView: ValueView
+	private lateinit var copyResultButton: RoundButton
 	override val presenter = SmartContractRegisterDetailPresenter(this)
 
 	override fun AnkoContext<Fragment>.initView() {
@@ -84,18 +86,18 @@ class SmartContractRegisterDetailFragment : BaseFragment<SmartContractRegisterDe
 					}
 				}
 				sessionTitle(EOSAccountText.memoInfo)
-				availableResultView.apply {
-					text = accountName + "-" + SharedAddress.getCurrentEOS()
-				}.into(this)
+				availableResultView = valueView {
+					setContent(accountName + "-" + SharedAddress.getCurrentEOS())
+				}
 
-				copyResultButton.apply {
+				copyResultButton = roundButton {
 					setBlueStyle(20.uiPX())
 					text = EOSAccountText.copyResult
 				}.click {
 					availableResultView.apply {
 						context.clickToCopy(getContent())
 					}
-				}.into(this)
+				}
 			}
 		}
 	}

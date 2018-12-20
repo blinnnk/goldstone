@@ -1,9 +1,11 @@
 package io.goldstone.blockchain
 
 import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
+import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import org.junit.Assert
 import org.junit.Test
@@ -53,6 +55,12 @@ class ExampleUnitTest {
 	@Test
 	fun bigNumber() {
 		println(BigDecimal.valueOf(10).pow(18).add(BigDecimal.ZERO))
+	}
+
+	@Test
+	fun validBTCAddressLength() {
+		println(CryptoValue.isBitcoinAddressLength(" mgqkf2Y6YaiLzQckRWuvcbGXUh2ys2dbbN"))
+		println(BTCUtils.isValidTestnetAddress("mgqkf2Y6YaiLzQckRWuvcbGXUh2ys2dbbN"))
 	}
 }
 

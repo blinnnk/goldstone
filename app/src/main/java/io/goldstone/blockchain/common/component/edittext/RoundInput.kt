@@ -34,7 +34,7 @@ open class RoundInput(context: Context) : EditText(context) {
 	var title by observing("") {
 		invalidate()
 	}
-	var horizontalPaddingSize by observing(5.uiPX()) {
+	var horizontalPaddingSize by observing(0.uiPX()) {
 		invalidate()
 	}
 

@@ -19,6 +19,8 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.multichain.isBTCSeries
+import io.goldstone.blockchain.crypto.multichain.isEOSToken
+import io.goldstone.blockchain.crypto.multichain.isERC20Token
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailcenter.view.TokenDetailCenterFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.contract.TokenInfoContract
@@ -46,6 +48,7 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 	private lateinit var tokenInfoView: TokenInfoView
 	private lateinit var balanceCell: GraySquareCell
 	private lateinit var addressCell: GraySquareCell
+	private lateinit var tokenContractCell: GraySquareCell
 	private lateinit var hash160Cell: GraySquareCell
 	private lateinit var transactionCountCell: GraySquareCell
 	private lateinit var totalReceiveCell: GraySquareCell
@@ -113,6 +116,19 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 					sessionTitle(TokenDetailText.accountInformation)
 					addressCell = graySquareCell {
 						setTitle(TokenDetailText.address)
+					}
+					if (token?.contract.isEOSToken() || token?.contract.isERC20Token()) {
+						sessionTitle(TokenDetailText.tokenInfo)
+						// 显示当前 `Token` 的合约地址
+						tokenContractCell = graySquareCell {
+							if (token?.contract.isERC20Token()) {
+								setTitle(TokenDetailText.contract)
+								setSubtitle(token?.contract?.contract.orEmpty())
+							} else {
+								setTitle(TokenDetailText.code)
+								setSubtitle(token?.contract?.contract.orEmpty())
+							}
+						}
 					}
 					// 只有 bitcoin series coin type 的会额外显示 `hash160` 格式的地址
 					if (token?.contract.isBTCSeries()) {

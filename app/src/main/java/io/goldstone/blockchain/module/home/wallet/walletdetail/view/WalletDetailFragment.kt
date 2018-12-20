@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
@@ -48,11 +51,11 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	private val slideHeader by lazy { WalletSlideHeader(context!!) }
 	private var headerView: WalletDetailHeaderView? = null
 	override lateinit var presenter: WalletDetailContract.GSPresenter
-
 	/**
 	 * this `slideHeader` will show or hide depends on the distance that user sliding the
 	 * recyclerView, and not in the same layer with `RecyclerView's headerView`
 	 */
+	@SuppressLint("MissingPermission")
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
@@ -61,6 +64,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		slideHeader.apply {
 			notifyButton.onClick { showNotificationListFragment() }
 		}
+		System.out.println(SharedValue.getJSCode())
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {

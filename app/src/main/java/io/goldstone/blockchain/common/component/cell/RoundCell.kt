@@ -51,11 +51,11 @@ class RoundCell(context: Context) : GSCard(context) {
 	var container: RelativeLayout
 
 	init {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, wrapContent)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 		setCardBackgroundColor(GrayScale.whiteGray)
 		container = relativeLayout {
 			lparams(matchParent, matchParent)
-			layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, cellHeight)
+			layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)
 			subtitleView.into(this)
 			titleView.into(this)
 			arrowIcon.into(this)

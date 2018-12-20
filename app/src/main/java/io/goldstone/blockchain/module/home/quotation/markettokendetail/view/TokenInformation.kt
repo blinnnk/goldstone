@@ -42,7 +42,7 @@ class TokenInformation(context: Context) : TopBottomLineCell(context) {
 	private val startDate = GraySquareCell(context)
 
 	init {
-		setHorizontalPadding(PaddingSize.device.toFloat())
+		setHorizontalPadding(PaddingSize.content.toFloat())
 		setTitle(QuotationText.tokenInformation)
 		layoutParams = RelativeLayout.LayoutParams(matchParent, 250.uiPX())
 		verticalLayout {

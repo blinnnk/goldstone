@@ -35,6 +35,7 @@ object EOSValue {
 
 class EOSTransactionMethod(val value: String) {
 	companion object {
+		val Transfer = EOSTransactionMethod("transfer")
 		fun transfer() = EOSTransactionMethod("transfer")
 		fun undelegatebw() = EOSTransactionMethod("undelegatebw")
 	}

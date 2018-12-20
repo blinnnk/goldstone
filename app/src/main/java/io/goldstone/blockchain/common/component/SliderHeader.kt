@@ -24,15 +24,13 @@ open class SliderHeader(context: Context) : RelativeLayout(context) {
   init {
     layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
 
-    blurView
-      .apply {
+    blurView.apply {
         alpha = 0f
         setOverlayColor(Spectrum.opacity8Green)
         setBlurRadius(20.uiPX().toFloat())
         layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.sliderHeaderHeight)
       }
     this.addView(blurView)
-
   }
 
   open fun onHeaderShowedStyle() {

@@ -49,6 +49,7 @@ abstract class SilentUpdater {
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
+		updateNewDAPP()// todo
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -70,7 +71,8 @@ abstract class SilentUpdater {
 												 hasNewConfig,
 												 hasNewShareContent,
 												 hasNewRecommendedDAPP,
-												 hasNewDAPP ->
+												 hasNewDAPP,
+												 hasNewDAPPJSCode ->
 				fun updateData() {
 					if (hasNewDefaultTokens) updateLocalDefaultTokens()
 					if (hasNewChainNodes) updateNodeData()
@@ -82,6 +84,7 @@ abstract class SilentUpdater {
 					}
 					if (hasNewRecommendedDAPP) updateRecommendedDAPP()
 					if (hasNewDAPP) updateNewDAPP()
+					if (hasNewDAPPJSCode) updateDAPPJSCode()
 					// 确认后更新 MD5 值到数据库
 					AppConfigTable.dao.updateMD5Info(
 						newDefaultTokenListMD5,
@@ -91,7 +94,8 @@ abstract class SilentUpdater {
 						newConfigMD5,
 						newShareContentMD5,
 						newRecommendedDAPPMD5,
-						newDAPPMD5
+						newDAPPMD5,
+						newDAPPJSCode
 					)
 				}
 				when {
@@ -129,6 +133,7 @@ abstract class SilentUpdater {
 	private var newShareContentMD5 = ""
 	private var newRecommendedDAPPMD5 = ""
 	private var newDAPPMD5 = ""
+	private var newDAPPJSCode = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -139,7 +144,8 @@ abstract class SilentUpdater {
 			hasNewConfig: Boolean,
 			hasNewShareContent: Boolean,
 			hasNewRecommendedDAPP: Boolean,
-			hasNewDAPP: Boolean
+			hasNewDAPP: Boolean,
+			hasNewDAPPCode: Boolean
 		) -> Unit
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
@@ -152,6 +158,7 @@ abstract class SilentUpdater {
 				newShareContentMD5 = md5s.safeGet("share_content_md5")
 				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
 				newDAPPMD5 = md5s.safeGet("dapps_md5")
+				newDAPPJSCode = md5s.safeGet("get_js_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
@@ -160,7 +167,8 @@ abstract class SilentUpdater {
 					config.configMD5 != newConfigMD5,
 					config.shareContentMD5 != newShareContentMD5,
 					config.dappRecommendMD5 != newRecommendedDAPPMD5,
-					config.newDAPPMD5 != newDAPPMD5
+					config.newDAPPMD5 != newDAPPMD5,
+					config.dappJSCodeMD5 != newDAPPJSCode
 				)
 			}
 		}
@@ -238,10 +246,10 @@ abstract class SilentUpdater {
 
 	private fun checkAvailableEOSTokenList() {
 		if (!account.isValid(false)) return
-		EOSAPI.getEOSTokenList(chainID, account) { tokenList, error ->
+		fun updateData(tokens: List<TokenContract>) {
 			// 拉取潜在资产的 `Icon Url`
-			if (tokenList.isNotNull() && error.isNone()) GoldStoneAPI.getIconURL(tokenList) { tokenIcons, getIconError ->
-				if (tokenIcons.isNotNull() && getIconError.isNone()) tokenList.forEach { contract ->
+			GoldStoneAPI.getIconURL(tokens) { tokenIcons, getIconError ->
+				if (tokenIcons.isNotNull() && getIconError.isNone()) tokens.forEach { contract ->
 					//  这个接口只服务主网下的 `Token` 插入 `DefaultToken`
 					// EOS 的价格不再这里更新
 					if (!CoinSymbol(contract.symbol).isEOS()) DefaultTokenTable.dao.insert(
@@ -251,7 +259,6 @@ abstract class SilentUpdater {
 							chainID
 						)
 					)
-
 					val targetToken = MyTokenTable.dao.getTokenByContractAndAddress(
 						contract.contract,
 						contract.symbol,
@@ -273,6 +280,17 @@ abstract class SilentUpdater {
 					)
 				}
 			}
+		}
+
+		// 优先从 `EOSPark` 获取 `Token List`, 如果出错或测试网替换为 `GoldStone` 的接口
+		if (!SharedValue.isTestEnvironment()) EOSAPI.getTokenBalance(account) { tokens, error ->
+			if (tokens.isNotNull() && error.isNone()) {
+				updateData(tokens.map { TokenContract(it.codeName, it.symbol, it.getDecimal()) })
+			} else EOSAPI.getEOSTokenList(chainID, account) { tokenList, tokenListError ->
+				if (tokenList.isNotNull() && tokenListError.isNone()) updateData(tokenList)
+			}
+		} else EOSAPI.getEOSTokenList(chainID, account) { tokenList, tokenListError ->
+			if (tokenList.isNotNull() && tokenListError.isNone()) updateData(tokenList)
 		}
 	}
 
@@ -383,20 +401,25 @@ abstract class SilentUpdater {
 			}
 			// 因为第三方接口 NewDex 没有列表查询的 API, 只能一个一个的请求, 这里可能会造成
 			// 线程开启太多的内存溢出. 限制每 `500ms` 检查一个 `Symbol` 的价格
-			object : ConcurrentAsyncCombine() {
-				val eosTokens =
-					myTokens.filter {
-						ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
-					}
-				override val delayTime: Long? = 500
-				override var asyncCount: Int = eosTokens.size
-				override fun doChildTask(index: Int) {
-					EOSAPI.updateLocalTokenPrice(
-						TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null)
-					)
-					completeMark()
+			EOSAPI.getPairsFromNewDex { pairs, error ->
+				if (pairs.isNotNull() && error.isNone()) {
+					object : ConcurrentAsyncCombine() {
+						val eosTokens =
+							myTokens.filter {
+								ChainID(it.chainID).isEOSMain() && !CoinSymbol(it.symbol).isEOS()
+							}
+						override val delayTime: Long? = 300
+						override var asyncCount: Int = eosTokens.size
+						override fun doChildTask(index: Int) {
+							EOSAPI.updateTokenPriceFromNewDex(
+								TokenContract(eosTokens[index].contract, eosTokens[index].symbol, null),
+								pairs
+							)
+							completeMark()
+						}
+					}.start()
 				}
-			}.start()
+			}
 		}
 	}
 
@@ -503,6 +526,15 @@ abstract class SilentUpdater {
 			if (dapps.isNotNull() && error.isNone()) {
 				DAPPTable.dao.deleteAllUnRecommended()
 				DAPPTable.dao.insertAll(dapps)
+			} else ErrorDisplayManager(error)
+		}
+	}
+
+	private fun updateDAPPJSCode() {
+		GoldStoneAPI.getDAPPJSCode { code, error ->
+			if (code.isNotNull() && error.isNone()) {
+				AppConfigTable.dao.updateJSCode(code)
+				SharedValue.updateJSCode(code)
 			} else ErrorDisplayManager(error)
 		}
 	}
