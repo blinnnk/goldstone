@@ -9,7 +9,7 @@ import io.goldstone.blockchain.module.home.rammarket.module.ramtrade.model.Tradi
  * @author: yangLiHai
  * @description:
  */
-class BigTransactionContract{
+class BigTransactionContract {
 	interface GSView: GoldStoneView<GSPresenter> {
 		fun updateUI(data: ArrayList<TradingInfoModel>)
 	}

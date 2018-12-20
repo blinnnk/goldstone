@@ -66,7 +66,7 @@ class RAMTradePercentPresenter(private val gsView: RAMDistributedContract.GSView
 	
 	private fun getTradeData() {
 		GoldStoneAPI.getEOSRAMTradeDistributed {data, error ->
-			if (error.isNone()){
+			if (error.isNone()) {
 				data?.let {
 					if (it.size == 6) {
 						tradeDistributeList.clear()

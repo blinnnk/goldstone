@@ -80,7 +80,7 @@ class RAMPriceChartAndMenuView(
 		loadingView.visibility = View.GONE
 	}
 	
-	private fun updateCurrentData(buttonId: Int){
+	private fun updateCurrentData(buttonId: Int) {
 		hold(when(buttonId) {
 			EOSRAMChartType.Minute.code -> EOSRAMChartType.Minute
 			EOSRAMChartType.Hour.code -> EOSRAMChartType.Hour
