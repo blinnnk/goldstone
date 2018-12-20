@@ -38,10 +38,7 @@ import io.goldstone.blockchain.module.common.walletimport.walletimport.view.Wall
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -79,9 +76,10 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, wrapContent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
-				lparams(matchParent, matchParent)
+				lparams(matchParent, wrapContent)
 				mnemonicInput.apply {
 					hint = ImportWalletText.mnemonicHint
 				}.into(this)

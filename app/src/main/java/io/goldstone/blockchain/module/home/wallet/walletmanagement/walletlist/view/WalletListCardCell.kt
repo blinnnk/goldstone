@@ -4,10 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.*
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
@@ -79,7 +76,6 @@ class WalletListCardCell(context: Context) : GSCard(context) {
 			lparams {
 				width = AvatarSize.middle
 				height = AvatarSize.middle
-				margin = 20.uiPX()
 				elevation = 10.uiPX().toFloat()
 			}
 			avatar = imageView {
@@ -87,6 +83,8 @@ class WalletListCardCell(context: Context) : GSCard(context) {
 				scaleY = 1.02f
 				layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 			}
+		}.setMargins<FrameLayout.LayoutParams> {
+			margin = 20.uiPX()
 		}
 
 		relativeLayout {

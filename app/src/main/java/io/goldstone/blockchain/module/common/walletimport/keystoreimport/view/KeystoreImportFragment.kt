@@ -57,10 +57,10 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 	override val presenter = KeystoreImportPresenter(this)
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, wrapContent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
-				lparams(matchParent, matchParent)
-
+				lparams(matchParent, wrapContent)
 				attentionText = AttentionTextView(context)
 				attentionText.apply {
 					isCenter()

@@ -399,6 +399,7 @@ object FingerprintPaymentText {
 		HoneyLanguage.TraditionalChinese.code -> "確認要關閉指紋支付功能嗎？重新開啟需要再次驗證密碼。"
 		else -> ""
 	}
+
 	@JvmField
 	val goToSetFingerprint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Go to set the fingerprint"
@@ -409,6 +410,7 @@ object FingerprintPaymentText {
 		HoneyLanguage.TraditionalChinese.code -> "去設置指紋"
 		else -> ""
 	}
+
 	@JvmField
 	val authenticationAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Fingerprint Identification"
