@@ -188,9 +188,8 @@ class RAMMarketDetailFragment : GSFragment(), RAMMarketDetailContract.GSView {
 		tradingView.notifyTradingListData()
 	}
 	
-	override fun showRAMBalance(ramBalance: String, eosBalance: String) {
-		tradingView.setRAMBalance(EOSRAMExchangeText.ramBalanceDescription(ramBalance))
-		tradingView.setEOSBalance(EOSRAMExchangeText.eosBalanceDescription(eosBalance))
+	override fun showRAMExchangeTips(text: String) {
+		tradingView.showRAMExchangeTips(text)
 	}
 	override fun showError(error: Throwable) {
 		ErrorDisplayManager(error).show(context)

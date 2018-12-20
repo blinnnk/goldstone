@@ -109,7 +109,7 @@ fun RAMMarketDetailPresenter.calculateCountAndUpdate(ramChartType: EOSRAMChartTy
 					// 只能取到前一个时间段的数据，所以size=1的时候，取得数据无效，所以直接更新UI
 					launchUI {
 						candleDataMap[ramChartType.info]?.apply {
-							ramMarketDetailView.updateCandleChartUI(ramChartType.dateType, this)
+							gsView.updateCandleChartUI(ramChartType.dateType, this)
 						}
 					}
 				} else getCountDataFormNet(ramChartType, size)
@@ -148,16 +148,16 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 			
 			launchUI {
 				candleDataMap[period]?.apply {
-					ramMarketDetailView.updateCandleChartUI(dateType, this)
+					gsView.updateCandleChartUI(dateType, this)
 				}
 			}
 			
 		} else {
 			launchUI {
 				// Show the error exception to user
-				ramMarketDetailView.showError(error)
+				gsView.showError(error)
 				candleDataMap[period]?.apply {
-					ramMarketDetailView.updateCandleChartUI(dateType, this)
+					gsView.updateCandleChartUI(dateType, this)
 				}
 			}
 		}
@@ -166,7 +166,7 @@ fun RAMMarketDetailPresenter.getCountDataFormNet(ramChartType: EOSRAMChartType, 
 
 fun RAMMarketDetailPresenter.updateTodayPriceUI() {
 	ramInformationModel.let {
-		ramMarketDetailView.showTodayPrice(
+		gsView.showTodayPrice(
 			it.openPrice.formatCount(4),
 			it.HighPrice.formatCount(4),
 			it.lowPrice.formatCount(4)
@@ -185,7 +185,7 @@ fun RAMMarketDetailPresenter.updateCurrentPriceUI() {
 		}
 		updateTodayPriceUI()
 		calculatePricePercent()
-		ramMarketDetailView.showCurrentPriceAndPercent(
+		gsView.showCurrentPriceAndPercent(
 			infoModel.currentPrice,
 			infoModel.pricePercent
 		)
@@ -218,9 +218,9 @@ fun RAMMarketDetailPresenter.getTodayPrice() {
 			calculatePricePercent()
 		} else {
 			launchUI{
-				ramMarketDetailView.showError(error)
+				gsView.showError(error)
 					// 出错了可能长连接已经断了， 需要在此给当前价格赋值
-				ramMarketDetailView.showCurrentPriceAndPercent(
+				gsView.showCurrentPriceAndPercent(
 					ramInformationModel.currentPrice,
 					ramInformationModel.pricePercent
 				)

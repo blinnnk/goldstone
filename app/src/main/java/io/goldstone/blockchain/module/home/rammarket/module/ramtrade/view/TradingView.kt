@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.rammarket.module.ramtrade.view
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
@@ -69,12 +70,11 @@ class TradingView(context: Context, val fragment: RAMMarketDetailFragment): Line
 		tradingDashboardView.eosEditText.afterTextChanged = runnable
 	}
 	
-	fun setRAMBalance(text: String) {
-		tradingDashboardView.ramBalance.text = text
-	}
 	
-	fun setEOSBalance(text: String) {
-		tradingDashboardView.eosBalance.text = text
+	fun showRAMExchangeTips(text: String) {
+		tradingDashboardView.ramExchangeTips.text = text
+		tradingDashboardView.ramExchangeTips.visibility = View.VISIBLE
+		tradingDashboardView.setConfirmButtonUnable()
 	}
 	
 	fun setConfirmEvent(runnable: Runnable) {

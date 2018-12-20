@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.rammarket.presenter
 
 import com.blinnnk.extension.*
+import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.sharedpreference.*
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
@@ -22,7 +23,7 @@ import java.math.BigDecimal
  * @author: yanglihai
  * @description: 头部的price展示presenter
  */
-class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.GSView)
+class RAMMarketDetailPresenter(val gsView: RAMMarketDetailContract.GSView)
  : RAMMarketDetailContract.GSPresenter {
 	
 	val currentAccount = SharedAddress.getCurrentEOSAccount()
@@ -35,6 +36,9 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 		getTodayPrice()
 		updateRAMCandleData(EOSRAMChartType.Minute)
 		recentTransactions()
+		if (isTestEnvironment) {
+			gsView.showRAMExchangeTips(EOSRAMExchangeText.ramTradeOnlyMainNet)
+		}
 	}
 	
 	var candleDataMap: HashMap<String, ArrayList<CandleChartModel>> = hashMapOf()
@@ -49,7 +53,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 			
 			override fun getServerBack(content: JSONObject, isDisconnected: Boolean) {
 				if (isDisconnected) {
-					ramMarketDetailView.showSocketDisconnectedPercentColor(GrayScale.midGray)
+					gsView.showSocketDisconnectedPercentColor(GrayScale.midGray)
 					return
 				}
 				parseSocketResult(content)
@@ -78,7 +82,7 @@ class RAMMarketDetailPresenter(val ramMarketDetailView: RAMMarketDetailContract.
 					buyList.add(model)
 				}
 				launchUI {
-					ramMarketDetailView.notifyTradingViewData()
+					gsView.notifyTradingViewData()
 				}
 			}
 			

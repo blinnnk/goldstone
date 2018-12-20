@@ -37,10 +37,7 @@ interface RAMMarketDetailContract {
 		
 		fun notifyTradingViewData()
 		
-		fun showRAMBalance(
-			ramBalance: String,
-			eosBalance: String
-		)
+		fun showRAMExchangeTips(text: String)
 	}
 	
 	interface GSPresenter : GoldStonePresenter

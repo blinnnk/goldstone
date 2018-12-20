@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.InputFilter
 import android.text.method.DigitsKeyListener
 import android.view.Gravity
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import com.blinnnk.extension.into
@@ -37,8 +38,8 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		showRightLabel("EOS")
 		imeOptions = EditorInfo.IME_ACTION_DONE
 	}
-	val ramBalance = TextView(context)
-	val eosBalance = TextView(context)
+	val ramExchangeTips = TextView(context)
+	
 	private val confirmButton = RoundButton(context)
 	private var showHistoryEvent: Runnable? = null
 	private var confirmEvent: Runnable? = null
@@ -51,6 +52,12 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 	}
 	fun setConfirmEvent(runnable: Runnable) {
 		confirmEvent = runnable
+	}
+	
+	fun setConfirmButtonUnable() {
+		confirmButton.isEnabled = false
+		confirmButton.setGrayStyle(width = dashboardWidth - RAMMarketPadding)
+		confirmButton.resetConfirmParams()
 	}
 	
 	init {
@@ -66,6 +73,7 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 		menu.getButton { button ->
 			button.click {
 				menu.selected(button.id)
+				if (!confirmButton.isEnabled) return@click
 				if (button.id == 0) {
 					stakeType = StakeType.BuyRam
 					confirmButton.setBlueStyle(width = dashboardWidth - RAMMarketPadding)
@@ -93,14 +101,6 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			leftMargin = 5.uiPX()
 		}
 		
-		ramBalance.apply {
-			leftPadding = RAMMarketPadding
-			text = EOSRAMExchangeText.ramBalanceDescription("0")
-			textColor = GrayScale.midGray
-			typeface = GoldStoneFont.heavy(context)
-			textSize = fontSize(10)
-		}.into(this)
-		
 		eosEditText.apply {
 			title = EOSRAMExchangeText.eos
 			hint = EOSRAMExchangeText.enterCountHint
@@ -113,18 +113,10 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			leftMargin = 5.uiPX()
 		}
 		
-		eosBalance.apply {
-			leftPadding = RAMMarketPadding
-			text = EOSRAMExchangeText.eosBalanceDescription("0")
-			textColor = GrayScale.midGray
-			typeface = GoldStoneFont.heavy(context)
-			textSize = fontSize(10)
-		}.into(this)
-		
 		linearLayout {
 			leftPadding = RAMMarketPadding
 			gravity = Gravity.CENTER_VERTICAL
-			layoutParams = LinearLayout.LayoutParams(wrapContent, 36.uiPX())
+			layoutParams = LinearLayout.LayoutParams(wrapContent, 30.uiPX())
 			imageView {
 				imageResource = R.drawable.trading_discipline
 				setColorFilter(Spectrum.deepBlue)
@@ -141,12 +133,26 @@ class TradingDashboardView(context: Context): LinearLayout(context) {
 			}
 		}
 		
-		confirmButton.apply {
-			setBlueStyle(width = dashboardWidth - RAMMarketPadding)
-			text = EOSRAMExchangeText.confirmToTrade
-			resetConfirmParams()
-			onClick { confirmEvent?.run() }
-		}.into(this)
+		verticalLayout {
+			layoutParams = LinearLayout.LayoutParams(matchParent, 86.uiPX())
+			gravity = Gravity.BOTTOM
+			confirmButton.apply {
+				setBlueStyle(width = dashboardWidth - RAMMarketPadding)
+				text = EOSRAMExchangeText.confirmToTrade
+				resetConfirmParams()
+				onClick { confirmEvent?.run() }
+			}.into(this)
+			
+			ramExchangeTips.apply {
+				gravity = Gravity.CENTER
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+				textColor = Spectrum.lightRed
+				textSize = fontSize(10)
+				typeface = GoldStoneFont.heavy(context)
+				visibility = View.GONE
+			}.into(this)
+			
+		}
 		
 	}
 	

@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.Language.EOSRAMExchangeText
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
-import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
@@ -43,12 +42,12 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 							sellList.clear()
 							sellList.addAll(tempList)
 						}
-						ramMarketDetailView.showTradingViewData(buyList, sellList)
+						gsView.showTradingViewData(buyList, sellList)
 					}
 				}
 			} else {
 				launchUI {
-					ramMarketDetailView.showError(error)
+					gsView.showError(error)
 				}
 			}
 		}
@@ -58,10 +57,10 @@ fun RAMMarketDetailPresenter.recentTransactions() {
 
 fun RAMMarketDetailPresenter.setAccountInfoFromDatabase() {
 	GlobalScope.launch(Dispatchers.Default) {
-		EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)?.let { localData ->
-			val ramBalance = ((localData.ramQuota -localData. ramUsed).toDouble() / 1024.0).formatCount(4)
+		val currentEOSAccountTable = EOSAccountTable.dao.getAccount(currentAccount.name, currentChainID)
+		if (currentEOSAccountTable == null) {
 			launchUI {
-				ramMarketDetailView.showRAMBalance(ramBalance, if (localData.balance.isEmpty()) "0.0" else localData.balance)
+				gsView.showRAMExchangeTips(EOSRAMExchangeText.ramTradeHasNoAccount)
 			}
 		}
 	}

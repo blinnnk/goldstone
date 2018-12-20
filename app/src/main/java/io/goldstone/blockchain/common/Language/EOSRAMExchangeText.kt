@@ -65,30 +65,6 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
-	val ramOccupyAmount:(value: String) -> String = { value ->
-		when(currentLanguage) {
-			HoneyLanguage.English.code -> "RAM occupy amount ${value}GB"
-			HoneyLanguage.Chinese.code -> "RAM occupy amount ${value}GB"
-			HoneyLanguage.Japanese.code -> ""
-			HoneyLanguage.Korean.code -> ""
-			HoneyLanguage.Russian.code -> ""
-			HoneyLanguage.TraditionalChinese.code -> ""
-			else -> ""
-		}
-	}
-	
-	val ramTotalAmount:(value: String) -> String = { value ->
-		when(currentLanguage) {
-			HoneyLanguage.English.code -> "RAM total amount ${value}GB"
-			HoneyLanguage.Chinese.code -> "RAM total amount ${value}GB"
-			HoneyLanguage.Japanese.code -> ""
-			HoneyLanguage.Korean.code -> ""
-			HoneyLanguage.Russian.code -> ""
-			HoneyLanguage.TraditionalChinese.code -> ""
-			else -> ""
-		}
-	}
-	
 	val bigOrder = when(currentLanguage) {
 		HoneyLanguage.English.code -> "big"
 		HoneyLanguage.Chinese.code -> "big"
@@ -211,29 +187,6 @@ object EOSRAMExchangeText {
 		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
-	val ramBalanceDescription: (count: String) -> String = {
-		when(currentLanguage) {
-			HoneyLanguage.English.code -> "balance $it KB"
-			HoneyLanguage.Chinese.code -> "balance $it KB"
-			HoneyLanguage.Japanese.code -> ""
-			HoneyLanguage.Korean.code -> ""
-			HoneyLanguage.Russian.code -> ""
-			HoneyLanguage.TraditionalChinese.code -> ""
-			else -> ""
-		}
-	}
-	val eosBalanceDescription: (count: String) -> String = {
-		when(currentLanguage) {
-			HoneyLanguage.English.code -> "balance $it EOS"
-			HoneyLanguage.Chinese.code -> "balance $it EOS"
-			HoneyLanguage.Japanese.code -> ""
-			HoneyLanguage.Korean.code -> ""
-			HoneyLanguage.Russian.code -> ""
-			HoneyLanguage.TraditionalChinese.code -> ""
-			else -> ""
-		}
-	}
-	
 	val confirmToTrade = when(currentLanguage) {
 		HoneyLanguage.English.code -> "confirm"
 		HoneyLanguage.Chinese.code -> "confirm"
@@ -395,16 +348,6 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
-	val eosNoAccount = when(currentLanguage) {
-		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "当前钱包下没有EOS账户，无法购买"
-		HoneyLanguage.Japanese.code -> ""
-		HoneyLanguage.Korean.code -> ""
-		HoneyLanguage.Russian.code -> ""
-		HoneyLanguage.TraditionalChinese.code -> ""
-		else -> ""
-	}
-	
 	val testNetTradeDisableMessage = when(currentLanguage) {
 		HoneyLanguage.English.code -> ""
 		HoneyLanguage.Chinese.code -> "您当前使用Jungle测试网络，内存交易所仅提供主网交易，请切换节点后再买卖内存"
@@ -415,18 +358,19 @@ object EOSRAMExchangeText {
 		else -> ""
 	}
 	
-	val noEnoughRAM = when(currentLanguage) {
+	val  ramTradeOnlyMainNet = when(currentLanguage) {
 		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "没有足够的内存"
+		HoneyLanguage.Chinese.code -> "Please use EOS Mainnet \n account to exchange."
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
 		HoneyLanguage.TraditionalChinese.code -> ""
 		else -> ""
 	}
-	val noEnoughEOS = when(currentLanguage) {
+	
+	val  ramTradeHasNoAccount = when(currentLanguage) {
 		HoneyLanguage.English.code -> ""
-		HoneyLanguage.Chinese.code -> "没有足够的EOS"
+		HoneyLanguage.Chinese.code -> "You don't have an account."
 		HoneyLanguage.Japanese.code -> ""
 		HoneyLanguage.Korean.code -> ""
 		HoneyLanguage.Russian.code -> ""
