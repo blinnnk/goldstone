@@ -1,8 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.fingerprintsetting.presenter
 
 import com.blinnnk.extension.isNotNull
-import com.blinnnk.util.load
-import com.blinnnk.util.then
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -22,14 +20,12 @@ import kotlinx.coroutines.launch
  * @author KaySaith
  * @date  2018/12/18
  */
-class FingerprintSettingPresenter(
-	private val view: FingerprintSettingContract.GSView
-) : FingerprintSettingContract.GSPresenter {
+class FingerprintSettingPresenter : FingerprintSettingContract.GSPresenter {
 	override fun start() {
 
 	}
 
-	override fun getSecret(password: String, hold: (String) -> Unit) {
+	override fun getSecret(password: String, hold: (secret: String?, error: AccountError) -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
 			if (SharedWallet.getCurrentWalletType().isBIP44()) {
 				GoldStoneApp.appContext.verifyKeystorePasswordByWalletID(
@@ -39,8 +35,8 @@ class FingerprintSettingPresenter(
 					if (isCorrect) {
 						val mnemonic =
 							JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(WalletTable.dao.getEncryptMnemonic()!!)
-						hold(mnemonic)
-					} else view.showError(AccountError.WrongPassword)
+						hold(mnemonic, AccountError.None)
+					} else hold(null, AccountError.None)
 				}
 			} else {
 				GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(
@@ -48,8 +44,8 @@ class FingerprintSettingPresenter(
 					SharedWallet.getCurrentWalletID()
 				) { privateKey, error ->
 					if (privateKey.isNotNull() && error.isNone()) {
-						hold(privateKey.toString(16))
-					} else view.showError(error)
+						hold(privateKey.toString(16), error)
+					} else hold(null, AccountError.None)
 				}
 			}
 		}
@@ -58,6 +54,7 @@ class FingerprintSettingPresenter(
 	override fun turnOffFingerprintPayment(callback: () -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
 			WalletTable.dao.turnOffFingerprint()
+			SharedWallet.updateFingerprint(false)
 			launchUI(callback)
 		}
 	}
@@ -66,14 +63,6 @@ class FingerprintSettingPresenter(
 		GlobalScope.launch(Dispatchers.Default) {
 			WalletTable.dao.updateFingerEncryptKey(encryptKey)
 			launchUI(callback)
-		}
-	}
-
-	override fun getUsedStatus(hold: (Boolean) -> Unit) {
-		load {
-			WalletTable.dao.getEncryptFingerprintKey()
-		} then {
-			hold(it.isNotNull())
 		}
 	}
 }
