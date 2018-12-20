@@ -61,10 +61,10 @@ object DialogText {
 	val mobileNetworkDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Are you willing to update resources in 4g environment?"
 		HoneyLanguage.Chinese.code -> "您正在使用手机网络，您是否愿意使用手机网络更新数据？"
-		HoneyLanguage.Japanese.code -> "モバイルネットワーク"
-		HoneyLanguage.Korean.code -> "모바일 네트워크"
-		HoneyLanguage.Russian.code -> "Мобильная сеть"
-		HoneyLanguage.TraditionalChinese.code -> "手機網絡"
+		HoneyLanguage.Japanese.code -> "モバイルネットワークを使用してデータを更新しますか？"
+		HoneyLanguage.Korean.code -> "모바일 네트워크를 사용하여 데이터를 업데이트 하시겠습니까?"
+		HoneyLanguage.Russian.code -> "Готовы ли вы использовать мобильную сеть для обновления ваших данных?"
+		HoneyLanguage.TraditionalChinese.code -> "您正在使用手機網絡，您是否願意使用手機網絡更新數據？"
 		else -> ""
 	}
 
