@@ -85,13 +85,10 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		presenter = FingerprintSettingPresenter(this)
+		presenter = FingerprintSettingPresenter()
 		presenter.start()
-		presenter.getUsedStatus { isChecked ->
-			switchCell.setSelectedStatus(isChecked)
-			if (!isChecked) updateButtonStatus()
-			else turnOffFingerprint()
-		}
+		switchCell.setSelectedStatus(SharedWallet.hasFingerprint())
+		resetButtonEvent()
 	}
 
 	override fun showError(error: Throwable) {
@@ -101,6 +98,11 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 	override fun onDestroy() {
 		super.onDestroy()
 		fingerprintManager.removeHandler()
+	}
+
+	private fun resetButtonEvent() {
+		if (!SharedWallet.hasFingerprint()) updateButtonStatus()
+		else turnOffFingerprint()
 	}
 
 	private fun turnOffFingerprint() {
@@ -115,6 +117,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 						presenter.turnOffFingerprintPayment {
 							dialog.dismiss()
 							context.alert(CommonText.succeed)
+							resetButtonEvent()
 						}
 					}
 				}
@@ -136,32 +139,47 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 								true,
 								cancelAction = {
 									loadingView.remove()
+									switchCell.setSelectedStatus(SharedWallet.hasFingerprint())
 								}
 							) { passwordInput ->
 								// 校验 `Keystore` 密码来验证身份
 								val password = passwordInput?.text.toString()
 								// 如果是 `Bip44` 钱包返回 `mnemonic` 如果是多链钱包返回 `root private key`
-								presenter.getSecret(password) { secret ->
+								presenter.getSecret(password) { secret, error ->
 									launchUI {
 										loadingView.remove()
-										showFingerprintDashboard(context, false) { cipher ->
-											if (cipher.isNotNull()) {
-												val fingerEncryptKey =
-													JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).encryptData(secret)
-												presenter.updateFingerEncryptKey(fingerEncryptKey) {
-													SharedWallet.updateFingerprint(true)
-													context.alert(CommonText.succeed)
+										if (secret.isNotNull() && error.isNone()) {
+											showFingerprintDashboard(
+												context,
+												false,
+												cancelAction = {
+													switchCell.setSelectedStatus(SharedWallet.hasFingerprint())
 												}
-											} else {
-												// Fingerprint cryptoObject 在部分机型返回 null
-												// 这个时候就直接调用 Keystore 加密而不在额外用 Finger 返回的 cipher 做为条件
-												val fingerEncryptKey =
-													JavaKeystoreUtil(KeystoreInfo.isMnemonic()).encryptData(secret)
-												presenter.updateFingerEncryptKey(fingerEncryptKey) {
-													SharedWallet.updateFingerprint(true)
-													context.alert(CommonText.succeed)
+											) { cipher ->
+												if (cipher.isNotNull()) {
+													val fingerEncryptKey =
+														JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).encryptData(secret)
+													presenter.updateFingerEncryptKey(fingerEncryptKey) {
+														SharedWallet.updateFingerprint(true)
+														context.alert(CommonText.succeed)
+														resetButtonEvent()
+													}
+												} else {
+													// Fingerprint cryptoObject 在部分机型返回 null
+													// 这个时候就直接调用 Keystore 加密而不在额外用 Finger 返回的 cipher 做为条件
+													val fingerEncryptKey =
+														JavaKeystoreUtil(KeystoreInfo.isMnemonic()).encryptData(secret)
+													presenter.updateFingerEncryptKey(fingerEncryptKey) {
+														SharedWallet.updateFingerprint(true)
+														context.alert(CommonText.succeed)
+														resetButtonEvent()
+													}
 												}
 											}
+										} else {
+											showError(error)
+											SharedWallet.updateFingerprint(false)
+											resetButtonEvent()
 										}
 									}
 								}
@@ -208,6 +226,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 			context: Context,
 			showPasswordButton: Boolean,
 			usePasswordEvent: () -> Unit = {},
+			cancelAction: () -> Unit = {},
 			hold: (cipher: Cipher?) -> Unit
 		) {
 			val manager = FingerPrintManager(context)
@@ -248,10 +267,13 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 				showAttentionDashboard(
 					"Fingerprint Detected",
 					"put you finger on your sensor, then we can detect you fingerprint",
-					fingerView
-				) {
-					manager.removeHandler()
-				}
+					fingerView,
+					cancelAction = {
+						manager.removeHandler()
+						dialog.dismiss()
+						cancelAction()
+					}
+				)
 				manager.observing { cipher, error ->
 					// `cipher` 是 `null` `error.isNone()` 也可以传出去
 					if (error.hasError()) {

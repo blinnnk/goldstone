@@ -24,7 +24,7 @@ import org.json.JSONObject
 import java.io.Serializable
 import java.math.BigInteger
 
-@Entity(tableName = "eosTransactions", primaryKeys = ["txID", "recordAccountName"])
+@Entity(tableName = "eosTransactions", primaryKeys = ["serverID", "txID", "recordAccountName"])
 data class EOSTransactionTable(
 	var dataIndex: Int,
 	var serverID: Long,

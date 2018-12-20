@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.dapp.dappexplorer.view
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
+import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
@@ -47,14 +48,14 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				}
 			}
 			it.cancelSearchEvent = Runnable {
-				updateAdapterData<DAPPExplorerAdapter>(arrayListOf())
+				it.presenter.removeSelfFromActivity()
 			}
 			it.enterKeyEvent = Runnable {
 				getMainActivity()?.showDappBrowserFragment(
-					it.getSearchContent(),
+					formattedURL(it.getSearchContent()),
 					PreviousView.DAPPExplorer,
 					"FFFFFF",
-					this
+					parentFragment
 				)
 			}
 		}
@@ -78,5 +79,11 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				}
 			}
 		}
+	}
+
+	private fun formattedURL(url: String): String {
+		return if (url.indexOf("http") == -1 || url.indexOf("https") == -1)  {
+			"https://$url"
+		} else url
 	}
 }

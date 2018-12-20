@@ -56,23 +56,7 @@ class DAPPOverlayFragment : BaseOverlayFragment<DAPPOverlayPresenter>() {
 			addFragmentAndSetArgument<DAPPExplorerFragment>(ContainerID.content)
 			showSearchInput(
 				cancelEvent = {
-					cancelSearchEvent?.run()
-					showCloseButton(true) {
-						presenter.removeSelfFromActivity()
-					}
-					showSearchButton(true) {
-						showSearchInput(
-							cancelEvent = {
-								cancelSearchEvent?.run()
-								showCloseButton(true) {
-									presenter.removeSelfFromActivity()
-								}
-							},
-							enterKeyEvent = {
-								enterKeyEvent?.run()
-							}
-						)
-					}
+					presenter.removeSelfFromActivity()
 				},
 				enterKeyEvent = {
 					enterKeyEvent?.run()

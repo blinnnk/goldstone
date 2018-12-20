@@ -38,7 +38,7 @@ class WalletImportCenterFragment : BaseFragment<WalletImportCenterPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
-			lparams(matchParent, matchParent)
+			lparams(matchParent, wrapContent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
 				lparams {
