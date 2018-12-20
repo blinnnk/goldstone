@@ -29,6 +29,7 @@ interface GasSelectionContract {
 	}
 
 	interface GSPresenter : GoldStonePresenter {
+		var currentFee: GasFee
 		fun checkIsValidTransfer(@WorkerThread callback: (GoldStoneError) -> Unit)
 		fun addCustomFeeCell()
 		fun transfer(

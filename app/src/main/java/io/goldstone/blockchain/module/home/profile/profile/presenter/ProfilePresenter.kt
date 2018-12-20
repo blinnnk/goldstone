@@ -118,11 +118,11 @@ class ProfilePresenter(
 			fragment.context?.apply {
 				val data = arrayListOf(
 					Pair("GoldStone ID", SharedWallet.getGoldStoneID()),
-					Pair("APK Channel", currentChannel.value),
-					Pair("Version Code", "${SystemUtils.getVersionCode(this)}")
+					Pair(ProfileText.apkChannel, currentChannel.value),
+					Pair(ProfileText.versionCode, "${SystemUtils.getVersionCode(this)}")
 				)
 				Dashboard(this) {
-					showList("GoldStone Developer", TitleCellAdapter(data))
+					showList(ProfileText.developerOptions, TitleCellAdapter(data))
 				}
 				SharedValue.updateDeveloperModeStatus(true)
 			}

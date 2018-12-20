@@ -84,7 +84,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 
 	override fun flipPage() {
 		super.flipPage()
-		presenter.loadMore()
+//		presenter.loadMore()
 	}
 
 	override fun showNetworkAlert() {

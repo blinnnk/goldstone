@@ -64,7 +64,8 @@ fun GasSelectionPresenter.checkBalanceIsValid(
 					}
 					// Token 的余额和 ETH 用于转账的 `MinerFee` 的余额是否同时足够
 					val isEnough =
-						tokenBalance.toWei(token.decimal) >= gasView.getTransferCount() && ethBalance.toWei(18) > BigInteger.valueOf(currentFee.getUsedAmount())
+						tokenBalance.toWei(token.decimal) >= gasView.getTransferCount() &&
+							ethBalance.toWei(18) > BigInteger.valueOf(currentFee.getUsedAmount())
 					if (isEnough) callback(GoldStoneError.None) else callback(TransferError.BalanceIsNotEnough)
 				}
 			}
@@ -142,7 +143,7 @@ fun GasSelectionPresenter.getUnitSymbol() = token.contract.getSymbol()
 
 private fun GasSelectionPresenter.insertPendingDataToDatabase(
 	value: BigInteger,
-	raw: PaymentDetailModel,
+	paymentModel: PaymentDetailModel,
 	taxHash: String,
 	memoData: String
 ) {
@@ -151,21 +152,21 @@ private fun GasSelectionPresenter.insertPendingDataToDatabase(
 		// 以太坊返回的是 second, 本地的是 mills 在这里转化一下
 		timeStamp = (System.currentTimeMillis() / 1000).toString(),
 		hash = taxHash,
-		nonce = raw.nonce.toString(),
+		nonce = paymentModel.nonce.toString(),
 		blockHash = "",
 		transactionIndex = "",
 		fromAddress = getETHERC20OrETCAddress(),
-		to = raw.toWalletAddress,
+		to = paymentModel.toWalletAddress,
 		value = value.toString(),
 		count = CryptoUtils.toCountByDecimal(value, token.decimal.orZero()),
 		gas = "",
 		gasPrice = currentFee.gasPrice.toString(),
 		hasError = "0",
 		txReceiptStatus = "1",
-		input = raw.inputData,
+		input = paymentModel.inputData,
 		contractAddress = token.contract.contract,
 		cumulativeGasUsed = "",
-		gasUsed = raw.gasLimit.toString(),
+		gasUsed = paymentModel.gasLimit.toString(),
 		confirmations = "-1",
 		isReceive = false,
 		isERC20Token = token.symbol.isETH(),
@@ -175,7 +176,7 @@ private fun GasSelectionPresenter.insertPendingDataToDatabase(
 		memo = memoData,
 		chainID = token.chainID,
 		isFee = false,
-		minerFee = CryptoUtils.toGasUsedEther(raw.gasLimit.toString(), raw.gasPrice.toString(), false)
+		minerFee = CryptoUtils.toGasUsedEther(paymentModel.gasLimit.toString(), paymentModel.gasPrice.toString(), false)
 	).let {
 		GoldStoneDataBase.database.transactionDao().insert(it)
 		GoldStoneDataBase.database.transactionDao().insert(it.apply { isFee = true })

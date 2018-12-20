@@ -51,11 +51,11 @@ object WalletText {
 	@JvmField
 	val isUsing = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Using Now"
-		HoneyLanguage.Chinese.code -> "Using Now"
-		HoneyLanguage.Japanese.code -> "Using Now"
-		HoneyLanguage.Korean.code -> "Using Now"
-		HoneyLanguage.Russian.code -> "Using Now"
-		HoneyLanguage.TraditionalChinese.code -> "Using Now"
+		HoneyLanguage.Chinese.code -> "正在使用"
+		HoneyLanguage.Japanese.code -> "使用中"
+		HoneyLanguage.Korean.code -> "사용중"
+		HoneyLanguage.Russian.code -> "При использовании"
+		HoneyLanguage.TraditionalChinese.code -> "正在使用"
 		else -> ""
 	}
 

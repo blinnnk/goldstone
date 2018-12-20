@@ -14,3 +14,7 @@ fun launchUI(callback: () -> Unit) {
 	GlobalScope.launch(Dispatchers.Main) { callback() }
 }
 
+fun launchDefault(callback: () -> Unit) {
+	GlobalScope.launch(Dispatchers.Default) { callback() }
+}
+

@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
@@ -21,7 +22,6 @@ import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.cell.switchCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.FingerprintPaymentText
 import io.goldstone.blockchain.common.language.ProfileText
@@ -29,9 +29,12 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.FingerPrintManager
+import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.alert
+import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
+import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
 import io.goldstone.blockchain.crypto.utils.KeystoreInfo
 import io.goldstone.blockchain.module.home.profile.fingerprintsetting.contract.FingerprintSettingContract
@@ -123,7 +126,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 
 	private fun updateButtonStatus() {
 		when {
-			fingerprintManager.checker().isValid() || !fingerprintManager.checker().isUnsupportedDevice() -> {
+			fingerprintManager.checker().isValid() -> {
 				with(switchCell) {
 					setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusUnset)
 					clickEvent = Runnable {
@@ -132,7 +135,10 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 							showAlertView(
 								FingerprintPaymentText.permissionVerifyAlertTitle,
 								FingerprintPaymentText.permissionVerifyAlertDescription,
-								true
+								true,
+								cancelAction = {
+									loadingView.remove()
+								}
 							) { passwordInput ->
 								// 校验 `Keystore` 密码来验证身份
 								val password = passwordInput?.text.toString()
@@ -140,15 +146,15 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 								presenter.getSecret(password) { secret ->
 									launchUI {
 										loadingView.remove()
-										showFingerprintDashboard(context, false) { cipher, error ->
-											if (cipher.isNotNull() && error.isNone()) {
+										showFingerprintDashboard(context, false) { cipher ->
+											if (cipher.isNotNull()) {
 												val fingerEncryptKey =
 													JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).encryptData(secret)
 												presenter.updateFingerEncryptKey(fingerEncryptKey) {
 													SharedWallet.updateFingerprint(true)
 													context.alert(CommonText.succeed)
 												}
-											} else if (cipher.isNull() && error.isNone()) {
+											} else {
 												// Fingerprint cryptoObject 在部分机型返回 null
 												// 这个时候就直接调用 Keystore 加密而不在额外用 Finger 返回的 cipher 做为条件
 												val fingerEncryptKey =
@@ -157,7 +163,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 													SharedWallet.updateFingerprint(true)
 													context.alert(CommonText.succeed)
 												}
-											} else showError(error)
+											}
 										}
 									}
 								}
@@ -204,10 +210,11 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 			context: Context,
 			showPasswordButton: Boolean,
 			usePasswordEvent: () -> Unit = {},
-			hold: (cipher: Cipher?, error: GoldStoneError) -> Unit
+			hold: (cipher: Cipher?) -> Unit
 		) {
 			val manager = FingerPrintManager(context)
 			var passwordButton: GraySquareCell? = null
+			var description: TextView
 			val fingerView = LinearLayout(context).apply {
 				orientation = LinearLayout.VERTICAL
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
@@ -219,6 +226,14 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					setColorFilter(Spectrum.white)
 					layoutParams = LinearLayout.LayoutParams(90.uiPX(), 90.uiPX())
 					addCorner(45.uiPX(), Spectrum.green)
+				}
+				description = textView {
+					layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
+					gravity = Gravity.CENTER
+					textSize = fontSize(12)
+					textColor = GrayScale.midGray
+					typeface = GoldStoneFont.medium(context)
+					text = "detecting your fingerprint now"
 				}
 				if (showPasswordButton) {
 					passwordButton = graySquareCell {
@@ -240,13 +255,20 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					manager.removeHandler()
 				}
 				manager.observing { cipher, error ->
-					hold(cipher, error)
-					manager.removeHandler()
-					dialog.dismiss()
+					// `cipher` 是 `null` `error.isNone()` 也可以传出去
+					if (error.hasError()) {
+						description.text = error.message
+						description.textColor = Spectrum.lightRed
+					} else {
+						hold(cipher)
+						manager.removeHandler()
+						dialog.dismiss()
+					}
 				}
 				passwordButton?.onClick {
 					usePasswordEvent()
 					dialog.dismiss()
+					manager.removeHandler()
 					passwordButton?.preventDuplicateClicks()
 				}
 			}

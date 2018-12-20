@@ -133,8 +133,8 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		browser.goBack()
-		browser.backEvent {
+		if (browser.canGoBack()) browser.goBack()
+		else browser.backEvent {
 			activity?.removeFragment(this)
 			activity?.showHomeFragment()
 		}
