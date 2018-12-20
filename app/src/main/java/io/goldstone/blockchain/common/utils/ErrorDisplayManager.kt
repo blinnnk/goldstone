@@ -3,9 +3,8 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
-import io.goldstone.blockchain.common.language.ChainErrorText
+import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.EosResourceErrorText
-import io.goldstone.blockchain.common.language.TransactionErrorText
 import io.goldstone.blockchain.common.thread.launchUI
 
 
@@ -70,7 +69,7 @@ class ErrorDisplayManager(error: Throwable) {
 				try {
 					if (!packageName.isNullOrEmpty() && contains(packageName, true)) {
 						context.alert(substring(packageName.length, length))
-					} else context.alert(this)
+					} else if (!this.contains(GoldStoneError.None.message, true)) context.alert(this)
 				} catch (error: Exception) {
 					// Context 丢失的时候执行
 					LogUtil.error("Error Display Manager", error)

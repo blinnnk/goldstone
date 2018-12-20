@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
+import android.content.Context
 import android.content.Intent
 import android.text.format.DateFormat
 import com.blinnnk.extension.*
@@ -88,23 +89,15 @@ class ProfilePresenter(
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.profileOverlay) isFalse {
 				if (title == ProfileText.shareApp) {
-					showShareChooser()
-				} else {
-					addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main, FragmentTag.profileOverlay) {
-						putString(ArgumentKey.profileTitle, title)
+					AppConfigTable.getAppConfig(Dispatchers.Main) {
+						showShareChooser(this, it?.shareContent.orEmpty())
 					}
+				} else addFragmentAndSetArguments<ProfileOverlayFragment>(
+					ContainerID.main,
+					FragmentTag.profileOverlay
+				) {
+					putString(ArgumentKey.profileTitle, title)
 				}
-			}
-		}
-	}
-
-	private fun showShareChooser() {
-		AppConfigTable.getAppConfig(Dispatchers.Main) {
-			it?.apply {
-				val intent = Intent(Intent.ACTION_SEND)
-				intent.putExtra(Intent.EXTRA_TEXT, shareContent)
-				intent.type = "text/plain"
-				fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 			}
 		}
 	}
@@ -141,4 +134,13 @@ class ProfilePresenter(
 
 	private fun getCurrentLanguageSymbol() =
 		HoneyLanguage.getLanguageByCode(SharedWallet.getCurrentLanguageCode())
+
+	companion object {
+		fun showShareChooser(context: Context, content: String) {
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.putExtra(Intent.EXTRA_TEXT, content)
+			intent.type = "text/plain"
+			context.startActivity(Intent.createChooser(intent, "share"))
+		}
+	}
 }

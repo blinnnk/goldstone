@@ -123,12 +123,6 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 		}.view
 	}
 
-	private fun formattedURL(url: String): String {
-		return if (!url.contains("http", true)) {
-			"http://$url"
-		} else url
-	}
-
 	private fun removeSelfFromActivity() {
 		getMainActivity()?.removeFragment(this)
 		getMainActivity()?.showHomeFragment()

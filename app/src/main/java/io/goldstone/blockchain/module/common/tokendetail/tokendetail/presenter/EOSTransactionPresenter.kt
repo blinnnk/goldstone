@@ -57,9 +57,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 							dataIndex = currentMaxCount.orZero() - (index + 1)
 						}
 					})
-					val finalData =
-						if (detailView.asyncData.isNullOrEmpty()) data else data.plus(localData)
-					flipPage(finalData, callback)
+					flipPage(data, callback)
 					currentMaxCount = currentMaxCount.orZero() - pageSize
 				} else callback()
 			}
