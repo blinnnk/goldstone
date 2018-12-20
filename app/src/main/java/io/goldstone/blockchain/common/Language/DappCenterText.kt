@@ -7,7 +7,7 @@ package io.goldstone.blockchain.common.language
 
 object DappCenterText {
 	@JvmField
-	val dappSearchPlaceholderText = when (currentLanguage) {
+	val dappSearchBarPlaceholderText = when (currentLanguage) {
 		HoneyLanguage.English.code->"Search Dapp by keywords or URL"
 		HoneyLanguage.Chinese.code->"搜索Dapp关键字或网址"
 		HoneyLanguage.Japanese.code->"DappキーワードまたはURLを検索する"
@@ -27,7 +27,7 @@ object DappCenterText {
 		else -> ""
 	}
 	@JvmField
-	val recentDap = when (currentLanguage) {
+	val recentDapp = when (currentLanguage) {
 		HoneyLanguage.English.code->"Recently Used"
 		HoneyLanguage.Chinese.code->"最近使用"
 		HoneyLanguage.Japanese.code->"最近使用された"
@@ -58,12 +58,32 @@ object DappCenterText {
 	}
 	@JvmField
 	val thirdPartDappAlertDescription = when (currentLanguage) {
-		HoneyLanguage.English.code->"This is a DAPP provided by a third party. Your use of the third party Dapp will be subject to the User Agreement and Privacy Policy of the third party Dapp."
-		HoneyLanguage.Chinese.code->"这是由第三方提供的的DAPP，您在第三方Dapp上的使用行为将适用该第三方Dapp的《用户协议》和《隐私条款》。"
-		HoneyLanguage.Japanese.code->"これは第三者によって提供されるDAPPです。第三者Dappの使用は、第三者Dappのユーザー同意書およびプライバシーポリシーの対象となります。"
-		HoneyLanguage.Korean.code->"이것은 제 3 자에 의해 제공되는 DAPP입니다. 귀하의 제 3의 Dapp 사용은 제 3의 Dapp의 사용자 계약 및 개인 정보 보호 정책의 적용을받습니다."
+		HoneyLanguage.English.code->"This is a Dapp provided by a third party. Your use of the third party Dapp will be subject to the User Agreement and Privacy Policy of the third party Dapp."
+		HoneyLanguage.Chinese.code->"这是由第三方提供的的 Dapp，您在第三方 Dapp 上的使用行为将适用该第三方 Dapp 的《用户协议》和《隐私条款》。"
+		HoneyLanguage.Japanese.code->"これは第三者によって提供される Dapp です。第三者 Dapp の使用は、第三者 Dapp のユーザー同意書およびプライバシーポリシーの対象となります。"
+		HoneyLanguage.Korean.code->"이것은 제 3 자에 의해 제공되는 Dapp 입니다. 귀하의 제 3의 Dapp 사용은 제 3의 Dapp 의 사용자 계약 및 개인 정보 보호 정책의 적용을받습니다."
 		HoneyLanguage.Russian.code->"Это DAPP, предоставленный третьей стороной. Использование Dapp третьей стороной будет регулироваться Соглашением с пользователем и Политикой конфиденциальности Dapp третьей стороны."
-		HoneyLanguage.TraditionalChinese.code->"這是由第三方提供的的DAPP，您在第三方Dapp上的使用行為將適用該第三方Dapp的《用戶協議》和《隱私條款》。"
+		HoneyLanguage.TraditionalChinese.code->"這是由第三方提供的的 Dapp，您在第三方 Dapp 上的使用行為將適用該第三方 Dapp 的《用戶協議》和《隱私條款》。"
+		else -> ""
+	}
+	@JvmField
+	val checkAllDapps = when (currentLanguage) {
+		HoneyLanguage.English.code->"View all the Decentralized applications"
+		HoneyLanguage.Chinese.code->"查看全部去中心化应用"
+		HoneyLanguage.Japanese.code->"すべての Dapp を表示"
+		HoneyLanguage.Korean.code->"모든 Dapp 보기"
+		HoneyLanguage.Russian.code->"Посмотреть все Dapps"
+		HoneyLanguage.TraditionalChinese.code->"查看全部去中心化應用"
+		else -> ""
+	}
+	@JvmField
+	val dappExplorer = when (currentLanguage) {
+		HoneyLanguage.English.code->"Dapp Explorer"
+		HoneyLanguage.Chinese.code->"Dapp 浏览器"
+		HoneyLanguage.Japanese.code->"Dapp エクスプローラ"
+		HoneyLanguage.Korean.code->"Dapp 탐색기"
+		HoneyLanguage.Russian.code->"Dapp Проводник"
+		HoneyLanguage.TraditionalChinese.code->"Dapp 瀏覽器"
 		else -> ""
 	}
 }
