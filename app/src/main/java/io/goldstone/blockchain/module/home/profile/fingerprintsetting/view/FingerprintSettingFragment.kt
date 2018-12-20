@@ -23,6 +23,8 @@ import io.goldstone.blockchain.common.component.cell.switchCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.FingerprintPaymentText
+import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
@@ -48,7 +50,7 @@ import javax.crypto.Cipher
  * @date  2018/12/18
  */
 class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSView {
-	override val pageTitle: String = "Fingerprint Settings"
+	override val pageTitle: String = ProfileText.fingerprintSettings
 	override lateinit var presenter: FingerprintSettingContract.GSPresenter
 	private lateinit var switchCell: SwitchCell
 	private lateinit var fingerprintManager: FingerPrintManager
@@ -107,12 +109,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 
 	private fun turnOffFingerprint() {
 		with(switchCell) {
-			setTitle("Using Fingerprint Payment")
+			setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusEnabled)
 			clickEvent = Runnable {
 				Dashboard(context) {
 					showAlert(
-						"Turn Off Fingerprint",
-						"are you sure that you decide tto turn off your fingerprint payment function"
+						FingerprintPaymentText.TurnOffAlertTitle,
+						FingerprintPaymentText.TurnOffAlertDescription
 					) {
 						presenter.turnOffFingerprintPayment {
 							dialog.dismiss()
@@ -129,13 +131,13 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 		when {
 			fingerprintManager.checker().isValid() -> {
 				with(switchCell) {
-					setTitle("USE FINGERPRINT PAYMENT")
+					setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusUnset)
 					clickEvent = Runnable {
 						loadingView.show()
 						Dashboard(context) {
 							showAlertView(
-								"Permission Verify",
-								"verify you identity before you setting fingerprint function",
+								FingerprintPaymentText.permissionVerifyAlertTitle,
+								FingerprintPaymentText.permissionVerifyAlertDescription,
 								true,
 								cancelAction = {
 									loadingView.remove()
@@ -189,13 +191,13 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 				}
 			}
 			fingerprintManager.checker().isUnsupportedDevice() -> {
-				switchCell.setTitle("UNSUPPORTED DEVICE")
+				switchCell.setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusUnsupport)
 				switchCell.setSelectedStatus(false)
 				switchCell.clickEvent = Runnable {
 					Dashboard(switchCell.context) {
 						showAlert(
-							"Unsupported Fingerprint",
-							"Unfortunately, your device does not support fingerprint payment."
+							FingerprintPaymentText.fingerprintNotSupported,
+							FingerprintPaymentText.fingerprintNotSupportedDescription
 						) {
 							switchCell.setSelectedStatus(false)
 						}
@@ -203,7 +205,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 				}
 			}
 			else -> {
-				switchCell.setTitle("GO TO SET FINGERPRINT")
+				switchCell.setTitle(FingerprintPaymentText.goToSetFingerprint)
 				switchCell.setSelectedStatus(false)
 				switchCell.clickEvent = Runnable {
 					val intent = Intent(Settings.ACTION_SECURITY_SETTINGS)
@@ -255,7 +257,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 				if (showPasswordButton) {
 					passwordButton = graySquareCell {
 						layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
-						setTitle("Use Password")
+						setTitle(FingerprintPaymentText.usePassword)
 						showArrow()
 					}
 					passwordButton?.setMargins<LinearLayout.LayoutParams> {
@@ -265,8 +267,9 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 			}
 			Dashboard(context) {
 				showAttentionDashboard(
-					"Fingerprint Detected",
-					"put you finger on your sensor, then we can detect you fingerprint",
+
+				FingerprintPaymentText.authenticationAlertTitle,
+				FingerprintPaymentText.authenticationAlertDescription,
 					fingerView,
 					cancelAction = {
 						manager.removeHandler()

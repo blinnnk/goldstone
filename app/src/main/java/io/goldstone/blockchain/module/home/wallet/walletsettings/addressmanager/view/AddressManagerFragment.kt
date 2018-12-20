@@ -15,10 +15,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.error.AccountError
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
@@ -306,7 +303,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	private fun showCreatorDashboard() {
 		Dashboard(context!!) {
 			showGrid(
-				"Create New Address",
+				WalletText.createNewAddress,
 				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
 					verifyMultiChainWalletPassword(context!!) { password, error ->
 						if (!password.isNullOrEmpty() && error.isNone() && it.chainType.isNotNull()) {
@@ -463,7 +460,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					namesInMyTokenTable.size == 1 -> hold(namesInMyTokenTable.first())
 					namesInMyTokenTable.isEmpty() -> hold(newDefaultAddress)
 					else -> context?.selector(
-						"Multiple Account Name Be Detected On This Account",
+						EOSAccountText.chooseFromMultipleEosAccounts,
 						namesInMyTokenTable
 					) { _, index ->
 						hold(namesInMyTokenTable[index])
@@ -510,7 +507,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				GridIconTitleModel.getMenuModels(hasDefaultCell, isCashAddress)
 			Dashboard(context) {
 				showGrid(
-					"More Operation",
+					WalletText.moreOperations,
 					GridIconTitleAdapter(data) {
 						when (it.name) {
 							WalletText.setDefaultAddress -> setDefaultAddressEvent()

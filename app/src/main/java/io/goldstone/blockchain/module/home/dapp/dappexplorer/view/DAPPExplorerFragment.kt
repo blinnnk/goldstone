@@ -7,6 +7,7 @@ import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
@@ -25,7 +26,7 @@ import org.greenrobot.eventbus.EventBus
  */
 class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContract.GSView {
 
-	override val pageTitle: String get() = "DAPP Explorer"
+	override val pageTitle: String get() = DappCenterText.dappExplorer
 	override lateinit var presenter: DAPPExplorerContract.GSPresenter
 
 	override fun showError(error: Throwable) {

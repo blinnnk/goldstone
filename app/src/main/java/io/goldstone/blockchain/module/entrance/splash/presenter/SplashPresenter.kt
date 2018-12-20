@@ -7,6 +7,7 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.Dashboard
+import io.goldstone.blockchain.common.language.ChainErrorText
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -183,7 +184,7 @@ class SplashPresenter(val activity: SplashActivity) {
 						)
 					}
 				} else launchUI {
-					val title = "Check EOS Account Name Error"
+					val title = ChainErrorText.getKeyAccountsError
 					val subtitle = error.message
 					Dashboard(context) {
 						showAlertView(
