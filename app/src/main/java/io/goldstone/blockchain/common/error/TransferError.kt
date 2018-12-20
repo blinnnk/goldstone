@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.error
 
-import io.goldstone.blockchain.common.language.ErrorText
+import io.goldstone.blockchain.common.language.*
 
 
 /**
@@ -23,9 +23,9 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val TransferToSelf = TransferError("Can't transfer to your self in eos blockchain")
 		@JvmStatic
-		val InvalidBigNumber = TransferError("Invalid Number, Value is too big")
+		val InvalidBigNumber = TransferError(ErrorText.inputTooBig)
 		@JvmStatic
-		val InvalidRAMNumber = TransferError("RAM Should Sell in byte amount, please check you input value, it must be long type number")
+		val InvalidRAMNumber = TransferError(EosResourceErrorText.ramNoDecimals)
 		@JvmStatic
 		val GetWrongFeeFromChain = TransferError(ErrorText.getWrongFeeFromChain)
 		@JvmStatic
@@ -33,20 +33,24 @@ class TransferError(val content: String) : GoldStoneError(content) {
 		@JvmStatic
 		val WrongRAMInputValue = TransferError(ErrorText.sellRAMTooLess)
 		@JvmStatic
-		val WrongPermission = TransferError("Wrong Keys Permission")
+		val WrongPermission = TransferError(ErrorText.wrongPermission)
 		@JvmStatic
-		val LessRAMForRegister = TransferError("less RAM for register account")
+		val LessRAMForRegister = TransferError(EosResourceErrorText.ramNotEnoughForNewAccount)
 	}
 }
 
 open class AccountError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val BackUpMnemonic = AccountError("Please back up you mnemonic first")
+		val DecryptKeyStoreError = AccountError(ErrorText.decryptKeyStoreError)
+		@JvmStatic
+		val BackUpMnemonic = AccountError(WalletErrorText.mnemonicsBackUpReminder)
 		@JvmStatic
 		val InvalidAccountName = AccountError(ErrorText.invalidAccountName)
 		@JvmStatic
-		val InactivatedAccountName = AccountError(ErrorText.inactivatedAccountName)
+		val InactivatedAccountName = AccountError(ErrorText.inactivedAccountName)
+		@JvmStatic
+		val inactiveEosKeyCannotRegister = AccountError(EOSAccountText.inactiveEosKeyCannotRegister)
 		@JvmStatic
 		val EmptyName = AccountError(ErrorText.emptyName)
 		@JvmStatic
@@ -81,7 +85,7 @@ open class AccountError(val content: String) : GoldStoneError(content) {
 class PasswordError(val content: String) : GoldStoneError(content) {
 	companion object {
 		@JvmStatic
-		val InputIsEmpty = AccountError("please enter your password to unlock your wallet")
+		val InputIsEmpty = AccountError(TransactionErrorText.emptyConfirmPassword)
 		@JvmStatic
 		val None = AccountError(GoldStoneError.None.message)
 	}

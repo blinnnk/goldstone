@@ -93,11 +93,11 @@ object ImportWalletText {
 	@JvmField
 	val customEOSPath = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Custom EOS Path"
-		HoneyLanguage.Chinese.code -> "自定义EOS路径"
+		HoneyLanguage.Chinese.code -> "自定义 EOS 路径"
 		HoneyLanguage.Japanese.code -> "カスタムEOSパス"
 		HoneyLanguage.Korean.code -> "맞춤 EOS 경로"
 		HoneyLanguage.Russian.code -> "Пользовательский путь EOS"
-		HoneyLanguage.TraditionalChinese.code -> "自定義EOS路徑"
+		HoneyLanguage.TraditionalChinese.code -> "自定義 EOS 路徑"
 		else -> ""
 	}
 	@JvmField
@@ -163,11 +163,11 @@ object ImportWalletText {
 	@JvmField
 	val eosAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Account Name"
-		HoneyLanguage.Chinese.code -> "用户名"
+		HoneyLanguage.Chinese.code -> "账户名"
 		HoneyLanguage.Japanese.code -> "アカウント名"
 		HoneyLanguage.Korean.code -> "계정 이름"
 		HoneyLanguage.Russian.code -> "Имя пользователя"
-		HoneyLanguage.TraditionalChinese.code -> "用戶名"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶名"
 		else -> ""
 	}
 	@JvmField
@@ -296,7 +296,7 @@ object ImportWalletText {
 	val importPrivateKeyHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Clear text private key of any of the above chains"
 		HoneyLanguage.Chinese.code -> "以上任一链的明文私钥"
-		HoneyLanguage.Japanese.code -> "上記のチェーンのいずれかのクリアテキストの秘密鍵"
+		HoneyLanguage.Japanese.code -> "上記のチェーンのいずれかの秘密鍵"
 		HoneyLanguage.Korean.code -> "위 체인 중 하나의 일반 텍스트 개인 키"
 		HoneyLanguage.Russian.code -> "Открытый текстовый закрытый ключ любой из вышеперечисленных цепочек"
 		HoneyLanguage.TraditionalChinese.code -> "以上任一鏈的明文私鑰"

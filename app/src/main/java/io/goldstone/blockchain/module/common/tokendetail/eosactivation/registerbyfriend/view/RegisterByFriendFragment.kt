@@ -102,7 +102,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 				copyResultButton = roundButton {
 					visibility = View.GONE
 					setBlueStyle(20.uiPX())
-					text = "Copy The Result"
+					text = EOSAccountText.copyAddOn
 				}.click {
 					availableResultView.apply {
 						context.clickToCopy(getContent())
@@ -124,8 +124,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 									if (isAvailable) {
 										showAvailableResult(true, account)
 										hasResultView = true
-									}
-									else context.alert(EOSAccountText.checkNameResultUnavailable)
+									} else context.alert(EOSAccountText.checkNameResultUnavailable)
 								} else context.alert(error.message)
 							}
 						}
@@ -143,7 +142,7 @@ class RegisterByFriendFragment : BaseFragment<RegisterByFriendPresenter>() {
 		availableDescriptionView.visibility = if (status) View.VISIBLE else View.GONE
 		confirmButton.visibility = if (status) View.GONE else View.VISIBLE
 		copyResultButton.visibility = if (status) View.VISIBLE else View.GONE
-		val data = if (status)  newAccount?.name + "-" + SharedAddress.getCurrentEOS() else ""
+		val data = if (status) newAccount?.name + "-" + SharedAddress.getCurrentEOS() else ""
 		availableResultView.setContent(data)
 	}
 

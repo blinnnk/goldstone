@@ -22,6 +22,10 @@ import io.goldstone.blockchain.common.component.gsCard
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.title.SessionTitleView
 import io.goldstone.blockchain.common.component.title.sessionTitle
+import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.DappCenterText
+import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -57,7 +61,7 @@ import org.jetbrains.anko.verticalLayout
  */
 class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
-	override val pageTitle: String = "Dapp Center"
+	override val pageTitle: String = ProfileText.dappCenter
 
 	override lateinit var presenter: DAppCenterContract.GSPresenter
 	private lateinit var searchBar: SearchBar
@@ -94,10 +98,10 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 					}
 					searchBar.into(this)
 					recommendedSession = sessionTitle {
-						setTitle("Recommend DAPP", Spectrum.white)
+						setTitle(DappCenterText.recommendDapp, Spectrum.white)
 						setSubtitle(
 							"(--)",
-							"Check All (--)",
+							"${CommonText.checkAll} (--)",
 							Spectrum.opacity5White,
 							Spectrum.white
 						) {
@@ -169,7 +173,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							themedViewPager {
 								layoutParams = LinearLayout.LayoutParams(matchParent, 986.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
-								val titles = listOf("NEW DAPP", "LATEST USED")
+								val titles = listOf(DappCenterText.newDapp, DappCenterText.recentDapp)
 								menuBar.setMenuTitles(titles) { button, id ->
 									button.onClick {
 										currentItem = id
@@ -198,7 +202,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 	override fun showRecommendedSession(count: Int) {
 		recommendedSession.setSubtitle(
 			"($count)",
-			"Check All ($count)",
+			"${CommonText.checkAll} ($count)",
 			Spectrum.opacity5White,
 			Spectrum.white
 		) {
@@ -249,8 +253,8 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 				if (isUsed) callback()
 				else Dashboard(context) {
 					showAlert(
-						"Attention About DAPP Terms",
-						"once you decide to use third-party DAPP, it means you have to read their term/privacy, that will be necessary for you"
+						DappCenterText.thirdPartDappAlertTitle,
+						DappCenterText.thirdPartDappAlertDescription
 					) {
 						GlobalScope.launch(Dispatchers.Default) {
 							FavoriteTable.updateDAPPUsedStatus(dappID) {

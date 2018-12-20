@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.DataValue
 import io.goldstone.blockchain.common.value.GrayScale
@@ -35,7 +36,7 @@ class DAPPAdapter(
 			preventDuplicateClicks()
 		}
 		layoutParams = LinearLayout.LayoutParams(matchParent, 50.uiPX())
-		text = "Check All Decentralization Application"
+		text = DappCenterText.checkAllDapps
 		textSize = fontSize(12)
 		textColor = GrayScale.midGray
 		typeface = GoldStoneFont.medium(context)

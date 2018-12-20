@@ -76,7 +76,7 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 			Dashboard(context!!) {
 				showAlert(
 					ProfileText.editContactAlertTitle,
-					ProfileText.deleteContactAlertDescription,
+					ProfileText.editContactAlertDescription,
 					cancelAction = {
 						recyclerView.adapter?.notifyItemChanged(position)
 					},
