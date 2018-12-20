@@ -40,7 +40,7 @@ object APIPath {
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
 	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
 	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
-		"$header/eos/tokenList?chainid=$chainID&account=$account"
+		"$header/eos/tokenHistory?chainid=$chainID&account=$account"
 	}
 	val getEOSTokenCountInfo: (
 		header: String,
@@ -49,7 +49,7 @@ object APIPath {
 		code: String,
 		symbol: String
 	) -> String = { header, chainID, account, codeName, symbol ->
-		"$header/eos/txCountInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
+		"$header/eos/transferStatInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
 	}
 	val getEOSTransactions: (
 		header: String,
@@ -61,7 +61,7 @@ object APIPath {
 		codeName: String,
 		symbol: String
 	) -> String = { header, chainID, account, pageSize, startID, endID, codeName, symbol ->
-		"$header/eos/actionList?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
+		"$header/eos/actionHistory?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
 	}
 	val defaultTokenList: (
 		header: String

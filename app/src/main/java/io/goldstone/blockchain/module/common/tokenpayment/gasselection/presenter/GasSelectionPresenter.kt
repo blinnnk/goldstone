@@ -33,7 +33,7 @@ class GasSelectionPresenter(
 	val gasView: GasSelectionContract.GSView
 ) : GasSelectionContract.GSPresenter {
 
-	var currentFee =
+	override var currentFee =
 		if (token.contract.isBTCSeries()) GasFee(gasView.getGasLimit(), 30, MinerFeeType.Recommend)
 		else GasFee(gasView.getGasLimit(), 30, MinerFeeType.Recommend)
 
@@ -71,6 +71,7 @@ class GasSelectionPresenter(
 			}.click { it ->
 				clearSelectedStatus(parent)
 				it.setSelectedStatus(true)
+				currentFee = GasFee(fee.gasLimit, fee.gasPrice, it.model?.type!!)
 				getGasCurrencyPrice(it.model!!.count) {
 					gasView.showSpendingValue(it)
 				}
