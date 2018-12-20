@@ -12,7 +12,9 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -51,10 +53,14 @@ class TokenAssetPresenter(
 	// 在详情界面有可能有 `Stake` 或 `Trade` 操作这里, 恢复显示的时候从
 	// 数据库更新一次信息
 	override fun start() {
-		updateRefundInfo()
-		updateAccountInfo()
+		if (NetworkUtil.hasNetwork()) {
+			updateRefundInfo()
+			updateAccountInfo()
+			showChainTransactionCount()
+		} else {
+			showLocalTransactionCount()
+		}
 		setDelegateBandwidthEOSCount()
-		showTransactionCount()
 	}
 
 	override fun updateRefundInfo() {
@@ -85,7 +91,7 @@ class TokenAssetPresenter(
 	}
 
 	private fun setDelegateBandwidthEOSCount() {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			val totalDelegate =
 				EOSAccountTable.dao.getAccount(account.name, chainID.id)?.totalDelegateBandInfo
 			val description = if (totalDelegate.isNullOrEmpty()) {
@@ -165,11 +171,10 @@ class TokenAssetPresenter(
 		}
 	}
 
-	private fun showTransactionCount() {
+	private fun showChainTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val account = SharedAddress.getCurrentEOSAccount()
 		EOSAPI.getTransactionCount(
-			SharedChain.getEOSCurrent().chainID,
+			chainID,
 			account,
 			EOSCodeName.EOSIOToken.value,
 			CoinSymbol.EOS
@@ -177,6 +182,19 @@ class TokenAssetPresenter(
 			if (latestCount.isNotNull() && error.isNone()) launchUI {
 				assetView.setTransactionCount(latestCount)
 			} else assetView.showError(error)
+		}
+	}
+
+	private fun showLocalTransactionCount() {
+		launchDefault {
+			EOSTransactionTable.dao.getMaxDataIndex(
+				account.name,
+				EOSCodeName.EOSIOToken.value,
+				CoinSymbol.eos,
+				chainID.id
+			)?.let {
+				assetView.setTransactionCount(it)
+			}
 		}
 	}
 

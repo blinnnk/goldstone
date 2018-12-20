@@ -68,15 +68,15 @@ fun BigInteger.convertToDiskUnit(): String {
  */
 fun BigInteger.musTimeStampConverter(): String {
 	val isNegative = toDouble() < 0.0
-	val decimalValue = Math.abs(toDouble())
-	val msValue = decimalValue / 1000.0
+	val musValue = Math.abs(toDouble())
+	val msValue = musValue / 1000.0
 	val secValue = msValue / 1000.0
 	val minValue = secValue / 60.0
 	val prefix = if (isNegative) "-" else ""
 	return when {
-		msValue < 0.1 -> "$prefix$decimalValue" suffix EOSCPUUnit.MUS.value
-		msValue >= 0.1 -> "$prefix$msValue" suffix EOSCPUUnit.MS.value
-		secValue >= 0.1 -> "$prefix${secValue.formatCount(5)}" suffix EOSCPUUnit.SEC.value
+		msValue < 0.1 -> "$prefix$musValue" suffix EOSCPUUnit.MUS.value
+		msValue in 0.1 .. 1000.0 -> "$prefix$msValue" suffix EOSCPUUnit.MS.value
+		secValue in 0.1 .. 60.0 -> "$prefix${secValue.formatCount(5)}" suffix EOSCPUUnit.SEC.value
 		minValue >= 0.1 -> "$prefix${minValue.formatCount(5)}" suffix EOSCPUUnit.MIN.value
 		else -> "$prefix${minValue.formatCount(5)}" suffix EOSCPUUnit.MIN.value
 	}

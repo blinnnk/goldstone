@@ -12,8 +12,8 @@ import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.multichain.*
-import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
+import io.goldstone.blockchain.kernel.commontable.TransactionTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.module.common.tokendetail.tokendetail.event.TokenDetailEvent
@@ -27,6 +27,7 @@ import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.observer.ETHSeriesTransactionObserver
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.getCurrentConfirmationNumber
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.presenter.ETHSeriesTransactionUtils.updateERC20FeeInfo
+import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -57,7 +58,9 @@ class TransactionDetailPresenter(
 			} else showProgress(null)
 			// 显示账单的基础信息
 			showHeaderData(TransactionHeaderModel(data))
-			showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
+			if (data.contract.isEOSSeries()) getEOSMinerInfo {
+				showTransactionInfo(data.blockNumber, data.confirmations, it)
+			} else showTransactionInfo(data.blockNumber, data.confirmations, data.minerFee)
 			showTransactionAddresses(
 				TransactionDetailModel(data.fromAddress, CommonText.from.toUpperCase()),
 				TransactionDetailModel(data.toAddress, CommonText.to.toUpperCase())
@@ -91,6 +94,20 @@ class TransactionDetailPresenter(
 				} else detailView.showErrorAlert(error)
 			}
 		}
+	}
+
+	private fun getEOSMinerInfo(hold: (minerInfo: String) -> Unit) {
+		if (data.minerFee.isEmpty()) {
+			hold(CommonText.calculating)
+			EOSAPI.getBandWidthByTxID(data.hash) { cpuUsage, netUsage, error ->
+				if (cpuUsage.isNotNull() && netUsage.isNotNull() && error.isNone()) {
+					EOSTransactionTable.dao.updateBandWidthByTxID(data.hash, cpuUsage, netUsage)
+					launchUI {
+						hold(TransactionListModel.generateEOSMinerContent(cpuUsage, netUsage))
+					}
+				}
+			}
+		} else hold(data.minerFee)
 	}
 
 	private fun updateConfirmationNumber() {
@@ -236,7 +253,7 @@ class TransactionDetailPresenter(
 		launchUI {
 			with(detailView) {
 				showLoading(false)
-				if (memo != null && error.isNone())
+				if (memo.isNotNull() && error.isNone())
 					showMemo(TransactionDetailModel(memo, TransactionText.memo))
 				else showErrorAlert(error)
 			}

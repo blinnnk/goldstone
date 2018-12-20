@@ -84,7 +84,7 @@ class DAPPBrowser(
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter=${SharedValue.getJSCode()};" +
+						"${SharedValue.getJSCode()};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -131,9 +131,7 @@ class DAPPBrowser(
 			) { balance, error ->
 				launchUI {
 					if (balance.isNotNull() && error.isNone()) {
-						evaluateJavascript("javascript:(function(){scatter.balance=$balance})()", null)
-					} else {
-						evaluateJavascript("javascript:(function(){scatter.balance=\"failed\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getCurrencyBalanceEvent',true,true);event.data=$balance;document.dispatchEvent(event)})()", null)
 					}
 				}
 			}
@@ -164,9 +162,7 @@ class DAPPBrowser(
 			getStringAccountInfo(EOSAccount(accountName)) { accountInfo, error ->
 				launchUI {
 					if (accountInfo.isNotNull() && error.isNone()) {
-						evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
-					} else {
-						evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getAccountEvent',true,true);event.data=$accountInfo;document.dispatchEvent(event)})()", null)
 					}
 				}
 			}
@@ -218,9 +214,7 @@ class DAPPBrowser(
 				) { result, error ->
 					launchUI {
 						if (result.isNotNull() && error.isNone()) {
-							evaluateJavascript("javascript:(function(){scatter.tableRow=$result})()", null)
-						} else {
-							evaluateJavascript("javascript:(function(){scatter.tableRow=\"failed\"})()", null)
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getTableRowsEvent',true,true);event.data=$result;document.dispatchEvent(event)})()", null)
 						}
 					}
 				}
@@ -238,17 +232,20 @@ class DAPPBrowser(
 						PaymentDetailPresenter.getPrivatekey(
 							context,
 							ChainType.EOS,
+							cancelEvent = {
+								evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+							},
 							confirmEvent = {
 								loadingView.show()
 							}
 						) { privateKey, error ->
 							launchUI {
 								loadingView.remove()
-							}
-							if (privateKey.isNotNull() && error.isNone()) {
-								val signature = EOSPrivateKey(privateKey).sign(Sha256.from(data.toByteArray())).toString()
-								launchUI {
-									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
+								if (privateKey.isNotNull() && error.isNone()) {
+									val signature = EOSPrivateKey(privateKey).sign(Sha256.from(data.toByteArray())).toString()
+									evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"$signature\";document.dispatchEvent(event)})()", null)
+								} else {
+									evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 								}
 							}
 						}
@@ -263,7 +260,6 @@ class DAPPBrowser(
 				val actionObject = try {
 					JSONObject(action)
 				} catch (error: Exception) {
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
 					return@launchUI
 				}
@@ -280,13 +276,16 @@ class DAPPBrowser(
 				action,
 				cancelEvent = {
 					loadingView.remove()
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 				},
 				confirmEvent = {
 					PaymentDetailPresenter.getPrivatekey(
 						context,
 						ChainType.EOS,
-						cancelEvent = { loadingView.remove() },
+						cancelEvent = {
+							loadingView.remove()
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+						},
 						confirmEvent = { loadingView.show() }
 					) { privateKey, error ->
 						if (privateKey.isNotNull() && error.isNone()) {
@@ -295,15 +294,15 @@ class DAPPBrowser(
 									loadingView.remove()
 									if (response.isNotNull() && pushTransactionError.isNone()) {
 										response.showDialog(context)
+										evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 									} else {
-										evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+										evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 										ErrorDisplayManager(pushTransactionError).show(context)
 									}
 								}
 							}
 						} else launchUI {
 							loadingView.remove()
-							evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 						}
 					}
 				}
@@ -315,7 +314,7 @@ class DAPPBrowser(
 				action,
 				false,
 				cancelEvent = {
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 				},
 				confirmEvent = { loadingView.show() }
 			) { response, error ->
@@ -323,10 +322,10 @@ class DAPPBrowser(
 					loadingView.remove()
 					if (response.isNotNull() && error.isNone()) {
 						response.showDialog(context)
-						evaluateJavascript("javascript:(function(){scatter.transactionResult=${response.result}})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 					} else {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 						ErrorDisplayManager(error).show(context)
-						evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 					}
 				}
 			}
@@ -349,7 +348,7 @@ class DAPPBrowser(
 					actionObject,
 					true,
 					cancelEvent = {
-						evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					},
 					confirmEvent = { loadingView.show() }
 				) { response, error ->
@@ -357,10 +356,10 @@ class DAPPBrowser(
 						loadingView.remove()
 						if (response.isNotNull() && error.isNone()) {
 							response.showDialog(context)
-							evaluateJavascript("javascript:(function(){scatter.transactionResult=${response.result}})()", null)
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 						} else {
 							ErrorDisplayManager(error).show(context)
-							evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 						}
 					}
 				}
