@@ -64,6 +64,7 @@ class EOSAccountRegisterPresenter(
 		ramAmount: BigInteger,
 		cpuEOSCount: Double,
 		netAEOSCount: Double,
+		@UiThread cancelAction: () -> Unit,
 		@WorkerThread callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		if (ramAmount < BigInteger.valueOf(4096)) {
@@ -82,7 +83,8 @@ class EOSAccountRegisterPresenter(
 						fragment.context!!,
 						totalSpent,
 						TokenContract.EOS,
-						StakeType.Register
+						StakeType.Register,
+						cancelAction = cancelAction
 					) { privateKey, privateKeyError ->
 						// 首先检测当前私钥的权限, 是单独 `Owner` 或 单独 `Active` 或全包包含,
 						// 首先选择 `Active` 权限, 如果不是选择 `Owner` 如果都没有返回 `error` 权限错误
