@@ -19,7 +19,7 @@ class CoinRankAdapter(
 ) : HoneyBaseAdapterWithHeaderAndFooter<CoinRankModel, CoinRankHeader, CoinRankCell, View>() {
 	override fun generateCell(context: Context) = CoinRankCell(context)
 	
-	override fun generateFooter(context: Context) = BottomLoadingView(context)
+	override fun generateFooter(context: Context) = BottomLoadingView(context).apply(holdFooter)
 	
 	override fun generateHeader(context: Context) = CoinRankHeader(context).apply(holdHeader)
 	

@@ -15,7 +15,7 @@ interface CoinRankContract {
 		fun showLoadingView(status: Boolean)
 		fun showBottomLoading(isShow: Boolean)
 		fun showHeaderData(model: CoinGlobalModel)
-		fun showListData(isClear: Boolean,data: List<CoinRankModel>)
+		fun showListData(isClear: Boolean, data: List<CoinRankModel>)
 	}
 	interface GSPresenter: GoldStonePresenter {
 		fun loadFirstPage()

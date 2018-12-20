@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.blinnnk.uikit.ScreenSize
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
+import io.goldstone.blockchain.common.Language.CoinRankText
 import io.goldstone.blockchain.module.home.quotation.rank.model.CoinGlobalModel
 import io.goldstone.blockchain.module.home.quotation.rank.presenter.CoinRankPresenter
 import org.jetbrains.anko.*
@@ -48,7 +49,7 @@ class CoinRankHeader(context: Context): LinearLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			textView {
-				text = "market cap"
+				text = CoinRankText.marketCap
 				gravity = Gravity.CENTER
 			}.lparams(matchParent, wrapContent)
 			addView(marketCap)
@@ -58,7 +59,7 @@ class CoinRankHeader(context: Context): LinearLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			textView {
-				text = "volume 24h"
+				text = CoinRankText.volume24h
 				gravity = Gravity.CENTER
 			}.lparams(matchParent, wrapContent)
 			addView(volume24h)
@@ -68,7 +69,7 @@ class CoinRankHeader(context: Context): LinearLayout(context) {
 			gravity = Gravity.CENTER
 			layoutParams = LayoutParams(ScreenSize.Width / 3, matchParent)
 			textView {
-				text = "btc dominance"
+				text = CoinRankText.btcDominance
 				gravity = Gravity.CENTER
 			}.lparams(matchParent, wrapContent)
 			addView(btcDominance)

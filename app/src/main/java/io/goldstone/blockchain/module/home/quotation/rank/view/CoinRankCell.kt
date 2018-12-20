@@ -26,15 +26,15 @@ class CoinRankCell(context: Context): BaseCell(context) {
 	
 	private val cellHeight = 50.uiPX()
 	private val cellWidth = ScreenSize.Width - 20.uiPX()
-	private val rankWidth = cellWidth / 20
+	private val rankWidth = cellWidth / 10
 	private val iconWidth = cellWidth / 6
-	private val symbolWidth = cellWidth / 4
+	private val symbolWidth = cellWidth / 6
 	private val priceWidth = cellWidth / 5
 	private val changeWidth = cellWidth / 6
 	
 	private val rank = TextView(context).apply {
 		layoutParams = LayoutParams(rankWidth, matchParent)
-		gravity = Gravity.CENTER_VERTICAL
+		gravity = Gravity.CENTER
 	}
 	private val icon = ImageView(context).apply {
 		layoutParams = LayoutParams(Math.min(cellHeight, iconWidth), matchParent)
@@ -76,7 +76,6 @@ class CoinRankCell(context: Context): BaseCell(context) {
 				}
 			}
 			
-			
 			name.text = it.name
 			symbol.text = it.symbol
 			price.text = "${BigDecimal(it.price.toString()).setScale(2, BigDecimal.ROUND_HALF_UP)}"
@@ -88,12 +87,10 @@ class CoinRankCell(context: Context): BaseCell(context) {
 	
 	init {
 		hasArrow = false
+		leftPadding = 10.uiPX()
+		rightPadding = 10.uiPX()
 		linearLayout {
 			layoutParams = LayoutParams(matchParent, 50.uiPX())
-			setMargins<RelativeLayout.LayoutParams> {
-				leftMargin = 10.uiPX()
-				rightMargin = 10.uiPX()
-			}
 			addView(rank)
 			addView(icon)
 			verticalLayout {

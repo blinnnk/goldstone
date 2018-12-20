@@ -13,8 +13,7 @@ import java.math.BigDecimal
  * @description:
  */
 @Suppress("IMPLICIT_CAST_TO_ANY")
-class CoinRankPresenter(private val gsView: CoinRankContract.GSView
-): CoinRankContract.GSPresenter {
+class CoinRankPresenter(private val gsView: CoinRankContract.GSView) : CoinRankContract.GSPresenter {
 	
 	private var lastRank = 0
 	
