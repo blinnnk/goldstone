@@ -78,7 +78,7 @@ fun ViewGroup.showQuickPaymentDashboard(
 			contentLayout,
 			hold = {
 				confirmEvent()
-				transaction.trade(context, callback)
+				transaction.trade(context, cancelEvent, callback)
 			},
 			cancelAction = cancelEvent
 		)

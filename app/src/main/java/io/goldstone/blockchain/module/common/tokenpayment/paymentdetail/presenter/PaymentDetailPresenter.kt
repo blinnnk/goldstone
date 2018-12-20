@@ -57,7 +57,10 @@ class PaymentDetailPresenter(
 		return rootFragment?.token
 	}
 
-	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
+	fun goToGasEditorFragmentOrTransfer(
+		cancelEvent: () -> Unit,
+		callback: (GoldStoneError) -> Unit
+	) {
 		if (!NetworkUtil.hasNetwork()) {
 			callback(NetworkError.WithOutNetwork)
 		} else {
@@ -84,6 +87,7 @@ class PaymentDetailPresenter(
 				token?.contract.isEOSSeries() -> transferEOS(
 					count,
 					getToken()?.contract.orEmpty(),
+					cancelEvent,
 					callback
 				)
 				else -> prepareETHSeriesPaymentModel(count, callback)
@@ -108,13 +112,14 @@ class PaymentDetailPresenter(
 			confirmEvent: () -> Unit = {},
 			hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) {
-			if (SharedWallet.hasFingerprint()) getPrivatekeyByFingerprint(context, chainType, hold)
+			if (SharedWallet.hasFingerprint()) getPrivatekeyByFingerprint(context, chainType, cancelEvent, hold)
 			else getPrivatekeyByPassword(context, chainType, cancelEvent, confirmEvent, hold)
 		}
 
 		private fun getPrivatekeyByFingerprint(
 			context: Context,
 			chainType: ChainType,
+			cancelEvent: () -> Unit,
 			hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) = GlobalScope.launch(Dispatchers.Main) {
 			FingerprintSettingFragment.showFingerprintDashboard(
@@ -122,7 +127,8 @@ class PaymentDetailPresenter(
 				true,
 				usePasswordEvent = {
 					PaymentDetailPresenter.getPrivatekeyByPassword(context, ChainType.EOS, hold = hold)
-				}
+				},
+				cancelAction = cancelEvent
 			) { cipher ->
 				load {
 					WalletTable.dao.getEncryptFingerprintKey()

@@ -104,6 +104,7 @@ data class EOSTransactionInfo(
 	// 故在此传入 Decimal
 	fun trade(
 		context: Context,
+		cancelAction: () -> Unit,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		if (!toAccount.isValid(false)) {
@@ -113,7 +114,8 @@ data class EOSTransactionInfo(
 				context,
 				amount.toCount(contract.decimal ?: CryptoValue.eosDecimal),
 				contract,
-				StakeType.Trade
+				StakeType.Trade,
+				cancelAction = cancelAction
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
 					transfer(EOSPrivateKey(privateKey), hold)

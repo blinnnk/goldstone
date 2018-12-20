@@ -38,6 +38,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI.getStringAccountInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -325,7 +326,7 @@ class DAPPBrowser(
 						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 					} else {
 						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
-						ErrorDisplayManager(error).show(context)
+						if (error.hasError()) ErrorDisplayManager(error).show(context)
 					}
 				}
 			}
@@ -500,18 +501,27 @@ class DAPPBrowser(
 							launchUI {
 								loadingView.remove()
 								if (pushJson.isNotNull() && hashError.isNone()) {
-									val result = Uri.encode(pushJson)
+									val result = Uri.encode("{\"signedData\": $pushJson, \"error\": \"${hashError.message}\"}")
 									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
 								} else {
-									evaluateJavascript("javascript:getEOSSignedData(\"${hashError.message}\")", null)
+									val result = Uri.encode("{\"signedData\": undefined, \"error\": \"${hashError.message}\"}")
+									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
 								}
 							}
 						}
 					} else launchUI {
 						loadingView.remove()
-						evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
+						val result = Uri.encode("{\"signedData\": undefined, \"error\": \"${error.message}\"}")
+						evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
 					}
 				}
+			}
+		}
+
+		@JavascriptInterface
+		fun showShareDashboard(shareContent: String) {
+			launchUI {
+				ProfilePresenter.showShareChooser(context!!, shareContent)
 			}
 		}
 

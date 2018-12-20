@@ -5,6 +5,7 @@ import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.language.DappCenterText
@@ -52,12 +53,15 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				it.presenter.removeSelfFromActivity()
 			}
 			it.enterKeyEvent = Runnable {
-				getMainActivity()?.showDappBrowserFragment(
-					formattedURL(it.getSearchContent()),
-					PreviousView.DAPPExplorer,
-					"FFFFFF",
-					parentFragment
-				)
+				getMainActivity()?.apply {
+					SoftKeyboard.hide(this)
+					showDappBrowserFragment(
+						formattedURL(it.getSearchContent()),
+						PreviousView.DAPPExplorer,
+						"FFFFFF",
+						parentFragment
+					)
+				}
 			}
 		}
 	}
@@ -83,7 +87,7 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 	}
 
 	private fun formattedURL(url: String): String {
-		return if (url.indexOf("http") == -1 || url.indexOf("https") == -1)  {
+		return if (!url.contains("http", true))  {
 			"https://$url"
 		} else url
 	}

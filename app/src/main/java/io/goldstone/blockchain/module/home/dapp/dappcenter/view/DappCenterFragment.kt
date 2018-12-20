@@ -25,7 +25,6 @@ import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.language.ProfileText
-import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
