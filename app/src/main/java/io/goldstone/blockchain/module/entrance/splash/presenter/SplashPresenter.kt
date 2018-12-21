@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -37,7 +38,24 @@ import java.io.File
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
-
+	
+	// 初始化sandbox的数据
+	@WorkerThread
+	fun updateSandboxData(config: AppConfigTable) {
+		if (WalletTable.dao.rowCount() == 0) {
+			 SandBoxManager.recoveryLanguage()?.apply {
+				 config.language = this
+			 }
+			val sandboxCurrency = SandBoxManager.recoveryCurrency()
+			if (!sandboxCurrency.isNullOrEmpty()) {
+				config.currencyCode = sandboxCurrency
+			}
+			SandBoxManager.recoveryDefaultMarketSelected()
+			SandBoxManager.recoveryQuotationSelections {  }
+		}
+		
+	}
+	
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
@@ -53,7 +71,6 @@ class SplashPresenter(val activity: SplashActivity) {
 		if (ExchangeTable.dao.rowCount() == 0) {
 			val localData =
 				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_market_list).map { ExchangeTable(it) }
-			SandBoxManager.recoveryDefaultMarketSelected(localData)
 			ExchangeTable.dao.insertAll(localData)
 		}
 	}
@@ -67,34 +84,20 @@ class SplashPresenter(val activity: SplashActivity) {
 			callback()
 		} else callback()
 	}
-
+	
 	@WorkerThread
 	fun initSupportCurrencyList(context: Context) {
 		if (SupportCurrencyTable.dao.rowCount() == 0) {
-			val sandboxCurrency = SandBoxManager.getCurrency()
-			var changedStatus = false // 是否设置了选中的status，只命中一次，如果从沙盒中获取到了，那么就不用默认的货币了
-			var baseNeedChangePosition = -1 // 需要将本地的默认货币更改状态的下标
 			val localCurrency =
-				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).mapIndexed { index, it ->
-					 // 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+				context.convertLocalJsonFileToJSONObjectArray(R.raw.support_currency_list).map {
 					SupportCurrencyTable(it).apply {
-						if (sandboxCurrency.isNotEmpty()
-							&& sandboxCurrency.equals(this.currencySymbol, true)) {
-							// 如果沙盒中有数据，那么更新状态
-							changedStatus = true
-							this.isUsed = true
-							SharedWallet.updateCurrentRate(this.rate)
-						}
-						if (this.currencySymbol.equals(CountryCode.currentCurrency, true)) {
-							baseNeedChangePosition = index
+						// 初始化的汇率显示本地 `Json` 中的值, 之后是通过网络更新
+						if (currencySymbol.equals(CountryCode.currentCurrency, true)) {
+							isUsed = true
+							SharedWallet.updateCurrentRate(rate)
 						}
 					}
 				}
-			if (!changedStatus && baseNeedChangePosition != -1) {
-				localCurrency[baseNeedChangePosition].isUsed = true
-				SharedWallet.updateCurrentRate(localCurrency[baseNeedChangePosition].rate)
-			}
-			
 			SupportCurrencyTable.dao.insertAll(localCurrency)
 		}
 	}

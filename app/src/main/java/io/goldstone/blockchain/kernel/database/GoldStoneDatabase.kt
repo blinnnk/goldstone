@@ -93,7 +93,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun favoriteDao(): FavoriteDao
 
 	companion object {
-		const val databaseVersion = 14
+		const val databaseVersion = 19
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

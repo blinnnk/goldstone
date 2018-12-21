@@ -7,6 +7,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.toJsonArray
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -26,24 +28,36 @@ object SandBoxManager {
 	private const val marketListFileName = "marketList"
 	private const val quotationPairsFileName = "quotationPairs"
 	
-	fun getLanguage(): Int {
+	fun recoveryLanguage(): Int? {
 		val language = getSandBoxContentByName(languageFileName)
-		return if (language.isEmpty()) -1 else language.toInt()
+		return if (!language.isNullOrEmpty()) {
+			AppConfigTable.dao.updateLanguageCode(language.toInt())
+			language.toInt()
+		} else {
+			null
+		}
 	}
 	
 	fun updateLanguage(language: Int) {
 		updateSandBoxContentByName(languageFileName, language.toString())
 	}
 	
-	fun getCurrency(): String {
-		return getSandBoxContentByName(currencyFileName)
+	fun recoveryCurrency(): String {
+		val currency = getSandBoxContentByName(currencyFileName)
+		if (!currency.isNullOrEmpty()) {
+			AppConfigTable.dao.updateCurrency(currency)
+			SupportCurrencyTable.dao.setCurrentCurrencyUnused()
+			SupportCurrencyTable.dao.setCurrencyInUse(currency)
+		}
+		return currency
 	}
 	
 	fun updateCurrency(currency: String) {
 		updateSandBoxContentByName(currencyFileName, currency)
 	}
 	
-	fun recoveryDefaultMarketSelected(defaultMarketList: List<ExchangeTable>) {
+	fun recoveryDefaultMarketSelected() {
+		val defaultMarketList = ExchangeTable.dao.getAll()
 		val marketString = getSandBoxContentByName(marketListFileName)
 		if (marketString.isNullOrEmpty()) return
 		val sandboxMarketList = try {
@@ -57,8 +71,11 @@ object SandBoxManager {
 				if (sandboxMarketList.contains(it.marketId)) {
 					it.isSelected = true
 				}
+				ExchangeTable.dao.update(it)
 			}
 		}
+		
+		
 	}
 	
 	

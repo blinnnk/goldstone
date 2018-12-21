@@ -76,12 +76,6 @@ class QuotationPresenter(
 			it.orderID
 		}.toList().let { quotations ->
 			if (!hasCheckedPairDate) {
-				if (invalidDatePairs.size() == 0) {
-					SandBoxManager.recoveryQuotationSelections {
-						updateData()
-					}
-					return
-				}
 				updateInvalidDatePair(invalidDatePairs) {
 					launchUI {
 						updateData()
