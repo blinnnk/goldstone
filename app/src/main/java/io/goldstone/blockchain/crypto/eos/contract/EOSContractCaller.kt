@@ -83,19 +83,16 @@ class EOSContractCaller(
 				} else {
 					dataCode = EOSUtils.getLittleEndianCode(data)
 				}
-				val authorizationObject = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 				val action = EOSAction(
 					code,
 					dataCode,
 					method,
-					authorizationObject
+					listOf(authorization)
 				)
 				val serialization = EOSTransactionUtils.serialize(
 					chainID,
 					header,
-					listOf(action),
-					listOf(authorization),
-					dataCode
+					listOf(action)
 				)
 				hold(serialization, error)
 			} else hold(null, error)

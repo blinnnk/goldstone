@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.component.container.SplashContainer
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
-import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -24,7 +23,6 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
-import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -33,7 +31,6 @@ import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter.Companion.updateAccountInformation
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -68,14 +65,16 @@ class SplashActivity : AppCompatActivity() {
 				}
 			)
 			GlobalScope.launch(Dispatchers.Default) {
-				presenter.cleanWhenUpdateDatabaseOrElse {
-					presenter.initSupportCurrencyList(this@SplashActivity)
-					presenter.initDefaultExchangeData(this@SplashActivity)
-					prepareAppConfig {
-						presenter.recoverySandboxData { hasChanged ->
-							if (hasChanged) {
-								AppConfigTable.dao.getAppConfig()?.prepareData()
-							} else prepareData()
+				with(presenter) {
+					cleanWhenUpdateDatabaseOrElse {
+						initSupportCurrencyList(this@SplashActivity)
+						initDefaultExchangeData(this@SplashActivity)
+						prepareAppConfig {
+							recoverySandboxData { hasChanged ->
+								if (hasChanged) {
+									AppConfigTable.dao.getAppConfig()?.prepareData()
+								} else prepareData()
+							}
 						}
 					}
 				}

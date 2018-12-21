@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
@@ -30,6 +31,7 @@ import org.json.JSONObject
 fun ViewGroup.showQuickPaymentDashboard(
 	data: JSONObject,
 	isSampleTransfer: Boolean, // 如果是 `isTransactionObject` 传入的 `JSONObject` 是含有全量信息的
+	dappChainURL: String,
 	cancelEvent: () -> Unit,
 	confirmEvent: () -> Unit,
 	callback: (EOSResponse?, GoldStoneError) -> Unit
@@ -76,7 +78,12 @@ fun ViewGroup.showQuickPaymentDashboard(
 			contentLayout,
 			hold = {
 				confirmEvent()
-				transaction.trade(context, cancelEvent, callback)
+				transaction.trade(
+					context,
+					if (dappChainURL.isNotEmpty()) dappChainURL else SharedChain.getEOSCurrent().getURL(),
+					cancelAction = cancelEvent,
+					hold = callback
+				)
 			},
 			cancelAction = {
 				cancelEvent()

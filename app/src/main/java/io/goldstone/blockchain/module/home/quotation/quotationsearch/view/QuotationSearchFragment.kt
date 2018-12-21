@@ -119,8 +119,8 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 						exchange.marketId
 					}
 					presenter.updateSelectedExchangeID(selectedIDs)
-					SandBoxManager.updateMarketList(selectedIDs)
 					updateResultAfterConditionChanged()
+					SandBoxManager.updateMyExchanges(selectedIDs)
 					dialog.dismiss()
 				}
 				.negativeButton(text = CommonText.cancel) {

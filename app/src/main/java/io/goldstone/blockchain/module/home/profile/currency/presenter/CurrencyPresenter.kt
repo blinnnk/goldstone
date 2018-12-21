@@ -5,6 +5,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencyAdapter
@@ -35,13 +36,12 @@ class CurrencyPresenter(
 	}
 
 	fun updateCurrency(symbol: String) {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			val currencyDao = SupportCurrencyTable.dao
 			currencyDao.setCurrentCurrencyUnused()
 			currencyDao.setCurrencyInUse(symbol)
 			val rate = currencyDao.getCurrencyBySymbol(symbol)?.rate
 			AppConfigTable.dao.updateCurrency(symbol)
-			SandBoxManager.updateCurrency(symbol)
 			rate?.let { SharedWallet.updateCurrentRate(it) }
 			SharedWallet.updateCurrencyCode(symbol)
 		}

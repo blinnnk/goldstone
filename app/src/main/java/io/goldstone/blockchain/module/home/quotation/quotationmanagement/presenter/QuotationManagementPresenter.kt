@@ -6,6 +6,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.sandbox.SandBoxManager
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.utils.getObjectMD5HexString
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.QuotationUpdateEvent
@@ -24,7 +25,6 @@ import org.greenrobot.eventbus.EventBus
 class QuotationManagementPresenter(
 	override val fragment: QuotationManagementFragment
 ) : BaseRecyclerPresenter<QuotationManagementFragment, QuotationSelectionTable>() {
-
 
 	private var initDataMD5: String? = null
 
@@ -72,11 +72,10 @@ class QuotationManagementPresenter(
 			} else callback()
 		}
 	}
-	
-	fun updateSandboxPairs() {
-		GlobalScope.launch(Dispatchers.Default) {
-			val newPairs = fragment.asyncData?.filter { it.isSelecting }?.map { it.pair } ?: listOf()
-			SandBoxManager.updateQuotationPairs(newPairs)
+
+	fun updateSandboxPairs() = launchDefault {
+		fragment.asyncData?.filter { it.isSelecting }?.map { it.pair }?.let {
+			SandBoxManager.updateQuotationPairs(it)
 		}
 	}
 

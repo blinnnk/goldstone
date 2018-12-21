@@ -6,6 +6,7 @@ import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TokenDetailText
@@ -137,7 +138,9 @@ class TokenAssetPresenter(
 		netAmount: BigInteger,
 		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		PrivateKeyExportPresenter.getPrivateKey(
+		if (cpuAmount == BigInteger.ZERO && netAmount == BigInteger.ZERO) {
+			hold(null, TransferError("please enter the value you decide redemption bandwidth"))
+		} else PrivateKeyExportPresenter.getPrivateKey(
 			SharedAddress.getCurrentEOS(),
 			ChainType.EOS,
 			password
@@ -149,7 +152,11 @@ class TokenAssetPresenter(
 					cpuAmount,
 					netAmount,
 					ExpirationType.FiveMinutes
-				).send(EOSPrivateKey(privateKey), hold)
+				).send(
+					EOSPrivateKey(privateKey),
+					SharedChain.getEOSCurrent().getURL(),
+					hold
+				)
 			} else hold(null, error)
 		}
 	}

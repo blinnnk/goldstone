@@ -42,9 +42,7 @@ class MainActivity : AppCompatActivity() {
 		val application = application as GoldStoneApp
 		// 初始化 `Google Analytics` 追踪器
 		tracker = application.getDefaultTracker()
-
 		transparentStatus()
-
 		setContentView(relativeLayout {
 			id = ContainerID.main
 			if (savedInstanceState.isNull()) {
