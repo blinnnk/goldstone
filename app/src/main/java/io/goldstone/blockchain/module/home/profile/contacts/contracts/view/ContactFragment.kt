@@ -58,7 +58,7 @@ class ContactFragment : BaseRecyclerFragment<ContactPresenter, ContactTable>() {
 
 		recyclerView.addSwipeEvent<ContactsCell>(R.drawable.delete_icon, 20.uiPX(), ItemTouchHelper.LEFT) { position, cell ->
 			Dashboard(context!!) {
-				dialog.cancelOnTouchOutside(false)
+				cancelOnTouchOutside()
 				showAlert(
 					ProfileText.deleteContactAlertTitle,
 					ProfileText.deleteContactAlertDescription,

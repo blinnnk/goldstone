@@ -143,7 +143,7 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 					presenter.loadMore()
 					attentionDashboard = null
 				}
-				dialog.cancelOnTouchOutside(false)
+				cancelOnTouchOutside()
 			}
 		}
 	}

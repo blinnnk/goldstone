@@ -27,7 +27,6 @@ class ValueView(context: Context) : TextView(context) {
 	init {
 		addCorner(CornerSize.small.toInt(), GrayScale.whiteGray)
 		layoutParams = ViewGroup.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-		minimumHeight = 70.uiPX()
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 		maxLines = 8
 		movementMethod = ScrollingMovementMethod()

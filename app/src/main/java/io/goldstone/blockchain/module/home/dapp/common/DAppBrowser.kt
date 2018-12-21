@@ -337,6 +337,7 @@ class DAPPBrowser(
 		 */
 		@JavascriptInterface
 		fun simpleTransfer(action: String) {
+			System.out.println("+++ simple $action")
 			launchUI {
 				val actionObject = try {
 					JSONObject(action)
@@ -385,7 +386,7 @@ class DAPPBrowser(
 						title,
 						message,
 						CommonText.confirm,
-						{ dialog.dismiss() }
+						cancelAction = { dismiss() }
 					) {
 						evaluateJavascript("javascript:showAlert(\"clickedConfirmButton\")", null)
 					}
