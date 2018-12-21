@@ -38,7 +38,7 @@ class DescriptionView(context: Context) : TextView(context) {
 	}
 
 	fun isFingerprint(): DescriptionView {
-		text = FingerprintPaymentText.pageDescription
+		text = FingerprintPaymentText.featureDescription
 		return this
 	}
 

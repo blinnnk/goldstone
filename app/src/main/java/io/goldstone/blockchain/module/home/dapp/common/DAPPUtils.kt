@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
@@ -73,8 +74,8 @@ fun ViewGroup.showQuickPaymentDashboard(
 	}
 	Dashboard(context) {
 		showDashboard(
-			"Quick Payment",
-			"confirmation the transaction from current DAPP, then sign the data",
+			AlertText.transferRequestTitle,
+			AlertText.transferRequestDescription,
 			contentLayout,
 			hold = {
 				confirmEvent()
@@ -111,8 +112,8 @@ fun ViewGroup.showOperationDashboard(
 	Dashboard(context) {
 		dialog.cancelOnTouchOutside(false)
 		showDashboard(
-			"Contract Operation",
-			"contract need you to sign the data, and proof it is valid operation",
+			AlertText.signDataRequestTitle,
+			AlertText.signDataRequestDescription,
 			contentLayout,
 			hold = {
 				confirmEvent()

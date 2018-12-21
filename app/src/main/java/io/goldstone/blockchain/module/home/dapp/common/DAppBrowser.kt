@@ -17,6 +17,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -227,8 +228,8 @@ class DAPPBrowser(
 			launchUI {
 				Dashboard(context) {
 					showAlert(
-						"Signed Data Request",
-						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+						AlertText.signRequestTitle,
+						AlertText.signRequestDescription
 					) {
 						PaymentDetailPresenter.getPrivatekey(
 							context,

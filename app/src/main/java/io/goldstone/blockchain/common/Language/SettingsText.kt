@@ -319,7 +319,7 @@ object ProfileText {
 object FingerprintPaymentText {
 
 	@JvmField
-	val pageDescription = when (currentLanguage) {
+	val featureDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "After you open the fingerprint payment, you can confirm the transfer and signature by fingerprint. At the same time, you can still transfer or sign using the previously set password."
 		HoneyLanguage.Chinese.code -> "开启指纹支付后，你可以通过指纹来确认转账及签名。同时您仍旧可以使用之前设置的密码来转账或签名。"
 		HoneyLanguage.Japanese.code -> "指紋支払いを開いた後、指紋で転送と署名を確認することができます。 同時に、以前に設定したパスワードを使用して転送または署名することもできます。"
@@ -462,3 +462,5 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 }
+
+
