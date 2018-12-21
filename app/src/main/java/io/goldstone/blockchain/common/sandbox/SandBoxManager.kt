@@ -30,9 +30,9 @@ object SandBoxManager {
 	@WorkerThread
 	fun recoveryData() {
 		recoveryLanguage()
-		SandBoxManager.recoveryCurrency()
-		SandBoxManager.recoveryMarketSelectedStatus()
-		SandBoxManager.recoveryQuotationSelections()
+		recoveryCurrency()
+		recoveryMarketSelectedStatus()
+		recoveryQuotationSelections()
 	}
 	@WorkerThread
 	fun updateCurrency(currency: String) {
