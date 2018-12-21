@@ -41,7 +41,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	
 	// 初始化sandbox的数据
 	@WorkerThread
-	fun recoverySandboxData(hold: (hasConfigChanged: Boolean) -> Unit) {
+	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
 		if (WalletTable.dao.rowCount() == 0) {
 			SandBoxManager.recoveryData()
 			hold(true)
