@@ -95,7 +95,7 @@ class GoldStoneDialog(private val context: Context) {
 				title(text = DialogText.mobileNetwork)
 				positiveButton(text = CommonText.gotIt) {
 					confirmAction()
-					dialog.dismiss()
+					dismiss()
 				}
 				negativeButton(text = CommonText.cancel)
 				customView(view = it)

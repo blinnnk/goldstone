@@ -9,6 +9,7 @@ import android.os.Looper
 import android.os.Message
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat
 import android.support.v4.os.CancellationSignal
+import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.error.GoldStoneError
 import javax.crypto.Cipher
 
@@ -21,16 +22,22 @@ class FingerPrintManager(val context: Context) {
 
 	private var cancel: CancellationSignal? = null
 	private var handler: Handler? = null
-	private val fingerprint = FingerprintManagerCompat.from(context)
+	private var fingerprint: FingerprintManagerCompat? = null
+	private var fingerCallback: FingerprintManagerCompat.AuthenticationCallback? = null
 
 	fun observing(callback: (cipher: Cipher?, error: GoldStoneError) -> Unit) {
+		if (fingerprint.isNull()) fingerprint = FingerprintManagerCompat.from(context)
 		val crypto = null
 		val flags = 0
 		cancel = CancellationSignal()
-		val fingerCallback = object : FingerprintManagerCompat.AuthenticationCallback() {
+		fingerCallback = object : FingerprintManagerCompat.AuthenticationCallback() {
 			override fun onAuthenticationError(errMsgId: Int, errString: CharSequence?) {
 				super.onAuthenticationError(errMsgId, errString)
-				callback(null, GoldStoneError(errString?.toString() ?: "error"))
+				if (errMsgId == FingerprintManager.FINGERPRINT_ERROR_CANCELED) {
+					// TODO
+				} else {
+					callback(null, GoldStoneError(errString?.toString() ?: "error"))
+				}
 			}
 
 			override fun onAuthenticationFailed() {
@@ -63,18 +70,22 @@ class FingerPrintManager(val context: Context) {
 				}
 			}
 		}
-		fingerprint.authenticate(crypto, flags, cancel, fingerCallback, handler)
+		fingerprint?.authenticate(crypto, flags, cancel, fingerCallback!!, handler)
 	}
 
 	fun checker(): FingerPrintType {
-		return if (fingerprint.isHardwareDetected) {
-			if (fingerprint.hasEnrolledFingerprints()) FingerPrintType.Valid
+		if (fingerprint.isNull()) fingerprint = FingerprintManagerCompat.from(context)
+		return if (fingerprint!!.isHardwareDetected) {
+			if (fingerprint!!.hasEnrolledFingerprints()) FingerPrintType.Valid
 			else FingerPrintType.NoneFingerprint
 		} else FingerPrintType.NoneHardware
 	}
 
 	fun removeHandler() {
 		handler?.removeCallbacksAndMessages(null)
+		cancel = null
+		fingerprint = null
+		fingerCallback = null
 	}
 
 	private fun handleErrorCode(code: Int) {
@@ -91,12 +102,13 @@ class FingerPrintManager(val context: Context) {
 			}
 			FingerprintManager.FINGERPRINT_ERROR_UNABLE_TO_PROCESS -> {
 			}
-		}//todo 指纹传感器不可用，该操作被取消
-		//todo 当前设备不可用，请稍后再试
-		//todo 由于太多次尝试失败导致被锁，该操作被取消
-		//todo 没有足够的存储空间保存这次操作，该操作不能完成
-		//todo 操作时间太长，一般为30秒
-		//todo 传感器不能处理当前指纹图片
+		}
+		// todo 指纹传感器不可用，该操作被取消
+		// todo 当前设备不可用，请稍后再试
+		// todo 由于太多次尝试失败导致被锁，该操作被取消
+		// todo 没有足够的存储空间保存这次操作，该操作不能完成
+		// todo 操作时间太长，一般为30秒
+		// todo 传感器不能处理当前指纹图片
 	}
 
 }

@@ -109,15 +109,15 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 
 	private fun turnOffFingerprint() {
 		with(switchCell) {
-			setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusEnabled)
+			setTitle(FingerprintPaymentText.buttonStatusEnabled)
 			clickEvent = Runnable {
 				Dashboard(context) {
 					showAlert(
-						FingerprintPaymentText.TurnOffAlertTitle,
-						FingerprintPaymentText.TurnOffAlertDescription
+						FingerprintPaymentText.turnOffAlertTitle,
+						FingerprintPaymentText.turnOffAlertDescription
 					) {
 						presenter.turnOffFingerprintPayment {
-							dialog.dismiss()
+							dismiss()
 							context.alert(CommonText.succeed)
 							resetButtonEvent()
 						}
@@ -131,7 +131,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 		when {
 			fingerprintManager.checker().isValid() -> {
 				with(switchCell) {
-					setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusUnset)
+					setTitle(FingerprintPaymentText.buttonStatusUnset)
 					clickEvent = Runnable {
 						loadingView.show()
 						Dashboard(context) {
@@ -191,13 +191,13 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 				}
 			}
 			fingerprintManager.checker().isUnsupportedDevice() -> {
-				switchCell.setTitle(FingerprintPaymentText.fingerprintPaymentButtonStatusUnsupport)
+				switchCell.setTitle(FingerprintPaymentText.buttonStatusUnsupport)
 				switchCell.setSelectedStatus(false)
 				switchCell.clickEvent = Runnable {
 					Dashboard(switchCell.context) {
 						showAlert(
-							FingerprintPaymentText.fingerprintNotSupported,
-							FingerprintPaymentText.fingerprintNotSupportedDescription
+							FingerprintPaymentText.unsupported,
+							FingerprintPaymentText.unsupportedDescription
 						) {
 							switchCell.setSelectedStatus(false)
 						}
@@ -247,8 +247,8 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					addCorner(45.uiPX(), Spectrum.green)
 				}
 				description = textView {
-					layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
-					gravity = Gravity.CENTER
+					layoutParams = LinearLayout.LayoutParams(matchParent, 35.uiPX())
+					gravity = Gravity.CENTER or Gravity.BOTTOM
 					textSize = fontSize(12)
 					textColor = GrayScale.midGray
 					typeface = GoldStoneFont.medium(context)
@@ -267,13 +267,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 			}
 			Dashboard(context) {
 				showAttentionDashboard(
-
-				FingerprintPaymentText.authenticationAlertTitle,
-				FingerprintPaymentText.authenticationAlertDescription,
+					FingerprintPaymentText.authenticationAlertTitle,
+					FingerprintPaymentText.authenticationAlertDescription,
 					fingerView,
 					cancelAction = {
 						manager.removeHandler()
-						dialog.dismiss()
+						dismiss()
 						cancelAction()
 					}
 				)
@@ -285,12 +284,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					} else {
 						hold(cipher)
 						manager.removeHandler()
-						dialog.dismiss()
+						dismiss()
 					}
 				}
 				passwordButton?.onClick {
 					usePasswordEvent()
-					dialog.dismiss()
+					dismiss()
 					manager.removeHandler()
 					passwordButton?.preventDuplicateClicks()
 				}

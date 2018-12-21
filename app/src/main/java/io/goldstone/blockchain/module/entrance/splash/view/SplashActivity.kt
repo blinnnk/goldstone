@@ -66,44 +66,44 @@ class SplashActivity : AppCompatActivity() {
 			)
 			GlobalScope.launch(Dispatchers.Default) {
 				presenter.cleanWhenUpdateDatabaseOrElse {
-					prepareData()
+					prepareAppConfig {
+						prepareData()
+					}
 				}
 			}
 		}
 	}
 
 	@WorkerThread
-	private fun prepareData() {
-		prepareAppConfig {
-			SharedValue.updatePincodeDisplayStatus(showPincode)
-			SharedWallet.updateCurrencyCode(currencyCode)
-			SharedValue.updateJSCode(jsCode)
-			// 如果本地的钱包数量不为空那么才开始注册设备
-			// 把 `GoldStoneID` 存储到 `SharePreference` 里面
-			SharedWallet.updateGoldStoneID(goldStoneID)
-			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
-				val hasStartingFragment =
-					supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
-				if (!hasStartingFragment) launchUI {
-					addFragment<StartingFragment>(it.id)
-				}
+	private fun AppConfigTable.prepareData() {
+		SharedValue.updatePincodeDisplayStatus(showPincode)
+		SharedWallet.updateCurrencyCode(currencyCode)
+		SharedValue.updateJSCode(jsCode)
+		// 如果本地的钱包数量不为空那么才开始注册设备
+		// 把 `GoldStoneID` 存储到 `SharePreference` 里面
+		SharedWallet.updateGoldStoneID(goldStoneID)
+		findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
+			val hasStartingFragment =
+				supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
+			if (!hasStartingFragment) launchUI {
+				addFragment<StartingFragment>(it.id)
 			}
-			// Add currency data from local JSON file
-			with(presenter) {
-				initNodeList(activity) {
-					prepareNodeInfo {
-						// 初次安装软件关键数据从本地 JSON 生成到数据库,
-						// 后续会在网络环境更新为网络数据
-						initLaunchLanguage(language)
-						initSupportCurrencyList(activity)
-						initDefaultExchangeData(activity)
-						initDefaultToken(activity)
-						// 检查市场状况
-						prepareInReviewStatus {
-							updateAccountInformation(activity) {
-								launchUI {
-									jump<MainActivity>()
-								}
+		}
+		// Add currency data from local JSON file
+		with(presenter) {
+			initNodeList(activity) {
+				prepareNodeInfo {
+					// 初次安装软件关键数据从本地 JSON 生成到数据库,
+					// 后续会在网络环境更新为网络数据
+					initLaunchLanguage(language)
+					initSupportCurrencyList(activity)
+					initDefaultExchangeData(activity)
+					initDefaultToken(activity)
+					// 检查市场状况
+					prepareInReviewStatus {
+						updateAccountInformation(activity) {
+							launchUI {
+								jump<MainActivity>()
 							}
 						}
 					}

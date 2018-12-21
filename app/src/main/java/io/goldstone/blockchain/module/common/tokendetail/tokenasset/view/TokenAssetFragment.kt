@@ -353,7 +353,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun Dashboard.showRefundBandwidthEditorDashboard(receiver: EOSAccount) {
-		with(dialog) {
+		getDialog {
 			cancelOnTouchOutside(false)
 			setContentView(
 				DelegateEditorView(context).apply {
@@ -369,7 +369,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 						) { response, error ->
 							launchUI {
 								if (response.isNotNull() && error.isNone()) launchUI {
-									dialog.dismiss()
+									dismiss()
 									showLoading(false)
 									presenter.updateRefundInfo()
 									response.showDialog(context)
