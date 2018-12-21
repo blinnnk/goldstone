@@ -9,6 +9,7 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.language.ChainErrorText
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -18,6 +19,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.isEOS
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
@@ -36,7 +38,17 @@ import java.io.File
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
-
+	
+	// 初始化sandbox的数据
+	@WorkerThread
+	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
+		if (WalletTable.dao.rowCount() == 0) {
+			SandBoxManager.recoveryData {
+				hold(true)
+			}
+		} else hold(false)
+	}
+	
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
@@ -65,7 +77,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			callback()
 		} else callback()
 	}
-
+	
 	@WorkerThread
 	fun initSupportCurrencyList(context: Context) {
 		if (SupportCurrencyTable.dao.rowCount() == 0) {
