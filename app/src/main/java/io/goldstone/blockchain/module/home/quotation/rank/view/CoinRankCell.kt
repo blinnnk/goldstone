@@ -40,6 +40,7 @@ class CoinRankCell(context: Context): BaseCell(context) {
 		layoutParams = LayoutParams(Math.min(cellHeight, iconWidth), matchParent)
 		gravity = Gravity.CENTER
 		setColorFilter(Spectrum.white)
+		padding = 5.uiPX()
 		addCorner(layoutParams.width / 2, Spectrum.white)
 	}
 	private val name = TextView(context).apply {
