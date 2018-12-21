@@ -349,7 +349,6 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 
-	@JvmField
 	val buttonStatusUnsupport = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DEVICE DOES NOT SUPPORT"
 		HoneyLanguage.Chinese.code -> "您当前的设备不支持本功能"
@@ -370,16 +369,7 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
-	val buttonStatusUnset = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enable fingerprint payment"
-		HoneyLanguage.Chinese.code -> "开启指纹支付"
-		HoneyLanguage.Japanese.code -> "指紋の支払いを開く"
-		HoneyLanguage.Korean.code -> "열린 지문 지불"
-		HoneyLanguage.Russian.code -> "Включить оплату по отпечатку пальца"
-		HoneyLanguage.TraditionalChinese.code -> "開啟指紋支付"
-		else -> ""
-	}
-	@JvmField
+
 	val turnOffAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Turn off fingerprint payment"
 		HoneyLanguage.Chinese.code -> "关闭指纹支付"
@@ -442,6 +432,16 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
+	val buttonStatusUnset = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enable fingerprint payment"
+		HoneyLanguage.Chinese.code -> "开启指纹支付"
+		HoneyLanguage.Japanese.code -> "指紋の支払いを開く"
+		HoneyLanguage.Korean.code -> "열린 지문 지불"
+		HoneyLanguage.Russian.code -> "Включить оплату по отпечатку пальца"
+		HoneyLanguage.TraditionalChinese.code -> "開啟指紋支付"
+		else -> ""
+	}
+	@JvmField
 	val permissionVerifyAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Authentication"
 		HoneyLanguage.Chinese.code -> "身份验证"
@@ -461,6 +461,17 @@ object FingerprintPaymentText {
 		HoneyLanguage.TraditionalChinese.code -> "需要輸入密碼來驗證您的身份，以開啟指紋支付功能。"
 		else -> ""
 	}
+	@JvmField
+	val detecting = when (currentLanguage) {
+		HoneyLanguage.English.code->"Identifying fingerprints"
+		HoneyLanguage.Chinese.code->"正在鉴别指纹"
+		HoneyLanguage.Japanese.code->"指紋の識別"
+		HoneyLanguage.Korean.code->"지문 식별"
+		HoneyLanguage.Russian.code->"Идентификация отпечатков пальцев"
+		HoneyLanguage.TraditionalChinese.code->"正在鑑別指紋"
+		else -> ""
+	}
+
 }
 
 

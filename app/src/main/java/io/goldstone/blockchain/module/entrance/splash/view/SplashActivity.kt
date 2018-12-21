@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.component.container.SplashContainer
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
@@ -31,6 +33,7 @@ import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter.Companion.updateAccountInformation
 import io.goldstone.blockchain.module.entrance.starting.view.StartingFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
+import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -66,44 +69,48 @@ class SplashActivity : AppCompatActivity() {
 			)
 			GlobalScope.launch(Dispatchers.Default) {
 				presenter.cleanWhenUpdateDatabaseOrElse {
-					prepareData()
+					presenter.initSupportCurrencyList(this@SplashActivity)
+					presenter.initDefaultExchangeData(this@SplashActivity)
+					prepareAppConfig {
+						presenter.recoverySandboxData { hasChanged ->
+							if (hasChanged) {
+								AppConfigTable.dao.getAppConfig()?.prepareData()
+							} else prepareData()
+						}
+					}
 				}
 			}
 		}
 	}
 
 	@WorkerThread
-	private fun prepareData() {
-		prepareAppConfig {
-			SharedValue.updatePincodeDisplayStatus(showPincode)
-			SharedWallet.updateCurrencyCode(currencyCode)
-			SharedValue.updateJSCode(jsCode)
-			// 如果本地的钱包数量不为空那么才开始注册设备
-			// 把 `GoldStoneID` 存储到 `SharePreference` 里面
-			SharedWallet.updateGoldStoneID(goldStoneID)
-			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
-				val hasStartingFragment =
-					supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
-				if (!hasStartingFragment) launchUI {
-					addFragment<StartingFragment>(it.id)
-				}
+	private fun AppConfigTable.prepareData() {
+		SharedValue.updatePincodeDisplayStatus(showPincode)
+		SharedWallet.updateCurrencyCode(currencyCode)
+		SharedValue.updateJSCode(jsCode)
+		// 如果本地的钱包数量不为空那么才开始注册设备
+		// 把 `GoldStoneID` 存储到 `SharePreference` 里面
+		SharedWallet.updateGoldStoneID(goldStoneID)
+		findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
+			val hasStartingFragment =
+				supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
+			if (!hasStartingFragment) launchUI {
+				addFragment<StartingFragment>(it.id)
 			}
-			// Add currency data from local JSON file
-			with(presenter) {
-				initNodeList(activity) {
-					prepareNodeInfo {
-						// 初次安装软件关键数据从本地 JSON 生成到数据库,
-						// 后续会在网络环境更新为网络数据
-						initLaunchLanguage(language)
-						initSupportCurrencyList(activity)
-						initDefaultExchangeData(activity)
-						initDefaultToken(activity)
-						// 检查市场状况
-						prepareInReviewStatus {
-							updateAccountInformation(activity) {
-								launchUI {
-									jump<MainActivity>()
-								}
+		}
+		// Add currency data from local JSON file
+		with(presenter) {
+			initNodeList(activity) {
+				prepareNodeInfo {
+					// 初次安装软件关键数据从本地 JSON 生成到数据库,
+					// 后续会在网络环境更新为网络数据
+					initLaunchLanguage(language)
+					initDefaultToken(activity)
+					// 检查市场状况
+					prepareInReviewStatus {
+						updateAccountInformation(activity) {
+							launchUI {
+								jump<MainActivity>()
 							}
 						}
 					}

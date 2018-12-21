@@ -32,24 +32,37 @@ import org.jetbrains.anko.*
  */
 
 class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
-	val dialog = MaterialDialog(context)
+	private var dialog: MaterialDialog? = null
 
 	init {
-		dialog.window.setLayout(ScreenSize.overlayContentWidth, wrapContent)
+		dialog = MaterialDialog(context)
+		dialog?.window?.setLayout(ScreenSize.overlayContentWidth, wrapContent)
 		val shape = GradientDrawable().apply {
 			cornerRadius = CornerSize.small
 			shape = GradientDrawable.RECTANGLE
 			setSize(matchParent, matchParent)
 			setColor(Spectrum.white)
 		}
-		dialog.window.setBackgroundDrawable(shape)
+		dialog?.window?.setBackgroundDrawable(shape)
 		hold(this)
 	}
 
-	fun dismiss() = dialog.dismiss()
+	fun dismiss() {
+		dialog?.dismiss()
+		dialog = null
+	}
+
+	// 安全非空的 Dialog
+	fun getDialog(hold: MaterialDialog.() -> Unit) {
+		dialog?.let(hold)
+	}
+
+	fun cancelOnTouchOutside() {
+		dialog?.cancelOnTouchOutside(false)
+	}
 
 	fun <T, C : View> showList(title: String, adapter: HoneyBaseAdapter<T, C>) {
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			customListAdapter(adapter)
 			negativeButton(text = CommonText.gotIt)
@@ -58,7 +71,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 	}
 
 	fun <T, C : View> showGrid(title: String, adapter: HoneyBaseAdapter<T, C>) {
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			customListAdapter(adapter)
 			getRecyclerView()?.layoutManager =
@@ -75,7 +88,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		hold: (T) -> Unit,
 		cancelAction: () -> Unit
 	) {
-		with(dialog) {
+		getDialog {
 			cancelOnTouchOutside(false)
 			title(text = title)
 			message(text = message)
@@ -83,7 +96,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 			if (hold.isNotNull()) {
 				positiveButton(text = CommonText.confirm) {
 					hold(customView)
-					dialog.dismiss()
+					dialog?.dismiss()
 				}
 			}
 			negativeButton(text = CommonText.cancel) {
@@ -99,7 +112,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		customView: T,
 		cancelAction: () -> Unit
 	) {
-		with(dialog) {
+		getDialog {
 			cancelOnTouchOutside(false)
 			title(text = title)
 			message(text = message)
@@ -118,7 +131,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		cancelAction: () -> Unit = {},
 		confirmAction: () -> Unit
 	) {
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			message(text = message)
 			positiveButton(text = positiveButtonTitle) {
@@ -138,7 +151,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		confirmAction: (List<String>) -> Unit
 	) {
 		var selectedItems = listOf<String>()
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			listItemsMultiChoice(
 				items = data,
@@ -146,7 +159,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 				waitForPositiveButton = false
 			) { _, _, items ->
 				selectedItems = items
-				dialog.setActionButtonEnabled(WhichButton.POSITIVE, items.isNotEmpty())
+				dialog?.setActionButtonEnabled(WhichButton.POSITIVE, items.isNotEmpty())
 			}
 			positiveButton(text = CommonText.confirm) {
 				confirmAction(selectedItems)

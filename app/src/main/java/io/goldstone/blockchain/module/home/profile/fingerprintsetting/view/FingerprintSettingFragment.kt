@@ -117,7 +117,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 						FingerprintPaymentText.turnOffAlertDescription
 					) {
 						presenter.turnOffFingerprintPayment {
-							dialog.dismiss()
+							dismiss()
 							context.alert(CommonText.succeed)
 							resetButtonEvent()
 						}
@@ -247,12 +247,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					addCorner(45.uiPX(), Spectrum.green)
 				}
 				description = textView {
-					layoutParams = LinearLayout.LayoutParams(matchParent, 30.uiPX())
-					gravity = Gravity.CENTER
+					layoutParams = LinearLayout.LayoutParams(matchParent, 35.uiPX())
+					gravity = Gravity.CENTER or Gravity.BOTTOM
 					textSize = fontSize(12)
 					textColor = GrayScale.midGray
 					typeface = GoldStoneFont.medium(context)
-					text = "detecting your fingerprint now"
+					text = FingerprintPaymentText.detecting
 				}
 				if (showPasswordButton) {
 					passwordButton = graySquareCell {
@@ -267,13 +267,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 			}
 			Dashboard(context) {
 				showAttentionDashboard(
-
-				FingerprintPaymentText.authenticationAlertTitle,
-				FingerprintPaymentText.authenticationAlertDescription,
+					FingerprintPaymentText.authenticationAlertTitle,
+					FingerprintPaymentText.authenticationAlertDescription,
 					fingerView,
 					cancelAction = {
 						manager.removeHandler()
-						dialog.dismiss()
+						dismiss()
 						cancelAction()
 					}
 				)
@@ -285,12 +284,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					} else {
 						hold(cipher)
 						manager.removeHandler()
-						dialog.dismiss()
+						dismiss()
 					}
 				}
 				passwordButton?.onClick {
 					usePasswordEvent()
-					dialog.dismiss()
+					dismiss()
 					manager.removeHandler()
 					passwordButton?.preventDuplicateClicks()
 				}

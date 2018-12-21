@@ -9,6 +9,7 @@ import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.GoldStoneDialog
 import io.goldstone.blockchain.common.language.TokenDetailText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.utils.safeShowError
@@ -136,14 +137,14 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 		if (attentionDashboard.isNull()) {
 			attentionDashboard = Dashboard(context!!) {
 				showAlert(
-					"No Actions Found \n(DataSize: $dataSize Transactions)",
-					"The number of pages currently loaded has not found relevant data, try to change the classification or slide up to load more.",
-					"Load More"
+					"${TransactionText.noActionsFound} \n${TransactionText.filterDataResource}",
+					TransactionText.filterFoundNoItem,
+					TransactionText.loadMore
 				) {
 					presenter.loadMore()
 					attentionDashboard = null
 				}
-				dialog.cancelOnTouchOutside(false)
+				cancelOnTouchOutside()
 			}
 		}
 	}

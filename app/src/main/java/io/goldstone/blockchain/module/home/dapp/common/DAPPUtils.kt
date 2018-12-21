@@ -39,9 +39,7 @@ fun ViewGroup.showQuickPaymentDashboard(
 	// 解除 `memo` 里面的 `count` 计算出当前需要转账的货币的 `Decimal` 作为参数
 	val info = if (!isSampleTransfer) data.getTargetObject("data") else data
 	// 渠道分成需要在 `memo` 标记渠道, 一些 `DAPP` 会自动添加在 `memo` 里, 但是 `BetDice` 需要手动添加
-	val memo = if (info.safeGet("to").equals("betdicebacca", true))
-		"${info.safeGet("memo")},ref:goldstonebet"
-	else info.safeGet("memo")
+	val memo = info.safeGet("memo").completeMemoChannel(info.safeGet("to"))
 	val transaction =
 		if (!isSampleTransfer) EOSTransactionInfo(data, memo)
 		else EOSTransactionInfo(data)
@@ -49,9 +47,9 @@ fun ViewGroup.showQuickPaymentDashboard(
 		orientation = LinearLayout.VERTICAL
 		layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 		padding = PaddingSize.content
-		valueView {
+		if (memo.isNotEmpty()) valueView {
 			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
-			layoutParams.width = matchParent
+			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			setContent(memo)
 		}.setMargins<LinearLayout.LayoutParams> {
 			bottomMargin = 10.uiPX()
@@ -81,7 +79,10 @@ fun ViewGroup.showQuickPaymentDashboard(
 				confirmEvent()
 				transaction.trade(context, cancelEvent, callback)
 			},
-			cancelAction = cancelEvent
+			cancelAction = {
+				cancelEvent()
+				dismiss()
+			}
 		)
 	}
 }
@@ -100,17 +101,17 @@ fun ViewGroup.showOperationDashboard(
 			setTitle("Contract")
 			setSubtitle(data.safeGet("account"))
 		}
-
-		valueView {
+		val dataInfo = data.safeGet("data")
+		if (dataInfo.isNotEmpty()) valueView {
 			addCorner(CornerSize.normal.toInt(), GrayScale.whiteGray)
-			layoutParams.width = matchParent
-			setContent(data.safeGet("data"))
+			layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+			setContent(dataInfo)
 		}.setMargins<LinearLayout.LayoutParams> {
 			topMargin = PaddingSize.content
 		}
 	}
 	Dashboard(context) {
-		dialog.cancelOnTouchOutside(false)
+		cancelOnTouchOutside()
 		showDashboard(
 			AlertText.signDataRequestTitle,
 			AlertText.signDataRequestDescription,
@@ -118,7 +119,19 @@ fun ViewGroup.showOperationDashboard(
 			hold = {
 				confirmEvent()
 			},
-			cancelAction = cancelEvent
+			cancelAction = {
+				cancelEvent()
+				dismiss()
+			}
 		)
 	}
+}
+
+// 渠道分成需要在 `memo` 标记渠道, 一些 `DAPP` 会自动添加在 `memo` 里, 但是 `BetDice` 需要手动添加
+private fun String.completeMemoChannel(toAccount: String): String {
+	return if (
+		toAccount.equals("betdicebacca", true) ||
+		toAccount.equals("betdiceadmin", true)
+	) "$this,ref:goldstonebet"
+	else this
 }

@@ -25,6 +25,9 @@ object APIPath {
 		"$header/account/searchPair?pair=$pair" +
 			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
 	}
+	val searchPairByExactKey: (header: String) -> String = {
+		"$it/account/searchPairByExactKey"
+	}
 	val marketList: (header: String) -> String = { header ->
 		"$header/index/marketList?md5="
 	}

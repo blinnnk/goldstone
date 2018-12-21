@@ -325,4 +325,59 @@ object TransactionText {
 		else -> ""
 	}
 
+	@JvmField
+	val noActionsFound = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No corresponding record found"
+		HoneyLanguage.Chinese.code -> "未找到相应记录"
+		HoneyLanguage.Japanese.code -> "対応するレコードが見つかりません"
+		HoneyLanguage.Korean.code -> "해당 레코드가 없습니다."
+		HoneyLanguage.Russian.code -> "Соответствующая запись не найдена"
+		HoneyLanguage.TraditionalChinese.code -> "未找到相應記錄"
+		else -> ""
+	}
+	@JvmField
+	val filterDataResource: (dataSize: Int) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> {
+				if (it < 2) {
+					"(Data retrieved: $it Transaction)"
+				} else {
+					"(Data retrieved: $it Transactions)"
+				}
+			}
+			HoneyLanguage.Chinese.code -> "(已检索数据: $it 条账单)"
+			HoneyLanguage.Japanese.code -> "（取り出されたデータ：$it 取引）"
+			HoneyLanguage.Korean.code -> "(검색된 데이터 : $it 거래)"
+			HoneyLanguage.English.code -> {
+				if (it < 2) {
+					"(Полученные данные: $it транзакция)"
+				} else {
+					"(Полученные данные: $it транзакции)"
+				}
+			}
+			HoneyLanguage.TraditionalChinese.code -> "(已檢索數據: $it 條賬單)"
+			else -> ""
+		}
+	}
+	@JvmField
+	val filterFoundNoItem = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No specified type of transaction was found in the currently retrieved data"
+		HoneyLanguage.Chinese.code -> "在目前检索到的数据中未发现指定类型的账单"
+		HoneyLanguage.Japanese.code -> "現在検索されているデータに特定の種類の請求書が見つかりませんでした"
+		HoneyLanguage.Korean.code -> "현재 검색된 데이터에서 지정된 유형의 청구서를 찾을 수 없습니다."
+		HoneyLanguage.Russian.code -> "Указанный тип транзакции не был найден в полученных данных."
+		HoneyLanguage.TraditionalChinese.code -> "在目前檢索到的數據中未發現指定類型的賬單"
+		else -> ""
+	}
+
+	@JvmField
+	val loadMore = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Load more"
+		HoneyLanguage.Chinese.code -> "加载更多"
+		HoneyLanguage.Japanese.code -> "もっと読み込む"
+		HoneyLanguage.Korean.code -> "더 많은로드"
+		HoneyLanguage.Russian.code -> "Загрузить больше"
+		HoneyLanguage.TraditionalChinese.code -> "加載更多"
+		else -> ""
+	}
 }
