@@ -108,17 +108,31 @@ class PaymentDetailPresenter(
 		fun getPrivatekey(
 			context: Context,
 			chainType: ChainType,
+			actionType: PrivatekeyActionType,
 			cancelEvent: () -> Unit = {},
 			confirmEvent: () -> Unit = {},
 			hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) {
-			if (SharedWallet.hasFingerprint()) getPrivatekeyByFingerprint(context, chainType, cancelEvent, hold)
-			else getPrivatekeyByPassword(context, chainType, cancelEvent, confirmEvent, hold)
+			if (SharedWallet.hasFingerprint()) getPrivatekeyByFingerprint(
+				context,
+				chainType,
+				actionType,
+				cancelEvent,
+				hold
+			) else getPrivatekeyByPassword(
+				context,
+				chainType,
+				actionType,
+				cancelEvent,
+				confirmEvent,
+				hold
+			)
 		}
 
 		private fun getPrivatekeyByFingerprint(
 			context: Context,
 			chainType: ChainType,
+			actionType: PrivatekeyActionType,
 			cancelEvent: () -> Unit,
 			hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) = GlobalScope.launch(Dispatchers.Main) {
@@ -126,7 +140,13 @@ class PaymentDetailPresenter(
 				context,
 				true,
 				usePasswordEvent = {
-					PaymentDetailPresenter.getPrivatekeyByPassword(context, ChainType.EOS, hold = hold)
+					PaymentDetailPresenter.getPrivatekeyByPassword(
+						context,
+						ChainType.EOS,
+						actionType,
+						cancelEvent = cancelEvent,
+						hold = hold
+					)
 				},
 				cancelAction = cancelEvent
 			) { cipher ->
@@ -150,14 +170,21 @@ class PaymentDetailPresenter(
 		private fun getPrivatekeyByPassword(
 			context: Context,
 			chainType: ChainType,
+			actionType: PrivatekeyActionType,
 			cancelEvent: () -> Unit = {},
 			confirmEvent: () -> Unit = {},
 			@WorkerThread hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) = GlobalScope.launch(Dispatchers.Main) {
+			val dashboardText = when (actionType) {
+				PrivatekeyActionType.SignData ->
+					Pair(TransactionText.confirmTransactionTitle, TransactionText.confirmTransaction)
+				PrivatekeyActionType.Transfer ->
+					Pair(TransactionText.signData, TransactionText.signDataDescription)
+			}
 			Dashboard(context) {
 				showAlertView(
-					TransactionText.confirmTransactionTitle.toUpperCase(),
-					TransactionText.confirmTransaction,
+					dashboardText.first,
+					dashboardText.second,
 					true,
 					cancelAction = {
 						GlobalScope.launch(Dispatchers.Default) {
@@ -182,4 +209,8 @@ class PaymentDetailPresenter(
 			}
 		}
 	}
+}
+
+enum class PrivatekeyActionType {
+	SignData, Transfer
 }

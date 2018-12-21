@@ -37,6 +37,7 @@ import io.goldstone.blockchain.module.common.tokenpayment.gasselection.presenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentBTCSeriesModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.model.PaymentDetailModel
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PrivatekeyActionType
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.transactions.transactiondetail.model.ReceiptModel
@@ -197,6 +198,7 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 					PaymentDetailPresenter.getPrivatekey(
 						context!!,
 						token?.contract.getChainType(),
+						PrivatekeyActionType.Transfer,
 						cancelEvent = {
 							showLoadingStatus(false)
 						}
@@ -223,11 +225,18 @@ class GasSelectionFragment : GSFragment(), GasSelectionContract.GSView {
 									}
 								}
 							}
-						} else if (error.hasError()) showError(error)
+						} else {
+							if (privateKeyError.hasError()) showError(privateKeyError)
+							launchUI {
+								showLoadingStatus(false)
+							}
+						}
 					}
 				} else {
 					showError(error)
-					showLoadingStatus(false)
+					launchUI {
+						showLoadingStatus(false)
+					}
 				}
 			}
 		}

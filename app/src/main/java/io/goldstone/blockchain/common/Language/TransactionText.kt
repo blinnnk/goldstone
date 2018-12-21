@@ -86,6 +86,40 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "轉賬確認"
 		else -> ""
 	}
+
+	@JvmField
+	val signData = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Sign Data"
+		HoneyLanguage.Chinese.code -> "Sign Data"
+		HoneyLanguage.Japanese.code -> "Sign Data"
+		HoneyLanguage.Korean.code -> "Sign Data"
+		HoneyLanguage.Russian.code -> "Sign Data"
+		HoneyLanguage.TraditionalChinese.code -> "Sign Data"
+		else -> ""
+	}
+
+	@JvmField
+	val signDataDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "sign the data to confirm the identity of the account"
+		HoneyLanguage.Chinese.code -> "sign the data to confirm the identity of the account"
+		HoneyLanguage.Japanese.code -> "sign the data to confirm the identity of the account"
+		HoneyLanguage.Korean.code -> "sign the data to confirm the identity of the account"
+		HoneyLanguage.Russian.code -> "sign the data to confirm the identity of the account"
+		HoneyLanguage.TraditionalChinese.code -> "sign the data to confirm the identity of the account"
+		else -> ""
+	}
+
+	@JvmField
+	val dappSignDataDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		HoneyLanguage.Chinese.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		HoneyLanguage.Japanese.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		HoneyLanguage.Korean.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		HoneyLanguage.Russian.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		HoneyLanguage.TraditionalChinese.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		else -> ""
+	}
+
 	@JvmField
 	val confirmTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Confirm transaction with your password"

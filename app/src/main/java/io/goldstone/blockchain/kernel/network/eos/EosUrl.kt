@@ -33,8 +33,9 @@ object EOSUrl {
 	val getInfo: () -> String = {
 		"${SharedChain.getEOSCurrent().getURL()}/v1/chain/${EOSMethod.GetInfo.method}"
 	}
-	val pushTransaction: () -> String = {
-		"${SharedChain.getEOSCurrent().getURL()}/v1/chain/${EOSMethod.PushTransaction.method}"
+
+	fun pushTransaction(header: String): String {
+		return "$header/v1/chain/${EOSMethod.PushTransaction.method}"
 	}
 
 	val getPairsFromNewDex: () -> String = {

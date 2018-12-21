@@ -18,7 +18,7 @@ object GrayScale {
 	@JvmField
 	val lightGray = Color.parseColor("#FFE5E5E5")
 	@JvmField
-	val whiteGray = Color.parseColor("#FFF2F2F2")
+	val whiteGray = Color.parseColor("#FFF5F5F5")
 	@JvmField
 	val gray = Color.parseColor("#FFAAAAAA")
 	@JvmField

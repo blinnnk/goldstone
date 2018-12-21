@@ -30,6 +30,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
@@ -43,15 +44,12 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.bottomPadding
-import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.support.v4.nestedScrollView
 import org.jetbrains.anko.support.v4.onPageChangeListener
 import org.jetbrains.anko.support.v4.themedViewPager
-import org.jetbrains.anko.topPadding
-import org.jetbrains.anko.verticalLayout
 
 
 /**
@@ -85,9 +83,6 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 			nestedScrollView {
 				lparams(matchParent, matchParent)
 				verticalLayout {
-					isFocusableInTouchMode = true
-					isFocusable = true
-					descendantFocusability = FOCUS_BEFORE_DESCENDANTS
 					lparams(matchParent, matchParent)
 					gravity = Gravity.CENTER_HORIZONTAL
 					topPadding = 30.uiPX()

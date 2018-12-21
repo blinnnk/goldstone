@@ -18,6 +18,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
@@ -25,6 +26,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -38,6 +40,7 @@ import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI.getStringAccountInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PrivatekeyActionType
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -72,6 +75,7 @@ class DAPPBrowser(
 		settings.allowFileAccess = true
 		settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NARROW_COLUMNS
 		settings.useWideViewPort = true
+		settings.loadWithOverviewMode = true
 		setLayerType(View.LAYER_TYPE_HARDWARE, null)
 		settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
 		settings.setAppCacheEnabled(true)
@@ -121,14 +125,30 @@ class DAPPBrowser(
 
 	inner class JSInterface {
 
+		/**
+		 * Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+		 * @Description
+		 * 目前还遇到有些 `DAPP` 调用 `Scatter` 的这个方法完全不传参数, 那么就直接返回
+		 * 当前用户的 `AccountName`
+		 */
 		@JavascriptInterface
-		fun getEOSAccountBalance(code: String, account: String, symbol: String) {
-			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
-			Log.d("Scatter", code)
+		fun getEOSAccountBalance(code: String, accountName: String, symbol: String) {
+			val finalCode: String
+			val finalAccount: String
+			val finalSymbol: CoinSymbol
+			if (code == "undefined" && symbol == "undefined") {
+				finalCode = EOSCodeName.EOSIOToken.value
+				finalAccount = account.name
+				finalSymbol = CoinSymbol.EOS
+			} else {
+				finalCode = code
+				finalAccount = accountName
+				finalSymbol = CoinSymbol(symbol)
+			}
 			EOSAPI.getCurrencyBalance(
-				EOSAccount(account),
-				CoinSymbol(symbol),
-				code
+				EOSAccount(finalAccount),
+				finalSymbol,
+				finalCode
 			) { balance, error ->
 				launchUI {
 					if (balance.isNotNull() && error.isNone()) {
@@ -227,12 +247,13 @@ class DAPPBrowser(
 			launchUI {
 				Dashboard(context) {
 					showAlert(
-						"Signed Data Request",
-						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+						TransactionText.signData,
+						TransactionText.dappSignDataDescription
 					) {
 						PaymentDetailPresenter.getPrivatekey(
 							context,
 							ChainType.EOS,
+							PrivatekeyActionType.SignData,
 							cancelEvent = {
 								evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 							},
@@ -283,6 +304,7 @@ class DAPPBrowser(
 					PaymentDetailPresenter.getPrivatekey(
 						context,
 						ChainType.EOS,
+						PrivatekeyActionType.SignData,
 						cancelEvent = {
 							loadingView.remove()
 							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
@@ -290,7 +312,10 @@ class DAPPBrowser(
 						confirmEvent = { loadingView.show() }
 					) { privateKey, error ->
 						if (privateKey.isNotNull() && error.isNone()) {
-							EOSContractCaller(action, ChainID.EOS).send(EOSPrivateKey(privateKey)) { response, pushTransactionError ->
+							EOSContractCaller(action, ChainID.EOS).send(
+								EOSPrivateKey(privateKey),
+								SharedChain.getEOSCurrent().getURL()
+							) { response, pushTransactionError ->
 								launchUI {
 									loadingView.remove()
 									if (response.isNotNull() && pushTransactionError.isNone()) {
@@ -314,6 +339,7 @@ class DAPPBrowser(
 			showQuickPaymentDashboard(
 				action,
 				false,
+				"",
 				cancelEvent = {
 					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 				},
@@ -334,21 +360,26 @@ class DAPPBrowser(
 
 		/**
 		 * action like {"from":"beautifulleo","to":"betlottoinst","quantity":"0.1000 EOS","memo":"1|1029338"}
+		 * @Description
+		 * 因为某些 DAPP 要求使用 DAPP 自己的指定节点进行访问, 这里预留了传入自定义 ChainURL 的方法
+		 * 等待后续确定方案再实施
 		 */
 		@JavascriptInterface
 		fun simpleTransfer(action: String) {
-			System.out.println("+++ simple $action")
+			// TODO Description DAPP Custom ChainURL
+			val dappChainURL = SharedChain.getEOSCurrent().getURL()
 			launchUI {
 				val actionObject = try {
 					JSONObject(action)
 				} catch (error: Exception) {
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
 					return@launchUI
 				}
 				showQuickPaymentDashboard(
 					actionObject,
 					true,
+					dappChainURL,
 					cancelEvent = {
 						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					},
@@ -491,29 +522,37 @@ class DAPPBrowser(
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
 			launchUI {
-				PaymentDetailPresenter.getPrivatekey(
-					context,
-					ChainType.EOS,
-					cancelEvent = { loadingView.remove() },
-					confirmEvent = { loadingView.show() }
-				) { privateKey, error ->
-					if (privateKey.isNotNull() && error.isNone()) {
-						EOSContractCaller(JSONObject(data)).getPushTransactionObject(EOSPrivateKey(privateKey)) { pushJson, hashError ->
-							launchUI {
-								loadingView.remove()
-								if (pushJson.isNotNull() && hashError.isNone()) {
-									val result = Uri.encode("{\"signedData\": $pushJson, \"error\": \"${hashError.message}\"}")
-									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
-								} else {
-									val result = Uri.encode("{\"signedData\": undefined, \"error\": \"${hashError.message}\"}")
-									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+				Dashboard(context) {
+					showAlert(
+						TransactionText.signData,
+						TransactionText.dappSignDataDescription
+					) {
+						PaymentDetailPresenter.getPrivatekey(
+							context,
+							ChainType.EOS,
+							PrivatekeyActionType.SignData,
+							cancelEvent = { loadingView.remove() },
+							confirmEvent = { loadingView.show() }
+						) { privateKey, error ->
+							if (privateKey.isNotNull() && error.isNone()) {
+								EOSContractCaller(JSONObject(data)).getPushTransactionObject(EOSPrivateKey(privateKey)) { pushJson, hashError ->
+									launchUI {
+										loadingView.remove()
+										if (pushJson.isNotNull() && hashError.isNone()) {
+											val result = Uri.encode("{\"signedData\": $pushJson, \"error\": \"${hashError.message}\"}")
+											evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+										} else {
+											val result = Uri.encode("{\"signedData\": \"undefined\", \"error\": \"${hashError.message}\"}")
+											evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+										}
+									}
 								}
+							} else launchUI {
+								loadingView.remove()
+								val result = Uri.encode("{\"signedData\":  \"undefined\", \"error\": \"${error.message}\"}")
+								evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
 							}
 						}
-					} else launchUI {
-						loadingView.remove()
-						val result = Uri.encode("{\"signedData\": undefined, \"error\": \"${error.message}\"}")
-						evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
 					}
 				}
 			}

@@ -17,10 +17,10 @@ data class EOSAction(
 	val code: EOSCodeName,
 	val cryptoData: String,
 	val methodName: EOSTransactionMethod,
-	val authorizationObjects: String
+	val authorizationObjects: List<EOSAuthorization>
 ) : Serializable, EOSModel {
 	override fun createObject(): String {
-		return "{\"account\":\"${code.value}\",\"authorization\":$authorizationObjects,\"data\":\"$cryptoData\",\"name\":\"$${methodName.value}\"}"
+		return "{\"account\":\"${code.value}\",\"authorization\":${authorizationObjects.map { it.createObject() }},\"data\":\"$cryptoData\",\"name\":\"$${methodName.value}\"}"
 	}
 
 	override fun serialize(): String {

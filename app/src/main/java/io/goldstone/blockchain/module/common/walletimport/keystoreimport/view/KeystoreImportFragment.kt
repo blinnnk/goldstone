@@ -130,11 +130,9 @@ class KeystoreImportFragment : BaseFragment<KeystoreImportPresenter>() {
 						hintInput
 					) {
 						launchUI {
+							button.showLoadingStatus(false)
 							if (it.hasError()) safeShowError(it)
-							else {
-								button.showLoadingStatus(false)
-								activity?.jump<SplashActivity>()
-							}
+							else activity?.jump<SplashActivity>()
 						}
 					}
 				}
