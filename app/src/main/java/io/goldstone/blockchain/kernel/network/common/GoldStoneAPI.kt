@@ -352,7 +352,7 @@ object GoldStoneAPI {
 		)
 	}
 	
-	fun getPairsByExactKey(
+	fun getQuotationSelectionsByPairs(
 		pairList: JsonArray,
 		@WorkerThread hold: (lineData: List<QuotationSelectionTable>?, error: RequestError) -> Unit
 	) {

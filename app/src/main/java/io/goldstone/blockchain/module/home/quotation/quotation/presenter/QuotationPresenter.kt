@@ -77,7 +77,7 @@ class QuotationPresenter(
 		}.toList().let { quotations ->
 			if (!hasCheckedPairDate) {
 				if (invalidDatePairs.size() == 0) {
-					SandBoxManager.updateSelectionsFromSandboxPairs {
+					SandBoxManager.recoveryQuotationSelections {
 						updateData()
 					}
 					return
