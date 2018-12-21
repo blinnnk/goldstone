@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
@@ -28,11 +29,11 @@ object SandBoxManager {
 	private const val quotationPairsFileName = "quotationPairs"
 	
 	@WorkerThread
-	fun recoveryData() {
+	fun recoveryData(callback: () -> Unit) {
 		recoveryLanguage()
 		recoveryCurrency()
 		recoveryMarketSelectedStatus()
-		recoveryQuotationSelections()
+		recoveryQuotationSelections(callback)
 	}
 	@WorkerThread
 	fun updateCurrency(currency: String) {
@@ -90,10 +91,23 @@ object SandBoxManager {
 		
 	}
 	
-	private fun recoveryQuotationSelections() {
+	private fun recoveryQuotationSelections(callback: () -> Unit) {
+		if (!NetworkUtil.hasNetwork()) {
+			callback()
+			return
+		}
 		val quotationSelectionListString = getSandBoxContentByName(quotationPairsFileName)
-		if (quotationSelectionListString.isNullOrEmpty()) return
-		val pairList = Gson().fromJson<List<String>>(quotationSelectionListString, object : TypeToken<List<String>>() {}.type).toJsonArray()
+		if (quotationSelectionListString.isNullOrEmpty()) {
+			callback()
+			return
+		}
+		val pairList = try {
+			Gson().fromJson<List<String>>(quotationSelectionListString, object : TypeToken<List<String>>() {}.type).toJsonArray()
+		} catch (error: Exception) {
+			error.printStackTrace()
+			callback()
+			return
+		}
 		if (pairList.size() != 0) {
 			GoldStoneAPI.getQuotationSelectionsByPairs(pairList) { quotationTables, error ->
 				if (!quotationTables.isNullOrEmpty() && error.isNone()) {
@@ -110,10 +124,17 @@ object SandBoxManager {
 									)
 								}
 							}
+							callback()
+						} else {
+							callback()
 						}
 					}
+				} else {
+					callback()
 				}
 			}
+		} else {
+			callback()
 		}
 	}
 	
