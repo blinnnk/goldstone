@@ -30,7 +30,6 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.*
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blockchain.module.home.dapp.dappcenter.contract.DAppCenterContract
@@ -44,12 +43,15 @@ import io.goldstone.blockchain.module.home.home.view.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.*
+import org.jetbrains.anko.bottomPadding
+import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.support.v4.nestedScrollView
 import org.jetbrains.anko.support.v4.onPageChangeListener
 import org.jetbrains.anko.support.v4.themedViewPager
+import org.jetbrains.anko.topPadding
+import org.jetbrains.anko.verticalLayout
 
 
 /**
@@ -57,9 +59,9 @@ import org.jetbrains.anko.support.v4.themedViewPager
  * @date  2018/11/29
  */
 class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
-	
+
 	override val pageTitle: String = ProfileText.dappCenter
-	
+
 	override lateinit var presenter: DAppCenterContract.GSPresenter
 	private lateinit var searchBar: SearchBar
 	private lateinit var recommendDAPP: RecommendDappView
@@ -67,17 +69,17 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 	private lateinit var newAPP: DAPPRecyclerView
 	private lateinit var latestUsed: DAPPRecyclerView
 	private lateinit var recommendedSession: SessionTitleView
-	
+
 	override fun showError(error: Throwable) {
 		safeShowError(error)
 	}
-	
+
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter = DAppCenterPresenter(this)
 		presenter.start()
 	}
-	
+
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
 			verticalLayout {
@@ -168,7 +170,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 									}
 								)
 								themedViewPager {
-									
+
 									layoutParams = LinearLayout.LayoutParams(matchParent, 986.uiPX())
 									adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 									val titles = listOf(DappCenterText.newDapp, DappCenterText.recentDapp)
@@ -193,11 +195,11 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 			}
 		}.view
 	}
-	
+
 	override fun showRecommendDAPP(data: ArrayList<DAPPTable>) = launchUI {
 		recommendDAPP.setData(data)
 	}
-	
+
 	override fun showRecommendedSession(count: Int) {
 		recommendedSession.setSubtitle(
 			"($count)",
@@ -208,26 +210,26 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 			showDAPPListDetailFragment(DAPPType.Recommend)
 		}
 	}
-	
+
 	override fun showAllDAPP(data: ArrayList<DAPPTable>) = launchUI {
 		newAPP.setData(data)
 	}
-	
+
 	override fun showLatestUsed(data: ArrayList<DAPPTable>) {
 		latestUsed.setData(data)
 	}
-	
+
 	// 这个会报漏给搜索界面的点击更新事件
 	override fun refreshLatestUsed() {
 		presenter.setUsedDAPPs()
 	}
-	
+
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
 		activity?.getHomeFragment()?.apply {
 			presenter.showWalletDetailFragment()
 		}
 	}
-	
+
 	private fun showDAPPListDetailFragment(type: DAPPType) {
 		getMainActivity()?.apply {
 			addFragmentAndSetArguments<DAPPOverlayFragment>(ContainerID.main) {
@@ -236,7 +238,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 			hideHomeFragment()
 		}
 	}
-	
+
 	private fun showDAPPExplorerFragment() {
 		getMainActivity()?.apply {
 			addFragmentAndSetArguments<DAPPOverlayFragment>(ContainerID.main) {
@@ -245,7 +247,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 			hideHomeFragment()
 		}
 	}
-	
+
 	companion object {
 		fun showAttentionOrElse(context: Context, dappID: String, callback: () -> Unit) {
 			DAPPTable.getDAPPUsedStatus(dappID) { isUsed ->

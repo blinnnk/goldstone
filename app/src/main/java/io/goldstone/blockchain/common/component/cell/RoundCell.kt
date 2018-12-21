@@ -24,7 +24,7 @@ import org.jetbrains.anko.custom.ankoView
  * @author KaySaith
  */
 class RoundCell(context: Context) : GSCard(context) {
-
+	var container: RelativeLayout
 	private val cellHeight = 40.uiPX()
 	private val titleView = TextView(context).apply {
 		textSize = fontSize(14)
@@ -48,11 +48,10 @@ class RoundCell(context: Context) : GSCard(context) {
 		gravity = Gravity.CENTER_VERTICAL or Gravity.END
 		layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)
 	}
-	var container: RelativeLayout
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-		setCardBackgroundColor(GrayScale.whiteGray)
+		setCardBackgroundColor(GrayScale.lightGray)
 		container = relativeLayout {
 			lparams(matchParent, matchParent)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)

@@ -3,8 +3,10 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
+import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.EosResourceErrorText
+import io.goldstone.blockchain.common.language.ErrorText
 import io.goldstone.blockchain.common.thread.launchUI
 
 
@@ -55,6 +57,10 @@ class ErrorDisplayManager(error: Throwable) {
 				// EOS交易时CPU不足
 				errorMessage.contains("tx_net_usage_exceeded", true) -> {
 					EosResourceErrorText.netNotEnough
+				}
+				// EOS 账号 错误
+				errorMessage.contains("account does not exist", true) -> {
+					ErrorText.invalidAccountName
 				}
 				else -> error.message
 			}

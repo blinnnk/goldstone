@@ -62,17 +62,17 @@ interface SupportCurrencyDao {
 	@Query("SELECT * FROM supportCurrency WHERE isUsed = :isUsed")
 	fun getCurrentCurrency(isUsed: Boolean = true): SupportCurrencyTable
 
-	@Query("UPDATE supportCurrency set isUsed = :unused WHERE isUsed = :isUsed")
-	fun setCurrentCurrencyUnused(unused: Boolean = false, isUsed: Boolean = true)
+	@Query("UPDATE supportCurrency set isUsed = 1 WHERE isUsed = 0")
+	fun setCurrentCurrencyUnused()
 
-	@Query("UPDATE supportCurrency set isUsed = :isUsed WHERE currencySymbol = :symbol")
-	fun setCurrencyInUse(symbol: String, isUsed: Boolean = true)
+	@Query("UPDATE supportCurrency set isUsed = 1 WHERE currencySymbol = :symbol")
+	fun setCurrencyInUse(symbol: String)
 
-	@Query("SELECT * FROM supportCurrency WHERE currencySymbol LIKE :symbol")
+	@Query("SELECT * FROM supportCurrency WHERE currencySymbol = :symbol")
 	fun getCurrencyBySymbol(symbol: String): SupportCurrencyTable?
 
-	@Query("UPDATE supportCurrency SET rate = :rate WHERE isUsed LIKE :isUsed")
-	fun updateUsedRate(rate: Double, isUsed: Boolean = true)
+	@Query("UPDATE supportCurrency SET rate = :rate WHERE isUsed = 1")
+	fun updateUsedRate(rate: Double)
 
 	@Insert
 	fun insert(token: SupportCurrencyTable)

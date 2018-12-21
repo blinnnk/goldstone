@@ -117,8 +117,8 @@ interface AppConfigDao {
 	@Query("SELECT * FROM appConfig LIMIT 1")
 	fun getAppConfig(): AppConfigTable?
 
-	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
-	fun updateCurrency(newCurrencyCode: String)
+	@Query("UPDATE appConfig SET currencyCode = :currencyCode WHERE id = 1")
+	fun updateCurrency(currencyCode: String)
 
 	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5, dappRecommendMD5 = :dappRecommendMD5, newDAPPMD5 = :newDAPPMD5, dappJSCodeMD5 =:dappJSCode  WHERE id = 1")
 	fun updateMD5Info(

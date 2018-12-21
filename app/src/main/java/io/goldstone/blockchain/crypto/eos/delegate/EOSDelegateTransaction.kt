@@ -9,7 +9,6 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
-import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAction
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionUtils
@@ -47,19 +46,16 @@ class EOSDelegateTransaction(
 					)
 					val transactionCode = transaction.serialize()
 					val authorization = EOSAuthorization(from.name, permission)
-					val authorizationObject = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 					val action = EOSAction(
 						EOSCodeName.EOSIO,
 						transactionCode,
 						EOSTransactionMethod.undelegatebw(),
-						authorizationObject
+						listOf(authorization)
 					)
 					val serialization = EOSTransactionUtils.serialize(
 						chainID,
 						header,
-						listOf(action),
-						listOf(authorization),
-						transactionCode
+						listOf(action)
 					)
 					hold(serialization, error)
 				}

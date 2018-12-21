@@ -33,7 +33,6 @@ import org.jetbrains.anko.*
 
 class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 	private var dialog: MaterialDialog? = null
-
 	init {
 		dialog = MaterialDialog(context)
 		dialog?.window?.setLayout(ScreenSize.overlayContentWidth, wrapContent)

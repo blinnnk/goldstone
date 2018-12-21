@@ -246,8 +246,10 @@ object EOSAPI {
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,
+		chainURL: String,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
+		println("pushTransaction API Address: ${EOSUrl.pushTransaction(chainURL)}")
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("signatures", signatures.toJsonArray()),
@@ -255,12 +257,11 @@ object EOSAPI {
 				Pair("compression", "none"),
 				Pair("packed_context_free_data", "00")
 			),
-			EOSUrl.pushTransaction(),
+			EOSUrl.pushTransaction(chainURL),
 			false
 		) { result, error ->
-			if (result.isNullOrEmpty() || error.hasError()) {
-				hold(null, error)
-			} else {
+			if (result.isNullOrEmpty() || error.hasError()) hold(null, error)
+			else {
 				val response = JSONObject(result)
 				when {
 					result.contains("processed") -> {

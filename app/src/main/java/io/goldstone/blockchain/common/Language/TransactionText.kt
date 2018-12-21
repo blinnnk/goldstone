@@ -86,6 +86,40 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "轉賬確認"
 		else -> ""
 	}
+
+	@JvmField
+	val signData = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Sign Data"
+		HoneyLanguage.Chinese.code -> "数据签名"
+		HoneyLanguage.Japanese.code -> "データ署名"
+		HoneyLanguage.Korean.code -> "데이터 서명"
+		HoneyLanguage.Russian.code -> "Подпись данных"
+		HoneyLanguage.TraditionalChinese.code -> "數據簽名"
+		else -> ""
+	}
+
+	@JvmField
+	val signDataDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Sign to chain to authenticate for authentication, please confirm.."
+		HoneyLanguage.Chinese.code -> "向链发起签名以进行身份验证，请确认。"
+		HoneyLanguage.Japanese.code -> "認証のためにチェーンに署名したいと考えています。確認してください。"
+		HoneyLanguage.Korean.code -> "인증을 위해 체인에 서명하여 확인하십시오."
+		HoneyLanguage.Russian.code -> "Подпишите цепочку для аутентификации для аутентификации, пожалуйста, подтвердите."
+		HoneyLanguage.TraditionalChinese.code -> "向鏈發起簽名以進行身份驗證，請確認。"
+		else -> ""
+	}
+
+	@JvmField
+	val dappSignDataDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Currently Dapp wants to sign to chain for authentication, please confirm."
+		HoneyLanguage.Chinese.code -> "当前 Dapp 想要向链发起签名以进行身份验证，请确认。"
+		HoneyLanguage.Japanese.code -> "現在、Dappは認証のためにチェーンに署名したいと考えています。確認してください。"
+		HoneyLanguage.Korean.code -> "현재 Dapp는 인증을 위해 체인에 서명하려고합니다. 확인하십시오."
+		HoneyLanguage.Russian.code -> "В настоящее время Dapp хочет подписать цепочку для аутентификации, пожалуйста, подтвердите."
+		HoneyLanguage.TraditionalChinese.code -> "當前 Dapp 想要向鏈發起簽名以進行身份驗證，請確認。"
+		else -> ""
+	}
+
 	@JvmField
 	val confirmTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Confirm transaction with your password"

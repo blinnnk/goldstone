@@ -35,10 +35,7 @@ class LanguagePresenter(
 		)
 	}
 
-	fun setLanguage(
-		language: String,
-		hold: Boolean.() -> Unit
-	) {
+	fun setLanguage(language: String, hold: Boolean.() -> Unit) {
 		fragment.context?.apply {
 			alert(
 				AlertText.switchLanguage,
@@ -68,8 +65,8 @@ class LanguagePresenter(
 				HoneyLanguage.TraditionalChinese.language -> HoneyLanguage.TraditionalChinese.code
 				else -> HoneyLanguage.English.code
 			}
-			AppConfigTable.dao.updateLanguageCode(code)
 			SandBoxManager.updateLanguage(code)
+			AppConfigTable.dao.updateLanguageCode(code)
 		} then {
 			callback()
 		}

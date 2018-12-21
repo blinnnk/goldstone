@@ -1,5 +1,7 @@
 package io.goldstone.blockchain
 
+import com.blinnnk.extension.toList
+import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -7,6 +9,7 @@ import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
+import org.json.JSONArray
 import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
@@ -61,6 +64,12 @@ class ExampleUnitTest {
 	fun validBTCAddressLength() {
 		println(CryptoValue.isBitcoinAddressLength(" mgqkf2Y6YaiLzQckRWuvcbGXUh2ys2dbbN"))
 		println(BTCUtils.isValidTestnetAddress("mgqkf2Y6YaiLzQckRWuvcbGXUh2ys2dbbN"))
+	}
+
+	@Test
+	fun stringArrayConverter() {
+		// expect result hello||hey||
+		println(listOf("hello", "hey").map { "$it||" }.joinToString("") { it })
 	}
 }
 

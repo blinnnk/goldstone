@@ -313,11 +313,11 @@ object ErrorText {
 	@JvmField
 	val inactivedAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This account name has not been activated yet"
-		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册。"
-		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません。"
+		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册"
+		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません"
 		HoneyLanguage.Korean.code -> "이 계정은 아직 등록되지 않았습니다."
 		HoneyLanguage.Russian.code -> "Эта учетная запись еще не зарегистрирована."
-		HoneyLanguage.TraditionalChinese.code -> "這個 EOS 賬戶還沒有被註冊。"
+		HoneyLanguage.TraditionalChinese.code -> "這個 EOS 賬戶還沒有被註冊"
 		else -> ""
 	}
 }
@@ -326,33 +326,33 @@ object TransactionErrorText {
 	@JvmField
 	val transferToInactiveEOSAcount = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The EOS account you want to transfer to doesn't exist."
-		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活。"
-		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません。"
+		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活"
+		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません"
 		HoneyLanguage.Korean.code -> "전송하려는 EOS 계정이 활성화되지 않았습니다."
 		HoneyLanguage.Russian.code -> "Учетная запись EOS, которую вы хотите передать, не активирована."
-		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活。"
+		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活"
 		else -> ""
 	}
 
 	@JvmField
 	val emptyConfirmPassword = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please enter password to unlock your wallet."
-		HoneyLanguage.Chinese.code -> "请输入密码以解锁钱包。"
-		HoneyLanguage.Japanese.code -> "ウォレットのロックを解除するにはパスワードを入力してください。"
+		HoneyLanguage.Chinese.code -> "请输入密码以解锁钱包"
+		HoneyLanguage.Japanese.code -> "ウォレットのロックを解除するにはパスワードを入力してください"
 		HoneyLanguage.Korean.code -> "지갑 잠금을 해제하려면 비밀번호를 입력하십시오."
 		HoneyLanguage.Russian.code -> "Введите пароль, чтобы разблокировать свой кошелек."
-		HoneyLanguage.TraditionalChinese.code -> "請輸入密碼以解鎖錢包。"
+		HoneyLanguage.TraditionalChinese.code -> "請輸入密碼以解鎖錢包"
 		else -> ""
 	}
 	// 余额不足以支付燃气费的提示
 	@JvmField
 	val notEnoughGasFee = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Your account's ETH balance is not sufficient to pay for gas."
-		HoneyLanguage.Chinese.code -> "您账户的ETH余额不足以支付燃气费。"
-		HoneyLanguage.Japanese.code -> "アカウントのETH残高はガスのために支払うために十分ではありません。"
+		HoneyLanguage.Chinese.code -> "您账户的ETH余额不足以支付燃气费"
+		HoneyLanguage.Japanese.code -> "アカウントのETH残高はガスのために支払うために十分ではありません"
 		HoneyLanguage.Korean.code -> "계정의 ETH 잔액으로 가스 요금을 지불하기에 충분하지 않습니다."
 		HoneyLanguage.Russian.code -> "Баланса ETH для вашей учетной записи недостаточно для оплаты газа."
-		HoneyLanguage.TraditionalChinese.code -> "您賬戶的ETH餘額不足以支付燃氣費。"
+		HoneyLanguage.TraditionalChinese.code -> "您賬戶的ETH餘額不足以支付燃氣費"
 		else -> ""
 	}
 
@@ -437,5 +437,4 @@ object EosResourceErrorText {
 		HoneyLanguage.TraditionalChinese.code -> "您的 NET (計算) 餘額不足。"
 		else -> ""
 	}
-
 }

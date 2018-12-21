@@ -104,6 +104,7 @@ data class EOSTransactionInfo(
 	// 故在此传入 Decimal
 	fun trade(
 		context: Context,
+		chaiURL: String = SharedChain.getEOSCurrent().getURL(),
 		cancelAction: () -> Unit,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
@@ -118,7 +119,7 @@ data class EOSTransactionInfo(
 				cancelAction = cancelAction
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
-					transfer(EOSPrivateKey(privateKey), hold)
+					transfer(EOSPrivateKey(privateKey), chaiURL, hold)
 				} else hold(null, error)
 			}
 		}
@@ -143,6 +144,7 @@ data class EOSTransactionInfo(
 
 	private fun transfer(
 		privateKey: EOSPrivateKey,
+		chaiURL: String = SharedChain.getEOSCurrent().getURL(),
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		val permission =
@@ -156,7 +158,7 @@ data class EOSTransactionInfo(
 				// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
 				ExpirationType.FiveMinutes,
 				contract
-			).send(privateKey, hold)
+			).send(privateKey, chaiURL, hold)
 		} else hold(null, TransferError.WrongPermission)
 	}
 
