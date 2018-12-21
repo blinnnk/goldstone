@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import com.blinnnk.extension.hideStatusBar
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.removeFragment
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.gsfragment.GSFragment
@@ -26,6 +27,7 @@ import io.goldstone.blockchain.module.home.dapp.dappbrowser.contract.DAppBrowser
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.presenter.DAppBrowserPresenter
 import io.goldstone.blockchain.module.home.dapp.dapplist.event.DAPPListDisplayEvent
 import io.goldstone.blockchain.module.home.dapp.dappoverlay.event.DAPPExplorerDisplayEvent
+import io.goldstone.blockchain.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.greenrobot.eventbus.EventBus
 import org.jetbrains.anko.*
@@ -121,22 +123,21 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 		}.view
 	}
 
-	private fun formattedURL(url: String): String {
-		return if (!url.contains("http", true)) {
-			"http://$url"
-		} else url
-	}
-
 	private fun removeSelfFromActivity() {
 		getMainActivity()?.removeFragment(this)
 		getMainActivity()?.showHomeFragment()
 	}
 
 	override fun setBaseBackEvent(activity: MainActivity?, parent: Fragment?) {
-		browser.goBack()
-		browser.backEvent {
+		if (browser.canGoBack()) browser.goBack()
+		else browser.backEvent {
 			activity?.removeFragment(this)
-			activity?.showHomeFragment()
+			activity?.supportFragmentManager?.apply {
+				val dappOverlayFragment = fragments.find { it is DAPPOverlayFragment }
+				if (dappOverlayFragment.isNotNull()) {
+					beginTransaction().show(dappOverlayFragment).commitNow()
+				} else activity.showHomeFragment()
+			}
 		}
 	}
 }

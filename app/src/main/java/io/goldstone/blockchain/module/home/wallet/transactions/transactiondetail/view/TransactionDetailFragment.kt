@@ -129,7 +129,7 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 	}
 
 	override fun showError(error: Throwable) {
-		context?.let { ErrorDisplayManager(error).show(it) }
+		ErrorDisplayManager(error).show(context)
 	}
 
 	override fun showTransactionInformation(vararg info: TransactionDetailModel) {

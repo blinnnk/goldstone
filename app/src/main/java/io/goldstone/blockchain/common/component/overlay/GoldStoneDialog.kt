@@ -89,13 +89,13 @@ class GoldStoneDialog(private val context: Context) {
 		if (GoldStoneApp.hasShownMobileAlert) return
 		generateCustomView(
 			R.drawable.dialog_mobile_4g,
-			"Are you willing to update resources in 4g environment?"
+			DialogText.mobileNetworkDescription
 		) {
 			with(dialog) {
 				title(text = DialogText.mobileNetwork)
 				positiveButton(text = CommonText.gotIt) {
 					confirmAction()
-					dialog.dismiss()
+					dismiss()
 				}
 				negativeButton(text = CommonText.cancel)
 				customView(view = it)

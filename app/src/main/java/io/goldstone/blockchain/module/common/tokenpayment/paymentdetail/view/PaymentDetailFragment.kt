@@ -99,7 +99,9 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 					text = CommonText.next
 				}.click { button ->
 					button.showLoadingStatus()
-					presenter.goToGasEditorFragmentOrTransfer {
+					presenter.goToGasEditorFragmentOrTransfer(
+						cancelEvent = { button.showLoadingStatus(false) }
+					) {
 						if (it.hasError()) safeShowError(it)
 						launchUI {
 							button.showLoadingStatus(false)

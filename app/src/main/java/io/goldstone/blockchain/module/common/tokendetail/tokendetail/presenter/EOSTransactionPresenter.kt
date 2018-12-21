@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.hasValue
+import com.blinnnk.extension.orElse
 import com.blinnnk.extension.orEmpty
 import com.blinnnk.extension.orZero
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -40,9 +41,9 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 		}.generateBalanceList(token.contract) {
 			it.updateHeaderData(false)
 		}
-		fun loadTargetRangeData(endID: Long, pageSize: Int) {
+		fun loadRangeDataFromChain(endID: Long, pageSize: Int) {
 			// 拉取指定范围和数量的账单
-			EOSAPI.getEOSTransactions(
+			if (NetworkUtil.hasNetwork()) EOSAPI.getEOSTransactions(
 				SharedChain.getEOSCurrent().chainID,
 				account,
 				pageSize,
@@ -56,18 +57,16 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 							dataIndex = currentMaxCount.orZero() - (index + 1)
 						}
 					})
-					flipPage(data.plus(localData), callback)
+					flipPage(data, callback)
 					currentMaxCount = currentMaxCount.orZero() - pageSize
-				} else {
-					callback()
-				}
+				} else callback()
 			}
 		}
 		when {
 			// 本地指定范围的数据是空的条件判断
 			localData.isEmpty() -> {
 				// 准备 `MongoDB` 格式的 `EndID`
-				loadTargetRangeData(
+				loadRangeDataFromChain(
 					// 本地无数据初次加载
 					// 或分页数据本地不存在此范围片段, 向上获取指定 `ID`
 					if (currentMaxCount == totalCount) 0L
@@ -84,16 +83,16 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 			localData.size < DataValue.pageCount
 				&& localData.size != totalCount
 				&& localData.minBy { it.dataIndex }?.dataIndex ?: 0 > 1 -> {
-				loadTargetRangeData(
+				loadRangeDataFromChain(
 					// 本地片段存在不足的情况
 					if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)
 						localData.minBy { it.dataIndex }?.serverID ?: 0L
-					else dao.getDataByDataIndex(
+					else dao.getTargetServerID(
 						account.name,
 						currentMaxCount.orZero() + 1,
 						token.symbol.symbol,
 						codeName
-					)?.serverID ?: 0L,
+					).orElse(0L),
 					DataValue.pageCount
 				)
 			}
@@ -106,28 +105,12 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 	}
 }
 
-fun TokenDetailPresenter.getEOSSeriesData() {
+fun TokenDetailPresenter.getCountInfoFromChain() {
 	// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
 	val account = SharedAddress.getCurrentEOSAccount()
 	val chainID = SharedChain.getEOSCurrent().chainID
 	val codeName = token.contract.contract
-	if (!NetworkUtil.hasNetwork()) {
-		EOSTransactionTable.getMaxDataIndexTable(
-			account,
-			token.contract,
-			chainID
-		) {
-			launchUI {
-				totalCount = it
-				currentMaxCount = it
-				// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
-				// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
-				detailView.getDetailAdapter()?.dataSet?.clear()
-				// 初始化
-				loadMore()
-			}
-		}
-	} else EOSAPI.getTransactionCount(
+	EOSAPI.getTransactionCount(
 		chainID,
 		account,
 		codeName,
@@ -145,6 +128,27 @@ fun TokenDetailPresenter.getEOSSeriesData() {
 		} else {
 			detailView.showLoading(false)
 			detailView.showBottomLoading(false)
+		}
+	}
+}
+
+fun TokenDetailPresenter.getCountInfoFromLocal() {
+	// 创建的时候准备相关的账单数据, 服务本地网络混合分页的逻辑
+	val account = SharedAddress.getCurrentEOSAccount()
+	val chainID = SharedChain.getEOSCurrent().chainID
+	EOSTransactionTable.getMaxDataIndexTable(
+		account,
+		token.contract,
+		chainID
+	) {
+		launchUI {
+			totalCount = it
+			currentMaxCount = it
+			// 初次加载的时候, 这个逻辑会复用到监听转账的 Pending Data 的状态更改.
+			// 当 `PendingData Observer` 调用这个方法的时候让数据重新加载显示, 来达到更新 `Pending Status` 的效果
+			detailView.getDetailAdapter()?.dataSet?.clear()
+			// 初始化
+			loadMore()
 		}
 	}
 }

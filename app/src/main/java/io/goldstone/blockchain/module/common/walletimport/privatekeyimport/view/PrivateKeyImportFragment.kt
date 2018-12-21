@@ -54,9 +54,10 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, wrapContent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
-				lparams(matchParent, matchParent)
+				lparams(matchParent, wrapContent)
 				attentionText.apply {
 					isCenter()
 					setPadding(15.uiPX(), 30.uiPX(), 15.uiPX(), 20.uiPX())
@@ -98,18 +99,16 @@ class PrivateKeyImportFragment : BaseFragment<PrivateKeyImportPresenter>() {
 					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 				}
 
-				agreementView
-					.click {
-						getParentFragment<WalletImportFragment> {
-							presenter.showTargetFragment<WebViewFragment>(
-								Bundle().apply {
-									putString(ArgumentKey.webViewUrl, WebUrl.terms)
-									putString(ArgumentKey.webViewName, ProfileText.terms)
-								}
-							)
-						}
+				agreementView.click {
+					getParentFragment<WalletImportFragment> {
+						presenter.showTargetFragment<WebViewFragment>(
+							Bundle().apply {
+								putString(ArgumentKey.webViewUrl, WebUrl.terms)
+								putString(ArgumentKey.webViewName, ProfileText.terms)
+							}
+						)
 					}
-					.into(this)
+				}.into(this)
 
 				confirmButton = roundButton {
 					text = CommonText.confirm.toUpperCase()

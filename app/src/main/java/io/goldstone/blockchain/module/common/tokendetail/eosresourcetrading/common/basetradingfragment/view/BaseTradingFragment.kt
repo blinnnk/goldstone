@@ -75,7 +75,9 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			}
 			setConfirmClickEvent {
 				showLoading(true)
-				presenter.gainConfirmEvent { response, error ->
+				presenter.gainConfirmEvent(
+					cancelAction = { showLoading(false) }
+				) { response, error ->
 					if (response.isNotNull() && error.isNone()) {
 						launchUI {
 							getParentContainer()?.apply {
@@ -110,7 +112,9 @@ open class BaseTradingFragment : BaseFragment<BaseTradingPresenter>() {
 			}
 			setConfirmClickEvent {
 				showLoading(true)
-				presenter.refundOrSellConfirmEvent { response, error ->
+				presenter.refundOrSellConfirmEvent(
+					cancelAction = { showLoading(false) }
+				) { response, error ->
 					if (response.isNotNull() && error.isNone()) {
 						launchUI {
 							getParentContainer()?.apply {

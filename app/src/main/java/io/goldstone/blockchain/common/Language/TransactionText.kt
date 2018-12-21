@@ -18,12 +18,12 @@ object TransactionText {
 	}
 	@JvmField
 	val confirmations = when (currentLanguage) {
-		HoneyLanguage.English.code -> "CONFIRMED BLOCKS"
-		HoneyLanguage.Chinese.code -> "已确认区块"
-		HoneyLanguage.Japanese.code -> "確認済みのブロック"
-		HoneyLanguage.Korean.code -> "확인 된 블록"
-		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕННЫЕ БЛОКИ"
-		HoneyLanguage.TraditionalChinese.code -> "已確認區塊"
+		HoneyLanguage.English.code -> "CONFIRMATION STATUS"
+		HoneyLanguage.Chinese.code -> "确认状态"
+		HoneyLanguage.Japanese.code -> "確認ステータス"
+		HoneyLanguage.Korean.code -> "확인 상태"
+		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕНИЕ СТАТУСА"
+		HoneyLanguage.TraditionalChinese.code -> "確認狀態"
 		else -> ""
 	}
 	@JvmField
@@ -154,11 +154,11 @@ object TransactionText {
 	@JvmField
 	val process = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Chinese.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Japanese.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Korean.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Russian.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.TraditionalChinese.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.Chinese.code -> "区块确认"
+		HoneyLanguage.Japanese.code -> "ブロック確認"
+		HoneyLanguage.Korean.code -> "블록 확인"
+		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕНИЕ ПРОЦЕССА"
+		HoneyLanguage.TraditionalChinese.code -> "區塊確認"
 		else -> ""
 	}
 
@@ -291,6 +291,16 @@ object TransactionText {
 		HoneyLanguage.Korean.code -> "뒤집을 수 없는"
 		HoneyLanguage.Russian.code -> "Необратимые"
 		HoneyLanguage.TraditionalChinese.code -> "不可逆的"
+		else -> ""
+	}
+	@JvmField
+	val confirmed = when (currentLanguage) {
+		HoneyLanguage.English.code -> " Blocks Confirmed"
+		HoneyLanguage.Chinese.code -> " 个区块已确认"
+		HoneyLanguage.Japanese.code -> " ブロック確認済み"
+		HoneyLanguage.Korean.code -> " 블록이 확인되었습니다"
+		HoneyLanguage.Russian.code -> " блока подтверждены"
+		HoneyLanguage.TraditionalChinese.code -> " 個區塊已確認"
 		else -> ""
 	}
 

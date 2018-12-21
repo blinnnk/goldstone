@@ -116,7 +116,8 @@ class EOSAccountRegisterFragment : BaseFragment<EOSAccountRegisterPresenter>() {
 						publickeyInput.getContent(),
 						BigInteger(assignResources[0].right),
 						assignResources[1].right.toDouble(),
-						assignResources[1].right.toDouble()
+						assignResources[1].right.toDouble(),
+						cancelAction = { button.showLoadingStatus(false) }
 					) { response, error ->
 						launchUI {
 							if (response.isNotNull() && error.isNone()) response.showDialog(context)

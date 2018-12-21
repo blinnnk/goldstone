@@ -531,9 +531,7 @@ object GoldStoneAPI {
 		)
 	}
 
-	fun getDAPPJSCode(
-		@WorkerThread hold: (data: String?, error: RequestError) -> Unit
-	) {
+	fun getDAPPJSCode(@WorkerThread hold: (data: String?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.getDAPPJSCode(APIPath.currentUrl),
 			"data",

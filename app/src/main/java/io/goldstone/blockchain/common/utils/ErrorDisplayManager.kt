@@ -3,6 +3,8 @@ package io.goldstone.blockchain.common.utils
 import android.content.Context
 import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
+import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.EosResourceErrorText
 import io.goldstone.blockchain.common.thread.launchUI
 
 
@@ -33,12 +35,26 @@ class ErrorDisplayManager(error: Throwable) {
 					// 上报 Server 逻辑, 这部分超时
 					null
 				}
+				// 第三报错
+				errorMessage.contains("onResponse Error in 61", true) -> {
+					// 上报 Server 逻辑, 这部分超时
+					null
+				}
 				// 比特币交易的时候数额特别小的时候, 链会返回这个关键字的错误.
 				errorMessage.contains("64: dust", true) -> {
 					"amount too small to be recognised as legitimate on the bitcoin network."
 				}
+
 				errorMessage.contains("insufficient staked", true) -> {
 					"target account doesn't have enough bandwidth to refund"
+				}
+				// EOS交易时CPU不足
+				errorMessage.contains("tx_cpu_usage_exceeded", true) -> {
+					EosResourceErrorText.cpuNotEnough
+				}
+				// EOS交易时CPU不足
+				errorMessage.contains("tx_net_usage_exceeded", true) -> {
+					EosResourceErrorText.netNotEnough
 				}
 				else -> error.message
 			}
@@ -53,7 +69,7 @@ class ErrorDisplayManager(error: Throwable) {
 				try {
 					if (!packageName.isNullOrEmpty() && contains(packageName, true)) {
 						context.alert(substring(packageName.length, length))
-					} else context.alert(this)
+					} else if (!this.contains(GoldStoneError.None.message, true)) context.alert(this)
 				} catch (error: Exception) {
 					// Context 丢失的时候执行
 					LogUtil.error("Error Display Manager", error)

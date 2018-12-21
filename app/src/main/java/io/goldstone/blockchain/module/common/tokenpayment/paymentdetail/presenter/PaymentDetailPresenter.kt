@@ -2,7 +2,10 @@ package io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.present
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.*
+import com.blinnnk.extension.getDecimalCount
+import com.blinnnk.extension.getParentFragment
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.orZero
 import com.blinnnk.util.getParentFragment
 import com.blinnnk.util.load
 import com.blinnnk.util.then
@@ -12,6 +15,7 @@ import io.goldstone.blockchain.common.error.*
 import io.goldstone.blockchain.common.language.LoadingText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
@@ -53,7 +57,10 @@ class PaymentDetailPresenter(
 		return rootFragment?.token
 	}
 
-	fun goToGasEditorFragmentOrTransfer(callback: (GoldStoneError) -> Unit) {
+	fun goToGasEditorFragmentOrTransfer(
+		cancelEvent: () -> Unit,
+		callback: (GoldStoneError) -> Unit
+	) {
 		if (!NetworkUtil.hasNetwork()) {
 			callback(NetworkError.WithOutNetwork)
 		} else {
@@ -80,6 +87,7 @@ class PaymentDetailPresenter(
 				token?.contract.isEOSSeries() -> transferEOS(
 					count,
 					getToken()?.contract.orEmpty(),
+					cancelEvent,
 					callback
 				)
 				else -> prepareETHSeriesPaymentModel(count, callback)
@@ -104,13 +112,14 @@ class PaymentDetailPresenter(
 			confirmEvent: () -> Unit = {},
 			hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) {
-			if (SharedWallet.hasFingerprint()) getPrivatekeyByFingerprint(context, chainType, hold)
+			if (SharedWallet.hasFingerprint()) getPrivatekeyByFingerprint(context, chainType, cancelEvent, hold)
 			else getPrivatekeyByPassword(context, chainType, cancelEvent, confirmEvent, hold)
 		}
 
 		private fun getPrivatekeyByFingerprint(
 			context: Context,
 			chainType: ChainType,
+			cancelEvent: () -> Unit,
 			hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) = GlobalScope.launch(Dispatchers.Main) {
 			FingerprintSettingFragment.showFingerprintDashboard(
@@ -118,27 +127,22 @@ class PaymentDetailPresenter(
 				true,
 				usePasswordEvent = {
 					PaymentDetailPresenter.getPrivatekeyByPassword(context, ChainType.EOS, hold = hold)
-				}
-			) { cipher, error ->
+				},
+				cancelAction = cancelEvent
+			) { cipher ->
 				load {
 					WalletTable.dao.getEncryptFingerprintKey()
 				} then { encryptKey ->
-					val decryptKey = when {
-						cipher.isNotNull() && error.isNone() ->
-							JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).decryptData(encryptKey!!)
-						cipher.isNull() && error.isNone() ->
-							JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptKey!!)
-						else -> null
+					val decryptKey =
+						if (cipher.isNotNull()) JavaKeystoreUtil(KeystoreInfo.isFingerPrinter(cipher)).decryptData(encryptKey!!)
+						else JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(encryptKey!!)
+					PrivateKeyExportPresenter.getPrivateKeyByRootData(
+						chainType.getContract().getAddress(false),
+						chainType,
+						decryptKey
+					) {
+						hold(it, GoldStoneError.None)
 					}
-					if (decryptKey.isNotNull()) {
-						PrivateKeyExportPresenter.getPrivateKeyByRootData(
-							chainType.getContract().getAddress(false),
-							chainType,
-							decryptKey
-						) {
-							hold(it, GoldStoneError.None)
-						}
-					} else hold(null, error)
 				}
 			}
 		}
@@ -158,7 +162,7 @@ class PaymentDetailPresenter(
 					cancelAction = {
 						GlobalScope.launch(Dispatchers.Default) {
 							hold(null, AccountError.None)
-							cancelEvent()
+							launchUI(cancelEvent)
 						}
 					}
 				) { passwordInput ->
