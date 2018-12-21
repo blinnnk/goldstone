@@ -73,7 +73,7 @@ class SplashActivity : AppCompatActivity() {
 					presenter.initDefaultExchangeData(this@SplashActivity)
 					prepareAppConfig {
 						presenter.recoverySandboxData { hasChanged ->
-							if (hasConfigChanged) {
+							if (hasChanged) {
 								AppConfigTable.dao.getAppConfig()?.prepareData()
 							} else prepareData()
 						}
