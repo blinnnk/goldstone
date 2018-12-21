@@ -72,8 +72,13 @@ class SplashActivity : AppCompatActivity() {
 					presenter.initSupportCurrencyList(this@SplashActivity)
 					presenter.initDefaultExchangeData(this@SplashActivity)
 					prepareAppConfig {
-						presenter.updateSandboxData(this)
-						prepareData()
+						presenter.recoverySandboxData { hasConfigChanged ->
+							if (hasConfigChanged) {
+								AppConfigTable.dao.getAppConfig()?.apply {
+									prepareData()
+								}
+							} else prepareData()
+						}
 					}
 				}
 			}

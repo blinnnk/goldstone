@@ -41,19 +41,11 @@ class SplashPresenter(val activity: SplashActivity) {
 	
 	// 初始化sandbox的数据
 	@WorkerThread
-	fun updateSandboxData(config: AppConfigTable) {
+	fun recoverySandboxData(hold: (hasConfigChanged: Boolean) -> Unit) {
 		if (WalletTable.dao.rowCount() == 0) {
-			 SandBoxManager.recoveryLanguage()?.apply {
-				 config.language = this
-			 }
-			val sandboxCurrency = SandBoxManager.recoveryCurrency()
-			if (!sandboxCurrency.isNullOrEmpty()) {
-				config.currencyCode = sandboxCurrency
-			}
-			SandBoxManager.recoveryDefaultMarketSelected()
-			SandBoxManager.recoveryQuotationSelections {  }
-		}
-		
+			SandBoxManager.recoveryData()
+			hold(true)
+		} else hold(false)
 	}
 	
 	@WorkerThread

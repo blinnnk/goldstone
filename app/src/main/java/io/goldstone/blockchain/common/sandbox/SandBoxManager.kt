@@ -1,7 +1,6 @@
 @file:Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 
 package io.goldstone.blockchain.common.sandbox
-
 import android.support.annotation.WorkerThread
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -28,40 +27,53 @@ object SandBoxManager {
 	private const val marketListFileName = "marketList"
 	private const val quotationPairsFileName = "quotationPairs"
 	
-	fun recoveryLanguage(): Int? {
-		val language = getSandBoxContentByName(languageFileName)
-		return if (!language.isNullOrEmpty()) {
-			AppConfigTable.dao.updateLanguageCode(language.toInt())
-			language.toInt()
-		} else {
-			null
-		}
+	@WorkerThread
+	fun recoveryData() {
+		recoveryLanguage()
+		SandBoxManager.recoveryCurrency()
+		SandBoxManager.recoveryMarketSelectedStatus()
+		SandBoxManager.recoveryQuotationSelections()
 	}
-	
+	@WorkerThread
+	fun updateCurrency(currency: String) {
+		updateSandBoxContentByName(currencyFileName, currency)
+	}
+	@WorkerThread
 	fun updateLanguage(language: Int) {
 		updateSandBoxContentByName(languageFileName, language.toString())
 	}
+	@WorkerThread
+	fun updateMarketList(newMarketList: List<Int>) {
+		updateSandBoxContentByName(marketListFileName, Gson().toJson(newMarketList))
+	}
+	@WorkerThread
+	fun updateQuotationPairs(newPairs: List<String>) {
+		updateSandBoxContentByName(quotationPairsFileName, Gson().toJson(newPairs))
+	}
 	
-	fun recoveryCurrency(): String {
+	private fun recoveryLanguage() {
+		val language = getSandBoxContentByName(languageFileName)
+		if (!language.isNullOrEmpty()) {
+			AppConfigTable.dao.updateLanguageCode(language.toInt())
+			language.toInt()
+		}
+	}
+	
+	private fun recoveryCurrency() {
 		val currency = getSandBoxContentByName(currencyFileName)
 		if (!currency.isNullOrEmpty()) {
 			AppConfigTable.dao.updateCurrency(currency)
 			SupportCurrencyTable.dao.setCurrentCurrencyUnused()
 			SupportCurrencyTable.dao.setCurrencyInUse(currency)
 		}
-		return currency
 	}
 	
-	fun updateCurrency(currency: String) {
-		updateSandBoxContentByName(currencyFileName, currency)
-	}
-	
-	fun recoveryDefaultMarketSelected() {
+	private fun recoveryMarketSelectedStatus() {
 		val defaultMarketList = ExchangeTable.dao.getAll()
-		val marketString = getSandBoxContentByName(marketListFileName)
-		if (marketString.isNullOrEmpty()) return
+		val marketListString = getSandBoxContentByName(marketListFileName)
+		if (marketListString.isNullOrEmpty()) return
 		val sandboxMarketList = try {
-			Gson().fromJson<List<Int>>(marketString, object : TypeToken<List<Int>>() {}.type)
+			Gson().fromJson<List<Int>>(marketListString, object : TypeToken<List<Int>>() {}.type)
 		} catch (error: Exception) {
 			error.printStackTrace()
 			return
@@ -78,44 +90,29 @@ object SandBoxManager {
 		
 	}
 	
-	
-	fun updateMarketList(newMarketList: List<Int>) {
-		updateSandBoxContentByName(marketListFileName, Gson().toJson(newMarketList))
-	}
-	
-	fun updateQuotationPairs(newPairs: List<String>) {
-		updateSandBoxContentByName(quotationPairsFileName, Gson().toJson(newPairs))
-	}
-	
-	
-	fun recoveryQuotationSelections(@WorkerThread callback: () -> Unit) {
-		val quotationSelectionString = getSandBoxContentByName(quotationPairsFileName)
-		if (quotationSelectionString.isNullOrEmpty()) return
-		val pairList = Gson().fromJson<List<String>>(quotationSelectionString, object : TypeToken<List<String>>() {}.type).toJsonArray()
-		if (pairList.size() == 0) {
-			callback()
-			return
-		}
-		GoldStoneAPI.getQuotationSelectionsByPairs(pairList) { quotationTables, error ->
-			if (!quotationTables.isNullOrEmpty() && error.isNone()) {
-				GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChartDataSet, lineChartError ->
-					if (!lineChartDataSet.isNullOrEmpty() && lineChartError.isNone()) {
-						lineChartDataSet.forEach { lineChartData ->
-							quotationTables.find { it.pair == lineChartData.pair }?.apply {
-								QuotationSelectionTable.insertSelection(
-									QuotationSelectionTable(
-										this,
-										lineChartData.pointList.toString(),
-										true
+	private fun recoveryQuotationSelections() {
+		val quotationSelectionListString = getSandBoxContentByName(quotationPairsFileName)
+		if (quotationSelectionListString.isNullOrEmpty()) return
+		val pairList = Gson().fromJson<List<String>>(quotationSelectionListString, object : TypeToken<List<String>>() {}.type).toJsonArray()
+		if (pairList.size() != 0) {
+			GoldStoneAPI.getQuotationSelectionsByPairs(pairList) { quotationTables, error ->
+				if (!quotationTables.isNullOrEmpty() && error.isNone()) {
+					GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChartDataSet, lineChartError ->
+						if (!lineChartDataSet.isNullOrEmpty() && lineChartError.isNone()) {
+							lineChartDataSet.forEach { lineChartData ->
+								quotationTables.find { it.pair == lineChartData.pair }?.apply {
+									QuotationSelectionTable.insertSelection(
+										QuotationSelectionTable(
+											this,
+											lineChartData.pointList.toString(),
+											true
+										)
 									)
-								)
+								}
 							}
 						}
-						callback()
 					}
 				}
-				
-				
 			}
 		}
 	}
