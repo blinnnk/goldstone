@@ -92,15 +92,7 @@ object SandBoxManager {
 	}
 	
 	private fun recoveryQuotationSelections(callback: () -> Unit) {
-		if (!NetworkUtil.hasNetwork()) {
-			callback()
-			return
-		}
 		val quotationSelectionListString = getSandBoxContentByName(quotationPairsFileName)
-		if (quotationSelectionListString.isNullOrEmpty()) {
-			callback()
-			return
-		}
 		val pairList = try {
 			Gson().fromJson<List<String>>(quotationSelectionListString, object : TypeToken<List<String>>() {}.type).toJsonArray()
 		} catch (error: Exception) {
@@ -108,7 +100,10 @@ object SandBoxManager {
 			callback()
 			return
 		}
-		if (pairList.size() != 0) {
+		if (NetworkUtil.hasNetwork()
+			&& !quotationSelectionListString.isEmpty()
+			&& pairList.size() != 0
+		) {
 			GoldStoneAPI.getQuotationSelectionsByPairs(pairList) { quotationTables, error ->
 				if (!quotationTables.isNullOrEmpty() && error.isNone()) {
 					GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChartDataSet, lineChartError ->
@@ -116,11 +111,7 @@ object SandBoxManager {
 							lineChartDataSet.forEach { lineChartData ->
 								quotationTables.find { it.pair == lineChartData.pair }?.apply {
 									QuotationSelectionTable.insertSelection(
-										QuotationSelectionTable(
-											this,
-											lineChartData.pointList.toString(),
-											true
-										)
+										QuotationSelectionTable(this, lineChartData.pointList.toString(), true)
 									)
 								}
 							}
