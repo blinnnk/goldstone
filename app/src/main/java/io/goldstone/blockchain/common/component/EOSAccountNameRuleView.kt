@@ -8,7 +8,6 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.FingerprintPaymentText
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.ProfileText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
 import io.goldstone.blockchain.common.value.GrayScale
@@ -39,7 +38,7 @@ class DescriptionView(context: Context) : TextView(context) {
 	}
 
 	fun isFingerprint(): DescriptionView {
-		text = FingerprintPaymentText.fingerprintDescription
+		text = FingerprintPaymentText.pageDescription
 		return this
 	}
 

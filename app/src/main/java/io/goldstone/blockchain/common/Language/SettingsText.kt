@@ -319,7 +319,7 @@ object ProfileText {
 object FingerprintPaymentText {
 
 	@JvmField
-	val fingerprintDescription = when (currentLanguage) {
+	val pageDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "After you open the fingerprint payment, you can confirm the transfer and signature by fingerprint. At the same time, you can still transfer or sign using the previously set password."
 		HoneyLanguage.Chinese.code -> "开启指纹支付后，你可以通过指纹来确认转账及签名。同时您仍旧可以使用之前设置的密码来转账或签名。"
 		HoneyLanguage.Japanese.code -> "指紋支払いを開いた後、指紋で転送と署名を確認することができます。 同時に、以前に設定したパスワードを使用して転送または署名することもできます。"
@@ -329,7 +329,7 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
-	val fingerprintNotSupported = when (currentLanguage) {
+	val unsupported = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Device does not support"
 		HoneyLanguage.Chinese.code -> "您当前的设备不支持本功能"
 		HoneyLanguage.Japanese.code -> "デバイスはサポートしていません"
@@ -339,7 +339,7 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
-	val fingerprintNotSupportedDescription = when (currentLanguage) {
+	val unsupportedDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Your current device does not support fingerprint encryption and therefore cannot use fingerprint payment."
 		HoneyLanguage.Chinese.code -> "您当前的设备不支持指纹加密，因而无法使用指纹支付。"
 		HoneyLanguage.Japanese.code -> "現在のデバイスは指紋認証をサポートしていないため、指紋認証は使用できません。"
@@ -350,17 +350,7 @@ object FingerprintPaymentText {
 	}
 
 	@JvmField
-	val enableFingerprintPayment = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Your current device does not support fingerprint encryption and therefore cannot use fingerprint payment."
-		HoneyLanguage.Chinese.code -> "您当前的设备不支持指纹加密，因而无法使用指纹支付。"
-		HoneyLanguage.Japanese.code -> "現在のデバイスは指紋認証をサポートしていないため、指紋認証は使用できません。"
-		HoneyLanguage.Korean.code -> "현재 사용중인 장치는 지문 암호화를 지원하지 않으므로 지문 인식을 사용할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Ваше текущее устройство не поддерживает шифрование отпечатков пальцев и поэтому не может использовать оплату отпечатков пальцев."
-		HoneyLanguage.TraditionalChinese.code -> "您當前的設備不支持指紋加密，因而無法使用指紋支付。"
-		else -> ""
-	}
-	@JvmField
-	val fingerprintPaymentButtonStatusUnsupport = when (currentLanguage) {
+	val buttonStatusUnsupport = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DEVICE DOES NOT SUPPORT"
 		HoneyLanguage.Chinese.code -> "您当前的设备不支持本功能"
 		HoneyLanguage.Japanese.code -> "デバイスはサポートしていません"
@@ -370,7 +360,7 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
-	val fingerprintPaymentButtonStatusEnabled = when (currentLanguage) {
+	val buttonStatusEnabled = when (currentLanguage) {
 		HoneyLanguage.English.code -> "FINGERPRINT PAYMENT ENABLED"
 		HoneyLanguage.Chinese.code -> "指纹支付已开启"
 		HoneyLanguage.Japanese.code -> "指紋の支払いが有効になっています"
@@ -380,7 +370,17 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
-	val TurnOffAlertTitle = when (currentLanguage) {
+	val buttonStatusUnset = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enable fingerprint payment"
+		HoneyLanguage.Chinese.code -> "开启指纹支付"
+		HoneyLanguage.Japanese.code -> "指紋の支払いを開く"
+		HoneyLanguage.Korean.code -> "열린 지문 지불"
+		HoneyLanguage.Russian.code -> "Включить оплату по отпечатку пальца"
+		HoneyLanguage.TraditionalChinese.code -> "開啟指紋支付"
+		else -> ""
+	}
+	@JvmField
+	val turnOffAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Turn off fingerprint payment"
 		HoneyLanguage.Chinese.code -> "关闭指纹支付"
 		HoneyLanguage.Japanese.code -> "指紋の支払いを閉じる"
@@ -390,7 +390,7 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
-	val TurnOffAlertDescription = when (currentLanguage) {
+	val turnOffAlertDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Are you sure you want to turn off fingerprint payment?"
 		HoneyLanguage.Chinese.code -> "确认要关闭指纹支付功能吗？重新开启需要再次验证密码。"
 		HoneyLanguage.Japanese.code -> "あなたは指紋の支払いを止めてもよろしいですか？ 再開するにはパスワードの再確認が必要です。"
@@ -439,16 +439,6 @@ object FingerprintPaymentText {
 		HoneyLanguage.Korean.code -> "비밀번호 입력"
 		HoneyLanguage.Russian.code -> "Введите пароль"
 		HoneyLanguage.TraditionalChinese.code -> "輸入密碼"
-		else -> ""
-	}
-	@JvmField
-	val fingerprintPaymentButtonStatusUnset = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Enable fingerprint payment"
-		HoneyLanguage.Chinese.code -> "开启指纹支付"
-		HoneyLanguage.Japanese.code -> "指紋の支払いを開く"
-		HoneyLanguage.Korean.code -> "열린 지문 지불"
-		HoneyLanguage.Russian.code -> "Включить оплату по отпечатку пальца"
-		HoneyLanguage.TraditionalChinese.code -> "開啟指紋支付"
 		else -> ""
 	}
 	@JvmField
