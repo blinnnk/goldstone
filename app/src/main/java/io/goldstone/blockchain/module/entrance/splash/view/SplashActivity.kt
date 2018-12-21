@@ -65,9 +65,17 @@ class SplashActivity : AppCompatActivity() {
 				}
 			)
 			GlobalScope.launch(Dispatchers.Default) {
-				presenter.cleanWhenUpdateDatabaseOrElse {
-					prepareAppConfig {
-						prepareData()
+				with(presenter) {
+					cleanWhenUpdateDatabaseOrElse {
+						initSupportCurrencyList(this@SplashActivity)
+						initDefaultExchangeData(this@SplashActivity)
+						prepareAppConfig {
+							recoverySandboxData { hasChanged ->
+								if (hasChanged) {
+									AppConfigTable.dao.getAppConfig()?.prepareData()
+								} else prepareData()
+							}
+						}
 					}
 				}
 			}
@@ -96,8 +104,6 @@ class SplashActivity : AppCompatActivity() {
 					// 初次安装软件关键数据从本地 JSON 生成到数据库,
 					// 后续会在网络环境更新为网络数据
 					initLaunchLanguage(language)
-					initSupportCurrencyList(activity)
-					initDefaultExchangeData(activity)
 					initDefaultToken(activity)
 					// 检查市场状况
 					prepareInReviewStatus {

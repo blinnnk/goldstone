@@ -7,6 +7,7 @@ import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -74,12 +75,15 @@ class QuotationPresenter(
 		}.sortedByDescending {
 			it.orderID
 		}.toList().let { quotations ->
-			if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
-				launchUI {
-					updateData()
+			if (!hasCheckedPairDate) {
+				updateInvalidDatePair(invalidDatePairs) {
+					launchUI {
+						updateData()
+					}
 				}
 				hasCheckedPairDate = true
 			}
+			
 			launchUI {
 				// 更新 `UI`
 				diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
