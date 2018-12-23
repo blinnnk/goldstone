@@ -319,7 +319,7 @@ object ProfileText {
 object FingerprintPaymentText {
 
 	@JvmField
-	val fingerprintDescription = when (currentLanguage) {
+	val featureDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "After you open the fingerprint payment, you can confirm the transfer and signature by fingerprint. At the same time, you can still transfer or sign using the previously set password."
 		HoneyLanguage.Chinese.code -> "开启指纹支付后，你可以通过指纹来确认转账及签名。同时您仍旧可以使用之前设置的密码来转账或签名。"
 		HoneyLanguage.Japanese.code -> "指紋支払いを開いた後、指紋で転送と署名を確認することができます。 同時に、以前に設定したパスワードを使用して転送または署名することもできます。"
@@ -349,17 +349,6 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 
-	@JvmField
-	val enableFingerprintPayment = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Your current device does not support fingerprint encryption and therefore cannot use fingerprint payment."
-		HoneyLanguage.Chinese.code -> "您当前的设备不支持指纹加密，因而无法使用指纹支付。"
-		HoneyLanguage.Japanese.code -> "現在のデバイスは指紋認証をサポートしていないため、指紋認証は使用できません。"
-		HoneyLanguage.Korean.code -> "현재 사용중인 장치는 지문 암호화를 지원하지 않으므로 지문 인식을 사용할 수 없습니다."
-		HoneyLanguage.Russian.code -> "Ваше текущее устройство не поддерживает шифрование отпечатков пальцев и поэтому не может использовать оплату отпечатков пальцев."
-		HoneyLanguage.TraditionalChinese.code -> "您當前的設備不支持指紋加密，因而無法使用指紋支付。"
-		else -> ""
-	}
-	@JvmField
 	val buttonStatusUnsupport = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DEVICE DOES NOT SUPPORT"
 		HoneyLanguage.Chinese.code -> "您当前的设备不支持本功能"
@@ -380,6 +369,7 @@ object FingerprintPaymentText {
 		else -> ""
 	}
 	@JvmField
+
 	val turnOffAlertTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Turn off fingerprint payment"
 		HoneyLanguage.Chinese.code -> "关闭指纹支付"
@@ -471,4 +461,17 @@ object FingerprintPaymentText {
 		HoneyLanguage.TraditionalChinese.code -> "需要輸入密碼來驗證您的身份，以開啟指紋支付功能。"
 		else -> ""
 	}
+	@JvmField
+	val detecting = when (currentLanguage) {
+		HoneyLanguage.English.code->"Identifying fingerprints"
+		HoneyLanguage.Chinese.code->"正在鉴别指纹"
+		HoneyLanguage.Japanese.code->"指紋の識別"
+		HoneyLanguage.Korean.code->"지문 식별"
+		HoneyLanguage.Russian.code->"Идентификация отпечатков пальцев"
+		HoneyLanguage.TraditionalChinese.code->"正在鑑別指紋"
+		else -> ""
+	}
+
 }
+
+

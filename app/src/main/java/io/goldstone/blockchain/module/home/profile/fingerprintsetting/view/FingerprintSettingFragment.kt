@@ -252,7 +252,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 					textSize = fontSize(12)
 					textColor = GrayScale.midGray
 					typeface = GoldStoneFont.medium(context)
-					text = "detecting your fingerprint now"
+					text = FingerprintPaymentText.detecting
 				}
 				if (showPasswordButton) {
 					passwordButton = graySquareCell {

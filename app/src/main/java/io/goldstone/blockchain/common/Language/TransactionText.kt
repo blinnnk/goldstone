@@ -90,33 +90,33 @@ object TransactionText {
 	@JvmField
 	val signData = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Sign Data"
-		HoneyLanguage.Chinese.code -> "Sign Data"
-		HoneyLanguage.Japanese.code -> "Sign Data"
-		HoneyLanguage.Korean.code -> "Sign Data"
-		HoneyLanguage.Russian.code -> "Sign Data"
-		HoneyLanguage.TraditionalChinese.code -> "Sign Data"
+		HoneyLanguage.Chinese.code -> "数据签名"
+		HoneyLanguage.Japanese.code -> "データ署名"
+		HoneyLanguage.Korean.code -> "데이터 서명"
+		HoneyLanguage.Russian.code -> "Подпись данных"
+		HoneyLanguage.TraditionalChinese.code -> "數據簽名"
 		else -> ""
 	}
 
 	@JvmField
 	val signDataDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "sign the data to confirm the identity of the account"
-		HoneyLanguage.Chinese.code -> "sign the data to confirm the identity of the account"
-		HoneyLanguage.Japanese.code -> "sign the data to confirm the identity of the account"
-		HoneyLanguage.Korean.code -> "sign the data to confirm the identity of the account"
-		HoneyLanguage.Russian.code -> "sign the data to confirm the identity of the account"
-		HoneyLanguage.TraditionalChinese.code -> "sign the data to confirm the identity of the account"
+		HoneyLanguage.English.code -> "Sign to chain to authenticate for authentication, please confirm.."
+		HoneyLanguage.Chinese.code -> "向链发起签名以进行身份验证，请确认。"
+		HoneyLanguage.Japanese.code -> "認証のためにチェーンに署名したいと考えています。確認してください。"
+		HoneyLanguage.Korean.code -> "인증을 위해 체인에 서명하여 확인하십시오."
+		HoneyLanguage.Russian.code -> "Подпишите цепочку для аутентификации для аутентификации, пожалуйста, подтвердите."
+		HoneyLanguage.TraditionalChinese.code -> "向鏈發起簽名以進行身份驗證，請確認。"
 		else -> ""
 	}
 
 	@JvmField
 	val dappSignDataDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
-		HoneyLanguage.Chinese.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
-		HoneyLanguage.Japanese.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
-		HoneyLanguage.Korean.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
-		HoneyLanguage.Russian.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
-		HoneyLanguage.TraditionalChinese.code -> "current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+		HoneyLanguage.English.code -> "Currently Dapp wants to sign to chain for authentication, please confirm."
+		HoneyLanguage.Chinese.code -> "当前 Dapp 想要向链发起签名以进行身份验证，请确认。"
+		HoneyLanguage.Japanese.code -> "現在、Dappは認証のためにチェーンに署名したいと考えています。確認してください。"
+		HoneyLanguage.Korean.code -> "현재 Dapp는 인증을 위해 체인에 서명하려고합니다. 확인하십시오."
+		HoneyLanguage.Russian.code -> "В настоящее время Dapp хочет подписать цепочку для аутентификации, пожалуйста, подтвердите."
+		HoneyLanguage.TraditionalChinese.code -> "當前 Dapp 想要向鏈發起簽名以進行身份驗證，請確認。"
 		else -> ""
 	}
 
@@ -359,4 +359,59 @@ object TransactionText {
 		else -> ""
 	}
 
+	@JvmField
+	val noActionsFound = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No corresponding record found"
+		HoneyLanguage.Chinese.code -> "未找到相应记录"
+		HoneyLanguage.Japanese.code -> "対応するレコードが見つかりません"
+		HoneyLanguage.Korean.code -> "해당 레코드가 없습니다."
+		HoneyLanguage.Russian.code -> "Соответствующая запись не найдена"
+		HoneyLanguage.TraditionalChinese.code -> "未找到相應記錄"
+		else -> ""
+	}
+	@JvmField
+	val filterDataResource: (dataSize: Int) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> {
+				if (it < 2) {
+					"(Data retrieved: $it Transaction)"
+				} else {
+					"(Data retrieved: $it Transactions)"
+				}
+			}
+			HoneyLanguage.Chinese.code -> "(已检索数据: $it 条账单)"
+			HoneyLanguage.Japanese.code -> "（取り出されたデータ：$it 取引）"
+			HoneyLanguage.Korean.code -> "(검색된 데이터 : $it 거래)"
+			HoneyLanguage.English.code -> {
+				if (it < 2) {
+					"(Полученные данные: $it транзакция)"
+				} else {
+					"(Полученные данные: $it транзакции)"
+				}
+			}
+			HoneyLanguage.TraditionalChinese.code -> "(已檢索數據: $it 條賬單)"
+			else -> ""
+		}
+	}
+	@JvmField
+	val filterFoundNoItem = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No specified type of transaction was found in the currently retrieved data"
+		HoneyLanguage.Chinese.code -> "在目前检索到的数据中未发现指定类型的账单"
+		HoneyLanguage.Japanese.code -> "現在検索されているデータに特定の種類の請求書が見つかりませんでした"
+		HoneyLanguage.Korean.code -> "현재 검색된 데이터에서 지정된 유형의 청구서를 찾을 수 없습니다."
+		HoneyLanguage.Russian.code -> "Указанный тип транзакции не был найден в полученных данных."
+		HoneyLanguage.TraditionalChinese.code -> "在目前檢索到的數據中未發現指定類型的賬單"
+		else -> ""
+	}
+
+	@JvmField
+	val loadMore = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Load more"
+		HoneyLanguage.Chinese.code -> "加载更多"
+		HoneyLanguage.Japanese.code -> "もっと読み込む"
+		HoneyLanguage.Korean.code -> "더 많은로드"
+		HoneyLanguage.Russian.code -> "Загрузить больше"
+		HoneyLanguage.TraditionalChinese.code -> "加載更多"
+		else -> ""
+	}
 }
