@@ -17,13 +17,13 @@ object ProfileText {
 		else -> ""
 	}
 	@JvmField
-	val dappCenter = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Dapp Center"
-		HoneyLanguage.Chinese.code -> "Dapp 中心"
-		HoneyLanguage.Japanese.code -> "Dapp センター"
-		HoneyLanguage.Korean.code -> "Dapp 센터"
+	val DAPPCenter = when (currentLanguage) {
+		HoneyLanguage.English.code -> "DAPP Center"
+		HoneyLanguage.Chinese.code -> "DAPP 中心"
+		HoneyLanguage.Japanese.code -> "DAPP センター"
+		HoneyLanguage.Korean.code -> "DAPP 센터"
 		HoneyLanguage.Russian.code -> "DAPP Центр"
-		HoneyLanguage.TraditionalChinese.code -> "Dapp 中心"
+		HoneyLanguage.TraditionalChinese.code -> "DAPP 中心"
 		else -> ""
 	}
 	@JvmField
