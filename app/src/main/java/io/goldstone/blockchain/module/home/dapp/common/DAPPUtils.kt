@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.valueView
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.value.CornerSize
 import io.goldstone.blockchain.common.value.GrayScale
@@ -50,7 +51,7 @@ fun ViewGroup.showQuickPaymentDashboard(
 		}?.safeGet("data")?.toJsonObject()!! else actions[0]
 	// 渠道分成需要在 `memo` 标记渠道, 一些 `DAPP` 会自动添加在 `memo` 里, 但是 `BetDice` 需要手动添加
 	val memo = info.safeGet("memo").completeMemoChannel(info.safeGet("to"))
-	// `Quantity` 用于解析 `Decimal` 和 `Symbol` 而用
+	// `Quantity` 解析 `Decimal` 和 `Symbol` 而用
 	val quantity = info.safeGet("quantity")
 	val transaction =
 		if (actions.size > 1) MultipleActionsTransaction(quantity, actions.map { EOSAction(it) })
@@ -86,8 +87,8 @@ fun ViewGroup.showQuickPaymentDashboard(
 	}
 	Dashboard(context) {
 		showDashboard(
-			"Quick Payment",
-			"confirmation the transaction from current DAPP, then sign the data",
+			AlertText.transferRequestTitle,
+			AlertText.transferRequestDescription,
 			contentLayout,
 			hold = {
 				confirmEvent()
@@ -139,8 +140,8 @@ fun ViewGroup.showOperationDashboard(
 	Dashboard(context) {
 		cancelOnTouchOutside()
 		showDashboard(
-			"Contract Operation",
-			"contract need you to sign the data, and proof it is valid operation",
+			AlertText.signDataRequestTitle,
+			AlertText.signDataRequestDescription,
 			contentLayout,
 			hold = {
 				confirmEvent()

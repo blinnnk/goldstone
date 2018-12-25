@@ -18,6 +18,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress

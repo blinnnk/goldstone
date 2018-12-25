@@ -32,7 +32,6 @@ class AddressSelectionPresenter(
 ) : AddressSelectionContract.GSPresenter {
 
 	override fun start() {
-		selectionView.asyncData = arrayListOf()
 		setAddressList()
 	}
 

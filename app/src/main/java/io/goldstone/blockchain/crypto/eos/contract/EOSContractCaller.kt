@@ -8,10 +8,7 @@ import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
-import io.goldstone.blockchain.crypto.eos.transaction.EOSAction
-import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
-import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionUtils
-import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.eos.transaction.*
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
@@ -34,23 +31,23 @@ class EOSContractCaller(
 
 	// JSON Object 结构
 	//  {"account":"prochaintech","name":"click","authorization":[{"actor":"beautifulleo","permission":"active"}],"data":{"clickRequest":{"account":"beautifulleo","candyId":10,"ref":""}}}
-	constructor(data: JSONObject, chainID: ChainID) : this(
+	constructor(action: JSONObject, chainID: ChainID) : this(
 		EOSAuthorization(
-			JSONArray(data.safeGet("authorization")).toJSONObjectList()[0].safeGet("actor"),
-			EOSActor.getActorByValue(JSONArray(data.safeGet("authorization")).toJSONObjectList()[0].safeGet("permission"))!!
+			JSONArray(action.safeGet("authorization")).toJSONObjectList()[0].safeGet("actor"),
+			EOSActor.getActorByValue(JSONArray(action.safeGet("authorization")).toJSONObjectList()[0].safeGet("permission"))!!
 		),
-		EOSCodeName(data.safeGet("account")),
-		EOSTransactionMethod(data.safeGet("name")),
+		EOSCodeName(action.safeGet("account")),
+		EOSTransactionMethod(action.safeGet("name")),
 		chainID,
-		data.safeGet("data")
+		action.safeGet("data")
 	)
 
-	constructor(data: JSONObject) : this(
-		EOSAuthorization(data.safeGet("actor"), EOSActor.Active),
-		EOSCodeName(data.safeGet("code")),
-		EOSTransactionMethod(data.safeGet("method")),
-		ChainID(data.safeGet("chainID")),
-		data.safeGet("data")
+	constructor(action: JSONObject) : this(
+		EOSAuthorization(action.safeGet("actor"), EOSActor.Active),
+		EOSCodeName(action.safeGet("code")),
+		EOSTransactionMethod(action.safeGet("method")),
+		ChainID(action.safeGet("chainID")),
+		action.safeGet("data")
 	)
 
 	override fun serialized(
@@ -64,19 +61,30 @@ class EOSContractCaller(
 				// data 和 memo 不同, 对 data 数据签名还要对对象的具体类型做判断
 				// 如果 data 没有对象化, 那么就做简单的编码处理
 				val dataCode: String
-				if(data.contains("{")) {
+				if (data.contains("{")) {
 					val dataObject = JSONObject(data)
 					val coreObject =
 						if (dataObject.names().length() == 1 && data.substringAfter(":").contains("{"))
 							dataObject.getTargetObject(dataObject.names()[0].toString())
 						else dataObject
+					// For `BetDice` 的 `Lottery` 编码要把 `ExtendedSymbol` 的编码放到最后面
+					val allNames = coreObject.names().toList().toArrayList()
+					if (allNames.contains("extendedSymbol")) {
+						allNames.remove("username")
+						allNames.add("username")
+					}
 					dataCode =
-						coreObject.names().toList().map {
-							val value = coreObject.get(it)
-							when {
-								value is Int -> EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
-								value.toString().contains("ref", true) ->
-									EOSUtils.convertMemoToCode(value.toString())
+						allNames.map { name ->
+							val value = coreObject.get(name)
+							when  {
+								value is Int -> {
+									val code = EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
+									code.completeZero(16 - code.length)
+								}
+								// `BetDice` 的领取彩票需要对这个他们自定义的字段做特殊变异处理, 这里写了定制的枚举方法.
+								name.equals("extendedSymbol", true) -> {
+									EOSUtils.toLittleEndian(BigInteger(value.toString()).toString(16))
+								}
 								else -> EOSUtils.getLittleEndianCode(value.toString())
 							}
 						}.joinToString("") { it }

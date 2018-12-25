@@ -51,7 +51,7 @@ class RoundCell(context: Context) : GSCard(context) {
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
-		setCardBackgroundColor(GrayScale.lightGray)
+		setCardBackgroundColor(GrayScale.whiteGray)
 		container = relativeLayout {
 			lparams(matchParent, matchParent)
 			layoutParams = RelativeLayout.LayoutParams(matchParent, cellHeight)
