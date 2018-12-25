@@ -96,7 +96,7 @@ class TabItem(context: Context) : LinearLayout(context) {
 		titleView.text = when (type) {
 			TabItemType.Market -> QuotationText.market.toLowerCase()
 			TabItemType.Wallet -> WalletText.wallet.toLowerCase()
-			TabItemType.DAppCenter -> ProfileText.DAPPCenter.toLowerCase()
+			TabItemType.DAppCenter -> ProfileText.dappCenter.toLowerCase()
 			TabItemType.Setting -> ProfileText.settings.toLowerCase()
 		}
 	}

@@ -17,7 +17,7 @@ object ProfileText {
 		else -> ""
 	}
 	@JvmField
-	val DAPPCenter = when (currentLanguage) {
+	val dappCenter = when (currentLanguage) {
 		HoneyLanguage.English.code -> "DAPP Center"
 		HoneyLanguage.Chinese.code -> "DAPP 中心"
 		HoneyLanguage.Japanese.code -> "DAPP センター"
