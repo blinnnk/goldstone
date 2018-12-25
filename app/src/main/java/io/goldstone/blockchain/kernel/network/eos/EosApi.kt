@@ -243,6 +243,18 @@ object EOSAPI {
 		}
 	}
 
+	fun getStringChainInfo(
+		@WorkerThread hold: (chainInfo: String?, error: GoldStoneError) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			EOSUrl.getInfo(),
+			listOf(),
+			true
+		) { result, error ->
+			hold(result?.firstOrNull(), error)
+		}
+	}
+
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,

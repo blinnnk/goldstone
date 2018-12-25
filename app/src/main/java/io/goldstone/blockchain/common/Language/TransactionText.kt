@@ -114,7 +114,7 @@ object TransactionText {
 		HoneyLanguage.English.code -> "Currently Dapp wants to sign to chain for authentication, please confirm."
 		HoneyLanguage.Chinese.code -> "当前 Dapp 想要向链发起签名以进行身份验证，请确认。"
 		HoneyLanguage.Japanese.code -> "現在、Dappは認証のためにチェーンに署名したいと考えています。確認してください。"
-		HoneyLanguage.Korean.code -> "현재 Dapp는 인증을 위해 체인에 서명하려고합니다. 확인하십시오."
+		HoneyLanguage.Korean.code -> "현재 Dapp 는 인증을 위해 체인에 서명하려고합니다. 확인하십시오."
 		HoneyLanguage.Russian.code -> "В настоящее время Dapp хочет подписать цепочку для аутентификации, пожалуйста, подтвердите."
 		HoneyLanguage.TraditionalChinese.code -> "當前 Dapp 想要向鏈發起簽名以進行身份驗證，請確認。"
 		else -> ""

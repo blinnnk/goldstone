@@ -8,7 +8,10 @@ import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
-import io.goldstone.blockchain.crypto.eos.transaction.*
+import io.goldstone.blockchain.crypto.eos.transaction.EOSAction
+import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
+import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionUtils
+import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainID
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
@@ -63,28 +66,21 @@ class EOSContractCaller(
 				val dataCode: String
 				if (data.contains("{")) {
 					val dataObject = JSONObject(data)
-					val coreObject =
-						if (dataObject.names().length() == 1 && data.substringAfter(":").contains("{"))
-							dataObject.getTargetObject(dataObject.names()[0].toString())
-						else dataObject
 					// For `BetDice` 的 `Lottery` 编码要把 `ExtendedSymbol` 的编码放到最后面
-					val allNames = coreObject.names().toList().toArrayList()
+					val allNames = dataObject.names().toList().toArrayList()
 					if (allNames.contains("extendedSymbol")) {
 						allNames.remove("username")
 						allNames.add("username")
 					}
 					dataCode =
 						allNames.map { name ->
-							val value = coreObject.get(name)
-							when  {
-								value is Int -> {
-									val code = EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
-									code.completeZero(16 - code.length)
-								}
+							val value = dataObject.get(name)
+							when {
+								value is Int ->
+									EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
 								// `BetDice` 的领取彩票需要对这个他们自定义的字段做特殊变异处理, 这里写了定制的枚举方法.
-								name.equals("extendedSymbol", true) -> {
+								name.equals("extendedSymbol", true) ->
 									EOSUtils.toLittleEndian(BigInteger(value.toString()).toString(16))
-								}
 								else -> EOSUtils.getLittleEndianCode(value.toString())
 							}
 						}.joinToString("") { it }

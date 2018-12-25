@@ -42,7 +42,9 @@ class CurrencyPresenter(
 			currencyDao.setCurrencyInUse(symbol)
 			val rate = currencyDao.getCurrencyBySymbol(symbol)?.rate
 			AppConfigTable.dao.updateCurrency(symbol)
-			rate?.let { SharedWallet.updateCurrentRate(it) }
+			rate?.let {
+				SharedWallet.updateCurrentRate(it)
+			}
 			SharedWallet.updateCurrencyCode(symbol)
 		}
 	}

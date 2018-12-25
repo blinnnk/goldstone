@@ -18,7 +18,6 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
-import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
@@ -274,6 +273,19 @@ class DAPPBrowser(
 								}
 							}
 						}
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
+		fun getInfo() {
+			EOSAPI.getStringChainInfo { chainInfo, error ->
+				launchUI {
+					if (chainInfo.isNotNull() && error.isNone()) {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getInfo',true,true);event.data=$chainInfo;document.dispatchEvent(event)})()", null)
+					} else {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getInfo',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					}
 				}
 			}
