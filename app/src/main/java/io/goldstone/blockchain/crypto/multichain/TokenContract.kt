@@ -154,7 +154,7 @@ fun TokenContract?.getSymbol(): CoinSymbol {
 
 fun TokenContract?.getAddress(isEOSAccountName: Boolean = true): String {
 	return when {
-		TokenContract(this?.contract.orEmpty(), CoinSymbol.pureBTCSymbol, CryptoValue.btcSeriesDecimal).isBTC() ->
+		TokenContract(this?.contract.orEmpty(), CoinSymbol.btc, CryptoValue.btcSeriesDecimal).isBTC() ->
 			AddressUtils.getCurrentBTCAddress()
 		TokenContract(this?.contract.orEmpty(), CoinSymbol.ltc, CryptoValue.btcSeriesDecimal).isLTC() ->
 			AddressUtils.getCurrentLTCAddress()

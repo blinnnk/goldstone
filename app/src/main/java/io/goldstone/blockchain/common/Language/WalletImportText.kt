@@ -27,14 +27,14 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val customBitcoinPath: (isYingYongBao: Boolean) -> String = {
+	val customBitcoinPath: () -> String = {
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> "Custom ${HoneyLanguage.bitcoinPrefix(it)} Path"
-			HoneyLanguage.Chinese.code -> "自定义 ${HoneyLanguage.bitcoinPrefix(it)} 路径"
-			HoneyLanguage.Japanese.code -> "カスタム ${HoneyLanguage.bitcoinPrefix(it)} パス"
-			HoneyLanguage.Korean.code -> "사용자 정의 ${HoneyLanguage.bitcoinPrefix(it)} 경로"
-			HoneyLanguage.Russian.code -> "Пользовательский путь ${HoneyLanguage.bitcoinPrefix(it)}"
-			HoneyLanguage.TraditionalChinese.code -> "自定義 ${HoneyLanguage.bitcoinPrefix(it)} 路徑"
+			HoneyLanguage.English.code -> "Custom ${HoneyLanguage.bitcoinPrefix()} Path"
+			HoneyLanguage.Chinese.code -> "自定义 ${HoneyLanguage.bitcoinPrefix()} 路径"
+			HoneyLanguage.Japanese.code -> "カスタム ${HoneyLanguage.bitcoinPrefix()} パス"
+			HoneyLanguage.Korean.code -> "사용자 정의 ${HoneyLanguage.bitcoinPrefix()} 경로"
+			HoneyLanguage.Russian.code -> "Пользовательский путь ${HoneyLanguage.bitcoinPrefix()}"
+			HoneyLanguage.TraditionalChinese.code -> "自定義 ${HoneyLanguage.bitcoinPrefix()} 路徑"
 			else -> ""
 		}
 	}
@@ -49,14 +49,14 @@ object ImportWalletText {
 		else -> ""
 	}
 	@JvmField
-	val customBTCTestPath: (isYingYongBao: Boolean) -> String = {
+	val customBTCTestPath: () -> String = {
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> "Custom ${HoneyLanguage.bitcoinPrefix(it)} Test Path"
-			HoneyLanguage.Chinese.code -> "自定义 ${HoneyLanguage.bitcoinPrefix(it)} 测试路径"
-			HoneyLanguage.Japanese.code -> "カスタム ${HoneyLanguage.bitcoinPrefix(it)} テストパス"
-			HoneyLanguage.Korean.code -> "사용자 지정 ${HoneyLanguage.bitcoinPrefix(it)} 테스트 경로"
-			HoneyLanguage.Russian.code -> "Пользовательский тестовый путь ${HoneyLanguage.bitcoinPrefix(it)}"
-			HoneyLanguage.TraditionalChinese.code -> "自定義 ${HoneyLanguage.bitcoinPrefix(it)} 測試路徑"
+			HoneyLanguage.English.code -> "Custom ${HoneyLanguage.bitcoinPrefix()} Test Path"
+			HoneyLanguage.Chinese.code -> "自定义 ${HoneyLanguage.bitcoinPrefix()} 测试路径"
+			HoneyLanguage.Japanese.code -> "カスタム ${HoneyLanguage.bitcoinPrefix()} テストパス"
+			HoneyLanguage.Korean.code -> "사용자 지정 ${HoneyLanguage.bitcoinPrefix()} 테스트 경로"
+			HoneyLanguage.Russian.code -> "Пользовательский тестовый путь ${HoneyLanguage.bitcoinPrefix()}"
+			HoneyLanguage.TraditionalChinese.code -> "自定義 ${HoneyLanguage.bitcoinPrefix()} 測試路徑"
 			else -> ""
 		}
 	}
@@ -272,16 +272,7 @@ object ImportWalletText {
 		HoneyLanguage.TraditionalChinese.code -> "助憶口令格式不對"
 		else -> ""
 	}
-	@JvmField
-	val pathAlert = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Invalid path"
-		HoneyLanguage.Chinese.code -> "路径格式不正确"
-		HoneyLanguage.Japanese.code -> "パス形式が正しくありません"
-		HoneyLanguage.Korean.code -> "로트 포맷 오류"
-		HoneyLanguage.Russian.code -> "Неправильный формат пути"
-		HoneyLanguage.TraditionalChinese.code -> "路徑格式不正確"
-		else -> ""
-	}
+
 	@JvmField
 	val addressFormatAlert = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Invalid address"

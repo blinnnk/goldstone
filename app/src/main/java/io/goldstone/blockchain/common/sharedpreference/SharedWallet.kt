@@ -60,12 +60,6 @@ object SharedWallet {
 	fun updateUnregisterGoldStoneID(goldStoneID: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.unregisterGoldStoneID, goldStoneID)
 
-	fun getInReviewStatus(): Boolean =
-		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.yingYongBaoInReview)
-
-	fun updateInReviewStatus(status: Boolean) =
-		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.yingYongBaoInReview, status)
-
 	fun getCurrentName(): String =
 		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentName)
 

@@ -20,7 +20,6 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
@@ -33,7 +32,6 @@ import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
-import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
@@ -60,12 +58,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		PathModel(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader, DefaultPath.default),
 		PathModel(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader, DefaultPath.default),
 		PathModel(
-			ImportWalletText.customBitcoinPath(SharedWallet.getInReviewStatus()),
+			ImportWalletText.customBitcoinPath(),
 			DefaultPath.btcPathHeader,
 			DefaultPath.default
 		),
 		PathModel(
-			ImportWalletText.customBTCTestPath(SharedWallet.getInReviewStatus()),
+			ImportWalletText.customBTCTestPath(),
 			DefaultPath.testPathHeader,
 			DefaultPath.default
 		),

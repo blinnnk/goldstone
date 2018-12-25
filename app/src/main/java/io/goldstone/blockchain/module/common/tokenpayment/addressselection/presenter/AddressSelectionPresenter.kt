@@ -124,7 +124,7 @@ class AddressSelectionPresenter(
 				SharedValue.isTestEnvironment() ->
 					selectionView.showError(Throwable("this is a mainnet address, please switch your local net setting in settings first"))
 				!token.contract.isBTC() ->
-					selectionView.showError(Throwable(ErrorText.invalidChainAddress(CoinSymbol.btc())))
+					selectionView.showError(Throwable(ErrorText.invalidChainAddress(CoinSymbol.btc)))
 				else -> WalletTable.getAllBTCMainnetAddresses {
 					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}

@@ -11,14 +11,11 @@ import android.widget.TextView
 import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
-import com.blinnnk.extension.suffix
 import com.blinnnk.uikit.uiPX
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
-import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import org.jetbrains.anko.radioButton
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.wrapContent
@@ -95,10 +92,7 @@ class NodeSelectionCell(context: Context) : RelativeLayout(context) {
 	fun isChecked() = radio.isChecked
 
 	fun setData(name: String, isSelected: Boolean, id: Int): NodeSelectionCell {
-		title.text =
-			if (SharedWallet.getInReviewStatus() && name.contains(CoinSymbol.pureBTCSymbol, true))
-				CoinSymbol.btc() suffix name.substringAfter(" ")
-			else name
+		title.text = name
 		radio.isChecked = isSelected
 		this.id = id
 		return this
