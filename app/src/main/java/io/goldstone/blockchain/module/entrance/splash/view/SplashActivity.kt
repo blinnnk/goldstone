@@ -10,7 +10,6 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -24,7 +23,6 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
@@ -106,11 +104,9 @@ class SplashActivity : AppCompatActivity() {
 					initLaunchLanguage(language)
 					initDefaultToken(activity)
 					// 检查市场状况
-					prepareInReviewStatus {
-						updateAccountInformation(activity) {
-							launchUI {
-								jump<MainActivity>()
-							}
+					updateAccountInformation(activity) {
+						launchUI {
+							jump<MainActivity>()
 						}
 					}
 				}
@@ -171,19 +167,6 @@ class SplashActivity : AppCompatActivity() {
 				}
 				config.let(callback)
 			}
-		}
-	}
-
-	@WorkerThread
-	private fun prepareInReviewStatus(callback: (GoldStoneError) -> Unit) {
-		GoldStoneAPI.getConfigList { serverConfigs, error ->
-			if (serverConfigs.isNotNull() && error.isNone()) {
-				val isInReview = serverConfigs.find {
-					it.name.equals("inReview", true)
-				}?.switch?.toIntOrNull() == 1
-				SharedWallet.updateInReviewStatus(isInReview)
-				callback(error)
-			} else callback(error)
 		}
 	}
 

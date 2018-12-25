@@ -50,7 +50,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 			Pair("${CoinSymbol.etc}/${CoinSymbol.erc}", ethSeriesAddress.isNotEmpty()),
 			Pair(CoinSymbol.eos, eosAddress.isNotEmpty()),
 			Pair("${CoinSymbol.eos} JUNGLE", eosJungle.isNotEmpty()),
-			Pair(CoinSymbol.btc(), btcMainnetAddress.isNotEmpty()),
+			Pair(CoinSymbol.btc, btcMainnetAddress.isNotEmpty()),
 			Pair(CoinSymbol.ltc, ltcAddress.isNotEmpty()),
 			Pair(CoinSymbol.bch, bchAddress.isNotEmpty()),
 			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())

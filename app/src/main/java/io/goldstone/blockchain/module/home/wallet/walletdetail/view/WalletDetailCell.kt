@@ -42,14 +42,12 @@ class WalletDetailCell(context: Context) : BaseCell(context) {
 				symbol.isBCH() -> icon.image.imageResource = R.drawable.bch_icon
 				symbol.isEOS() -> icon.image.imageResource = R.drawable.eos_icon
 				symbol.isBTC() ->
-					icon.image.imageResource =
-						if (SharedWallet.getInReviewStatus()) R.drawable.default_token
-						else R.drawable.btc_icon
+					icon.image.imageResource = R.drawable.btc_icon
 				else -> icon.image.glideImage("$iconUrl?imageView2/1/w/120/h/120")
 			}
-			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
+			tokenInfo.title.text = symbol.symbol
 			// 部分 `Token` 没有 `Name` 这里就直接显示 `Symbol`
-			tokenInfo.subtitle.text = CoinSymbol.updateNameIfInReview(tokenName isEmptyThen symbol.symbol)
+			tokenInfo.subtitle.text = tokenName isEmptyThen symbol.symbol
 			if (contract.isEOSSeries() && eosWalletType != EOSWalletType.Available) {
 				if (eosWalletType == EOSWalletType.Inactivated)
 					showStatusButton(BasicRadiusButton.Companion.Style.Pending)

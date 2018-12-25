@@ -105,13 +105,6 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 		} else goToPaymentDetailFragment(toAddress, count, token)
 	}
 
-	private fun showAlert(title: String, subtitle: String, callback: () -> Unit) {
-		alert(title, subtitle) {
-			yesButton { callback() }
-			noButton { }
-		}.show()
-	}
-
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		token?.let {
@@ -199,6 +192,13 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 				presenter.popFragmentFrom<AddressSelectionFragment>()
 			}
 		}
+	}
+
+	private fun showAlert(title: String, subtitle: String, callback: () -> Unit) {
+		alert(title, subtitle) {
+			yesButton { callback() }
+			noButton { }
+		}.show()
 	}
 
 	private fun setScanButtonStatus(isShow: Boolean = true, callback: () -> Unit = {}) {

@@ -142,7 +142,7 @@ class PaymentDetailPresenter(
 				usePasswordEvent = {
 					PaymentDetailPresenter.getPrivatekeyByPassword(
 						context,
-						ChainType.EOS,
+						chainType,
 						actionType,
 						cancelEvent = cancelEvent,
 						hold = hold

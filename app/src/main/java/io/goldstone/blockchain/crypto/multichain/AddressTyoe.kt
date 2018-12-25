@@ -8,9 +8,9 @@ package io.goldstone.blockchain.crypto.multichain
 
 enum class AddressType(val value: String, val symbol: String) {
 	ETHSeries("ETH/ERC20/ETC", CoinSymbol.eth),
-	BTC(CoinSymbol.btc(), CoinSymbol.pureBTCSymbol),
+	BTC(CoinSymbol.btc, CoinSymbol.btc),
 	BCH("BCH", CoinSymbol.bch),
-	BTCSeriesTest("${CoinSymbol.btc()} Test", CoinSymbol.pureBTCSymbol),
+	BTCSeriesTest("${CoinSymbol.btc} Test", CoinSymbol.btc),
 	LTC("LTC", CoinSymbol.ltc),
 	EOS("EOS", CoinSymbol.eos),
 	EOSJungle("EOS Jungle", CoinSymbol.eos),

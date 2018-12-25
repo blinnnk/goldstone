@@ -34,6 +34,7 @@ object EOSValue {
 }
 
 class EOSTransactionMethod(val value: String) {
+	fun isTransfer(): Boolean = value.equals("transfer", true)
 	companion object {
 		val Transfer = EOSTransactionMethod("transfer")
 		fun transfer() = EOSTransactionMethod("transfer")

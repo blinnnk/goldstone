@@ -14,7 +14,6 @@ import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.button.SquareIcon
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.multichain.*
@@ -41,16 +40,14 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				contract.isBCH() -> icon.image.imageResource = R.drawable.bch_icon
 				contract.isEOS() -> icon.image.imageResource = R.drawable.eos_icon
 				contract.isBTC() ->
-					icon.image.imageResource =
-						if (SharedWallet.getInReviewStatus()) R.drawable.default_token
-						else R.drawable.btc_icon
+					icon.image.imageResource = R.drawable.btc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}
-			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(symbol)
+			tokenInfo.title.text = symbol.symbol
 			tokenInfo.subtitle.text = when {
 				contract.isERC20Token() -> "contract address:" suffix contract.contract
 				contract.isEOSToken() -> "code name:" suffix contract.contract
-				else -> CoinSymbol.updateNameIfInReview(if (tokenName.isEmpty()) symbol.symbol else tokenName)
+				else -> if (tokenName.isEmpty()) symbol.symbol else tokenName
 			}
 		}
 	}
@@ -66,16 +63,14 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 				TokenContract(this).isBCH() -> icon.image.imageResource = R.drawable.bch_icon
 				TokenContract(this).isEOS() -> icon.image.imageResource = R.drawable.eos_icon
 				TokenContract(this).isBTC() ->
-					icon.image.imageResource =
-						if (SharedWallet.getInReviewStatus()) R.drawable.default_token
-						else R.drawable.btc_icon
+					icon.image.imageResource = R.drawable.btc_icon
 				else -> icon.image.glideImage(iconUrl)
 			}
-			tokenInfo.title.text = CoinSymbol.updateSymbolIfInReview(CoinSymbol(symbol))
+			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = when {
 				TokenContract(this).isERC20Token() -> "contract address:" suffix contract
 				TokenContract(this).isEOSToken() -> "code name:" suffix contract
-				else -> CoinSymbol.updateNameIfInReview(if (name.isEmpty()) symbol else name)
+				else -> if (name.isEmpty()) symbol else name
 			}
 			switch.isChecked = isUsed
 		}

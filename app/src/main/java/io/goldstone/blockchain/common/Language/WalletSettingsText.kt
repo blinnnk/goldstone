@@ -312,11 +312,11 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val bitcoinAddress: (isYingYongBao: Boolean) -> String = {
+	val bitcoinAddress: () -> String = {
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> "${HoneyLanguage.bitcoinPrefix(it)} Address"
-			HoneyLanguage.Chinese.code -> "${HoneyLanguage.bitcoinPrefix(it)} 地址"
-			HoneyLanguage.Japanese.code -> "${HoneyLanguage.bitcoinPrefix(it)} アドレス"
+			HoneyLanguage.English.code -> "${HoneyLanguage.bitcoinPrefix()} Address"
+			HoneyLanguage.Chinese.code -> "${HoneyLanguage.bitcoinPrefix()} 地址"
+			HoneyLanguage.Japanese.code -> "${HoneyLanguage.bitcoinPrefix()} アドレス"
 			HoneyLanguage.Korean.code -> "비트 코인 주소"
 			HoneyLanguage.Russian.code -> "Адрес биткойна"
 			HoneyLanguage.TraditionalChinese.code -> "比特幣地址"

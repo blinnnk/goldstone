@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto.multichain
 
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import java.io.Serializable
 
 
@@ -13,7 +12,7 @@ class CoinSymbol(val symbol: String) : Serializable {
 	companion object {
 		const val eth = "ETH"
 		const val etc = "ETC"
-		const val pureBTCSymbol = "BTC"
+		const val btc = "BTC"
 		const val ltc = "LTC"
 		const val bch = "BCH"
 		const val erc = "ERC"
@@ -23,7 +22,7 @@ class CoinSymbol(val symbol: String) : Serializable {
 		@JvmStatic
 		val ETC: CoinSymbol = CoinSymbol(etc)
 		@JvmStatic
-		val BTC: CoinSymbol = CoinSymbol(pureBTCSymbol)
+		val BTC: CoinSymbol = CoinSymbol(btc)
 		@JvmStatic
 		val LTC: CoinSymbol = CoinSymbol(ltc)
 		@JvmStatic
@@ -31,32 +30,15 @@ class CoinSymbol(val symbol: String) : Serializable {
 		@JvmStatic
 		val EOS: CoinSymbol = CoinSymbol(eos)
 		@JvmStatic
-		val btc: () -> String = {
-			if (SharedWallet.getInReviewStatus()) "B.C." else "BTC"
-		}
-		@JvmStatic
 		val allBTCSeriesSymbol: () -> List<String> = {
-			listOf(ltc, btc(), bch)
-		}
-
-		fun updateSymbolIfInReview(symbol: CoinSymbol): String {
-			return if (symbol.isBTC() && SharedWallet.getInReviewStatus()) CoinSymbol.btc()
-			else symbol.symbol
-		}
-
-		fun updateNameIfInReview(name: String): String {
-			return if (
-				name.contains("Bitcoin", true) &&
-				SharedWallet.getInReviewStatus()
-			) "Bitc."
-			else name
+			listOf(ltc, btc, bch)
 		}
 	}
 }
 
 fun CoinSymbol?.isEOS() = this?.symbol.equals(CoinSymbol.eos, true)
 fun CoinSymbol?.isETH() = this?.symbol.equals(CoinSymbol.eth, true)
-fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.pureBTCSymbol, true)
+fun CoinSymbol?.isBTC() = this?.symbol.equals(CoinSymbol.btc, true)
 fun CoinSymbol?.isLTC() = this?.symbol.equals(CoinSymbol.ltc, true)
 fun CoinSymbol?.isBCH() = this?.symbol.equals(CoinSymbol.bch, true)
 fun CoinSymbol?.isETC() = this?.symbol.equals(CoinSymbol.etc, true)

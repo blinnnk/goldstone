@@ -298,7 +298,7 @@ class AddressManagerPresenter(
 						// 在 `MyToken` 里面注册新地址, 用于更换 `DefaultAddress` 的时候做准备
 						insertNewToMyToken(
 							TokenContract.btcContract,
-							CoinSymbol.pureBTCSymbol,
+							CoinSymbol.btc,
 							address,
 							ChainID.btcMain
 						)
@@ -329,7 +329,7 @@ class AddressManagerPresenter(
 						// `BTCTest` 是 `BTCSeries` 公用的地址
 						insertNewToMyToken(
 							TokenContract.btcContract,
-							CoinSymbol.pureBTCSymbol,
+							CoinSymbol.btc,
 							address,
 							ChainID.btcTest
 						)

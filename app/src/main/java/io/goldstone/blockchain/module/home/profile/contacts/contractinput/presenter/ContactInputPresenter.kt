@@ -208,7 +208,7 @@ class ContactInputPresenter(
 			btcMainnetAddressText.isNotEmpty() &&
 			!BTCUtils.isValidMainnetAddress(btcMainnetAddressText)
 		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.btc()))
+			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.btc))
 			return
 		}
 		// 符合以上规则的可以进入插入地址

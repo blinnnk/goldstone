@@ -144,7 +144,7 @@ data class EOSTransactionInfo(
 
 	private fun transfer(
 		privateKey: EOSPrivateKey,
-		chaiURL: String = SharedChain.getEOSCurrent().getURL(),
+		chaiURL: String,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		val permission =

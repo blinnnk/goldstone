@@ -11,6 +11,7 @@ import android.widget.Toast
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
+import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.SystemUtils
 import com.blinnnk.util.load
 import com.blinnnk.util.then
@@ -48,6 +49,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.matchParent
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -280,16 +282,16 @@ class DAPPBrowser(
 		@JavascriptInterface
 		fun transferEOS(action: String) {
 			launchUI {
-				val actionObject = try {
-					JSONObject(action)
+				val actions = try {
+					JSONArray(JSONObject(action).safeGet("actions")).toJSONObjectList()
 				} catch (error: Exception) {
 					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
 					return@launchUI
 				}
-				if (actionObject.safeGet("name").equals(EOSTransactionMethod.Transfer.value, true)) {
-					scatterEOSTransaction(actionObject)
+				if (actions[0].safeGet("name").equals(EOSTransactionMethod.Transfer.value, true)) {
+					scatterEOSTransaction(actions)
 				} else {
-					scatterSignOperation(actionObject)
+					scatterSignOperation(actions[0])
 				}
 			}
 		}
@@ -336,7 +338,7 @@ class DAPPBrowser(
 			)
 		}
 
-		private val scatterEOSTransaction: (action: JSONObject) -> Unit = { action ->
+		private val scatterEOSTransaction: (action: List<JSONObject>) -> Unit = { action ->
 			showQuickPaymentDashboard(
 				action,
 				false,
@@ -378,7 +380,7 @@ class DAPPBrowser(
 					return@launchUI
 				}
 				showQuickPaymentDashboard(
-					actionObject,
+					listOf(actionObject),
 					true,
 					dappChainURL,
 					cancelEvent = {

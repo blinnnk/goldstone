@@ -77,7 +77,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}
 
 				btcMainnetAddressInput = roundInput {
-					title = CoinSymbol.btc()
+					title = CoinSymbol.btc
 					hint = ContactText.btcMainnetAddress
 				}.lparams {
 					width = matchParent
@@ -119,7 +119,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}
 
 				btcTestnetAddressInput = roundInput {
-					title = "${CoinSymbol.btc()} Series TEST"
+					title = "${CoinSymbol.btc} Series TEST"
 					hint = ContactText.btcTestnetAddress
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
