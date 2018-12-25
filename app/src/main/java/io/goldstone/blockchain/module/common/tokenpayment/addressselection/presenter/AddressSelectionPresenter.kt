@@ -121,7 +121,7 @@ class AddressSelectionPresenter(
 
 			AddressType.BTC -> when {
 				SharedValue.isTestEnvironment() ->
-					selectionView.showError(Throwable("this is a mainnet address, please switch your local net setting in settings first"))
+					selectionView.showError(Throwable(QRText.findMainNetAddress))
 				!token.contract.isBTC() ->
 					selectionView.showError(Throwable(ErrorText.invalidChainAddress(CoinSymbol.btc)))
 				else -> WalletTable.getAllBTCMainnetAddresses {
@@ -131,9 +131,9 @@ class AddressSelectionPresenter(
 
 			AddressType.BTCSeriesTest -> when {
 				!SharedValue.isTestEnvironment() ->
-					selectionView.showError(Throwable("this is a testnet address, please switch your local net setting in settings first"))
+					selectionView.showError(Throwable(QRText.findTestNetAddress))
 				!token.contract.isBTCSeries() ->
-					selectionView.showError(Throwable("This is a invalid address type for Testnet, Please check it again"))
+					selectionView.showError(Throwable(QRText.findInvalidTestNetAddress))
 				else -> WalletTable.getAllBTCSeriesTestnetAddresses {
 					selectionView.goToPaymentDetailWithExistedCheckedDialog(this, toAddress, count, token)
 				}

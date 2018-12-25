@@ -250,7 +250,7 @@ class DAPPBrowser(
 				Dashboard(context) {
 					showAlert(
 						TransactionText.signData,
-						TransactionText.dappSignDataDescription
+						TransactionText.signDataDescription
 					) {
 						PaymentDetailPresenter.getPrivatekey(
 							context,
@@ -540,7 +540,7 @@ class DAPPBrowser(
 				Dashboard(context) {
 					showAlert(
 						TransactionText.signData,
-						TransactionText.dappSignDataDescription
+						TransactionText.signDataDescription
 					) {
 						PaymentDetailPresenter.getPrivatekey(
 							context,
