@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import java.io.File
@@ -28,6 +29,7 @@ object SandBoxManager {
 	private const val currencyFileName = "currency"
 	private const val marketListFileName = "marketList"
 	private const val quotationPairsFileName = "quotationPairs"
+	private const val walletTableFileName = "walletTable"
 
 	@WorkerThread
 	fun recoveryData(callback: () -> Unit) {
@@ -55,6 +57,14 @@ object SandBoxManager {
 	@WorkerThread
 	fun updateQuotationPairs(newPairs: List<String>) {
 		updateSandBoxContentByName(quotationPairsFileName, Gson().toJson(newPairs))
+	}
+	
+	@WorkerThread
+	fun updateWalletTables(walletTableSets: List<WalletTable>) {
+		val walletModelList = walletTableSets.map {
+			WalletModel(it)
+		}
+		updateSandBoxContentByName(walletTableFileName, Gson().toJson(walletModelList))
 	}
 
 	private fun recoveryLanguage() {
@@ -120,6 +130,32 @@ object SandBoxManager {
 				} else callback()
 			}
 		} else callback()
+	}
+	
+	private fun recoveryWalletTables() {
+		val walletModelListString = getSandBoxContentByName(walletTableFileName)
+		val pairList = try {
+			Gson().fromJson<List<WalletModel>>(walletModelListString, object : TypeToken<List<WalletModel>>() {}.type)
+		} catch (error: Exception) {
+			return
+		}
+		pairList.forEach {
+			when {
+				it.isWatchOnly -> {
+					// 观察钱包
+					recoveryWatchOnlyWallet(it)
+				}
+				it.encryptMnemonic != null -> {
+					// 助记词钱包
+					recoveryMnemonicWallet(it)
+				}
+				else -> {
+					// keystore 钱包
+					recoveryKeystoreWallet(it)
+				}
+			}
+		}
+		
 	}
 
 

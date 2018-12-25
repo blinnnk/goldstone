@@ -133,7 +133,7 @@ object GenerateMultiChainWallet {
 		}.start()
 	}
 
-	private fun getAddressIndexFromPath(path: String): Int {
+	fun getAddressIndexFromPath(path: String): Int {
 		return if (path.isEmpty()) -1
 		else path.substringAfterLast("/").toInt()
 	}
