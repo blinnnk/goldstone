@@ -17,9 +17,8 @@ import io.goldstone.blockchain.module.home.dapp.dapplist.model.DAPPType
 class DAPPListPresenter(
 	private val view: DAPPListContract.GSView
 ) : DAPPListContract.GSPresenter {
-	override fun start() {
 
-	}
+	override fun start() {}
 
 	override fun getData(type: DAPPType, hold: (List<DAPPTable>) -> Unit) {
 		load {

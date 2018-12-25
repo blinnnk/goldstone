@@ -8,7 +8,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.FOCUS_BEFORE_DESCENDANTS
+import android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
 import android.widget.LinearLayout
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.into
@@ -82,110 +82,108 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 
 	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return UI {
-			verticalLayout {
-				isFocusableInTouchMode = true
-				descendantFocusability = FOCUS_BEFORE_DESCENDANTS
-				nestedScrollView {
+			nestedScrollView {
+				lparams(matchParent, matchParent)
+				verticalLayout {
+					isFocusableInTouchMode = true
+					descendantFocusability = FOCUS_BLOCK_DESCENDANTS
 					lparams(matchParent, matchParent)
-					verticalLayout {
-						lparams(matchParent, matchParent)
-						gravity = Gravity.CENTER_HORIZONTAL
-						topPadding = 30.uiPX()
-						bottomPadding = 55.uiPX()
-						searchBar = SearchBar(context).click {
-							showDAPPExplorerFragment()
+					gravity = Gravity.CENTER_HORIZONTAL
+					topPadding = 30.uiPX()
+					bottomPadding = 55.uiPX()
+					searchBar = SearchBar(context).click {
+						showDAPPExplorerFragment()
+					}
+					searchBar.into(this)
+					recommendedSession = sessionTitle {
+						setTitle(DappCenterText.recommendDapp, Spectrum.white)
+						setSubtitle(
+							"(--)",
+							"${CommonText.checkAll} (--)",
+							Spectrum.opacity5White,
+							Spectrum.white
+						) {
+							showDAPPListDetailFragment(DAPPType.Recommend)
 						}
-						searchBar.into(this)
-						recommendedSession = sessionTitle {
-							setTitle(DappCenterText.recommendDapp, Spectrum.white)
-							setSubtitle(
-								"(--)",
-								"${CommonText.checkAll} (--)",
-								Spectrum.opacity5White,
-								Spectrum.white
-							) {
-								showDAPPListDetailFragment(DAPPType.Recommend)
+					}
+					recommendDAPP = RecommendDappView(
+						context,
+						clickCellEvent = {
+							showAttentionOrElse(context, id) {
+								getMainActivity()?.showDappBrowserFragment(
+									url,
+									PreviousView.DAPPCenter,
+									backgroundColor,
+									this@DAPPCenterFragment
+								)
+								presenter.setUsedDAPPs()
 							}
 						}
-						recommendDAPP = RecommendDappView(
-							context,
-							clickCellEvent = {
-								showAttentionOrElse(context, id) {
-									getMainActivity()?.showDappBrowserFragment(
-										url,
-										PreviousView.DAPPCenter,
-										backgroundColor,
-										this@DAPPCenterFragment
-									)
-									presenter.setUsedDAPPs()
-								}
-							}
-						)
-						recommendDAPP.into(this)
-						recommendDAPP.setMargins<LinearLayout.LayoutParams> {
-							bottomMargin = 5.uiPX()
-						}
-						gsCard {
-							lparams(ScreenSize.card, matchParent)
-							verticalLayout {
-								lparams(matchParent, matchParent)
-								menuBar = ViewPagerMenu(
-									context,
-									ScreenSize.card,
-									GrayScale.black,
-									12
-								)
-								menuBar.setColor(Color.TRANSPARENT, Spectrum.blue, GrayScale.lightGray)
-								menuBar.into(this)
-								minimumHeight = 200.uiPX()
-								newAPP = DAPPRecyclerView(
-									context,
-									clickCellEvent = {
-										showAttentionOrElse(context, id) {
-											getMainActivity()?.showDappBrowserFragment(
-												url,
-												PreviousView.DAPPCenter,
-												backgroundColor,
-												this@DAPPCenterFragment
-											)
-											presenter.setUsedDAPPs()
-										}
-									},
-									checkAllEvent = {
-										showDAPPListDetailFragment(DAPPType.New)
-									}
-								)
-								latestUsed = DAPPRecyclerView(
-									context,
-									clickCellEvent = {
+					)
+					recommendDAPP.into(this)
+					recommendDAPP.setMargins<LinearLayout.LayoutParams> {
+						bottomMargin = 5.uiPX()
+					}
+					gsCard {
+						lparams(ScreenSize.card, matchParent)
+						verticalLayout {
+							lparams(matchParent, matchParent)
+							menuBar = ViewPagerMenu(
+								context,
+								ScreenSize.card,
+								GrayScale.black,
+								12
+							)
+							menuBar.setColor(Color.TRANSPARENT, Spectrum.blue, GrayScale.lightGray)
+							menuBar.into(this)
+							minimumHeight = 200.uiPX()
+							newAPP = DAPPRecyclerView(
+								context,
+								clickCellEvent = {
+									showAttentionOrElse(context, id) {
 										getMainActivity()?.showDappBrowserFragment(
 											url,
 											PreviousView.DAPPCenter,
 											backgroundColor,
 											this@DAPPCenterFragment
 										)
-									},
-									checkAllEvent = {
-										showDAPPListDetailFragment(DAPPType.Latest)
+										presenter.setUsedDAPPs()
 									}
-								)
-								themedViewPager {
+								},
+								checkAllEvent = {
+									showDAPPListDetailFragment(DAPPType.New)
+								}
+							)
+							latestUsed = DAPPRecyclerView(
+								context,
+								clickCellEvent = {
+									getMainActivity()?.showDappBrowserFragment(
+										url,
+										PreviousView.DAPPCenter,
+										backgroundColor,
+										this@DAPPCenterFragment
+									)
+								},
+								checkAllEvent = {
+									showDAPPListDetailFragment(DAPPType.Latest)
+								}
+							)
+							themedViewPager {
 
-									layoutParams = LinearLayout.LayoutParams(matchParent, 986.uiPX())
-									adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
-									val titles = listOf(DappCenterText.newDapp, DappCenterText.recentDapp)
-									menuBar.setMenuTitles(titles) { button, id ->
-										button.onClick {
-											currentItem = id
-											menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)
-											button.preventDuplicateClicks()
-										}
+								layoutParams = LinearLayout.LayoutParams(matchParent, 986.uiPX())
+								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
+								val titles = listOf(DappCenterText.newDapp, DappCenterText.recentDapp)
+								menuBar.setMenuTitles(titles) { button, id ->
+									button.onClick {
+										currentItem = id
+										menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)
+										button.preventDuplicateClicks()
 									}
-									// `MenuBar` 滑动选中动画
-									onPageChangeListener {
-										onPageScrolled { position, percent, _ ->
-											menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
-										}
+								}
+								// `MenuBar` 滑动选中动画
+								onPageChangeListener {
+									onPageScrolled { position, percent, _ ->
+										menuBar.moveUnderLine(menuBar.getUnitWidth() * (percent + position))
 									}
 								}
 							}

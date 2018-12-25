@@ -62,7 +62,7 @@ interface SupportCurrencyDao {
 	@Query("SELECT * FROM supportCurrency WHERE isUsed = :isUsed")
 	fun getCurrentCurrency(isUsed: Boolean = true): SupportCurrencyTable
 
-	@Query("UPDATE supportCurrency set isUsed = 1 WHERE isUsed = 0")
+	@Query("UPDATE supportCurrency set isUsed = 0 WHERE isUsed = 1")
 	fun setCurrentCurrencyUnused()
 
 	@Query("UPDATE supportCurrency set isUsed = 1 WHERE currencySymbol = :symbol")
