@@ -75,6 +75,10 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 		this.title.text = title
 	}
 
+	fun setSearchInputHint(hint: String) {
+		searchInput?.editText?.hint = hint
+	}
+
 	fun showTitle(status: Boolean) {
 		title.visibility = if (status) View.VISIBLE else View.GONE
 	}

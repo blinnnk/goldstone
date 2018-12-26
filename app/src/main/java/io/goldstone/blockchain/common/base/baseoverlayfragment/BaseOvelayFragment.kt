@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.Overl
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -79,9 +80,15 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		overlayView.header.showSearchButton(isShow, setClickEvent)
 	}
 
-	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit, enterKeyEvent: () -> Unit) {
+	fun showSearchInput(
+		isShow: Boolean = true,
+		cancelEvent: () -> Unit,
+		enterKeyEvent: () -> Unit,
+		hint: String
+	) {
 		overlayView.isNotNull()
 		overlayView.header.showSearchInput(isShow, cancelEvent, enterKeyEvent)
+		overlayView.header.setSearchInputHint(hint)
 	}
 
 	fun showAddButton(status: Boolean, isLeft: Boolean = true, clickEvent: () -> Unit) {
@@ -90,6 +97,10 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
 	fun setTitle(title: String) {
 		overlayView.header.setTitle(title)
+	}
+
+	fun setSearchHint(hint: String) {
+		overlayView.header.setSearchInputHint(hint)
 	}
 
 	fun showTitle(status: Boolean) {

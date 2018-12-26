@@ -291,6 +291,9 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC")
 	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
+	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND chainID = :chainID")
+	fun getMyMaxBlockNumber(address: String, chainID: String): Int?
+
 	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
 	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().chainID.id): List<TransactionTable>
 

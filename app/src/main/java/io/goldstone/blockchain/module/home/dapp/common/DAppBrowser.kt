@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
@@ -162,7 +161,7 @@ class DAPPBrowser(
 
 		@JavascriptInterface
 		fun getIdentity(data: String) {
-			Log.d("getIdentity", data)
+			println("getIdentity $data")
 			GlobalScope.launch(Dispatchers.Default) {
 				val identity = "{ accounts: [{ \"authority\": \"active\", \"blockchain\": \"eos\", \"name\": \"${account.name}\" }] }"
 				delay(1000L)

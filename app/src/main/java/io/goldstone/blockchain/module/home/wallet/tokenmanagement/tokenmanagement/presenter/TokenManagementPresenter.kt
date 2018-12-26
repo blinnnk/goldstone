@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanageme
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.view.TokenSearchFragment
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -24,7 +25,8 @@ class TokenManagementPresenter(
 				showSearchInput(
 					true,
 					cancelEvent = { popFragmentFrom<TokenSearchFragment>() },
-					enterKeyEvent = {}
+					enterKeyEvent = {},
+					hint = EmptyText.searchInput
 				)
 			}
 		}

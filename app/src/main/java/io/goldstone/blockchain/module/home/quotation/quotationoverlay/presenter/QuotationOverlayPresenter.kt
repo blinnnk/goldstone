@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotationoverlay.presenter
 
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
@@ -38,7 +39,8 @@ class QuotationOverlayPresenter(
 					popFragmentFrom<QuotationSearchFragment>()
 					fragment.headerTitle = QuotationText.management
 				},
-				enterKeyEvent = {}
+				enterKeyEvent = {},
+				hint = EmptyText.searchInput
 			)
 		}
 	}

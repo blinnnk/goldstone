@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -608,7 +609,7 @@ object EOSAPI {
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("id", txID)),
-			EOSUrl.getTransaction(),
+			EOSUrl.getTransaction(getHistoryChainURL()),
 			false
 		) { jsonString, error ->
 			if (jsonString.isNotNull() && error.isNone()) {
@@ -691,6 +692,15 @@ object EOSAPI {
 					)
 				}
 			}
+		}
+	}
+
+	fun getHistoryChainURL(): String {
+		return when {
+			SharedChain.getEOSCurrent().chainID.isEOSMain() -> SharedValue.getMainnetHistoryURL()
+			SharedChain.getEOSCurrent().chainID.isEOSJungle() -> SharedValue.getJungleHistoryURL()
+			SharedChain.getEOSCurrent().chainID.isEOSKylin() -> SharedValue.getKylinHistoryURL()
+			else -> throw Throwable("wrong eos chain ID")
 		}
 	}
 

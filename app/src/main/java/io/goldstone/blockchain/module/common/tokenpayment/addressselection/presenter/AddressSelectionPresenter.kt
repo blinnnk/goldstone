@@ -2,13 +2,18 @@ package io.goldstone.blockchain.module.common.tokenpayment.addressselection.pres
 
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.load
+import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.ErrorText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.language.QRText
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
 import io.goldstone.blockchain.kernel.commontable.model.QRCodeModel
@@ -17,10 +22,6 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.getCurrentAddresses
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.WalletDetailCellModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * @date 28/03/2018 9:24 AM
@@ -95,6 +96,8 @@ class AddressSelectionPresenter(
 			AddressType.EOSJungle,
 			AddressType.EOSKylin,
 			AddressType.EOSAccountName -> when {
+				SharedAddress.getCurrentEOSAccount().isSame(EOSAccount(toAddress)) ->
+					selectionView.showError(TransferError.TransferToSelf)
 				!token.contract.isEOSSeries() ->
 					selectionView.showError(Throwable(AccountError.InvalidAddress))
 				// 查询数据库对应的当前链下的全部 `EOS Account Name` 用来提示比对
@@ -193,13 +196,13 @@ class AddressSelectionPresenter(
 	}
 
 	// 根据当前的 `Coin Type` 来选择展示地址的哪一项
-	private fun setAddressList() = GlobalScope.launch(Dispatchers.Default) {
-		val contacts = ContactTable.dao.getAllContacts()
-		withContext(Dispatchers.Main) {
+	private fun setAddressList() {
+		load {
+			ContactTable.dao.getAllContacts()
+		} then {
 			selectionView.showAddresses(
-				contacts.getCurrentAddresses(token.contract).toArrayList()
+				it.getCurrentAddresses(token.contract).toArrayList()
 			)
-			selectionView.updateInputStatus()
 		}
 	}
 }
