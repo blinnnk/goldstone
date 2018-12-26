@@ -19,6 +19,8 @@ import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.Excha
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceDao
+import io.goldstone.blockchain.module.home.rammarket.module.ramprice.model.RAMPriceTable
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationDao
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationExtraTypeConverter
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
@@ -49,6 +51,7 @@ import java.math.BigInteger
 		(ExchangeTable::class),
 		(EOSAccountTable::class),
 		(ChainNodeTable::class),
+		(RAMPriceTable::class),
 		(DAPPTable::class),
 		(FavoriteTable::class)
 	],
@@ -89,6 +92,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun eosAccountDao(): EOSAccountDao
 	abstract fun myTokenDefaultTableDao(): MyTokenDefaultTableDao
 	abstract fun chainNodeDao(): ChainNodeDao
+	abstract fun ramPriceDao(): RAMPriceDao
 	abstract fun dappDao(): DAPPDao
 	abstract fun favoriteDao(): FavoriteDao
 

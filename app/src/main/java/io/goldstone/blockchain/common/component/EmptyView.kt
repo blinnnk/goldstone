@@ -36,6 +36,7 @@ enum class EmptyType {
 	Quotation,
 	WalletDetail,
 	NotificationList,
+	RAMTransactions,
 	LatestUsedDAPP
 }
 
@@ -117,6 +118,11 @@ class EmptyView(context: Context) : LinearLayout(context) {
 				icon.imageResource = R.drawable.notification_list_empty_icon
 				introTitles.title.text = EmptyText.notificationListTitle
 				introTitles.subtitle.text = EmptyText.notificationListSubtitle
+			}
+			EmptyType.RAMTransactions -> {
+				icon.imageResource = R.drawable.ram_transactions_empty
+				introTitles.title.text = EmptyText.ramTransactionSearchTitle
+				introTitles.subtitle.text = EmptyText.ramTransactionSearchSubTitle
 			}
 
 			EmptyType.LatestUsedDAPP -> {

@@ -15,10 +15,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.HomeSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.textView
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 /**
  * @date 2018/6/25 1:34 PM
@@ -33,7 +30,7 @@ class ViewPagerMenu(
 ) : LinearLayout(context) {
 
 	private var titles: List<String> by observing(arrayListOf()) {
-		val unitWidth = if (titles.size < 4) maxWidth / titles.size else 100.uiPX()
+		val unitWidth = if (titles.size <= 4) maxWidth / titles.size else 100.uiPX()
 		underLineWidth = unitWidth.toFloat()
 		titles.forEachIndexed { index, content ->
 			textView(content) {
@@ -42,6 +39,7 @@ class ViewPagerMenu(
 				typeface = GoldStoneFont.heavy(context)
 				textColor = titleColor
 				gravity = Gravity.CENTER
+				singleLine = true
 				layoutParams = LinearLayout.LayoutParams(unitWidth, HomeSize.menuHeight - 2.uiPX())
 			}
 		}
@@ -51,6 +49,7 @@ class ViewPagerMenu(
 		isAntiAlias = true
 		style = Paint.Style.STROKE
 		strokeWidth = fontSize(7)
+		color = Spectrum.lightBlue
 	}
 
 	private val defaultLinePaint = Paint().apply {
@@ -119,5 +118,9 @@ class ViewPagerMenu(
 	fun moveUnderLine(distance: Float) {
 		underLineLeft = distance
 		invalidate()
+	}
+	
+	fun setBorderLineColor(color: Int) {
+		paint.color = color
 	}
 }

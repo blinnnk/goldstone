@@ -71,7 +71,8 @@ class ProfilePresenter(
 				ProfileModel(R.drawable.share_icon, ProfileText.shareApp, ""),
 				if (currentVersion.isEmpty() || currentVersion == SystemUtils.getVersionName(fragment.context!!))
 					ProfileModel(R.drawable.version_icon, ProfileText.version, currentVersion)
-				else ProfileModel(R.drawable.version_icon, ProfileText.version, currentVersion suffix CommonText.new)
+				else ProfileModel(R.drawable.version_icon, ProfileText.version, currentVersion suffix CommonText.new),
+				ProfileModel(R.drawable.share_icon, "eosram", "")
 			)
 			if (fragment.asyncData.isNull()) fragment.asyncData = data
 			else diffAndUpdateAdapterData<ProfileAdapter>(data)

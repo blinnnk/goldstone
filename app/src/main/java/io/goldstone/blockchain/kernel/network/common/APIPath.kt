@@ -42,8 +42,13 @@ object APIPath {
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
 	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
+	val getEOSRAMTradeData: (header: String) -> String = { "$it/eosram/tradeDataPerDay" }
+	val eosRAMOccupyRank: (header: String) -> String =  { "$it/eosram/holderRank" }
 	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
 		"$header/eos/tokenHistory?chainid=$chainID&account=$account"
+	}
+	val eosRAMHugeTransactions: (header: String, mode: Int) -> String = { header, mode ->
+		"$header/eosram/lastestTxList?mode=$mode"
 	}
 	val getEOSTokenCountInfo: (
 		header: String,
@@ -97,6 +102,21 @@ object APIPath {
 	}
 	val getQuotationCurrencyInfo: (header: String, pair: String) -> String = { header, pair ->
 		"$header/market/coinDetail?pair=$pair"
+	}
+	val getEOSRAMPriceTendcyCandle: (
+		header: String,
+		period: String,
+		size: Int
+	) -> String = { header, period, size ->
+		"$header/eosram/lineData?period=$period&size=$size"
+	}
+	val eosRAMLatestTrading: (header: String) -> String = { "$it/eosram/lastestTxListContainsSellAndBuy" }
+	val eosRAMTransactionsOfAccount: (
+		header: String,
+		account: String,
+		endID: Int,
+		size: Int) -> String = { header, account, endID, size ->
+		"$header/eosram/txListByAccount?account=$account&end=$endID&size=$size"
 	}
 
 	val getRecommendDAPPs: (header: String, page: Int, pageSize: Int) -> String = { header, pageIndex, pageSize ->

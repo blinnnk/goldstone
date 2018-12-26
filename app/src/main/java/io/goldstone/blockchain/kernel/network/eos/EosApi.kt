@@ -22,6 +22,7 @@ import io.goldstone.blockchain.kernel.commontable.EOSTransactionTable
 import io.goldstone.blockchain.kernel.network.ParameterUtil
 import io.goldstone.blockchain.kernel.network.common.APIPath
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
+import io.goldstone.blockchain.kernel.network.eos.commonmodel.*
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSChainInfo
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSTokenBalance
@@ -692,6 +693,36 @@ object EOSAPI {
 					)
 				}
 			}
+		}
+	}
+	
+	fun getGlobalInformation(
+		@WorkerThread hold: (EOSGlobalModel?, RequestError) -> Unit
+	) {
+		
+		RequestBody.create(
+			ETHJsonRPC.contentType,
+			ParameterUtil.prepareObjectContent(
+				Pair("scope", "eosio"),
+				Pair("code", "eosio"),
+				Pair("table", "global"),
+				Pair("json", "true")
+			)
+		).let {
+			RequisitionUtil.postRequest<EOSGlobalModel>(
+				it,
+				"rows",
+				EOSUrl.getTableRows(),
+				false,
+				false
+			) { data, error ->
+				if (data != null && data.isNotEmpty()) {
+					hold(data[0], RequestError.None)
+				} else {
+					hold(null, error)
+				}
+			}
+			
 		}
 	}
 

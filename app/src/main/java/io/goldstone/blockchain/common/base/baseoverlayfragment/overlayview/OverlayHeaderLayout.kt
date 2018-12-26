@@ -5,8 +5,8 @@ import android.content.Context
 import android.graphics.Paint
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Gravity
-import android.view.View
+import android.view.*
+import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -208,7 +208,18 @@ class OverlayHeaderLayout(context: Context) : RelativeLayout(context) {
 	fun setFilterEvent(action: () -> Unit) {
 		searchInput?.setFilterClickEvent(action)
 	}
-
+	fun setSearchText(text: String) {
+		searchInput?.editText?.setText(text)
+	}
+	fun setSearchEditor(imeOptions: Int, callback: (String) -> Unit) {
+		searchInput?.editText?.imeOptions = imeOptions
+		searchInput?.editText?.setOnEditorActionListener { textView, actionId, _ ->
+			if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+				callback(textView.text.toString().trim())
+				true
+			} else false
+		}
+	}
 	fun showSearchButton(isShow: Boolean, setClickEvent: () -> Unit) {
 		if (isShow) searchButton.click {
 			setClickEvent()

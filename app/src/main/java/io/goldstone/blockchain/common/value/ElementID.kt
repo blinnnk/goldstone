@@ -38,4 +38,5 @@ object ElementID {
 
 object ViewPagerID {
 	const val transactions = 3002
+	const val ramMarket = 3003
 }

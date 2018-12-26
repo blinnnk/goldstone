@@ -93,6 +93,17 @@ object TimeUtils {
 		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
+	
+	/**
+	 * @date: 2018/8/22
+	 * @author: yanglihai
+	 * @description: 把日期转换成日期+时间
+	 */
+	@SuppressLint("SimpleDateFormat")
+	fun formatYMdHmDate(date: Long): String {
+		val formatter = SimpleDateFormat("yyyy/MM/dd    HH:mm")
+		return formatter.format(java.util.Date(date))
+	}
 
 	@SuppressLint("SimpleDateFormat")
 	fun getUtcTime(time: Long): Long {

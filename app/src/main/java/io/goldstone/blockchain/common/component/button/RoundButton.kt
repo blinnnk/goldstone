@@ -15,7 +15,6 @@ import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GSCard
-import io.goldstone.blockchain.common.component.cell.RoundCell
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
@@ -78,8 +77,8 @@ class RoundButton(context: Context) : GSCard(context) {
 		}
 	}
 
-	fun setGrayStyle(top: Int? = null) {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, buttonHeight).apply {
+	fun setGrayStyle(top: Int? = null, width: Int = ScreenSize.widthWithPadding) {
+		layoutParams = LinearLayout.LayoutParams(width, buttonHeight).apply {
 			topMargin = top ?: marginTop
 			bottomMargin = 5.uiPX()
 		}
@@ -93,6 +92,13 @@ class RoundButton(context: Context) : GSCard(context) {
 			bottomMargin = 5.uiPX()
 		}
 		setCardBackgroundColor(Spectrum.blue)
+	}
+	fun setRedStyle(top: Int? = null, width: Int = ScreenSize.card, height: Int = buttonHeight) {
+		layoutParams = LinearLayout.LayoutParams(width, height).apply {
+			topMargin = top ?: marginTop
+			bottomMargin = 5.uiPX()
+		}
+		setCardBackgroundColor(Spectrum.lightRed)
 	}
 
 	fun setDarkStyle(top: Int? = null) {
