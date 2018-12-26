@@ -180,7 +180,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<QuotationOverlayFragment> {
 			presenter.popFragmentFrom<QuotationSearchFragment>()
-			showSearchInput(false, {}, {}, EmptyText.searchInput)
+			showSearchInput(false, {}, {}, EmptyText.tokenSearchInput)
 		}
 	}
 

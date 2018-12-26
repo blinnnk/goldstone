@@ -40,7 +40,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenManagementFragment> {
 			presenter.popFragmentFrom<TokenSearchFragment>()
-			showSearchInput(false, {}, {}, EmptyText.searchInput)
+			showSearchInput(false, {}, {}, EmptyText.tokenSearchInput)
 		}
 	}
 }

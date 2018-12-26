@@ -17,15 +17,28 @@ object EmptyText {
 		else -> ""
 	}
 	@JvmField
-	val searchInput = when (currentLanguage) {
+	val tokenSearchInput = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token name or contract address"
 		HoneyLanguage.Chinese.code -> "搜索Token名称或合约地址"
-		HoneyLanguage.Japanese.code -> "Token名称もしくは契約アドレスを検索する"
+		HoneyLanguage.Japanese.code -> "Token名称もしくは契約アドレスを検索"
 		HoneyLanguage.Korean.code -> "토큰 이름 또는 계약서 주소 검색"
 		HoneyLanguage.Russian.code -> "Поиск названия Token или адреса соглашения"
 		HoneyLanguage.TraditionalChinese.code -> "搜索Token名稱或合約地址"
 		else -> ""
 	}
+
+
+	@JvmField
+	val pairSearchInput = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Search by token symbol or pair"
+		HoneyLanguage.Chinese.code -> "搜索货币符号或交易对"
+		HoneyLanguage.Japanese.code -> "通貨記号またはペアで検索"
+		HoneyLanguage.Korean.code -> "통화 기호 또는 페어로 검색"
+		HoneyLanguage.Russian.code -> "Поиск по символу валюты или паре"
+		HoneyLanguage.TraditionalChinese.code -> "搜索Token名稱或合約地址"
+		else -> ""
+	}
+
 	@JvmField
 	val tokenDetailTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "No token transactions found"
