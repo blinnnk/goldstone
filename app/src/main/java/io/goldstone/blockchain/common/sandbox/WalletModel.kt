@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.common.sandbox
 
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.*
 
 /**
  * @date: 2018-12-24.
@@ -22,7 +22,16 @@ class WalletModel(
 	val hint: String? = null,
 	val isWatchOnly: Boolean = false,
 	val encryptMnemonic: String? = null,
-	val encryptFingerPrinterKey: String? = null
+	val encryptFingerPrinterKey: String? = null,
+	val currentEOSAccountName: EOSDefaultAllChainName,
+	val eosAccountNames: List<EOSAccountInfo>,
+	var currentETHSeriesAddress: String = "",
+	var currentETCAddress: String = "",
+	var currentBTCAddress: String = "",
+	var currentBTCSeriesTestAddress: String = "",
+	var currentLTCAddress: String = "",
+	var currentBCHAddress: String = "",
+	var currentEOSAddress: String = ""
 ) {
 	constructor(walletTable: WalletTable): this(
 		walletTable.id,
@@ -39,6 +48,8 @@ class WalletModel(
 		walletTable.hint,
 		walletTable.isWatchOnly,
 		walletTable.encryptMnemonic,
-		walletTable.encryptFingerPrinterKey
+		walletTable.encryptFingerPrinterKey,
+		walletTable.currentEOSAccountName,
+		walletTable.eosAccountNames
 	)
 }

@@ -2,8 +2,10 @@
 
 package io.goldstone.blockchain.common.sandbox
 
+import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNotNull
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.GoldStoneApp
@@ -32,11 +34,12 @@ object SandBoxManager {
 	private const val walletTableFileName = "walletTable"
 
 	@WorkerThread
-	fun recoveryData(callback: () -> Unit) {
+	fun recoveryData(context: Context,callback: () -> Unit) {
 		recoveryLanguage()
 		recoveryCurrency()
 		recoveryExchangeSelectedStatus()
 		recoveryQuotationSelections(callback)
+		recoveryWalletTables(context)
 	}
 
 	@WorkerThread
@@ -132,7 +135,7 @@ object SandBoxManager {
 		} else callback()
 	}
 	
-	private fun recoveryWalletTables() {
+	private fun recoveryWalletTables(context: Context) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
 		val pairList = try {
 			Gson().fromJson<List<WalletModel>>(walletModelListString, object : TypeToken<List<WalletModel>>() {}.type)
@@ -145,13 +148,13 @@ object SandBoxManager {
 					// 观察钱包
 					recoveryWatchOnlyWallet(it)
 				}
-				it.encryptMnemonic != null -> {
+				it.encryptMnemonic.isNotNull() -> {
 					// 助记词钱包
 					recoveryMnemonicWallet(it)
 				}
 				else -> {
 					// keystore 钱包
-					recoveryKeystoreWallet(it)
+					recoveryKeystoreWallet(context, it)
 				}
 			}
 		}
