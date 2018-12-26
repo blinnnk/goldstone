@@ -40,6 +40,18 @@ android {
     resConfigs "en", "ja", "ru", "zh_CN", "zh_HK", "zh_TW", "ko"
   }
 
+  // 自定义输出apk名字
+  applicationVariants.all {
+    variant ->
+      variant.outputs.all { output ->
+        if (buildType.name == 'release') {
+          outputFileName = new File("app_v" + defaultConfig.versionName + "_" +
+            new Date().format("yyyy-MM-dd-HH-mm-ss") + "_" +
+            buildType.name + ".apk")
+        }
+      }
+  }
+
   buildTypes {
     debug {
       minifyEnabled false

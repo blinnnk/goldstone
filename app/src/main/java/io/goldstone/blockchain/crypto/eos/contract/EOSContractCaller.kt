@@ -66,15 +66,19 @@ class EOSContractCaller(
 				val dataCode: String
 				if (data.contains("{")) {
 					val dataObject = JSONObject(data)
+					val coreObject =
+						if (dataObject.names().length() == 1 && data.substringAfter(":").contains("{"))
+							dataObject.getTargetObject(dataObject.names()[0].toString())
+						else dataObject
 					// For `BetDice` 的 `Lottery` 编码要把 `ExtendedSymbol` 的编码放到最后面
-					val allNames = dataObject.names().toList().toArrayList()
+					val allNames = coreObject.names().toList().toArrayList()
 					if (allNames.contains("extendedSymbol")) {
 						allNames.remove("username")
 						allNames.add("username")
 					}
 					dataCode =
 						allNames.map { name ->
-							val value = dataObject.get(name)
+							val value = coreObject.get(name)
 							when {
 								value is Int ->
 									EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))

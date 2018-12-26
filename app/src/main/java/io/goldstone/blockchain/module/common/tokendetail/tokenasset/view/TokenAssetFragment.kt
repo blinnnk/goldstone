@@ -121,9 +121,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 								layoutParams = LinearLayout.LayoutParams(iconSize, wrapContent)
 								setContent(info.first, info.second, Spectrum.blue)
 							}.click {
-								if (SharedWallet.isWatchOnlyWallet())
-									safeShowError(Throwable(AlertText.watchOnly))
-								else showTradingFragment(info.second)
+								showTradingFragment(info.second)
 							}
 						}
 					}
@@ -173,6 +171,10 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun showTradingFragment(title: String) {
+		if (SharedWallet.isWatchOnlyWallet()) {
+			safeShowError(Throwable(AlertText.watchOnly))
+			return
+		}
 		val parentPresenter =
 			getGrandFather<TokenDetailOverlayFragment>()?.presenter
 		when (title) {
@@ -311,22 +313,28 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		ramAssetCell = ProgressView(context).apply {
 			setTitle(TokenDetailText.ram)
 			setSubtitle(CommonText.calculating)
+		}.click {
+			showTradingFragment(TokenDetailText.buySellRAM)
 		}
 
 		cpuAssetCell = ProgressView(context).apply {
 			setTitle(TokenDetailText.cpu)
 			setSubtitle(CommonText.calculating)
+		}.click {
+			showTradingFragment(TokenDetailText.delegateCPU)
 		}
 
 		netAssetCell = ProgressView(context).apply {
 			setTitle(TokenDetailText.net)
 			setSubtitle(CommonText.calculating)
+		}.click {
+			showTradingFragment(TokenDetailText.delegateNET)
 		}
 
 		assetCard.addContent {
-			addView(ramAssetCell)
-			addView(cpuAssetCell)
-			addView(netAssetCell)
+			ramAssetCell.into(this)
+			cpuAssetCell.into(this)
+			netAssetCell.into(this)
 		}
 	}
 

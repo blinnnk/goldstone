@@ -69,7 +69,6 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 				imeOptions = EditorInfo.IME_ACTION_SEARCH
 				inputType = InputType.TYPE_CLASS_TEXT
 				textAlignment = EditText.TEXT_ALIGNMENT_GRAVITY
-				hint = EmptyText.searchInput
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				textSize = fontSize(12)
 				textColor = GrayScale.black

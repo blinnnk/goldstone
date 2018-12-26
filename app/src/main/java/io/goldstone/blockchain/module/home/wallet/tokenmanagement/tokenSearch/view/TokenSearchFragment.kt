@@ -4,6 +4,7 @@ import com.blinnnk.extension.getParentFragment
 import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -39,7 +40,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<TokenManagementFragment> {
 			presenter.popFragmentFrom<TokenSearchFragment>()
-			showSearchInput(false, {}) {}
+			showSearchInput(false, {}, {}, EmptyText.searchInput)
 		}
 	}
 }

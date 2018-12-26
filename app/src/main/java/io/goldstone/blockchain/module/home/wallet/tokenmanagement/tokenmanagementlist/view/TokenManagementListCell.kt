@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.Switch
-import com.blinnnk.extension.alignParentRight
-import com.blinnnk.extension.centerInVertical
-import com.blinnnk.extension.isDefaultStyle
-import com.blinnnk.extension.suffix
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
@@ -45,7 +42,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			}
 			tokenInfo.title.text = symbol.symbol
 			tokenInfo.subtitle.text = when {
-				contract.isERC20Token() -> "contract address:" suffix contract.contract
+				contract.isERC20Token() -> "contract address\n" suffix contract.contract.scaleTo(36)
 				contract.isEOSToken() -> "code name:" suffix contract.contract
 				else -> if (tokenName.isEmpty()) symbol.symbol else tokenName
 			}
@@ -68,7 +65,7 @@ open class TokenManagementListCell(context: Context) : BaseCell(context) {
 			}
 			tokenInfo.title.text = symbol
 			tokenInfo.subtitle.text = when {
-				TokenContract(this).isERC20Token() -> "contract address:" suffix contract
+				TokenContract(this).isERC20Token() -> "contract address:\n" suffix contract.scaleTo(36)
 				TokenContract(this).isEOSToken() -> "code name:" suffix contract
 				else -> if (name.isEmpty()) symbol else name
 			}

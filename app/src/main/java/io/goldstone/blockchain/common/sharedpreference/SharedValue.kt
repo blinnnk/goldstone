@@ -13,6 +13,26 @@ import io.goldstone.blockchain.common.value.SharesPreference
  * @date  2018/09/27
  */
 object SharedValue {
+	// Get Transaction EOS Chain URL
+	fun getMainnetHistoryURL(): String {
+		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.mainnetHistoryURL)
+	}
+	fun updateMainnetHistoryURL(url: String) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.mainnetHistoryURL, url)
+
+	fun getKylinHistoryURL(): String {
+		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.kylinHistoryURL)
+	}
+	fun updateKylinHistoryURL(url: String) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.kylinHistoryURL, url)
+
+	fun getJungleHistoryURL(): String {
+		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jungleHistoryURL)
+	}
+
+	fun updateJungleHistoryURL(url: String) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.jungleHistoryURL, url)
+
 	// EOS KB
 	fun getRAMUnitPrice(): Double =
 		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.ramUnitPrice)
