@@ -750,23 +750,22 @@ object EOSAccountText {
 	//	权限管理
 	@JvmField
 	val authority = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Authority Management"
-		HoneyLanguage.Chinese.code -> "权限管理"
-		HoneyLanguage.Japanese.code -> "権限管理"
-		HoneyLanguage.Korean.code -> "권한 관리"
-		HoneyLanguage.Russian.code -> "Управление полномочиями"
-		HoneyLanguage.TraditionalChinese.code -> "權限管理"
+		HoneyLanguage.English.code -> "Accounts"
+		HoneyLanguage.Chinese.code -> "账户管理"
+		HoneyLanguage.Japanese.code -> "アカウント"
+		HoneyLanguage.Korean.code -> "계정 관리"
+		HoneyLanguage.Russian.code -> "Счета"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶管理"
 		else -> ""
 	}
 
-
 	@JvmField
 	val accountNameSelection = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Account Manage"
+		HoneyLanguage.English.code -> "Account Management"
 		HoneyLanguage.Chinese.code -> "账户管理"
 		HoneyLanguage.Japanese.code -> "アカウント管理"
 		HoneyLanguage.Korean.code -> "계정 관리"
-		HoneyLanguage.Russian.code -> "Счета"
+		HoneyLanguage.Russian.code -> "Управление аккаунтом"
 		HoneyLanguage.TraditionalChinese.code -> "賬戶管理"
 		else -> ""
 	}
@@ -1422,6 +1421,27 @@ object EOSAccountText {
 		HoneyLanguage.TraditionalChinese.code -> "閾值"
 		else -> ""
 	}
+	@JvmField
+	val deletePermissionTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delete Permission"
+		HoneyLanguage.Chinese.code -> "删除权限"
+		HoneyLanguage.Japanese.code -> "権限を削除"
+		HoneyLanguage.Korean.code -> "권한 삭제"
+		HoneyLanguage.Russian.code -> "Удалить разрешение"
+		HoneyLanguage.TraditionalChinese.code -> "刪除權限"
+		else -> ""
+	}
+	@JvmField
+	val deletePermissionDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delete Permission"
+		HoneyLanguage.Chinese.code -> "确定要从该权限中移除这个公钥吗"
+		HoneyLanguage.Japanese.code -> "この公開鍵をこの許可から削除してよろしいですか？"
+		HoneyLanguage.Korean.code -> "이 공개 키를이 권한에서 제거 하시겠습니까?"
+		HoneyLanguage.Russian.code -> "Вы уверены, что хотите удалить этот открытый ключ из этого разрешения?"
+		HoneyLanguage.TraditionalChinese.code -> "確定要從該權限中移除這個公鑰嗎"
+		else -> ""
+	}
+
 	@JvmField
 	val currentPublicKey = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Current Key"

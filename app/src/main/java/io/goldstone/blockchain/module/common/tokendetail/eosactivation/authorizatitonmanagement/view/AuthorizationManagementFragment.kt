@@ -101,8 +101,8 @@ class AuthorizationManagementFragment
 	private fun deletePermissionKey(defaultPublicKey: String, actor: EOSActor) {
 		Dashboard(context!!) {
 			showAlert(
-				"Delete Permission Key",
-				"are you sure to delete this key's permission in this account",
+				EOSAccountText.deletePermissionTitle,
+				EOSAccountText.deletePermissionDescription,
 				cancelAction = {
 					dismiss()
 				},
@@ -269,5 +269,4 @@ class AuthorizationManagementFragment
 		overlayFragment?.showAddButton(false) {}
 		presenter.removeObserver()
 	}
-
 }
