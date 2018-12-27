@@ -58,7 +58,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 		val count = addresses.filter { it.second }.size
 		val allTypes = addresses.asSequence().filter { it.second }.map { it.first }.toList().toString()
 		val type = "(${allTypes.substring(1, allTypes.lastIndex)})"
-		val unit = ContactText.address
+		val unit = ContactText.address(count)
 		return "$count $unit $type"
 	}
 

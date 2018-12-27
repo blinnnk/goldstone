@@ -4,6 +4,7 @@ import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.crypto.keystore.getBigIntegerPrivateKeyByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
@@ -26,7 +27,7 @@ class FingerprintSettingPresenter : FingerprintSettingContract.GSPresenter {
 	}
 
 	override fun getSecret(password: String, hold: (secret: String?, error: AccountError) -> Unit) {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			if (SharedWallet.getCurrentWalletType().isBIP44()) {
 				GoldStoneApp.appContext.verifyKeystorePasswordByWalletID(
 					password,
@@ -45,7 +46,7 @@ class FingerprintSettingPresenter : FingerprintSettingContract.GSPresenter {
 				) { privateKey, error ->
 					if (privateKey.isNotNull() && error.isNone()) {
 						hold(privateKey.toString(16), error)
-					} else hold(null, AccountError.None)
+					} else hold(null, AccountError.WrongPassword)
 				}
 			}
 		}

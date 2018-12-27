@@ -90,18 +90,19 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 		})
 	}
 
+	private val offsetSize = BorderSize.bold + 3f
 	private val paint = Paint().apply {
 		isAntiAlias = true
 		color = GrayScale.lightGray
 		style = Paint.Style.STROKE
-		strokeWidth = BorderSize.bold
+		strokeWidth = offsetSize
 	}
 
 	@SuppressLint("DrawAllocation")
 	override fun onDraw(canvas: Canvas?) {
 		super.onDraw(canvas)
-		val cornerSize = (height - BorderSize.bold) / 2
-		val rectF = RectF(BorderSize.bold, BorderSize.bold, width - BorderSize.bold, height - BorderSize.bold)
+		val cornerSize = (height - offsetSize) / 2
+		val rectF = RectF(offsetSize, offsetSize, width - offsetSize, height - offsetSize)
 		canvas?.drawRoundRect(rectF, cornerSize, cornerSize, paint)
 	}
 

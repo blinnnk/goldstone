@@ -4,10 +4,13 @@ import com.blinnnk.extension.toList
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EosPublicKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
+import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
 import org.json.JSONArray
 import org.junit.Assert
@@ -70,6 +73,12 @@ class ExampleUnitTest {
 	fun stringArrayConverter() {
 		// expect result hello||hey||
 		println(listOf("hello", "hey").map { "$it||" }.joinToString("") { it })
+	}
+
+	@Test
+	fun utils() {
+		println(EOSUtils.getLittleEndianCode("owner"))
+		println(EOSUtils.getVariableUInt(1))
 	}
 }
 

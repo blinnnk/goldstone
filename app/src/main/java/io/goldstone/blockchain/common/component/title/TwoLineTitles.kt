@@ -6,7 +6,6 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.graphics.Typeface
-import android.os.Build
 import android.view.Gravity
 import android.view.ViewManager
 import android.widget.LinearLayout

@@ -47,10 +47,7 @@ import org.json.JSONObject
 class XinGePushReceiver : XGPushBaseReceiver() {
 
 	@SuppressLint("InvalidWakeLockTag", "WrongConstant")
-	private fun showNotificationOnLockScreen(
-		context: Context,
-		content: String
-	) {
+	private fun showNotificationOnLockScreen(context: Context, content: String) {
 		// 播放提醒音
 		val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 		val ringTone = RingtoneManager.getRingtone(context, notification)
@@ -72,54 +69,24 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 	}
 
-	override fun onSetTagResult(
-		p0: Context?,
-		p1: Int,
-		p2: String?
-	) {
-	}
-
-	override fun onNotifactionShowedResult(
-		context: Context?,
-		notifiShowedRlt: XGPushShowedResult?
-	) {
+	override fun onSetTagResult(p0: Context?, p1: Int, p2: String?) {}
+	override fun onNotifactionShowedResult(context: Context?, notifiShowedRlt: XGPushShowedResult?) {
 		if (context == null || notifiShowedRlt == null) return
-		// Normal Notification
 	}
 
 	override fun onUnregisterResult(context: Context?, p1: Int) {
-		if (context == null) {
-			return
-		}
+		if (context == null) return
 	}
 
-	override fun onDeleteTagResult(
-		p0: Context?,
-		p1: Int,
-		p2: String?
-	) {
-	}
-
-	override fun onRegisterResult(
-		p0: Context?,
-		p1: Int,
-		p2: XGPushRegisterResult?
-	) {
-	}
-
+	override fun onDeleteTagResult(p0: Context?, p1: Int, p2: String?) {}
+	override fun onRegisterResult(p0: Context?, p1: Int, p2: XGPushRegisterResult?) {}
 	@SuppressLint("PrivateResource")
-	override fun onTextMessage(
-		context: Context?,
-		message: XGPushTextMessage?
-	) {
+	override fun onTextMessage(context: Context?, message: XGPushTextMessage?) {
 		if (context == null) return
 		showNotificationOnLockScreen(context, message.toString())
 	}
 
-	override fun onNotifactionClickedResult(
-		context: Context?,
-		result: XGPushClickedResult?
-	) {
+	override fun onNotifactionClickedResult(context: Context?, result: XGPushClickedResult?) {
 		result?.customContent?.let {
 			when (JSONObject(it).safeGet("uri")) {
 				ClassURI.transactionDetail -> {

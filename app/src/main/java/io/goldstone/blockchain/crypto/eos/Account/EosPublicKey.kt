@@ -10,7 +10,6 @@ import java.util.*
 
 
 class EosPublicKey {
-
 	private val mCheck: Long
 	private val mCurveParam: CurveParam?
 	val bytes: ByteArray

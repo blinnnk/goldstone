@@ -37,7 +37,7 @@ class EOSContractCaller(
 	constructor(action: JSONObject, chainID: ChainID) : this(
 		EOSAuthorization(
 			JSONArray(action.safeGet("authorization")).toJSONObjectList()[0].safeGet("actor"),
-			EOSActor.getActorByValue(JSONArray(action.safeGet("authorization")).toJSONObjectList()[0].safeGet("permission"))!!
+			EOSActor.getActorByValue(JSONArray(action.safeGet("authorization")).toJSONObjectList()[0].safeGet("permission"))
 		),
 		EOSCodeName(action.safeGet("account")),
 		EOSTransactionMethod(action.safeGet("name")),
