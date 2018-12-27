@@ -11,6 +11,7 @@ import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.CreateWalletText
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.UIUtils.generateDefaultName
@@ -102,6 +103,8 @@ class CreateWalletPresenter(
 						fragment.showMnemonicBackupFragment(arguments)
 					}
 				}
+				// 插入数据库后更新sandbox
+				SandBoxManager.updateWalletTables()
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			}
 		}

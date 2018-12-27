@@ -7,6 +7,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.forEachOrEnd
 import com.blinnnk.extension.isNotNull
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -17,9 +18,11 @@ import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.json.JSONArray
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @date: 2018-12-05.
@@ -32,14 +35,19 @@ object SandBoxManager {
 	private const val marketListFileName = "marketList"
 	private const val quotationPairsFileName = "quotationPairs"
 	private const val walletTableFileName = "walletTable"
+	
+	private var walletCount = AtomicInteger(0)
 
 	@WorkerThread
-	fun recoveryData(context: Context,callback: () -> Unit) {
+	fun recoveryData(context: Context, callback: () -> Unit) {
 		recoveryLanguage()
 		recoveryCurrency()
 		recoveryExchangeSelectedStatus()
-		recoveryQuotationSelections(callback)
-		recoveryWalletTables(context)
+		recoveryQuotationSelections {
+			recoveryWalletTables(context) {
+				callback()
+			}
+		}
 	}
 
 	@WorkerThread
@@ -63,11 +71,14 @@ object SandBoxManager {
 	}
 	
 	@WorkerThread
-	fun updateWalletTables(walletTableSets: List<WalletTable>) {
-		val walletModelList = walletTableSets.map {
-			WalletModel(it)
+	fun updateWalletTables() {
+		WalletTable.getAll {
+			updateSandBoxContentByName(walletTableFileName, Gson().toJson(this.map {
+				WalletModel(it)
+			}))
+			
 		}
-		updateSandBoxContentByName(walletTableFileName, Gson().toJson(walletModelList))
+		
 	}
 
 	private fun recoveryLanguage() {
@@ -135,26 +146,44 @@ object SandBoxManager {
 		} else callback()
 	}
 	
-	private fun recoveryWalletTables(context: Context) {
+	private fun recoveryWalletTables(context: Context, callback: () -> Unit) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
-		val pairList = try {
-			Gson().fromJson<List<WalletModel>>(walletModelListString, object : TypeToken<List<WalletModel>>() {}.type)
-		} catch (error: Exception) {
-			return
+		var pairList = arrayListOf<WalletModel>()
+		pairList.apply {
+			try {
+				val jsonArray = JSONArray(walletModelListString)
+				for (index in 0 until jsonArray.length()) {
+					add(WalletModel(jsonArray.getJSONObject(index)))
+				}
+			} catch (error: Exception) {
+				error.printStackTrace()
+			}
 		}
-		pairList.forEach {
-			when {
-				it.isWatchOnly -> {
-					// 观察钱包
-					recoveryWatchOnlyWallet(it)
-				}
-				it.encryptMnemonic.isNotNull() -> {
-					// 助记词钱包
-					recoveryMnemonicWallet(it)
-				}
-				else -> {
-					// keystore 钱包
-					recoveryKeystoreWallet(context, it)
+		if (pairList.isNotEmpty()) {
+			walletCount = AtomicInteger(pairList.size)
+			pairList.forEach {
+				when {
+					it.isWatchOnly -> {
+						// 观察钱包
+						recoveryWatchOnlyWallet(it) {
+							walletCount.getAndDecrement()
+							if (walletCount.get() ==0) callback()
+						}
+					}
+					!it.encryptMnemonic.isNullOrEmpty() -> {
+						// 助记词钱包
+						recoveryMnemonicWallet(context, it) {
+							walletCount.getAndDecrement()
+							if (walletCount.get() ==0) callback()
+						}
+					}
+					else -> {
+						// keystore 钱包
+						recoveryKeystoreWallet(context, it) {
+							walletCount.getAndDecrement()
+							if (walletCount.get() ==0) callback()
+						}
+					}
 				}
 			}
 		}

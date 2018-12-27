@@ -31,6 +31,7 @@ import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
+import kotlinx.coroutines.*
 import java.io.File
 
 /**
@@ -41,13 +42,35 @@ class SplashPresenter(val activity: SplashActivity) {
 	
 	// 初始化sandbox的数据
 	@WorkerThread
-	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
+	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
 		if (WalletTable.dao.rowCount() == 0) {
-			SandBoxManager.recoveryData(activity) {
-				hold(true)
+			launchUI {
+				Dashboard(activity) {
+					showAlertView(
+						"恢复内容",
+						"是否要恢复内容？",
+						false,
+						cancelAction = {
+							GlobalScope.launch(Dispatchers.Default)  {
+								hold(false)
+							}
+						}
+					) {
+						GlobalScope.launch(Dispatchers.Default)  {
+							SandBoxManager.recoveryData(activity) {
+								hold(true)
+							}
+						}
+					}
+				}
 			}
+			
 		} else hold(false)
+		
+		
 	}
+	
+	
 	
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
@@ -102,7 +125,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
 		val walletCount = WalletTable.dao.rowCount()
 		if (walletCount == 0) {
-			cleanKeyStoreFile(activity.filesDir)
+//			cleanKeyStoreFile(activity.filesDir)
 			unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 		} else {
 			val needUnregister =

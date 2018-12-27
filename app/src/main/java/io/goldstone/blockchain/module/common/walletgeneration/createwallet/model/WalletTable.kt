@@ -9,6 +9,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -558,6 +559,9 @@ data class WalletTable(
 						SharedWallet.updateCurrentIsWatchOnlyOrNot(wallets.first().isWatchOnly.orFalse())
 					}
 				}
+				
+				// 删除数据库后更新sandbox
+				SandBoxManager.updateWalletTables()
 			}
 		}
 

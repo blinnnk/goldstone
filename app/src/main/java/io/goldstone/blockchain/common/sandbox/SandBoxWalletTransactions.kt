@@ -6,6 +6,7 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.FingerprintPaymentText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.crypto.bitcoin.BTCWalletUtils
@@ -27,7 +28,48 @@ import kotlinx.coroutines.*
  * @description:
  */
 
-fun recoveryMnemonicWallet(walletModel: WalletModel) {
+fun recoveryMnemonicWallet(context: Context, walletModel: WalletModel, callback: () -> Unit) {
+	launchUI {
+		Dashboard(context) {
+			showAlertView(
+				FingerprintPaymentText.usePassword,
+				"请输入${walletModel.name} 的密码",
+				true,
+				cancelAction = {
+					callback()
+				}
+			) { passwordInput ->
+				val password = passwordInput?.text?.toString()
+				if (password.isNullOrEmpty()) {
+					recoveryMnemonicWallet(context, walletModel,callback)
+					launchUI {
+						ErrorDisplayManager(Throwable(CommonText.wrongPassword)).show(context)
+					}
+				} else {
+					val loadingView = LoadingView(context)
+					loadingView.show()
+					GlobalScope.launch(Dispatchers.Default) {
+						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
+							launchUI { loadingView.remove() }
+							if (privateKey.isNotNull() && error.isNone()) {
+								recoveryMnemonicWallet(walletModel, callback)
+							} else {
+								recoveryMnemonicWallet(context, walletModel, callback)
+								launchUI {
+									ErrorDisplayManager(error).show(context)
+								}
+							}
+						}
+						
+					}
+				}
+				
+			}
+		}
+	}
+}
+
+private fun recoveryMnemonicWallet(walletModel: WalletModel, callback: () -> Unit) {
 	val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(walletModel.encryptMnemonic!!)
 	val ethAddress = Bip44Address(
 		generateETHSeriesAddress(mnemonic, walletModel.ethPath).getAddress(),
@@ -65,29 +107,31 @@ fun recoveryMnemonicWallet(walletModel: WalletModel) {
 		ChainType.EOS.id
 	)
 	insertWallet(walletModel, ChainAddresses(
-		ethAddress,
-		etcAddress,
-		btcAddress,
-		btcTestAddress,
-		ltcAddress,
-		bchAddress,
-		eosAddress
-	)
-	)
+			ethAddress,
+			etcAddress,
+			btcAddress,
+			btcTestAddress,
+			ltcAddress,
+			bchAddress,
+			eosAddress
+		),
+		callback)
 }
 
-fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel) {
+fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel, callback: () -> Unit) {
 	launchUI {
 		Dashboard(context) {
 			showAlertView(
-				"输入密码",
+				FingerprintPaymentText.usePassword,
 				"请输入${walletModel.name} 的密码",
 				true,
-				cancelAction = { }
+				cancelAction = {
+					callback()
+				}
 			) { passwordInput ->
 				val password = passwordInput?.text?.toString()
 				if (password.isNullOrEmpty()) {
-					recoveryKeystoreWallet(context, walletModel)
+					recoveryKeystoreWallet(context, walletModel, callback)
 					launchUI {
 						ErrorDisplayManager(Throwable(CommonText.wrongPassword)).show(context)
 					}
@@ -95,13 +139,13 @@ fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel) {
 					val loadingView = LoadingView(context)
 					loadingView.show()
 					GlobalScope.launch(Dispatchers.Default) {
-						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID("", walletModel.id) { privateKey, error ->
+						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
 							launchUI { loadingView.remove() }
 							if (privateKey.isNotNull() && error.isNone()) {
 								val multiChainAddresses = MultiChainUtils.getMultiChainAddressesByRootKey(privateKey)
-								insertWallet(walletModel, multiChainAddresses)
+								insertWallet(walletModel, multiChainAddresses, callback)
 							} else {
-								recoveryKeystoreWallet(context, walletModel)
+								recoveryKeystoreWallet(context, walletModel, callback)
 								launchUI {
 									ErrorDisplayManager(error).show(context)
 								}
@@ -117,7 +161,7 @@ fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel) {
 
 }
 
-fun recoveryWatchOnlyWallet(walletModel: WalletModel) {
+fun recoveryWatchOnlyWallet(walletModel: WalletModel, callback: () -> Unit) {
 	WalletTable(
 		id = walletModel.id,
 		avatarID = walletModel.avatarID,
@@ -137,7 +181,7 @@ fun recoveryWatchOnlyWallet(walletModel: WalletModel) {
 		btcSeriesTestAddresses = listOf(),
 		ltcAddresses = listOf(),
 		eosAddresses = listOf(),
-		eosAccountNames = walletModel.eosAccountNames,
+		eosAccountNames = listOf(),
 		ethPath = "",
 		btcPath = "",
 		etcPath = "",
@@ -148,12 +192,15 @@ fun recoveryWatchOnlyWallet(walletModel: WalletModel) {
 		isUsing = walletModel.isUsing,
 		hint = walletModel.hint,
 		isWatchOnly = walletModel.isWatchOnly,
-		hasBackUpMnemonic = true
-	).insert {  }
+		hasBackUpMnemonic = walletModel.hasBackUpMnemonic
+	).apply {
+		WalletTable.dao.insert(this)
+		callback()
+	}
 }
 
 
-private fun insertWallet(walletModel: WalletModel, chainAddresses: ChainAddresses) {
+private fun insertWallet(walletModel: WalletModel, chainAddresses: ChainAddresses, callback: () -> Unit) {
 	WalletTable(
 		id = walletModel.id,
 		avatarID = walletModel.avatarID,
@@ -173,7 +220,7 @@ private fun insertWallet(walletModel: WalletModel, chainAddresses: ChainAddresse
 		ltcAddresses = listOf(chainAddresses.ltc),
 		bchAddresses = listOf(chainAddresses.bch),
 		eosAddresses = listOf(chainAddresses.eos),
-		eosAccountNames = walletModel.eosAccountNames,
+		eosAccountNames = listOf(),
 		ethPath = walletModel.ethPath,
 		btcPath = walletModel.btcPath,
 		etcPath = walletModel.etcPath,
@@ -186,6 +233,9 @@ private fun insertWallet(walletModel: WalletModel, chainAddresses: ChainAddresse
 		isWatchOnly = walletModel.isWatchOnly,
 		encryptMnemonic = walletModel.encryptMnemonic,
 		encryptFingerPrinterKey = walletModel.encryptFingerPrinterKey,
-		hasBackUpMnemonic = true
-	).insert {  }
+		hasBackUpMnemonic = walletModel.hasBackUpMnemonic
+	).apply {
+		WalletTable.dao.insert(this)
+		callback()
+	}
 }

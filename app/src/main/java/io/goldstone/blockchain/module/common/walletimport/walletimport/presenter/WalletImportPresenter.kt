@@ -4,6 +4,7 @@ import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.crypto.multichain.ChainAddresses
 import io.goldstone.blockchain.crypto.multichain.ChainPath
@@ -11,10 +12,8 @@ import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSDefaultAllChainName
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
-import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter.Companion.insertNewAccount
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
-import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 
 /**
  * @date 23/03/2018 12:55 AM
@@ -86,6 +85,8 @@ class WalletImportPresenter(
 				insertNewAccount(multiChainAddresses) {
 					callback(wallet.id, GoldStoneError.None)
 				}
+				// 插入数据库后更新sandbox
+				SandBoxManager.updateWalletTables()
 				// 注册钱包地址用于发送 `Push`
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			} else callback(null, AccountError.ExistAddress)
