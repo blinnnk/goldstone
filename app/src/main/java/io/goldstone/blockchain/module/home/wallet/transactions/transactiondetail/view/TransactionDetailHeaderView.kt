@@ -49,7 +49,7 @@ class TransactionDetailHeaderView(context: Context) : RelativeLayout(context) {
 			gravity = Gravity.CENTER_HORIZONTAL
 			statusIcon.into(this)
 			info = twoLineTitles {
-				setSubtitleLineCount(3)
+				setSubtitleLineCount(2)
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				isCenter = true
 				setWildStyle()

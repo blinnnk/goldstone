@@ -7,6 +7,8 @@ import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.module.common.contract.GoldStonePresenter
 import io.goldstone.blockchain.module.common.contract.GoldStoneView
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationManagementModel
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationObserverModel
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationType
 
 
 /**
@@ -21,12 +23,20 @@ interface AuthorizationManagementContract {
 
 	interface GSPresenter : GoldStonePresenter {
 		fun updateAuthorization(
-			publicKey: String,
+			newPublicKey: String,
+			oldPublicKey: String,
 			permission: EOSActor,
 			privateKey: EOSPrivateKey,
-			isDelete: Boolean,
+			actionType: AuthorizationType,
 			hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 		)
-		fun refreshAuthList()
+
+		fun refreshAuthList(observerModel: AuthorizationObserverModel)
+		fun removeObserver()
+		fun checkIsExistedOrElse(
+			targetPublickey: String,
+			targetActor: EOSActor,
+			callback: (Boolean) -> Unit
+		)
 	}
 }

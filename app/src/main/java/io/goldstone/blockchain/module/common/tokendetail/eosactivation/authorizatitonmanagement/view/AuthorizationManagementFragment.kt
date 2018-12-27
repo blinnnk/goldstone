@@ -30,6 +30,8 @@ import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.contract.AuthorizationManagementContract
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationManagementModel
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationObserverModel
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationType
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.presenter.AuthorizationManagementPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
@@ -62,7 +64,7 @@ class AuthorizationManagementFragment
 		recyclerView.adapter = AuthorizationManagementAdapter(
 			asyncData.orEmptyArray(),
 			editAction = { publicKey, actor ->
-				updatePermissionKey(publicKey, actor)
+				updatePermissionKey(publicKey, actor, AuthorizationType.Edit)
 			},
 			deleteAction = { publickey, actor ->
 				deletePermissionKey(publickey, actor)
@@ -80,7 +82,7 @@ class AuthorizationManagementFragment
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
 		overlayFragment?.showAddButton(true, false) {
-			updatePermissionKey("", EOSActor.Active)
+			updatePermissionKey("", EOSActor.Active, AuthorizationType.Add)
 		}
 		presenter = AuthorizationManagementPresenter(this)
 		presenter.start()
@@ -94,7 +96,7 @@ class AuthorizationManagementFragment
 		overlayFragment?.presenter?.popFragmentFrom<AuthorizationManagementFragment>()
 	}
 
-	private fun deletePermissionKey(publicKey: String, actor: EOSActor) {
+	private fun deletePermissionKey(defaultPublicKey: String, actor: EOSActor) {
 		Dashboard(context!!) {
 			showAlert(
 				"Delete Permission Key",
@@ -118,15 +120,16 @@ class AuthorizationManagementFragment
 							loadingView.remove()
 							if (privateKey.isNotNull() && error.isNone()) {
 								presenter.updateAuthorization(
-									publicKey,
+									defaultPublicKey,
+									"",
 									actor,
 									EOSPrivateKey(privateKey),
-									true
+									AuthorizationType.Delete
 								) { response, responseError ->
 									launchUI {
 										if (response.isNotNull() && responseError.isNone()) {
 											response.showDialog(context!!)
-											presenter.refreshAuthList()
+											presenter.refreshAuthList(AuthorizationObserverModel(defaultPublicKey, true))
 										} else showError(responseError)
 									}
 								}
@@ -138,8 +141,12 @@ class AuthorizationManagementFragment
 		}
 	}
 
-	private fun updatePermissionKey(key: String, actor: EOSActor) {
-		showAddKeyDashboard(key, actor) { publicKey, eosActor ->
+	private fun updatePermissionKey(
+		defaultPublickey: String,
+		actor: EOSActor,
+		actionType: AuthorizationType
+	) {
+		showAddKeyDashboard(defaultPublickey, actor) { publicKey, eosActor ->
 			PaymentDetailPresenter.getPrivatekey(
 				context!!,
 				ChainType.EOS,
@@ -156,14 +163,15 @@ class AuthorizationManagementFragment
 					if (privateKey.isNotNull() && error.isNone()) {
 						presenter.updateAuthorization(
 							publicKey,
+							defaultPublickey,
 							eosActor,
 							EOSPrivateKey(privateKey),
-							false
+							actionType
 						) { response, responseError ->
 							launchUI {
 								if (response.isNotNull() && responseError.isNone()) {
 									response.showDialog(context!!)
-									presenter.refreshAuthList()
+									presenter.refreshAuthList(AuthorizationObserverModel(publicKey, false))
 								} else showError(responseError)
 							}
 						}
@@ -192,8 +200,8 @@ class AuthorizationManagementFragment
 				setSubtitle(SharedAddress.getCurrentEOSAccount().name)
 			}
 			keyInput = WalletEditText(context).apply {
-				hint = "enter your public key that decide to add"
-				if (publicKey.isNotEmpty()) setText(publicKey)
+				hint = if (publicKey.isNotEmpty()) publicKey else "enter your public key that decide to add"
+
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			}
 			keyInput.into(this)
@@ -237,7 +245,15 @@ class AuthorizationManagementFragment
 				hold = {
 					if (!EOSWalletUtils.isValidAddress(keyInput.getContent())) {
 						showError(AccountError.InvalidAddress)
-					} else confirmAction(keyInput.getContent(), selectedPermission)
+					} else {
+						presenter.checkIsExistedOrElse(keyInput.getContent(), selectedPermission) { existedInChain ->
+							launchUI {
+								if (existedInChain) {
+									showError(Throwable("This public key already exists under your $selectedPermission permission"))
+								} else confirmAction(keyInput.getContent(), selectedPermission)
+							}
+						}
+					}
 					dismiss()
 				}
 			) {
@@ -249,6 +265,7 @@ class AuthorizationManagementFragment
 	override fun onDestroy() {
 		super.onDestroy()
 		overlayFragment?.showAddButton(false) {}
+		presenter.removeObserver()
 	}
 
 }

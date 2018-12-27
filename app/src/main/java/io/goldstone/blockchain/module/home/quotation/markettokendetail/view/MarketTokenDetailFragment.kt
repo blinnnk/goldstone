@@ -2,6 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.markettokendetail.view
 
 import android.support.v4.app.Fragment
 import android.view.Gravity
+import android.view.View
 import android.widget.LinearLayout
 import com.blinnnk.extension.into
 import com.blinnnk.extension.preventDuplicateClicks
@@ -94,6 +95,7 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 				tokenSocialMedia = TokenSocialMedia(context) { url ->
 					presenter.openSystemBrowser(url)
 				}
+				tokenSocialMedia.visibility = View.GONE
 				tokenSocialMedia.into(this)
 
 				tokenInfoLink = TokenInfoLink(context) { link, title ->
@@ -112,7 +114,11 @@ class MarketTokenDetailFragment : BaseFragment<MarketTokenDetailPresenter>() {
 		priceHistory.model = priceModel
 		tokenInfo.setTokenDescription(tokenInfoData.description)
 		tokenInfoLink.model = tokenInfoData
-		tokenSocialMedia.model = tokenInfoData
+
+		if (tokenInfoData.socialMedia.isNotEmpty()) {
+			tokenSocialMedia.model = tokenInfoData
+			tokenSocialMedia.visibility = View.VISIBLE
+		}
 	}
 
 }

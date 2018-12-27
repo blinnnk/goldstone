@@ -160,7 +160,7 @@ interface EOSTransactionDao {
 	@Query("SELECT serverID FROM eosTransactions WHERE recordAccountName = :recordAccountName AND dataIndex = :dataIndex AND symbol = :symbol AND codeName = :codeName")
 	fun getTargetServerID(recordAccountName: String, dataIndex: Int, symbol: String, codeName: String): Long?
 
-	@Query("SELECT * FROM eosTransactions WHERE recordAccountName = :recordAccountName AND symbol = :symbol AND codeName = :codeName AND dataIndex BETWEEN :start AND :end  ORDER BY time, dataIndex DESC ")
+	@Query("SELECT * FROM eosTransactions WHERE recordAccountName = :recordAccountName AND symbol = :symbol AND codeName = :codeName AND dataIndex BETWEEN :start AND :end  ORDER BY time DESC")
 	fun getDataByRange(recordAccountName: String, start: Int, end: Int, symbol: String, codeName: String): List<EOSTransactionTable>
 
 	@Query("SELECT * FROM eosTransactions WHERE recordAccountName = :recordAddress")

@@ -160,10 +160,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		bchAddressInput.setText(data.bchAddress)
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.setConfirmButtonStyle(
 			nameInput,

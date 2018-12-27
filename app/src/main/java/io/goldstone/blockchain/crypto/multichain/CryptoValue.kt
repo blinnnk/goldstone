@@ -9,7 +9,6 @@ import com.blinnnk.util.TinyNumberUtils
  */
 
 object CryptoValue {
-	private const val bitcoinAddressLength = 34
 	const val bitcoinAddressClassicLength = 33
 	private val btcSeriesLengthRange = 33 .. 35
 	const val eosAddressLength = 53
