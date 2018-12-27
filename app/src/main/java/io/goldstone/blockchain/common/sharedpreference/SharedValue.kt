@@ -17,12 +17,14 @@ object SharedValue {
 	fun getMainnetHistoryURL(): String {
 		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.mainnetHistoryURL)
 	}
+
 	fun updateMainnetHistoryURL(url: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.mainnetHistoryURL, url)
 
 	fun getKylinHistoryURL(): String {
 		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.kylinHistoryURL)
 	}
+
 	fun updateKylinHistoryURL(url: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.kylinHistoryURL, url)
 
@@ -43,7 +45,9 @@ object SharedValue {
 	// DAPP JS Code
 	fun getJSCode(): String {
 		val localData = GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jsCode)
-		return localData.replace("goldStoneAccountName", SharedAddress.getCurrentEOSAccount().name)
+		return localData
+			.replace("goldStoneAccountName", SharedAddress.getCurrentEOSAccount().name)
+			.replace("goldStonePermission", SharedWallet.getValidPermission().value)
 	}
 
 	fun updateJSCode(code: String) =

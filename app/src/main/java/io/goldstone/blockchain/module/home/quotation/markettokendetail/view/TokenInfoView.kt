@@ -13,7 +13,9 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.matchParent
+import org.jetbrains.anko.rightPadding
 import org.jetbrains.anko.textColor
 
 /**
@@ -29,6 +31,8 @@ class TokenInfoView(context: Context) : TopBottomLineCell(context) {
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.medium(context)
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 105.uiPX())
+		leftPadding = PaddingSize.gsCard
+		rightPadding = PaddingSize.gsCard
 	}
 	
 	init {

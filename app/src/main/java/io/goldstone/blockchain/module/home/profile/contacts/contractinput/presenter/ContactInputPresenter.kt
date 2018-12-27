@@ -25,7 +25,6 @@ import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.event.ContactUpdateEvent
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable

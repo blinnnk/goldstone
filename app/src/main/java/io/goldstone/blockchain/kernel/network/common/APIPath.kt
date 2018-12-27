@@ -34,7 +34,9 @@ object APIPath {
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }
 	val getPriceByAddress: (header: String) -> String = { "$it/index/priceByAddress" }
-	val getCoinInfo: (header: String) -> String = { "$it/market/coinInfo?symbol=" }
+	val getCoinInfo: (header: String, symbol: String, contract: String) -> String = { header, symbol, contract ->
+		"$header/market/coinInfo?symbol=$symbol&contract=$contract"
+	}
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }

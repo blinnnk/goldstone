@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.sharedpreference
 import com.blinnnk.util.*
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.multichain.WalletType
 
 
@@ -23,6 +24,12 @@ object SharedWallet {
 
 	fun updateCurrencyCode(code: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currencyCode, code)
+
+	fun getValidPermission(): EOSActor =
+		EOSActor.getActorByValue(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.validEOSAccountPermission))
+
+	fun updateValidPermission(permission: String) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.validEOSAccountPermission, permission)
 
 	fun getCurrentRate(): Double =
 		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.rate)

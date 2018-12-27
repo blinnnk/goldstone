@@ -576,7 +576,7 @@ object TokenDetailText {
 
 	@JvmField
 	val permission = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Permission"
+		HoneyLanguage.English.code -> "Permissions"
 		HoneyLanguage.Chinese.code -> "Permission"
 		HoneyLanguage.Japanese.code -> "Permission"
 		HoneyLanguage.Korean.code -> "Permission"
@@ -703,7 +703,6 @@ object TokenDetailText {
 }
 
 object EOSAccountText {
-
 
 	@JvmField
 	val account = when (currentLanguage) {
@@ -1300,7 +1299,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val authorization = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Permission"
+		HoneyLanguage.English.code -> "Permissions"
 		HoneyLanguage.Chinese.code -> "权限"
 		HoneyLanguage.Japanese.code -> "許可"
 		HoneyLanguage.Korean.code -> "허가"
@@ -1364,8 +1363,18 @@ object EOSAccountText {
 		else -> ""
 	}
 	@JvmField
+	val permissionManagement = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Permissions Management"
+		HoneyLanguage.Chinese.code -> "权限管理"
+		HoneyLanguage.Japanese.code -> "権利管理"
+		HoneyLanguage.Korean.code -> "권한 관리"
+		HoneyLanguage.Russian.code -> "Управление правами"
+		HoneyLanguage.TraditionalChinese.code -> "權限管理"
+		else -> ""
+	}
+	@JvmField
 	val addNewPermissionTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Add permissions"
+		HoneyLanguage.English.code -> "Add A Permission"
 		HoneyLanguage.Chinese.code -> "新增权限"
 		HoneyLanguage.Japanese.code -> "権限を追加する"
 		HoneyLanguage.Korean.code -> "권한 추가"
@@ -1385,7 +1394,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val permissionList = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Permission list"
+		HoneyLanguage.English.code -> "Permission List"
 		HoneyLanguage.Chinese.code -> "权限列表"
 		HoneyLanguage.Japanese.code -> "許可リスト"
 		HoneyLanguage.Korean.code -> "사용 권한 목록"
@@ -1395,7 +1404,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val accountInformation = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Account information"
+		HoneyLanguage.English.code -> "Account Information"
 		HoneyLanguage.Chinese.code -> "账号信息"
 		HoneyLanguage.Japanese.code -> "アカウント情報"
 		HoneyLanguage.Korean.code -> "계정 정보"
@@ -1415,12 +1424,25 @@ object EOSAccountText {
 	}
 	@JvmField
 	val currentPublicKey = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Is using"
+		HoneyLanguage.English.code -> "Current Key"
 		HoneyLanguage.Chinese.code -> "正在使用"
 		HoneyLanguage.Japanese.code -> "使用中"
 		HoneyLanguage.Korean.code -> "사용중"
 		HoneyLanguage.Russian.code -> "Используется"
 		HoneyLanguage.TraditionalChinese.code -> "正在使用"
 		else -> ""
+	}
+
+	@JvmField
+	val duplicatedKey: (count: String) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "This public key already has $it permission."
+			HoneyLanguage.Chinese.code -> "这个公钥已经有 $it 权限了"
+			HoneyLanguage.Japanese.code -> "この公開鍵はすでに $it 権限を持っています。"
+			HoneyLanguage.Korean.code -> "이 공개 키에는 이미 $it 권한이 있습니다."
+			HoneyLanguage.Russian.code -> "Этот открытый ключ уже имеет $it разрешение."
+			HoneyLanguage.TraditionalChinese.code -> "這個公鑰已經有 $it 權限了"
+			else -> ""
+		}
 	}
 }

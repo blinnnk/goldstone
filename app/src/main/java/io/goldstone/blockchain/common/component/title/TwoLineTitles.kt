@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
+import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.custom.ankoView
 import org.jetbrains.anko.textColor
 import org.jetbrains.anko.textView
@@ -164,6 +165,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 
 	fun setSubtitleLineCount(lineCount: Int) {
 		subtitle.maxLines = lineCount
+		subtitle.bottomPadding = 2.uiPX()
 	}
 }
 

@@ -2,9 +2,14 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.authoriz
 
 import android.content.Context
 import android.view.View
+import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
+import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.clickToCopy
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationManagementModel
+import org.jetbrains.anko.matchParent
 
 
 /**
@@ -19,13 +24,18 @@ class AuthorizationManagementAdapter(
 	override fun generateCell(context: Context) =
 		AuthorizationManagementCell(context, editAction, deleteAction)
 
-	override fun generateFooter(context: Context) = View(context)
+	override fun generateFooter(context: Context) = View(context).apply {
+		layoutParams = LinearLayout.LayoutParams(matchParent, 20.uiPX())
+	}
 
 	override fun generateHeader(context: Context) =
 		AuthorizationManagementHeaderView(context)
 
 	override fun AuthorizationManagementCell.bindCell(data: AuthorizationManagementModel, position: Int) {
 		model = data
+		click {
+			context.clickToCopy(data.publicKey)
+		}
 		// 如果只有 1 个 Owner Key 的话那么禁止对其操作隐藏操作按钮
 		if (
 			dataSet.filter { EOSActor.getActorByValue(it.permission).isOwner() }.size == 1 &&

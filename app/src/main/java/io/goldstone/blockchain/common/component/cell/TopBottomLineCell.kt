@@ -18,10 +18,7 @@ import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.relativeLayout
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 /**
  * @date 25/04/2018 8:06 AM
