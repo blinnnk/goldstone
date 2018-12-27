@@ -12,6 +12,7 @@ import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.crypto.eos.EOSWalletType
@@ -510,7 +511,7 @@ data class WalletTable(
 			accountNames: List<EOSAccountInfo>,
 			@UiThread callback: () -> Unit
 		) {
-			GlobalScope.launch(Dispatchers.Default) {
+			launchDefault {
 				// 增量存储同一公钥下的多 `AccountName`
 				var currentAccountNames =
 					dao.getWalletByAddress(SharedAddress.getCurrentEOS())?.eosAccountNames ?: listOf()
@@ -524,7 +525,7 @@ data class WalletTable(
 		}
 
 		fun updateEOSDefaultName(defaultName: String, @UiThread callback: () -> Unit) {
-			GlobalScope.launch(Dispatchers.Default) {
+			launchDefault {
 				// 更新钱包数据库的 `Default EOS Address`
 				dao.findWhichIsUsing()?.apply {
 					dao.update(apply { currentEOSAccountName.updateCurrent(defaultName) })
@@ -650,4 +651,5 @@ interface WalletDao {
 
 	@Query("UPDATE wallet SET eosAddresses = :eosAddresses  WHERE isUsing = 1")
 	fun updateEOSAddress(eosAddresses: List<Bip44Address>)
+
 }

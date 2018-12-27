@@ -158,6 +158,7 @@ class MarketTokenDetailPresenter(
 			val localLanguageCode = tokenData.description.firstOrNull()?.toString()?.toIntOrNull()
 			val needToUpdate =
 				tokenData.marketCap.isEmpty()
+					|| tokenData.startDate.isEmpty()
 					|| tokenData.rankValue.isEmpty()
 					|| localLanguageCode != SharedWallet.getCurrentLanguageCode()
 			if (NetworkUtil.hasNetwork()) {

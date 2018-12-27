@@ -143,6 +143,24 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		}
 	}
 
+	fun showForceAlert(
+		title: String,
+		message: String,
+		positiveButtonTitle: String = CommonText.confirm,
+		confirmAction: () -> Unit
+	) {
+		cancelOnTouchOutside()
+		getDialog {
+			title(text = title)
+			message(text = message)
+			positiveButton(text = positiveButtonTitle) {
+				confirmAction()
+			}
+			negativeButton(null, "", null)
+			show()
+		}
+	}
+
 	fun showMultiChoice(
 		title: String,
 		data: List<String>,

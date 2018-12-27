@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.utils.isEmptyThen
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -76,7 +77,7 @@ data class MyTokenTable(
 		val dao = GoldStoneDataBase.database.myTokenDao()
 
 		fun updateOrInsertOwnerName(name: String, address: String) {
-			GlobalScope.launch(Dispatchers.Default) {
+			launchDefault {
 				dao.apply {
 					val chainID = SharedChain.getEOSCurrent().chainID.id
 					// 如果存在 OwnerName 和 OwnerAddress 一样的 EOS 记录, 那么就更新这条数据
@@ -91,9 +92,9 @@ data class MyTokenTable(
 								SharedChain.getEOSCurrent().chainID.id
 							)
 						defaultToken?.let {
-							dao.insert(MyTokenTable(it, name, address))
+							insert(MyTokenTable(it, name, address))
 						}
-					} else if (!pendingAccount.isNull()) {
+					} else if (pendingAccount.isNotNull()) {
 						// TODO 有可能出现 existing Account 不为空, 导入同一个 AccountName 但权限不同的私钥
 						updatePendingAccountName(name, address, chainID)
 					}
@@ -102,7 +103,7 @@ data class MyTokenTable(
 		}
 
 		fun getMyTokens(@WorkerThread hold: (List<MyTokenTable>) -> Unit) {
-			GlobalScope.launch(Dispatchers.Default) {
+			launchDefault {
 				WalletTable.dao
 					.findWhichIsUsing()?.getCurrentAddresses(true)?.let { addresses ->
 						dao.getTokensByAddress(addresses).let(hold)
