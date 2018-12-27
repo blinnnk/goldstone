@@ -577,11 +577,11 @@ object TokenDetailText {
 	@JvmField
 	val permission = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Permissions"
-		HoneyLanguage.Chinese.code -> "Permission"
-		HoneyLanguage.Japanese.code -> "Permission"
-		HoneyLanguage.Korean.code -> "Permission"
-		HoneyLanguage.Russian.code -> "Permission"
-		HoneyLanguage.TraditionalChinese.code -> "Permission"
+		HoneyLanguage.Chinese.code -> "权限"
+		HoneyLanguage.Japanese.code -> "許可"
+		HoneyLanguage.Korean.code -> "허가"
+		HoneyLanguage.Russian.code -> "компетентность"
+		HoneyLanguage.TraditionalChinese.code -> "權限"
 		else -> ""
 	}
 
