@@ -19,7 +19,7 @@ data class EOSAuthorization(
 
 	constructor(data: JSONObject) : this(
 		data.safeGet("actor"),
-		EOSActor.getActorByValue(data.safeGet("permission"))!!
+		EOSActor.getActorByValue(data.safeGet("permission"))
 	)
 
 	override fun createObject(): String {

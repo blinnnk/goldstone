@@ -27,7 +27,7 @@ open class GSCard(context: Context) : CardView(context) {
 	}
 
 	private fun addRippleEffect() {
-		val attrs = intArrayOf(R.attr.selectableItemBackground)
+		val attrs = intArrayOf(R.attr.selectableItemBackgroundBorderless)
 		val typedArray = context.obtainStyledAttributes(attrs)
 		val selectableItemBackground = typedArray.getResourceId(0, 0)
 		typedArray.recycle()

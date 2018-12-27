@@ -110,8 +110,8 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}
 
 				eosKylinAddressInput = roundInput {
-					title = "${CoinSymbol.eos} JUNGLE"
-					hint = ContactText.eosJungleHint
+					title = "${CoinSymbol.eos} Kylin"
+					hint = ContactText.eosKylinHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
 					width = matchParent

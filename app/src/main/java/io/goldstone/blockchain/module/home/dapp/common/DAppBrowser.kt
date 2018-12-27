@@ -356,6 +356,7 @@ class DAPPBrowser(
 				"",
 				cancelEvent = {
 					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+					loadingView.remove()
 				},
 				confirmEvent = { loadingView.show() }
 			) { response, error ->

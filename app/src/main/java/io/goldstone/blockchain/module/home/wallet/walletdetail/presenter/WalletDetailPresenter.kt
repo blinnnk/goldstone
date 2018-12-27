@@ -97,7 +97,7 @@ class WalletDetailPresenter(
 	 * 就是 `GoldStone ID` 的最后 `13` 位 如果本地有数据获取最后一条
 	 * 的创建时间作为请求时间
 	 */
-	private fun updateUnreadCount() {
+	override fun updateUnreadCount() {
 		val goldStoneID = SharedWallet.getGoldStoneID()
 		NotificationTable.getAllNotifications { notifications ->
 			val time =

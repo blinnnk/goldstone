@@ -181,6 +181,7 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 										} else {
 											showError(error)
 											SharedWallet.updateFingerprint(false)
+											switchCell.setSelectedStatus(SharedWallet.hasFingerprint())
 											resetButtonEvent()
 										}
 									}

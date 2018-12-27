@@ -61,7 +61,7 @@ class ContactInputPresenter(
 		super.onFragmentViewCreated()
 		contactID?.apply {
 			load {
-				GoldStoneDataBase.database.contactDao().getContact(this)
+				ContactTable.dao.getContact(this)
 			} then {
 				it?.apply { fragment.setAddressValue(this) }
 			}

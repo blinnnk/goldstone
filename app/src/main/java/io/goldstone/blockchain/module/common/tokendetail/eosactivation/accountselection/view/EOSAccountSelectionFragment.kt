@@ -21,7 +21,6 @@ import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.eos.accountregister.AccountActor
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.presenter.EOSAccountSelectionPresenter
@@ -132,5 +131,4 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 			container.findViewById<EOSAccountCell>(it)?.setRadioStatus(false)
 		}
 	}
-
 }

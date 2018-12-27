@@ -6,6 +6,7 @@ import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EosPublicKey
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
+import io.goldstone.blockchain.crypto.eos.transaction.completeZero
 import io.goldstone.blockchain.crypto.utils.toNoPrefixHexString
 import org.json.JSONObject
 import java.io.Serializable
@@ -71,7 +72,6 @@ data class EOSNewAccountModel(
 		val serializedCreator = EOSUtils.getLittleEndianCode(creator)
 		val serializedNewAccountName = EOSUtils.getLittleEndianCode(newAccountName)
 		val serializedOwnerThreshold = EOSUtils.getVariableUInt(ownerThreshold)
-		val completeZero = "000000"
 		val variableUIntOwnerSize = EOSUtils.getVariableUInt(owners.size)
 		val serializedOwnerSize = variableUIntOwnerSize + EOSUtils.completeZero(4 - variableUIntOwnerSize.length)
 		/** 序列化 Owners */
@@ -82,7 +82,6 @@ data class EOSNewAccountModel(
 			// 反解析的时候, 发现多 Actor 的时候每个后面都要额外补上 Account, Waits. 不知道原因
 			serializedOwners += it.serialize() + accounts + waits
 		}
-		serializedOwners += "00" // 反解析的时候发现, Owner 或 Active 序列完毕后会额外补贴两个 `0` 不知道为什么
 		/** 序列化 Actives */
 		val serializedActiveThreshold = EOSUtils.getVariableUInt(activeThreshold)
 		val variableUIntActiveSize = EOSUtils.getVariableUInt(owners.size)
@@ -91,11 +90,10 @@ data class EOSNewAccountModel(
 		actives.forEach {
 			serializedActives += it.serialize() + accounts + waits
 		}
-		serializedActives += "00"
 		val methodHeader = serializedAccount + serializedMethodName + serializedAuthorizationSize + serializedAuthorizations
 		val serializedNewAccountModel = serializedCreator + serializedNewAccountName +
-			serializedOwnerThreshold + completeZero + serializedOwnerSize + serializedOwners +
-			serializedActiveThreshold + completeZero + serializedActiveSize + serializedActives
+			serializedOwnerThreshold.completeZero(8 - serializedOwnerThreshold.length) + serializedOwnerSize + serializedOwners +
+			serializedActiveThreshold.completeZero(8 - serializedActiveThreshold.length) + serializedActiveSize + serializedActives
 		val hexDataByteArrayLength = EOSUtils.getHexDataByteLengthCode(serializedNewAccountModel)
 		return methodHeader + hexDataByteArrayLength + serializedNewAccountModel
 	}
@@ -116,7 +114,8 @@ data class ActorKey(
 	}
 
 	override fun serialize(): String {
-		return "${EosPublicKey(publicKey).bytes.toNoPrefixHexString()}${EOSUtils.getVariableUInt(weight)}"
+		val serializedWeight = EOSUtils.getVariableUInt(weight)
+		return "${EosPublicKey(publicKey).bytes.toNoPrefixHexString()}${serializedWeight.completeZero(4 - serializedWeight.length)}"
 	}
 }
 
@@ -136,22 +135,25 @@ data class AccountActor(
 }
 
 enum class EOSActor(val value: String) {
+	Empty(""),
 	Owner("owner"),
 	Active("active");
 
 	fun isActive(): Boolean {
 		return value.equals(Active.value, true)
 	}
+
 	fun isOwner(): Boolean {
 		return value.equals(Owner.value, true)
 	}
 
 	companion object {
-		fun getActorByValue(value: String): EOSActor? {
+		fun getActorByValue(value: String): EOSActor {
 			return when (value) {
-				Owner.value -> EOSActor.Owner
+				Owner.value -> Owner
 				Active.value -> Active
-				else -> null
+				Empty.value -> Empty
+				else -> throw Throwable("unknown permission")
 			}
 		}
 	}
