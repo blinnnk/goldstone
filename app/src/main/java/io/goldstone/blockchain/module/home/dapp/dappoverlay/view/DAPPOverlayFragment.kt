@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.blinnnk.extension.getChildFragment
 import com.blinnnk.util.addFragmentAndSetArgument
 import io.goldstone.blockchain.common.base.baseoverlayfragment.BaseOverlayFragment
+import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -62,7 +63,7 @@ class DAPPOverlayFragment : BaseOverlayFragment<DAPPOverlayPresenter>() {
 				enterKeyEvent = {
 					enterKeyEvent?.run()
 				},
-				hint = EmptyText.searchInput
+				hint = DappCenterText.dappSearchBarPlaceholderText
 			)
 
 		} else {

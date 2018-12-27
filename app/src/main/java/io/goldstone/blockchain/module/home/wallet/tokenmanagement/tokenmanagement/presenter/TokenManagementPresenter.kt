@@ -26,7 +26,7 @@ class TokenManagementPresenter(
 					true,
 					cancelEvent = { popFragmentFrom<TokenSearchFragment>() },
 					enterKeyEvent = {},
-					hint = EmptyText.searchInput
+					hint = EmptyText.tokenSearchInput
 				)
 			}
 		}

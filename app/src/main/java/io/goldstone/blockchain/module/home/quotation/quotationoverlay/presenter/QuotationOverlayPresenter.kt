@@ -40,7 +40,7 @@ class QuotationOverlayPresenter(
 					fragment.headerTitle = QuotationText.management
 				},
 				enterKeyEvent = {},
-				hint = EmptyText.searchInput
+				hint = EmptyText.pairSearchInput
 			)
 		}
 	}
