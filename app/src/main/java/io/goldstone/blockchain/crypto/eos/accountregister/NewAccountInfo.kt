@@ -134,10 +134,10 @@ data class AccountActor(
 	}
 }
 
-enum class EOSActor(val value: String) {
-	Empty(""),
-	Owner("owner"),
-	Active("active");
+enum class EOSActor(val value: String, val displayName: String) {
+	Empty("", ""),
+	Owner("owner", "owner"),
+	Active("active", "active");
 
 	fun isActive(): Boolean {
 		return value.equals(Active.value, true)

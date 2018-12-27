@@ -247,7 +247,6 @@ class DAPPBrowser(
 
 		@JavascriptInterface
 		fun getArbSignature(data: String) {
-			println("getArbSignature $data")
 			launchUI {
 				Dashboard(context) {
 					showAlert(

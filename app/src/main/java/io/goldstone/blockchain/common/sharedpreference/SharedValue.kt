@@ -14,22 +14,29 @@ import io.goldstone.blockchain.common.value.SharesPreference
  */
 object SharedValue {
 	// Get Transaction EOS Chain URL
+	// 如果服务器的 `ConfigList` 返回空要有默认值
 	fun getMainnetHistoryURL(): String {
-		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.mainnetHistoryURL)
+		val url =
+			GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.mainnetHistoryURL)
+		return if (url.equals("Default", true)) "https://proxy.eosnode.tools" else url
 	}
 
 	fun updateMainnetHistoryURL(url: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.mainnetHistoryURL, url)
 
 	fun getKylinHistoryURL(): String {
-		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.kylinHistoryURL)
+		val url =
+			GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.kylinHistoryURL)
+		return  if (url.equals("Default", true)) "https://kylin.eoscanada.com" else url
 	}
 
 	fun updateKylinHistoryURL(url: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.kylinHistoryURL, url)
 
 	fun getJungleHistoryURL(): String {
-		return GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jungleHistoryURL)
+		val url =
+			GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jungleHistoryURL)
+		return if (url.equals("Default", true)) " https://junglehistory.cryptolions.io:4433" else url
 	}
 
 	fun updateJungleHistoryURL(url: String) =
