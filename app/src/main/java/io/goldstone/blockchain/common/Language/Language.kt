@@ -355,6 +355,51 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "未識別到有效的二維碼圖片"
 		else -> ""
 	}
+
+	@JvmField
+	val findTestNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a test network address, which needs to switch to test nodes in the settings before it can be transferred."
+		HoneyLanguage.Chinese.code -> "这是一个测试网的地址，需要在设置中切换到测试节点后才可转账"
+		HoneyLanguage.Japanese.code -> "これはテストネットワークのアドレスです。テストネットワークは、転送する前に設定でテストノードに転送する必要があります。"
+		HoneyLanguage.Korean.code -> "이것은 전송되기 전에 설정에서 테스트 노드로 전송되어야하는 테스트 네트워크의 주소입니다."
+		HoneyLanguage.Russian.code -> "Это адрес тестовой сети, который необходимо передать тестовому узлу в настройках, прежде чем его можно будет передать."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個測試網的地址，需要在設置中切換到測試節點後才可轉賬"
+		else -> ""
+	}
+
+	@JvmField
+	val findMainNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a main network address, which needs to switch to mainnet nodes in the settings before it can be transferred."
+		HoneyLanguage.Chinese.code -> "这是一个主网的地址，需要在设置中切换到测试节点后才可转账"
+		HoneyLanguage.Japanese.code -> "これは、転送の前にセットメインネットワークノードに切り替える必要がメインネットワークのアドレスであります"
+		HoneyLanguage.Korean.code -> "기본 네트워크의 주소이며 기본 네트워크 노드로 전송되어야 전송됩니다."
+		HoneyLanguage.Russian.code -> "Это адрес первичной сети, который необходимо перенести на первичный сетевой узел в настройках, прежде чем его можно будет передать."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個主網的地址，需要在設置中切換到主網節點後才可轉賬"
+		else -> ""
+	}
+
+	@JvmField
+	val findInvalidTestNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Invalid testnet address"
+		HoneyLanguage.Chinese.code -> "这是一个无效的测试网地址,请检查后重新输入"
+		HoneyLanguage.Japanese.code -> "これは無効なテストネットワークアドレスです。確認して再入力してください"
+		HoneyLanguage.Korean.code -> "유효하지 않은 테스트 네트워크 주소입니다. 확인 후 다시 입력하십시오."
+		HoneyLanguage.Russian.code -> "Это неверный тестовый сетевой адрес, пожалуйста, проверьте и введите заново"
+		HoneyLanguage.TraditionalChinese.code -> "這是一個無效的測試網地址,請檢查後重新輸入"
+		else -> ""
+	}
+
+	@JvmField
+	val findInvalidMainNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Invalid address"
+		HoneyLanguage.Chinese.code -> "这是一个无效的地址,请检查后重新输入"
+		HoneyLanguage.Japanese.code -> "これは無効なプライマリネットワークアドレスです。確認して再入力してください"
+		HoneyLanguage.Korean.code -> "기본 네트워크 주소가 잘못되었습니다. 확인한 후 다시 입력하십시오."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個無效的主網地址,請檢查後重新輸入"
+		HoneyLanguage.Russian.code -> "Это неверный основной сетевой адрес, пожалуйста, проверьте и введите заново"
+		else -> ""
+	}
+
 	@JvmField
 	val invalidContract = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Inconsistent currency. The QR code scanned is not that of the current token, please change the transfer token, or change the scanned QR code."

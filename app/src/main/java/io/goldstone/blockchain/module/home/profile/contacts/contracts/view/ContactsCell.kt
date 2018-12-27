@@ -50,7 +50,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 			Pair("${CoinSymbol.etc}/${CoinSymbol.erc}", ethSeriesAddress.isNotEmpty()),
 			Pair(CoinSymbol.eos, eosAddress.isNotEmpty()),
 			Pair("${CoinSymbol.eos} JUNGLE", eosJungle.isNotEmpty()),
-			Pair(CoinSymbol.btc(), btcMainnetAddress.isNotEmpty()),
+			Pair(CoinSymbol.btc, btcMainnetAddress.isNotEmpty()),
 			Pair(CoinSymbol.ltc, ltcAddress.isNotEmpty()),
 			Pair(CoinSymbol.bch, bchAddress.isNotEmpty()),
 			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())
@@ -58,7 +58,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 		val count = addresses.filter { it.second }.size
 		val allTypes = addresses.asSequence().filter { it.second }.map { it.first }.toList().toString()
 		val type = "(${allTypes.substring(1, allTypes.lastIndex)})"
-		val unit = ContactText.address
+		val unit = ContactText.address(count)
 		return "$count $unit $type"
 	}
 

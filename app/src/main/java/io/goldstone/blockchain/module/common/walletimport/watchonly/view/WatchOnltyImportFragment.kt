@@ -26,6 +26,7 @@ import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
@@ -90,6 +91,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 			nameInput = roundInput {
 				hint = UIUtils.generateDefaultName()
 				title = CreateWalletText.name
+				horizontalPaddingSize = PaddingSize.gsCard
 			}
 			nameInput.setMargins<LinearLayout.LayoutParams> {
 				topMargin = 20.uiPX()

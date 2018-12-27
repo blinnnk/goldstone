@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.quotation.quotationsearch.view
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PorterDuff
 import android.text.InputType
 import android.view.Gravity
@@ -22,7 +23,9 @@ import io.goldstone.blockchain.common.value.fontSize
 import org.jetbrains.anko.*
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
-
+import com.blinnnk.extension.alignParentBottom
+import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.language.currentLanguage
 
 
 /**
@@ -68,16 +71,15 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 				singleLine = true
 				imeOptions = EditorInfo.IME_ACTION_SEARCH
 				inputType = InputType.TYPE_CLASS_TEXT
-				textAlignment = EditText.TEXT_ALIGNMENT_GRAVITY
-				hint = EmptyText.searchInput
 				backgroundTintMode = PorterDuff.Mode.CLEAR
 				textSize = fontSize(12)
 				textColor = GrayScale.black
 				hintTextColor = GrayScale.midGray
 				typeface = GoldStoneFont.medium(context)
-				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				setHorizontallyScrolling(false)
-				setPadding(0, 10.uiPX(), 0, 10.uiPX())
+				if (currentLanguage == HoneyLanguage.Russian.code) {
+					y = 5.uiPX().toFloat()
+				}
 			}
 			editText.setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
 				if (actionId == EditorInfo.IME_ACTION_SEARCH) {

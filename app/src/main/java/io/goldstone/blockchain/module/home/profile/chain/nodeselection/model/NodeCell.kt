@@ -13,7 +13,6 @@ import io.goldstone.blockchain.common.value.fontSize
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoName
 import org.jetbrains.anko.imageResource
-import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.topPadding
 import org.jetbrains.anko.wrapContent
 
@@ -51,8 +50,8 @@ class NodeCell(context: Context) : LinearLayout(context) {
 
 	fun btcType(): NodeCell {
 		icon.imageResource = R.drawable.btc_creator_icon
-		titles.title.text = CoinSymbol.btc()
-		titles.subtitle.text = CoinSymbol.updateNameIfInReview(CryptoName.btc)
+		titles.title.text = CoinSymbol.btc
+		titles.subtitle.text = CryptoName.btc
 		return this
 	}
 

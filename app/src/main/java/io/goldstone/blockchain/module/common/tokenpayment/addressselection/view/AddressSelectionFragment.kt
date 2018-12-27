@@ -68,6 +68,7 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 
 	override fun showAddresses(data: ArrayList<ContactTable>) {
 		updateAdapterData<AddressSelectionAdapter>(data)
+		updateInputStatus()
 	}
 
 	override fun goToPaymentDetailFragment(
@@ -114,6 +115,7 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		asyncData = arrayListOf()
 		token?.let {
 			presenter = AddressSelectionPresenter(it, this)
 			presenter.start()
@@ -169,7 +171,7 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 		safeShowError(error)
 	}
 
-	override fun updateInputStatus() {
+	private fun updateInputStatus() {
 		headerView?.apply {
 			getInputStatus { _, address ->
 				if (!address.isNullOrBlank()) {

@@ -158,6 +158,7 @@ class PrivateKeyExportPresenter(
 		}
 
 		// 内部无线程, 调用的时候尽量在异步调用
+		// 通过 `WalletID` 从 `Geth` 的 `KeyStore` 获取存入的 `Root PrivateKey`
 		private fun Context.verifyAndGetPrivateKey(
 			password: String,
 			walletID: Int,

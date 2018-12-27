@@ -27,10 +27,10 @@ import org.jetbrains.anko.relativeLayout
  * @date  2018/09/12
  */
 class EOSAccountCell(context: Context) : GrayCardView(context) {
+
 	private val info = TwoLineTitles(context).apply {
 		setBlackTitles(fontSize(14), 3.uiPX())
 	}
-
 	private lateinit var radio: RadioButton
 
 	init {

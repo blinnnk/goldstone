@@ -1,7 +1,11 @@
 package io.goldstone.blockchain.common.component.edittext
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.graphics.RectF
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
@@ -17,10 +21,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.value.BorderSize
-import io.goldstone.blockchain.common.value.GrayScale
-import io.goldstone.blockchain.common.value.Spectrum
-import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.common.value.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
@@ -50,15 +51,15 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 	}
 
 	init {
-		padding = BorderSize.bold.toInt()
-		addCircleBorder(viewHeight / 2, BorderSize.bold.toInt(), GrayScale.lightGray)
+		setWillNotDraw(false)
+		padding = BorderSize.bold.toInt() + 1.uiPX()
 		layoutParams = RelativeLayout.LayoutParams(matchParent, viewHeight)
 		relativeLayout {
 			lparams(matchParent, matchParent)
 			addCorner(viewHeight / 2, Spectrum.white)
 		}
 		titleView.apply {
-			leftPadding = 15.uiPX()
+			leftPadding = PaddingSize.content
 			layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 			gravity = Gravity.CENTER_VERTICAL
 			textColor = GrayScale.midGray
@@ -83,10 +84,26 @@ class RoundTitleInput(context: Context) : RelativeLayout(context) {
 			override fun afterTextChanged(s: Editable?) {
 				onTextChanged?.run()
 			}
+
 			override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 			override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-
 		})
+	}
+
+	private val offsetSize = BorderSize.bold + 3f
+	private val paint = Paint().apply {
+		isAntiAlias = true
+		color = GrayScale.lightGray
+		style = Paint.Style.STROKE
+		strokeWidth = offsetSize
+	}
+
+	@SuppressLint("DrawAllocation")
+	override fun onDraw(canvas: Canvas?) {
+		super.onDraw(canvas)
+		val cornerSize = (height - offsetSize) / 2
+		val rectF = RectF(offsetSize, offsetSize, width - offsetSize, height - offsetSize)
+		canvas?.drawRoundRect(rectF, cornerSize, cornerSize, paint)
 	}
 
 	fun setTitle(text: String) {

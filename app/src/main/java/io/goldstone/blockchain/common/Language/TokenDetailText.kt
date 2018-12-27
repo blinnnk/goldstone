@@ -565,12 +565,23 @@ object TokenDetailText {
 
 	@JvmField
 	val accountRegister = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Register"
+		HoneyLanguage.English.code -> "Account Register"
 		HoneyLanguage.Chinese.code -> "注册账号"
 		HoneyLanguage.Japanese.code -> "登録"
 		HoneyLanguage.Korean.code -> "등록 된 계정"
 		HoneyLanguage.Russian.code -> "Регистрация"
 		HoneyLanguage.TraditionalChinese.code -> "註冊賬號"
+		else -> ""
+	}
+
+	@JvmField
+	val permission = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Permission"
+		HoneyLanguage.Chinese.code -> "Permission"
+		HoneyLanguage.Japanese.code -> "Permission"
+		HoneyLanguage.Korean.code -> "Permission"
+		HoneyLanguage.Russian.code -> "Permission"
+		HoneyLanguage.TraditionalChinese.code -> "Permission"
 		else -> ""
 	}
 

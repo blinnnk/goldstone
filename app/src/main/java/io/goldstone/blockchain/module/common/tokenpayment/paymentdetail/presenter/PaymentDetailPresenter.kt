@@ -142,7 +142,7 @@ class PaymentDetailPresenter(
 				usePasswordEvent = {
 					PaymentDetailPresenter.getPrivatekeyByPassword(
 						context,
-						ChainType.EOS,
+						chainType,
 						actionType,
 						cancelEvent = cancelEvent,
 						hold = hold
@@ -177,9 +177,9 @@ class PaymentDetailPresenter(
 		) = GlobalScope.launch(Dispatchers.Main) {
 			val dashboardText = when (actionType) {
 				PrivatekeyActionType.SignData ->
-					Pair(TransactionText.confirmTransactionTitle, TransactionText.confirmTransaction)
-				PrivatekeyActionType.Transfer ->
 					Pair(TransactionText.signData, TransactionText.signDataDescription)
+				PrivatekeyActionType.Transfer ->
+					Pair(TransactionText.confirmTransactionTitle, TransactionText.confirmTransaction)
 			}
 			Dashboard(context) {
 				showAlertView(

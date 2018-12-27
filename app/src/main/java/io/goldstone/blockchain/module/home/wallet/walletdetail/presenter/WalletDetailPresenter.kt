@@ -41,8 +41,6 @@ class WalletDetailPresenter(
 	private val detailView: WalletDetailContract.GSView
 ) : WalletDetailContract.GSPresenter {
 
-	private var lockGettingChainModelsThread = false
-
 	override fun start() {
 		detailView.showLoading(true)
 		updateData()
@@ -56,20 +54,15 @@ class WalletDetailPresenter(
 		MyTokenWithDefaultTable.getMyDefaultTokens { models ->
 			launchUI {
 				updateUIByData(models)
-				// 这个页面检查的比较频繁所以在这里通过 `Boolean` 对线程的开启状态标记
-				if (!lockGettingChainModelsThread) {
-					// 再检查链上的最新价格和数量
-					lockGettingChainModelsThread = true
-					models.getChainModels { chainModels, error ->
-						detailView.showLoading(false)
-						lockGettingChainModelsThread = false
-						updateUIByData(chainModels)
-						if (error.hasError()) {
-							if (error.isChainError()) detailView.showChainError()
-							else detailView.showError(error)
-						}
+				// 再检查链上的最新价格和数量
+				models.getChainModels { chainModels, error ->
+					detailView.showLoading(false)
+					updateUIByData(chainModels)
+					if (error.hasError()) {
+						if (error.isChainError()) detailView.showChainError()
+						else detailView.showError(error)
 					}
-				} else detailView.showLoading(false)
+				}
 			}
 		}
 	}
@@ -97,7 +90,7 @@ class WalletDetailPresenter(
 	 * 就是 `GoldStone ID` 的最后 `13` 位 如果本地有数据获取最后一条
 	 * 的创建时间作为请求时间
 	 */
-	private fun updateUnreadCount() {
+	override fun updateUnreadCount() {
 		val goldStoneID = SharedWallet.getGoldStoneID()
 		NotificationTable.getAllNotifications { notifications ->
 			val time =

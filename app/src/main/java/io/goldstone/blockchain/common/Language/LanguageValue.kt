@@ -79,10 +79,10 @@ enum class HoneyLanguage(
 			}
 		}
 
-		val bitcoinPrefix: (isYingYongBao: Boolean) -> String = {
+		val bitcoinPrefix: () -> String = {
 			when (currentLanguage) {
-				HoneyLanguage.English.code -> if (it) "Bitc." else "Bitcoin"
-				HoneyLanguage.Chinese.code -> if (it) "B.C." else "比特币"
+				HoneyLanguage.English.code -> "Bitcoin"
+				HoneyLanguage.Chinese.code -> "比特币"
 				else -> "Bitcoin"
 			}
 		}

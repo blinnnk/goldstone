@@ -1,15 +1,13 @@
 package io.goldstone.blockchain
 
-import com.blinnnk.extension.toList
-import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
+import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.netcpumodel.BandWidthModel
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.common.basetradingfragment.view.StakeType
-import org.json.JSONArray
 import org.junit.Assert
 import org.junit.Test
 import java.math.BigDecimal
@@ -70,6 +68,23 @@ class ExampleUnitTest {
 	fun stringArrayConverter() {
 		// expect result hello||hey||
 		println(listOf("hello", "hey").map { "$it||" }.joinToString("") { it })
+	}
+
+	@Test
+	fun utils() {
+		println(EOSUtils.getLittleEndianCode("owner"))
+		println(EOSUtils.getVariableUInt(1))
+	}
+
+	@Test
+	fun sortString() {
+		val addresses = listOf(
+			"EOS69UvbnXLnE3Kmzv7VkPbXnD1FQZjcv9DAxrASAXCPY1PYN2RZu",
+			"EOS6ndAqVB4bWcU742CcPtbnie4VC32XtKx8WTSH4bBNtHTAUtC5V",
+			"EOS7L2Eo6hx8TA3ZMe6YmaYLmN6eHkMoaivtnEoVGcBzsqBgbxSN3",
+			"EOS6NdAqVB4bWcU742CcPtbnie4VC32XtKx8WTSH4bBNtHTAUtC5V"
+		)
+		println(addresses.sorted())
 	}
 }
 

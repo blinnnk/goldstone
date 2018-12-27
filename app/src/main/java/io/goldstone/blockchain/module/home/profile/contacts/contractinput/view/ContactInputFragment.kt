@@ -77,7 +77,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}
 
 				btcMainnetAddressInput = roundInput {
-					title = CoinSymbol.btc()
+					title = CoinSymbol.btc
 					hint = ContactText.btcMainnetAddress
 				}.lparams {
 					width = matchParent
@@ -110,8 +110,8 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}
 
 				eosKylinAddressInput = roundInput {
-					title = "${CoinSymbol.eos} JUNGLE"
-					hint = ContactText.eosJungleHint
+					title = "${CoinSymbol.eos} Kylin"
+					hint = ContactText.eosKylinHint
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
 					width = matchParent
@@ -119,7 +119,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 				}
 
 				btcTestnetAddressInput = roundInput {
-					title = "${CoinSymbol.btc()} Series TEST"
+					title = "${CoinSymbol.btc} Series TEST"
 					hint = ContactText.btcTestnetAddress
 					visibility = if (SharedValue.isTestEnvironment()) View.VISIBLE else View.GONE
 				}.lparams {
@@ -160,10 +160,7 @@ class ContactInputFragment : BaseFragment<ContactInputPresenter>() {
 		bchAddressInput.setText(data.bchAddress)
 	}
 
-	override fun onViewCreated(
-		view: View,
-		savedInstanceState: Bundle?
-	) {
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter.setConfirmButtonStyle(
 			nameInput,

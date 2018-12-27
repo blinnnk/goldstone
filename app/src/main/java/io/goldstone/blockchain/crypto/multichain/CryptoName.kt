@@ -24,17 +24,6 @@ object CryptoName {
 		eos
 	)
 
-	fun getChainNameBySymbol(symbol: String?): String {
-		return when (symbol) {
-			CoinSymbol.eos -> eos
-			CoinSymbol.ltc -> ltc
-			CoinSymbol.etc -> etc
-			CoinSymbol.bch -> bch
-			CoinSymbol.btc() -> btc
-			else -> eth
-		}
-	}
-
 	fun getChainNameByContract(contract: TokenContract?): String {
 		return when {
 			contract.isEOSSeries() -> eos

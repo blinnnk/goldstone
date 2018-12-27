@@ -1,7 +1,6 @@
 package io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.view
 
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
@@ -44,7 +43,7 @@ class NotificationListFragment :
 							toAddress =
 								NotificationTable.getBTCTransactionData(extra, false).map { extra ->
 									extra.address
-								}.toString()
+								}.joinToString(",") { address -> address }
 						} else {
 							fromAddress = extra.fromAddress
 							toAddress = extra.toAddress

@@ -65,8 +65,8 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 					textSize = fontSize(12)
 					typeface = GoldStoneFont.medium(context)
 					textColor = Spectrum.opacity5White
-					leftPadding = PaddingSize.device
-					rightPadding = PaddingSize.device
+					leftPadding = PaddingSize.content
+					rightPadding = PaddingSize.content
 				}
 			}.lparams {
 				centerHorizontally()

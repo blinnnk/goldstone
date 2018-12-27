@@ -13,6 +13,7 @@ import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -240,6 +241,9 @@ class TokenAssetPresenter(
 				if (eosAccount.isNotNull() && error.isNone()) {
 					// 初始化插入数据
 					EOSAccountTable.updateOrInsert(eosAccount, chainID)
+					EOSAccountTable.getValidPermission(account, chainID)?.apply {
+						SharedWallet.updateValidPermission(value)
+					}
 					callback(eosAccount)
 				}
 			}

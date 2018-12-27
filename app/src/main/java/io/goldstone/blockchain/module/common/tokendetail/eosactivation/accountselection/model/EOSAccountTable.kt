@@ -99,9 +99,12 @@ data class EOSAccountTable(
 
 		@WorkerThread
 		fun getPermissions(account: EOSAccount, chainID: ChainID): List<PermissionsInfo> {
-			val permissions =
-				JSONArray(dao.getPermissions(account.name, chainID.id)).toJSONObjectList()
-			return permissions.map { PermissionsInfo(it) }
+			val permissions = dao.getPermissions(account.name, chainID.id)
+			return if (!permissions.isNullOrBlank()) {
+				val permissionList =
+					JSONArray(dao.getPermissions(account.name, chainID.id)).toJSONObjectList()
+				permissionList.map { PermissionsInfo(it) }
+			} else listOf()
 		}
 
 		// 特殊情况下这几个字段的返回值会是 `null`
@@ -135,7 +138,7 @@ interface EOSAccountDao {
 	fun getAccount(name: String, chainID: String): EOSAccountTable?
 
 	@Query("SELECT permissions FROM eosAccount WHERE name = :name AND chainID = :chainID")
-	fun getPermissions(name: String, chainID: String): String
+	fun getPermissions(name: String, chainID: String): String?
 
 	@Query("UPDATE eosAccount SET totalDelegateBandInfo = :data WHERE name = :name AND chainID = :chainID")
 	fun updateDelegateBandwidthData(data: List<DelegateBandWidthInfo>, name: String, chainID: String)

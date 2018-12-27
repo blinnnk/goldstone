@@ -111,7 +111,7 @@ class EOSAccountSelectionPresenter(
 			permission.requiredAuthorization.getKeys().asSequence().filter {
 				it.publicKey == SharedAddress.getCurrentEOS()
 			}.map {
-				AccountActor(name, EOSActor.getActorByValue(permission.permissionName)!!, it.weight)
+				AccountActor(name, EOSActor.getActorByValue(permission.permissionName), it.weight)
 			}.toList()
 		}.toList().flatten()
 	}
