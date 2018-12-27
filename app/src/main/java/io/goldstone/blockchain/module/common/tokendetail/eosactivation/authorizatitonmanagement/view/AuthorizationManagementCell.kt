@@ -16,6 +16,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -45,7 +46,7 @@ class AuthorizationManagementCell(
 			} else {
 				borderView.backgroundColor = Spectrum.green
 			}
-			thresholdView.text = "THRESHOLD: $threshold"
+			thresholdView.text = "${EOSAccountText.threshold}: $threshold"
 		}
 	}
 

@@ -704,6 +704,17 @@ object TokenDetailText {
 
 object EOSAccountText {
 
+
+	@JvmField
+	val account = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account"
+		HoneyLanguage.Chinese.code -> "账户"
+		HoneyLanguage.Japanese.code -> "アカウント"
+		HoneyLanguage.Korean.code -> "계정"
+		HoneyLanguage.Russian.code -> "Счет"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶"
+		else -> ""
+	}
 	@JvmField
 	val pendingActivation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Pending Activation"
@@ -1341,4 +1352,75 @@ object EOSAccountText {
 		else -> ""
 	}
 
+	// 权限管理
+	@JvmField
+	val enterPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter the public key you want to add"
+		HoneyLanguage.Chinese.code -> "请输入想添加的公钥"
+		HoneyLanguage.Japanese.code -> "追加したい公開鍵を入力してください"
+		HoneyLanguage.Korean.code -> "추가하려는 공개 키를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Пожалуйста, введите открытый ключ, который вы хотите добавить"
+		HoneyLanguage.TraditionalChinese.code -> "請輸入想添加的公鑰"
+		else -> ""
+	}
+	@JvmField
+	val addNewPermissionTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Add permissions"
+		HoneyLanguage.Chinese.code -> "新增权限"
+		HoneyLanguage.Japanese.code -> "権限を追加する"
+		HoneyLanguage.Korean.code -> "권한 추가"
+		HoneyLanguage.Russian.code -> "Добавить разрешения"
+		HoneyLanguage.TraditionalChinese.code -> "新增權限"
+		else -> ""
+	}
+	@JvmField
+	val addNewPermissionDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "You can bind multiple public keys to your account. For the security of your account, please be careful to add."
+		HoneyLanguage.Chinese.code -> "您可以为您的账户绑定多个公钥。为了您的账号安全，请谨慎添加。"
+		HoneyLanguage.Japanese.code -> "自分のアカウントに複数の公開鍵をバインドできます。 アカウントのセキュリティを確保するために、追加してください。"
+		HoneyLanguage.Korean.code -> "여러 공개 키를 계정에 바인딩 할 수 있습니다. 계정 보안을 위해주의해서 추가하십시오."
+		HoneyLanguage.Russian.code -> "Вы можете привязать несколько открытых ключей к своей учетной записи. Для безопасности вашей учетной записи, пожалуйста, будьте осторожны, чтобы добавить."
+		HoneyLanguage.TraditionalChinese.code -> "您可以為您的賬戶綁定多個公鑰。為了您的賬號安全，請謹慎添加。"
+		else -> ""
+	}
+	@JvmField
+	val permissionList = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Permission list"
+		HoneyLanguage.Chinese.code -> "权限列表"
+		HoneyLanguage.Japanese.code -> "許可リスト"
+		HoneyLanguage.Korean.code -> "사용 권한 목록"
+		HoneyLanguage.Russian.code -> "Список разрешений"
+		HoneyLanguage.TraditionalChinese.code -> "權限列表"
+		else -> ""
+	}
+	@JvmField
+	val accountInformation = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account information"
+		HoneyLanguage.Chinese.code -> "账号信息"
+		HoneyLanguage.Japanese.code -> "アカウント情報"
+		HoneyLanguage.Korean.code -> "계정 정보"
+		HoneyLanguage.Russian.code -> "Информация об учетной записи"
+		HoneyLanguage.TraditionalChinese.code -> "賬號信息"
+		else -> ""
+	}
+	@JvmField
+	val threshold = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Threshold"
+		HoneyLanguage.Chinese.code -> "阈值"
+		HoneyLanguage.Japanese.code -> "しきい値"
+		HoneyLanguage.Korean.code -> "임계 값"
+		HoneyLanguage.Russian.code -> "порог"
+		HoneyLanguage.TraditionalChinese.code -> "閾值"
+		else -> ""
+	}
+	@JvmField
+	val currentPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Is using"
+		HoneyLanguage.Chinese.code -> "正在使用"
+		HoneyLanguage.Japanese.code -> "使用中"
+		HoneyLanguage.Korean.code -> "사용중"
+		HoneyLanguage.Russian.code -> "Используется"
+		HoneyLanguage.TraditionalChinese.code -> "正在使用"
+		else -> ""
+	}
 }

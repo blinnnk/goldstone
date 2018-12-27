@@ -18,12 +18,14 @@ import io.goldstone.blockchain.common.component.edittext.WalletEditText
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.error.AccountError
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.showDialog
@@ -188,11 +190,11 @@ class AuthorizationManagementFragment
 			padding = PaddingSize.content
 			graySquareCell {
 				layoutParams = LinearLayout.LayoutParams(matchParent, 45.uiPX())
-				setTitle("Account")
+				setTitle(EOSAccountText.account)
 				setSubtitle(SharedAddress.getCurrentEOSAccount().name)
 			}
 			keyInput = WalletEditText(context).apply {
-				hint = "enter your public key that decide to add"
+				hint = EOSAccountText.enterPublicKey
 				if (publicKey.isNotEmpty()) setText(publicKey)
 				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 			}
@@ -229,10 +231,11 @@ class AuthorizationManagementFragment
 				selectedPermission = EOSActor.Active
 			}
 		}
+
 		Dashboard(context!!) {
 			showDashboard(
-				"Add New Authorization",
-				"you can add more than one key to this account to use it",
+				EOSAccountText.addNewPermissionTitle,
+				EOSAccountText.addNewPermissionDescription,
 				editorView,
 				hold = {
 					if (!EOSWalletUtils.isValidAddress(keyInput.getContent())) {
