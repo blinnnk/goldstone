@@ -34,7 +34,7 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 	private lateinit var radio: RadioButton
 
 	init {
-		layoutParams = ViewGroup.LayoutParams(ScreenSize.card, 80.uiPX())
+		layoutParams = ViewGroup.LayoutParams(ScreenSize.widthWithPadding, 80.uiPX())
 		setContentPadding(15.uiPX(), 10.uiPX(), 15.uiPX(), 10.uiPX())
 		relativeLayout {
 			lparams(matchParent, matchParent)

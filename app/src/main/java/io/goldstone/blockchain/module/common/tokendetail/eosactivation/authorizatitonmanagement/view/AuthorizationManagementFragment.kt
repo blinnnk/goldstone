@@ -224,11 +224,11 @@ class AuthorizationManagementFragment
 			}
 
 			ownerCell = radioCell {
-				setTitle(EOSActor.Owner.value)
+				setTitle(EOSActor.Owner.displayName)
 			}
 
 			activeCell = radioCell {
-				setTitle(EOSActor.Active.value)
+				setTitle(EOSActor.Active.displayName)
 				setSwitchStatusBy(true)
 			}
 
