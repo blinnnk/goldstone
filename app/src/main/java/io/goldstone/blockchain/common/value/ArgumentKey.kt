@@ -88,6 +88,7 @@ object SharesPreference {
 	const val accountCheckedStatus = "accountCheckedStatus"
 	const val developerMode = "developerMode"
 	const val hasFingerprint = "hasFingerprint"
+	const val validEOSAccountPermission = "validEOSAccountPermission"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"

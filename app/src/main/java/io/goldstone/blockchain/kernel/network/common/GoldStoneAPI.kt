@@ -20,7 +20,6 @@ import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.TokenIcon
 import io.goldstone.blockchain.crypto.multichain.generateObject
 import io.goldstone.blockchain.crypto.multichain.node.ChainNodeTable
-import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.commontable.model.ETCTransactionModel
 import io.goldstone.blockchain.kernel.commontable.model.ServerConfigModel
 import io.goldstone.blockchain.kernel.network.ParameterUtil
@@ -351,7 +350,7 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
-	
+
 	fun getQuotationByPairs(
 		pairList: JsonArray,
 		@WorkerThread hold: (lineData: List<QuotationSelectionTable>?, error: RequestError) -> Unit
@@ -485,11 +484,12 @@ object GoldStoneAPI {
 
 	fun getTokenInfoFromMarket(
 		symbol: String,
+		contract: String,
 		chainID: ChainID,
 		@WorkerThread hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getCoinInfo(APIPath.currentUrl) + symbol,
+			APIPath.getCoinInfo(APIPath.currentUrl, symbol, contract),
 			"",
 			true,
 			isEncrypt = true

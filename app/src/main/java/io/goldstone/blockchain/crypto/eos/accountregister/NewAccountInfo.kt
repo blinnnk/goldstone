@@ -152,7 +152,7 @@ enum class EOSActor(val value: String) {
 			return when (value) {
 				Owner.value -> Owner
 				Active.value -> Active
-				Empty.value -> Empty
+				Empty.value, "Default" -> Empty // 服务空值和空的 SharedValue 的时候做的判断
 				else -> throw Throwable("unknown permission")
 			}
 		}

@@ -24,6 +24,8 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.kernel.receiver.registerDeviceForPush
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.DAppBrowserFragment
 import io.goldstone.blockchain.module.home.dapp.dappcenter.view.DAPPCenterFragment
+import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
+import io.goldstone.blockchain.module.home.profile.profile.view.ProfileFragment
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.wallet.walletdetail.view.WalletDetailFragment
 import org.jetbrains.anko.relativeLayout
@@ -143,6 +145,10 @@ class MainActivity : AppCompatActivity() {
 
 	fun getQuotationFragment(): QuotationFragment? {
 		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.quotation)
+	}
+
+	fun getProfileFragment(): ProfileFragment? {
+		return getHomeFragment()?.findChildFragmentByTag(FragmentTag.profile)
 	}
 
 	fun getDAPPCenterFragment(): DAPPCenterFragment? {

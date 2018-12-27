@@ -1,10 +1,7 @@
 package io.goldstone.blockchain.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.hasValue
-import com.blinnnk.extension.orElse
-import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.orZero
+import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.thread.launchUI
@@ -82,7 +79,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 			// 防止天然数据不够一页的情况, 防止拉到最后一页数据不够一页数量的情况.
 			localData.size < DataValue.pageCount
 				&& localData.size != totalCount
-				&& localData.minBy { it.dataIndex }?.dataIndex ?: 0 > 1 -> {
+				&& localData.minBy { it.dataIndex }?.dataIndex.isNotNull() -> {
 				loadRangeDataFromChain(
 					// 本地片段存在不足的情况
 					if (localData.maxBy { it.dataIndex }?.dataIndex.orZero() == currentMaxCount)

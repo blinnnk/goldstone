@@ -9,13 +9,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.blinnnk.extension.centerInVertical
-import com.blinnnk.extension.into
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
+import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.value.*
@@ -46,12 +45,14 @@ class AuthorizationManagementCell(
 				borderView.backgroundColor = Spectrum.green
 			}
 			thresholdView.text = "THRESHOLD: $threshold"
+			usingView.visibility = if (publicKey == SharedAddress.getCurrentEOS()) View.VISIBLE else View.GONE
 		}
 	}
 
 	private lateinit var publicKeyView: TextView
 	private lateinit var authorizationType: TextView
 	private lateinit var thresholdView: TextView
+	private lateinit var usingView: TextView
 	private lateinit var editIcon: ImageView
 	private lateinit var deleteIcon: ImageView
 	private var borderView: View
@@ -66,9 +67,10 @@ class AuthorizationManagementCell(
 			}
 		borderView.into(this)
 		verticalLayout {
-			setPadding(20.uiPX(), 15.uiPX(), 15.uiPX(), 15.uiPX())
+			setPadding(20.uiPX(), 15.uiPX(), 15.uiPX(), 10.uiPX())
 			lparams(matchParent, matchParent)
 			relativeLayout {
+				lparams(matchParent, wrapContent)
 				authorizationType = textView {
 					gravity = Gravity.CENTER
 					layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
@@ -82,7 +84,7 @@ class AuthorizationManagementCell(
 					editIcon = imageView {
 						imageResource = R.drawable.edit_contact_icon
 						scaleType = ImageView.ScaleType.CENTER_INSIDE
-						layoutParams = LinearLayout.LayoutParams(30.uiPX(), 30.uiPX())
+						layoutParams = LinearLayout.LayoutParams(25.uiPX(), 30.uiPX())
 						setColorFilter(GrayScale.midGray)
 					}.click {
 						editAction(
@@ -93,7 +95,7 @@ class AuthorizationManagementCell(
 					deleteIcon = imageView {
 						imageResource = R.drawable.delete_icon
 						scaleType = ImageView.ScaleType.CENTER_INSIDE
-						layoutParams = LinearLayout.LayoutParams(30.uiPX(), 30.uiPX())
+						layoutParams = LinearLayout.LayoutParams(25.uiPX(), 30.uiPX())
 						setColorFilter(GrayScale.midGray)
 					}.click {
 						deleteAction(
@@ -109,16 +111,32 @@ class AuthorizationManagementCell(
 				}
 			}
 			publicKeyView = textView {
-				topPadding = 10.uiPX()
 				textColor = GrayScale.black
 				textSize = fontSize(14)
 				typeface = GoldStoneFont.heavy(context)
 			}
-			thresholdView = textView {
-				topPadding = 10.uiPX()
-				textColor = GrayScale.midGray
-				textSize = fontSize(14)
-				typeface = GoldStoneFont.black(context)
+			relativeLayout {
+				lparams(matchParent, 30.uiPX())
+				thresholdView = textView {
+					textColor = GrayScale.midGray
+					textSize = fontSize(12)
+					typeface = GoldStoneFont.heavy(context)
+				}
+				thresholdView.centerInVertical()
+				usingView = textView {
+					text = "Current Publickey"
+					visibility = View.GONE
+					textColor = Spectrum.white
+					textSize = fontSize(10)
+					typeface = GoldStoneFont.heavy(context)
+					addCorner(12.uiPX(), Spectrum.green)
+					gravity = Gravity.CENTER
+					leftPadding = 10.uiPX()
+					rightPadding = 10.uiPX()
+					layoutParams = RelativeLayout.LayoutParams(wrapContent, 20.uiPX())
+				}
+				usingView.alignParentRight()
+				usingView.centerInVertical()
 			}
 		}
 	}

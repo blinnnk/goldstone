@@ -93,7 +93,7 @@ class TokenDetailPresenter(
 
 	private fun loadLocalData(isRefresh: Boolean) {
 		with(token.contract) {
-			GlobalScope.launch(Dispatchers.Default) {
+			launchDefault {
 				when {
 					isBTCSeries() -> getBTCSeriesData()
 					isETHSeries() -> getETHSeriesData()

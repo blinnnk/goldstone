@@ -151,7 +151,7 @@ fun Context.getBigIntegerPrivateKeyByWalletID(
 	if (keyStoreFile.isNotNull() && error.isNone()) {
 		val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
 		if (keyPair == null) hold(null, AccountError.WrongPassword)
-		else hold(keyPair.privateKey, AccountError.None)
+		else hold(keyPair.privateKey, error)
 	} else hold(null, error)
 }
 
