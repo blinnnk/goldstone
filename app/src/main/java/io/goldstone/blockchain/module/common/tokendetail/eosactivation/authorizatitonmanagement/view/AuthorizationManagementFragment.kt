@@ -70,8 +70,8 @@ class AuthorizationManagementFragment
 				presenter.showAlertBeforeDeleteLastKey { isFinalDelete ->
 					if (isFinalDelete) Dashboard(context!!) {
 						showAlert(
-							"Your Last Publickey",
-							"this is only one publickey under this account which belongs to you, once you delete this key you will lose all control of this account",
+							EOSAccountText.lostPermissionAlertTitle,
+							EOSAccountText.lostPermissionAlertDescription,
 							confirmAction = {
 								deletePermissionKey(publickey, actor, isFinalDelete)
 							}
@@ -109,17 +109,11 @@ class AuthorizationManagementFragment
 	private fun deletePermissionKey(defaultPublicKey: String, actor: EOSActor, isFinalDelete: Boolean) {
 		Dashboard(context!!) {
 			showAlert(
-<<<<<<< HEAD
-				EOSAccountText.deletePermissionTitle,
-				EOSAccountText.deletePermissionDescription,
+				EOSAccountText.deleteCurrentLastPermissionAlertTitle,
+				EOSAccountText.deleteCurrentLastPermissionAlertDescription,
 				cancelAction = {
 					dismiss()
 				},
-=======
-				"Delete Permission Key",
-				"are you sure to delete this key's permission in this account",
-				cancelAction = { dismiss() },
->>>>>>> d0d2c6cba91cf6cd944aadd87cdb6a88c7278c16
 				confirmAction = {
 					PaymentDetailPresenter.getPrivatekey(
 						context!!,
@@ -144,8 +138,8 @@ class AuthorizationManagementFragment
 											response.showDialog(context!!)
 											if (isFinalDelete) Dashboard(context!!) {
 												showForceAlert(
-													"Lost Control Of This Account",
-													"restart to update account name status under your publickey",
+													EOSAccountText.lostPermissionAlertTitle,
+													EOSAccountText.lostPermissionAlertDescription,
 													confirmAction = {
 														presenter.deleteAccount { activity?.jump<SplashActivity>() }
 													}
