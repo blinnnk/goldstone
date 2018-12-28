@@ -3,6 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.authoriz
 import android.os.Handler
 import android.os.Looper
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orFalse
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.load
@@ -25,6 +26,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authoriza
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationManagementModel
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationObserverModel
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.model.AuthorizationType
+import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import kotlinx.coroutines.Runnable
 import org.json.JSONObject
 
@@ -65,7 +67,11 @@ class AuthorizationManagementPresenter(
 		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		launchDefault {
-			EOSAccountTable.getValidPermission(account, chainID)?.let { currentPermission ->
+			val basicPermission =
+				EOSAccountTable.getValidPermission(account, chainID, permission.isOwner())
+			if (basicPermission.isNull())
+				hold(null, GoldStoneError("You don't have enough permission authorization to do this action."))
+			else {
 				val existedPermissions =
 					EOSAccountTable.getPermissions(account, chainID)
 				val existedPublicKeys = existedPermissions.find {
@@ -75,10 +81,14 @@ class AuthorizationManagementPresenter(
 					existedPublicKeys.isNullOrEmpty() -> listOf(ActorKey(newPublicKey, 1))
 					actionType == AuthorizationType.Add ->
 						existedPublicKeys.map { ActorKey(JSONObject(it)) }.plus(ActorKey(newPublicKey, 1))
-					actionType == AuthorizationType.Edit ->
-						existedPublicKeys.map {
+					actionType == AuthorizationType.Edit -> {
+						// 第一种是存在的账户修改新的账户, 第二种是挪移权限把 `Active` 存在的账户 挪到 `Owner` 不存在的下面
+						if (existedPublicKeys.any { it.contains(newPublicKey) }) existedPublicKeys.map {
 							ActorKey(JSONObject(it.replace(oldPublicKey, newPublicKey)))
-						}
+						} else existedPublicKeys.map {
+							ActorKey(JSONObject(it))
+						}.plus(ActorKey(newPublicKey, 1))
+					}
 					else -> existedPublicKeys.map { ActorKey(JSONObject(it)) }.minus(ActorKey(newPublicKey, 1))
 				}
 				EOSAuthorizationEditor(
@@ -87,13 +97,44 @@ class AuthorizationManagementPresenter(
 					if (permission.isOwner()) EOSActor.Empty else EOSActor.Owner,
 					permission,
 					1,
-					EOSAuthorization(account.name, currentPermission)
+					EOSAuthorization(account.name, basicPermission)
+				).send(
+					privateKey,
+					chaiURL = SharedChain.getEOSCurrent().getURL(),
+					hold = hold
 				)
-			}?.send(
-				privateKey,
-				chaiURL = SharedChain.getEOSCurrent().getURL(),
-				hold = hold
-			)
+			}
+		}
+	}
+
+	override fun showAlertBeforeDeleteLastKey(callback: (Boolean) -> Unit) {
+		launchDefault {
+			val existedPermissions =
+				EOSAccountTable.getPermissions(account, chainID)
+			val totalMyPublicKeys = existedPermissions.map {
+				it.requiredAuthorization.publicKeys
+			}.flatten().map {
+				ActorKey(JSONObject(it))
+			}.filter {
+				it.publicKey.equals(SharedAddress.getCurrentEOS(), true)
+			}
+			launchUI {
+				callback(totalMyPublicKeys.size == 1)
+			}
+		}
+	}
+
+	override fun deleteAccount(callback: () -> Unit) = launchDefault {
+		EOSAccountTable.dao.deleteByNameAndChainID(account.name, chainID.id)
+		WalletTable.dao.getWalletByAddress(SharedAddress.getCurrentEOS())?.apply {
+			eosAccountNames.filterNot {
+				it.name.equals(account.name, true) && it.chainID == chainID.id
+			}.let { accountInfo ->
+				val currentChainAccount = accountInfo.find { it.chainID == chainID.id }
+				val insteadAccount = if (currentChainAccount.isNotNull()) currentChainAccount.name else SharedAddress.getCurrentEOS()
+				WalletTable.dao.updateCurrentEOSAccountNames(accountInfo)
+				WalletTable.updateEOSDefaultName(insteadAccount, callback)
+			}
 		}
 	}
 

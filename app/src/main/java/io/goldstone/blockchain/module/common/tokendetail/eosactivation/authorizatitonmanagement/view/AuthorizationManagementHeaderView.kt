@@ -8,6 +8,7 @@ import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.language.EosResourceErrorText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.value.PaddingSize
+import org.jetbrains.anko.bottomPadding
 import org.jetbrains.anko.leftPadding
 import org.jetbrains.anko.padding
 
@@ -25,6 +26,7 @@ class AuthorizationManagementHeaderView(context: Context) : LinearLayout(context
 			leftPadding = PaddingSize.device
 		}
 		padding = PaddingSize.device
+		bottomPadding = 0
 		graySquareCell {
 			setTitle(EOSAccountText.account)
 			setSubtitle(SharedAddress.getCurrentEOSAccount().name)

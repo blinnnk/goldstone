@@ -53,6 +53,8 @@ import org.json.JSONObject
 /**
  * @author KaySaith
  * @date  2018/11/29
+ * @Important
+ *  兼容 Scatter 的 Dapp 在 地域 API 26 的机器上都无法运行 (除非更新 Chrome )
  */
 @Suppress("DEPRECATION")
 @SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
@@ -245,7 +247,6 @@ class DAPPBrowser(
 
 		@JavascriptInterface
 		fun getArbSignature(data: String) {
-			println("getArbSignature $data")
 			launchUI {
 				Dashboard(context) {
 					showAlert(

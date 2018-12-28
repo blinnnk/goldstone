@@ -87,9 +87,12 @@ data class EOSAccountTable(
 		}
 
 		@WorkerThread
-		fun getValidPermission(account: EOSAccount, chainID: ChainID): EOSActor? {
+		fun getValidPermission(account: EOSAccount, chainID: ChainID, useOwner: Boolean = false): EOSActor? {
 			val permission = EOSAccountTable.getPermissions(account, chainID)
-			val targetPermission = permission.find {
+			val actorPermission = if (useOwner) permission.filter {
+				EOSActor.getActorByValue(it.permissionName).isOwner()
+			} else permission
+			val targetPermission = actorPermission.find {
 				it.requiredAuthorization.publicKeys.find { publicKey ->
 					JSONObject(publicKey).safeGet("key").equals(SharedAddress.getCurrentEOS(), true)
 				}.isNotNull()
@@ -149,11 +152,14 @@ interface EOSAccountDao {
 	@Query("SELECT * FROM eosAccount WHERE name IN (:names) AND chainID = :chainID")
 	fun getAccounts(names: List<String>, chainID: String = SharedChain.getEOSCurrent().chainID.id): List<EOSAccountTable>
 
-	@Query("SELECT * FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
+	@Query("SELECT * FROM eosAccount WHERE recordPublicKey = :publicKey")
 	fun getByKey(publicKey: String): List<EOSAccountTable>
 
-	@Query("DELETE FROM eosAccount WHERE recordPublicKey LIKE :publicKey")
+	@Query("DELETE FROM eosAccount WHERE recordPublicKey = :publicKey")
 	fun deleteByKey(publicKey: String)
+
+	@Query("DELETE FROM eosAccount WHERE name = :name AND chainID = :chainID")
+	fun deleteByNameAndChainID(name: String, chainID: String)
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: EOSAccountTable)

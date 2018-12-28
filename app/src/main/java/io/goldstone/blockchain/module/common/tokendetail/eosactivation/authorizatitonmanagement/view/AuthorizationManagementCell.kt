@@ -68,7 +68,7 @@ class AuthorizationManagementCell(
 			}
 		borderView.into(this)
 		verticalLayout {
-			setPadding(20.uiPX(), 15.uiPX(), 15.uiPX(), 10.uiPX())
+			setPadding(20.uiPX(), 10.uiPX(), 15.uiPX(), 5.uiPX())
 			lparams(matchParent, matchParent)
 			relativeLayout {
 				lparams(matchParent, wrapContent)
@@ -113,7 +113,7 @@ class AuthorizationManagementCell(
 			}
 			publicKeyView = textView {
 				textColor = GrayScale.black
-				textSize = fontSize(14)
+				textSize = fontSize(12)
 				typeface = GoldStoneFont.heavy(context)
 			}
 			relativeLayout {

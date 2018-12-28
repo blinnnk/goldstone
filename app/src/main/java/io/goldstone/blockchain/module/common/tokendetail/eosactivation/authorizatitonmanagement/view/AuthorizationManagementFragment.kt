@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.common.tokendetail.eosactivation.authoriz
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
-import com.blinnnk.extension.into
-import com.blinnnk.extension.isNotNull
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basecell.BaseRadioCell
@@ -38,6 +35,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authoriza
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PrivatekeyActionType
+import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.padding
@@ -69,7 +67,17 @@ class AuthorizationManagementFragment
 				updatePermissionKey(publicKey, actor, AuthorizationType.Edit)
 			},
 			deleteAction = { publickey, actor ->
-				deletePermissionKey(publickey, actor)
+				presenter.showAlertBeforeDeleteLastKey { isFinalDelete ->
+					if (isFinalDelete) Dashboard(context!!) {
+						showAlert(
+							"Your Last Publickey",
+							"this is only one publickey under this account which belongs to you, once you delete this key you will lose all control of this account",
+							confirmAction = {
+								deletePermissionKey(publickey, actor, isFinalDelete)
+							}
+						)
+					} else deletePermissionKey(publickey, actor, isFinalDelete)
+				}
 			}
 		)
 	}
@@ -98,25 +106,27 @@ class AuthorizationManagementFragment
 		overlayFragment?.presenter?.popFragmentFrom<AuthorizationManagementFragment>()
 	}
 
-	private fun deletePermissionKey(defaultPublicKey: String, actor: EOSActor) {
+	private fun deletePermissionKey(defaultPublicKey: String, actor: EOSActor, isFinalDelete: Boolean) {
 		Dashboard(context!!) {
 			showAlert(
+<<<<<<< HEAD
 				EOSAccountText.deletePermissionTitle,
 				EOSAccountText.deletePermissionDescription,
 				cancelAction = {
 					dismiss()
 				},
+=======
+				"Delete Permission Key",
+				"are you sure to delete this key's permission in this account",
+				cancelAction = { dismiss() },
+>>>>>>> d0d2c6cba91cf6cd944aadd87cdb6a88c7278c16
 				confirmAction = {
 					PaymentDetailPresenter.getPrivatekey(
 						context!!,
 						ChainType.EOS,
 						PrivatekeyActionType.SignData,
-						cancelEvent = {
-							loadingView.remove()
-						},
-						confirmEvent = {
-							loadingView.show()
-						}
+						cancelEvent = { loadingView.remove() },
+						confirmEvent = { loadingView.show() }
 					) { privateKey, error ->
 						launchUI {
 							loadingView.remove()
@@ -128,10 +138,21 @@ class AuthorizationManagementFragment
 									EOSPrivateKey(privateKey),
 									AuthorizationType.Delete
 								) { response, responseError ->
+									dismiss()
 									launchUI {
 										if (response.isNotNull() && responseError.isNone()) {
 											response.showDialog(context!!)
-											presenter.refreshAuthList(AuthorizationObserverModel(defaultPublicKey, true))
+											if (isFinalDelete) Dashboard(context!!) {
+												showForceAlert(
+													"Lost Control Of This Account",
+													"restart to update account name status under your publickey",
+													confirmAction = {
+														presenter.deleteAccount { activity?.jump<SplashActivity>() }
+													}
+												)
+											} else presenter.refreshAuthList(
+												AuthorizationObserverModel(defaultPublicKey, true)
+											)
 										} else showError(responseError)
 									}
 								}
@@ -212,11 +233,11 @@ class AuthorizationManagementFragment
 			}
 
 			ownerCell = radioCell {
-				setTitle(EOSActor.Owner.value)
+				setTitle(EOSActor.Owner.displayName)
 			}
 
 			activeCell = radioCell {
-				setTitle(EOSActor.Active.value)
+				setTitle(EOSActor.Active.displayName)
 				setSwitchStatusBy(true)
 			}
 

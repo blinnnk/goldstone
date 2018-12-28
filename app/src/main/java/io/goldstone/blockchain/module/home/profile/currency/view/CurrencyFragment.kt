@@ -35,14 +35,13 @@ class CurrencyFragment : BaseRecyclerFragment<CurrencyPresenter, SupportCurrency
 			currentSymbol = currencySymbol
 			recyclerView.adapter?.notifyDataSetChanged()
 			context?.toast(CommonText.succeed)
+			presenter.updateCurrency(currencySymbol)
 		}
 	}
 
 	override fun onDestroy() {
 		super.onDestroy()
 		currentSymbol?.let {
-			presenter.updateCurrency(it)
-			// 更新 设置界面的 货币符号
 			getMainActivity()?.getProfileFragment()?.presenter?.updateData()
 			SandBoxManager.updateCurrency(it)
 		}
