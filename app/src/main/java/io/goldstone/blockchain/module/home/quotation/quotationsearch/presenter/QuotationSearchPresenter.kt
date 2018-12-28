@@ -76,6 +76,7 @@ class QuotationSearchPresenter(
 			}
 			showLoading(true)
 			GoldStoneAPI.getMarketSearchList(symbol, selectedIds.joinToString(",")) { searchList, error ->
+				System.out.println("hello $searchList")
 				if (searchList.isNotNull() && error.isNone()) {
 					val targetData = QuotationSelectionTable.dao.getAllPair()
 					// 如果本地没有已经选中的直接返回搜索的数据展示在界面
