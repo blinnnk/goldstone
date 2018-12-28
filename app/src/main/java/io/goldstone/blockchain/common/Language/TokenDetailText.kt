@@ -1526,4 +1526,14 @@ object EOSAccountText {
 		HoneyLanguage.TraditionalChinese.code->"這是您當前公鑰唯一持有的這個賬號的權限，刪除後該公鑰將無法管理這個賬號。"
 		else -> ""
 	}
+	@JvmField
+	val permissionDenied = when (currentLanguage) {
+		HoneyLanguage.English.code->"You do not have sufficient permissions to perform this operation."
+		HoneyLanguage.Chinese.code->"您没有足够的权限来执行此操作"
+		HoneyLanguage.Japanese.code->"この操作を実行するための十分な権限がありません"
+		HoneyLanguage.Korean.code->"이 작업을 수행 할 수있는 권한이 없습니다."
+		HoneyLanguage.Russian.code->"У вас недостаточно прав для выполнения этой операции"
+		HoneyLanguage.TraditionalChinese.code->"您沒有足夠的權限來執行此操作"
+		else -> ""
+	}
 }
