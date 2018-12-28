@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.sandbox
 import android.content.Context
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.GoldStoneApp
+import io.goldstone.blockchain.common.Language.SandBoxText
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
@@ -123,7 +124,7 @@ fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel, callback:
 		Dashboard(context) {
 			showAlertView(
 				FingerprintPaymentText.usePassword,
-				"请输入${walletModel.name} 的密码",
+				SandBoxText.walletPasswordInputTip(walletModel.name),
 				true,
 				cancelAction = {
 					callback()

@@ -5,9 +5,7 @@ package io.goldstone.blockchain.common.sandbox
 import android.content.Context
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.isNotNull
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -19,9 +17,7 @@ import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.json.JSONArray
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.io.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -38,6 +34,32 @@ object SandBoxManager {
 	
 	private var walletCount = AtomicInteger(0)
 
+	// 是否有需要恢复的数据
+	@WorkerThread
+	fun hasSandBoxStorage(): Boolean {
+		val directoryFiles = getDirectory().listFiles()
+		return if (directoryFiles.isEmpty()) {
+			false
+		} else {
+			var length = 0L
+			directoryFiles.forEach {
+				length += it.length()
+			}
+			length != 0L
+		}
+	}
+	
+	// 清除沙盒数据
+	@WorkerThread
+	fun cleanSandBox() {
+		val directoryFiles = getDirectory().listFiles()
+		if (!directoryFiles.isEmpty()) {
+			directoryFiles.forEach {
+				it.delete()
+			}
+		}
+	}
+	
 	@WorkerThread
 	fun recoveryData(context: Context, callback: () -> Unit) {
 		recoveryLanguage()
@@ -148,7 +170,7 @@ object SandBoxManager {
 	
 	private fun recoveryWalletTables(context: Context, callback: () -> Unit) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
-		var pairList = arrayListOf<WalletModel>()
+		val pairList = arrayListOf<WalletModel>()
 		pairList.apply {
 			try {
 				val jsonArray = JSONArray(walletModelListString)
