@@ -25,6 +25,7 @@ import io.goldstone.blockchain.common.component.title.sessionTitle
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.language.ProfileText
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -169,8 +170,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								}
 							)
 							themedViewPager {
-
-								layoutParams = LinearLayout.LayoutParams(matchParent, 995.uiPX())
+								layoutParams = LinearLayout.LayoutParams(matchParent, 998.uiPX())
 								adapter = ViewPagerAdapter(listOf(newAPP, latestUsed))
 								val titles = listOf(DappCenterText.newDapp, DappCenterText.recentDapp)
 								menuBar.setMenuTitles(titles) { button, id ->
@@ -255,7 +255,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 						DappCenterText.thirdPartDappAlertTitle,
 						DappCenterText.thirdPartDappAlertDescription
 					) {
-						GlobalScope.launch(Dispatchers.Default) {
+						launchDefault {
 							FavoriteTable.updateDAPPUsedStatus(dappID) {
 								launchUI(callback)
 							}

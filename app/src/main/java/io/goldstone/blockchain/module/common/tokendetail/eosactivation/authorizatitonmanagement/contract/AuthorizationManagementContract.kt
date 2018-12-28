@@ -38,7 +38,7 @@ interface AuthorizationManagementContract {
 			targetActor: EOSActor,
 			callback: (Boolean) -> Unit
 		)
-		fun showAlertBeforeDeleteLastKey(callback: (Boolean) -> Unit)
+		fun showAlertBeforeDeleteLastKey(willDeletePublicKey: String, callback: (Boolean) -> Unit)
 		fun deleteAccount(callback: () -> Unit)
 	}
 }

@@ -67,7 +67,7 @@ class AuthorizationManagementFragment
 				updatePermissionKey(publicKey, actor, AuthorizationType.Edit)
 			},
 			deleteAction = { publickey, actor ->
-				presenter.showAlertBeforeDeleteLastKey { isFinalDelete ->
+				presenter.showAlertBeforeDeleteLastKey(publickey) { isFinalDelete ->
 					if (isFinalDelete) Dashboard(context!!) {
 						showAlert(
 							EOSAccountText.lostPermissionAlertTitle,

@@ -55,6 +55,7 @@ object SharedValue {
 		return localData
 			.replace("goldStoneAccountName", SharedAddress.getCurrentEOSAccount().name)
 			.replace("goldStonePermission", SharedWallet.getValidPermission().value)
+			.replace("goldStonePublicKey", SharedAddress.getCurrentEOS())
 	}
 
 	fun updateJSCode(code: String) =

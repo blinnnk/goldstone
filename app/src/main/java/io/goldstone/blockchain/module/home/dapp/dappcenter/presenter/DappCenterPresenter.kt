@@ -28,7 +28,7 @@ class DAppCenterPresenter(
 
 	override fun setUsedDAPPs() {
 		load {
-			DAPPTable.dao.getUsed(DataValue.dappPageCount)
+			DAPPTable.dao.getUsed(DataValue.pageCount)
 		} then {
 			dappView.showLatestUsed(it.toArrayList())
 		}

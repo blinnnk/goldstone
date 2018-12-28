@@ -4,6 +4,7 @@ import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.value.DataValue
+import io.goldstone.blockchain.kernel.commontable.value.TableType
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.dapp.dapplist.contract.DAPPListContract
@@ -26,7 +27,7 @@ class DAPPListPresenter(
 				DAPPType.New -> DAPPTable.dao.getAll(DataValue.dappPageCount)
 				// 本地的数据加载全部
 				DAPPType.Latest -> {
-					DAPPTable.dao.getUsed(20)
+					DAPPTable.dao.getUsed(999)
 				}
 				DAPPType.Recommend -> DAPPTable.dao.getRecommended(DataValue.dappPageCount)
 				else -> throw Throwable("Wrong DAPP Type")
@@ -48,6 +49,7 @@ class DAPPListPresenter(
 			DAPPType.New -> GoldStoneAPI.getNewDAPPs(pageIndex) { data, error ->
 				if (data.isNotNull() && error.isNone()) {
 					hold(data)
+					DAPPTable.dao.insertAll(data)
 				} else view.showError(error)
 			}
 			else -> hold(listOf())

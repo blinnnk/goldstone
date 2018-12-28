@@ -108,7 +108,7 @@ class AuthorizationManagementPresenter(
 		}
 	}
 
-	override fun showAlertBeforeDeleteLastKey(callback: (Boolean) -> Unit) {
+	override fun showAlertBeforeDeleteLastKey(willDeletePublicKey: String, callback: (Boolean) -> Unit) {
 		launchDefault {
 			val existedPermissions =
 				EOSAccountTable.getPermissions(account, chainID)
@@ -120,7 +120,7 @@ class AuthorizationManagementPresenter(
 				it.publicKey.equals(SharedAddress.getCurrentEOS(), true)
 			}
 			launchUI {
-				callback(totalMyPublicKeys.size == 1)
+				callback(totalMyPublicKeys.size == 1 && totalMyPublicKeys.first().publicKey == willDeletePublicKey)
 			}
 		}
 	}
