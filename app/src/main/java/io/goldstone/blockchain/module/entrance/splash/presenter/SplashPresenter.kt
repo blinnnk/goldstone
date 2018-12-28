@@ -194,7 +194,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					cacheDataAndSetNetBy(currentWallet, callback)
 				}
 			} else {
-				// 账户不符合需要检测的条件的时候也比较为已经检测过了
+				// 账户不符合需要检测的条件的时候也标记为已经检测过了
 				SharedValue.updateAccountCheckedStatus(true)
 				cacheDataAndSetNetBy(currentWallet, callback)
 			}

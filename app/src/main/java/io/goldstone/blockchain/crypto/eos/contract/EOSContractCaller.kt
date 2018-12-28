@@ -19,7 +19,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger
 
-
 /**
  * @author KaySaith
  * @date  2018/11/30

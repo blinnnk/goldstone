@@ -165,7 +165,7 @@ class TwoLineTitles(context: Context) : LinearLayout(context) {
 
 	fun setSubtitleLineCount(lineCount: Int) {
 		subtitle.maxLines = lineCount
-		subtitle.bottomPadding = 2.uiPX()
+		subtitle.bottomPadding = 3.uiPX()
 	}
 }
 

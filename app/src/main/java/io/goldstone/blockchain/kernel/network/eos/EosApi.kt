@@ -695,7 +695,7 @@ object EOSAPI {
 		}
 	}
 
-	fun getHistoryChainURL(): String {
+	private fun getHistoryChainURL(): String {
 		return when {
 			SharedChain.getEOSCurrent().chainID.isEOSMain() -> SharedValue.getMainnetHistoryURL()
 			SharedChain.getEOSCurrent().chainID.isEOSJungle() -> SharedValue.getJungleHistoryURL()
