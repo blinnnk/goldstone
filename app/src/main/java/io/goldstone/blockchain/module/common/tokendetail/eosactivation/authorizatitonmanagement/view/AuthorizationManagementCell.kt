@@ -14,6 +14,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.click
@@ -44,7 +45,7 @@ class AuthorizationManagementCell(
 			} else {
 				borderView.backgroundColor = Spectrum.green
 			}
-			thresholdView.text = "THRESHOLD: $threshold"
+			thresholdView.text = "${EOSAccountText.threshold}: $threshold"
 			usingView.visibility = if (publicKey == SharedAddress.getCurrentEOS()) View.VISIBLE else View.GONE
 		}
 	}
@@ -124,7 +125,7 @@ class AuthorizationManagementCell(
 				}
 				thresholdView.centerInVertical()
 				usingView = textView {
-					text = "Current Publickey"
+					text = EOSAccountText.currentPublicKey
 					visibility = View.GONE
 					textColor = Spectrum.white
 					textSize = fontSize(10)

@@ -10,6 +10,7 @@ import com.blinnnk.util.load
 import com.blinnnk.util.observing
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.thread.launchDefault
@@ -70,7 +71,7 @@ class AuthorizationManagementPresenter(
 			val basicPermission =
 				EOSAccountTable.getValidPermission(account, chainID, permission.isOwner())
 			if (basicPermission.isNull())
-				hold(null, GoldStoneError("You don't have enough permission authorization to do this action."))
+				hold(null, GoldStoneError(EOSAccountText.permissionDenied))
 			else {
 				val existedPermissions =
 					EOSAccountTable.getPermissions(account, chainID)

@@ -2,6 +2,7 @@ package io.goldstone.blockchain.crypto.eos.accountregister
 
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
+import io.goldstone.blockchain.common.language.EOSAccountText
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.account.EosPublicKey
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
@@ -136,8 +137,8 @@ data class AccountActor(
 
 enum class EOSActor(val value: String, val displayName: String) {
 	Empty("", ""),
-	Owner("owner", "owner"),
-	Active("active", "active");
+	Owner("owner", EOSAccountText.permissionOwner),
+	Active("active", EOSAccountText.permissionActive);
 
 	fun isActive(): Boolean {
 		return value.equals(Active.value, true)

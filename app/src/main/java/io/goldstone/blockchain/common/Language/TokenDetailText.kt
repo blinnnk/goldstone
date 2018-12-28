@@ -18,22 +18,22 @@ object TokenDetailText {
 	}
 	@JvmField
 	val contract = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token Contract"
-		HoneyLanguage.Chinese.code -> "Token Contract"
-		HoneyLanguage.Japanese.code -> "Token Contract"
-		HoneyLanguage.Korean.code -> "Token Contract"
-		HoneyLanguage.Russian.code -> "Token Contract"
-		HoneyLanguage.TraditionalChinese.code -> "Token Contract"
+		HoneyLanguage.English.code -> "Contract"
+		HoneyLanguage.Chinese.code -> "合约"
+		HoneyLanguage.Japanese.code -> "契約"
+		HoneyLanguage.Korean.code -> "계약"
+		HoneyLanguage.Russian.code -> "Договор"
+		HoneyLanguage.TraditionalChinese.code -> "合約"
 		else -> ""
 	}
 	@JvmField
 	val code = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Token Code"
-		HoneyLanguage.Chinese.code -> "Token Code"
-		HoneyLanguage.Japanese.code -> "Token Code"
-		HoneyLanguage.Korean.code -> "Token Code"
-		HoneyLanguage.Russian.code -> "Token Code"
-		HoneyLanguage.TraditionalChinese.code -> "Token Code"
+		HoneyLanguage.English.code -> "Contract"
+		HoneyLanguage.Chinese.code -> "合约"
+		HoneyLanguage.Japanese.code -> "契約"
+		HoneyLanguage.Korean.code -> "계약"
+		HoneyLanguage.Russian.code -> "Договор"
+		HoneyLanguage.TraditionalChinese.code -> "合約"
 		else -> ""
 	}
 	@JvmField
@@ -576,12 +576,12 @@ object TokenDetailText {
 
 	@JvmField
 	val permission = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Permission"
-		HoneyLanguage.Chinese.code -> "Permission"
-		HoneyLanguage.Japanese.code -> "Permission"
-		HoneyLanguage.Korean.code -> "Permission"
-		HoneyLanguage.Russian.code -> "Permission"
-		HoneyLanguage.TraditionalChinese.code -> "Permission"
+		HoneyLanguage.English.code -> "Permissions"
+		HoneyLanguage.Chinese.code -> "权限"
+		HoneyLanguage.Japanese.code -> "許可"
+		HoneyLanguage.Korean.code -> "허가"
+		HoneyLanguage.Russian.code -> "компетентность"
+		HoneyLanguage.TraditionalChinese.code -> "權限"
 		else -> ""
 	}
 
@@ -705,6 +705,16 @@ object TokenDetailText {
 object EOSAccountText {
 
 	@JvmField
+	val account = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account"
+		HoneyLanguage.Chinese.code -> "账户"
+		HoneyLanguage.Japanese.code -> "アカウント"
+		HoneyLanguage.Korean.code -> "계정"
+		HoneyLanguage.Russian.code -> "Счет"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶"
+		else -> ""
+	}
+	@JvmField
 	val pendingActivation = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Pending Activation"
 		HoneyLanguage.Chinese.code -> "尚未激活"
@@ -740,23 +750,22 @@ object EOSAccountText {
 	//	权限管理
 	@JvmField
 	val authority = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Authority Management"
-		HoneyLanguage.Chinese.code -> "权限管理"
-		HoneyLanguage.Japanese.code -> "権限管理"
-		HoneyLanguage.Korean.code -> "권한 관리"
-		HoneyLanguage.Russian.code -> "Управление полномочиями"
-		HoneyLanguage.TraditionalChinese.code -> "權限管理"
+		HoneyLanguage.English.code -> "Accounts"
+		HoneyLanguage.Chinese.code -> "账户管理"
+		HoneyLanguage.Japanese.code -> "アカウント"
+		HoneyLanguage.Korean.code -> "계정 관리"
+		HoneyLanguage.Russian.code -> "Счета"
+		HoneyLanguage.TraditionalChinese.code -> "賬戶管理"
 		else -> ""
 	}
 
-
 	@JvmField
 	val accountNameSelection = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Account Manage"
+		HoneyLanguage.English.code -> "Account Management"
 		HoneyLanguage.Chinese.code -> "账户管理"
 		HoneyLanguage.Japanese.code -> "アカウント管理"
 		HoneyLanguage.Korean.code -> "계정 관리"
-		HoneyLanguage.Russian.code -> "Счета"
+		HoneyLanguage.Russian.code -> "Управление аккаунтом"
 		HoneyLanguage.TraditionalChinese.code -> "賬戶管理"
 		else -> ""
 	}
@@ -1080,7 +1089,7 @@ object EOSAccountText {
 	}
 	@JvmField
 	val checkNameResultIsInvalidShortDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "invalid"
+		HoneyLanguage.English.code -> "Invalid"
 		HoneyLanguage.Chinese.code -> "无效"
 		HoneyLanguage.Japanese.code -> "無効です"
 		HoneyLanguage.Korean.code -> "무효"
@@ -1266,30 +1275,9 @@ object EOSAccountText {
 		HoneyLanguage.TraditionalChinese.code -> "正在從鏈上加載賬戶信息"
 		else -> ""
 	}
-
-	@JvmField
-	val permissionActive = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Active"
-		HoneyLanguage.Chinese.code -> "Active(管理者)"
-		HoneyLanguage.Japanese.code -> "Active(管理者)"
-		HoneyLanguage.Korean.code -> "Active(활성)"
-		HoneyLanguage.Russian.code -> "Active(Активный)"
-		HoneyLanguage.TraditionalChinese.code -> "Active(管理者)"
-		else -> ""
-	}
-	@JvmField
-	val permissionOwner = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Owner"
-		HoneyLanguage.Chinese.code -> "Owner(所有者)"
-		HoneyLanguage.Japanese.code -> "所有者（所有者）"
-		HoneyLanguage.Korean.code -> "Owner (소유자)"
-		HoneyLanguage.Russian.code -> "Owner(Владелец)"
-		HoneyLanguage.TraditionalChinese.code -> "Owner(所有者)"
-		else -> ""
-	}
 	@JvmField
 	val authorization = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Permission"
+		HoneyLanguage.English.code -> "Permissions"
 		HoneyLanguage.Chinese.code -> "权限"
 		HoneyLanguage.Japanese.code -> "許可"
 		HoneyLanguage.Korean.code -> "허가"
@@ -1341,4 +1329,211 @@ object EOSAccountText {
 		else -> ""
 	}
 
+	// 权限管理
+	@JvmField
+	val enterPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter the public key you want to add"
+		HoneyLanguage.Chinese.code -> "请输入想添加的公钥"
+		HoneyLanguage.Japanese.code -> "追加したい公開鍵を入力してください"
+		HoneyLanguage.Korean.code -> "추가하려는 공개 키를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Пожалуйста, введите открытый ключ, который вы хотите добавить"
+		HoneyLanguage.TraditionalChinese.code -> "請輸入想添加的公鑰"
+		else -> ""
+	}
+	@JvmField
+	val permissionManagement = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Permissions Management"
+		HoneyLanguage.Chinese.code -> "权限管理"
+		HoneyLanguage.Japanese.code -> "権利管理"
+		HoneyLanguage.Korean.code -> "권한 관리"
+		HoneyLanguage.Russian.code -> "Управление правами"
+		HoneyLanguage.TraditionalChinese.code -> "權限管理"
+		else -> ""
+	}
+	@JvmField
+	val addNewPermissionTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Add A Permission"
+		HoneyLanguage.Chinese.code -> "新增权限"
+		HoneyLanguage.Japanese.code -> "権限を追加する"
+		HoneyLanguage.Korean.code -> "권한 추가"
+		HoneyLanguage.Russian.code -> "Добавить разрешения"
+		HoneyLanguage.TraditionalChinese.code -> "新增權限"
+		else -> ""
+	}
+	@JvmField
+	val addNewPermissionDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "You can bind multiple public keys to your account. For the security of your account, please be careful to add."
+		HoneyLanguage.Chinese.code -> "您可以为您的账户绑定多个公钥。为了您的账号安全，请谨慎添加。"
+		HoneyLanguage.Japanese.code -> "自分のアカウントに複数の公開鍵をバインドできます。 アカウントのセキュリティを確保するために、追加してください。"
+		HoneyLanguage.Korean.code -> "여러 공개 키를 계정에 바인딩 할 수 있습니다. 계정 보안을 위해주의해서 추가하십시오."
+		HoneyLanguage.Russian.code -> "Вы можете привязать несколько открытых ключей к своей учетной записи. Для безопасности вашей учетной записи, пожалуйста, будьте осторожны, чтобы добавить."
+		HoneyLanguage.TraditionalChinese.code -> "您可以為您的賬戶綁定多個公鑰。為了您的賬號安全，請謹慎添加。"
+		else -> ""
+	}
+	@JvmField
+	val permissionList = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Permission List"
+		HoneyLanguage.Chinese.code -> "权限列表"
+		HoneyLanguage.Japanese.code -> "許可リスト"
+		HoneyLanguage.Korean.code -> "사용 권한 목록"
+		HoneyLanguage.Russian.code -> "Список разрешений"
+		HoneyLanguage.TraditionalChinese.code -> "權限列表"
+		else -> ""
+	}
+	@JvmField
+	val accountInformation = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Account Information"
+		HoneyLanguage.Chinese.code -> "账号信息"
+		HoneyLanguage.Japanese.code -> "アカウント情報"
+		HoneyLanguage.Korean.code -> "계정 정보"
+		HoneyLanguage.Russian.code -> "Информация об учетной записи"
+		HoneyLanguage.TraditionalChinese.code -> "賬號信息"
+		else -> ""
+	}
+	@JvmField
+	val threshold = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Threshold"
+		HoneyLanguage.Chinese.code -> "阈值"
+		HoneyLanguage.Japanese.code -> "しきい値"
+		HoneyLanguage.Korean.code -> "임계 값"
+		HoneyLanguage.Russian.code -> "порог"
+		HoneyLanguage.TraditionalChinese.code -> "閾值"
+		else -> ""
+	}
+	@JvmField
+	val deletePermissionTitle = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delete Permission"
+		HoneyLanguage.Chinese.code -> "删除权限"
+		HoneyLanguage.Japanese.code -> "権限を削除"
+		HoneyLanguage.Korean.code -> "권한 삭제"
+		HoneyLanguage.Russian.code -> "Удалить разрешение"
+		HoneyLanguage.TraditionalChinese.code -> "刪除權限"
+		else -> ""
+	}
+	@JvmField
+	val deletePermissionDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Delete Permission"
+		HoneyLanguage.Chinese.code -> "确定要从该权限中移除这个公钥吗"
+		HoneyLanguage.Japanese.code -> "この公開鍵をこの許可から削除してよろしいですか？"
+		HoneyLanguage.Korean.code -> "이 공개 키를이 권한에서 제거 하시겠습니까?"
+		HoneyLanguage.Russian.code -> "Вы уверены, что хотите удалить этот открытый ключ из этого разрешения?"
+		HoneyLanguage.TraditionalChinese.code -> "確定要從該權限中移除這個公鑰嗎"
+		else -> ""
+	}
+
+	@JvmField
+	val currentPublicKey = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Current Key"
+		HoneyLanguage.Chinese.code -> "正在使用"
+		HoneyLanguage.Japanese.code -> "使用中"
+		HoneyLanguage.Korean.code -> "사용중"
+		HoneyLanguage.Russian.code -> "Используется"
+		HoneyLanguage.TraditionalChinese.code -> "正在使用"
+		else -> ""
+	}
+
+	@JvmField
+	val duplicatedKey: (count: String) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> "This public key already has $it permission."
+			HoneyLanguage.Chinese.code -> "这个公钥已经有 $it 权限了"
+			HoneyLanguage.Japanese.code -> "この公開鍵はすでに $it 権限を持っています。"
+			HoneyLanguage.Korean.code -> "이 공개 키에는 이미 $it 권한이 있습니다."
+			HoneyLanguage.Russian.code -> "Этот открытый ключ уже имеет $it разрешение."
+			HoneyLanguage.TraditionalChinese.code -> "這個公鑰已經有 $it 權限了"
+			else -> ""
+		}
+	}
+
+	@JvmField
+	val lostPermissionAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code->"Loss of permissions"
+		HoneyLanguage.Chinese.code->"失去权限"
+		HoneyLanguage.Japanese.code->"権限の喪失"
+		HoneyLanguage.Korean.code->"권력의 상실"
+		HoneyLanguage.Russian.code->"Потеря власти"
+		HoneyLanguage.TraditionalChinese.code->"失去權限"
+		else -> ""
+	}
+	@JvmField
+	val lostPermissionAlertDescription = when (currentLanguage) {
+		HoneyLanguage.English.code->"Your current public key does not have permission for this account. Click OK to refresh the permissions under the current public key (will exit the current interface)"
+		HoneyLanguage.Chinese.code->"您当前的公钥下不具有这个账号的权限了.点击确认后为您刷新当前公钥下的权限(会退出当前界面)"
+		HoneyLanguage.Japanese.code->"現在の公開鍵にはこのアカウントに対する権限がありません。[OK]をクリックして現在の公開鍵の権限を更新します（現在のインターフェースを終了します）。"
+		HoneyLanguage.Korean.code->"현재 공개 키에이 계정에 대한 권한이 없습니다. 현재 공용 키에서 권한을 새로 고치려면 확인을 클릭하십시오 (현재 인터페이스를 종료합니다)."
+		HoneyLanguage.Russian.code->"Ваш текущий открытый ключ не имеет разрешения для этой учетной записи. Нажмите кнопку ОК, чтобы обновить разрешения для текущего открытого ключа (выйдет из текущего интерфейса)"
+		HoneyLanguage.TraditionalChinese.code->"您當前的公鑰下不具有這個賬號的權限了.點擊確認後為您刷新當前公鑰下的權限(會退出當前界面)"
+		else -> ""
+	}
+	@JvmField
+	val deleteCurrentPublicKeyAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code->"Delete permission"
+		HoneyLanguage.Chinese.code->"删除权限"
+		HoneyLanguage.Japanese.code->"削除権限"
+		HoneyLanguage.Korean.code->"권한 삭제"
+		HoneyLanguage.Russian.code->"Удалить разрешение"
+		HoneyLanguage.TraditionalChinese.code->"刪除權限"
+		else -> ""
+	}
+	@JvmField
+	val deleteCurrentPublicKeyAlertDescription = when (currentLanguage) {
+		HoneyLanguage.English.code->"What you want to delete is the permission under the current public key. After deletion, the current public key will not have the corresponding permissions."
+		HoneyLanguage.Chinese.code->"您删除的是当前公钥下的权限。删除后，当前公钥将不具有对应权限。"
+		HoneyLanguage.Japanese.code->"あなたが削除したものは現在の公開鍵の下での許可です。 削除後、現在の公開鍵は対応する権限を持ちません。"
+		HoneyLanguage.Korean.code->"당신이 삭제 한 것은 현재의 공개 키의 허가입니다. 삭제 후에는 현재 공개 키에 해당 권한이 없습니다."
+		HoneyLanguage.Russian.code->"То, что вы удалили, является разрешением под текущим открытым ключом. После удаления текущий открытый ключ не будет иметь соответствующих разрешений."
+		HoneyLanguage.TraditionalChinese.code->"您刪除的是當前公鑰下的權限。刪除後，當前公鑰將不具有對應權限。"
+		else -> ""
+	}
+	@JvmField
+	val deleteCurrentLastPermissionAlertTitle = when (currentLanguage) {
+		HoneyLanguage.English.code->"Delete permission"
+		HoneyLanguage.Chinese.code->"删除权限"
+		HoneyLanguage.Japanese.code->"削除権限"
+		HoneyLanguage.Korean.code->"권한 삭제"
+		HoneyLanguage.Russian.code->"Удалить разрешение"
+		HoneyLanguage.TraditionalChinese.code->"刪除權限"
+		else -> ""
+	}
+	@JvmField
+	val deleteCurrentLastPermissionAlertDescription = when (currentLanguage) {
+		HoneyLanguage.English.code->"This is the only permission of this account that your current public key holds. After the deletion, the public key will not be able to take control of this account."
+		HoneyLanguage.Chinese.code->"这是您当前公钥唯一持有的这个账号的权限，删除后该公钥将无法管理这个账号。"
+		HoneyLanguage.Japanese.code->"これは、現在の公開鍵が保持しているこのアカウントの唯一の許可です削除後は、この公開鍵でこのアカウントを管理することはできません。"
+		HoneyLanguage.Korean.code->"이것은 현재 공개 키가 보유한이 계정의 유일한 사용 권한입니다. 삭제 후에 공개 키는이 계정을 관리 할 수 없습니다."
+		HoneyLanguage.Russian.code->"Это единственное разрешение этой учетной записи, которое хранится в вашем текущем открытом ключе. После удаления открытый ключ не сможет управлять этой учетной записью."
+		HoneyLanguage.TraditionalChinese.code->"這是您當前公鑰唯一持有的這個賬號的權限，刪除後該公鑰將無法管理這個賬號。"
+		else -> ""
+	}
+	@JvmField
+	val permissionDenied = when (currentLanguage) {
+		HoneyLanguage.English.code->"You do not have sufficient permissions to perform this operation."
+		HoneyLanguage.Chinese.code->"您没有足够的权限来执行此操作"
+		HoneyLanguage.Japanese.code->"この操作を実行するための十分な権限がありません"
+		HoneyLanguage.Korean.code->"이 작업을 수행 할 수있는 권한이 없습니다."
+		HoneyLanguage.Russian.code->"У вас недостаточно прав для выполнения этой операции"
+		HoneyLanguage.TraditionalChinese.code->"您沒有足夠的權限來執行此操作"
+		else -> ""
+	}
+
+	@JvmField
+	val permissionActive = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Active"
+		HoneyLanguage.Chinese.code -> "Active(管理者)"
+		HoneyLanguage.Japanese.code -> "Active(管理者)"
+		HoneyLanguage.Korean.code -> "Active(활성)"
+		HoneyLanguage.Russian.code -> "Active(Активный)"
+		HoneyLanguage.TraditionalChinese.code -> "Active(管理者)"
+		else -> ""
+	}
+	@JvmField
+	val permissionOwner = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Owner"
+		HoneyLanguage.Chinese.code -> "Owner(所有者)"
+		HoneyLanguage.Japanese.code -> "Owner(所有者)"
+		HoneyLanguage.Korean.code -> "Owner(소유자)"
+		HoneyLanguage.Russian.code -> "Owner(Владелец)"
+		HoneyLanguage.TraditionalChinese.code -> "Owner(所有者)"
+		else -> ""
+	}
 }
