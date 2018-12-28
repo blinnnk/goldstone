@@ -1275,27 +1275,6 @@ object EOSAccountText {
 		HoneyLanguage.TraditionalChinese.code -> "正在從鏈上加載賬戶信息"
 		else -> ""
 	}
-
-	@JvmField
-	val permissionActive = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Active"
-		HoneyLanguage.Chinese.code -> "Active(管理者)"
-		HoneyLanguage.Japanese.code -> "Active(管理者)"
-		HoneyLanguage.Korean.code -> "Active(활성)"
-		HoneyLanguage.Russian.code -> "Active(Активный)"
-		HoneyLanguage.TraditionalChinese.code -> "Active(管理者)"
-		else -> ""
-	}
-	@JvmField
-	val permissionOwner = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Owner"
-		HoneyLanguage.Chinese.code -> "Owner(所有者)"
-		HoneyLanguage.Japanese.code -> "所有者（所有者）"
-		HoneyLanguage.Korean.code -> "Owner (소유자)"
-		HoneyLanguage.Russian.code -> "Owner(Владелец)"
-		HoneyLanguage.TraditionalChinese.code -> "Owner(所有者)"
-		else -> ""
-	}
 	@JvmField
 	val authorization = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Permissions"
@@ -1534,6 +1513,27 @@ object EOSAccountText {
 		HoneyLanguage.Korean.code->"이 작업을 수행 할 수있는 권한이 없습니다."
 		HoneyLanguage.Russian.code->"У вас недостаточно прав для выполнения этой операции"
 		HoneyLanguage.TraditionalChinese.code->"您沒有足夠的權限來執行此操作"
+		else -> ""
+	}
+
+	@JvmField
+	val permissionActive = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Active"
+		HoneyLanguage.Chinese.code -> "Active(管理者)"
+		HoneyLanguage.Japanese.code -> "Active(管理者)"
+		HoneyLanguage.Korean.code -> "Active(활성)"
+		HoneyLanguage.Russian.code -> "Active(Активный)"
+		HoneyLanguage.TraditionalChinese.code -> "Active(管理者)"
+		else -> ""
+	}
+	@JvmField
+	val permissionOwner = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Owner"
+		HoneyLanguage.Chinese.code -> "Owner(所有者)"
+		HoneyLanguage.Japanese.code -> "Owner(所有者)"
+		HoneyLanguage.Korean.code -> "Owner(소유자)"
+		HoneyLanguage.Russian.code -> "Owner(Владелец)"
+		HoneyLanguage.TraditionalChinese.code -> "Owner(所有者)"
 		else -> ""
 	}
 }
