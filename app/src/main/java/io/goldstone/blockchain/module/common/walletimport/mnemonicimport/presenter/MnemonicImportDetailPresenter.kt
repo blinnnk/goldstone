@@ -1,11 +1,11 @@
 package io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter
 
 import android.support.annotation.WorkerThread
+import android.util.Log
 import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
@@ -97,7 +97,7 @@ class MnemonicImportDetailPresenter(
 			try {
 				JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(it.encryptMnemonic.orEmpty()).equals(mnemonic, true)
 			} catch (error: Exception) {
-				LogUtil.error("decrypt Data", error)
+				Log.e("decrypt Data", error.message)
 				false
 			}
 		}

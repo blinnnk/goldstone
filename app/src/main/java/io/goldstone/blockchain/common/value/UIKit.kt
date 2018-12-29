@@ -39,6 +39,8 @@ object Spectrum {
 	@JvmField
 	val blue = Color.parseColor("#FF235682")
 	@JvmField
+	val backgroundBlue = Color.parseColor("#FF1c4f7b")
+	@JvmField
 	val deepBlue = Color.parseColor("#FF17446B")
 	@JvmField
 	val blackBlue = Color.parseColor("#FF084A65")
@@ -49,8 +51,6 @@ object Spectrum {
 	@JvmField
 	val green = Color.parseColor("#FF1CC881")
 	@JvmField
-	val opacity8Green = Color.parseColor("#CC1CC881")
-	@JvmField
 	val darkBlue = Color.parseColor("#FF0863B8")
 	@JvmField
 	val red = Color.parseColor("#FFFA0D0D")
@@ -59,7 +59,7 @@ object Spectrum {
 	@JvmField
 	val yellow = Color.parseColor("#FFFFF988")
 	@JvmField
-	val DarkYellow = Color.parseColor("#FFF3EA3C")
+	val darkYellow = Color.parseColor("#FFF3EA3C")
 	@JvmField
 	val opacity1White = Color.parseColor("#1AFFFFFF")
 	@JvmField
@@ -185,7 +185,7 @@ object TokenDetailSize {
 
 object WalletDetailSize {
 	@JvmField
-	val headerHeight = 365.uiPX()
+	val headerHeight = 310.uiPX()
 }
 
 fun View.fontSize(defaultSize: Int): Float {

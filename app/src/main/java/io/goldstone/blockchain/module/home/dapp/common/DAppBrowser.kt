@@ -156,6 +156,8 @@ class DAPPBrowser(
 				launchUI {
 					if (balance.isNotNull() && error.isNone()) {
 						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getCurrencyBalanceEvent',true,true);event.data=$balance;document.dispatchEvent(event)})()", null)
+					} else {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getCurrencyBalanceEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					}
 				}
 			}

@@ -22,10 +22,8 @@ import kotlinx.coroutines.launch
  * @date  2018/12/18
  */
 class FingerprintSettingPresenter : FingerprintSettingContract.GSPresenter {
-	override fun start() {
 
-	}
-
+	override fun start() {}
 	override fun getSecret(password: String, hold: (secret: String?, error: AccountError) -> Unit) {
 		launchDefault {
 			if (SharedWallet.getCurrentWalletType().isBIP44()) {

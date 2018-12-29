@@ -2,7 +2,6 @@ package io.goldstone.blockchain.module.home.profile.profile.view
 
 import android.content.Context
 import android.widget.TextView
-import com.blinnnk.animation.updateOriginYAnimation
 import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.into
 import com.blinnnk.uikit.uiPX
@@ -28,17 +27,7 @@ class ProfileSlideHeader(context: Context) : SliderHeader(context) {
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}.into(this)
-
 		title.centerInParent()
-	}
-
-	override fun onHeaderShowedStyle() {
-		super.onHeaderShowedStyle()
-		title.updateOriginYAnimation(26.uiPX().toFloat())
-	}
-
-	override fun onHeaderHidesStyle() {
-		super.onHeaderHidesStyle()
-		title.updateOriginYAnimation(34.uiPX().toFloat())
+		title.y = 5.uiPX().toFloat()
 	}
 }

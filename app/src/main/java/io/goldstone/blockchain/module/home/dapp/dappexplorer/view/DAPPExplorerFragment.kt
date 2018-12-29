@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.dapp.dappexplorer.view
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.removeSelfWithAnimation
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
@@ -87,7 +86,7 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 	}
 
 	private fun formattedURL(url: String): String {
-		return if (!url.contains("http", true))  {
+		return if (!url.contains("http", true)) {
 			"https://$url"
 		} else url
 	}

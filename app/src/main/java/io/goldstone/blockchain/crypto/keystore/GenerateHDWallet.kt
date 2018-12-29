@@ -7,7 +7,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.ethereum.getAddress
@@ -189,7 +188,7 @@ fun Context.verifyKeystorePasswordByWalletID(
 		keyStore.unlock(keyStore.accounts.get(0), password)
 	} catch (error: Exception) {
 		hold(false)
-		LogUtil.error("wrong keystore password", error)
+		android.util.Log.e("wrong keystore password", error.message)
 		return
 	}
 	keyStore.lock(keyStore.accounts.get(0).address)

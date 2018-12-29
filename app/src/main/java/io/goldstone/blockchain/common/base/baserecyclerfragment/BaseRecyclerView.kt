@@ -10,12 +10,12 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import android.view.MotionEvent
 import android.widget.LinearLayout
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
 import com.blinnnk.util.TinyNumberUtils
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Spectrum
 import org.jetbrains.anko.matchParent
 import java.util.*
@@ -195,7 +195,7 @@ open class BaseRecyclerView(context: Context) : RecyclerView(context) {
 		try {
 			(findViewHolderForLayoutPosition(position)?.itemView as? T)?.let(block)
 		} catch (error: Exception) {
-			LogUtil.error("getItemAtAdapterPosition", error)
+			Log.e("getItemAtAdapterPosition", error.message)
 		}
 	}
 }

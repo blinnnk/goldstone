@@ -17,6 +17,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -62,7 +63,12 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		presenter = WalletDetailPresenter(this)
 		wrapper.addView(slideHeader)
 		slideHeader.apply {
-			notifyButton.onClick { showNotificationListFragment() }
+			notifyButton.click {
+				showNotificationListFragment()
+			}
+			searchButton.click {
+				showTokenManagementFragment()
+			}
 		}
 	}
 
@@ -114,7 +120,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		) {
 			headerView = this
 			currentAccount.onClick { showWalletSettingsFragment() }
-			addTokenButton.onClick { showTokenManagementFragment() }
 			sendButton.onClick { presenter.showTransferDashboard(true) }
 			depositButton.onClick {
 				presenter.showTransferDashboard(false)

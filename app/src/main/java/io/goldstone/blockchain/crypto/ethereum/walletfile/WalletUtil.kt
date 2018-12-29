@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.ethereum.walletfile
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import android.util.Log
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.keystore.convertKeystoreToModel
 import io.goldstone.blockchain.crypto.utils.clean0xPrefix
@@ -39,7 +39,7 @@ object WalletUtil {
 		return try {
 			wallet.decrypt(password)
 		} catch (error: Exception) {
-			LogUtil.error("getKeyPairFromWalletFile", error)
+			Log.e("getKeyPair", error.message)
 			null
 		}
 	}

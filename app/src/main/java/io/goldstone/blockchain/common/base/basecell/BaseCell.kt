@@ -35,7 +35,7 @@ open class BaseCell(context: Context) : RelativeLayout(context) {
 	private val paint = Paint().apply {
 		isAntiAlias = true
 		style = Paint.Style.FILL
-		color = Spectrum.opacity2White
+		color = Spectrum.opacity1White
 	}
 	private val arrowIcon by lazy { ArrowIconView(context) }
 

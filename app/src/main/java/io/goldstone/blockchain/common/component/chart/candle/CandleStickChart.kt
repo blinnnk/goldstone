@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.os.Handler
 import android.text.format.DateUtils
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
@@ -19,7 +20,6 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.interfaces.dataprovider.CandleDataProvider
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.fontSize
@@ -138,7 +138,7 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 				val entry = try {
 					valueData[position]
 				} catch (error: Exception) {
-					LogUtil.error("resetAxisStyle", error)
+					Log.e("resetAxisStyle", error.message)
 					return@IAxisValueFormatter ""
 				}
 				when {

@@ -12,6 +12,7 @@ import android.os.PowerManager
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.getStringFromSharedPreferences
@@ -23,7 +24,6 @@ import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ClassURI
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.IntentKey
@@ -150,7 +150,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								GoldStoneDataBase.database.appConfigDao()
 							if (isSucceed) {
 								configDao.updateHasRegisteredAddress(true)
-								LogUtil.debug("XinGePushReceiver", "code: $models")
+								Log.d("XinGePushReceiver", "code: $models")
 							} else configDao.updateHasRegisteredAddress(false)
 						}
 				}
@@ -204,7 +204,7 @@ fun Context.registerDeviceForPush() {
 			registerDevice(token.toString()) {
 				// 如果本地有注册成功的标记则不再注册
 				getStringFromSharedPreferences(SharesPreference.registerPush).let {
-					LogUtil.debug(this.javaClass.simpleName, "token: $it")
+					Log.d(this.javaClass.simpleName, "token: $it")
 					if (it == token) return@registerDevice
 				}
 				// 在本地数据库记录 `Push Token`
@@ -215,7 +215,7 @@ fun Context.registerDeviceForPush() {
 		}
 
 		override fun onFail(data: Any?, errCode: Int, message: String?) {
-			LogUtil.debug("registerDeviceForPush", message.orEmpty())
+			Log.d("registerDeviceForPush", message.orEmpty())
 		}
 	})
 }
@@ -243,9 +243,7 @@ fun Context.registerDevice(token: String, @UiThread callback: () -> Unit) {
 			GoldStoneCode.isSuccess(code) { isSuccessful ->
 				if (isSuccessful) {
 					saveDataToSharedPreferences(SharesPreference.registerPush, token)
-					launchUI {
-						callback()
-					}
+					launchUI(callback)
 				}
 			}
 		}
