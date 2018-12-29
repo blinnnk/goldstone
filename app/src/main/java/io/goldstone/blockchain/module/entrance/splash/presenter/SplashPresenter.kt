@@ -43,7 +43,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	// 初始化sandbox的数据
 	@WorkerThread
 	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
-		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxStorage()) {
+		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxData()) {
 			launchUI {
 				Dashboard(activity) {
 					showAlertView(
@@ -124,7 +124,6 @@ class SplashPresenter(val activity: SplashActivity) {
 	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
 		val walletCount = WalletTable.dao.rowCount()
 		if (walletCount == 0) {
-			cleanKeyStoreFile(activity.filesDir)
 			unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 		} else {
 			val needUnregister =

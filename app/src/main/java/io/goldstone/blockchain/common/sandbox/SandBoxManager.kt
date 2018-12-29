@@ -36,7 +36,7 @@ object SandBoxManager {
 
 	// 是否有需要恢复的数据
 	@WorkerThread
-	fun hasSandBoxStorage(): Boolean {
+	fun hasSandBoxData(): Boolean {
 		val directoryFiles = getDirectory().listFiles()
 		return if (directoryFiles.isEmpty()) {
 			false
