@@ -2,8 +2,8 @@ package io.goldstone.blockchain.common.utils
 
 import android.content.Context
 import android.support.annotation.UiThread
+import android.util.Log
 import com.blinnnk.extension.isNotNull
-import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.EosResourceErrorText
 import io.goldstone.blockchain.common.language.ErrorText
@@ -78,7 +78,7 @@ class ErrorDisplayManager(error: Throwable) {
 					} else if (!this.contains(GoldStoneError.None.message, true)) context.alert(this)
 				} catch (error: Exception) {
 					// Context 丢失的时候执行
-					LogUtil.error("Error Display Manager", error)
+					Log.e("Error Display Manager", error.message)
 				}
 			}
 		}

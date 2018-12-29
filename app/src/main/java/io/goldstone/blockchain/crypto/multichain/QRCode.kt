@@ -1,8 +1,8 @@
 package io.goldstone.blockchain.crypto.multichain
 
+import android.util.Log
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.kernel.commontable.model.QRCodeModel
 
 
@@ -42,7 +42,7 @@ class QRCode(val content: String) {
 				if (decimalContent.contains("&")) decimalContent.substringBefore("&")
 				else decimalContent
 			// 如果未来需要解析精度会用到 `Decimal` 这里暂时保留方法 By KaySaith
-			LogUtil.debug("convertERC20QRCode", decimal)
+			Log.d("convertERC20QRCode", decimal)
 			QRCodeModel(value.toDoubleOrNull().orZero(), accountName, contract, chainID)
 		} else {
 			QRCodeModel(0.0, accountName, contract, chainID)
@@ -89,7 +89,7 @@ class QRCode(val content: String) {
 					decimalContent
 				}
 			// 如果未来需要解析精度会用到 `Decimal` 这里暂时保留方法 By KaySaith
-			LogUtil.debug("convertERC20QRCode", decimal)
+			Log.d("convertERC20QRCode", decimal)
 			QRCodeModel(value.toDoubleOrNull().orZero(), walletAddress, contract, chainID)
 		} else {
 			QRCodeModel(0.0, walletAddress, contract, chainID)

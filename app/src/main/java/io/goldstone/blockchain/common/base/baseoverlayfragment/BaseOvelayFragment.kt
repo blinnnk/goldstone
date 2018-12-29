@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.base.baseoverlayfragment
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,9 +18,7 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.Overl
 import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
-import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.setTransparentStatusBar
 import io.goldstone.blockchain.common.value.ElementID
@@ -246,7 +245,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 					is BaseRecyclerFragment<*, *> -> currentFragment.recoveryBackEvent()
 				}
 			} catch (error: Exception) {
-				LogUtil.error(javaClass.simpleName, error)
+				Log.e(javaClass.simpleName, error.message)
 			}
 			is SplashActivity -> currentActivity.backEvent = null
 		}

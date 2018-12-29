@@ -1,6 +1,6 @@
 package io.goldstone.blockchain.crypto.utils
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import android.util.Log
 import io.goldstone.blockchain.crypto.ethereum.SolidityCode
 import java.io.ByteArrayOutputStream
 
@@ -45,7 +45,7 @@ fun String.toStringFromHex(): String {
 			)
 			index += 2
 		} catch (error: Exception) {
-			LogUtil.error("convertHexToString", error)
+			Log.e("convertHexToString", error.message)
 			return try {
 				toAscii(false)
 			} catch (error: Exception) {

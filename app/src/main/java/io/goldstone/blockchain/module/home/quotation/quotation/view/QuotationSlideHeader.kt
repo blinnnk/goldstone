@@ -23,20 +23,18 @@ import org.jetbrains.anko.textColor
  */
 class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 
-	val addTokenButton by lazy { CircleButton(context) }
+	val addTokenButton=  CircleButton(context)
 	private val title = TextView(context)
 
 	init {
 		addTokenButton.apply {
 			title = QuotationText.addToken
 			src = R.drawable.add_token_icon
-			x += PaddingSize.content
-			y = 15.uiPX().toFloat()
+			x += PaddingSize.device
+			y = 18.uiPX().toFloat()
 		}.into(this)
 
-		addTokenButton.apply {
-			centerInVertical()
-		}
+		addTokenButton.centerInVertical()
 
 		title.apply {
 			text = QuotationText.market
@@ -44,19 +42,17 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 		}.into(this)
-
 		title.centerInParent()
+		title.y = 5.uiPX().toFloat()
 	}
 
 	override fun onHeaderShowedStyle() {
 		super.onHeaderShowedStyle()
 		addTokenButton.setUnTransparent()
-		title.updateOriginYAnimation(26.uiPX().toFloat())
 	}
 
 	override fun onHeaderHidesStyle() {
 		super.onHeaderHidesStyle()
 		addTokenButton.setDefaultStyle()
-		title.updateOriginYAnimation(34.uiPX().toFloat())
 	}
 }

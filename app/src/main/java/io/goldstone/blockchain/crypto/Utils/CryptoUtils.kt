@@ -1,7 +1,7 @@
 package io.goldstone.blockchain.crypto.utils
 
+import android.util.Log
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.ethereum.*
 import io.goldstone.blockchain.crypto.extensions.toHexStringZeroPadded
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
@@ -67,7 +67,7 @@ object CryptoUtils {
 			amount = inputCode.substring(74, 138).hexToDecimal()
 			InputCodeData("transfer", address, amount)
 		} else {
-			LogUtil.debug("loadTransferInfoFromInputData", "not a contract transfer")
+			Log.d("loadTransferInfoFromInputData", "not a contract transfer")
 			null
 		}
 	}
@@ -97,14 +97,6 @@ object CryptoUtils {
 		0, SolidityCode.contractTransfer.length
 	) == SolidityCode.contractTransfer
 
-	fun getAddressFromPrivateKey(privateKey: String): String {
-		/** Convert PrivateKey To BigInteger */
-		val currentPrivateKey = privateKey.toBigInteger(16)
-		/** Get Public Key and Private Key*/
-		val publicKey =
-			ECKeyPair(currentPrivateKey, publicKeyFromPrivate(currentPrivateKey)).getAddress()
-		return publicKey.prepend0xPrefix()
-	}
 }
 
 fun BigDecimal.toCount(decimal: Int): BigDecimal {

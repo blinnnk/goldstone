@@ -26,16 +26,6 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "我的資產:"
 		else -> ""
 	}
-	@JvmField
-	val addToken = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Add More Tokens"
-		HoneyLanguage.Chinese.code -> "添加Token"
-		HoneyLanguage.Japanese.code -> "Tokenを追加"
-		HoneyLanguage.Korean.code -> "기타 Token 추가"
-		HoneyLanguage.Russian.code -> "Добавить Token"
-		HoneyLanguage.TraditionalChinese.code -> "添加其他Token"
-		else -> ""
-	}
 
 	@JvmField
 	val wallet = when (currentLanguage) {
@@ -69,6 +59,18 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "通知"
 		else -> ""
 	}
+
+	@JvmField
+	val addToken = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Add Token"
+		HoneyLanguage.Chinese.code -> "Add Token"
+		HoneyLanguage.Japanese.code -> "Add Token"
+		HoneyLanguage.Korean.code -> "Add Token"
+		HoneyLanguage.Russian.code -> "Add Token"
+		HoneyLanguage.TraditionalChinese.code -> "Add Token"
+		else -> ""
+	}
+
 	@JvmField
 	val setDefaultAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Set as the default address"

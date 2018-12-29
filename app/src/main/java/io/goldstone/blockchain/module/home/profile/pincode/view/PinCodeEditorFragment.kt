@@ -91,11 +91,11 @@ class PinCodeEditorFragment : BaseFragment<PinCodeEditorPresenter>() {
 		relativeLayout {
 			lparams {
 				width = ScreenSize.widthWithPadding
-				height = 80.uiPX()
+				height = 65.uiPX()
 			}
 
 			textView(PincodeText.show).apply {
-				textSize = fontSize(15)
+				textSize = fontSize(16)
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.heavy(context)
 				gravity = Gravity.CENTER_VERTICAL

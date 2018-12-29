@@ -221,7 +221,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				SharedAddress.updateCurrentEOS(currentEOSAddress)
 				SharedAddress.updateCurrentEOSName(currentEOSAccountName.getCurrent())
 				SharedWallet.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				SharedWallet.updateCurrentWalletID(avatarID)
+				SharedWallet.updateCurrentWalletID(id)
 				SharedWallet.updateCurrentBalance(balance.orElse(0.0))
 				SharedWallet.updateCurrentName(name)
 				callback()

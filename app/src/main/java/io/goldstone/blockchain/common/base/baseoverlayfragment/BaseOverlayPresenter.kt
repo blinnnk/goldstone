@@ -2,12 +2,12 @@ package io.goldstone.blockchain.common.base.baseoverlayfragment
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import com.blinnnk.extension.hideChildFragment
 import com.blinnnk.extension.removeChildFragment
 import com.blinnnk.extension.showChildFragment
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.addFragmentAndSetArgument
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.value.ContainerID
 
@@ -84,7 +84,7 @@ abstract class BaseOverlayPresenter<out T : BaseOverlayFragment<*>> {
 						addSubFragment<T>(bundle, 0)
 					}
 				} catch (error: Exception) {
-					LogUtil.error("showTargetFragment", error)
+					Log.e("showTargetFragment", error.message)
 				}
 			}
 		}

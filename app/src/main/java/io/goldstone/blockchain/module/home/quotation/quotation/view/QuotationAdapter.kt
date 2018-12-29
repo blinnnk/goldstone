@@ -27,7 +27,7 @@ class QuotationAdapter(
 
 	override fun generateHeader(context: Context) =
 		View(context).apply {
-			layoutParams = LinearLayout.LayoutParams(matchParent, 100.uiPX())
+			layoutParams = LinearLayout.LayoutParams(matchParent, 90.uiPX())
 		}
 
 	override fun generateCell(context: Context) = QuotationCell(context)

@@ -1,6 +1,6 @@
 package io.goldstone.blockchain
 
-import io.goldstone.blockchain.common.utils.LogUtil
+import android.util.Log
 import io.goldstone.blockchain.crypto.bitcoin.BTCUtils
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
@@ -25,7 +25,7 @@ class ExampleUnitTest {
 	fun mergeListAndDistinct() {
 		val list1 = listOf(1, 2, 3, 4, 5, 6)
 		val list2 = listOf(10, 20, 30, 4, 5, 6)
-		LogUtil.debug("mergeListAndDistinct", "${list1.asSequence().plus(list2).distinct().toList()}")
+		Log.d("mergeListAndDistinct", "${list1.asSequence().plus(list2).distinct().toList()}")
 	}
 
 	@Test
@@ -49,8 +49,8 @@ class ExampleUnitTest {
 	fun compare() {
 		val list1 = listOf(Pair(1, 2), Pair(1, 3))
 		val list2 = listOf(Pair(1, 2), Pair(1, 1))
-		LogUtil.debug("compare", list1.containsAll(list2).toString())
-		LogUtil.debug("compare", (list1.asSequence().plus(list2).distinct().toList() - list1).toString())
+		Log.d("compare", list1.containsAll(list2).toString())
+		Log.d("compare", (list1.asSequence().plus(list2).distinct().toList() - list1).toString())
 	}
 
 	@Test
@@ -72,8 +72,10 @@ class ExampleUnitTest {
 
 	@Test
 	fun utils() {
-		println(EOSUtils.getLittleEndianCode("owner"))
+		println(EOSUtils.getLittleEndianCode("a04965497f1661313738303364393066353135633133"))
 		println(EOSUtils.getVariableUInt(1))
+		println(EOSUtils.convertAmountToCode(BigInteger.valueOf(34577769)))
+		println(EOSUtils.convertAmountToCode(BigInteger.valueOf(790)))
 	}
 
 	@Test

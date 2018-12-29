@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.kernel.network.common
 
 import android.support.annotation.WorkerThread
+import android.util.Log
 import com.blinnnk.extension.getTargetChild
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.orZero
@@ -14,7 +15,6 @@ import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.AesCrypto
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ErrorTag
 import io.goldstone.blockchain.common.value.GoldStoneCryptoKey
 import io.goldstone.blockchain.common.value.currentChannel
@@ -45,12 +45,15 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
-		postRequest(
+		postRequest<String>(
 			RequestBody.create(ETHJsonRPC.contentType, condition),
+			"",
 			api,
-			isEncrypt,
-			hold
-		)
+			true,
+			isEncrypt
+		) { result, error ->
+			hold(result?.firstOrNull(), error)
+		}
 	}
 
 	inline fun <reified T> post(
@@ -88,7 +91,7 @@ object RequisitionUtil {
 		}
 	}
 
-	fun postString(
+	fun postAndGetTargetKeyValue(
 		condition: String,
 		api: String,
 		keyName: String,
@@ -110,11 +113,11 @@ object RequisitionUtil {
 		body: RequestBody,
 		keyName: String,
 		path: String,
-		justData: Boolean = false,
+		justData: Boolean,
 		isEncrypt: Boolean,
 		crossinline hold: (result: List<T>?, error: RequestError) -> Unit
 	) {
-		getCryptoRequest(body, path, isEncrypt) { requestBody ->
+		generateCryptoPostRequest(body, path, isEncrypt) { requestBody ->
 			client.newCall(requestBody).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					hold(null, RequestError.PostFailed("[API: ${path.getKeyName()}]\n[ERROR: $error]\n[API: $path]"))
@@ -143,32 +146,6 @@ object RequisitionUtil {
 		}
 	}
 
-	fun postRequest(
-		body: RequestBody,
-		path: String,
-		isEncrypt: Boolean,
-		hold: (result: String?, error: RequestError) -> Unit
-	) {
-		getCryptoRequest(body, path, isEncrypt) {
-			client.newCall(it).enqueue(object : Callback {
-				override fun onFailure(call: Call, error: IOException) {
-					hold(null, RequestError.PostFailed("[API: ${path.substringAfter("/")}]\n[ERROR: ${error.message}]\n[API: $path]"))
-				}
-
-				override fun onResponse(call: Call, response: Response) {
-					val data =
-						if (isEncrypt) AesCrypto.decrypt(response.body()?.string().orEmpty())
-						else response.body()?.string().orEmpty()
-					try {
-						hold(data, RequestError.None)
-					} catch (error: Exception) {
-						hold(null, RequestError.PostFailed("[API: ${path.getKeyName()}]\n[ERROR: $error]\n[API: $path]"))
-					}
-				}
-			})
-		}
-	}
-
 	@JvmStatic
 	inline fun <reified T> requestData(
 		api: String,
@@ -178,7 +155,7 @@ object RequisitionUtil {
 		isEncrypt: Boolean,
 		crossinline hold: (result: List<T>?, error: RequestError) -> Unit
 	) {
-		getCryptoGetRequest(api, isEncrypt, targetGoldStoneID) {
+		generateCryptoGetRequest(api, isEncrypt, targetGoldStoneID) {
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					hold(null, RequestError.PostFailed("[API: ${api.getKeyName()}]\n[ERROR: $error]"))
@@ -281,8 +258,7 @@ object RequisitionUtil {
 		return (goldStoneID + "0" + GoldStoneCryptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
 	}
 
-	/** —————————————————— header 加密请求参数准备 ——————————————————————*/
-	fun getCryptoRequest(
+	fun generateCryptoPostRequest(
 		body: RequestBody,
 		path: String,
 		isEncrypt: Boolean,
@@ -302,7 +278,7 @@ object RequisitionUtil {
 		)
 	}
 
-	fun getCryptoGetRequest(
+	fun generateCryptoGetRequest(
 		api: String,
 		isEncrypt: Boolean,
 		targetGoldStoneID: String? = null,
@@ -325,7 +301,7 @@ object RequisitionUtil {
 		chainURL: ChainURL,
 		hold: (result: String?, error: RequestError) -> Unit
 	) {
-		getCryptoRequest(body, chainURL.getURL(), chainURL.isEncrypt) { it ->
+		generateCryptoPostRequest(body, chainURL.getURL(), chainURL.isEncrypt) { it ->
 			client.newCall(it).enqueue(object : Callback {
 				override fun onFailure(call: Call, error: IOException) {
 					hold(null, RequestError.PostFailed("[CHAIN NAME: ${chainURL.chainType.id}]\n[ERROR: $error]\n[CHAIN: ${chainURL.getURL()}]"))
@@ -360,7 +336,7 @@ object RequisitionUtil {
 		val errorData = if (hasError == true) try {
 			JSONObject(data).safeGet("error")
 		} catch (error: Exception) {
-			LogUtil.error("checkChainErrorCode", error)
+			Log.e("checkChainErrorCode", error.message)
 			""
 		} else {
 			val code =
@@ -387,11 +363,12 @@ object GoldStoneCode {
 		if (code == 0) callback(true)
 		else {
 			callback(false)
-			LogUtil.error("function: GoldStoneCode, wrongCode: $code")
+			Log.e("Request Error: ", "function: GoldStoneCode, wrongCode: $code")
 		}
 	}
 
 	fun showErrorCodeReason(data: String?, errorCallback: () -> Unit = {}) {
+		val logTag = "Request Error: "
 		data?.apply {
 			val code = try {
 				JSONObject(this).safeGet("code")
@@ -402,20 +379,20 @@ object GoldStoneCode {
 				when (code.toInt()) {
 					-1 -> {
 						errorCallback()
-						LogUtil.error("Server Error GoldStone")
+						Log.e(logTag, "Server Error GoldStone")
 					}
 
 					-6 -> {
 						errorCallback()
-						LogUtil.error("参数错误 \n [DATA: $data]")
+						Log.e(logTag, "参数错误 \n [DATA: $data]")
 					}
 
 					-4 -> {
-						errorCallback()
-						LogUtil.error("Url Error")
 						/**
 						 *  `Device` 错误, `APi URL` 是否正确, `API` 文档是否有错误
 						 */
+						errorCallback()
+						Log.e(logTag, "Url Error")
 					}
 				}
 			}

@@ -7,12 +7,14 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
+import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAction
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.EOSTransactionUtils
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
 import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
 import io.goldstone.blockchain.kernel.network.eos.contract.EOSTransactionInterface
 import org.json.JSONArray
@@ -45,7 +47,7 @@ class EOSContractCaller(
 	)
 
 	constructor(action: JSONObject) : this(
-		EOSAuthorization(action.safeGet("actor"), EOSActor.Active),
+		EOSAuthorization(action.safeGet("actor"), EOSActor.getActorByValue(action.safeGet("permission"))),
 		EOSCodeName(action.safeGet("code")),
 		EOSTransactionMethod(action.safeGet("method")),
 		ChainID(action.safeGet("chainID")),
@@ -75,20 +77,27 @@ class EOSContractCaller(
 						allNames.remove("username")
 						allNames.add("username")
 					}
-					dataCode =
-						allNames.map { name ->
-							val value = coreObject.get(name)
-							when {
-								value is Int ->
-									EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
-								// `BetDice` 的领取彩票需要对这个他们自定义的字段做特殊变异处理, 这里写了定制的枚举方法.
-								name.equals("extendedSymbol", true) ->
-									EOSUtils.toLittleEndian(BigInteger(value.toString()).toString(16))
-								else -> EOSUtils.getLittleEndianCode(value.toString())
+					dataCode = allNames.map { name ->
+						val value = coreObject.get(name)
+						when {
+							value is Int ->
+								EOSUtils.convertAmountToCode(BigInteger.valueOf(value.toLong()))
+							// `BetDice` 的领取彩票需要对这个他们自定义的字段做特殊变异处理, 这里写了定制的枚举方法.
+							name.equals("extendedSymbol", true) ->
+								EOSUtils.toLittleEndian(BigInteger(value.toString()).toString(16))
+							else -> {
+								// 如果是 `AccountName` 的话用 特殊的编码方式, 否则只是 `16` 进制 `Hex`
+								if (EOSAccount(value.toString()).isValid(false))
+									EOSUtils.getLittleEndianCode(value.toString())
+								else value.toString().toCryptHexString()
 							}
-						}.joinToString("") { it }
+						}
+					}.joinToString("") { it }
 				} else {
-					dataCode = EOSUtils.getLittleEndianCode(data)
+					// 如果是 `AccountName` 的话用 特殊的编码方式, 否则只是 `16` 进制 `Hex`
+					dataCode = if (EOSAccount(data).isValid(false))
+						EOSUtils.getLittleEndianCode(data)
+					else EOSUtils.convertMemoToCode(data)
 				}
 				val action = EOSAction(
 					code,
