@@ -607,6 +607,9 @@ interface WalletDao {
 
 	@Query("SELECT * FROM wallet WHERE currentETHSeriesAddress LIKE :address OR currentEOSAddress LIKE :address OR currentBCHAddress LIKE :address OR currentLTCAddress LIKE :address OR currentBTCAddress LIKE :address OR currentBTCSeriesTestAddress LIKE :address")
 	fun getWalletByAddress(address: String): WalletTable?
+	
+	@Query("SELECT * FROM wallet where id = :id")
+	fun getWalletByID(id: Int): WalletTable?
 
 	@Query("SELECT eosAccountNames FROM wallet")
 	fun getEOSAccountNames(): List<String>

@@ -4,7 +4,7 @@ package io.goldstone.blockchain.common.sandbox
 
 import android.content.Context
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blockchain.GoldStoneApp
@@ -66,9 +66,8 @@ object SandBoxManager {
 		recoveryCurrency()
 		recoveryExchangeSelectedStatus()
 		recoveryQuotationSelections {
-			recoveryWalletTables(context) {
-				callback()
-			}
+			recoveryWallet(context, callback)
+			
 		}
 	}
 
@@ -168,7 +167,30 @@ object SandBoxManager {
 		} else callback()
 	}
 	
-	private fun recoveryWalletTables(context: Context, callback: () -> Unit) {
+	private fun recoveryWallet(context: Context, callback: () -> Unit) {
+		recoveryWalletTables(context) { finalWalletId ->
+			if (finalWalletId.isNull()) {
+				WalletTable.getAll {
+					if (isNotEmpty()) WalletTable.dao.update(this[0].apply { isUsing = true })
+					callback()
+				}
+			} else {
+				WalletTable.dao.getWalletByID(finalWalletId).apply {
+					if (this.isNull()) {
+						WalletTable.getAll {
+							if (isNotEmpty()) WalletTable.dao.update(this[0].apply { isUsing = true })
+							callback()
+						}
+					} else {
+						WalletTable.dao.update(this.apply { isUsing = true })
+						callback()
+					}
+				}
+			}
+		}
+	}
+	
+	private fun recoveryWalletTables(context: Context, callback: (lastWalletID: Int?) -> Unit) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
 		val pairList = arrayListOf<WalletModel>()
 		pairList.apply {
@@ -189,21 +211,21 @@ object SandBoxManager {
 						// 观察钱包
 						recoveryWatchOnlyWallet(it) {
 							walletCount.getAndDecrement()
-							if (walletCount.get() ==0) callback()
+							if (walletCount.get() == 0) callback(null)
 						}
 					}
 					!it.encryptMnemonic.isNullOrEmpty() -> {
 						// 助记词钱包
-						recoveryMnemonicWallet(context, it) {
+						recoveryMnemonicWallet(context, it) { isSuccess ->
 							walletCount.getAndDecrement()
-							if (walletCount.get() ==0) callback()
+							if (walletCount.get() == 0) callback(if (isSuccess) it.id else null)
 						}
 					}
 					else -> {
 						// keystore 钱包
-						recoveryKeystoreWallet(context, it) {
+						recoveryKeystoreWallet(context, it) { isSuccess ->
 							walletCount.getAndDecrement()
-							if (walletCount.get() ==0) callback()
+							if (walletCount.get() == 0) callback(if (isSuccess) it.id else null)
 						}
 					}
 				}

@@ -25,7 +25,6 @@ class WalletModel(
 	val ltcPath: String,
 	val bchPath: String,
 	val eosPath: String,
-	val isUsing: Boolean,
 	val hint: String? = null,
 	val isWatchOnly: Boolean = false,
 	val encryptMnemonic: String? = null,
@@ -51,7 +50,6 @@ class WalletModel(
 		jsonObject.safeGet("ltcPath"),
 		jsonObject.safeGet("bchPath"),
 		jsonObject.safeGet("eosPath"),
-		jsonObject.safeGet("isUsing").toBoolean(),
 		jsonObject.safeGet("hint"),
 		jsonObject.safeGet("isWatchOnly").toBoolean(),
 		jsonObject.safeGet("encryptMnemonic"),
@@ -78,12 +76,17 @@ class WalletModel(
 		walletTable.ltcPath,
 		walletTable.bchPath,
 		walletTable.eosPath,
-		walletTable.isUsing,
 		walletTable.hint,
 		walletTable.isWatchOnly,
 		walletTable.encryptMnemonic,
 		walletTable.encryptFingerPrinterKey,
 		walletTable.currentEOSAccountName,
-		walletTable.hasBackUpMnemonic
+		walletTable.hasBackUpMnemonic,
+		currentETHSeriesAddress = walletTable.currentETHSeriesAddress,
+		currentETCAddress = walletTable.currentETCAddress,
+		currentBTCAddress = walletTable.currentBTCAddress,
+		currentLTCAddress = walletTable.currentLTCAddress,
+		currentBCHAddress = walletTable.currentBCHAddress,
+		currentEOSAddress = walletTable.currentEOSAddress
 	)
 }
