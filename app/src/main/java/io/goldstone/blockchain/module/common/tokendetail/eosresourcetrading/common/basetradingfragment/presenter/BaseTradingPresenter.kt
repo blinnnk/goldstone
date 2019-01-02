@@ -74,8 +74,8 @@ open class BaseTradingPresenter(
 				else -> with(fragment) {
 					stakeResource(
 						context!!,
-						fragment.getInputValue(StakeType.Delegate).first,
-						fragment.getInputValue(StakeType.Delegate).second,
+						getInputValue(StakeType.Delegate).first,
+						getInputValue(StakeType.Delegate).second,
 						tradingType,
 						StakeType.Delegate,
 						isTransfer(StakeType.Delegate),

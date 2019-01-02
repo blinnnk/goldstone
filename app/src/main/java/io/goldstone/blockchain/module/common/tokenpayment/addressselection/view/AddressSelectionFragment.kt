@@ -197,7 +197,6 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 			if (isFromQuickTransfer) {
 				presenter.removeSelfFromActivity()
 			} else {
-				headerTitle = TokenDetailText.tokenDetail
 				presenter.popFragmentFrom<AddressSelectionFragment>()
 			}
 		}

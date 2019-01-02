@@ -50,10 +50,10 @@ class EOSAccountCell(context: Context) : GrayCardView(context) {
 	}
 
 	@SuppressLint("SetTextI18n")
-	fun setAccountInfo(name: String, authorization: String) {
+	fun setAccountInfo(name: String, authorization: String, isSinglePermission: Boolean) {
 		info.title.text = "${ImportWalletText.eosAccountName}: $name"
 		val permission =
-			if (authorization.equals(EOSActor.Owner.value, true)) EOSActor.Owner.value + "/" + EOSActor.Active.value
+			if (!isSinglePermission) EOSActor.Owner.value + "/" + EOSActor.Active.value
 			else authorization
 		val wholeString = "${EOSAccountText.authorization}: $permission"
 		info.subtitle.text = CustomTargetTextStyle(

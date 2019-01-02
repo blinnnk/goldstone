@@ -310,6 +310,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 							createChildAddressByButtonTitle(it.chainType) { addresses ->
 								launchUI {
 									updateUI(addresses, it.chainType)
+									toast(CommonText.succeed)
 								}
 							}
 						} else safeShowError(error)
@@ -329,27 +330,16 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				AddressManagerPresenter.createETHSeriesAddress(hold)
 			chainType.isETC() ->
 				AddressManagerPresenter.createETCAddress(hold)
-
 			chainType.isEOS() ->
 				AddressManagerPresenter.createEOSAddress(hold)
-
-			chainType.isLTC() -> {
-				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(hold)
-				else AddressManagerPresenter.createLTCAddress(hold)
-			}
-
-			chainType.isBCH() -> {
-				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(hold)
-				else AddressManagerPresenter.createBCHAddress(hold)
-			}
-
-			chainType.isBTC() -> {
-				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(hold)
-				else AddressManagerPresenter.createBTCAddress(hold)
-			}
+			SharedValue.isTestEnvironment() && chainType.isBTCSeries() ->
+				AddressManagerPresenter.createBTCTestAddress(hold)
+			chainType.isLTC() ->
+				AddressManagerPresenter.createLTCAddress(hold)
+			chainType.isBCH() ->
+				AddressManagerPresenter.createBCHAddress(hold)
+			chainType.isBTC() ->
+				AddressManagerPresenter.createBTCAddress(hold)
 		}
 	}
 
@@ -358,14 +348,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			chainType.isETH() -> ethSeriesView.model = addresses
 			chainType.isETC() -> etcAddressesView.model = addresses
 			chainType.isEOS() -> eosAddressesView.model = addresses
-			chainType.isLTC() -> {
-				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
-				else ltcAddressesView.model = addresses
-			}
-			chainType.isBCH() -> {
-				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
-				else bchAddressesView.model = addresses
-			}
+			SharedValue.isTestEnvironment() && chainType.isBTCSeries() ->
+				btcAddressesView.model = addresses
+			chainType.isLTC() -> ltcAddressesView.model = addresses
+			chainType.isBCH() -> bchAddressesView.model = addresses
 			chainType.isBTC() -> btcAddressesView.model = addresses
 		}
 	}

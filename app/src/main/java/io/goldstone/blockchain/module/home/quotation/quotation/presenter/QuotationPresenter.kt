@@ -24,6 +24,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationrank.view.QuotationRankFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -179,6 +180,12 @@ class QuotationPresenter(
 	fun showQuotationManagement() {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 			putString(ArgumentKey.quotationOverlayTitle, QuotationText.management)
+		}
+	}
+
+	fun showQuotationRankFragment() {
+		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+			putString(ArgumentKey.quotationOverlayTitle, QuotationText.rank)
 		}
 	}
 

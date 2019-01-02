@@ -8,7 +8,5 @@ import io.goldstone.blockchain.module.home.dapp.dappbrowser.contract.DAppBrowser
  * @date  2018/11/29
  */
 class DAppBrowserPresenter : DAppBrowserContract.GSPresenter {
-	override fun start() {
-
-	}
+	override fun start() {}
 }

@@ -3,10 +3,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import com.blinnnk.extension.alignParentRight
-import com.blinnnk.extension.centerInParent
-import com.blinnnk.extension.centerInVertical
-import com.blinnnk.extension.into
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.SliderHeader
@@ -54,7 +51,6 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 		balance.apply {
 			setBigWhiteStyle(18)
 			title.y += 2.uiPX()
-			subtitle.text = setBalanceInfo()
 			isCenter = true
 			visibility = View.GONE
 			y = 5.uiPX().toFloat()
@@ -82,13 +78,14 @@ class WalletSlideHeader(context: Context) : SliderHeader(context) {
 
 	private fun setBalanceValue(value: String) {
 		balance.title.text = value
+		balance.subtitle.text = setBalanceInfo()
 	}
 
 	companion object {
 		fun setBalanceInfo(): String {
 			val watchOnlyPrefix = if (SharedWallet.isWatchOnlyWallet()) WalletText.watchOnly + " · " else ""
 			return watchOnlyPrefix + if (!SharedValue.isTestEnvironment()) {
-				WalletText.totalAssets + " " + SharedWallet.getCurrencyCode()
+				WalletText.totalAssets suffix  SharedWallet.getCurrencyCode()
 			} else {
 				ChainText.testnet + " · " + WalletText.totalAssets + " (" + SharedWallet.getCurrencyCode() + ")"
 			}

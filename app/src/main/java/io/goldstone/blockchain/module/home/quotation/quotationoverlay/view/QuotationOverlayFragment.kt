@@ -28,6 +28,7 @@ class QuotationOverlayFragment : BaseOverlayFragment<QuotationOverlayPresenter>(
 					presenter.showQuotationSearchFragment()
 				}
 			}
+			QuotationText.rank -> presenter.showQuotationRankFragment()
 			else -> presenter.showMarketTokenCenter(currencyInfo)
 		}
 
