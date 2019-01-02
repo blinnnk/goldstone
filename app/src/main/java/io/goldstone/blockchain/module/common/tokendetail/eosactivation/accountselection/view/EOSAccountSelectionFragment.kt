@@ -42,15 +42,15 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 	private lateinit var loadingView: LinearLayout
 	private var defaultIndex: Int? = null
 
-	private var accountActors: List<AccountActor> by observing(listOf()) {
+	private var accountActors: List<Pair<AccountActor, Boolean>> by observing(listOf()) {
 		accountActors.forEachIndexed { index, actor ->
 			EOSAccountCell(container.context).apply {
 				id = index // for clearing radio checked status
-				if (actor.name == defaultActorName && defaultIndex.isNull()) {
+				if (actor.first.name == defaultActorName && defaultIndex.isNull()) {
 					setRadioStatus(true)
 					defaultIndex = index
 				}
-				setAccountInfo(actor.name, actor.permission.value)
+				setAccountInfo(actor.first.name, actor.first.permission.value, actor.second)
 			}.click {
 				clearRadiosStatus(accountActors.size)
 				it.setRadioStatus(true)
@@ -112,7 +112,7 @@ class EOSAccountSelectionFragment : BaseFragment<EOSAccountSelectionPresenter>()
 		}
 	}
 
-	fun setAccountNameList(actors: List<AccountActor>) {
+	fun setAccountNameList(actors: List<Pair<AccountActor, Boolean>>) {
 		accountActors = actors
 	}
 

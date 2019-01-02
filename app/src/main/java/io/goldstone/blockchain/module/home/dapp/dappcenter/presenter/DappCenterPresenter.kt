@@ -23,7 +23,7 @@ class DAppCenterPresenter(
 		setDAPPRecommendData()
 		setNewDAPP()
 		setUsedDAPPs()
-		getRecommendDappCount()
+		setRecommendDAPPCount()
 	}
 
 	override fun setUsedDAPPs() {
@@ -34,7 +34,7 @@ class DAppCenterPresenter(
 		}
 	}
 
-	private fun getRecommendDappCount() {
+	private fun setRecommendDAPPCount() {
 		load { DAPPTable.dao.getRecommendedCount() } then {
 			dappView.showRecommendedSession(it)
 		}

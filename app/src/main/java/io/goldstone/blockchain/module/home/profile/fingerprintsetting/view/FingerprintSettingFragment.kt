@@ -22,6 +22,7 @@ import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.cell.switchCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
+import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.FingerprintPaymentText
 import io.goldstone.blockchain.common.language.ProfileText
@@ -129,6 +130,9 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 
 	private fun updateButtonStatus() {
 		when {
+			SharedWallet.isWatchOnlyWallet() -> switchCell.clickEvent = Runnable {
+				showError(Throwable(AlertText.watchOnly))
+			}
 			fingerprintManager.checker().isValid() -> {
 				with(switchCell) {
 					setTitle(FingerprintPaymentText.buttonStatusUnset)
@@ -146,6 +150,11 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 							) { passwordInput ->
 								// 校验 `Keystore` 密码来验证身份
 								val password = passwordInput?.text.toString()
+								if (password.isEmpty()) {
+									dismiss()
+									showError(Throwable("Please enter your password to unlock keystore"))
+									return@showAlertView
+								}
 								// 如果是 `Bip44` 钱包返回 `mnemonic` 如果是多链钱包返回 `root private key`
 								presenter.getSecret(password) { secret, error ->
 									launchUI {

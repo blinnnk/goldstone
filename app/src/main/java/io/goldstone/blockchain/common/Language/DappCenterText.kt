@@ -18,7 +18,7 @@ object DappCenterText {
 	}
 	@JvmField
 	val recommendDapp = when (currentLanguage) {
-		HoneyLanguage.English.code->"RECOMMENDED DAPPs"
+		HoneyLanguage.English.code->"Recommended DAPP"
 		HoneyLanguage.Chinese.code->"推荐应用"
 		HoneyLanguage.Japanese.code->"推奨アプリケーション"
 		HoneyLanguage.Korean.code->"추천 응용 프로그램"

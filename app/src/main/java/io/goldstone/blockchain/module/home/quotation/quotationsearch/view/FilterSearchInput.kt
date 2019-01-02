@@ -68,6 +68,7 @@ class FilterSearchInput(context: Context) : LinearLayout(context) {
 			addCorner(5.uiPX(), Spectrum.white)
 			addView(filterIcon)
 			editText = editText {
+				layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
 				singleLine = true
 				imeOptions = EditorInfo.IME_ACTION_SEARCH
 				inputType = InputType.TYPE_CLASS_TEXT

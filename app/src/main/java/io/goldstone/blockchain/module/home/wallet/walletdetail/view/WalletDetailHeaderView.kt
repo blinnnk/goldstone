@@ -91,6 +91,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.lparams(matchParent, matchParent)
 		}.apply {
+			y += 15.uiPX()
 			centerInParent()
 		}
 

@@ -49,7 +49,7 @@ import java.util.*
 class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), WalletDetailContract.GSView {
 
 	override val pageTitle: String = "Wallet Detail"
-	private val slideHeader by lazy { WalletSlideHeader(context!!) }
+	private lateinit var slideHeader: WalletSlideHeader
 	private var headerView: WalletDetailHeaderView? = null
 	override lateinit var presenter: WalletDetailContract.GSPresenter
 	/**
@@ -61,8 +61,9 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
 		presenter = WalletDetailPresenter(this)
+		slideHeader = WalletSlideHeader(context!!)
 		wrapper.addView(slideHeader)
-		slideHeader.apply {
+		with(slideHeader) {
 			notifyButton.click {
 				showNotificationListFragment()
 			}

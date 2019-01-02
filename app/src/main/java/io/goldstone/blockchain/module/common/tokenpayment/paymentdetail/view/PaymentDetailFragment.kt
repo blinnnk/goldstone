@@ -308,12 +308,11 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			memoInputView = MemoInputView(context).apply {
 				setMemoContent(content)
 				updateConfirmButtonEvent { button ->
-					button.onClick {
+					button.click {
 						if (isValidMemoByChain(isEOSTransfer)) {
 							removeMemoInputView()
 							hold(getMemoContent())
 						} else context.toast(PrepareTransferText.invalidEOSMemoSize)
-						button.preventDuplicateClicks()
 					}
 				}
 			}

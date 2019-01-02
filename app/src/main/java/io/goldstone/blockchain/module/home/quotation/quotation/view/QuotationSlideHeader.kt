@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 
 import android.content.Context
 import android.widget.TextView
-import com.blinnnk.animation.updateOriginYAnimation
+import com.blinnnk.extension.alignParentRight
 import com.blinnnk.extension.centerInParent
 import com.blinnnk.extension.centerInVertical
 import com.blinnnk.extension.into
@@ -23,18 +23,28 @@ import org.jetbrains.anko.textColor
  */
 class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 
-	val addTokenButton=  CircleButton(context)
+	val addTokenButton = CircleButton(context)
+	val rankButton = CircleButton(context)
 	private val title = TextView(context)
 
 	init {
 		addTokenButton.apply {
 			title = QuotationText.addToken
 			src = R.drawable.add_token_icon
+			x -= PaddingSize.device
+			y = 18.uiPX().toFloat()
+		}.into(this)
+
+		rankButton.apply {
+			title = QuotationText.rankToken
+			src = R.drawable.rank_icon
 			x += PaddingSize.device
 			y = 18.uiPX().toFloat()
 		}.into(this)
 
+		rankButton.centerInVertical()
 		addTokenButton.centerInVertical()
+		addTokenButton.alignParentRight()
 
 		title.apply {
 			text = QuotationText.market

@@ -10,6 +10,7 @@ import io.goldstone.blockchain.module.home.quotation.markettokencenter.view.Mark
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotationmanagement.view.QuotationManagementFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationrank.view.QuotationRankFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.view.QuotationSearchFragment
 
 /**
@@ -22,6 +23,10 @@ class QuotationOverlayPresenter(
 
 	fun showQuotationManagementFragment() {
 		fragment.addFragmentAndSetArgument<QuotationManagementFragment>(ContainerID.content)
+	}
+
+	fun showQuotationRankFragment() {
+		fragment.addFragmentAndSetArgument<QuotationRankFragment>(ContainerID.content)
 	}
 
 	fun showMarketTokenCenter(model: QuotationModel?) {
