@@ -17,7 +17,6 @@ import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.profile.profile.model.ProfileModel
 import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
-import io.goldstone.blockchain.module.home.quotation.rank.view.CoinRankFragment
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
@@ -52,11 +51,6 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 							presenter.showTargetFragment(model.title)
 							preventDuplicateClicks()
 						} else safeShowError(AccountError.inactiveEosKeyCannotRegister)
-					}
-					model.title.equals("rank", true) -> onClick {
-						activity?.apply {
-							addFragmentAndSetArguments<CoinRankFragment>(ContainerID.content, "")
-						}
 					}
 					else -> onClick {
 						presenter.showTargetFragment(model.title)

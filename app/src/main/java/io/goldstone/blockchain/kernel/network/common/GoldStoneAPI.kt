@@ -25,18 +25,17 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationGlobalModel
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
-import io.goldstone.blockchain.module.home.quotation.rank.model.CoinGlobalModel
-import io.goldstone.blockchain.module.home.quotation.rank.model.CoinRankModel
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenSearch.model.TokenSearchModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
-import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -532,7 +531,7 @@ object GoldStoneAPI {
 		)
 	}
 	
-	fun getGlobalData(@WorkerThread hold: (model: CoinGlobalModel?, error: RequestError) -> Unit) {
+	fun getGlobalData(@WorkerThread hold: (model: QuotationGlobalModel?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.coinGlobalData(APIPath.currentUrl),
 			"",
@@ -540,7 +539,7 @@ object GoldStoneAPI {
 			 isEncrypt = true
 		) { result, error ->
 			if (result?.firstOrNull() != null && error.isNone()) {
-				val type =  object : TypeToken<CoinGlobalModel>() {}.type
+				val type =  object : TypeToken<QuotationGlobalModel>() {}.type
 				hold(
 					Gson().fromJson(result.first(), type),
 					error
@@ -549,7 +548,7 @@ object GoldStoneAPI {
 		}
 	}
 	
-	fun getCoinRank(rank: Int, @WorkerThread hold: (data: List<CoinRankModel>?, error: RequestError) -> Unit) {
+	fun getQuotationRank(rank: Int, @WorkerThread hold: (data: List<QuotationRankTable>?, error: RequestError) -> Unit) {
 		requestData(
 			APIPath.coinRank(APIPath.currentUrl, rank, 20),
 			"list",

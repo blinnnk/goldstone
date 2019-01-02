@@ -1,13 +1,16 @@
-package io.goldstone.blockchain.module.home.quotation.rank.model
+package io.goldstone.blockchain.module.home.quotation.quotationrank.model
 
+import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+
 /**
- * @date: 2018-12-12.
- * @author: yangLiHai
- * @description:
+ * @author KaySaith
+ * @date  2019/01/02
  */
-class CoinRankModel(
+data class QuotationRankTable(
+	@PrimaryKey(autoGenerate = true)
+	val id: Int,
 	@SerializedName("id_name")
 	val idName: String,
 	@SerializedName("market_cap")
