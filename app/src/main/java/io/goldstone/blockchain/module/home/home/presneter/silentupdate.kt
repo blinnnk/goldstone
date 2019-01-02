@@ -34,6 +34,7 @@ import io.goldstone.blockchain.kernel.network.ethereum.EtherScanApi
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.tokenasset.presenter.TokenAssetPresenter
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
@@ -70,7 +71,8 @@ abstract class SilentUpdater {
 												 hasNewShareContent,
 												 hasNewRecommendedDAPP,
 												 hasNewDAPP,
-												 hasNewDAPPJSCode ->
+												 hasNewDAPPJSCode,
+				                 hasNewQuotationRank ->
 				fun updateData() {
 					if (hasNewDefaultTokens) updateLocalDefaultTokens()
 					if (hasNewChainNodes) updateNodeData()
@@ -81,6 +83,7 @@ abstract class SilentUpdater {
 					if (hasNewRecommendedDAPP) updateRecommendedDAPP {}
 					if (hasNewDAPP) updateNewDAPP {}
 					if (hasNewDAPPJSCode) updateDAPPJSCode()
+					if (hasNewQuotationRank) updateQuotationRank()
 					// 确认后更新 MD5 值到数据库
 					AppConfigTable.dao.updateMD5Info(
 						newDefaultTokenListMD5,
@@ -91,7 +94,8 @@ abstract class SilentUpdater {
 						newShareContentMD5,
 						newRecommendedDAPPMD5,
 						newDAPPMD5,
-						newDAPPJSCode
+						newDAPPJSCode,
+						newQuotationRankMd5
 					)
 				}
 				when {
@@ -130,6 +134,7 @@ abstract class SilentUpdater {
 	private var newRecommendedDAPPMD5 = ""
 	private var newDAPPMD5 = ""
 	private var newDAPPJSCode = ""
+	private var newQuotationRankMd5 = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -141,7 +146,8 @@ abstract class SilentUpdater {
 			hasNewShareContent: Boolean,
 			hasNewRecommendedDAPP: Boolean,
 			hasNewDAPP: Boolean,
-			hasNewDAPPCode: Boolean
+			hasNewDAPPCode: Boolean,
+			hasNewQuotationRank: Boolean
 		) -> Unit
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
@@ -155,6 +161,7 @@ abstract class SilentUpdater {
 				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
 				newDAPPMD5 = md5s.safeGet("dapps_md5")
 				newDAPPJSCode = md5s.safeGet("get_js_md5")
+				newQuotationRankMd5 = md5s.safeGet("/market/coinRank_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
@@ -164,7 +171,8 @@ abstract class SilentUpdater {
 					config.shareContentMD5 != newShareContentMD5,
 					config.dappRecommendMD5 != newRecommendedDAPPMD5,
 					config.newDAPPMD5 != newDAPPMD5,
-					config.dappJSCodeMD5 != newDAPPJSCode
+					config.dappJSCodeMD5 != newDAPPJSCode,
+					config.quotationRankMd5 != newQuotationRankMd5
 				)
 			}
 		}
@@ -508,6 +516,15 @@ abstract class SilentUpdater {
 				AppConfigTable.dao.updateJSCode(code)
 				SharedValue.updateJSCode(code)
 			} else ErrorDisplayManager(error)
+		}
+	}
+	
+	private fun updateQuotationRank() {
+		GoldStoneAPI.getQuotationRank(0) { data, error ->
+			if (!data.isNullOrEmpty() && error.isNone()) {
+				QuotationRankTable.dao.clearTable()
+				QuotationRankTable.dao.insertAll(data)
+			}
 		}
 	}
 

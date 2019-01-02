@@ -1,13 +1,15 @@
 package io.goldstone.blockchain.module.home.quotation.quotationrank.model
 
-import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.*
 import com.google.gson.annotations.SerializedName
+import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 
 
 /**
  * @author KaySaith
  * @date  2019/01/02
  */
+@Entity(tableName = "quotationRank")
 data class QuotationRankTable(
 	@PrimaryKey(autoGenerate = true)
 	val id: Int,
@@ -23,5 +25,24 @@ data class QuotationRankTable(
 	val price: Float,
 	val rank: Int,
 	val icon: String,
-	val volume: String
-)
+	val volume: String,
+	val address: String
+) {
+	companion object {
+		@JvmField
+		val dao = GoldStoneDataBase.database.quotationRankDao()
+	}
+}
+
+@Dao
+interface QuotationRankDao {
+	@Insert
+	fun insertAll(rankList: List<QuotationRankTable>)
+	
+	@Query("SELECT * FROM quotationRank")
+	fun getAll(): List<QuotationRankTable>
+	
+	@Query("delete from quotationRank")
+	fun clearTable()
+	
+}

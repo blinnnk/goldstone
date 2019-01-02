@@ -49,7 +49,8 @@ data class AppConfigTable(
 	var shareContentMD5: String,
 	var dappRecommendMD5: String,
 	var newDAPPMD5: String,
-	var dappJSCodeMD5: String
+	var dappJSCodeMD5: String,
+	var quotationRankMd5: String
 ) {
 
 	companion object {
@@ -87,7 +88,8 @@ data class AppConfigTable(
 				shareContentMD5 = "",
 				dappRecommendMD5 = "",
 				newDAPPMD5 = "",
-				dappJSCodeMD5 = ""
+				dappJSCodeMD5 = "",
+				quotationRankMd5 = ""
 			)
 			dao.insert(config)
 			callback(config)
@@ -120,7 +122,7 @@ interface AppConfigDao {
 	@Query("UPDATE appConfig SET currencyCode = :currencyCode WHERE id = 1")
 	fun updateCurrency(currencyCode: String)
 
-	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5, dappRecommendMD5 = :dappRecommendMD5, newDAPPMD5 = :newDAPPMD5, dappJSCodeMD5 =:dappJSCode  WHERE id = 1")
+	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5, dappRecommendMD5 = :dappRecommendMD5, newDAPPMD5 = :newDAPPMD5, dappJSCodeMD5 =:dappJSCode, quotationRankMd5 = :quotationRankMd5  WHERE id = 1")
 	fun updateMD5Info(
 		defaultCoinListMD5: String,
 		nodeListMD5: String,
@@ -130,7 +132,8 @@ interface AppConfigDao {
 		shareContentMD5: String,
 		dappRecommendMD5: String,
 		newDAPPMD5: String,
-		dappJSCode: String
+		dappJSCode: String,
+		quotationRankMd5: String
 	)
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")

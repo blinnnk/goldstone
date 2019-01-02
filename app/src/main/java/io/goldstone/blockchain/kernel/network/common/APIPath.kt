@@ -43,7 +43,7 @@ object APIPath {
 	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
-	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
+	val getMD5Info: (header: String, coinSize: Int) -> String = { header, size ->"$header/index/md5Info?coin_rank_size=$size" }
 	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
 		"$header/eos/tokenHistory?chainid=$chainID&account=$account"
 	}

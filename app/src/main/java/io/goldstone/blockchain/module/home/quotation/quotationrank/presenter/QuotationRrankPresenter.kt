@@ -2,9 +2,11 @@ package io.goldstone.blockchain.module.home.quotation.quotationrank.presenter
 
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.quotation.quotationrank.contract.QuotationRankContract
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import java.math.BigDecimal
 
 
@@ -34,6 +36,19 @@ class QuotationRankPresenter(
 		}
 	}
 	
+	private fun getFirstPage(callback: () -> Unit) {
+		launchDefault {
+			val quotationRankData = QuotationRankTable.dao.getAll()
+			if (quotationRankData.isNotEmpty()) {
+				lastRank = quotationRankData[quotationRankData.lastIndex].rank
+				launchUI {
+					gsView.showListData(true, quotationRankData)
+					callback()
+				}
+			}
+		}
+	}
+	
 	private fun getNextPage(callback: () -> Unit) {
 		GoldStoneAPI.getQuotationRank(lastRank) { data, error ->
 			launchUI {
@@ -56,7 +71,7 @@ class QuotationRankPresenter(
 	override fun loadFirstPage() {
 		gsView.showLoadingView(true)
 		lastRank = 0
-		getNextPage {
+		getFirstPage {
 			gsView.showLoadingView(false)
 		}
 	}
