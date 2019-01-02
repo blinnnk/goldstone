@@ -23,7 +23,7 @@ class ProfileAdapter(
 		}
 
 	override fun generateHeader(context: Context) = View(context).apply {
-		layoutParams = LinearLayout.LayoutParams(matchParent, 90.uiPX())
+		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 	}
 
 	override fun generateCell(context: Context) = ProfileCell(context)

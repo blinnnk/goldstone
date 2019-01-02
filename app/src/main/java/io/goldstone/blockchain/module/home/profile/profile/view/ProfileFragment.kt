@@ -51,7 +51,7 @@ class ProfileFragment : BaseRecyclerFragment<ProfilePresenter, ProfileModel>() {
 						if (SharedAddress.getCurrentEOSAccount().isValid()) {
 							presenter.showTargetFragment(model.title)
 							preventDuplicateClicks()
-						} else safeShowError(AccountError.InactivatedAccountName)
+						} else safeShowError(AccountError.inactiveEosKeyCannotRegister)
 					}
 					model.title.equals("rank", true) -> onClick {
 						activity?.apply {

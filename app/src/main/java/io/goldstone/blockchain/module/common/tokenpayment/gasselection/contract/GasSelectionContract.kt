@@ -29,11 +29,12 @@ interface GasSelectionContract {
 	}
 
 	interface GSPresenter : GoldStonePresenter {
+		var currentFee: GasFee
 		fun checkIsValidTransfer(@WorkerThread callback: (GoldStoneError) -> Unit)
 		fun addCustomFeeCell()
 		fun transfer(
 			contract: TokenContract,
-			password: String,
+			privateKey: String,
 			paymentModel: Serializable,
 			gasFee: GasFee,
 			@WorkerThread callback: (receiptModel: ReceiptModel?, error: GoldStoneError) -> Unit

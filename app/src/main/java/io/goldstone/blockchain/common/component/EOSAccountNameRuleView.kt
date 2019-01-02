@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.EOSAccountText
+import io.goldstone.blockchain.common.language.FingerprintPaymentText
 import io.goldstone.blockchain.common.language.ImportWalletText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.ElementID
@@ -33,6 +34,11 @@ class DescriptionView(context: Context) : TextView(context) {
 
 	fun isNameRule(): DescriptionView {
 		text = EOSAccountText.activateForFriendHint
+		return this
+	}
+
+	fun isFingerprint(): DescriptionView {
+		text = FingerprintPaymentText.featureDescription
 		return this
 	}
 

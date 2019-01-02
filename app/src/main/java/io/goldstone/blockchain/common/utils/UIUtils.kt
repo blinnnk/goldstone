@@ -24,7 +24,6 @@ import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.value.DeviceName
 import io.goldstone.blockchain.common.value.Spectrum
 import java.text.SimpleDateFormat
-import java.util.*
 
 
 /**
@@ -93,22 +92,6 @@ object TimeUtils {
 		val simpleDateFormat = SimpleDateFormat("M-d HH:mm")
 		return simpleDateFormat.format(java.util.Date(date))
 	}
-
-	@SuppressLint("SimpleDateFormat")
-	fun getUtcTime(time: Long): Long {
-		val calendar = Calendar.getInstance()
-		calendar.timeInMillis = time
-		val timezone = calendar.timeZone
-		var offset = timezone.rawOffset
-		if (timezone.inDaylightTime(Date())) {
-			offset += timezone.dstSavings
-		}
-		val offsetHours = offset / 1000 / 60 / 60
-		val offsetMinutes = offset / 1000 / 60 % 60
-		calendar.add(Calendar.HOUR_OF_DAY, -offsetHours)
-		calendar.add(Calendar.MINUTE, -offsetMinutes)
-		return calendar.time.time
-	}
 }
 
 fun Long.toMillisecond(): Long {
@@ -120,7 +103,7 @@ fun Activity.transparentStatus() {
 		try {
 			packageManager.hasSystemFeature("com.oppo.feature.screen.heteromorphism")
 		} catch (error: Exception) {
-			LogUtil.error("hasSystemFeature", error)
+			Log.e("hasSystemFeature", error.message)
 			false
 		},
 		hasNotchInScreen(),
@@ -166,7 +149,7 @@ private fun Activity.detectNotchScreenInAndroidP(): Boolean? {
 		try {
 			View(this).rootWindowInsets.displayCutout?.safeInsetTop ?: 0 > 30.uiPX()
 		} catch (error: Exception) {
-			LogUtil.error("detectNotchScreenInAndroidP", error)
+			Log.e("detectNotch", error.message)
 			null
 		}
 	} else {

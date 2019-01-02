@@ -39,7 +39,7 @@ class EOSAccountSelectionPresenter(
 
 	private fun getNewAccountNameFromChain(@WorkerThread hold: (newAccount: List<EOSAccountInfo>) -> Unit) {
 		EOSAPI.getAccountNameByPublicKey(SharedAddress.getCurrentEOS()) { accounts, error ->
-			val wallet = WalletTable.dao.findWhichIsUsing(true)
+			val wallet = WalletTable.dao.findWhichIsUsing()
 			if (accounts.isNotNull() && error.isNone()) hold(accounts)
 			else wallet?.eosAccountNames?.filter {
 				it.chainID.equals(SharedChain.getEOSCurrent().chainID.id, true) &&
@@ -53,7 +53,7 @@ class EOSAccountSelectionPresenter(
 		// 从链上重新拉取一次该公钥的对应的 AccountNames,
 		getNewAccountNameFromChain { allAccounts ->
 			val localAccounts =
-				EOSAccountTable.dao.getAccounts(allAccounts.map { it.name })
+				EOSAccountTable.dao.getAccounts(allAccounts.map { it.name }, SharedAddress.getCurrentEOS())
 			val actors = arrayListOf<AccountActor>().apply {
 				addAll(
 					localAccounts.map { localAccount ->
@@ -70,11 +70,7 @@ class EOSAccountSelectionPresenter(
 					}
 				}
 			if (notInLocalAccount.isEmpty()) launchUI {
-				val willRemoveData = actors - actors.distinctBy { it.name }
-				val finalData = actors.filterNot { data ->
-					willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
-				}
-				fragment.setAccountNameList(finalData)
+				fragment.setAccountNameList(getPermissions(actors))
 				fragment.showLoadingView(false)
 			} else object : ConcurrentAsyncCombine() {
 				override var asyncCount: Int = notInLocalAccount.size
@@ -91,16 +87,40 @@ class EOSAccountSelectionPresenter(
 				}
 
 				override fun mergeCallBack() {
-					// `Owner` 和 `Active` 同时存在的时候界面做去重显示
-					val willRemoveData = actors - actors.distinctBy { it.name }
-					val finalData = actors.filterNot { data ->
-						willRemoveData.any { it.name.equals(data.name, true) } && data.permission.isActive()
-					}
-					fragment.setAccountNameList(finalData)
+
+					fragment.setAccountNameList(getPermissions(actors))
 					fragment.showLoadingView(false)
 				}
 			}.start()
 		}
+	}
+
+	// `Owner` 和 `Active` 同时存在的时候界面做去重显示
+	// Boolean is Single Permission
+	private fun getPermissions(actors: List<AccountActor>): List<Pair<AccountActor, Boolean>> {
+		val finalData =
+			arrayListOf<Pair<AccountActor, Boolean>>()
+		val actorMap = actors.groupBy {
+			if (it.permission.isOwner()) EOSActor.Owner.value
+			else EOSActor.Active.value
+		}
+		val owners = actorMap[EOSActor.Owner.value]
+		val actives = actorMap[EOSActor.Active.value]
+		when {
+			owners.isNullOrEmpty() -> finalData.addAll(actives?.map { Pair(it, true) } ?: listOf())
+			actives.isNullOrEmpty() -> finalData.addAll(owners.map { Pair(it, true) })
+			else -> actors.forEach { actor ->
+				if (
+					owners.any { it.name.equals(actor.name, true) } &&
+					actives.any { it.name.equals(actor.name, true) }
+				) {
+					finalData.add(Pair(actor, false))
+				} else {
+					finalData.add(Pair(actor, true))
+				}
+			}
+		}
+		return finalData.distinctBy { it.first.name }
 	}
 
 	private fun getAccountActorByPublicKey(
@@ -111,7 +131,7 @@ class EOSAccountSelectionPresenter(
 			permission.requiredAuthorization.getKeys().asSequence().filter {
 				it.publicKey == SharedAddress.getCurrentEOS()
 			}.map {
-				AccountActor(name, EOSActor.getActorByValue(permission.permissionName)!!, it.weight)
+				AccountActor(name, EOSActor.getActorByValue(permission.permissionName), it.weight)
 			}.toList()
 		}.toList().flatten()
 	}

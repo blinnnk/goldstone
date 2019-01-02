@@ -2,13 +2,14 @@ package io.goldstone.blockchain.common.component
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.widget.LinearLayout
+import android.graphics.Color
 import android.widget.RelativeLayout
 import com.blinnnk.animation.updateAlphaAnimation
+import com.blinnnk.animation.updateColorAnimation
 import com.blinnnk.uikit.uiPX
-import com.github.mmin18.widget.RealtimeBlurView
-import io.goldstone.blockchain.common.value.HomeSize
+import io.goldstone.blockchain.common.value.ShadowSize
 import io.goldstone.blockchain.common.value.Spectrum
+import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.matchParent
 
 /**
@@ -19,26 +20,17 @@ import org.jetbrains.anko.matchParent
 @SuppressLint("SetTextI18n")
 open class SliderHeader(context: Context) : RelativeLayout(context) {
 
-  private val blurView by lazy { RealtimeBlurView(context, null) }
+	init {
+		layoutParams = RelativeLayout.LayoutParams(matchParent, 75.uiPX())
+		elevation = ShadowSize.Header
+	}
 
-  init {
-    layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+	open fun onHeaderShowedStyle() {
+		updateColorAnimation(Color.TRANSPARENT, Spectrum.deepBlue)
+	}
 
-    blurView.apply {
-        alpha = 0f
-        setOverlayColor(Spectrum.opacity8Green)
-        setBlurRadius(20.uiPX().toFloat())
-        layoutParams = LinearLayout.LayoutParams(matchParent, HomeSize.sliderHeaderHeight)
-      }
-    this.addView(blurView)
-  }
-
-  open fun onHeaderShowedStyle() {
-    blurView.updateAlphaAnimation(1f)
-  }
-
-  open fun onHeaderHidesStyle() {
-    blurView.updateAlphaAnimation(0f)
-  }
+	open fun onHeaderHidesStyle() {
+		updateColorAnimation(Spectrum.deepBlue, Color.TRANSPARENT)
+	}
 
 }

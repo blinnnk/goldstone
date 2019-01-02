@@ -10,6 +10,7 @@
 	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
 	<!-- 本地读写权限 -->
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.USE_FINGERPRINT" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<!-- 相机使用权限 -->
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -36,6 +37,7 @@
 		android:supportsRtl="true"
 		android:theme="@style/MainTheme"
 		android:usesCleartextTraffic="true"
+		android:windowSoftInputMode="adjustResize"
 		tools:ignore="GoogleAppIndexingWarning,RtlEnabled"
 		tools:replace="icon, label"
 		tools:targetApi="donut">
@@ -58,7 +60,8 @@
 			android:launchMode="singleTop"
 			android:screenOrientation="portrait"
 			android:theme="@style/MainTheme"
-			android:windowSoftInputMode="adjustPan" />
+			android:windowSoftInputMode="stateHidden|adjustResize"
+			android:windowTranslucentStatus="true" />
 
 		<!-- APP实现的Receiver，用于接收消息和结果反馈 -->
 		<receiver

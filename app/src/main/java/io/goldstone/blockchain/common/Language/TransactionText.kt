@@ -18,12 +18,12 @@ object TransactionText {
 	}
 	@JvmField
 	val confirmations = when (currentLanguage) {
-		HoneyLanguage.English.code -> "CONFIRMED BLOCKS"
-		HoneyLanguage.Chinese.code -> "已确认区块"
-		HoneyLanguage.Japanese.code -> "確認済みのブロック"
-		HoneyLanguage.Korean.code -> "확인 된 블록"
-		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕННЫЕ БЛОКИ"
-		HoneyLanguage.TraditionalChinese.code -> "已確認區塊"
+		HoneyLanguage.English.code -> "CONFIRMATION STATUS"
+		HoneyLanguage.Chinese.code -> "确认状态"
+		HoneyLanguage.Japanese.code -> "確認ステータス"
+		HoneyLanguage.Korean.code -> "확인 상태"
+		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕНИЕ СТАТУСА"
+		HoneyLanguage.TraditionalChinese.code -> "確認狀態"
 		else -> ""
 	}
 	@JvmField
@@ -86,6 +86,29 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "轉賬確認"
 		else -> ""
 	}
+
+	@JvmField
+	val signData = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Sign Data"
+		HoneyLanguage.Chinese.code -> "数据签名"
+		HoneyLanguage.Japanese.code -> "データ署名"
+		HoneyLanguage.Korean.code -> "데이터 서명"
+		HoneyLanguage.Russian.code -> "Подпись данных"
+		HoneyLanguage.TraditionalChinese.code -> "數據簽名"
+		else -> ""
+	}
+
+	@JvmField
+	val signDataDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Sign to chain to authenticate for authentication, please confirm.."
+		HoneyLanguage.Chinese.code -> "向链发起签名以进行身份验证，请确认。"
+		HoneyLanguage.Japanese.code -> "認証のためにチェーンに署名したいと考えています。確認してください。"
+		HoneyLanguage.Korean.code -> "인증을 위해 체인에 서명하여 확인하십시오."
+		HoneyLanguage.Russian.code -> "Подпишите цепочку для аутентификации для аутентификации, пожалуйста, подтвердите."
+		HoneyLanguage.TraditionalChinese.code -> "向鏈發起簽名以進行身份驗證，請確認。"
+		else -> ""
+	}
+
 	@JvmField
 	val confirmTransaction = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Confirm transaction with your password"
@@ -154,11 +177,11 @@ object TransactionText {
 	@JvmField
 	val process = when (currentLanguage) {
 		HoneyLanguage.English.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Chinese.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Japanese.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Korean.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.Russian.code -> "CONFIRMATION PROCESS"
-		HoneyLanguage.TraditionalChinese.code -> "CONFIRMATION PROCESS"
+		HoneyLanguage.Chinese.code -> "区块确认"
+		HoneyLanguage.Japanese.code -> "ブロック確認"
+		HoneyLanguage.Korean.code -> "블록 확인"
+		HoneyLanguage.Russian.code -> "ПОДТВЕРЖДЕНИЕ ПРОЦЕССА"
+		HoneyLanguage.TraditionalChinese.code -> "區塊確認"
 		else -> ""
 	}
 
@@ -293,6 +316,16 @@ object TransactionText {
 		HoneyLanguage.TraditionalChinese.code -> "不可逆的"
 		else -> ""
 	}
+	@JvmField
+	val confirmed = when (currentLanguage) {
+		HoneyLanguage.English.code -> " Blocks Confirmed"
+		HoneyLanguage.Chinese.code -> " 个区块已确认"
+		HoneyLanguage.Japanese.code -> " ブロック確認済み"
+		HoneyLanguage.Korean.code -> " 블록이 확인되었습니다"
+		HoneyLanguage.Russian.code -> " блока подтверждены"
+		HoneyLanguage.TraditionalChinese.code -> " 個區塊已確認"
+		else -> ""
+	}
 
 	@JvmField
 	val netUsage = when (currentLanguage) {
@@ -315,4 +348,59 @@ object TransactionText {
 		else -> ""
 	}
 
+	@JvmField
+	val noActionsFound = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No corresponding record found"
+		HoneyLanguage.Chinese.code -> "未找到相应记录"
+		HoneyLanguage.Japanese.code -> "対応するレコードが見つかりません"
+		HoneyLanguage.Korean.code -> "해당 레코드가 없습니다."
+		HoneyLanguage.Russian.code -> "Соответствующая запись не найдена"
+		HoneyLanguage.TraditionalChinese.code -> "未找到相應記錄"
+		else -> ""
+	}
+	@JvmField
+	val filterDataResource: (dataSize: Int) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> {
+				if (it < 2) {
+					"(Data retrieved: $it Transaction)"
+				} else {
+					"(Data retrieved: $it Transactions)"
+				}
+			}
+			HoneyLanguage.Chinese.code -> "(已检索数据: $it 条账单)"
+			HoneyLanguage.Japanese.code -> "（取り出されたデータ：$it 取引）"
+			HoneyLanguage.Korean.code -> "(검색된 데이터 : $it 거래)"
+			HoneyLanguage.English.code -> {
+				if (it < 2) {
+					"(Полученные данные: $it транзакция)"
+				} else {
+					"(Полученные данные: $it транзакции)"
+				}
+			}
+			HoneyLanguage.TraditionalChinese.code -> "(已檢索數據: $it 條賬單)"
+			else -> ""
+		}
+	}
+	@JvmField
+	val filterFoundNoItem = when (currentLanguage) {
+		HoneyLanguage.English.code -> "No specified type of transaction was found in the currently retrieved data"
+		HoneyLanguage.Chinese.code -> "在目前检索到的数据中未发现指定类型的账单"
+		HoneyLanguage.Japanese.code -> "現在検索されているデータに特定の種類の請求書が見つかりませんでした"
+		HoneyLanguage.Korean.code -> "현재 검색된 데이터에서 지정된 유형의 청구서를 찾을 수 없습니다."
+		HoneyLanguage.Russian.code -> "Указанный тип транзакции не был найден в полученных данных."
+		HoneyLanguage.TraditionalChinese.code -> "在目前檢索到的數據中未發現指定類型的賬單"
+		else -> ""
+	}
+
+	@JvmField
+	val loadMore = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Load more"
+		HoneyLanguage.Chinese.code -> "加载更多"
+		HoneyLanguage.Japanese.code -> "もっと読み込む"
+		HoneyLanguage.Korean.code -> "더 많은로드"
+		HoneyLanguage.Russian.code -> "Загрузить больше"
+		HoneyLanguage.TraditionalChinese.code -> "加載更多"
+		else -> ""
+	}
 }

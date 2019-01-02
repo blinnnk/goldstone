@@ -35,6 +35,8 @@ class DAPPRecyclerView(
 
 	init {
 		layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+		// 把滑动交给父view
+		recyclerView.setHasFixedSize(true)
 		recyclerView.isNestedScrollingEnabled = false
 		recyclerView.into(this)
 	}

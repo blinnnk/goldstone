@@ -22,8 +22,8 @@ android {
     applicationId "io.goldstone.blockchain"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 21
-    versionName "1.6.3"
+    versionCode 23
+    versionName "1.7.2"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
@@ -38,6 +38,18 @@ android {
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     // Leave only the supported languages
     resConfigs "en", "ja", "ru", "zh_CN", "zh_HK", "zh_TW", "ko"
+  }
+
+  // 自定义输出apk名字
+  applicationVariants.all {
+    variant ->
+      variant.outputs.all { output ->
+        if (buildType.name == 'release') {
+          outputFileName = new File("app_v" + defaultConfig.versionName + "_" +
+            new Date().format("yyyy-MM-dd-HH-mm-ss") + "_" +
+            buildType.name + ".apk")
+        }
+      }
   }
 
   buildTypes {
@@ -80,10 +92,9 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   // ANKO
   implementation 'org.jetbrains.anko:anko:0.10.8'
-  // 2.0 Beta 以上需要兼容 AndroidX 先不要升级
   implementation 'com.afollestad.material-dialogs:core:2.0.0-alpha12'
   // HoneyUI By Blink Co.
-  implementation 'com.blinnnk:honeyui:0.3.5.1'
+  implementation 'com.blinnnk:honeyui:0.3.5.3'
   // Crypto Ethereum
   implementation 'org.ethereum:geth:1.8.11'
   // Crypto Bitcoin
@@ -93,8 +104,6 @@ dependencies {
   implementation 'com.madgag.spongycastle:prov:1.58.0.0'
   // Crypt slf4j
   implementation 'org.slf4j:slf4j-api:1.8.0-beta2'
-  // BlurView
-  implementation 'com.github.mmin18:realtimeblurview:1.1.2'
   // Room Database
   implementation 'android.arch.persistence.room:runtime:1.1.1'
   kapt 'android.arch.persistence.room:compiler:1.1.1'
@@ -112,7 +121,7 @@ dependencies {
   implementation 'com.tencent.wup:wup:1.0.0.E-release'
   implementation 'com.tencent.mid:mid:4.0.6-release'
   // Google Analytics
-  implementation 'com.google.android.gms:play-services-analytics:16.0.5'
+  implementation 'com.google.android.gms:play-services-analytics:16.0.6'
   // Wave Animation
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
   // MPAndroidChart

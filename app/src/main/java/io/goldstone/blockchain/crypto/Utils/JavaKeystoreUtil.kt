@@ -11,21 +11,29 @@ import io.goldstone.blockchain.common.utils.AesCrypto
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
+import javax.crypto.Cipher
 import javax.crypto.Cipher.*
 
-class JavaKeystoreUtil(
-	private val keyStoreAlias: String = "skipBackUp"
-) {
+data class KeystoreInfo(val alias: String, val cipher: Cipher) {
+	companion object {
+		fun isMnemonic(): KeystoreInfo {
+			val cipher = getInstance("RSA/ECB/PKCS1Padding")
+			return KeystoreInfo("skipBackUp", cipher)
+		}
 
+		fun isFingerPrinter(cipher: Cipher): KeystoreInfo {
+			return KeystoreInfo("fingerPrinter", cipher)
+		}
+	}
+}
+
+class JavaKeystoreUtil(private val keystoreInfo: KeystoreInfo) {
 	private val keyStore: KeyStore
-
 	private val keystoreProvider = "AndroidKeyStore"
-	private val rsaCipher = "RSA/ECB/PKCS1Padding"
-
 	init {
 		keyStore = KeyStore.getInstance(keystoreProvider)
 		keyStore.load(null)
-		if (!keyStore.containsAlias(keyStoreAlias)) createNewKey()
+		if (!keyStore.containsAlias(keystoreInfo.alias)) createNewKey()
 	}
 
 	private fun createNewKey() {
@@ -36,10 +44,11 @@ class JavaKeystoreUtil(
 
 	@TargetApi(Build.VERSION_CODES.M)
 	private fun createNewKeyM() {
-		val generator = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, keystoreProvider)
+		val generator =
+			KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_RSA, keystoreProvider)
 		generator.initialize(
 			KeyGenParameterSpec.Builder(
-				keyStoreAlias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+				keystoreInfo.alias, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
 			).setBlockModes(KeyProperties.BLOCK_MODE_ECB).setEncryptionPaddings(
 				KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1
 			).build()
@@ -51,10 +60,9 @@ class JavaKeystoreUtil(
 		return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			AesCrypto.encrypt(content).orEmpty()
 		} else {
-			val encryptKey = keyStore.getCertificate(keyStoreAlias).publicKey
-			val cipher = getInstance(rsaCipher)
-			cipher.init(ENCRYPT_MODE, encryptKey)
-			val result = cipher.doFinal(content.toByteArray())
+			val encryptKey = keyStore.getCertificate(keystoreInfo.alias).publicKey
+			keystoreInfo.cipher.init(ENCRYPT_MODE, encryptKey)
+			val result = keystoreInfo.cipher.doFinal(content.toByteArray())
 			Base64.encodeToString(result, Base64.DEFAULT)
 		}
 	}
@@ -63,12 +71,10 @@ class JavaKeystoreUtil(
 		return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			AesCrypto.decrypt(encryptContent).orEmpty()
 		} else {
-			val decryptKey = keyStore.getKey(keyStoreAlias, null) as PrivateKey
-			val cipher = getInstance(rsaCipher)
-			cipher.init(DECRYPT_MODE, decryptKey)
-			val result = cipher.doFinal(Base64.decode(encryptContent, Base64.DEFAULT))
+			val decryptKey = keyStore.getKey(keystoreInfo.alias, null) as PrivateKey
+			keystoreInfo.cipher.init(DECRYPT_MODE, decryptKey)
+			val result = keystoreInfo.cipher.doFinal(Base64.decode(encryptContent, Base64.DEFAULT))
 			String(result)
 		}
-
 	}
 }

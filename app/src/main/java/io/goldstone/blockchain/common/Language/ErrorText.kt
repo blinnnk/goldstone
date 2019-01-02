@@ -7,6 +7,17 @@ package io.goldstone.blockchain.common.language
 
 object ErrorText {
 	@JvmField
+	val inputTooBig = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The value you entered is too large and is outside the allowable range."
+		HoneyLanguage.Chinese.code -> "您输入的数值过大，超出了允许的范围。"
+		HoneyLanguage.Japanese.code -> "入力した値が大きすぎ、許容範囲外です。"
+		HoneyLanguage.Korean.code -> "입력 한 값이 너무 커서 허용 범위를 벗어났습니다."
+		HoneyLanguage.Russian.code -> "Введенное вами значение слишком велико и выходит за допустимый диапазон."
+		HoneyLanguage.TraditionalChinese.code -> "您輸入的數值過大，超出了允許的範圍。"
+		else -> ""
+	}
+
+	@JvmField
 	val balanceIsNotEnough = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Insufficient current account balance"
 		HoneyLanguage.Chinese.code -> "当前账户余额不足"
@@ -19,11 +30,11 @@ object ErrorText {
 	@JvmField
 	val sellRAMTooLess = when (currentLanguage) {
 		HoneyLanguage.English.code -> "The RAM sold needs to be larger than 1 byte (bytes)."
-		HoneyLanguage.Chinese.code -> "卖出的RAM需要大于1byte(字节)."
+		HoneyLanguage.Chinese.code -> "卖出的RAM需要大于 1 byte(字节)."
 		HoneyLanguage.Japanese.code -> "販売されるRAMは1バイト（バイト）より大きくする必要があります。"
 		HoneyLanguage.Korean.code -> "판매 된 RAM은 1 바이트 (바이트)보다 커야합니다."
 		HoneyLanguage.Russian.code -> "Объем продаваемой ОЗУ должен быть больше 1 байта (байты)."
-		HoneyLanguage.TraditionalChinese.code -> "賣出的RAM需要大於1byte(字節)."
+		HoneyLanguage.TraditionalChinese.code -> "賣出的RAM需要大於 1 byte(字節)."
 		else -> ""
 	}
 	@JvmField
@@ -34,6 +45,16 @@ object ErrorText {
 		HoneyLanguage.Korean.code -> "소수점 정밀도가 현재 토큰에서 허용하는 범위를 초과합니다. 소수 부분을 조금 줄이십시오."
 		HoneyLanguage.Russian.code -> "Точность десятичной точки превышает диапазон, разрешенный текущим токеном. Немного сократите десятичную часть."
 		HoneyLanguage.TraditionalChinese.code -> "小數點精度超過了當前token允許的範圍，請把小數部分改短一點"
+		else -> ""
+	}
+	@JvmField
+	val wrongPermission = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Insufficient current account permissions"
+		HoneyLanguage.Chinese.code -> "当前账户权限不足"
+		HoneyLanguage.Japanese.code -> "アカウントのアクセス許可が不十分です"
+		HoneyLanguage.Korean.code -> "현재 계정 권한이 충분하지 않습니다."
+		HoneyLanguage.Russian.code -> "Недостаточно разрешений текущей учетной записи."
+		HoneyLanguage.TraditionalChinese.code -> "當前賬戶權限不足"
 		else -> ""
 	}
 	@JvmField
@@ -270,10 +291,10 @@ object ErrorText {
 	val error = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Error"
 		HoneyLanguage.Chinese.code -> "出错了"
-		HoneyLanguage.Japanese.code -> "何かが間違っていた"
+		HoneyLanguage.Japanese.code -> "エラー"
 		HoneyLanguage.Korean.code -> "틀린"
-		HoneyLanguage.Russian.code -> "Что-то пошло не так."
-		HoneyLanguage.TraditionalChinese.code -> "出錯了"
+		HoneyLanguage.Russian.code -> "Ошибка"
+		HoneyLanguage.TraditionalChinese.code -> "出错了"
 		else -> ""
 	}
 
@@ -290,13 +311,130 @@ object ErrorText {
 
 	// 导入观察钱包时导入了未激活的账号
 	@JvmField
-	val inactivatedAccountName = when (currentLanguage) {
+	val inactivedAccountName = when (currentLanguage) {
 		HoneyLanguage.English.code -> "This account name has not been activated yet"
-		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册。"
-		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません。"
+		HoneyLanguage.Chinese.code -> "这个 EOS 账户还没有被注册"
+		HoneyLanguage.Japanese.code -> "このアカウントはまだ登録されていません"
 		HoneyLanguage.Korean.code -> "이 계정은 아직 등록되지 않았습니다."
 		HoneyLanguage.Russian.code -> "Эта учетная запись еще не зарегистрирована."
-		HoneyLanguage.TraditionalChinese.code -> "這個 EOS 賬戶還沒有被註冊。"
+		HoneyLanguage.TraditionalChinese.code -> "這個 EOS 賬戶還沒有被註冊"
+		else -> ""
+	}
+}
+
+object TransactionErrorText {
+	@JvmField
+	val transferToInactiveEOSAcount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The EOS account you want to transfer to doesn't exist."
+		HoneyLanguage.Chinese.code -> "你想要转账的EOS账户尚未激活"
+		HoneyLanguage.Japanese.code -> "転送したいEOSアカウントは有効化されていません"
+		HoneyLanguage.Korean.code -> "전송하려는 EOS 계정이 활성화되지 않았습니다."
+		HoneyLanguage.Russian.code -> "Учетная запись EOS, которую вы хотите передать, не активирована."
+		HoneyLanguage.TraditionalChinese.code -> "你想要轉賬的EOS賬戶尚未激活"
+		else -> ""
+	}
+
+	@JvmField
+	val emptyConfirmPassword = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter password to unlock your wallet."
+		HoneyLanguage.Chinese.code -> "请输入密码以解锁钱包"
+		HoneyLanguage.Japanese.code -> "ウォレットのロックを解除するにはパスワードを入力してください"
+		HoneyLanguage.Korean.code -> "지갑 잠금을 해제하려면 비밀번호를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Введите пароль, чтобы разблокировать свой кошелек."
+		HoneyLanguage.TraditionalChinese.code -> "請輸入密碼以解鎖錢包"
+		else -> ""
+	}
+	// 余额不足以支付燃气费的提示
+	@JvmField
+	val notEnoughGasFee = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your account's ETH balance is not sufficient to pay for gas."
+		HoneyLanguage.Chinese.code -> "您账户的ETH余额不足以支付燃气费"
+		HoneyLanguage.Japanese.code -> "アカウントのETH残高はガスのために支払うために十分ではありません"
+		HoneyLanguage.Korean.code -> "계정의 ETH 잔액으로 가스 요금을 지불하기에 충분하지 않습니다."
+		HoneyLanguage.Russian.code -> "Баланса ETH для вашей учетной записи недостаточно для оплаты газа."
+		HoneyLanguage.TraditionalChinese.code -> "您賬戶的ETH餘額不足以支付燃氣費"
+		else -> ""
+	}
+
+}
+
+object WalletErrorText {
+	@JvmField
+	val mnemonicsBackUpReminder = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please back up your mnemonics before proceeding with asset operations."
+		HoneyLanguage.Chinese.code -> "请先备份好助记词再进行资产操作。"
+		HoneyLanguage.Japanese.code -> "資産操作を続行する前にニーモニックをバックアップしてください。"
+		HoneyLanguage.Korean.code -> "자산 조작을 계속하기 전에 니모닉을 백업하십시오."
+		HoneyLanguage.Russian.code -> "Пожалуйста, создайте резервную копию своей мнемоники перед продолжением операций с активами."
+		HoneyLanguage.TraditionalChinese.code -> "請先備份好助記詞再進行資產操作。"
+		else -> ""
+	}
+}
+
+object ChainErrorText {
+	@JvmField
+	val getKeyAccountsError = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Failed to get the EOS account list correctly from chain."
+		HoneyLanguage.Chinese.code -> "未能从链上正确获取EOS账户列表。"
+		HoneyLanguage.Japanese.code -> "チェーンからEOSアカウントリストを正しく取得できませんでした。"
+		HoneyLanguage.Korean.code -> "체인에서 EOS 계정 목록을 제대로 가져 오지 못했습니다."
+		HoneyLanguage.Russian.code -> "Не удалось правильно получить список учетных записей EOS из цепочки."
+		HoneyLanguage.TraditionalChinese.code -> "未能從鏈上正確獲取EOS賬戶列表。"
+		else -> ""
+	}
+	@JvmField
+	val getEOSBalanceError = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Failed to update currency balances from EOS chain."
+		HoneyLanguage.Chinese.code -> "未能从EOS链上正确更新货币余额。"
+		HoneyLanguage.Japanese.code -> "EOSチェーンから通貨バランスを正しく更新できませんでした。"
+		HoneyLanguage.Korean.code -> "EOS 체인의 통화 잔액을 올바르게 업데이트하지 못했습니다."
+		HoneyLanguage.Russian.code -> "Не удалось правильно обновить валютный баланс из сети EOS."
+		HoneyLanguage.TraditionalChinese.code -> "未能從鏈上正確獲取EOS賬戶列表。"
+		else -> ""
+	}
+}
+
+object EosResourceErrorText {
+	@JvmField
+	val ramNoDecimals = when (currentLanguage) {
+		HoneyLanguage.English.code -> "The smallest unit of memory trading is bytes (Byte, 1 KB = 1024 Byte). Decimal numbers are not supported. Please check your input."
+		HoneyLanguage.Chinese.code -> "内存交易的最小单位是字节(Byte, 1 KB = 1024 Byte)，不支持小数数字，请检查您的输入。"
+		HoneyLanguage.Japanese.code -> "メモリ取引の最小単位はバイト(Byte, 1 KB = 1024 Byte)です。小数はサポートされていません。入力を確認してください。"
+		HoneyLanguage.Korean.code -> "메모리 거래의 최소 단위는 바이트 (Byte, 1 KB = 1024 Byte) 이며 십진수는 지원되지 않습니다. 입력을 확인하십시오."
+		HoneyLanguage.Russian.code -> "Наименьшая единица памяти - байты(Byte, 1 KB = 1024 Byte). Десятичные числа не поддерживаются. Проверьте свои данные."
+		HoneyLanguage.TraditionalChinese.code -> "內存交易的最小單位是字節(Byte, 1 KB = 1024 Byte)，不支持小數數字，請檢查您的輸入。"
+		else -> ""
+	}
+	@JvmField
+	val ramNotEnoughForNewAccount = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your RAM balance is not sufficient to activate your new account."
+		HoneyLanguage.Chinese.code -> "您的内存(RAM)余额不足以激活新账号。"
+		HoneyLanguage.Japanese.code -> "RAMの残高では、新しいアカウントを有効にすることはできません。"
+		HoneyLanguage.Korean.code -> "RAM 잔액만으로는 새 계정을 활성화 할 수 없습니다."
+		HoneyLanguage.Russian.code -> "При балансе RAM вы не сможете включить новые учетные записи."
+		HoneyLanguage.TraditionalChinese.code -> "您的內存(RAM)餘額不足以激活新賬號。"
+		else -> ""
+	}
+
+	@JvmField
+	val cpuNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your CPU balance is insufficient."
+		HoneyLanguage.Chinese.code -> "您的 CPU (计算) 余额不足。"
+		HoneyLanguage.Japanese.code -> "CPU（計算）の残高が不足しています。"
+		HoneyLanguage.Korean.code -> "CPU (계산) 잔액이 부족합니다."
+		HoneyLanguage.Russian.code -> "Ваш CPU (расчетный) баланс недостаточен."
+		HoneyLanguage.TraditionalChinese.code -> "您的 CPU (計算) 餘額不足。"
+		else -> ""
+	}
+
+	@JvmField
+	val netNotEnough = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Your NET balance is insufficient."
+		HoneyLanguage.Chinese.code -> "您的 NET (计算) 余额不足。"
+		HoneyLanguage.Japanese.code -> "NET（計算）の残高が不足しています。"
+		HoneyLanguage.Korean.code -> "NET (계산) 잔액이 부족합니다."
+		HoneyLanguage.Russian.code -> "Ваш NET (расчетный) баланс недостаточен."
+		HoneyLanguage.TraditionalChinese.code -> "您的 NET (計算) 餘額不足。"
 		else -> ""
 	}
 }

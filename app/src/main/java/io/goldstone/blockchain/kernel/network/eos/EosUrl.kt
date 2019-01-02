@@ -27,14 +27,15 @@ object EOSUrl {
 		"${SharedChain.getEOSCurrent().getURL()}/v1/chain/${EOSMethod.GetTableRows.method}"
 	}
 
-	val getTransaction: () -> String = {
-		"${SharedChain.getEOSCurrent().getURL()}/v1/history/${EOSMethod.GetTransaction.method}"
+	val getTransaction: (header: String) -> String = {
+		"$it/v1/history/${EOSMethod.GetTransaction.method}"
 	}
 	val getInfo: () -> String = {
 		"${SharedChain.getEOSCurrent().getURL()}/v1/chain/${EOSMethod.GetInfo.method}"
 	}
-	val pushTransaction: () -> String = {
-		"${SharedChain.getEOSCurrent().getURL()}/v1/chain/${EOSMethod.PushTransaction.method}"
+
+	fun pushTransaction(header: String): String {
+		return "$header/v1/chain/${EOSMethod.PushTransaction.method}"
 	}
 
 	val getPairsFromNewDex: () -> String = {

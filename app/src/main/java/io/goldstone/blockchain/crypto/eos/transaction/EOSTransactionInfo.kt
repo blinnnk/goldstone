@@ -103,7 +103,9 @@ data class EOSTransactionInfo(
 	// 转不同的币需要标记 `Decimal` 不然会转账失败, 这里面会有检查函数
 	// 故在此传入 Decimal
 	fun trade(
-		context: Context?,
+		context: Context,
+		chaiURL: String = SharedChain.getEOSCurrent().getURL(),
+		cancelAction: () -> Unit,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		if (!toAccount.isValid(false)) {
@@ -113,10 +115,11 @@ data class EOSTransactionInfo(
 				context,
 				amount.toCount(contract.decimal ?: CryptoValue.eosDecimal),
 				contract,
-				StakeType.Trade
+				StakeType.Trade,
+				cancelAction = cancelAction
 			) { privateKey, error ->
 				if (error.isNone() && privateKey.isNotNull()) {
-					transfer(privateKey, hold)
+					transfer(EOSPrivateKey(privateKey), chaiURL, hold)
 				} else hold(null, error)
 			}
 		}
@@ -132,7 +135,7 @@ data class EOSTransactionInfo(
 			contract,
 			SharedChain.getEOSCurrent().chainID
 		) {
-			val dataIndex = if (it?.dataIndex.isNull()) 0 else it?.dataIndex!! + 1
+			val dataIndex = if (it.isNull()) 0 else it + 1
 			val transaction = EOSTransactionTable(this, response, dataIndex)
 			EOSTransactionTable.dao.insert(transaction)
 			callback()
@@ -141,6 +144,7 @@ data class EOSTransactionInfo(
 
 	private fun transfer(
 		privateKey: EOSPrivateKey,
+		chaiURL: String,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		val permission =
@@ -154,7 +158,7 @@ data class EOSTransactionInfo(
 				// 这里现在默认有效期设置为 5 分钟. 日后根据需求可以用户自定义
 				ExpirationType.FiveMinutes,
 				contract
-			).send(privateKey, hold)
+			).send(privateKey, chaiURL, hold)
 		} else hold(null, TransferError.WrongPermission)
 	}
 

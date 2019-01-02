@@ -12,6 +12,7 @@ import android.os.PowerManager
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import android.support.v4.app.NotificationCompat
+import android.util.Log
 import com.blinnnk.extension.safeGet
 import com.blinnnk.util.TinyNumber
 import com.blinnnk.util.getStringFromSharedPreferences
@@ -23,7 +24,6 @@ import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.ClassURI
 import io.goldstone.blockchain.common.value.CountryCode
 import io.goldstone.blockchain.common.value.IntentKey
@@ -47,10 +47,7 @@ import org.json.JSONObject
 class XinGePushReceiver : XGPushBaseReceiver() {
 
 	@SuppressLint("InvalidWakeLockTag", "WrongConstant")
-	private fun showNotificationOnLockScreen(
-		context: Context,
-		content: String
-	) {
+	private fun showNotificationOnLockScreen(context: Context, content: String) {
 		// 播放提醒音
 		val notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 		val ringTone = RingtoneManager.getRingtone(context, notification)
@@ -72,54 +69,24 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 			.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
 	}
 
-	override fun onSetTagResult(
-		p0: Context?,
-		p1: Int,
-		p2: String?
-	) {
-	}
-
-	override fun onNotifactionShowedResult(
-		context: Context?,
-		notifiShowedRlt: XGPushShowedResult?
-	) {
+	override fun onSetTagResult(p0: Context?, p1: Int, p2: String?) {}
+	override fun onNotifactionShowedResult(context: Context?, notifiShowedRlt: XGPushShowedResult?) {
 		if (context == null || notifiShowedRlt == null) return
-		// Normal Notification
 	}
 
 	override fun onUnregisterResult(context: Context?, p1: Int) {
-		if (context == null) {
-			return
-		}
+		if (context == null) return
 	}
 
-	override fun onDeleteTagResult(
-		p0: Context?,
-		p1: Int,
-		p2: String?
-	) {
-	}
-
-	override fun onRegisterResult(
-		p0: Context?,
-		p1: Int,
-		p2: XGPushRegisterResult?
-	) {
-	}
-
+	override fun onDeleteTagResult(p0: Context?, p1: Int, p2: String?) {}
+	override fun onRegisterResult(p0: Context?, p1: Int, p2: XGPushRegisterResult?) {}
 	@SuppressLint("PrivateResource")
-	override fun onTextMessage(
-		context: Context?,
-		message: XGPushTextMessage?
-	) {
+	override fun onTextMessage(context: Context?, message: XGPushTextMessage?) {
 		if (context == null) return
 		showNotificationOnLockScreen(context, message.toString())
 	}
 
-	override fun onNotifactionClickedResult(
-		context: Context?,
-		result: XGPushClickedResult?
-	) {
+	override fun onNotifactionClickedResult(context: Context?, result: XGPushClickedResult?) {
 		result?.customContent?.let {
 			when (JSONObject(it).safeGet("uri")) {
 				ClassURI.transactionDetail -> {
@@ -183,7 +150,7 @@ class XinGePushReceiver : XGPushBaseReceiver() {
 								GoldStoneDataBase.database.appConfigDao()
 							if (isSucceed) {
 								configDao.updateHasRegisteredAddress(true)
-								LogUtil.debug("XinGePushReceiver", "code: $models")
+								Log.d("XinGePushReceiver", "code: $models")
 							} else configDao.updateHasRegisteredAddress(false)
 						}
 				}
@@ -237,18 +204,18 @@ fun Context.registerDeviceForPush() {
 			registerDevice(token.toString()) {
 				// 如果本地有注册成功的标记则不再注册
 				getStringFromSharedPreferences(SharesPreference.registerPush).let {
-					LogUtil.debug(this.javaClass.simpleName, "token: $it")
+					Log.d(this.javaClass.simpleName, "token: $it")
 					if (it == token) return@registerDevice
 				}
 				// 在本地数据库记录 `Push Token`
 				val currentWallet =
-					WalletTable.dao.findWhichIsUsing(true)
+					WalletTable.dao.findWhichIsUsing()
 				XinGePushReceiver.registerAddressesForPush(currentWallet)
 			}
 		}
 
 		override fun onFail(data: Any?, errCode: Int, message: String?) {
-			LogUtil.debug("registerDeviceForPush", message.orEmpty())
+			Log.d("registerDeviceForPush", message.orEmpty())
 		}
 	})
 }
@@ -276,9 +243,7 @@ fun Context.registerDevice(token: String, @UiThread callback: () -> Unit) {
 			GoldStoneCode.isSuccess(code) { isSuccessful ->
 				if (isSuccessful) {
 					saveDataToSharedPreferences(SharesPreference.registerPush, token)
-					launchUI {
-						callback()
-					}
+					launchUI(callback)
 				}
 			}
 		}

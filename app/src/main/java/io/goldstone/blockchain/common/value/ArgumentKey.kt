@@ -84,12 +84,18 @@ object SharesPreference {
 	const val hasBackUpMnemonic = "hasBackUpMnemonic"
 	const val isNotchScreen = "isNotchScreen"
 	const val isTestEnvironment = "isTestEnvironment"
-	const val yingYongBaoInReview = "yingYongBaoInReview"
 	const val needToShowPincode = "needToShowPincode"
 	const val accountCheckedStatus = "accountCheckedStatus"
 	const val developerMode = "developerMode"
+	const val hasFingerprint = "hasFingerprint"
+	const val validEOSAccountPermission = "validEOSAccountPermission"
 	// EOS
 	const val ramUnitPrice = "ramUnitPrice"
 	const val cpuUnitPrice = "cpuUnitPrice"
 	const val netUnitPrice = "netUnitPrice"
+
+	const val jsCode = "jsCode"
+	const val kylinHistoryURL = "kylinHistoryURL"
+	const val jungleHistoryURL = "jungleHistoryURL"
+	const val mainnetHistoryURL = "mainnetHistoryURL"
 }

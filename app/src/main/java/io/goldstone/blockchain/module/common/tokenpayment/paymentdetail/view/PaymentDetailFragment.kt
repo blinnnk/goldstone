@@ -99,7 +99,9 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 					text = CommonText.next
 				}.click { button ->
 					button.showLoadingStatus()
-					presenter.goToGasEditorFragmentOrTransfer {
+					presenter.goToGasEditorFragmentOrTransfer(
+						cancelEvent = { button.showLoadingStatus(false) }
+					) {
 						if (it.hasError()) safeShowError(it)
 						launchUI {
 							button.showLoadingStatus(false)
@@ -306,12 +308,11 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 			memoInputView = MemoInputView(context).apply {
 				setMemoContent(content)
 				updateConfirmButtonEvent { button ->
-					button.onClick {
+					button.click {
 						if (isValidMemoByChain(isEOSTransfer)) {
 							removeMemoInputView()
 							hold(getMemoContent())
 						} else context.toast(PrepareTransferText.invalidEOSMemoSize)
-						button.preventDuplicateClicks()
 					}
 				}
 			}

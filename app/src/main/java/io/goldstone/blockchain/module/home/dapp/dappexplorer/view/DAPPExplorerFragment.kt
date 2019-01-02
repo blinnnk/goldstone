@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
 import com.blinnnk.extension.toArrayList
+import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.module.home.dapp.dappbrowser.view.PreviousView
@@ -24,7 +26,7 @@ import org.greenrobot.eventbus.EventBus
  */
 class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContract.GSView {
 
-	override val pageTitle: String get() = "DAPP Explorer"
+	override val pageTitle: String get() = DappCenterText.dappExplorer
 	override lateinit var presenter: DAPPExplorerContract.GSPresenter
 
 	override fun showError(error: Throwable) {
@@ -47,15 +49,18 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				}
 			}
 			it.cancelSearchEvent = Runnable {
-				updateAdapterData<DAPPExplorerAdapter>(arrayListOf())
+				it.presenter.removeSelfFromActivity()
 			}
 			it.enterKeyEvent = Runnable {
-				getMainActivity()?.showDappBrowserFragment(
-					it.getSearchContent(),
-					PreviousView.DAPPExplorer,
-					"FFFFFF",
-					this
-				)
+				getMainActivity()?.apply {
+					SoftKeyboard.hide(this)
+					showDappBrowserFragment(
+						formattedURL(it.getSearchContent()),
+						PreviousView.DAPPExplorer,
+						"FFFFFF",
+						parentFragment
+					)
+				}
 			}
 		}
 	}
@@ -78,5 +83,11 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 				}
 			}
 		}
+	}
+
+	private fun formattedURL(url: String): String {
+		return if (!url.contains("http", true)) {
+			"https://$url"
+		} else url
 	}
 }

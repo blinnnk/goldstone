@@ -32,7 +32,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 	override fun AnkoContext<Fragment>.initView() {
 		relativeLayout {
 			lparams(matchParent, matchParent)
-			backgroundColor = Spectrum.blue
+			backgroundColor = Spectrum.backgroundBlue
 			verticalLayout {
 				lparams(matchParent, matchParent)
 				gravity = Gravity.CENTER_HORIZONTAL

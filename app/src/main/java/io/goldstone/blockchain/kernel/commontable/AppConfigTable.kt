@@ -37,6 +37,7 @@ data class AppConfigTable(
 	var language: Int = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 	var currencyCode: String = CountryCode.currentCurrency,
 	var pushToken: String = "",
+	var jsCode: String = "",
 	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
 	var terms: String = "",
@@ -47,7 +48,8 @@ data class AppConfigTable(
 	var configMD5: String,
 	var shareContentMD5: String,
 	var dappRecommendMD5: String,
-	var newDAPPMD5: String
+	var newDAPPMD5: String,
+	var dappJSCodeMD5: String
 ) {
 
 	companion object {
@@ -74,8 +76,9 @@ data class AppConfigTable(
 				frozenTime = 0L,
 				goldStoneID = ApkUtil.generateGoldStoneID(),
 				language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
+				currencyCode = CountryCode.currentCurrency,
 				terms = getLocalTerms(),
-				isMainnet = true,
+				jsCode = "{connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){identity={accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":goldStoneAccountName}]};resolve(identity)})},identity:{accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":goldStoneAccountName}]},forgetIdentity:function(){currentAccount=null;identity=null;return new Promise(function(resolve,reject){resolve()})},linkAccount:function(publicKey,network){console.log(\"linkAccount***\"+publicKey)},suggestNetwork:function(data){console.log(\"suggestNetwork***\");return new Promise(function(resolve,reject){resolve(true)})},isConnected:function(){return new Promise(function(resolve,reject){resolve(true)})},authenticate:function(nonce){console.log(\"authenticate***\"+nonce)},getOrRequestIdentity:function(data){console.log(\"getOrRequestIdentity***\"+JSON.stringify(data))},transactionResult:null,getIdentityResult:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,tableRowInterval:null,accountInterval:null,balanceInterval:null,identityInterval:null,eos:function(data){console.log(\"scatter.eos\"+JSON.stringify(data));return{transaction:function(action){console.log(\"eos.transaction\"+JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})},getRequiredKeys:function(){console.log(\"eos.getRequiredKeys ***\")},getAbi:function(data){console.log(\"eos.getAbi\");console.log(JSON.stringify(data));return new Promise(function(resolve,reject){resolve(\"get abi to do\")})},getTableRows:function(data){console.log(\"eos.getTableRows\");window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.tableRowInterval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};window.scatter.tableRow=null;clearInterval(window.scatter.tableRowInterval)}},1500)})},getAccount:function(data){console.log(\"eos.getAccount\");window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.accountInterval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};clearInterval(window.scatter.accountInterval);window.scatter.accountInfo=null}},1500)})},getCurrencyBalance:function(code,name,symbol){console.log(\"eos.getCurrencyBalance\");window.control.getEOSAccountBalance(code,name,symbol);return new Promise(function(resolve,reject){window.scatter.balanceInterval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance)};clearInterval(window.scatter.balanceInterval);window.scatter.balance=null}},2000)})},getInfo:function(data){console.log(\"eos.getInfo\"+JSON.stringify(data))},contract:function(data){console.log(\"eos.contract\");console.log(JSON.stringify(data)+\"eos.contract\");return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){console.log(\"eos.getArbitrarySignature\");window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);window.scatter.arbSignature=null;clearInterval(window.scatter.interval)}},1500)})}}",
 				defaultCoinListMD5 = "",
 				exchangeListMD5 = "",
 				nodeListMD5 = "",
@@ -83,7 +86,8 @@ data class AppConfigTable(
 				configMD5 = "",
 				shareContentMD5 = "",
 				dappRecommendMD5 = "",
-				newDAPPMD5 = ""
+				newDAPPMD5 = "",
+				dappJSCodeMD5 = ""
 			)
 			dao.insert(config)
 			callback(config)
@@ -113,10 +117,10 @@ interface AppConfigDao {
 	@Query("SELECT * FROM appConfig LIMIT 1")
 	fun getAppConfig(): AppConfigTable?
 
-	@Query("UPDATE appConfig SET currencyCode = :newCurrencyCode WHERE id = 1")
-	fun updateCurrency(newCurrencyCode: String)
+	@Query("UPDATE appConfig SET currencyCode = :currencyCode WHERE id = 1")
+	fun updateCurrency(currencyCode: String)
 
-	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5, dappRecommendMD5 = :dappRecommendMD5, newDAPPMD5 = :newDAPPMD5 WHERE id = 1")
+	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5, dappRecommendMD5 = :dappRecommendMD5, newDAPPMD5 = :newDAPPMD5, dappJSCodeMD5 =:dappJSCode  WHERE id = 1")
 	fun updateMD5Info(
 		defaultCoinListMD5: String,
 		nodeListMD5: String,
@@ -125,7 +129,8 @@ interface AppConfigDao {
 		configMD5: String,
 		shareContentMD5: String,
 		dappRecommendMD5: String,
-		newDAPPMD5: String
+		newDAPPMD5: String,
+		dappJSCode: String
 	)
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
@@ -146,20 +151,17 @@ interface AppConfigDao {
 	@Query("UPDATE appConfig SET retryTimes = :times WHERE id = 1")
 	fun updateRetryTimes(times: Int)
 
-	@Query("UPDATE appConfig SET nodeListMD5 = :md5 WHERE id = 1")
-	fun updateNodeListMD5(md5: String)
-
 	@Query("UPDATE appConfig SET isMainnet = :isMainnet WHERE id = 1")
 	fun updateChainStatus(isMainnet: Boolean)
-
-	@Query("UPDATE appConfig SET defaultCoinListMD5 = :md5 WHERE id = 1")
-	fun updateDefaultMD5(md5: String)
 
 	@Query("UPDATE appConfig SET frozenTime = :time WHERE id = 1")
 	fun updateFrozenTime(time: Long)
 
 	@Query("UPDATE appConfig SET shareContent = :content WHERE id = 1")
 	fun updateShareContent(content: String)
+
+	@Query("UPDATE appConfig SET jsCode = :code WHERE id = 1")
+	fun updateJSCode(code: String)
 
 	@Query("UPDATE appConfig SET terms = :content WHERE id = 1")
 	fun updateTerms(content: String)

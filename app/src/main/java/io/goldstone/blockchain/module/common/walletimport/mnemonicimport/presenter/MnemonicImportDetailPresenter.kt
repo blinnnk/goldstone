@@ -5,11 +5,11 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.base.basefragment.BasePresenter
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.GenerateMultiChainWallet
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.KeystoreInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.view.MnemonicImportDetailFragment
@@ -90,13 +90,13 @@ class MnemonicImportDetailPresenter(
 		callback: (GoldStoneError) -> Unit
 	) {
 		// 加密 `Mnemonic` 后存入数据库, 用于用户创建子账号的时候使用
-		val encryptMnemonic = JavaKeystoreUtil().encryptData(mnemonic)
+		val encryptMnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).encryptData(mnemonic)
 		val allWallets = WalletTable.dao.getAllWallets()
 		val isExistent = allWallets.any {
 			try {
-				JavaKeystoreUtil().decryptData(it.encryptMnemonic.orEmpty()).equals(mnemonic, true)
+				JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(it.encryptMnemonic.orEmpty()).equals(mnemonic, true)
 			} catch (error: Exception) {
-				LogUtil.error("decrypt Data", error)
+				println("decrypt Data: ${error.message}")
 				false
 			}
 		}

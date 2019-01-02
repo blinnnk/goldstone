@@ -15,7 +15,6 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
-import io.goldstone.blockchain.common.component.button.IconWithTitle
 import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.GrayScale
@@ -111,16 +110,15 @@ open class GraySquareCell(context: Context) : GSCard(context) {
 
 	@SuppressLint("SetTextI18n")
 	fun setSubtitle(content: String) {
-		val isScaleMiddle = content.length > 24
+		val isScaleMiddle = content.length > 32
 		subtitle.visibility = View.VISIBLE
 		subtitle.text = object : FixTextLength() {
 			override var text = content
-			override val maxWidth = ScreenSize.widthWithPadding * 0.65f
+			override val maxWidth = ScreenSize.widthWithPadding * 0.7f
 			override val textSize: Float = fontSize(12.uiPX())
 		}.getFixString(isScaleMiddle)
 	}
 }
-
 
 fun ViewManager.graySquareCell() = graySquareCell {}
 inline fun ViewManager.graySquareCell(init: GraySquareCell.() -> Unit) = ankoView({ GraySquareCell(it) }, 0, init)

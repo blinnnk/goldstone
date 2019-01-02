@@ -28,5 +28,6 @@ interface WalletDetailContract {
 
 	interface GSPresenter : GoldStonePresenter {
 		fun showTransferDashboard(isAddress: Boolean)
+		fun updateUnreadCount()
 	}
 }

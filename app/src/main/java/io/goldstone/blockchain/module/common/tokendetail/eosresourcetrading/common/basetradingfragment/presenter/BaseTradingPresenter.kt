@@ -21,6 +21,7 @@ import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.eos.transaction.ExpirationType
+import io.goldstone.blockchain.crypto.multichain.ChainType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.CryptoValue
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -38,6 +39,7 @@ import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.comm
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
 import io.goldstone.blockchain.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PrivatekeyActionType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -51,7 +53,10 @@ open class BaseTradingPresenter(
 	override val fragment: BaseTradingFragment
 ) : BasePresenter<BaseTradingFragment>() {
 
-	open fun gainConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
+	open fun gainConfirmEvent(
+		cancelAction: () -> Unit,
+		callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
+	) {
 		showMnemonicBackUpDialogOrElse { hasBackUp ->
 			when {
 				!hasBackUp -> {
@@ -62,17 +67,19 @@ open class BaseTradingPresenter(
 						context!!,
 						getInputValue(StakeType.BuyRam).first,
 						getInputValue(StakeType.BuyRam).second,
+						cancelAction,
 						callback
 					)
 				}
 				else -> with(fragment) {
 					stakeResource(
 						context!!,
-						fragment.getInputValue(StakeType.Delegate).first,
-						fragment.getInputValue(StakeType.Delegate).second,
+						getInputValue(StakeType.Delegate).first,
+						getInputValue(StakeType.Delegate).second,
 						tradingType,
 						StakeType.Delegate,
 						isTransfer(StakeType.Delegate),
+						cancelAction,
 						callback
 					)
 				}
@@ -80,7 +87,10 @@ open class BaseTradingPresenter(
 		}
 	}
 
-	open fun refundOrSellConfirmEvent(callback: (response: EOSResponse?, error: GoldStoneError) -> Unit) {
+	open fun refundOrSellConfirmEvent(
+		cancelAction: () -> Unit,
+		callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
+	) {
 		showMnemonicBackUpDialogOrElse { hasBackUp ->
 			when {
 				!hasBackUp -> callback(null, AccountError.BackUpMnemonic)
@@ -91,6 +101,7 @@ open class BaseTradingPresenter(
 					} else sellRAM(
 						context!!,
 						sellAmount.toLong(),
+						cancelAction,
 						callback
 					)
 				}
@@ -102,6 +113,7 @@ open class BaseTradingPresenter(
 						tradingType,
 						if (tradingType.isCPU()) StakeType.RefundCPU else StakeType.RefundNET,
 						isTransfer(StakeType.Refund),
+						cancelAction,
 						callback
 					)
 				}
@@ -133,7 +145,6 @@ open class BaseTradingPresenter(
 				TradingType.NET -> {
 					val netEOSValue = "${account?.netWeight?.toEOSCount()}" suffix CoinSymbol.eos
 					val availableNET = account?.netLimit?.max.orZero() - account?.netLimit?.used.orZero()
-					// TODO 计算 NET 的租赁价格
 					setProcessUsage(netEOSValue, availableNET, account?.netLimit?.max.orZero(), SharedValue.getNETUnitPrice())
 				}
 				TradingType.RAM -> {
@@ -182,6 +193,7 @@ open class BaseTradingPresenter(
 			tradingType: TradingType,
 			stakeType: StakeType,
 			isTransfer: Boolean,
+			cancelAction: () -> Unit,
 			@WorkerThread callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 		) {
 			val fromAccount = SharedAddress.getCurrentEOSAccount()
@@ -191,23 +203,32 @@ open class BaseTradingPresenter(
 					transferCount,
 					TokenContract.EOS,
 					stakeType,
-					fromAccount.isSame(toAccount)
+					fromAccount.isSame(toAccount),
+					cancelAction
 				) { privateKey, error ->
-					val chainID = SharedChain.getEOSCurrent().chainID
-					val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
-					when {
-						permission.isNull() -> callback(null, TransferError.WrongPermission)
-						error.isNone() && privateKey.isNotNull() -> EOSBandWidthTransaction(
-							chainID,
-							EOSAuthorization(fromAccount.name, permission),
-							toAccount.name,
-							transferCount.toEOSUnit(),
-							tradingType,
-							stakeType,
-							isTransfer,
-							ExpirationType.FiveMinutes
-						).send(privateKey, callback)
-						else -> callback(null, error)
+					if (error.hasError()) {
+						callback(null, error)
+					} else {
+						val chainID = SharedChain.getEOSCurrent().chainID
+						val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
+						when {
+							permission.isNull() -> callback(null, TransferError.WrongPermission)
+							error.isNone() && privateKey.isNotNull() -> EOSBandWidthTransaction(
+								chainID,
+								EOSAuthorization(fromAccount.name, permission),
+								toAccount.name,
+								transferCount.toEOSUnit(),
+								tradingType,
+								stakeType,
+								isTransfer,
+								ExpirationType.FiveMinutes
+							).send(
+								EOSPrivateKey(privateKey),
+								SharedChain.getEOSCurrent().getURL(),
+								callback
+							)
+							else -> callback(null, error)
+						}
 					}
 				}
 			} else callback(null, AccountError.InvalidAccountName)
@@ -216,6 +237,7 @@ open class BaseTradingPresenter(
 		fun sellRAM(
 			context: Context,
 			tradingCount: Long,
+			cancelAction: () -> Unit,
 			@WorkerThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
 		) {
 			val fromAccount = SharedAddress.getCurrentEOSAccount()
@@ -224,18 +246,27 @@ open class BaseTradingPresenter(
 				context,
 				tradingCount,
 				TokenContract.EOS,
-				StakeType.SellRam
+				StakeType.SellRam,
+				cancelAction = cancelAction
 			) { privateKey, error ->
-				val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
-				when {
-					permission.isNull() -> callback(null, TransferError.WrongPermission)
-					error.isNone() && privateKey.isNotNull() -> EOSSellRamTransaction(
-						chainID,
-						EOSAuthorization(fromAccount.name, permission),
-						BigInteger.valueOf(tradingCount),
-						ExpirationType.FiveMinutes
-					).send(privateKey, callback)
-					else -> callback(null, error)
+				if (error.hasError()) {
+					callback(null, error)
+				} else {
+					val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
+					when {
+						permission.isNull() -> callback(null, TransferError.WrongPermission)
+						error.isNone() && privateKey.isNotNull() -> EOSSellRamTransaction(
+							chainID,
+							EOSAuthorization(fromAccount.name, permission),
+							BigInteger.valueOf(tradingCount),
+							ExpirationType.FiveMinutes
+						).send(
+							EOSPrivateKey(privateKey),
+							SharedChain.getEOSCurrent().getURL(),
+							callback
+						)
+						else -> callback(null, error)
+					}
 				}
 			}
 		}
@@ -244,6 +275,7 @@ open class BaseTradingPresenter(
 			context: Context,
 			toAccount: EOSAccount,
 			tradingCount: Double,
+			cancelAction: () -> Unit,
 			@WorkerThread callback: (response: EOSResponse?, GoldStoneError) -> Unit
 		) {
 			val fromAccount = SharedAddress.getCurrentEOSAccount()
@@ -253,30 +285,40 @@ open class BaseTradingPresenter(
 				context,
 				tradingCount,
 				TokenContract.EOS,
-				StakeType.BuyRam
+				StakeType.BuyRam,
+				cancelAction = cancelAction
 			) { privateKey, error ->
-				val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
-				when {
-					permission.isNull() -> callback(null, TransferError.WrongPermission)
-					error.isNone() && privateKey.isNotNull() -> EOSBuyRamTransaction(
-						chainID,
-						EOSAuthorization(fromAccount.name, permission),
-						toAccount.name,
-						tradingCount.toEOSUnit(),
-						ExpirationType.FiveMinutes
-					).send(privateKey, callback)
-					else -> callback(null, error)
+				if (error.hasError()) {
+					callback(null, error)
+				} else {
+					val permission = EOSAccountTable.getValidPermission(fromAccount, chainID)
+					when {
+						permission.isNull() -> callback(null, TransferError.WrongPermission)
+						error.isNone() && privateKey.isNotNull() -> EOSBuyRamTransaction(
+							chainID,
+							EOSAuthorization(fromAccount.name, permission),
+							toAccount.name,
+							tradingCount.toEOSUnit(),
+							ExpirationType.FiveMinutes
+						).send(
+							EOSPrivateKey(privateKey),
+							SharedChain.getEOSCurrent().getURL(),
+							callback
+						)
+						else -> callback(null, error)
+					}
 				}
 			} else callback(null, AccountError.InvalidAccountName)
 		}
 
 		fun <T : Number> prepareTransaction(
-			context: Context?,
+			context: Context,
 			tradingCount: T,
 			contract: TokenContract,
 			type: StakeType,
 			isMySelf: Boolean = true,
-			@WorkerThread hold: (privateKey: EOSPrivateKey?, error: GoldStoneError) -> Unit
+			cancelAction: () -> Unit,
+			@WorkerThread hold: (privateKey: String?, error: GoldStoneError) -> Unit
 		) {
 			val fromAccount = SharedAddress.getCurrentEOSAccount()
 			val chain = SharedChain.getEOSCurrent().chainID
@@ -284,50 +326,63 @@ open class BaseTradingPresenter(
 			isValidInputValue(tradingCount, type.isSellRam()) { error ->
 				if (error.hasError()) GlobalScope.launch(Dispatchers.Default) {
 					hold(null, error)
-				} else {
-					// 检查余额
-					when {
-						type.isSellRam() -> EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
-							// 检查发起账户的 `RAM` 余额是否足够
-							when {
-								!ramError.isNone() -> hold(null, ramError)
-								ramAvailable.isNull() -> hold(null, ramError)
-								ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
-									hold(null, TransferError.BalanceIsNotEnough)
-								tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
-								else -> PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
+				} else when {
+					type.isSellRam() -> EOSAPI.getAvailableRamBytes(fromAccount) { ramAvailable, ramError ->
+						// 检查发起账户的 `RAM` 余额是否足够
+						when {
+							!ramError.isNone() -> hold(null, ramError)
+							ramAvailable.isNull() -> hold(null, ramError)
+							ramAvailable < BigInteger.valueOf(tradingCount.toLong()) ->
+								hold(null, TransferError.BalanceIsNotEnough)
+							tradingCount == 1.0 -> hold(null, TransferError.SellRAMTooLess)
+							else -> PaymentDetailPresenter.getPrivatekey(
+								context,
+								ChainType.EOS,
+								PrivatekeyActionType.Transfer,
+								cancelEvent = cancelAction,
+								hold = hold
+							)
+						}
+					}
+					// 检查代理的资源的余额状态
+					type.isRefund() -> GlobalScope.launch(Dispatchers.Default) {
+						val accountInfo =
+							EOSAccountTable.dao.getAccount(fromAccount.name, chain.id)
+						val selfDelegate =
+							accountInfo?.totalDelegateBandInfo?.filter {
+								it.fromName.equals(fromAccount.name, true)
 							}
-						}
-						// 检查代理的资源的余额状态
-						type.isRefund() -> GlobalScope.launch(Dispatchers.Default) {
-							val accountInfo =
-								EOSAccountTable.dao.getAccount(fromAccount.name, chain.id)
-							val selfDelegate =
-								accountInfo?.totalDelegateBandInfo?.filter {
-									it.fromName.equals(fromAccount.name, true)
-								}
-							val count = if (type.isRefundCPU()) selfDelegate?.sumByDouble {
-								it.cpuWeight.substringBefore(" ").toDoubleOrZero()
-							} ?: 0.0 else selfDelegate?.sumByDouble {
-								it.netWeight.substringBefore(" ").toDoubleOrZero()
-							} ?: 0.0
-							// 如果不是 `Refund` 自己的, 那么直接进入私钥获取面板, 不再做本地检查,
-							// 交由 `EOS` 链处理
-							if ((tradingCount is Double && count >= tradingCount) || isMySelf) {
-								PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
-							} else hold(null, TransferError.RefundMoreThenExisted)
-						}
-						else -> EOSAPI.getAccountBalanceBySymbol(
-							fromAccount,
-							CoinSymbol(contract.symbol),
-							contract.contract
-						) { balance, balanceError ->
-							if (balance.isNotNull() && balanceError.isNone() && tradingCount is Double) {
-								// 检查发起账户的余额是否足够
-								if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
-								else PaymentDetailPresenter.showGetPrivateKeyDashboard(context, hold = hold)
-							} else hold(null, balanceError)
-						}
+						val count = if (type.isRefundCPU()) selfDelegate?.sumByDouble {
+							it.cpuWeight.substringBefore(" ").toDoubleOrZero()
+						} ?: 0.0 else selfDelegate?.sumByDouble {
+							it.netWeight.substringBefore(" ").toDoubleOrZero()
+						} ?: 0.0
+						// 如果不是 `Refund` 自己的, 那么直接进入私钥获取面板, 不再做本地检查,
+						// 交由 `EOS` 链处理
+						if ((tradingCount is Double && count >= tradingCount) || isMySelf) {
+							PaymentDetailPresenter.getPrivatekey(
+								context,
+								ChainType.EOS,
+								PrivatekeyActionType.Transfer,
+								hold = hold
+							)
+						} else hold(null, TransferError.RefundMoreThenExisted)
+					}
+					else -> EOSAPI.getAccountBalanceBySymbol(
+						fromAccount,
+						CoinSymbol(contract.symbol),
+						contract.contract
+					) { balance, balanceError ->
+						if (balance.isNotNull() && balanceError.isNone() && tradingCount is Double) {
+							// 检查发起账户的余额是否足够
+							if (balance < tradingCount) hold(null, TransferError.BalanceIsNotEnough)
+							else PaymentDetailPresenter.getPrivatekey(
+								context,
+								ChainType.EOS,
+								PrivatekeyActionType.Transfer,
+								hold = hold
+							)
+						} else hold(null, balanceError)
 					}
 				}
 			}

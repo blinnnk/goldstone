@@ -1,6 +1,7 @@
 package io.goldstone.blockchain.module.home.home.presneter
 
 import android.content.Context
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.Connectivity
@@ -11,6 +12,7 @@ import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.crypto.eos.EOSUnit
@@ -35,9 +37,6 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 /**
  * @author KaySaith
@@ -48,8 +47,7 @@ abstract class SilentUpdater {
 	private val account = SharedAddress.getCurrentEOSAccount()
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
-	fun star(context: Context) = GlobalScope.launch(Dispatchers.Default) {
-		updateNewDAPP()// todo
+	fun star(context: Context) = launchDefault {
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -71,18 +69,18 @@ abstract class SilentUpdater {
 												 hasNewConfig,
 												 hasNewShareContent,
 												 hasNewRecommendedDAPP,
-												 hasNewDAPP ->
+												 hasNewDAPP,
+												 hasNewDAPPJSCode ->
 				fun updateData() {
 					if (hasNewDefaultTokens) updateLocalDefaultTokens()
 					if (hasNewChainNodes) updateNodeData()
 					if (hasNewExchanges) updateLocalExchangeData()
 					if (hasNewTerm) updateAgreement()
 					if (hasNewShareContent) updateShareContent()
-					if (hasNewConfig) {
-						// TODO
-					}
-					if (hasNewRecommendedDAPP) updateRecommendedDAPP()
-					if (hasNewDAPP) updateNewDAPP()
+					if (hasNewConfig) updateConfigListData()
+					if (hasNewRecommendedDAPP) updateRecommendedDAPP {}
+					if (hasNewDAPP) updateNewDAPP {}
+					if (hasNewDAPPJSCode) updateDAPPJSCode()
 					// 确认后更新 MD5 值到数据库
 					AppConfigTable.dao.updateMD5Info(
 						newDefaultTokenListMD5,
@@ -92,7 +90,8 @@ abstract class SilentUpdater {
 						newConfigMD5,
 						newShareContentMD5,
 						newRecommendedDAPPMD5,
-						newDAPPMD5
+						newDAPPMD5,
+						newDAPPJSCode
 					)
 				}
 				when {
@@ -100,7 +99,7 @@ abstract class SilentUpdater {
 					Connectivity.isConnectedMobile(GoldStoneApp.appContext) -> {
 						launchUI {
 							GoldStoneDialog(context).showMobile4GConfirm {
-								GlobalScope.launch(Dispatchers.Default) {
+								launchDefault {
 									updateData()
 									updateTokenInfo()
 								}
@@ -130,6 +129,7 @@ abstract class SilentUpdater {
 	private var newShareContentMD5 = ""
 	private var newRecommendedDAPPMD5 = ""
 	private var newDAPPMD5 = ""
+	private var newDAPPJSCode = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -140,7 +140,8 @@ abstract class SilentUpdater {
 			hasNewConfig: Boolean,
 			hasNewShareContent: Boolean,
 			hasNewRecommendedDAPP: Boolean,
-			hasNewDAPP: Boolean
+			hasNewDAPP: Boolean,
+			hasNewDAPPCode: Boolean
 		) -> Unit
 	) {
 		GoldStoneAPI.getMD5List { md5s, error ->
@@ -153,6 +154,7 @@ abstract class SilentUpdater {
 				newShareContentMD5 = md5s.safeGet("share_content_md5")
 				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
 				newDAPPMD5 = md5s.safeGet("dapps_md5")
+				newDAPPJSCode = md5s.safeGet("get_js_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
@@ -161,7 +163,8 @@ abstract class SilentUpdater {
 					config.configMD5 != newConfigMD5,
 					config.shareContentMD5 != newShareContentMD5,
 					config.dappRecommendMD5 != newRecommendedDAPPMD5,
-					config.newDAPPMD5 != newDAPPMD5
+					config.newDAPPMD5 != newDAPPMD5,
+					config.dappJSCodeMD5 != newDAPPJSCode
 				)
 			}
 		}
@@ -189,17 +192,11 @@ abstract class SilentUpdater {
 	}
 
 	private fun checkAvailableERC20TokenList() {
-		val transactionDao =
-			GoldStoneDataBase.database.transactionDao()
-		val allTransactions =
-			transactionDao.getTransactionsByAddress(
-				SharedAddress.getCurrentEthereum(),
-				SharedChain.getCurrentETH().chainID.id
-			)
-		val maxBlockNumber =
-			allTransactions.filterNot {
-				it.contractAddress.equals(TokenContract.etcContract, true)
-			}.maxBy { it.blockNumber }?.blockNumber
+		val transactionDao = TransactionTable.dao
+		val maxBlockNumber = transactionDao.getMyMaxBlockNumber(
+			SharedAddress.getCurrentEthereum(),
+			SharedChain.getCurrentETH().chainID.id
+		)
 		getERC20TokenTransactions(maxBlockNumber ?: 0)
 	}
 
@@ -505,21 +502,54 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private fun updateRecommendedDAPP() {
-		GoldStoneAPI.getRecommendDAPPs(0) { dapps, error ->
-			if (dapps.isNotNull() && error.isNone()) {
-				DAPPTable.dao.deleteAllRecommend()
-				DAPPTable.dao.insertAll(dapps)
+	private fun updateDAPPJSCode() {
+		GoldStoneAPI.getDAPPJSCode { code, error ->
+			if (code.isNotNull() && error.isNone()) {
+				AppConfigTable.dao.updateJSCode(code)
+				SharedValue.updateJSCode(code)
 			} else ErrorDisplayManager(error)
 		}
 	}
 
-	private fun updateNewDAPP() {
-		GoldStoneAPI.getNewDAPPs(0) { dapps, error ->
-			if (dapps.isNotNull() && error.isNone()) {
-				DAPPTable.dao.deleteAllUnRecommended()
-				DAPPTable.dao.insertAll(dapps)
-			} else ErrorDisplayManager(error)
+	/**
+	 * `GetTransaction` 的 `RPC` 接口分别在, 进入账单 获取 `CPU NET` 消耗值,
+	 * `Transfer Observer` 监听转账进度的时候需要调取, 同时有因为很多 `History`
+	 * 节点经常挂掉. 导致这里有可能需要动态的有 `CMS` 更新可支持的节点.
+	 * 故此增加了 `Config List` 的配置支持.
+	 */
+	private fun updateConfigListData() {
+		GoldStoneAPI.getConfigList { models, error ->
+			if (!models.isNullOrEmpty() && error.isNone()) {
+				models.forEach {
+					when (it.name) {
+						"eosKylinHistory" -> SharedValue.updateKylinHistoryURL(it.value)
+						"eosJungleHistory" -> SharedValue.updateJungleHistoryURL(it.value)
+						"eosMainnetHistory" -> SharedValue.updateMainnetHistoryURL(it.value)
+					}
+				}
+			}
+		}
+	}
+
+	companion object {
+		fun updateRecommendedDAPP(@WorkerThread callback: () -> Unit) {
+			GoldStoneAPI.getRecommendDAPPs(0) { dapps, error ->
+				if (dapps.isNotNull() && error.isNone()) {
+					DAPPTable.dao.deleteAllRecommend()
+					DAPPTable.dao.insertAll(dapps)
+					callback()
+				} else ErrorDisplayManager(error)
+			}
+		}
+
+		fun updateNewDAPP(@WorkerThread callback: () -> Unit) {
+			GoldStoneAPI.getNewDAPPs(0) { dapps, error ->
+				if (dapps.isNotNull() && error.isNone()) {
+					DAPPTable.dao.deleteAllUnRecommended()
+					DAPPTable.dao.insertAll(dapps)
+					callback()
+				} else ErrorDisplayManager(error)
+			}
 		}
 	}
 }

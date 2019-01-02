@@ -1,5 +1,6 @@
 package io.goldstone.blockchain.module.home.profile.profile.presenter
 
+import android.content.Context
 import android.content.Intent
 import android.text.format.DateFormat
 import com.blinnnk.extension.*
@@ -58,7 +59,7 @@ class ProfilePresenter(
 				),
 				ProfileModel(R.drawable.chain_icon, ProfileText.chain, if (SharedValue.isTestEnvironment()) ChainText.testnet else ChainText.mainnet),
 				ProfileModel(R.drawable.pin_code_icon, ProfileText.pinCode, ""),
-				ProfileModel(R.drawable.eos_account_register, ProfileText.eosAccountRegister, ""),
+				ProfileModel(R.drawable.fingerprint_icon, ProfileText.fingerprintSettings, ""),
 				ProfileModel(R.drawable.currency_icon, ProfileText.currency, SharedWallet.getCurrencyCode()),
 				ProfileModel(R.drawable.language_icon, ProfileText.language, getCurrentLanguageSymbol()),
 				ProfileModel(R.drawable.contacts_icon, ProfileText.contacts, it.toString()),
@@ -89,23 +90,15 @@ class ProfilePresenter(
 		fragment.activity?.apply {
 			findIsItExist(FragmentTag.profileOverlay) isFalse {
 				if (title == ProfileText.shareApp) {
-					showShareChooser()
-				} else {
-					addFragmentAndSetArguments<ProfileOverlayFragment>(ContainerID.main, FragmentTag.profileOverlay) {
-						putString(ArgumentKey.profileTitle, title)
+					AppConfigTable.getAppConfig(Dispatchers.Main) {
+						showShareChooser(this, it?.shareContent.orEmpty())
 					}
+				} else addFragmentAndSetArguments<ProfileOverlayFragment>(
+					ContainerID.main,
+					FragmentTag.profileOverlay
+				) {
+					putString(ArgumentKey.profileTitle, title)
 				}
-			}
-		}
-	}
-
-	private fun showShareChooser() {
-		AppConfigTable.getAppConfig(Dispatchers.Main) {
-			it?.apply {
-				val intent = Intent(Intent.ACTION_SEND)
-				intent.putExtra(Intent.EXTRA_TEXT, shareContent)
-				intent.type = "text/plain"
-				fragment.context?.startActivity(Intent.createChooser(intent, "share"))
 			}
 		}
 	}
@@ -119,11 +112,11 @@ class ProfilePresenter(
 			fragment.context?.apply {
 				val data = arrayListOf(
 					Pair("GoldStone ID", SharedWallet.getGoldStoneID()),
-					Pair("APK Channel", currentChannel.value),
-					Pair("Version Code", "${SystemUtils.getVersionCode(this)}")
+					Pair(ProfileText.apkChannel, currentChannel.value),
+					Pair(ProfileText.versionCode, "${SystemUtils.getVersionCode(this)}")
 				)
 				Dashboard(this) {
-					showList("GoldStone Developer", TitleCellAdapter(data))
+					showList(ProfileText.developerOptions, TitleCellAdapter(data))
 				}
 				SharedValue.updateDeveloperModeStatus(true)
 			}
@@ -142,4 +135,13 @@ class ProfilePresenter(
 
 	private fun getCurrentLanguageSymbol() =
 		HoneyLanguage.getLanguageByCode(SharedWallet.getCurrentLanguageCode())
+
+	companion object {
+		fun showShareChooser(context: Context, content: String) {
+			val intent = Intent(Intent.ACTION_SEND)
+			intent.putExtra(Intent.EXTRA_TEXT, content)
+			intent.type = "text/plain"
+			context.startActivity(Intent.createChooser(intent, "share"))
+		}
+	}
 }

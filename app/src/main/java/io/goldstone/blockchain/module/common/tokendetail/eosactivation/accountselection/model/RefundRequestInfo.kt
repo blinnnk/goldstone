@@ -64,7 +64,7 @@ data class RefundRequestInfo(
 		val expirationDate =
 			if (expirationTimeStamp == 0L) ""
 			else HoneyDateUtil.getSinceTime(expirationTimeStamp, DateAndTimeText.getDateText())
-		return "$totalRefundsEOS" suffix CoinSymbol.eos + " / " + expirationDate
+		return "$totalRefundsEOS" suffix CoinSymbol.eos + if (expirationDate.isNotEmpty()) " / $expirationDate" else ""
 	}
 }
 

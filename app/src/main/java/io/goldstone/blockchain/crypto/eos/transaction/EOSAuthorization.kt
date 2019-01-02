@@ -1,8 +1,10 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
+import com.blinnnk.extension.safeGet
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
+import org.json.JSONObject
 import java.io.Serializable
 
 /**
@@ -14,6 +16,12 @@ data class EOSAuthorization(
 	val actor: String,
 	val permission: EOSActor
 ) : Serializable, EOSModel {
+
+	constructor(data: JSONObject) : this(
+		data.safeGet("actor"),
+		EOSActor.getActorByValue(data.safeGet("permission"))
+	)
+
 	override fun createObject(): String {
 		return "{\"actor\":\"$actor\",\"permission\":\"${permission.value}\"}"
 	}

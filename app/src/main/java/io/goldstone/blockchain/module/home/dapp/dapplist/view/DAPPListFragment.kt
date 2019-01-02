@@ -8,6 +8,7 @@ import com.blinnnk.extension.toArrayList
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
 import io.goldstone.blockchain.common.utils.getMainActivity
@@ -33,9 +34,9 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 
 	override val pageTitle: String
 		get() = when (type) {
-			DAPPType.Recommend -> "Recommend DAPP"
-			DAPPType.Latest -> "Latest Used DAPP"
-			DAPPType.New -> "New DAPP"
+			DAPPType.Recommend -> DappCenterText.recommendDapp
+			DAPPType.Latest -> DappCenterText.recentDapp
+			DAPPType.New -> DappCenterText.newDapp
 			else -> ""
 		}
 	override lateinit var presenter: DAPPListContract.GSPresenter
@@ -115,12 +116,15 @@ class DAPPListFragment : GSRecyclerFragment<DAPPTable>(), DAPPListContract.GSVie
 			},
 			clickEvent = {
 				DAPPCenterFragment.showAttentionOrElse(context!!, it.id) {
-					getMainActivity()?.showDappBrowserFragment(
-						it.url,
-						PreviousView.DAPPList,
-						it.backgroundColor,
-						this
-					)
+					getMainActivity()?.apply {
+						showDappBrowserFragment(
+							it.url,
+							PreviousView.DAPPList,
+							it.backgroundColor,
+							this@DAPPListFragment
+						)
+						getDAPPCenterFragment()?.presenter?.setUsedDAPPs()
+					}
 				}
 			}
 		)

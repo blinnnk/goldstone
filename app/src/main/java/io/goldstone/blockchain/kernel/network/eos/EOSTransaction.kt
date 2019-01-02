@@ -32,9 +32,6 @@ class EOSTransaction(
 	private val contract: TokenContract
 ) : Serializable, EOSTransactionInterface() {
 
-	fun stringfy(): String {
-		return "fromAccount: ${fromAccount.actor},permission: ${fromAccount.permission},toAccountName: $toAccountName, amount: $amount, memo: $memo, contract: $contract"
-	}
 	override fun serialized(@UiThread hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit) {
 		val transactionInfo = EOSTransactionInfo(
 			EOSAccount(fromAccount.actor),
@@ -46,21 +43,18 @@ class EOSTransaction(
 		val transactionInfoCode = transactionInfo.serialize()
 		EOSAPI.getTransactionHeader(expirationType) { header, error ->
 			val authorization = fromAccount
-			val authorizationObjects = EOSAuthorization.createMultiAuthorizationObjects(authorization)
 			// 准备 Action
 			val action = EOSAction(
 				EOSCodeName(contract.contract),
 				transactionInfoCode,
 				EOSTransactionMethod.transfer(),
-				authorizationObjects
+				listOf(authorization)
 			)
 			if (header.isNotNull() && error.isNone()) {
 				val serialization = EOSTransactionUtils.serialize(
 					SharedChain.getEOSCurrent().chainID,
 					header,
-					listOf(action),
-					listOf(authorization),
-					transactionInfoCode
+					listOf(action)
 				)
 				hold(serialization, error)
 			} else hold(null, error)

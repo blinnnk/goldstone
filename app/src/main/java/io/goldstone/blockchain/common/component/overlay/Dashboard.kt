@@ -17,6 +17,7 @@ import com.afollestad.materialdialogs.list.customListAdapter
 import com.afollestad.materialdialogs.list.getRecyclerView
 import com.afollestad.materialdialogs.list.listItemsMultiChoice
 import com.blinnnk.base.HoneyBaseAdapter
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.value.*
@@ -31,24 +32,36 @@ import org.jetbrains.anko.*
  */
 
 class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
-	val dialog = MaterialDialog(context)
-
+	private var dialog: MaterialDialog? = null
 	init {
-		dialog.window.setLayout(ScreenSize.overlayContentWidth, wrapContent)
+		dialog = MaterialDialog(context)
+		dialog?.window?.setLayout(ScreenSize.overlayContentWidth, wrapContent)
 		val shape = GradientDrawable().apply {
 			cornerRadius = CornerSize.small
 			shape = GradientDrawable.RECTANGLE
 			setSize(matchParent, matchParent)
 			setColor(Spectrum.white)
 		}
-		dialog.window.setBackgroundDrawable(shape)
+		dialog?.window?.setBackgroundDrawable(shape)
 		hold(this)
 	}
 
-	fun dismiss() = dialog.dismiss()
+	fun dismiss() {
+		dialog?.dismiss()
+		dialog = null
+	}
+
+	// 安全非空的 Dialog
+	fun getDialog(hold: MaterialDialog.() -> Unit) {
+		dialog?.let(hold)
+	}
+
+	fun cancelOnTouchOutside() {
+		dialog?.cancelOnTouchOutside(false)
+	}
 
 	fun <T, C : View> showList(title: String, adapter: HoneyBaseAdapter<T, C>) {
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			customListAdapter(adapter)
 			negativeButton(text = CommonText.gotIt)
@@ -57,7 +70,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 	}
 
 	fun <T, C : View> showGrid(title: String, adapter: HoneyBaseAdapter<T, C>) {
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			customListAdapter(adapter)
 			getRecyclerView()?.layoutManager =
@@ -69,20 +82,40 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 
 	fun <T : View> showDashboard(
 		title: String,
-		customView: T,
 		message: String,
+		customView: T,
 		hold: (T) -> Unit,
 		cancelAction: () -> Unit
 	) {
-		with(dialog) {
+		getDialog {
 			cancelOnTouchOutside(false)
 			title(text = title)
 			message(text = message)
 			customView(view = customView)
-			positiveButton(text = CommonText.confirm) {
-				hold(customView)
-				dialog.dismiss()
+			if (hold.isNotNull()) {
+				positiveButton(text = CommonText.confirm) {
+					hold(customView)
+					dialog?.dismiss()
+				}
 			}
+			negativeButton(text = CommonText.cancel) {
+				cancelAction()
+			}
+			show()
+		}
+	}
+
+	fun <T : View> showAttentionDashboard(
+		title: String,
+		message: String,
+		customView: T,
+		cancelAction: () -> Unit
+	) {
+		getDialog {
+			cancelOnTouchOutside(false)
+			title(text = title)
+			message(text = message)
+			customView(view = customView)
 			negativeButton(text = CommonText.cancel) {
 				cancelAction()
 			}
@@ -97,7 +130,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		cancelAction: () -> Unit = {},
 		confirmAction: () -> Unit
 	) {
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			message(text = message)
 			positiveButton(text = positiveButtonTitle) {
@@ -110,6 +143,24 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		}
 	}
 
+	fun showForceAlert(
+		title: String,
+		message: String,
+		positiveButtonTitle: String = CommonText.confirm,
+		confirmAction: () -> Unit
+	) {
+		cancelOnTouchOutside()
+		getDialog {
+			title(text = title)
+			message(text = message)
+			positiveButton(text = positiveButtonTitle) {
+				confirmAction()
+			}
+			negativeButton(null, "", null)
+			show()
+		}
+	}
+
 	fun showMultiChoice(
 		title: String,
 		data: List<String>,
@@ -117,7 +168,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 		confirmAction: (List<String>) -> Unit
 	) {
 		var selectedItems = listOf<String>()
-		with(dialog) {
+		getDialog {
 			title(text = title)
 			listItemsMultiChoice(
 				items = data,
@@ -125,7 +176,7 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 				waitForPositiveButton = false
 			) { _, _, items ->
 				selectedItems = items
-				dialog.setActionButtonEnabled(WhichButton.POSITIVE, items.isNotEmpty())
+				dialog?.setActionButtonEnabled(WhichButton.POSITIVE, items.isNotEmpty())
 			}
 			positiveButton(text = CommonText.confirm) {
 				confirmAction(selectedItems)
@@ -159,8 +210,8 @@ class Dashboard(private val context: Context, hold: Dashboard.() -> Unit) {
 			}
 			if (showEditText) showDashboard(
 				title,
-				input,
 				subtitle,
+				input,
 				{ action(it.findViewById(ElementID.passwordInput)) },
 				cancelAction
 			)

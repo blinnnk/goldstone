@@ -32,6 +32,7 @@ class QuotationManagementFragment :
 	override fun onDestroy() {
 		super.onDestroy()
 		with(presenter) {
+			updateSandboxPairs()
 			updateQuotationDataChanged {
 				notifyQuotationDataChanged()
 			}

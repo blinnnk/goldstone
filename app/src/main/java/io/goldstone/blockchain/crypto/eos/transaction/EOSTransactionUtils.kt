@@ -1,6 +1,5 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
-import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.header.TransactionHeader
@@ -50,9 +49,7 @@ object EOSTransactionUtils {
 	fun serialize(
 		chainID: ChainID,
 		header: TransactionHeader,
-		actions: List<EOSAction>,
-		authorizations: List<EOSAuthorization>,
-		transactionInfoCryptoData: String
+		actions: List<EOSAction>
 	): EOSTransactionSerialization {
 		val serializedHeader = header.serialize()
 		//  `contextFreeActions` 目前只有空的状态
@@ -62,18 +59,11 @@ object EOSTransactionUtils {
 		// 一整个一整个的序列化 `Action` 的子值, 这里只考虑了单一 `Action Child` 的情况
 		var serializedActions = serializedActionSize
 		actions.forEach { action ->
-			serializedActions += EOSUtils.getLittleEndianCode(action.code.value) + EOSUtils.getLittleEndianCode(action.methodName.value)
+			serializedActions += action.serialize()
 		}
-		val serializedAuthorizationSize = EOSUtils.getVariableUInt(authorizations.size)
-		var serializedAuthorizations = serializedAuthorizationSize
-		authorizations.forEach { authorization ->
-			serializedAuthorizations += EOSUtils.getLittleEndianCode(authorization.actor) + EOSUtils.getLittleEndianCode(authorization.permission.value)
-		}
-		val serializedDataByteLength = EOSUtils.getVariableUInt(Hex.decode(transactionInfoCryptoData).size)
 		val serializedTransactionExtension = "00"
 		val packedTX = serializedHeader +
-			serializedContextFreeActions + serializedActions + serializedAuthorizations +
-			serializedDataByteLength + transactionInfoCryptoData + serializedTransactionExtension
+			serializedContextFreeActions + serializedActions + serializedTransactionExtension
 		val serializedData = chainID.id + packedTX
 		return EOSTransactionSerialization(packedTX, serializedData.completeZero())
 	}

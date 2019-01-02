@@ -6,13 +6,17 @@ import com.blinnnk.util.HoneyDateUtil
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.error.GoldStoneError
+import io.goldstone.blockchain.common.error.TransferError
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.DateAndTimeText
 import io.goldstone.blockchain.common.language.TokenDetailText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -51,10 +55,14 @@ class TokenAssetPresenter(
 	// 在详情界面有可能有 `Stake` 或 `Trade` 操作这里, 恢复显示的时候从
 	// 数据库更新一次信息
 	override fun start() {
-		updateRefundInfo()
-		updateAccountInfo()
+		if (NetworkUtil.hasNetwork()) {
+			updateRefundInfo()
+			updateAccountInfo()
+			showChainTransactionCount()
+		} else {
+			showLocalTransactionCount()
+		}
 		setDelegateBandwidthEOSCount()
-		showTransactionCount()
 	}
 
 	override fun updateRefundInfo() {
@@ -71,12 +79,12 @@ class TokenAssetPresenter(
 
 	override fun getLatestActivationDate(contract: TokenContract, hold: (String) -> Unit) {
 		GlobalScope.launch(Dispatchers.Default) {
-			val time = EOSTransactionTable.dao.getMaxDataIndex(
+			val time = EOSTransactionTable.dao.getMaxDataIndexTime(
 				account.name,
 				contract.contract,
 				contract.symbol,
 				chainID.id
-			)?.time
+			)
 			launchUI {
 				if (time.isNotNull()) hold(HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText()))
 				else hold(CommonText.calculating)
@@ -85,7 +93,7 @@ class TokenAssetPresenter(
 	}
 
 	private fun setDelegateBandwidthEOSCount() {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			val totalDelegate =
 				EOSAccountTable.dao.getAccount(account.name, chainID.id)?.totalDelegateBandInfo
 			val description = if (totalDelegate.isNullOrEmpty()) {
@@ -131,7 +139,9 @@ class TokenAssetPresenter(
 		netAmount: BigInteger,
 		hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
-		PrivateKeyExportPresenter.getPrivateKey(
+		if (cpuAmount == BigInteger.ZERO && netAmount == BigInteger.ZERO) {
+			hold(null, TransferError("please enter the value you decide redemption bandwidth"))
+		} else PrivateKeyExportPresenter.getPrivateKey(
 			SharedAddress.getCurrentEOS(),
 			ChainType.EOS,
 			password
@@ -143,7 +153,11 @@ class TokenAssetPresenter(
 					cpuAmount,
 					netAmount,
 					ExpirationType.FiveMinutes
-				).send(EOSPrivateKey(privateKey), hold)
+				).send(
+					EOSPrivateKey(privateKey),
+					SharedChain.getEOSCurrent().getURL(),
+					hold
+				)
 			} else hold(null, error)
 		}
 	}
@@ -165,11 +179,10 @@ class TokenAssetPresenter(
 		}
 	}
 
-	private fun showTransactionCount() {
+	private fun showChainTransactionCount() {
 		// 先查数据库获取交易从数量, 如果数据库数据是空的那么从网络查询转账总个数
-		val account = SharedAddress.getCurrentEOSAccount()
 		EOSAPI.getTransactionCount(
-			SharedChain.getEOSCurrent().chainID,
+			chainID,
 			account,
 			EOSCodeName.EOSIOToken.value,
 			CoinSymbol.EOS
@@ -177,6 +190,19 @@ class TokenAssetPresenter(
 			if (latestCount.isNotNull() && error.isNone()) launchUI {
 				assetView.setTransactionCount(latestCount)
 			} else assetView.showError(error)
+		}
+	}
+
+	private fun showLocalTransactionCount() {
+		launchDefault {
+			EOSTransactionTable.dao.getMaxDataIndex(
+				account.name,
+				EOSCodeName.EOSIOToken.value,
+				CoinSymbol.eos,
+				chainID.id
+			)?.let {
+				assetView.setTransactionCount(it)
+			}
 		}
 	}
 
@@ -215,6 +241,9 @@ class TokenAssetPresenter(
 				if (eosAccount.isNotNull() && error.isNone()) {
 					// 初始化插入数据
 					EOSAccountTable.updateOrInsert(eosAccount, chainID)
+					EOSAccountTable.getValidPermission(account, chainID)?.apply {
+						SharedWallet.updateValidPermission(value)
+					}
 					callback(eosAccount)
 				}
 			}

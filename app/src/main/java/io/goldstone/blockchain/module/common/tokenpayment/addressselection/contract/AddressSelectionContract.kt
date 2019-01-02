@@ -16,7 +16,6 @@ interface AddressSelectionContract {
 		var asyncData: ArrayList<ContactTable>?
 		fun showAddresses(data: ArrayList<ContactTable>)
 		fun goToPaymentDetailFragment(address: String, count: Double, token: WalletDetailCellModel)
-		fun updateInputStatus()
 		fun goToPaymentDetailWithExistedCheckedDialog(
 			addresses: List<String>,
 			toAddress: String,

@@ -15,12 +15,11 @@ import io.goldstone.blockchain.common.language.QuotationText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
+import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotation.model.CurrencyPriceInfoModel
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.textColor
-import org.jetbrains.anko.wrapContent
+import org.jetbrains.anko.*
 
 /**
  * @date 25/04/2018 8:22 AM
@@ -63,7 +62,6 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		priceTitles.text = CustomTargetTextStyle(
 			value, "${model.currentPrice.toBigDecimal()}" + value, GrayScale.black, 12.uiPX(), true, false
 		)
-
 		percent.text = model.percent + "%"
 		// 增减显示不同的颜色
 		when {
@@ -72,8 +70,8 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 			else -> percent.textColor = Spectrum.green
 		}
 	}
-	private val priceTitles by lazy { TextView(context) }
-	private val percent by lazy { TextView(context) }
+	private var priceTitles: TextView
+	private var percent: TextView
 
 	init {
 		setHorizontalPadding(PaddingSize.content.toFloat())
@@ -81,21 +79,23 @@ class CurrentPriceView(context: Context) : TopBottomLineCell(context) {
 		setTitle(QuotationText.currentPrice)
 		layoutParams = LinearLayout.LayoutParams(matchParent, 80.uiPX())
 		showTopLine = true
-		priceTitles.apply {
+		priceTitles = textView {
 			textColor = GrayScale.black
 			textSize = fontSize(24)
 			typeface = GoldStoneFont.black(context)
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, wrapContent)
 			gravity = Gravity.START or Gravity.BOTTOM
+			x = PaddingSize.gsCard.toFloat()
 			y -= 5.uiPX()
-		}.into(this)
-		percent.apply {
+		}
+		percent = textView {
 			textColor = Spectrum.green
 			textSize = fontSize(15)
 			typeface = GoldStoneFont.heavy(context)
 			layoutParams = LinearLayout.LayoutParams(ScreenSize.widthWithPadding, 20.uiPX())
 			gravity = Gravity.END or Gravity.BOTTOM
+			x -= PaddingSize.gsCard
 			y -= 31.uiPX()
-		}.into(this)
+		}
 	}
 }

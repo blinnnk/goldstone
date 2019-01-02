@@ -5,8 +5,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.common.error.GoldStoneError
-import io.goldstone.blockchain.common.error.RequestError
-import io.goldstone.blockchain.common.utils.LogUtil
+import io.goldstone.blockchain.common.sharedpreference.SharedChain
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSTransactionSerialization
 import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
@@ -26,14 +25,16 @@ abstract class EOSTransactionInterface {
 		@UiThread hold: (serialization: EOSTransactionSerialization?, error: GoldStoneError) -> Unit
 	)
 
+	// 某些 DAPP 会要求 PushTransaction 到指定的节点, 故此这里作为参数传递
 	open fun send(
 		privateKey: EOSPrivateKey,
+		chaiURL: String,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		serialized { data, error ->
 			if (data.isNotNull() && error.isNone()) {
 				val signature = privateKey.sign(Sha256.from(Hex.decode(data.serialized))).toString()
-				EOSAPI.pushTransaction(listOf(signature), data.packedTX, hold)
+				EOSAPI.pushTransaction(listOf(signature), data.packedTX, chaiURL, hold)
 			} else hold(null, error)
 		}
 	}

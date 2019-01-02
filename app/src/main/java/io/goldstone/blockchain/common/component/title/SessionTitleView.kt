@@ -51,9 +51,10 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 		addView(subtitle)
 	}
 
-	fun setTitle(text: String, color: Int = GrayScale.midGray) {
+	fun setTitle(text: String, color: Int = GrayScale.midGray): SessionTitleView {
 		titleView.text = text
 		titleView.textColor = color
+		return this
 	}
 
 	fun setSubtitle(
@@ -62,7 +63,7 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 		specificColor: Int,
 		color: Int = GrayScale.midGray,
 		subtitleClickEvent: () -> Unit = {}
-	) {
+	): SessionTitleView {
 		subtitle.visibility = View.VISIBLE
 		subtitle.textColor = color
 		subtitle.text = CustomTargetTextStyle(specificText, wholeText, specificColor, 11.uiPX(), false, false)
@@ -70,6 +71,7 @@ class SessionTitleView(context: Context) : RelativeLayout(context) {
 			subtitleClickEvent()
 			subtitle.preventDuplicateClicks()
 		}
+		return this
 	}
 }
 

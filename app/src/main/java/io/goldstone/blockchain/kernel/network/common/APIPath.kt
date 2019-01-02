@@ -25,13 +25,18 @@ object APIPath {
 		"$header/account/searchPair?pair=$pair" +
 			if (marketIds.isEmpty()) "" else "&market_ids=$marketIds"
 	}
+	val searchPairByExactKey: (header: String) -> String = {
+		"$it/account/searchPairByExactKey"
+	}
 	val marketList: (header: String) -> String = { header ->
 		"$header/index/marketList?md5="
 	}
 	val getConfigList: (header: String) -> String = { "$it/index/getConfigList" }
 	val getCurrencyLineChartData: (header: String) -> String = { "$it/account/lineDataByDay" }
 	val getPriceByAddress: (header: String) -> String = { "$it/index/priceByAddress" }
-	val getCoinInfo: (header: String) -> String = { "$it/market/coinInfo?symbol=" }
+	val getCoinInfo: (header: String, symbol: String, contract: String) -> String = { header, symbol, contract ->
+		"$header/market/coinInfo?symbol=$symbol&contract=$contract"
+	}
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
@@ -40,7 +45,7 @@ object APIPath {
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
 	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
 	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
-		"$header/eos/tokenList?chainid=$chainID&account=$account"
+		"$header/eos/tokenHistory?chainid=$chainID&account=$account"
 	}
 	val getEOSTokenCountInfo: (
 		header: String,
@@ -49,7 +54,7 @@ object APIPath {
 		code: String,
 		symbol: String
 	) -> String = { header, chainID, account, codeName, symbol ->
-		"$header/eos/txCountInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
+		"$header/eos/transferStatInfo?chainid=$chainID&account=$account&code=$codeName&symbol=$symbol"
 	}
 	val getEOSTransactions: (
 		header: String,
@@ -61,7 +66,7 @@ object APIPath {
 		codeName: String,
 		symbol: String
 	) -> String = { header, chainID, account, pageSize, startID, endID, codeName, symbol ->
-		"$header/eos/actionList?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
+		"$header/eos/actionHistory?chainid=$chainID&account=$account&size=$pageSize&start=$startID&end=$endID&code=$codeName&symbol=$symbol"
 	}
 	val defaultTokenList: (
 		header: String
@@ -102,6 +107,11 @@ object APIPath {
 
 	val getNewDAPPs: (header: String, page: Int, pageSize: Int) -> String = { header, pageIndex, pageSize ->
 		"$header/dapp/getDapps?page=$pageIndex&size=$pageSize"
+	}
+
+	// 从服务器动态更新注入 `Scatter` 的 `JS Code`
+	val getDAPPJSCode: (header: String) -> String = { header ->
+		"$header/index/getJSCode"
 	}
 
 	val searchDAPP: (header: String, condition: String) -> String = { header, condition ->

@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.component.chart.line
 import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import com.blinnnk.extension.hasValue
 import com.blinnnk.extension.isNull
@@ -21,7 +22,6 @@ import com.github.mikephil.charting.renderer.LineChartRenderer
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.chart.XAxisRenderer
 import io.goldstone.blockchain.common.utils.GoldStoneFont
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.Spectrum
@@ -89,7 +89,7 @@ abstract class LineChart : BarLineChartBase<LineData>, LineDataProvider {
 				val entry = try {
 					valueData?.get(position)
 				} catch (error: Exception) {
-					LogUtil.error("LineChart getFormattedValue", error)
+					Log.e("LineChart getFormattedValue", error.message)
 					return@IAxisValueFormatter ""
 				}
 				// 传进来的时间可能是 timeStamp long 有的时候是 转好的 string

@@ -137,7 +137,7 @@ object PincodeText {
 		else -> ""
 	}
 	@JvmField
-	val enterPincode = when (currentLanguage) {
+	val enterPinCode = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter PIN"
 		HoneyLanguage.Chinese.code -> "输入 PIN 码"
 		HoneyLanguage.Japanese.code -> "PIN を入力"
@@ -147,13 +147,23 @@ object PincodeText {
 		else -> ""
 	}
 	@JvmField
-	val enterPincodeDescription = when (currentLanguage) {
+	val setPincodeDescription = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Set the lock screen password to protect privacy. Once the lock screen password is enabled, you need to enter the lock screen password to view the wallet every time you open GoldStone."
 		HoneyLanguage.Chinese.code -> "设置锁屏密码保护隐私，一旦开启锁屏密码，每次打开 GoldStone 时需要输入锁屏密码才能查看钱包"
 		HoneyLanguage.Japanese.code -> "ロック画面のパスワードを設定すると、プライバシー保護のために画面がロックされます。ロック画面のパスワードが有効になったら、ゴールドストーンを開くたびにウォレットを表示するためにロック画面のパスワードを入力する必要があります。"
 		HoneyLanguage.Korean.code -> "잠금 화면 암호를 설정하여 개인 정보를 보호하십시오. 화면 잠금 암호가 활성화되면 GoldStone을 열 때마다 지갑 화면을 보려면 잠금 화면 암호를 입력해야합니다."
 		HoneyLanguage.Russian.code -> "Установите пароль для блокировки экрана для защиты конфиденциальности. После того как пароль заблокированного экрана включен, вам нужно ввести пароль блокировки для просмотра кошелька каждый раз, когда вы открываете GoldStone."
 		HoneyLanguage.TraditionalChinese.code -> "設置鎖屏密碼保護隱私，一旦開啟鎖屏密碼，每次打開 GoldStone 時需要輸入鎖屏密碼才能查看錢包"
+		else -> ""
+	}
+	@JvmField
+	val enterPinCodeDescription = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Please enter the 4-digit PIN code"
+		HoneyLanguage.Chinese.code -> "请输入设置的4位数字 PIN 码"
+		HoneyLanguage.Japanese.code -> "設定した4桁の PIN コードを入力してください"
+		HoneyLanguage.Korean.code -> "설정된 4 자리 PIN 코드를 입력하십시오."
+		HoneyLanguage.Russian.code -> "Введите четырехзначный PIN-код"
+		HoneyLanguage.TraditionalChinese.code -> "請輸入設置的4位數字 PIN 碼"
 		else -> ""
 	}
 }
@@ -202,6 +212,20 @@ object ContactText {
 		else -> ""
 	}
 
+	//显示联系人有多少个地址的文案
+	@JvmField
+	val address: (count: Int) -> String = {
+		when (currentLanguage) {
+			HoneyLanguage.English.code -> if (it > 1) "Addresses" else "Address"
+			HoneyLanguage.Chinese.code -> "个地址"
+			HoneyLanguage.Japanese.code -> "アドレス"
+			HoneyLanguage.Korean.code -> "주소"
+			HoneyLanguage.Russian.code -> if (it > 1) "Адреса" else "Адрес"
+			HoneyLanguage.TraditionalChinese.code -> "個地址"
+			else -> ""
+		}
+	}
+
 	@JvmField
 	val ethERCAndETHint = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Enter Ethereum, ERC20 or Ethereum Classic address that you want to store"
@@ -232,6 +256,17 @@ object ContactText {
 		HoneyLanguage.Korean.code -> "저장할 EOS Jungle 테스트 계정 이름을 입력하십시오"
 		HoneyLanguage.Russian.code -> "Введите имя тестовой учетной записи EOS Jungle, которое вы хотите сохранить."
 		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的 EOS Jungle 測試網網賬戶名"
+		else -> ""
+	}
+
+	@JvmField
+	val eosKylinHint = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Enter EOS Kylin address that you want to store"
+		HoneyLanguage.Chinese.code -> "输入您要存储的 EOS Kylin 测试网账户名"
+		HoneyLanguage.Japanese.code -> "保存したい EOS Kylinテストネットワークアカウント名を入力してください"
+		HoneyLanguage.Korean.code -> "저장할 EOS Kylin 테스트 계정 이름을 입력하십시오"
+		HoneyLanguage.Russian.code -> "Введите имя тестовой учетной записи EOS Kylin, которое вы хотите сохранить."
+		HoneyLanguage.TraditionalChinese.code -> "輸入您要存儲的 EOS Kylin 測試網網賬戶名"
 		else -> ""
 	}
 
@@ -320,6 +355,51 @@ object QRText {
 		HoneyLanguage.TraditionalChinese.code -> "未識別到有效的二維碼圖片"
 		else -> ""
 	}
+
+	@JvmField
+	val findTestNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a test network address, which needs to switch to test nodes in the settings before it can be transferred."
+		HoneyLanguage.Chinese.code -> "这是一个测试网的地址，需要在设置中切换到测试节点后才可转账"
+		HoneyLanguage.Japanese.code -> "これはテストネットワークのアドレスです。テストネットワークは、転送する前に設定でテストノードに転送する必要があります。"
+		HoneyLanguage.Korean.code -> "이것은 전송되기 전에 설정에서 테스트 노드로 전송되어야하는 테스트 네트워크의 주소입니다."
+		HoneyLanguage.Russian.code -> "Это адрес тестовой сети, который необходимо передать тестовому узлу в настройках, прежде чем его можно будет передать."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個測試網的地址，需要在設置中切換到測試節點後才可轉賬"
+		else -> ""
+	}
+
+	@JvmField
+	val findMainNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "This is a main network address, which needs to switch to mainnet nodes in the settings before it can be transferred."
+		HoneyLanguage.Chinese.code -> "这是一个主网的地址，需要在设置中切换到测试节点后才可转账"
+		HoneyLanguage.Japanese.code -> "これは、転送の前にセットメインネットワークノードに切り替える必要がメインネットワークのアドレスであります"
+		HoneyLanguage.Korean.code -> "기본 네트워크의 주소이며 기본 네트워크 노드로 전송되어야 전송됩니다."
+		HoneyLanguage.Russian.code -> "Это адрес первичной сети, который необходимо перенести на первичный сетевой узел в настройках, прежде чем его можно будет передать."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個主網的地址，需要在設置中切換到主網節點後才可轉賬"
+		else -> ""
+	}
+
+	@JvmField
+	val findInvalidTestNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Invalid testnet address"
+		HoneyLanguage.Chinese.code -> "这是一个无效的测试网地址,请检查后重新输入"
+		HoneyLanguage.Japanese.code -> "これは無効なテストネットワークアドレスです。確認して再入力してください"
+		HoneyLanguage.Korean.code -> "유효하지 않은 테스트 네트워크 주소입니다. 확인 후 다시 입력하십시오."
+		HoneyLanguage.Russian.code -> "Это неверный тестовый сетевой адрес, пожалуйста, проверьте и введите заново"
+		HoneyLanguage.TraditionalChinese.code -> "這是一個無效的測試網地址,請檢查後重新輸入"
+		else -> ""
+	}
+
+	@JvmField
+	val findInvalidMainNetAddress = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Invalid address"
+		HoneyLanguage.Chinese.code -> "这是一个无效的地址,请检查后重新输入"
+		HoneyLanguage.Japanese.code -> "これは無効なプライマリネットワークアドレスです。確認して再入力してください"
+		HoneyLanguage.Korean.code -> "기본 네트워크 주소가 잘못되었습니다. 확인한 후 다시 입력하십시오."
+		HoneyLanguage.TraditionalChinese.code -> "這是一個無效的主網地址,請檢查後重新輸入"
+		HoneyLanguage.Russian.code -> "Это неверный основной сетевой адрес, пожалуйста, проверьте и введите заново"
+		else -> ""
+	}
+
 	@JvmField
 	val invalidContract = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Inconsistent currency. The QR code scanned is not that of the current token, please change the transfer token, or change the scanned QR code."

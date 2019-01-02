@@ -10,7 +10,6 @@ import com.blinnnk.extension.*
 import io.goldstone.blockchain.common.component.GradientType
 import io.goldstone.blockchain.common.component.GradientView
 import io.goldstone.blockchain.common.component.container.SplashContainer
-import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
@@ -24,7 +23,6 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.crypto.multichain.node.ChainURL
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.kernel.receiver.XinGePushReceiver
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.entrance.splash.presenter.SplashPresenter
@@ -65,45 +63,50 @@ class SplashActivity : AppCompatActivity() {
 				}
 			)
 			GlobalScope.launch(Dispatchers.Default) {
-				presenter.cleanWhenUpdateDatabaseOrElse {
-					prepareData()
+				with(presenter) {
+					cleanWhenUpdateDatabaseOrElse {
+						initSupportCurrencyList(this@SplashActivity)
+						initDefaultExchangeData(this@SplashActivity)
+						prepareAppConfig {
+							recoverySandboxData { hasChanged ->
+								if (hasChanged) {
+									AppConfigTable.dao.getAppConfig()?.prepareData()
+								} else prepareData()
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 
 	@WorkerThread
-	private fun prepareData() {
-		prepareAppConfig {
-			SharedValue.updatePincodeDisplayStatus(showPincode)
-			SharedWallet.updateCurrencyCode(currencyCode)
-			// 如果本地的钱包数量不为空那么才开始注册设备
-			// 把 `GoldStoneID` 存储到 `SharePreference` 里面
-			SharedWallet.updateGoldStoneID(goldStoneID)
-			findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
-				val hasStartingFragment =
-					supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
-				if (!hasStartingFragment) launchUI {
-					addFragment<StartingFragment>(it.id)
-				}
+	private fun AppConfigTable.prepareData() {
+		SharedValue.updatePincodeDisplayStatus(showPincode)
+		SharedWallet.updateCurrencyCode(currencyCode)
+		SharedValue.updateJSCode(jsCode)
+		// 如果本地的钱包数量不为空那么才开始注册设备
+		// 把 `GoldStoneID` 存储到 `SharePreference` 里面
+		SharedWallet.updateGoldStoneID(goldStoneID)
+		findViewById<RelativeLayout>(ContainerID.splash)?.let { it ->
+			val hasStartingFragment =
+				supportFragmentManager.fragments.find { it is StartingFragment }.isNotNull()
+			if (!hasStartingFragment) launchUI {
+				addFragment<StartingFragment>(it.id)
 			}
-			// Add currency data from local JSON file
-			with(presenter) {
-				initNodeList(activity) {
-					prepareNodeInfo {
-						// 初次安装软件关键数据从本地 JSON 生成到数据库,
-						// 后续会在网络环境更新为网络数据
-						initLaunchLanguage(language)
-						initSupportCurrencyList(activity)
-						initDefaultExchangeData(activity)
-						initDefaultToken(activity)
-						// 检查市场状况
-						prepareInReviewStatus {
-							updateAccountInformation(activity) {
-								launchUI {
-									jump<MainActivity>()
-								}
-							}
+		}
+		// Add currency data from local JSON file
+		with(presenter) {
+			initNodeList(activity) {
+				prepareNodeInfo {
+					// 初次安装软件关键数据从本地 JSON 生成到数据库,
+					// 后续会在网络环境更新为网络数据
+					initLaunchLanguage(language)
+					initDefaultToken(activity)
+					// 检查市场状况
+					updateAccountInformation(activity) {
+						launchUI {
+							jump<MainActivity>()
 						}
 					}
 				}
@@ -159,25 +162,11 @@ class SplashActivity : AppCompatActivity() {
 			} else {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
 				if (config.isRegisteredAddresses) {
-					val currentWallet =
-						WalletTable.dao.findWhichIsUsing(true)
+					val currentWallet = WalletTable.dao.findWhichIsUsing()
 					XinGePushReceiver.registerAddressesForPush(currentWallet)
 				}
 				config.let(callback)
 			}
-		}
-	}
-
-	@WorkerThread
-	private fun prepareInReviewStatus(callback: (GoldStoneError) -> Unit) {
-		GoldStoneAPI.getConfigList { serverConfigs, error ->
-			if (serverConfigs.isNotNull() && error.isNone()) {
-				val isInReview = serverConfigs.find {
-					it.name.equals("inReview", true)
-				}?.switch?.toIntOrNull() == 1
-				SharedWallet.updateInReviewStatus(isInReview)
-				callback(error)
-			} else callback(error)
 		}
 	}
 

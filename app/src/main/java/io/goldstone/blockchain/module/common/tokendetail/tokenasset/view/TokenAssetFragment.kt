@@ -18,6 +18,7 @@ import io.goldstone.blockchain.common.component.ProcessType
 import io.goldstone.blockchain.common.component.ProgressView
 import io.goldstone.blockchain.common.component.button.titleIcon
 import io.goldstone.blockchain.common.component.cell.GraySquareCell
+import io.goldstone.blockchain.common.component.cell.graySquareCell
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.component.title.sessionTitle
@@ -36,6 +37,7 @@ import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.multichain.TokenContract
 import io.goldstone.blockchain.crypto.multichain.getAddress
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.view.EOSAccountSelectionFragment
+import io.goldstone.blockchain.module.common.tokendetail.eosactivation.authorizatitonmanagement.view.AuthorizationManagementFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.cputradingdetail.view.CPUTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.nettradingdetail.view.NETTradingFragment
 import io.goldstone.blockchain.module.common.tokendetail.eosresourcetrading.ramtradingdetail.view.RAMTradingFragment
@@ -110,25 +112,32 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 					gridLayout {
 						leftPadding = 10.uiPX()
 						rightPadding = 10.uiPX()
-						val iconSize = ScreenSize.card / 4
+						val iconSize = ScreenSize.widthWithPadding / 4
 						listOf(
 							Pair(R.drawable.cpu_icon, TokenDetailText.delegateCPU),
 							Pair(R.drawable.net_icon, TokenDetailText.delegateNET),
 							Pair(R.drawable.ram_icon, TokenDetailText.buySellRAM),
-							Pair(R.drawable.register_icon, TokenDetailText.accountRegister)
+							Pair(R.drawable.permission_icon, TokenDetailText.permission)
 						).forEach { info ->
 							titleIcon {
 								layoutParams = LinearLayout.LayoutParams(iconSize, wrapContent)
 								setContent(info.first, info.second, Spectrum.blue)
 							}.click {
-								if (SharedWallet.isWatchOnlyWallet())
-									safeShowError(Throwable(AlertText.watchOnly))
-								else showTradingFragment(info.second)
+								showTradingFragment(info.second)
 							}
 						}
 					}
 					showTransactionCells()
 					showAssetDashboard()
+					sessionTitle {
+						setTitle("Extension Tools")
+					}
+					graySquareCell {
+						setTitle(TokenDetailText.accountRegister)
+						showArrow()
+					}.click {
+						showTradingFragment(TokenDetailText.accountRegister)
+					}
 				}
 			}
 		}.view
@@ -173,6 +182,10 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun showTradingFragment(title: String) {
+		if (SharedWallet.isWatchOnlyWallet()) {
+			safeShowError(Throwable(AlertText.watchOnly))
+			return
+		}
 		val parentPresenter =
 			getGrandFather<TokenDetailOverlayFragment>()?.presenter
 		when (title) {
@@ -184,6 +197,8 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 				?.showTargetFragment<RAMTradingFragment>(Bundle(), 2)
 			TokenDetailText.accountRegister -> parentPresenter
 				?.showTargetFragment<EOSAccountRegisterFragment>(Bundle(), 2)
+			TokenDetailText.permission -> parentPresenter?.
+				showTargetFragment<AuthorizationManagementFragment>(Bundle(), 2)
 		}
 	}
 
@@ -311,22 +326,28 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		ramAssetCell = ProgressView(context).apply {
 			setTitle(TokenDetailText.ram)
 			setSubtitle(CommonText.calculating)
+		}.click {
+			showTradingFragment(TokenDetailText.buySellRAM)
 		}
 
 		cpuAssetCell = ProgressView(context).apply {
 			setTitle(TokenDetailText.cpu)
 			setSubtitle(CommonText.calculating)
+		}.click {
+			showTradingFragment(TokenDetailText.delegateCPU)
 		}
 
 		netAssetCell = ProgressView(context).apply {
 			setTitle(TokenDetailText.net)
 			setSubtitle(CommonText.calculating)
+		}.click {
+			showTradingFragment(TokenDetailText.delegateNET)
 		}
 
 		assetCard.addContent {
-			addView(ramAssetCell)
-			addView(cpuAssetCell)
-			addView(netAssetCell)
+			ramAssetCell.into(this)
+			cpuAssetCell.into(this)
+			netAssetCell.into(this)
 		}
 	}
 
@@ -353,7 +374,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 	}
 
 	private fun Dashboard.showRefundBandwidthEditorDashboard(receiver: EOSAccount) {
-		with(dialog) {
+		getDialog {
 			cancelOnTouchOutside(false)
 			setContentView(
 				DelegateEditorView(context).apply {
@@ -369,7 +390,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 						) { response, error ->
 							launchUI {
 								if (response.isNotNull() && error.isNone()) launchUI {
-									dialog.dismiss()
+									dismiss()
 									showLoading(false)
 									presenter.updateRefundInfo()
 									response.showDialog(context)

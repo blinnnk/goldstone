@@ -2,10 +2,7 @@ package io.goldstone.blockchain.kernel.network.common
 
 import android.annotation.SuppressLint
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.orEmpty
-import com.blinnnk.extension.safeGet
-import com.blinnnk.extension.toArrayList
-import com.blinnnk.extension.toJSONObjectList
+import com.blinnnk.extension.*
 import com.blinnnk.util.ConcurrentAsyncCombine
 import com.blinnnk.util.TinyNumberUtils
 import com.google.gson.Gson
@@ -301,18 +298,15 @@ object GoldStoneAPI {
 		country: String,
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
-			RequestBody.create(
-				requestContentType,
-				ParameterUtil.prepare(
-					true,
-					Pair("language", language),
-					Pair("cid", pushToken),
-					Pair("device", deviceID),
-					Pair("push_type", isChina),
-					Pair("os", isAndroid),
-					Pair("country", country)
-				)
+		RequisitionUtil.post(
+			ParameterUtil.prepare(
+				true,
+				Pair("language", language),
+				Pair("cid", pushToken),
+				Pair("device", deviceID),
+				Pair("push_type", isChina),
+				Pair("os", isAndroid),
+				Pair("country", country)
 			),
 			APIPath.registerDevice(APIPath.currentUrl),
 			true,
@@ -341,15 +335,25 @@ object GoldStoneAPI {
 		pairList: JsonArray,
 		@WorkerThread hold: (lineData: List<QuotationSelectionLineChartModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
-			RequestBody.create(
-				requestContentType,
-				ParameterUtil.prepare(true, Pair("pair_list", pairList))
-			),
-			"data_list",
+		RequisitionUtil.post(
+			ParameterUtil.prepare(true, Pair("pair_list", pairList)),
 			APIPath.getCurrencyLineChartData(APIPath.currentUrl),
-			isEncrypt = true,
-			hold = hold
+			"data_list",
+			true,
+			hold
+		)
+	}
+
+	fun getQuotationByPairs(
+		pairList: JsonArray,
+		@WorkerThread hold: (lineData: List<QuotationSelectionTable>?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.post(
+			AesCrypto.encrypt(pairList.toString()).orEmpty(),
+			APIPath.searchPairByExactKey(APIPath.currentUrl),
+			"pair_list",
+			true,
+			hold
 		)
 	}
 
@@ -357,11 +361,8 @@ object GoldStoneAPI {
 		content: String,
 		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
-			RequestBody.create(
-				requestContentType,
-				content
-			),
+		RequisitionUtil.post(
+			content,
 			APIPath.updateAddresses(APIPath.currentUrl),
 			true,
 			hold
@@ -373,14 +374,11 @@ object GoldStoneAPI {
 		time: Long,
 		@WorkerThread hold: (unreadCount: Int?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
-			RequestBody.create(
-				requestContentType,
-				ParameterUtil.prepare(
-					true,
-					Pair("device", deviceID),
-					Pair("time", time)
-				)
+		RequisitionUtil.post(
+			ParameterUtil.prepare(
+				true,
+				Pair("device", deviceID),
+				Pair("time", time)
 			),
 			APIPath.getUnreadCount(APIPath.currentUrl),
 			true
@@ -398,19 +396,15 @@ object GoldStoneAPI {
 			error: RequestError
 		) -> Unit
 	) {
-		RequisitionUtil.postRequest<String>(
-			RequestBody.create(
-				requestContentType,
-				ParameterUtil.prepare(true, Pair("time", time))
-			),
-			"message_list",
+		RequisitionUtil.postAndGetTargetKeyValue(
+			ParameterUtil.prepare(true, Pair("time", time)),
 			APIPath.getNotification(APIPath.currentUrl),
-			true,
+			"message_list",
 			true
 		) { result, error ->
 			// 因为返回的数据格式复杂这里采用自己处理数据的方式, 不用 `Gson`
-			if (result?.firstOrNull() != null && error.isNone()) {
-				val jsonArray = JSONArray(result.first())
+			if (result.isNotNull() && error.isNone()) {
+				val jsonArray = JSONArray(result)
 				if (jsonArray.length() == 0) {
 					hold(arrayListOf(), error)
 				} else {
@@ -426,13 +420,10 @@ object GoldStoneAPI {
 		addressList: List<String>,
 		@WorkerThread hold: (priceList: List<TokenPriceModel>?, error: RequestError) -> Unit
 	) {
-		RequisitionUtil.postRequest(
-			RequestBody.create(
-				requestContentType,
-				ParameterUtil.prepare(true, Pair("address_list", addressList))
-			),
-			"price_list",
+		RequisitionUtil.post(
+			ParameterUtil.prepare(true, Pair("address_list", addressList)),
 			APIPath.getPriceByAddress(APIPath.currentUrl),
+			"price_list",
 			isEncrypt = true,
 			hold = hold
 		)
@@ -470,11 +461,12 @@ object GoldStoneAPI {
 
 	fun getTokenInfoFromMarket(
 		symbol: String,
+		contract: String,
 		chainID: ChainID,
 		@WorkerThread hold: (coinInfo: CoinInfoModel?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
-			APIPath.getCoinInfo(APIPath.currentUrl) + symbol,
+			APIPath.getCoinInfo(APIPath.currentUrl, symbol, contract),
 			"",
 			true,
 			isEncrypt = true
@@ -514,6 +506,17 @@ object GoldStoneAPI {
 			isEncrypt = true,
 			hold = hold
 		)
+	}
+
+	fun getDAPPJSCode(@WorkerThread hold: (data: String?, error: RequestError) -> Unit) {
+		requestData<String>(
+			APIPath.getDAPPJSCode(APIPath.currentUrl),
+			"data",
+			true,
+			isEncrypt = true
+		) { result, error ->
+			hold(result?.firstOrNull(), error)
+		}
 	}
 
 	fun searchDAPP(

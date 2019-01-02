@@ -18,6 +18,7 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
+import io.goldstone.blockchain.common.language.ContactText
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.value.*
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
@@ -49,7 +50,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 			Pair("${CoinSymbol.etc}/${CoinSymbol.erc}", ethSeriesAddress.isNotEmpty()),
 			Pair(CoinSymbol.eos, eosAddress.isNotEmpty()),
 			Pair("${CoinSymbol.eos} JUNGLE", eosJungle.isNotEmpty()),
-			Pair(CoinSymbol.btc(), btcMainnetAddress.isNotEmpty()),
+			Pair(CoinSymbol.btc, btcMainnetAddress.isNotEmpty()),
 			Pair(CoinSymbol.ltc, ltcAddress.isNotEmpty()),
 			Pair(CoinSymbol.bch, bchAddress.isNotEmpty()),
 			Pair("BTCTest", btcSeriesTestnetAddress.isNotEmpty())
@@ -57,7 +58,7 @@ open class ContactsCell(context: Context) : RelativeLayout(context) {
 		val count = addresses.filter { it.second }.size
 		val allTypes = addresses.asSequence().filter { it.second }.map { it.first }.toList().toString()
 		val type = "(${allTypes.substring(1, allTypes.lastIndex)})"
-		val unit = if (count > 1) "Addresses" else "Address"
+		val unit = ContactText.address(count)
 		return "$count $unit $type"
 	}
 

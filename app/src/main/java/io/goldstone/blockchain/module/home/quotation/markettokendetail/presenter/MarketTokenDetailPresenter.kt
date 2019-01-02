@@ -158,6 +158,7 @@ class MarketTokenDetailPresenter(
 			val localLanguageCode = tokenData.description.firstOrNull()?.toString()?.toIntOrNull()
 			val needToUpdate =
 				tokenData.marketCap.isEmpty()
+					|| tokenData.startDate.isEmpty()
 					|| tokenData.rankValue.isEmpty()
 					|| localLanguageCode != SharedWallet.getCurrentLanguageCode()
 			if (NetworkUtil.hasNetwork()) {
@@ -303,7 +304,7 @@ class MarketTokenDetailPresenter(
 		@UiThread hold: (DefaultTokenTable) -> Unit
 	) {
 		val chainID = TokenContract(info.contract, info.symbol, null).getMainnetChainID()
-		GoldStoneAPI.getTokenInfoFromMarket(info.symbol, chainID) { coinInfo, error ->
+		GoldStoneAPI.getTokenInfoFromMarket(info.symbol, info.contract, chainID) { coinInfo, error ->
 			if (coinInfo.isNotNull() && error.isNone()) DefaultTokenTable.updateOrInsertCoinInfo(coinInfo) {
 				DefaultTokenTable.getToken(info.contract, info.symbol, chainID) {
 					it?.let(hold)

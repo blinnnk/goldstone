@@ -7,6 +7,7 @@ import io.goldstone.blockchain.common.error.GoldStoneError
 import io.goldstone.blockchain.common.error.RequestError
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.utils.toJsonArray
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
@@ -26,7 +27,6 @@ import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSRAMMarket
 import io.goldstone.blockchain.kernel.network.eos.commonmodel.EOSTokenBalance
 import io.goldstone.blockchain.kernel.network.eos.thirdparty.EOSPark
 import io.goldstone.blockchain.kernel.network.eos.thirdparty.NewDexPair
-import io.goldstone.blockchain.kernel.network.ethereum.ETHJsonRPC
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.DelegateBandWidthInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.RefundRequestInfo
@@ -34,7 +34,6 @@ import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountse
 import io.goldstone.blockchain.module.common.tokendetail.tokeninfo.model.EOSTokenCountInfo
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.EOSAccountInfo
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.math.BigInteger
@@ -111,18 +110,12 @@ object EOSAPI {
 		blockNumber: Int,
 		@WorkerThread hold: (jsonString: String?, error: RequestError) -> Unit
 	) {
-		RequestBody.create(
-			ETHJsonRPC.contentType,
-			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber))
-		).let { requestBody ->
-			val api = EOSUrl.getBlock()
-			RequisitionUtil.postRequest(
-				requestBody,
-				api,
-				false,
-				hold
-			)
-		}
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(Pair("block_num_or_id", blockNumber)),
+			EOSUrl.getBlock(),
+			false,
+			hold
+		)
 	}
 
 	fun getAccountInfo(
@@ -130,31 +123,26 @@ object EOSAPI {
 		targetNet: String = "",
 		@WorkerThread hold: (accountInfo: EOSAccountTable?, error: GoldStoneError) -> Unit
 	) {
-		RequestBody.create(
-			ETHJsonRPC.contentType,
-			ParameterUtil.prepareObjectContent(Pair("account_name", account.name))
-		).let { requestBody ->
-			val api =
-				if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
-				else EOSUrl.getAccountInfoInTargetNet(targetNet)
-			RequisitionUtil.postRequest(
-				requestBody,
-				api,
-				false
-			) { result, error ->
-				// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
-				// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
-				if (result?.isNotEmpty() == true && error.isNone()) {
-					hold(
-						EOSAccountTable(
-							JSONObject(result),
-							SharedAddress.getCurrentEOS(),
-							SharedChain.getEOSCurrent().chainID
-						),
-						error
-					)
-				} else hold(null, error)
-			}
+		val api =
+			if (targetNet.isEmpty()) EOSUrl.getAccountInfo()
+			else EOSUrl.getAccountInfoInTargetNet(targetNet)
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.name)),
+			api,
+			false
+		) { result, error ->
+			// 测试网络挂了的时候, 换一个网络请求接口. 目前值处理了测试网络的情况
+			// 这个库还承载着本地查询是否是激活的账号的用户所以会额外存储公钥地址
+			if (result?.isNotEmpty() == true && error.isNone()) {
+				hold(
+					EOSAccountTable(
+						JSONObject(result),
+						SharedAddress.getCurrentEOS(),
+						SharedChain.getEOSCurrent().chainID
+					),
+					error
+				)
+			} else hold(null, error)
 		}
 	}
 
@@ -163,17 +151,12 @@ object EOSAPI {
 		account: EOSAccount,
 		@WorkerThread hold: (result: String?, error: GoldStoneError) -> Unit
 	) {
-		RequestBody.create(
-			ETHJsonRPC.contentType,
-			ParameterUtil.prepareObjectContent(Pair("account_name", account.name))
-		).let { requestBody ->
-			RequisitionUtil.postRequest(
-				requestBody,
-				EOSUrl.getAccountInfo(),
-				false,
-				hold
-			)
-		}
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(Pair("account_name", account.name)),
+			EOSUrl.getAccountInfo(),
+			false,
+			hold
+		)
 	}
 
 	fun getAvailableRamBytes(
@@ -243,11 +226,25 @@ object EOSAPI {
 		}
 	}
 
+	fun getStringChainInfo(
+		@WorkerThread hold: (chainInfo: String?, error: GoldStoneError) -> Unit
+	) {
+		RequisitionUtil.requestUnCryptoData<String>(
+			EOSUrl.getInfo(),
+			listOf(),
+			true
+		) { result, error ->
+			hold(result?.firstOrNull(), error)
+		}
+	}
+
 	fun pushTransaction(
 		signatures: List<String>,
 		packedTrxCode: String,
+		chainURL: String,
 		@WorkerThread hold: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
+		println("pushTransaction API Address: ${EOSUrl.pushTransaction(chainURL)}")
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("signatures", signatures.toJsonArray()),
@@ -255,12 +252,11 @@ object EOSAPI {
 				Pair("compression", "none"),
 				Pair("packed_context_free_data", "00")
 			),
-			EOSUrl.pushTransaction(),
+			EOSUrl.pushTransaction(chainURL),
 			false
 		) { result, error ->
-			if (result.isNullOrEmpty() || error.hasError()) {
-				hold(null, error)
-			} else {
+			if (result.isNullOrEmpty() || error.hasError()) hold(null, error)
+			else {
 				val response = JSONObject(result)
 				when {
 					result.contains("processed") -> {
@@ -312,6 +308,25 @@ object EOSAPI {
 		}
 	}
 
+	/** 这个方法直接返回链数据没有做任何处理, 服务 `Scatter` 的调用 */
+	fun getCurrencyBalance(
+		account: EOSAccount,
+		symbol: CoinSymbol,
+		code: String,
+		@WorkerThread hold: (result: String?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.post(
+			ParameterUtil.prepareObjectContent(
+				Pair("code", code),
+				Pair("account", account.name),
+				Pair("symbol", symbol.symbol)
+			),
+			EOSUrl.getAccountEOSBalance(),
+			false,
+			hold
+		)
+	}
+
 	// `EOS` 对 `token` 做任何操作的时候 需要在操作其 `Code Name`
 	fun getAccountResource(
 		account: EOSAccount,
@@ -337,7 +352,8 @@ object EOSAPI {
 		tokenCodeName: EOSCodeName = EOSCodeName.EOSIO,
 		@WorkerThread hold: (data: List<RefundRequestInfo>?, error: GoldStoneError) -> Unit
 	) {
-		if (!account.isValid(false)) hold(null, AccountError.InvalidAccountName)
+		if (!account.isValid(false))
+			hold(null, AccountError.InvalidAccountName)
 		else RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(
 				Pair("scope", account.name),
@@ -392,7 +408,7 @@ object EOSAPI {
 		if (indexPosition.isNotNull()) params.add(indexPosition)
 		if (keyType.isNotNull()) params.add(keyType)
 
-		RequisitionUtil.postString(
+		RequisitionUtil.postAndGetTargetKeyValue(
 			ParameterUtil.prepareObjectContent(params),
 			EOSUrl.getTableRows(),
 			"",
@@ -576,7 +592,7 @@ object EOSAPI {
 	) {
 		RequisitionUtil.post(
 			ParameterUtil.prepareObjectContent(Pair("id", txID)),
-			EOSUrl.getTransaction(),
+			EOSUrl.getTransaction(getHistoryChainURL()),
 			false
 		) { jsonString, error ->
 			if (jsonString.isNotNull() && error.isNone()) {
@@ -587,7 +603,7 @@ object EOSAPI {
 
 	fun getRAMMarket(
 		hold: (data: EOSRAMMarket?, error: RequestError) -> Unit) {
-		RequisitionUtil.postString(
+		RequisitionUtil.postAndGetTargetKeyValue(
 			ParameterUtil.prepareObjectContent(
 				Pair("scope", "eosio"),
 				Pair("code", "eosio"),
@@ -659,6 +675,15 @@ object EOSAPI {
 					)
 				}
 			}
+		}
+	}
+
+	private fun getHistoryChainURL(): String {
+		return when {
+			SharedChain.getEOSCurrent().chainID.isEOSMain() -> SharedValue.getMainnetHistoryURL()
+			SharedChain.getEOSCurrent().chainID.isEOSJungle() -> SharedValue.getJungleHistoryURL()
+			SharedChain.getEOSCurrent().chainID.isEOSKylin() -> SharedValue.getKylinHistoryURL()
+			else -> throw Throwable("wrong eos chain ID")
 		}
 	}
 

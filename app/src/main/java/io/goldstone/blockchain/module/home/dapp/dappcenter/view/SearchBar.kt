@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.GSCard
+import io.goldstone.blockchain.common.language.DappCenterText
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
@@ -36,7 +37,7 @@ class SearchBar(context: Context) : GSCard(context) {
 			input = textView {
 				layoutParams = RelativeLayout.LayoutParams(matchParent, matchParent)
 				leftPadding = 45.uiPX()
-				text = "Search what you want to use"
+				text = DappCenterText.dappSearchBarPlaceholderText
 				textColor = GrayScale.midGray
 				textSize = fontSize(14)
 				gravity = Gravity.CENTER_VERTICAL

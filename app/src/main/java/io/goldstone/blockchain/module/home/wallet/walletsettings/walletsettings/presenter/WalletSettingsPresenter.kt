@@ -16,6 +16,7 @@ import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.ArgumentKey
 import io.goldstone.blockchain.common.value.ContainerID
 import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blockchain.crypto.utils.KeystoreInfo
 import io.goldstone.blockchain.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.common.walletgeneration.mnemonicbackup.view.MnemonicBackupFragment
@@ -100,7 +101,7 @@ class WalletSettingsPresenter(
 				if (!SharedWallet.hasBackUpMnemonic()) WalletTable.getCurrent(Dispatchers.Main) {
 					encryptMnemonic?.let {
 						recoveryHeaderStyle()
-						val mnemonicCode = JavaKeystoreUtil().decryptData(it)
+						val mnemonicCode = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(it)
 						val data = Bundle().apply {
 							putString(ArgumentKey.mnemonicCode, mnemonicCode)
 						}

@@ -94,11 +94,11 @@ object WalletSettingsText {
 	@JvmField
 	val allEOSAddresses = when (currentLanguage) {
 		HoneyLanguage.English.code -> "All EOS Addresses"
-		HoneyLanguage.Chinese.code -> "所有EOS地址"
+		HoneyLanguage.Chinese.code -> "所有 EOS 地址"
 		HoneyLanguage.Japanese.code -> "All EOS Addresses"
 		HoneyLanguage.Korean.code -> "All EOS Addresses"
 		HoneyLanguage.Russian.code -> "Все адреса EOS"
-		HoneyLanguage.TraditionalChinese.code -> "所有EOS地址"
+		HoneyLanguage.TraditionalChinese.code -> "所有 EOS 地址"
 		else -> ""
 	}
 	@JvmField
@@ -294,11 +294,11 @@ object WalletSettingsText {
 	@JvmField
 	val eosAddress = when (currentLanguage) {
 		HoneyLanguage.English.code -> "EOS Address"
-		HoneyLanguage.Chinese.code -> "EOS地址"
-		HoneyLanguage.Japanese.code -> "EOSアドレス"
+		HoneyLanguage.Chinese.code -> "EOS 地址"
+		HoneyLanguage.Japanese.code -> "EOS アドレス"
 		HoneyLanguage.Korean.code -> "EOS 주소"
 		HoneyLanguage.Russian.code -> "Адрес EOS"
-		HoneyLanguage.TraditionalChinese.code -> "EOS地址"
+		HoneyLanguage.TraditionalChinese.code -> "EOS 地址"
 		else -> ""
 	}
 	@JvmField
@@ -312,11 +312,11 @@ object WalletSettingsText {
 		else -> ""
 	}
 	@JvmField
-	val bitcoinAddress: (isYingYongBao: Boolean) -> String = {
+	val bitcoinAddress: () -> String = {
 		when (currentLanguage) {
-			HoneyLanguage.English.code -> "${HoneyLanguage.bitcoinPrefix(it)} Address"
-			HoneyLanguage.Chinese.code -> "${HoneyLanguage.bitcoinPrefix(it)} 地址"
-			HoneyLanguage.Japanese.code -> "${HoneyLanguage.bitcoinPrefix(it)} アドレス"
+			HoneyLanguage.English.code -> "${HoneyLanguage.bitcoinPrefix()} Address"
+			HoneyLanguage.Chinese.code -> "${HoneyLanguage.bitcoinPrefix()} 地址"
+			HoneyLanguage.Japanese.code -> "${HoneyLanguage.bitcoinPrefix()} アドレス"
 			HoneyLanguage.Korean.code -> "비트 코인 주소"
 			HoneyLanguage.Russian.code -> "Адрес биткойна"
 			HoneyLanguage.TraditionalChinese.code -> "比特幣地址"

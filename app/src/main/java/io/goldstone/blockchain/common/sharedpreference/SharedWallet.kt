@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.sharedpreference
 import com.blinnnk.util.*
 import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.value.SharesPreference
+import io.goldstone.blockchain.crypto.eos.accountregister.EOSActor
 import io.goldstone.blockchain.crypto.multichain.WalletType
 
 
@@ -11,11 +12,24 @@ import io.goldstone.blockchain.crypto.multichain.WalletType
  * @date  2018/09/27
  */
 object SharedWallet {
+
+	fun hasFingerprint(): Boolean =
+		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.hasFingerprint)
+
+	fun updateFingerprint(has: Boolean) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.hasFingerprint, has)
+
 	fun getCurrencyCode(): String =
 		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currencyCode)
 
 	fun updateCurrencyCode(code: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.currencyCode, code)
+
+	fun getValidPermission(): EOSActor =
+		EOSActor.getActorByValue(GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.validEOSAccountPermission))
+
+	fun updateValidPermission(permission: String) =
+		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.validEOSAccountPermission, permission)
 
 	fun getCurrentRate(): Double =
 		GoldStoneApp.appContext.getDoubleFromSharedPreferences(SharesPreference.rate)
@@ -52,12 +66,6 @@ object SharedWallet {
 
 	fun updateUnregisterGoldStoneID(goldStoneID: String) =
 		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.unregisterGoldStoneID, goldStoneID)
-
-	fun getInReviewStatus(): Boolean =
-		GoldStoneApp.appContext.getBooleanFromSharedPreferences(SharesPreference.yingYongBaoInReview)
-
-	fun updateInReviewStatus(status: Boolean) =
-		GoldStoneApp.appContext.saveDataToSharedPreferences(SharesPreference.yingYongBaoInReview, status)
 
 	fun getCurrentName(): String =
 		GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.currentName)

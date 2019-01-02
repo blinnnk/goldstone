@@ -15,10 +15,7 @@ import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.title.AttentionTextView
 import io.goldstone.blockchain.common.error.AccountError
-import io.goldstone.blockchain.common.language.CommonText
-import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.language.WalletSettingsText
-import io.goldstone.blockchain.common.language.WalletText
+import io.goldstone.blockchain.common.language.*
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
@@ -262,7 +259,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 
 	// 测试网络环境下的测试地址是公用的所以这里要额外处理 `Title` 显示
 	fun setBitcoinAddressesModel(wallet: WalletTable) {
-		val title = WalletSettingsText.bitcoinAddress(SharedWallet.getInReviewStatus())
+		val title = WalletSettingsText.bitcoinAddress()
 		val addresses = wallet.btcAddresses
 		btcAddressesView.checkAllEvent = presenter.showAllBTCAddresses()
 		btcAddressesView.setTitle(title)
@@ -271,7 +268,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setBTCSeriesTestAddressesModel(wallet: WalletTable) {
-		val title = "${CoinSymbol.btc()}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
+		val title = "${CoinSymbol.btc}/${CoinSymbol.ltc}/${CoinSymbol.bch} ${WalletSettingsText.testAddress}"
 		val addresses = wallet.btcSeriesTestAddresses
 		btcAddressesView.checkAllEvent = presenter.showAllBTCSeriesTestAddresses()
 		btcAddressesView.setTitle(title)
@@ -306,13 +303,14 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	private fun showCreatorDashboard() {
 		Dashboard(context!!) {
 			showGrid(
-				"Create New Address",
+				WalletText.createNewAddress,
 				GridIconTitleAdapter(GridIconTitleModel.getModels()) {
 					verifyMultiChainWalletPassword(context!!) { password, error ->
 						if (!password.isNullOrEmpty() && error.isNone() && it.chainType.isNotNull()) {
 							createChildAddressByButtonTitle(it.chainType) { addresses ->
 								launchUI {
 									updateUI(addresses, it.chainType)
+									toast(CommonText.succeed)
 								}
 							}
 						} else safeShowError(error)
@@ -332,27 +330,16 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				AddressManagerPresenter.createETHSeriesAddress(hold)
 			chainType.isETC() ->
 				AddressManagerPresenter.createETCAddress(hold)
-
 			chainType.isEOS() ->
 				AddressManagerPresenter.createEOSAddress(hold)
-
-			chainType.isLTC() -> {
-				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(hold)
-				else AddressManagerPresenter.createLTCAddress(hold)
-			}
-
-			chainType.isBCH() -> {
-				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(hold)
-				else AddressManagerPresenter.createBCHAddress(hold)
-			}
-
-			chainType.isBTC() -> {
-				if (SharedValue.isTestEnvironment())
-					AddressManagerPresenter.createBTCTestAddress(hold)
-				else AddressManagerPresenter.createBTCAddress(hold)
-			}
+			SharedValue.isTestEnvironment() && chainType.isBTCSeries() ->
+				AddressManagerPresenter.createBTCTestAddress(hold)
+			chainType.isLTC() ->
+				AddressManagerPresenter.createLTCAddress(hold)
+			chainType.isBCH() ->
+				AddressManagerPresenter.createBCHAddress(hold)
+			chainType.isBTC() ->
+				AddressManagerPresenter.createBTCAddress(hold)
 		}
 	}
 
@@ -361,14 +348,10 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			chainType.isETH() -> ethSeriesView.model = addresses
 			chainType.isETC() -> etcAddressesView.model = addresses
 			chainType.isEOS() -> eosAddressesView.model = addresses
-			chainType.isLTC() -> {
-				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
-				else ltcAddressesView.model = addresses
-			}
-			chainType.isBCH() -> {
-				if (SharedValue.isTestEnvironment()) btcAddressesView.model = addresses
-				else bchAddressesView.model = addresses
-			}
+			SharedValue.isTestEnvironment() && chainType.isBTCSeries() ->
+				btcAddressesView.model = addresses
+			chainType.isLTC() -> ltcAddressesView.model = addresses
+			chainType.isBCH() -> bchAddressesView.model = addresses
 			chainType.isBTC() -> btcAddressesView.model = addresses
 		}
 	}
@@ -463,7 +446,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					namesInMyTokenTable.size == 1 -> hold(namesInMyTokenTable.first())
 					namesInMyTokenTable.isEmpty() -> hold(newDefaultAddress)
 					else -> context?.selector(
-						"Multiple Account Name Be Detected On This Account",
+						EOSAccountText.chooseFromMultipleEosAccounts,
 						namesInMyTokenTable
 					) { _, index ->
 						hold(namesInMyTokenTable[index])
@@ -510,7 +493,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				GridIconTitleModel.getMenuModels(hasDefaultCell, isCashAddress)
 			Dashboard(context) {
 				showGrid(
-					"More Operation",
+					WalletText.moreOperations,
 					GridIconTitleAdapter(data) {
 						when (it.name) {
 							WalletText.setDefaultAddress -> setDefaultAddressEvent()

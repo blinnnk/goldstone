@@ -7,7 +7,9 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blockchain.R
 import io.goldstone.blockchain.common.component.overlay.Dashboard
+import io.goldstone.blockchain.common.language.ChainErrorText
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
@@ -35,6 +37,16 @@ import java.io.File
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
+
+	// 初始化sandbox的数据
+	@WorkerThread
+	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
+		if (WalletTable.dao.rowCount() == 0) {
+			SandBoxManager.recoveryData {
+				hold(true)
+			}
+		} else hold(false)
+	}
 
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
@@ -143,7 +155,7 @@ class SplashPresenter(val activity: SplashActivity) {
 	companion object {
 		@WorkerThread
 		fun updateAccountInformation(context: Context, callback: () -> Unit) {
-			val currentWallet = WalletTable.dao.findWhichIsUsing(true) ?: return
+			val currentWallet = WalletTable.dao.findWhichIsUsing() ?: return
 			if (
 				!currentWallet.eosAccountNames.currentPublicKeyIsActivated() &&
 				!currentWallet.eosAccountNames.hasActivatedOrWatchOnly() &&
@@ -159,7 +171,7 @@ class SplashPresenter(val activity: SplashActivity) {
 					cacheDataAndSetNetBy(currentWallet, callback)
 				}
 			} else {
-				// 账户不符合需要检测的条件的时候也比较为已经检测过了
+				// 账户不符合需要检测的条件的时候也标记为已经检测过了
 				SharedValue.updateAccountCheckedStatus(true)
 				cacheDataAndSetNetBy(currentWallet, callback)
 			}
@@ -183,7 +195,7 @@ class SplashPresenter(val activity: SplashActivity) {
 						)
 					}
 				} else launchUI {
-					val title = "Check EOS Account Name Error"
+					val title = ChainErrorText.getKeyAccountsError
 					val subtitle = error.message
 					Dashboard(context) {
 						showAlertView(
@@ -209,7 +221,7 @@ class SplashPresenter(val activity: SplashActivity) {
 				SharedAddress.updateCurrentEOS(currentEOSAddress)
 				SharedAddress.updateCurrentEOSName(currentEOSAccountName.getCurrent())
 				SharedWallet.updateCurrentIsWatchOnlyOrNot(isWatchOnly)
-				SharedWallet.updateCurrentWalletID(avatarID)
+				SharedWallet.updateCurrentWalletID(id)
 				SharedWallet.updateCurrentBalance(balance.orElse(0.0))
 				SharedWallet.updateCurrentName(name)
 				callback()
@@ -221,6 +233,7 @@ class SplashPresenter(val activity: SplashActivity) {
 			val type = wallet.getWalletType()
 			type.updateSharedPreference()
 			SharedWallet.updateBackUpMnemonicStatus(wallet.hasBackUpMnemonic)
+			SharedWallet.updateFingerprint(wallet.encryptFingerPrinterKey.isNotNull())
 			when {
 				type.isBTCTest() -> NodeSelectionPresenter.setAllTestnet {
 					cacheWalletData(wallet, callback)

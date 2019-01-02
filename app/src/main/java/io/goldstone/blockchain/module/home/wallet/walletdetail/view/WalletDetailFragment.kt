@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import com.afollestad.materialdialogs.MaterialDialog
@@ -14,6 +17,7 @@ import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.language.WalletSettingsText
 import io.goldstone.blockchain.common.sharedpreference.SharedValue
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
@@ -45,21 +49,27 @@ import java.util.*
 class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), WalletDetailContract.GSView {
 
 	override val pageTitle: String = "Wallet Detail"
-	private val slideHeader by lazy { WalletSlideHeader(context!!) }
+	private lateinit var slideHeader: WalletSlideHeader
 	private var headerView: WalletDetailHeaderView? = null
 	override lateinit var presenter: WalletDetailContract.GSPresenter
-
 	/**
 	 * this `slideHeader` will show or hide depends on the distance that user sliding the
 	 * recyclerView, and not in the same layer with `RecyclerView's headerView`
 	 */
+	@SuppressLint("MissingPermission")
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
 		presenter = WalletDetailPresenter(this)
+		slideHeader = WalletSlideHeader(context!!)
 		wrapper.addView(slideHeader)
-		slideHeader.apply {
-			notifyButton.onClick { showNotificationListFragment() }
+		with(slideHeader) {
+			notifyButton.click {
+				showNotificationListFragment()
+			}
+			searchButton.click {
+				showTokenManagementFragment()
+			}
 		}
 	}
 
@@ -111,7 +121,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		) {
 			headerView = this
 			currentAccount.onClick { showWalletSettingsFragment() }
-			addTokenButton.onClick { showTokenManagementFragment() }
 			sendButton.onClick { presenter.showTransferDashboard(true) }
 			depositButton.onClick {
 				presenter.showTransferDashboard(false)

@@ -25,7 +25,6 @@ import io.goldstone.blockchain.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blockchain.crypto.multichain.AddressType
 import io.goldstone.blockchain.crypto.multichain.CoinSymbol
 import io.goldstone.blockchain.crypto.utils.MultiChainUtils
-import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
 import io.goldstone.blockchain.module.home.profile.contacts.contractinput.view.ContactInputFragment
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.event.ContactUpdateEvent
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
@@ -61,7 +60,7 @@ class ContactInputPresenter(
 		super.onFragmentViewCreated()
 		contactID?.apply {
 			load {
-				GoldStoneDataBase.database.contactDao().getContact(this)
+				ContactTable.dao.getContact(this)
 			} then {
 				it?.apply { fragment.setAddressValue(this) }
 			}
@@ -208,7 +207,7 @@ class ContactInputPresenter(
 			btcMainnetAddressText.isNotEmpty() &&
 			!BTCUtils.isValidMainnetAddress(btcMainnetAddressText)
 		) {
-			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.btc()))
+			fragment.context?.alert(ContactText.wrongAddressFormat(CoinSymbol.btc))
 			return
 		}
 		// 符合以上规则的可以进入插入地址

@@ -2,7 +2,7 @@ package io.goldstone.blockchain.module.home.wallet.walletdetail.view
 
 import android.R
 import android.content.Context
-import android.graphics.Color
+import android.graphics.PorterDuff
 import android.view.Gravity
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -11,13 +11,13 @@ import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.FixTextLength
 import com.blinnnk.util.observing
-import io.goldstone.blockchain.common.component.button.RoundButtonWithIcon
 import io.goldstone.blockchain.common.component.button.StoneButton
 import io.goldstone.blockchain.common.language.CommonText
 import io.goldstone.blockchain.common.language.WalletText
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.*
-import io.goldstone.blockchain.common.value.PaddingSize
+import io.goldstone.blockchain.common.utils.AvatarManager
+import io.goldstone.blockchain.common.utils.GoldStoneFont
+import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.common.value.WalletDetailSize
 import io.goldstone.blockchain.common.value.fontSize
@@ -48,27 +48,24 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			else currentAccount.avatar.glideImage(avatar)
 		}
 	}
-	val addTokenButton = RoundButtonWithIcon(context)
 	val currentAccount = CurrentAccountView(context)
 	private val waveView = WaveLoadingView(context)
 	private var progressBar: ProgressBar? = null
-	private val balanceTitle by lazy { TextView(context) }
-	private val sectionHeaderHeight = 25.uiPX()
+	private val balanceTitle = TextView(context)
 	private lateinit var balanceSubtitle: TextView
-	val sendButton by lazy { StoneButton(context) }
-	val depositButton by lazy { StoneButton(context) }
+	val sendButton = StoneButton(context)
+	val depositButton = StoneButton(context)
 
 	init {
+		backgroundColor = Spectrum.blue
 		setWillNotDraw(false)
-
 		layoutParams = RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight)
-
 		waveView.apply {
 			layoutParams =
-				RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight - 50.uiPX())
+				RelativeLayout.LayoutParams(matchParent, WalletDetailSize.headerHeight)
 			setShapeType(WaveLoadingView.ShapeType.RECTANGLE)
 			progressValue = 30
-			waveColor = Color.parseColor("#FF1c4f7b")
+			waveColor = Spectrum.backgroundBlue
 			setAnimDuration(30000)
 			setAmplitudeRatio(50)
 			startAnimation()
@@ -77,7 +74,7 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 		currentAccount.into(this)
 		currentAccount.apply {
 			centerInHorizontal()
-			y += 30.uiPX()
+			y += 28.uiPX()
 		}
 
 		verticalLayout {
@@ -87,7 +84,6 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				textColor = Spectrum.white
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.into(this)
-
 			balanceSubtitle = textView {
 				textSize = fontSize(12)
 				typeface = GoldStoneFont.medium(context)
@@ -95,15 +91,15 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				gravity = Gravity.CENTER_HORIZONTAL
 			}.lparams(matchParent, matchParent)
 		}.apply {
+			y += 15.uiPX()
 			centerInParent()
 		}
 
 		relativeLayout {
 			lparams {
 				width = matchParent
-				height = 80.uiPX()
+				height = 50.uiPX()
 				alignParentBottom()
-				y -= sectionHeaderHeight
 			}
 
 			sendButton.apply {
@@ -112,35 +108,11 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 			sendButton.setMargins<RelativeLayout.LayoutParams> {
 				leftMargin = 15.uiPX()
 			}
-
 			depositButton.apply { text = CommonText.deposit }.into(this)
 			depositButton.setMargins<RelativeLayout.LayoutParams> {
 				rightMargin = 15.uiPX()
 			}
-
 			depositButton.alignParentRight()
-		}
-
-		textView {
-			text = WalletText.section.toUpperCase()
-			typeface = GoldStoneFont.heavy(context)
-			textColor = Spectrum.white
-			textSize = fontSize(15)
-			y -= 10.uiPX()
-		}.apply {
-			alignParentBottom()
-			x += PaddingSize.content
-		}
-
-		addTokenButton.into(this)
-		addTokenButton.apply {
-			setTitle(WalletText.addToken.toUpperCase())
-			x -= PaddingSize.content
-			y -= 10.uiPX()
-			removeIcon()
-			layoutParams.height = 24.uiPX()
-			alignParentRight()
-			alignParentBottom()
 		}
 	}
 
@@ -151,18 +123,15 @@ class WalletDetailHeaderView(context: Context) : RelativeLayout(context) {
 				null,
 				R.attr.progressBarStyleInverse
 			).apply {
-				indeterminateDrawable.setColorFilter(
-					Spectrum.white,
-					android.graphics.PorterDuff.Mode.SRC_ATOP
-				)
+				indeterminateDrawable.setColorFilter(Spectrum.white, PorterDuff.Mode.SRC_ATOP)
 				layoutParams = RelativeLayout.LayoutParams(16.uiPX(), 16.uiPX())
-				x = WalletText.section.toUpperCase().measureTextWidth(16.uiPX().toFloat()) + 16.uiPX()
-				y -= 12.uiPX()
+				y -= 70.uiPX()
 			}
 			progressBar?.into(this)
 			progressBar?.alignParentBottom()
+			progressBar?.centerInHorizontal()
 		} else {
-			if (!progressBar.isNull()) {
+			if (progressBar.isNotNull()) {
 				removeView(progressBar)
 				progressBar = null
 			}

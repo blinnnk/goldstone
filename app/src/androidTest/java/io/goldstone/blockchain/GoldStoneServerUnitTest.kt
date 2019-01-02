@@ -3,12 +3,12 @@
 package io.goldstone.blockchain
 
 import android.support.test.filters.LargeTest
+import android.support.test.internal.util.LogUtil
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.ChainID
@@ -38,7 +38,7 @@ class GoldStoneServerUnitTest {
 		// Change any symbol or contract value to test the result
 		val symbolOrContract = "t"
 		GoldStoneAPI.getTokenInfoBySymbol(symbolOrContract, Current.supportChainIDs()) { tokens, error ->
-			LogUtil.debug("$position GetSearchToken $error", tokens.toString())
+			LogUtil.logDebug("$position GetSearchToken $error", tokens.toString())
 			// it must has result with `t` value by contract, if result is empty will be failed
 			assertTrue("Search token with `tr` by symbol or contract is empty", tokens.isNullOrEmpty())
 		}
@@ -47,7 +47,7 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getShareContent() {
 		GoldStoneAPI.getShareContent { content, _ ->
-			LogUtil.debug("$position getShareContent", content.toString())
+			LogUtil.logDebug("$position getShareContent", content.toString())
 			// Share content title, content, url must not be empty
 			assertTrue("Share title is empty", content?.title?.isNotEmpty() == true)
 			assertTrue("Share content is empty", content?.content?.isNotEmpty() == true)
@@ -69,7 +69,7 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getTermsFromServer() {
 		GoldStoneAPI.getTerms { term, _ ->
-			LogUtil.debug(position, term.orEmpty())
+			LogUtil.logDebug(position, term.orEmpty())
 			assertTrue("Terms is empty", term?.isNotEmpty() == true)
 		}
 	}
@@ -77,7 +77,7 @@ class GoldStoneServerUnitTest {
 	@Test
 	fun getConfigList() {
 		GoldStoneAPI.getConfigList { list, _ ->
-			LogUtil.debug(position, list.toString())
+			LogUtil.logDebug(position, list.toString())
 		}
 	}
 
@@ -85,7 +85,7 @@ class GoldStoneServerUnitTest {
 	fun getWebUrlValue() {
 		val terms =
 			"${WebUrl.header}/${WebUrl.webLanguage(SharedWallet.getCurrentLanguageCode())}/termAndConditions"
-		LogUtil.debug("getWebUrlValue", terms)
+		LogUtil.logDebug("getWebUrlValue", terms)
 	}
 
 	@Test
@@ -94,7 +94,7 @@ class GoldStoneServerUnitTest {
 			SharedWallet.getGoldStoneID(),
 			System.currentTimeMillis()
 		) { count, _ ->
-			LogUtil.debug(position + "getUnreadCount", count.toString())
+			LogUtil.logDebug(position + "getUnreadCount", count.toString())
 		}
 	}
 
@@ -105,7 +105,7 @@ class GoldStoneServerUnitTest {
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
 			0
 		) { transaction, _ ->
-			LogUtil.debug("getETCTransactions", "$transaction")
+			LogUtil.logDebug("getETCTransactions", "$transaction")
 		}
 	}
 }

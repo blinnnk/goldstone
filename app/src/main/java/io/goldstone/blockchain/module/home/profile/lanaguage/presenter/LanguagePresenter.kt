@@ -6,6 +6,7 @@ import com.blinnnk.util.then
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.AlertText
 import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.profile.lanaguage.model.LanguageModel
@@ -34,10 +35,7 @@ class LanguagePresenter(
 		)
 	}
 
-	fun setLanguage(
-		language: String,
-		hold: Boolean.() -> Unit
-	) {
+	fun setLanguage(language: String, hold: Boolean.() -> Unit) {
 		fragment.context?.apply {
 			alert(
 				AlertText.switchLanguage,
@@ -67,6 +65,7 @@ class LanguagePresenter(
 				HoneyLanguage.TraditionalChinese.language -> HoneyLanguage.TraditionalChinese.code
 				else -> HoneyLanguage.English.code
 			}
+			SandBoxManager.updateLanguage(code)
 			AppConfigTable.dao.updateLanguageCode(code)
 		} then {
 			callback()

@@ -7,6 +7,7 @@ import com.blinnnk.util.then
 import com.google.gson.JsonArray
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerPresenter
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.GoldStoneWebSocket
 import io.goldstone.blockchain.common.utils.NetworkUtil
@@ -23,6 +24,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationAdapter
 import io.goldstone.blockchain.module.home.quotation.quotation.view.QuotationFragment
 import io.goldstone.blockchain.module.home.quotation.quotationoverlay.view.QuotationOverlayFragment
+import io.goldstone.blockchain.module.home.quotation.quotationrank.view.QuotationRankFragment
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -74,12 +76,15 @@ class QuotationPresenter(
 		}.sortedByDescending {
 			it.orderID
 		}.toList().let { quotations ->
-			if (!hasCheckedPairDate) updateInvalidDatePair(invalidDatePairs) {
-				launchUI {
-					updateData()
+			if (!hasCheckedPairDate) {
+				updateInvalidDatePair(invalidDatePairs) {
+					launchUI {
+						updateData()
+					}
 				}
 				hasCheckedPairDate = true
 			}
+			
 			launchUI {
 				// 更新 `UI`
 				diffAndUpdateAdapterData<QuotationAdapter>(quotations.toArrayList())
@@ -175,6 +180,12 @@ class QuotationPresenter(
 	fun showQuotationManagement() {
 		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
 			putString(ArgumentKey.quotationOverlayTitle, QuotationText.management)
+		}
+	}
+
+	fun showQuotationRankFragment() {
+		fragment.activity?.addFragmentAndSetArguments<QuotationOverlayFragment>(ContainerID.main) {
+			putString(ArgumentKey.quotationOverlayTitle, QuotationText.rank)
 		}
 	}
 

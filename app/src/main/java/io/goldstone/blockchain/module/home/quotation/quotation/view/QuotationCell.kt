@@ -22,6 +22,7 @@ import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationMo
 import org.jetbrains.anko.margin
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.textColor
+import org.jetbrains.anko.textView
 
 @SuppressLint("SetTextI18n")
 /**
@@ -45,7 +46,6 @@ class QuotationCell(context: Context) : GSCard(context) {
 			false,
 			false
 		)
-
 		tokenPrice.subtitle.text = model.percent + "%"
 		lineChart.resetDataWithTargetLabelCount(
 			model.chartData.mapIndexed { index, chartPoint ->
@@ -75,17 +75,7 @@ class QuotationCell(context: Context) : GSCard(context) {
 	}
 	private var tokenInfo: TwoLineTitles
 	private var tokenPrice: TwoLineTitles
-	private val exchangeName by lazy {
-		TextView(context).apply {
-			textSize = fontSize(12)
-			textColor = GrayScale.midGray
-			typeface = GoldStoneFont.medium(context)
-			gravity = Gravity.END
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
-			x -= 20.uiPX()
-			y += 52.uiPX()
-		}
-	}
+	private var exchangeName: TextView
 	private val lineChart = object : QuotationLineChart(context) {
 		override val isDrawPoints: Boolean = false
 		override val isPerformBezier: Boolean = true
@@ -96,8 +86,8 @@ class QuotationCell(context: Context) : GSCard(context) {
 	}
 
 	init {
-		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, 165.uiPX())
-		resetCardElevation(ShadowSize.Cell)
+		layoutParams = LinearLayout.LayoutParams(ScreenSize.card, 160.uiPX())
+		resetCardElevation(3.uiPX().toFloat())
 		tokenInfo = twoLineTitles {
 			x += 20.uiPX()
 			setBlackTitles()
@@ -109,11 +99,19 @@ class QuotationCell(context: Context) : GSCard(context) {
 			setColorStyle(Spectrum.green)
 			isFloatRight = true
 		}
-		addView(exchangeName)
+		exchangeName = textView {
+			textSize = fontSize(12)
+			textColor = GrayScale.midGray
+			typeface = GoldStoneFont.medium(context)
+			gravity = Gravity.END
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 20.uiPX())
+			x -= 20.uiPX()
+			y += 52.uiPX()
+		}
 		tokenPrice.alignParentRight()
 		lineChart.apply {
 			id = ElementID.chartView
-			layoutParams = RelativeLayout.LayoutParams(matchParent, 90.uiPX())
+			layoutParams = RelativeLayout.LayoutParams(matchParent, 88.uiPX())
 			y = 45.uiPX().toFloat()
 		}.into(this)
 		lineChart.setMargins<FrameLayout.LayoutParams> {

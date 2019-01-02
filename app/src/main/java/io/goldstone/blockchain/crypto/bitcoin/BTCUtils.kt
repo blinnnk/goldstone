@@ -42,7 +42,6 @@ object BTCUtils {
 		return when {
 			address.isEmpty() -> false
 			!CryptoValue.isBitcoinAddressLength(address) -> false
-			!address.matches("^[1-9A-HJ-NP-Za-z]+$".toRegex()) -> false
 			address.substring(0, 1).toIntOrNull().isNull() -> false
 			else -> true
 		}

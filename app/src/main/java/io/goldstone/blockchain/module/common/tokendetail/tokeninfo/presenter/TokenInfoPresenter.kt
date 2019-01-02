@@ -64,12 +64,12 @@ class TokenInfoPresenter(
 		GlobalScope.launch(Dispatchers.Default) {
 			when {
 				token.contract.isEOSToken() -> {
-					val time = EOSTransactionTable.dao.getMaxDataIndex(
+					val time = EOSTransactionTable.dao.getMaxDataIndexTime(
 						SharedAddress.getCurrentEOSAccount().name,
 						token.contract.contract,
 						token.contract.symbol,
 						token.chainID
-					)?.time
+					)
 					val date = if (time.isNotNull()) {
 						HoneyDateUtil.getSinceTime(time, DateAndTimeText.getDateText())
 					} else CommonText.calculating
@@ -262,7 +262,7 @@ class TokenInfoPresenter(
 				contract.isBTC() -> ChainExplorer.btcAddressDetail(contract.getAddress())
 				contract.isLTC() -> ChainExplorer.ltcAddressDetail(contract.getAddress())
 				contract.isBCH() -> ChainExplorer.bchAddressDetail(contract.getAddress())
-				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(contract.getAddress())
+				contract.isEOSSeries() -> ChainExplorer.eosAddressDetail(contract.getAddress(true))
 				contract.isETC() -> ChainExplorer.etcAddressDetail(contract.getAddress())
 				else -> ChainExplorer.ethAddressDetail(contract.getAddress())
 			}

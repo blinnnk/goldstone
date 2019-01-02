@@ -3,6 +3,7 @@ package io.goldstone.blockchain.common.base.baseoverlayfragment
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,6 @@ import io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.Overl
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.common.utils.getMainActivity
 import io.goldstone.blockchain.common.utils.setTransparentStatusBar
 import io.goldstone.blockchain.common.value.ElementID
@@ -79,9 +79,15 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 		overlayView.header.showSearchButton(isShow, setClickEvent)
 	}
 
-	fun showSearchInput(isShow: Boolean = true, cancelEvent: () -> Unit, enterKeyEvent: () -> Unit) {
+	fun showSearchInput(
+		isShow: Boolean = true,
+		cancelEvent: () -> Unit,
+		enterKeyEvent: () -> Unit,
+		hint: String
+	) {
 		overlayView.isNotNull()
 		overlayView.header.showSearchInput(isShow, cancelEvent, enterKeyEvent)
+		overlayView.header.setSearchInputHint(hint)
 	}
 
 	fun showAddButton(status: Boolean, isLeft: Boolean = true, clickEvent: () -> Unit) {
@@ -90,6 +96,10 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 
 	fun setTitle(title: String) {
 		overlayView.header.setTitle(title)
+	}
+
+	fun setSearchHint(hint: String) {
+		overlayView.header.setSearchInputHint(hint)
 	}
 
 	fun showTitle(status: Boolean) {
@@ -235,7 +245,7 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 					is BaseRecyclerFragment<*, *> -> currentFragment.recoveryBackEvent()
 				}
 			} catch (error: Exception) {
-				LogUtil.error(javaClass.simpleName, error)
+				Log.e(javaClass.simpleName, error.message)
 			}
 			is SplashActivity -> currentActivity.backEvent = null
 		}

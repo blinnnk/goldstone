@@ -19,7 +19,9 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blockchain.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.EmptyText
 import io.goldstone.blockchain.common.language.QuotationText
+import io.goldstone.blockchain.common.sandbox.SandBoxManager
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.*
 import io.goldstone.blockchain.common.value.GrayScale
@@ -119,6 +121,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 					}
 					presenter.updateSelectedExchangeID(selectedIDs)
 					updateResultAfterConditionChanged()
+					SandBoxManager.updateMyExchanges(selectedIDs)
 					dialog.dismiss()
 				}
 				.negativeButton(text = CommonText.cancel) {
@@ -177,7 +180,7 @@ class QuotationSearchFragment : GSRecyclerFragment<QuotationSelectionTable>(), Q
 	override fun setBackEvent(mainActivity: MainActivity?) {
 		getParentFragment<QuotationOverlayFragment> {
 			presenter.popFragmentFrom<QuotationSearchFragment>()
-			showSearchInput(false, {}) {}
+			showSearchInput(false, {}, {}, EmptyText.tokenSearchInput)
 		}
 	}
 

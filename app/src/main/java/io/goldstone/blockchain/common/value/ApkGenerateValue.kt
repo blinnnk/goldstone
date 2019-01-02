@@ -5,7 +5,7 @@ package io.goldstone.blockchain.common.value
  * @author KaySaith
  */
 @JvmField
-val currentChannel = ApkChannel.Home
+val currentChannel = ApkChannel.Test
 
 enum class ApkChannel(val value: String, val code: Int) {
 	Home("Home", 1),
@@ -20,5 +20,6 @@ enum class ApkChannel(val value: String, val code: Int) {
 	Lenovo("Lenovo", 10),
 	Sogou("Sogou", 11),
 	Oppo("Oppo", 12),
-	Qihoo("Qihoo", 13)
+	Qihoo("Qihoo", 13),
+	Test("Test", 14)
 }

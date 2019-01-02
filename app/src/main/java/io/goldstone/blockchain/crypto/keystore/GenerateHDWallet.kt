@@ -3,10 +3,10 @@
 package io.goldstone.blockchain.crypto.keystore
 
 import android.content.Context
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blockchain.common.error.AccountError
 import io.goldstone.blockchain.common.language.ImportWalletText
-import io.goldstone.blockchain.common.utils.LogUtil
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
 import io.goldstone.blockchain.crypto.ethereum.ECKeyPair
 import io.goldstone.blockchain.crypto.ethereum.getAddress
@@ -140,16 +140,17 @@ fun Context.generateTemporaryKeyStore(
 	}
 }
 
+// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
+@WorkerThread
 fun Context.getBigIntegerPrivateKeyByWalletID(
 	password: String,
 	walletID: Int,
 	hold: (privateKey: BigInteger?, error: AccountError) -> Unit
 ) = getKeystoreFileByWalletID(password, walletID) { keyStoreFile, error ->
-	// 因为提取和解析 `Keystore` 比较耗时, 所以 `KeyStore` 的操作放到异步
 	if (keyStoreFile.isNotNull() && error.isNone()) {
 		val keyPair = WalletUtil.getKeyPairFromWalletFile(keyStoreFile, password)
 		if (keyPair == null) hold(null, AccountError.WrongPassword)
-		else hold(keyPair.privateKey, AccountError.None)
+		else hold(keyPair.privateKey, error)
 	} else hold(null, error)
 }
 
@@ -187,7 +188,7 @@ fun Context.verifyKeystorePasswordByWalletID(
 		keyStore.unlock(keyStore.accounts.get(0), password)
 	} catch (error: Exception) {
 		hold(false)
-		LogUtil.error("wrong keystore password", error)
+		android.util.Log.e("wrong keystore password", error.message)
 		return
 	}
 	keyStore.lock(keyStore.accounts.get(0).address)
@@ -200,10 +201,7 @@ fun Context.updatePasswordByWalletID(
 	newPassword: String,
 	callback: (AccountError) -> Unit
 ) = GlobalScope.launch(Dispatchers.Default) {
-	getBigIntegerPrivateKeyByWalletID(
-		oldPassword,
-		walletID
-	) { privateKey, error ->
+	getBigIntegerPrivateKeyByWalletID(oldPassword, walletID) { privateKey, error ->
 		if (privateKey.isNotNull() && error.isNone()) {
 			deleteWalletByWalletID(walletID, oldPassword) { deleteError ->
 				if (deleteError.isNone()) {

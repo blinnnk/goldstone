@@ -1,9 +1,18 @@
 package io.goldstone.blockchain.crypto.eos.transaction
 
+import com.blinnnk.extension.getTargetObject
+import com.blinnnk.extension.isNull
+import com.blinnnk.extension.safeGet
+import com.blinnnk.extension.toJSONObjectList
+import com.subgraph.orchid.encoders.Hex
 import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
+import io.goldstone.blockchain.crypto.eos.EOSUtils
 import io.goldstone.blockchain.crypto.eos.base.EOSModel
+import org.json.JSONArray
+import org.json.JSONObject
 import java.io.Serializable
+import java.math.BigInteger
 
 /**
  * @author KaySaith
@@ -16,21 +25,56 @@ import java.io.Serializable
 data class EOSAction(
 	val code: EOSCodeName,
 	val cryptoData: String,
-	val methodName: EOSTransactionMethod,
-	val authorizationObjects: String
+	val method: EOSTransactionMethod,
+	val authorizations: List<EOSAuthorization>
 ) : Serializable, EOSModel {
+
+	constructor(data: JSONObject) : this(
+		EOSCodeName(data.safeGet("account")),
+		serializeData(data),
+		EOSTransactionMethod(data.safeGet("name")),
+		JSONArray(data.safeGet("authorization")).toJSONObjectList().map { EOSAuthorization(it) }
+	)
+
 	override fun createObject(): String {
-		return "{\"account\":\"${code.value}\",\"authorization\":$authorizationObjects,\"data\":\"$cryptoData\",\"name\":\"$${methodName.value}\"}"
+		return "{\"account\":\"${code.value}\",\"authorization\":${authorizations.map { it.createObject() }},\"data\":\"$cryptoData\",\"name\":\"$${method.value}\"}"
 	}
 
 	override fun serialize(): String {
-		return ""
+		return EOSUtils.getLittleEndianCode(code.value) +
+			EOSUtils.getLittleEndianCode(method.value) +
+			EOSUtils.getVariableUInt(authorizations.size) +
+			authorizations.map {
+				EOSUtils.getLittleEndianCode(it.actor) + EOSUtils.getLittleEndianCode(it.permission.value)
+			}.joinToString("") { it } +
+			EOSUtils.getVariableUInt(Hex.decode(cryptoData).size) + // Crypto Data Length
+			cryptoData
 	}
 
 	companion object {
 		fun createMultiActionObjects(vararg actions: EOSAction): String {
 			val actionObjects = actions.joinToString(",") { it.createObject() }
 			return "[$actionObjects]"
+		}
+
+		fun serializeData(action: JSONObject): String {
+			val method = EOSTransactionMethod(action.safeGet("name"))
+			return if (method.isTransfer()) {
+				EOSTransactionInfo(action, action.getTargetObject("data").safeGet("memo")).serialize()
+			} else {
+				val data = action.getTargetObject("data")
+				val allNames = data.names()
+				var serializationData = ""
+				(0 until allNames.length()).forEach {
+					val value = data.safeGet(allNames[it].toString())
+					serializationData += if (value.toLongOrNull().isNull()) {
+						EOSUtils.getLittleEndianCode(value)
+					} else {
+						EOSUtils.convertAmountToCode(BigInteger(value))
+					}
+				}
+				serializationData
+			}
 		}
 	}
 }

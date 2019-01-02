@@ -17,6 +17,7 @@ import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSUnit
 import io.goldstone.blockchain.crypto.eos.EOSWalletUtils
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.EOSResponse
 import io.goldstone.blockchain.crypto.eos.transaction.EOSAuthorization
 import io.goldstone.blockchain.crypto.multichain.TokenContract
@@ -63,6 +64,7 @@ class EOSAccountRegisterPresenter(
 		ramAmount: BigInteger,
 		cpuEOSCount: Double,
 		netAEOSCount: Double,
+		@UiThread cancelAction: () -> Unit,
 		@WorkerThread callback: (response: EOSResponse?, error: GoldStoneError) -> Unit
 	) {
 		if (ramAmount < BigInteger.valueOf(4096)) {
@@ -78,27 +80,36 @@ class EOSAccountRegisterPresenter(
 				checkNewAccountInfo(newAccountName, publicKey) { validAccount, validPublicKey, error ->
 					if (error.hasError()) callback(null, error)
 					else BaseTradingPresenter.prepareTransaction(
-						fragment.context,
+						fragment.context!!,
 						totalSpent,
 						TokenContract.EOS,
-						StakeType.Register
+						StakeType.Register,
+						cancelAction = cancelAction
 					) { privateKey, privateKeyError ->
 						// 首先检测当前私钥的权限, 是单独 `Owner` 或 单独 `Active` 或全包包含,
 						// 首先选择 `Active` 权限, 如果不是选择 `Owner` 如果都没有返回 `error` 权限错误
-						val chainID = SharedChain.getEOSCurrent().chainID
-						val permission = EOSAccountTable.getValidPermission(creatorAccount, chainID)
-						when {
-							permission.isNull() -> callback(null, GoldStoneError("Wrong Permission Keys"))
-							error.isNone() && privateKey.isNotNull() -> EOSRegisterTransaction(
-								chainID,
-								EOSAuthorization(creatorAccount.name, permission),
-								validAccount!!.name,
-								validPublicKey.orEmpty(),
-								ramAmount,
-								cpuEOSCount.toEOSUnit(),
-								netAEOSCount.toEOSUnit()
-							).send(privateKey, callback)
-							else -> callback(null, privateKeyError)
+						if (privateKeyError.hasError()) {
+							callback(null, privateKeyError)
+						} else {
+							val chainID = SharedChain.getEOSCurrent().chainID
+							val permission = EOSAccountTable.getValidPermission(creatorAccount, chainID)
+							when {
+								permission.isNull() -> callback(null, GoldStoneError("Wrong Permission Keys"))
+								error.isNone() && privateKey.isNotNull() -> EOSRegisterTransaction(
+									chainID,
+									EOSAuthorization(creatorAccount.name, permission),
+									validAccount!!.name,
+									validPublicKey.orEmpty(),
+									ramAmount,
+									cpuEOSCount.toEOSUnit(),
+									netAEOSCount.toEOSUnit()
+								).send(
+									EOSPrivateKey(privateKey),
+									SharedChain.getEOSCurrent().getURL(),
+									callback
+								)
+								else -> callback(null, privateKeyError)
+							}
 						}
 					}
 				}

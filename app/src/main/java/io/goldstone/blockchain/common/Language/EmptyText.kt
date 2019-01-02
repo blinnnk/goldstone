@@ -17,15 +17,28 @@ object EmptyText {
 		else -> ""
 	}
 	@JvmField
-	val searchInput = when (currentLanguage) {
+	val tokenSearchInput = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Token name or contract address"
 		HoneyLanguage.Chinese.code -> "搜索Token名称或合约地址"
-		HoneyLanguage.Japanese.code -> "Token名称もしくは契約アドレスを検索する"
+		HoneyLanguage.Japanese.code -> "Token名称もしくは契約アドレスを検索"
 		HoneyLanguage.Korean.code -> "토큰 이름 또는 계약서 주소 검색"
 		HoneyLanguage.Russian.code -> "Поиск названия Token или адреса соглашения"
 		HoneyLanguage.TraditionalChinese.code -> "搜索Token名稱或合約地址"
 		else -> ""
 	}
+
+
+	@JvmField
+	val pairSearchInput = when (currentLanguage) {
+		HoneyLanguage.English.code -> "Search by token symbol or pair"
+		HoneyLanguage.Chinese.code -> "搜索货币符号或交易对"
+		HoneyLanguage.Japanese.code -> "通貨記号またはペアで検索"
+		HoneyLanguage.Korean.code -> "통화 기호 또는 페어로 검색"
+		HoneyLanguage.Russian.code -> "Поиск по символу валюты или паре"
+		HoneyLanguage.TraditionalChinese.code -> "搜索Token名稱或合約地址"
+		else -> ""
+	}
+
 	@JvmField
 	val tokenDetailTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "No token transactions found"
@@ -58,12 +71,12 @@ object EmptyText {
 	}
 	@JvmField
 	val latestUsedDAPP = when (currentLanguage) {
-		HoneyLanguage.English.code -> "None latest used dapp now"
-		HoneyLanguage.Chinese.code -> "None latest used dapp now"
-		HoneyLanguage.Japanese.code -> "None latest used dapp now"
-		HoneyLanguage.Korean.code -> "None latest used dapp now"
-		HoneyLanguage.Russian.code -> "None latest used dapp now"
-		HoneyLanguage.TraditionalChinese.code -> "None latest used dapp now"
+		HoneyLanguage.English.code->"No Dapp usage record"
+		HoneyLanguage.Chinese.code->"没有Dapp使用记录"
+		HoneyLanguage.Japanese.code->"Dapp使用記録はありません"
+		HoneyLanguage.Korean.code->"Dapp 사용 기록 없음"
+		HoneyLanguage.Russian.code->"Нет записи об использовании Dapp"
+		HoneyLanguage.TraditionalChinese.code->"沒有Dapp使用記錄"
 		else -> ""
 	}
 	@JvmField
@@ -78,12 +91,12 @@ object EmptyText {
 	}
 	@JvmField
 	val latestUsedDAPPSubtitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "once you used any dapp, it will appear here and convenience for you next to use"
-		HoneyLanguage.Chinese.code -> "once you used any dapp, it will appear here and convenience for you next to use"
-		HoneyLanguage.Japanese.code -> "once you used any dapp, it will appear here and convenience for you next to use"
-		HoneyLanguage.Korean.code -> "once you used any dapp, it will appear here and convenience for you next to use"
-		HoneyLanguage.Russian.code -> "once you used any dapp, it will appear here and convenience for you next to use"
-		HoneyLanguage.TraditionalChinese.code -> "once you used any dapp, it will appear here and convenience for you next to use"
+		HoneyLanguage.English.code->"Here you will see the Dapps you have recently visited so that you can quickly find them."
+		HoneyLanguage.Chinese.code->"这里会显示您最近访问过的 Dapp，以方便您快速找到用过的Dapp"
+		HoneyLanguage.Japanese.code->"ここにあなたが最近訪れたDappが表示されますので、使用したDappをすばやく見つけることができます。"
+		HoneyLanguage.Korean.code->"여기에 최근에 방문한 Dapp가 표시되어 사용 된 Dapp를 빨리 찾을 수 있습니다."
+		HoneyLanguage.Russian.code->"Здесь вы увидите Dapp, который вы недавно посетили, чтобы вы могли быстро найти использованный Dapp."
+		HoneyLanguage.TraditionalChinese.code->"這裡會顯示您最近訪問過的 Dapp，以方便您快速找到用過的Dapp"
 		else -> ""
 	}
 	@JvmField

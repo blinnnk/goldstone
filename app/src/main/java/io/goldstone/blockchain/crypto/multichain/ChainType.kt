@@ -66,7 +66,7 @@ class ChainType(val id: Int) : Serializable {
 	) {
 		GlobalScope.launch(Dispatchers.Default) {
 			val walletDao = WalletTable.dao
-			val currentWallet = walletDao.findWhichIsUsing(true)
+			val currentWallet = walletDao.findWhichIsUsing()
 			when (id) {
 				ChainType.ETH.id -> {
 					SharedAddress.updateCurrentEthereum(newAddress.address)

@@ -6,6 +6,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.extension.toArrayList
 import com.blinnnk.extension.toMillisecond
 import com.blinnnk.util.ConcurrentAsyncCombine
+import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.TimeUtils
@@ -70,7 +71,7 @@ class TokenDetailPresenter(
 					isETH() -> loadETHChainData(getMaxBlockNumber())
 					isERC20Token() -> loadERCChainData(getMaxBlockNumber())
 				}
-				isEOSSeries() -> getEOSSeriesData()
+				isEOSSeries() -> getCountInfoFromChain()
 			}
 		}
 	}
@@ -92,12 +93,13 @@ class TokenDetailPresenter(
 
 	private fun loadLocalData(isRefresh: Boolean) {
 		with(token.contract) {
-			GlobalScope.launch(Dispatchers.Default) {
+			launchDefault {
 				when {
 					isBTCSeries() -> getBTCSeriesData()
 					isETHSeries() -> getETHSeriesData()
-					isEOSSeries() -> if (isRefresh) getEOSSeriesData() else {
-						if (
+					isEOSSeries() -> if (isRefresh) getCountInfoFromChain() else {
+						if (totalCount.isNull() && !NetworkUtil.hasNetwork()) getCountInfoFromLocal()
+						else if (
 							totalCount == null
 							|| currentMaxCount == null
 							|| currentMaxCount ?: 0 <= 0
@@ -122,7 +124,7 @@ class TokenDetailPresenter(
 	}
 
 	// 没数据或初始化的时候先生产默认值显示
-	private fun updateEmptyCharData() = GlobalScope.launch(Dispatchers.Default) {
+	private fun updateEmptyCharData() = launchDefault {
 		listOf<TransactionListModel>().generateBalanceList(token.contract) {
 			it.updateHeaderData(true)
 		}

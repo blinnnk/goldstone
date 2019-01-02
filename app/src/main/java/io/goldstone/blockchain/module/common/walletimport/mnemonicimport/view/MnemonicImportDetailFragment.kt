@@ -12,32 +12,31 @@ import com.blinnnk.util.getParentFragment
 import io.goldstone.blockchain.common.base.basefragment.BaseFragment
 import io.goldstone.blockchain.common.component.AgreementView
 import io.goldstone.blockchain.common.component.button.RoundButton
+import io.goldstone.blockchain.common.component.button.roundButton
 import io.goldstone.blockchain.common.component.cell.RoundCell
+import io.goldstone.blockchain.common.component.cell.roundCell
 import io.goldstone.blockchain.common.component.edittext.RoundInput
 import io.goldstone.blockchain.common.component.edittext.WalletEditText
+import io.goldstone.blockchain.common.component.edittext.roundInput
 import io.goldstone.blockchain.common.component.title.ExplanationTitle
 import io.goldstone.blockchain.common.language.*
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.NetworkUtil
 import io.goldstone.blockchain.common.utils.UIUtils
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.common.value.ArgumentKey
+import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.WebUrl
 import io.goldstone.blockchain.crypto.multichain.ChainPath
 import io.goldstone.blockchain.crypto.multichain.DefaultPath
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import io.goldstone.blockchain.module.common.walletimport.mnemonicimport.presenter.MnemonicImportDetailPresenter
-import io.goldstone.blockchain.module.common.walletimport.privatekeyimport.view.PrivateKeyImportFragment
 import io.goldstone.blockchain.module.common.walletimport.walletimport.view.WalletImportFragment
 import io.goldstone.blockchain.module.common.webview.view.WebViewFragment
 import io.goldstone.blockchain.module.entrance.splash.view.SplashActivity
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import org.jetbrains.anko.AnkoContext
-import org.jetbrains.anko.matchParent
-import org.jetbrains.anko.scrollView
-import org.jetbrains.anko.verticalLayout
+import org.jetbrains.anko.*
 
 /**
  * @date 23/03/2018 1:46 AM
@@ -45,13 +44,13 @@ import org.jetbrains.anko.verticalLayout
  */
 class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>() {
 	override val pageTitle: String = ImportMethodText.mnemonic
-	private val confirmButton by lazy { RoundButton(context!!) }
-	private val walletNameInput by lazy { RoundInput(context!!) }
+	private lateinit var confirmButton: RoundButton
+	private lateinit var walletNameInput: RoundInput
+	private lateinit var pathSettings: RoundCell
+	private lateinit var passwordInput: RoundInput
+	private lateinit var repeatPassword: RoundInput
+	private lateinit var hintInput: RoundInput
 	private val mnemonicInput by lazy { WalletEditText(context!!) }
-	private val pathSettings by lazy { RoundCell(context!!) }
-	private val passwordInput by lazy { RoundInput(context!!) }
-	private val repeatPassword by lazy { RoundInput(context!!) }
-	private val hintInput by lazy { RoundInput(context!!) }
 	private val agreementView by lazy { AgreementView(context!!) }
 	override val presenter = MnemonicImportDetailPresenter(this)
 	// Default Value
@@ -59,12 +58,12 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 		PathModel(ImportWalletText.customEthereumPath, DefaultPath.ethPathHeader, DefaultPath.default),
 		PathModel(ImportWalletText.customEthereumClassicPath, DefaultPath.etcPathHeader, DefaultPath.default),
 		PathModel(
-			ImportWalletText.customBitcoinPath(SharedWallet.getInReviewStatus()),
+			ImportWalletText.customBitcoinPath(),
 			DefaultPath.btcPathHeader,
 			DefaultPath.default
 		),
 		PathModel(
-			ImportWalletText.customBTCTestPath(SharedWallet.getInReviewStatus()),
+			ImportWalletText.customBTCTestPath(),
 			DefaultPath.testPathHeader,
 			DefaultPath.default
 		),
@@ -75,48 +74,63 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 
 	override fun AnkoContext<Fragment>.initView() {
 		scrollView {
+			lparams(matchParent, wrapContent)
 			verticalLayout {
 				gravity = Gravity.CENTER_HORIZONTAL
-				lparams(matchParent, matchParent)
+				lparams(matchParent, wrapContent)
 				mnemonicInput.apply {
 					hint = ImportWalletText.mnemonicHint
-					setMargins<LinearLayout.LayoutParams> { topMargin = 30.uiPX() }
 				}.into(this)
+				mnemonicInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 30.uiPX()
+				}
 
-				pathSettings.apply {
+				pathSettings = roundCell {
 					setTitles(ImportWalletText.path, ImportWalletText.defaultPath)
-					setMargins<LinearLayout.LayoutParams> {
-						topMargin = 20.uiPX()
-						bottomMargin = 10.uiPX()
-					}
 				}.click {
 					showPatSettingsDashboard()
-				}.into(this)
+				}
+				pathSettings.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 20.uiPX()
+					bottomMargin = 10.uiPX()
+				}
 
-				walletNameInput.apply {
+				walletNameInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					hint = UIUtils.generateDefaultName()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 15.uiPX() }
 					title = CreateWalletText.name
-				}.into(this)
+				}
+				walletNameInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 15.uiPX()
+				}
 
-				passwordInput.apply {
+				passwordInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.password
 					setPasswordSafeLevel()
-				}.into(this)
+				}
+				passwordInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 5.uiPX()
+				}
 
-				repeatPassword.apply {
+				repeatPassword = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setPasswordInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.repeatPassword
-				}.into(this)
+				}
+				repeatPassword.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 5.uiPX()
+				}
 
-				hintInput.apply {
+				hintInput = roundInput {
+					horizontalPaddingSize = PaddingSize.gsCard
 					setTextInput()
-					setMargins<LinearLayout.LayoutParams> { topMargin = 5.uiPX() }
 					title = CreateWalletText.hint
-				}.into(this)
+				}
+				hintInput.setMargins<LinearLayout.LayoutParams> {
+					topMargin = 5.uiPX()
+				}
 
 				agreementView.click {
 					getParentFragment<WalletImportFragment> {
@@ -129,7 +143,7 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 					}
 				}.into(this)
 
-				confirmButton.apply {
+				confirmButton = roundButton {
 					text = CommonText.confirm.toUpperCase()
 					setBlueStyle(10.uiPX())
 				}.click { button ->
@@ -157,7 +171,8 @@ class MnemonicImportDetailFragment : BaseFragment<MnemonicImportDetailPresenter>
 							else activity?.jump<SplashActivity>()
 						}
 					}
-				}.into(this)
+				}
+
 				ExplanationTitle(context).apply {
 					text = QAText.whatIsMnemonic.setUnderline()
 				}.click {

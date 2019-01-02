@@ -5,9 +5,6 @@ import android.support.annotation.WorkerThread
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.kernel.commontable.value.TableType
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.Serializable
 
 
@@ -31,12 +28,12 @@ data class FavoriteTable(
 
 		@WorkerThread
 		fun updateDAPPUsedStatus(dappID: String, callback: () -> Unit) {
-			FavoriteTable.dao.insert(
+			dao.insert(
 				FavoriteTable(
 					SharedWallet.getCurrentWalletID(),
 					TableType.DAPP,
 					dappID,
-					"${System.currentTimeMillis()}"
+					System.currentTimeMillis().toString()
 				)
 			)
 			callback()
@@ -57,4 +54,7 @@ interface FavoriteDao {
 
 	@Query("DELETE FROM favoriteTable WHERE walletID = :walletID")
 	fun deleteAll(walletID: Int)
+
+	@Query("SELECT * FROM favoriteTable WHERE walletID = :walletID")
+	fun getAll(walletID: Int = SharedWallet.getCurrentWalletID()): List<FavoriteTable>
 }

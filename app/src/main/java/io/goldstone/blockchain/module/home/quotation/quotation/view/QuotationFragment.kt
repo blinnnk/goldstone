@@ -3,10 +3,10 @@ package io.goldstone.blockchain.module.home.quotation.quotation.view
 import android.os.Bundle
 import android.view.View
 import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blockchain.common.base.baserecyclerfragment.BaseRecyclerView
+import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blockchain.module.home.quotation.quotation.presenter.QuotationPresenter
@@ -14,7 +14,6 @@ import io.goldstone.blockchain.module.home.quotation.quotationmanagement.event.Q
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /**
  * @date 26/03/2018 8:56 PM
@@ -64,10 +63,12 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		wrapper.addView(slideHeader)
-		slideHeader.addTokenButton.apply {
-			onClick {
+		with(slideHeader) {
+			addTokenButton.click {
 				presenter.showQuotationManagement()
-				preventDuplicateClicks()
+			}
+			rankButton.click {
+				presenter.showQuotationRankFragment()
 			}
 		}
 	}

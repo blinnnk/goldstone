@@ -50,6 +50,7 @@ open class RoundInput(context: Context) : EditText(context) {
 	private var showAlert = false
 
 	init {
+
 		paint.isAntiAlias = true
 		paint.style = Paint.Style.STROKE
 		paint.color = GrayScale.lightGray

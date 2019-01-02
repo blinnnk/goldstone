@@ -3,7 +3,6 @@ package io.goldstone.blockchain.module.home.dapp.common
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
@@ -11,6 +10,7 @@ import android.widget.Toast
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toIntOrZero
+import com.blinnnk.extension.toJSONObjectList
 import com.blinnnk.util.SystemUtils
 import com.blinnnk.util.load
 import com.blinnnk.util.then
@@ -18,14 +18,18 @@ import io.goldstone.blockchain.GoldStoneApp
 import io.goldstone.blockchain.common.component.overlay.Dashboard
 import io.goldstone.blockchain.common.component.overlay.LoadingView
 import io.goldstone.blockchain.common.language.CommonText
+import io.goldstone.blockchain.common.language.TransactionText
 import io.goldstone.blockchain.common.sharedpreference.SharedAddress
 import io.goldstone.blockchain.common.sharedpreference.SharedChain
+import io.goldstone.blockchain.common.sharedpreference.SharedValue
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchUI
 import io.goldstone.blockchain.common.utils.AesCrypto
 import io.goldstone.blockchain.common.utils.ErrorDisplayManager
+import io.goldstone.blockchain.crypto.eos.EOSCodeName
 import io.goldstone.blockchain.crypto.eos.EOSTransactionMethod
 import io.goldstone.blockchain.crypto.eos.account.EOSAccount
+import io.goldstone.blockchain.crypto.eos.account.EOSPrivateKey
 import io.goldstone.blockchain.crypto.eos.base.showDialog
 import io.goldstone.blockchain.crypto.eos.contract.EOSContractCaller
 import io.goldstone.blockchain.crypto.eos.ecc.Sha256
@@ -33,14 +37,24 @@ import io.goldstone.blockchain.crypto.multichain.*
 import io.goldstone.blockchain.kernel.commontable.MyTokenTable
 import io.goldstone.blockchain.kernel.network.common.RequisitionUtil
 import io.goldstone.blockchain.kernel.network.eos.EOSAPI
+import io.goldstone.blockchain.kernel.network.eos.EOSAPI.getStringAccountInfo
 import io.goldstone.blockchain.module.common.tokendetail.eosactivation.accountselection.model.EOSAccountTable
 import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PaymentDetailPresenter
+import io.goldstone.blockchain.module.common.tokenpayment.paymentdetail.presenter.PrivatekeyActionType
+import io.goldstone.blockchain.module.home.profile.profile.presenter.ProfilePresenter
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.matchParent
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
  * @author KaySaith
  * @date  2018/11/29
+ * @Important
+ *  兼容 Scatter 的 Dapp 在 地域 API 26 的机器上都无法运行 (除非更新 Chrome )
  */
 @Suppress("DEPRECATION")
 @SuppressLint("SetJavaScriptEnabled", "ViewConstructor")
@@ -64,6 +78,7 @@ class DAPPBrowser(
 		settings.allowFileAccess = true
 		settings.layoutAlgorithm = WebSettings.LayoutAlgorithm.NARROW_COLUMNS
 		settings.useWideViewPort = true
+		settings.loadWithOverviewMode = true
 		setLayerType(View.LAYER_TYPE_HARDWARE, null)
 		settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
 		settings.setAppCacheEnabled(true)
@@ -77,7 +92,7 @@ class DAPPBrowser(
 				hold(newProgress)
 				fun evaluateJS() {
 					view?.evaluateJavascript("javascript:(function(){" +
-						"scatter={connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){console.log(JSON.stringify(data));identity={accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":\"${account.name}\"}]};return new Promise(function(resolve,reject){resolve(identity)})},getIdentityFromPermissions:function(data){console.log(\"getIdentityFromPermissions***\"+JSON.stringify(data))},requestSignature:function(data){console.log(\"requestSignature***\"+JSON.stringify(data))},identity:{accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":\"${account.name}\"}]},forgetIdentity:function(){currentAccount=null;identity=null;return new Promise(function(resolve,reject){resolve()})},linkAccount:function(publicKey,network){console.log(\"linkAccount***\"+publicKey)},suggestNetwork:function(data){console.log(\"suggestNetwork***\");return new Promise(function(resolve,reject){resolve(true)})},isConnected:function(){return new Promise(function(resolve,reject){resolve(true)})},authenticate:function(nonce){console.log(\"authenticate***\"+nonce)},getOrRequestIdentity:function(data){console.log(\"getOrRequestIdentity***\"+JSON.stringify(data))},transactionResult:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,tableRowInterval:null,accountInterval:null,balanceInterval:null,eos:function(data){console.log(\"scatter.eos\"+JSON.stringify(data));return{transaction:function(action, action1){console.log(\"eos.transaction\");console.log(\"eos.transaction\" + JSON.stringify(action) + JSON.stringify(action1));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})},getAbi:function(data){console.log(\"eos.getAbi\");console.log(JSON.stringify(data));return new Promise(function(resolve,reject){resolve(\"get abi to do\")})},getTableRows:function(data){console.log(\"eos.getTableRows\");window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.tableRowInterval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};window.scatter.tableRow=null;clearInterval(window.scatter.tableRowInterval)}},1500)})},getAccount:function(data){console.log(\"eos.getAccount\");window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.accountInterval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};window.scatter.accountInfo=null;clearInterval(window.scatter.accountInterval)}},1500)})},getCurrencyBalance:function(code,name,symbol){console.log(\"eos.getCurrencyBalance\");window.control.getEOSAccountBalance(code,name,symbol);return new Promise(function(resolve,reject){window.scatter.balanceInterval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance.split(\",\"))};window.scatter.balance=null;clearInterval(window.scatter.balanceInterval)}},2000)})},contract:function(data){console.log(\"eos.contract\");console.log(JSON.stringify(data)+\"eos.contract\");return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){console.log(\"eos.getArbitrarySignature\");window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);window.scatter.arbSignature=null;clearInterval(window.scatter.interval)}},1500)})}};" +
+						"${SharedValue.getJSCode()};" +
 						"event=document.createEvent('HTMLEvents');" +
 						"event.initEvent('scatterLoaded',true,true);" +
 						"document.dispatchEvent(event);" +
@@ -113,39 +128,67 @@ class DAPPBrowser(
 
 	inner class JSInterface {
 
+		/**
+		 * Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+		 * @Description
+		 * 目前还遇到有些 `DAPP` 调用 `Scatter` 的这个方法完全不传参数, 那么就直接返回
+		 * 当前用户的 `AccountName`
+		 */
 		@JavascriptInterface
 		fun getEOSAccountBalance(code: String, accountName: String, symbol: String) {
-			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
-			Log.d("Scatter", code)
-			EOSAPI.getAccountBalanceBySymbol(EOSAccount(accountName), CoinSymbol(symbol), code) { balance, error ->
+			val finalCode: String
+			val finalAccount: String
+			val finalSymbol: CoinSymbol
+			if (code == "undefined" && symbol == "undefined") {
+				finalCode = EOSCodeName.EOSIOToken.value
+				finalAccount = account.name
+				finalSymbol = CoinSymbol.EOS
+			} else {
+				finalCode = code
+				finalAccount = accountName
+				finalSymbol = CoinSymbol(symbol)
+			}
+			EOSAPI.getCurrencyBalance(
+				EOSAccount(finalAccount),
+				finalSymbol,
+				finalCode
+			) { balance, error ->
 				launchUI {
 					if (balance.isNotNull() && error.isNone()) {
-						evaluateJavascript("javascript:(function(){scatter.balance=\"$balance\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getCurrencyBalanceEvent',true,true);event.data=$balance;document.dispatchEvent(event)})()", null)
 					} else {
-						evaluateJavascript("javascript:(function(){scatter.balance=\"failed\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getCurrencyBalanceEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					}
 				}
 			}
 		}
 
 		@JavascriptInterface
-		fun getEOSAccountInfo(accountName: String) {
-			launchUI {
-				val accountObject = try {
-					JSONObject(accountName)
-				} catch (error: Exception) {
-					evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
-					println("GoldStone-DAPP Get AccountERROR: ${error.message}\n DATA: $accountName")
-					return@launchUI
+		fun getIdentity(data: String) {
+			println("getIdentity $data")
+			GlobalScope.launch(Dispatchers.Default) {
+				val identity = "{ accounts: [{ \"authority\": \"active\", \"blockchain\": \"eos\", \"name\": \"${account.name}\" }] }"
+				delay(1000L)
+				launchUI {
+					evaluateJavascript("javascript:(function(){scatter.getIdentityResult=${JSONObject(identity)}})()", null)
 				}
-				// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
-				EOSAPI.getStringAccountInfo(EOSAccount(accountObject.safeGet("account_name"))) { accountInfo, error ->
-					launchUI {
-						if (accountInfo.isNotNull() && error.isNone()) {
-							evaluateJavascript("javascript:(function(){scatter.accountInfo=$accountInfo})()", null)
-						} else {
-							evaluateJavascript("javascript:(function(){scatter.accountInfo=\"failed\"})()", null)
-						}
+			}
+		}
+
+		/** *
+		 * 这里遇到了有些 DAPP 传入的是  {"account_name":"beautifulleo"}
+		 * 有些直接传入了 "\"beautifulleo\""
+		 */
+		@JavascriptInterface
+		fun getEOSAccountInfo(account: String) {
+			val accountName =
+				if (account.contains("{")) JSONObject(account).safeGet("account_name")
+				else account.replace("\"", "")
+			// Scatter 合约的方法, 有传回 `Code` 这里目前暂时只支持查询了 `EOS Balance`
+			getStringAccountInfo(EOSAccount(accountName)) { accountInfo, error ->
+				launchUI {
+					if (accountInfo.isNotNull() && error.isNone()) {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getAccountEvent',true,true);event.data=$accountInfo;document.dispatchEvent(event)})()", null)
 					}
 				}
 			}
@@ -164,7 +207,6 @@ class DAPPBrowser(
 		@JavascriptInterface
 		fun getTableRows(data: String) {
 			launchUI {
-				System.out.println("data $data")
 				val tableObject = try {
 					JSONObject(data)
 				} catch (error: Exception) {
@@ -198,9 +240,7 @@ class DAPPBrowser(
 				) { result, error ->
 					launchUI {
 						if (result.isNotNull() && error.isNone()) {
-							evaluateJavascript("javascript:(function(){scatter.tableRow=$result})()", null)
-						} else {
-							evaluateJavascript("javascript:(function(){scatter.tableRow=\"failed\"})()", null)
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getTableRowsEvent',true,true);event.data=$result;document.dispatchEvent(event)})()", null)
 						}
 					}
 				}
@@ -212,22 +252,27 @@ class DAPPBrowser(
 			launchUI {
 				Dashboard(context) {
 					showAlert(
-						"Signed Data Request",
-						"Current DAPP request your sign data to verify your account, this behavior doesn't need any pay."
+						TransactionText.signData,
+						TransactionText.signDataDescription
 					) {
-						PaymentDetailPresenter.showGetPrivateKeyDashboard(
+						PaymentDetailPresenter.getPrivatekey(
 							context,
+							ChainType.EOS,
+							PrivatekeyActionType.SignData,
+							cancelEvent = {
+								evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+							},
 							confirmEvent = {
 								loadingView.show()
 							}
 						) { privateKey, error ->
 							launchUI {
 								loadingView.remove()
-							}
-							if (privateKey.isNotNull() && error.isNone()) {
-								val signature = privateKey.sign(Sha256.from(data.toByteArray())).toString()
-								launchUI {
-									evaluateJavascript("javascript:(function(){scatter.arbSignature=\"$signature\"})()", null)
+								if (privateKey.isNotNull() && error.isNone()) {
+									val signature = EOSPrivateKey(privateKey).sign(Sha256.from(data.toByteArray())).toString()
+									evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"$signature\";document.dispatchEvent(event)})()", null)
+								} else {
+									evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getArbSignatureEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 								}
 							}
 						}
@@ -237,19 +282,31 @@ class DAPPBrowser(
 		}
 
 		@JavascriptInterface
+		fun getInfo() {
+			EOSAPI.getStringChainInfo { chainInfo, error ->
+				launchUI {
+					if (chainInfo.isNotNull() && error.isNone()) {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getInfo',true,true);event.data=$chainInfo;document.dispatchEvent(event)})()", null)
+					} else {
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('getInfo',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+					}
+				}
+			}
+		}
+
+		@JavascriptInterface
 		fun transferEOS(action: String) {
 			launchUI {
-				val actionObject = try {
-					JSONObject(action)
+				val actions = try {
+					JSONArray(JSONObject(action).safeGet("actions")).toJSONObjectList()
 				} catch (error: Exception) {
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
 					return@launchUI
 				}
-				if (actionObject.safeGet("name").equals(EOSTransactionMethod.Transfer.value, true)) {
-					scatterEOSTransaction(actionObject)
+				if (actions[0].safeGet("name").equals(EOSTransactionMethod.Transfer.value, true)) {
+					scatterEOSTransaction(actions)
 				} else {
-					scatterSignOperation(actionObject)
+					scatterSignOperation(actions[0])
 				}
 			}
 		}
@@ -259,41 +316,51 @@ class DAPPBrowser(
 				action,
 				cancelEvent = {
 					loadingView.remove()
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 				},
 				confirmEvent = {
-					PaymentDetailPresenter.showGetPrivateKeyDashboard(
+					PaymentDetailPresenter.getPrivatekey(
 						context,
-						cancelEvent = { loadingView.remove() },
+						ChainType.EOS,
+						PrivatekeyActionType.SignData,
+						cancelEvent = {
+							loadingView.remove()
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+						},
 						confirmEvent = { loadingView.show() }
 					) { privateKey, error ->
 						if (privateKey.isNotNull() && error.isNone()) {
-							EOSContractCaller(action, ChainID.EOS).send(privateKey) { response, pushTransactionError ->
+							EOSContractCaller(action, ChainID.EOS).send(
+								EOSPrivateKey(privateKey),
+								SharedChain.getEOSCurrent().getURL()
+							) { response, pushTransactionError ->
 								launchUI {
 									loadingView.remove()
 									if (response.isNotNull() && pushTransactionError.isNone()) {
 										response.showDialog(context)
+										evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 									} else {
-										evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+										evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 										ErrorDisplayManager(pushTransactionError).show(context)
 									}
 								}
 							}
 						} else launchUI {
 							loadingView.remove()
-							evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
 						}
 					}
 				}
 			)
 		}
 
-		private val scatterEOSTransaction: (action: JSONObject) -> Unit = { action ->
+		private val scatterEOSTransaction: (action: List<JSONObject>) -> Unit = { action ->
 			showQuickPaymentDashboard(
 				action,
 				false,
+				"",
 				cancelEvent = {
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+					loadingView.remove()
 				},
 				confirmEvent = { loadingView.show() }
 			) { response, error ->
@@ -301,10 +368,10 @@ class DAPPBrowser(
 					loadingView.remove()
 					if (response.isNotNull() && error.isNone()) {
 						response.showDialog(context)
-						evaluateJavascript("javascript:(function(){scatter.transactionResult=${response.result}})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 					} else {
-						ErrorDisplayManager(error).show(context)
-						evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
+						if (error.hasError()) ErrorDisplayManager(error).show(context)
 					}
 				}
 			}
@@ -312,22 +379,28 @@ class DAPPBrowser(
 
 		/**
 		 * action like {"from":"beautifulleo","to":"betlottoinst","quantity":"0.1000 EOS","memo":"1|1029338"}
+		 * @Description
+		 * 因为某些 DAPP 要求使用 DAPP 自己的指定节点进行访问, 这里预留了传入自定义 ChainURL 的方法
+		 * 等待后续确定方案再实施
 		 */
 		@JavascriptInterface
 		fun simpleTransfer(action: String) {
+			// TODO Description DAPP Custom ChainURL
+			val dappChainURL = SharedChain.getEOSCurrent().getURL()
 			launchUI {
 				val actionObject = try {
 					JSONObject(action)
 				} catch (error: Exception) {
-					evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+					evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					println("GoldStone-DAPP Transfer EOS ERROR: $error\n DATA: $action")
 					return@launchUI
 				}
 				showQuickPaymentDashboard(
-					actionObject,
+					listOf(actionObject),
 					true,
+					dappChainURL,
 					cancelEvent = {
-						evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+						evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 					},
 					confirmEvent = { loadingView.show() }
 				) { response, error ->
@@ -335,10 +408,10 @@ class DAPPBrowser(
 						loadingView.remove()
 						if (response.isNotNull() && error.isNone()) {
 							response.showDialog(context)
-							evaluateJavascript("javascript:(function(){scatter.transactionResult=${response.result}})()", null)
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=${response.result};document.dispatchEvent(event)})()", null)
 						} else {
 							ErrorDisplayManager(error).show(context)
-							evaluateJavascript("javascript:(function(){scatter.transactionResult=\"failed\"})()", null)
+							evaluateJavascript("javascript:(function(){var event=document.createEvent('Event');event.initEvent('transactionEvent',true,true);event.data=\"failed\";document.dispatchEvent(event)})()", null)
 						}
 					}
 				}
@@ -363,7 +436,7 @@ class DAPPBrowser(
 						title,
 						message,
 						CommonText.confirm,
-						{ dialog.dismiss() }
+						cancelAction = { dismiss() }
 					) {
 						evaluateJavascript("javascript:showAlert(\"clickedConfirmButton\")", null)
 					}
@@ -467,30 +540,47 @@ class DAPPBrowser(
 
 		@JavascriptInterface
 		fun getEOSSingedData(data: String) {
-			System.out.println(data)
 			launchUI {
-				PaymentDetailPresenter.showGetPrivateKeyDashboard(
-					context,
-					cancelEvent = { loadingView.remove() },
-					confirmEvent = { loadingView.show() }
-				) { privateKey, error ->
-					if (privateKey.isNotNull() && error.isNone()) {
-						EOSContractCaller(JSONObject(data)).getPushTransactionObject(privateKey) { pushJson, hashError ->
-							launchUI {
-								loadingView.remove()
-								if (pushJson.isNotNull() && hashError.isNone()) {
-									val result = Uri.encode(pushJson)
-									evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
-								} else {
-									evaluateJavascript("javascript:getEOSSignedData(\"${hashError.message}\")", null)
+				Dashboard(context) {
+					showAlert(
+						TransactionText.signData,
+						TransactionText.signDataDescription
+					) {
+						PaymentDetailPresenter.getPrivatekey(
+							context,
+							ChainType.EOS,
+							PrivatekeyActionType.SignData,
+							cancelEvent = { loadingView.remove() },
+							confirmEvent = { loadingView.show() }
+						) { privateKey, error ->
+							if (privateKey.isNotNull() && error.isNone()) {
+								EOSContractCaller(JSONObject(data)).getPushTransactionObject(EOSPrivateKey(privateKey)) { pushJson, hashError ->
+									launchUI {
+										loadingView.remove()
+										if (pushJson.isNotNull() && hashError.isNone()) {
+											val result = Uri.encode("{\"signedData\": $pushJson, \"error\": \"${hashError.message}\"}")
+											evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+										} else {
+											val result = Uri.encode("{\"signedData\": \"undefined\", \"error\": \"${hashError.message}\"}")
+											evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
+										}
+									}
 								}
+							} else launchUI {
+								loadingView.remove()
+								val result = Uri.encode("{\"signedData\":  \"undefined\", \"error\": \"${error.message}\"}")
+								evaluateJavascript("javascript:getEOSSignedData(\"$result\")", null)
 							}
 						}
-					} else launchUI {
-						loadingView.remove()
-						evaluateJavascript("javascript:getEOSSignedData(\"${error.message}\")", null)
 					}
 				}
+			}
+		}
+
+		@JavascriptInterface
+		fun showShareDashboard(shareContent: String) {
+			launchUI {
+				ProfilePresenter.showShareChooser(context!!, shareContent)
 			}
 		}
 
@@ -498,6 +588,7 @@ class DAPPBrowser(
 		fun backEvent(callback: () -> Unit) {
 			evaluateJavascript("javascript:backEvent()") {
 				if (it.equals("\"finished\"", true)) callback()
+				else callback()
 			}
 		}
 	}
