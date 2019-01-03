@@ -15,6 +15,8 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPDao
 import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContractDao
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankDao
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeDao
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionDao
@@ -50,7 +52,8 @@ import java.math.BigInteger
 		(EOSAccountTable::class),
 		(ChainNodeTable::class),
 		(DAPPTable::class),
-		(FavoriteTable::class)
+		(FavoriteTable::class),
+		(QuotationRankTable::class)
 	],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
@@ -91,6 +94,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun chainNodeDao(): ChainNodeDao
 	abstract fun dappDao(): DAPPDao
 	abstract fun favoriteDao(): FavoriteDao
+	abstract fun quotationRankDao(): QuotationRankDao
 
 	companion object {
 		const val databaseVersion = 15

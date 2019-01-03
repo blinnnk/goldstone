@@ -40,10 +40,11 @@ object APIPath {
 	val getUnreadCount: (header: String) -> String = { "$it/account/checkUnreadMessage" }
 	val getNewVersion: (header: String) -> String = { "$it/index/getNewVersion" }
 	val getShareContent: (header: String) -> String = { "$it/index/getShareContent" }
-	val unregeisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
+	val unregisterDevice: (header: String) -> String = { "$it/account/unregisterDevice" }
 	val getIconURL: (header: String) -> String = { "$it/index/getTokenBySymbolAndAddress" }
 	val getChainNodes: (header: String) -> String = { "$it/market/getChainNodes" }
-	val getMD5Info: (header: String) -> String = { "$it/index/md5Info" }
+	val getMD5Info: (header: String, coinRankSize: Int) -> String = {
+			header, coinRankSize ->"$header/index/md5Info?coin_rank_size=$coinRankSize" }
 	val getEOSTokenList: (header: String, chainID: String, account: String) -> String = { header, chainID, account ->
 		"$header/eos/tokenHistory?chainid=$chainID&account=$account"
 	}
@@ -116,5 +117,13 @@ object APIPath {
 
 	val searchDAPP: (header: String, condition: String) -> String = { header, condition ->
 		"$header/dapp/searchDapp?dapp=$condition"
+	}
+	
+	val coinGlobalData: (header: String) -> String = {
+		"$it/market/globalData"
+	}
+	
+	val coinRank:(header: String, rank: Int, size: Int) -> String = { header, rank, size ->
+		"$header/market/coinRank?rank=$rank&size=$size"
 	}
 }

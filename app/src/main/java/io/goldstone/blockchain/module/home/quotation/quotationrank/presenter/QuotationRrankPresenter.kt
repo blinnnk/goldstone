@@ -1,7 +1,17 @@
 package io.goldstone.blockchain.module.home.quotation.quotationrank.presenter
 
+import com.blinnnk.extension.*
+import com.blinnnk.util.load
+import com.blinnnk.util.then
+import io.goldstone.blockchain.common.language.HoneyLanguage
+import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.thread.launchDefault
+import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
+import io.goldstone.blockchain.module.home.home.presneter.SilentUpdater
 import io.goldstone.blockchain.module.home.quotation.quotationrank.contract.QuotationRankContract
-import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankModel
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
+import java.math.BigDecimal
 
 
 /**
@@ -9,26 +19,116 @@ import io.goldstone.blockchain.module.home.quotation.quotationrank.model.Quotati
  * @date  2019/01/02
  */
 class QuotationRankPresenter(
-	private val view: QuotationRankContract.GSView
+	private val rankView: QuotationRankContract.GSView
 ) : QuotationRankContract.GSPresenter {
+	private var lastRank = 0
+	
 	override fun start() {
-		setMarketInfo()
-		setInitData()
+		getGlobalData()
+		loadFirstPage()
 	}
-
+	
+	private fun getGlobalData() {
+		GoldStoneAPI.getGlobalRankData { model, error ->
+			launchUI {
+				if (model.isNotNull() && error.isNone()) {
+					rankView.showHeaderData(model)
+				} else {
+					rankView.showError(error)
+				}
+			}
+		}
+	}
+	
+	override fun loadFirstPage() {
+		rankView.showLoadingView(true)
+		launchDefault {
+			val localData = QuotationRankTable.dao.getAll()
+			if (localData.isEmpty()) SilentUpdater.updateRecommendedDAPP {
+				load {
+					QuotationRankTable.dao.getAll()
+				} then {
+					rankView.showLoadingView(false)
+					lastRank = localData.last().rank
+					rankView.updateData(it.toArrayList())
+					
+				}
+			} else launchUI {
+				lastRank = localData.last().rank
+				rankView.showLoadingView(false)
+				rankView.updateData(localData)
+			}
+		}
+	}
+	
 	override fun loadMore() {
-		// TODO
+		rankView.showBottomLoading(true)
+		GoldStoneAPI.getQuotationRankList(lastRank) { data, error ->
+			launchUI {
+				if (data.isNotNull() && error.isNone()) {
+					rankView.updateData(data)
+					if (data.isNotEmpty()) {
+						lastRank = data.last().rank
+					}
+				} else {
+					rankView.showError(error)
+				}
+				rankView.showBottomLoading(false)
+			}
+		}
 	}
-
-	private fun setInitData() {
-		// 从数据库获取数据
-		val data  =
-			listOf<QuotationRankModel>()
-		view.updateAdapterDataSet(data)
-	}
-
-	private fun setMarketInfo() {
-		// 大盘指数相关
-		view.showMarketInfo()
+	
+	
+	companion object {
+		
+		enum class NumberUnit(val value: BigDecimal, private val chineseSymbol: String, private val englishSymbol: String) {
+			Thousand(BigDecimal(Math.pow(10.0, 3.0)), "千", "T"),
+			Million(BigDecimal(Math.pow(10.0, 6.0)), "百万", "M"),
+			Billion(BigDecimal(Math.pow(10.0, 9.0)), "十亿", "B"),
+			TenThousand(BigDecimal(Math.pow(10.0, 4.0)), "万", "W"),
+			HundredMillion(BigDecimal(Math.pow(10.0, 8.0)), "亿", "Y");
+			
+			fun getUnit(): String {
+				return  when (currentLanguage) {
+					HoneyLanguage.English.code, HoneyLanguage.Russian.code -> this.englishSymbol
+					else -> this.chineseSymbol
+				}
+			}
+			
+			fun calculate(volume: BigDecimal): String {
+				return volume.divide(
+					value,
+					1,
+					BigDecimal.ROUND_HALF_UP
+				).toPlainString() suffix getUnit()
+			}
+		}
+		
+		fun parseVolumeText(text: String): String {
+			val volume = BigDecimal(text)
+			return if (currentLanguage == HoneyLanguage.English.code || currentLanguage == HoneyLanguage.Russian.code) {
+				when {
+					volume > NumberUnit.Billion.value ->
+						NumberUnit.Billion.calculate(volume)
+					volume > NumberUnit.Million.value ->
+						NumberUnit.Million.calculate(volume)
+					volume > NumberUnit.Thousand.value ->
+						NumberUnit.Thousand.calculate(volume)
+					else -> volume.setScale(
+						1,
+						BigDecimal.ROUND_HALF_UP
+					).toString()
+				}
+			} else when {
+					volume > NumberUnit.HundredMillion.value ->
+						NumberUnit.HundredMillion.calculate(volume)
+					volume > NumberUnit.TenThousand.value ->
+						NumberUnit.TenThousand.calculate(volume)
+					else -> volume.setScale(
+						1,
+						BigDecimal.ROUND_HALF_UP
+					).toString()
+				}
+		}
 	}
 }
