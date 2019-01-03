@@ -161,7 +161,7 @@ abstract class SilentUpdater {
 				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
 				newDAPPMD5 = md5s.safeGet("dapps_md5")
 				newDAPPJSCode = md5s.safeGet("get_js_md5")
-				newQuotationRankMd5 = md5s.safeGet("/market/coinRank_md5")
+				newQuotationRankMd5 = md5s.safeGet("coin_rank_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,

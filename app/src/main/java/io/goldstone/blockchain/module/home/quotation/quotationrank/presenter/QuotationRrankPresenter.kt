@@ -45,6 +45,8 @@ class QuotationRankPresenter(
 					gsView.showListData(true, quotationRankData)
 					callback()
 				}
+			} else {
+				getNextPage(callback)
 			}
 		}
 	}

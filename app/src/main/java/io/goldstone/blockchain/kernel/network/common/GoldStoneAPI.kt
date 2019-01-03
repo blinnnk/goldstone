@@ -237,7 +237,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMD5List(@WorkerThread hold: (md5s: JSONObject?, error: RequestError) -> Unit) {
 		requestData<String>(
-			APIPath.getMD5Info(APIPath.currentUrl),
+			APIPath.getMD5Info(APIPath.currentUrl, 10, 10, 20),
 			"",
 			true,
 			isEncrypt = true

@@ -28,9 +28,8 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 	private val cellWidth = ScreenSize.Width - 20.uiPX()
 	private val rankWidth = cellWidth / 10
 	private val iconWidth = cellWidth / 6
-	private val symbolWidth = cellWidth / 6
+	private val symbolWidth = cellWidth / 3
 	private val priceWidth = cellWidth / 5
-	private val changeWidth = cellWidth / 6
 	
 	private val rank = TextView(context).apply {
 		layoutParams = LayoutParams(rankWidth, matchParent)
@@ -48,11 +47,9 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 	}
 	private val symbol = TextView(context)
 	private val price = TextView(context).apply {
-		layoutParams = LayoutParams(priceWidth, matchParent)
 		gravity = Gravity.CENTER
 	}
 	private val changePercent = TextView(context).apply {
-		layoutParams = LayoutParams(changeWidth, matchParent)
 		gravity = Gravity.CENTER
 	}
 	private val marketCap = TextView(context).apply {
@@ -81,6 +78,11 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 			symbol.text = it.symbol
 			price.text = "${BigDecimal(it.price.toString()).setScale(2, BigDecimal.ROUND_HALF_UP)}"
 			changePercent.text = it.changePercent24h
+			if (it.changePercent24h.contains("-")) {
+				changePercent.setTextColor(Spectrum.green)
+			} else {
+				changePercent.setTextColor(Spectrum.lightRed)
+			}
 			marketCap.text = QuotationRankPresenter.parseVolumeText(it.marketCap.replace(",", ""))
 			volume.text = QuotationRankPresenter.parseVolumeText(it.volume.replace(",", ""))
 		}
@@ -101,8 +103,12 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				addView(symbol)
 				addView(name)
 			}
-			addView(price)
-			addView(changePercent)
+			verticalLayout {
+				layoutParams = LayoutParams(priceWidth, 50.uiPX())
+				gravity = Gravity.CENTER_VERTICAL
+				addView(price)
+				addView(changePercent)
+			}
 			verticalLayout {
 				layoutParams = LayoutParams(matchParent, matchParent)
 				gravity = Gravity.CENTER
