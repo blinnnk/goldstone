@@ -30,7 +30,7 @@ open class BaseRadioCell(context: Context) : BaseCell(context) {
 		radioButton.isChecked = checkedStatus
 	}
 	protected val title = TextView(context).apply {
-		x = 60.uiPX().toFloat()
+		x = 50.uiPX().toFloat()
 		textSize = fontSize(15)
 		textColor = GrayScale.black
 		typeface = GoldStoneFont.medium(context)

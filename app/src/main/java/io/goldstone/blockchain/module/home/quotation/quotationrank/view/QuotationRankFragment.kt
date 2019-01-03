@@ -42,6 +42,10 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankModel>(), Quotatio
 		updateAdapterData<QuotationRankAdapter>(data.toArrayList())
 	}
 
+	override fun showMarketInfo() {
+		// TODO
+	}
+
 	override fun flipPage() {
 		super.flipPage()
 		presenter.loadMore()
@@ -49,10 +53,6 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankModel>(), Quotatio
 
 	override fun showError(error: Throwable) {
 		ErrorDisplayManager(error).show(context)
-	}
-
-	override fun showMarketInfo() {
-		// TODO
 	}
 
 	private fun showQuotationDetailFragment() {
