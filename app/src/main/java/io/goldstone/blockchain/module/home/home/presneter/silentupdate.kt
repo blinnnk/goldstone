@@ -48,6 +48,7 @@ abstract class SilentUpdater {
 	private val chainID = SharedChain.getEOSCurrent().chainID
 
 	fun star(context: Context) = launchDefault {
+		val configDao = AppConfigTable.dao
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -61,7 +62,7 @@ abstract class SilentUpdater {
 			// 拉取 EOS 的总的 Delegate Data
 			updateDelegateBandwidthData()
 		}
-		AppConfigTable.dao.getAppConfig()?.let {
+		configDao.getAppConfig()?.let {
 			checkMD5Info(it) { hasNewDefaultTokens,
 												 hasNewChainNodes,
 												 hasNewExchanges,
@@ -71,28 +72,35 @@ abstract class SilentUpdater {
 												 hasNewRecommendedDAPP,
 												 hasNewDAPP,
 												 hasNewDAPPJSCode ->
+				// 确认后更新 MD5 值到数据库
 				fun updateData() {
-					if (hasNewDefaultTokens) updateLocalDefaultTokens()
-					if (hasNewChainNodes) updateNodeData()
-					if (hasNewExchanges) updateLocalExchangeData()
-					if (hasNewTerm) updateAgreement()
-					if (hasNewShareContent) updateShareContent()
-					if (hasNewConfig) updateConfigListData()
-					if (hasNewRecommendedDAPP) updateRecommendedDAPP {}
-					if (hasNewDAPP) updateNewDAPP {}
-					if (hasNewDAPPJSCode) updateDAPPJSCode()
-					// 确认后更新 MD5 值到数据库
-					AppConfigTable.dao.updateMD5Info(
-						newDefaultTokenListMD5,
-						newChainNodesMD5,
-						newExchangeListMD5,
-						newTermMD5,
-						newConfigMD5,
-						newShareContentMD5,
-						newRecommendedDAPPMD5,
-						newDAPPMD5,
-						newDAPPJSCode
-					)
+					if (hasNewDefaultTokens) updateLocalDefaultTokens {
+						configDao.updateDefaultTokenMD5(newDefaultTokenListMD5)
+					}
+					if (hasNewChainNodes) updateNodeData {
+						configDao.updateNodesMD5(newChainNodesMD5)
+					}
+					if (hasNewExchanges) updateLocalExchangeData {
+						configDao.updateExchangeMD5(newExchangeListMD5)
+					}
+					if (hasNewTerm) updateAgreement {
+						configDao.updateTermMD5(newTermMD5)
+					}
+					if (hasNewShareContent) updateShareContent {
+						configDao.updateShareContentMD5(newShareContentMD5)
+					}
+					if (hasNewConfig) updateConfigListData {
+						configDao.updateConfigMD5(newConfigMD5)
+					}
+					if (hasNewRecommendedDAPP) updateRecommendedDAPP {
+						configDao.updateRecommendMD5(newRecommendedDAPPMD5)
+					}
+					if (hasNewDAPP) updateNewDAPP {
+						configDao.updateNewDAPPMD5(newDAPPMD5)
+					}
+					if (hasNewDAPPJSCode) updateDAPPJSCode {
+						configDao.updateDAPPJSCodeMD5(newDAPPJSCodeMD5)
+					}
 				}
 				when {
 					Connectivity.isConnectedWifi(GoldStoneApp.appContext) -> updateData()
@@ -129,7 +137,7 @@ abstract class SilentUpdater {
 	private var newShareContentMD5 = ""
 	private var newRecommendedDAPPMD5 = ""
 	private var newDAPPMD5 = ""
-	private var newDAPPJSCode = ""
+	private var newDAPPJSCodeMD5 = ""
 	private fun checkMD5Info(
 		config: AppConfigTable,
 		hold: (
@@ -154,7 +162,7 @@ abstract class SilentUpdater {
 				newShareContentMD5 = md5s.safeGet("share_content_md5")
 				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
 				newDAPPMD5 = md5s.safeGet("dapps_md5")
-				newDAPPJSCode = md5s.safeGet("get_js_md5")
+				newDAPPJSCodeMD5 = md5s.safeGet("get_js_md5")
 				hold(
 					config.defaultCoinListMD5 != newDefaultTokenListMD5,
 					config.nodeListMD5 != newChainNodesMD5,
@@ -164,15 +172,16 @@ abstract class SilentUpdater {
 					config.shareContentMD5 != newShareContentMD5,
 					config.dappRecommendMD5 != newRecommendedDAPPMD5,
 					config.newDAPPMD5 != newDAPPMD5,
-					config.dappJSCodeMD5 != newDAPPJSCode
+					config.dappJSCodeMD5 != newDAPPJSCodeMD5
 				)
 			}
 		}
 	}
 
-	private fun updateLocalExchangeData() {
+	private fun updateLocalExchangeData(callback: () -> Unit) {
 		GoldStoneAPI.getMarketList { exchanges, error ->
 			if (exchanges.isNotNull() && error.isNone()) {
+				callback()
 				val exchangeDao = ExchangeTable.dao
 				val localData = exchangeDao.getAll()
 				if (localData.isEmpty()) {
@@ -358,8 +367,9 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private fun updateNodeData() {
+	private fun updateNodeData(callback: () -> Unit) {
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
+			callback()
 			val nodeDao = ChainNodeTable.dao
 			if (serverNodes.isNotNull() && error.isNone() && serverNodes.isNotEmpty()) {
 				nodeDao.deleteAll()
@@ -413,9 +423,10 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private fun updateLocalDefaultTokens() {
+	private fun updateLocalDefaultTokens(callback: () -> Unit) {
 		GoldStoneAPI.getDefaultTokens { serverTokens, error ->
 			if (!serverTokens.isNullOrEmpty() && error.isNone()) {
+				callback()
 				val localTokens = DefaultTokenTable.dao.getAllTokens()
 				// 开一个线程更新图片
 				updateLocalTokenIcon(serverTokens, localTokens)
@@ -468,9 +479,10 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private fun updateShareContent() {
+	private fun updateShareContent(callback: () -> Unit) {
 		GoldStoneAPI.getShareContent { shareContent, error ->
 			if (!shareContent.isNull() && error.isNone()) {
+				callback()
 				val shareText = if (shareContent.title.isEmpty() && shareContent.content.isEmpty()) {
 					ProfileText.shareContent
 				} else {
@@ -494,19 +506,21 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private fun updateAgreement() {
+	private fun updateAgreement(callback: () -> Unit) {
 		GoldStoneAPI.getTerms { term, error ->
 			if (!term.isNullOrBlank() && error.isNone()) {
 				AppConfigTable.dao.updateTerms(term)
+				callback()
 			}
 		}
 	}
 
-	private fun updateDAPPJSCode() {
+	private fun updateDAPPJSCode(callback: () -> Unit) {
 		GoldStoneAPI.getDAPPJSCode { code, error ->
 			if (code.isNotNull() && error.isNone()) {
 				AppConfigTable.dao.updateJSCode(code)
 				SharedValue.updateJSCode(code)
+				callback()
 			} else ErrorDisplayManager(error)
 		}
 	}
@@ -517,9 +531,10 @@ abstract class SilentUpdater {
 	 * 节点经常挂掉. 导致这里有可能需要动态的有 `CMS` 更新可支持的节点.
 	 * 故此增加了 `Config List` 的配置支持.
 	 */
-	private fun updateConfigListData() {
+	private fun updateConfigListData(callback: () -> Unit) {
 		GoldStoneAPI.getConfigList { models, error ->
 			if (!models.isNullOrEmpty() && error.isNone()) {
+				callback()
 				models.forEach {
 					when (it.name) {
 						"eosKylinHistory" -> SharedValue.updateKylinHistoryURL(it.value)

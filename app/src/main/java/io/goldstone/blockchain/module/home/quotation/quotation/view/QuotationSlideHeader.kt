@@ -59,10 +59,12 @@ class QuotationSlideHeader(context: Context) : SliderHeader(context) {
 	override fun onHeaderShowedStyle() {
 		super.onHeaderShowedStyle()
 		addTokenButton.setUnTransparent()
+		rankButton.setUnTransparent()
 	}
 
 	override fun onHeaderHidesStyle() {
 		super.onHeaderHidesStyle()
 		addTokenButton.setDefaultStyle()
+		rankButton.setDefaultStyle()
 	}
 }

@@ -120,18 +120,32 @@ interface AppConfigDao {
 	@Query("UPDATE appConfig SET currencyCode = :currencyCode WHERE id = 1")
 	fun updateCurrency(currencyCode: String)
 
-	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5, nodeListMD5 = :nodeListMD5, exchangeListMD5 = :exchangeListMD5, termMD5 = :termMD5, configMD5 = :configMD5, shareContentMD5 = :shareContentMD5, dappRecommendMD5 = :dappRecommendMD5, newDAPPMD5 = :newDAPPMD5, dappJSCodeMD5 =:dappJSCode  WHERE id = 1")
-	fun updateMD5Info(
-		defaultCoinListMD5: String,
-		nodeListMD5: String,
-		exchangeListMD5: String,
-		termMD5: String,
-		configMD5: String,
-		shareContentMD5: String,
-		dappRecommendMD5: String,
-		newDAPPMD5: String,
-		dappJSCode: String
-	)
+	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5 WHERE id = 1")
+	fun updateDefaultTokenMD5(defaultCoinListMD5: String)
+
+	@Query("UPDATE appConfig SET nodeListMD5 = :nodeListMD5 WHERE id = 1")
+	fun updateNodesMD5(nodeListMD5: String)
+
+	@Query("UPDATE appConfig SET exchangeListMD5 = :exchangeListMD5 WHERE id = 1")
+	fun updateExchangeMD5(exchangeListMD5: String)
+
+	@Query("UPDATE appConfig SET termMD5 = :termMD5 WHERE id = 1")
+	fun updateTermMD5(termMD5: String)
+
+	@Query("UPDATE appConfig SET shareContentMD5 = :shareContentMD5 WHERE id = 1")
+	fun updateShareContentMD5(shareContentMD5: String)
+
+	@Query("UPDATE appConfig SET dappJSCodeMD5 = :dappJSCodeMD5 WHERE id = 1")
+	fun updateDAPPJSCodeMD5(dappJSCodeMD5: String)
+
+	@Query("UPDATE appConfig SET dappRecommendMD5 = :dappRecommendMD5 WHERE id = 1")
+	fun updateRecommendMD5(dappRecommendMD5: String)
+
+	@Query("UPDATE appConfig SET newDAPPMD5 = :newDAPPMD5 WHERE id = 1")
+	fun updateNewDAPPMD5(newDAPPMD5: String)
+
+	@Query("UPDATE appConfig SET configMD5 = :configMD5 WHERE id = 1")
+	fun updateConfigMD5(configMD5: String)
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
 	fun updatePincode(pinCode: Int)
