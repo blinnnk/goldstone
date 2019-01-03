@@ -1,8 +1,4 @@
-package io.goldstone.blockchain.common.Language
-
-
-import io.goldstone.blockchain.common.language.HoneyLanguage
-import io.goldstone.blockchain.common.language.currentLanguage
+package io.goldstone.blockchain.common.language
 
 /**
  * @date: 2018-12-20.
@@ -10,7 +6,8 @@ import io.goldstone.blockchain.common.language.currentLanguage
  * @description:
  */
 object CoinRankText {
-	val marketCap =when (currentLanguage) {
+	@JvmField
+	val marketCap = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Cap"
 		HoneyLanguage.Chinese.code -> "Market Cap"
 		HoneyLanguage.Japanese.code -> "Market Cap"
@@ -19,8 +16,8 @@ object CoinRankText {
 		HoneyLanguage.TraditionalChinese.code -> "Market Cap"
 		else -> ""
 	}
-	
-	val volume24h =when (currentLanguage) {
+	@JvmField
+	val volume24h = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Volume 24h"
 		HoneyLanguage.Chinese.code -> "Volume 24h"
 		HoneyLanguage.Japanese.code -> "Volume 24h"
@@ -29,8 +26,8 @@ object CoinRankText {
 		HoneyLanguage.TraditionalChinese.code -> "Volume 24h"
 		else -> ""
 	}
-	
-	val btcDominance =when (currentLanguage) {
+	@JvmField
+	val btcDominance = when (currentLanguage) {
 		HoneyLanguage.English.code -> "BTC Dominance"
 		HoneyLanguage.Chinese.code -> "BTC Dominance"
 		HoneyLanguage.Japanese.code -> "BTC Dominance"
@@ -39,5 +36,4 @@ object CoinRankText {
 		HoneyLanguage.TraditionalChinese.code -> "BTC Dominance"
 		else -> ""
 	}
-	
 }

@@ -97,7 +97,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun quotationRankDao(): QuotationRankDao
 
 	companion object {
-		const val databaseVersion = 15
+		const val databaseVersion = 16
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

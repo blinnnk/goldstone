@@ -565,7 +565,7 @@ abstract class SilentUpdater {
 				}
 			}
 		}
-		
+
 		fun updateRecommendedDAPP(@WorkerThread callback: () -> Unit) {
 			GoldStoneAPI.getRecommendDAPPs(0) { dapps, error ->
 				if (dapps.isNotNull() && error.isNone()) {

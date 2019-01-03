@@ -544,7 +544,10 @@ object GoldStoneAPI {
 		}
 	}
 	
-	fun getQuotationRankList(rank: Int, @WorkerThread hold: (data: List<QuotationRankTable>?, error: RequestError) -> Unit) {
+	fun getQuotationRankList(
+		rank: Int,
+		@WorkerThread hold: (data: List<QuotationRankTable>?, error: RequestError) -> Unit
+	) {
 		requestData(
 			APIPath.coinRank(APIPath.currentUrl, rank, 20),
 			"list",

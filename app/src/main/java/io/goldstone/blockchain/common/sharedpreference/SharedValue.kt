@@ -36,7 +36,7 @@ object SharedValue {
 	fun getJungleHistoryURL(): String {
 		val url =
 			GoldStoneApp.appContext.getStringFromSharedPreferences(SharesPreference.jungleHistoryURL)
-		return if (url.equals("Default", true)) " https://junglehistory.cryptolions.io:4433" else url
+		return if (url.equals("Default", true)) "https://junglehistory.cryptolions.io:4433" else url
 	}
 
 	fun updateJungleHistoryURL(url: String) =
