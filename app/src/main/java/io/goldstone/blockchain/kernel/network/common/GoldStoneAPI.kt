@@ -25,6 +25,8 @@ import io.goldstone.blockchain.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blockchain.module.home.profile.profile.model.ShareContentModel
 import io.goldstone.blockchain.module.home.profile.profile.model.VersionModel
 import io.goldstone.blockchain.module.home.quotation.markettokendetail.model.CandleChartModel
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationGlobalModel
+import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionLineChartModel
 import io.goldstone.blockchain.module.home.quotation.quotationsearch.model.QuotationSelectionTable
@@ -34,7 +36,6 @@ import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagemen
 import io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blockchain.module.home.wallet.walletdetail.model.TokenPriceModel
 import okhttp3.MediaType
-import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -236,7 +237,7 @@ object GoldStoneAPI {
 	@JvmStatic
 	fun getMD5List(@WorkerThread hold: (md5s: JSONObject?, error: RequestError) -> Unit) {
 		requestData<String>(
-			APIPath.getMD5Info(APIPath.currentUrl),
+			APIPath.getMD5Info(APIPath.currentUrl, 20),
 			"",
 			true,
 			isEncrypt = true
@@ -317,7 +318,7 @@ object GoldStoneAPI {
 		@WorkerThread hold: (isRegistered: Boolean?, error: RequestError) -> Unit
 	) {
 		requestData<String>(
-			APIPath.unregeisterDevice(APIPath.currentUrl),
+			APIPath.unregisterDevice(APIPath.currentUrl),
 			"code",
 			true,
 			isEncrypt = true,
@@ -529,6 +530,30 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
+	
+	fun getGlobalRankData(@WorkerThread hold: (model: QuotationGlobalModel?, error: RequestError) -> Unit) {
+		requestData<String>(
+			APIPath.coinGlobalData(APIPath.currentUrl),
+			"",
+			true,
+			isEncrypt = true
+		) { result, error ->
+			if (result?.firstOrNull() != null && error.isNone()) {
+				hold(QuotationGlobalModel(JSONObject(result.first())), error)
+			} else hold(null, error)
+		}
+	}
+	
+	fun getQuotationRankList(rank: Int, @WorkerThread hold: (data: List<QuotationRankTable>?, error: RequestError) -> Unit) {
+		requestData(
+			APIPath.coinRank(APIPath.currentUrl, rank, 20),
+			"list",
+			false,
+			isEncrypt = true,
+			hold = hold
+		)
+	}
+	
 }
 
 

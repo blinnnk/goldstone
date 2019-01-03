@@ -49,7 +49,8 @@ data class AppConfigTable(
 	var shareContentMD5: String,
 	var dappRecommendMD5: String,
 	var newDAPPMD5: String,
-	var dappJSCodeMD5: String
+	var dappJSCodeMD5: String,
+	var quotationRankMd5: String
 ) {
 
 	companion object {
@@ -87,7 +88,8 @@ data class AppConfigTable(
 				shareContentMD5 = "",
 				dappRecommendMD5 = "",
 				newDAPPMD5 = "",
-				dappJSCodeMD5 = ""
+				dappJSCodeMD5 = "",
+				quotationRankMd5 = ""
 			)
 			dao.insert(config)
 			callback(config)
@@ -137,6 +139,9 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET dappJSCodeMD5 = :dappJSCodeMD5 WHERE id = 1")
 	fun updateDAPPJSCodeMD5(dappJSCodeMD5: String)
+	
+	@Query("UPDATE appConfig SET quotationRankMd5 = :quotationRankMd5 WHERE id = 1")
+	fun updateQuotationRankMD5(quotationRankMd5: String)
 
 	@Query("UPDATE appConfig SET dappRecommendMD5 = :dappRecommendMD5 WHERE id = 1")
 	fun updateRecommendMD5(dappRecommendMD5: String)
