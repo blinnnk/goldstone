@@ -44,14 +44,13 @@ class QuotationRankPresenter(
 		rankView.showLoadingView(true)
 		launchDefault {
 			val localData = QuotationRankTable.dao.getAll()
-			if (localData.isEmpty()) SilentUpdater.updateRecommendedDAPP {
+			if (localData.isEmpty()) SilentUpdater.updateQuotationRank {
 				load {
 					QuotationRankTable.dao.getAll()
 				} then {
 					rankView.showLoadingView(false)
-					lastRank = localData.last().rank
+					lastRank = it.lastOrNull()?.rank ?: 0
 					rankView.updateData(it.toArrayList())
-					
 				}
 			} else launchUI {
 				lastRank = localData.last().rank
@@ -65,12 +64,12 @@ class QuotationRankPresenter(
 		rankView.showBottomLoading(true)
 		GoldStoneAPI.getQuotationRankList(lastRank) { data, error ->
 			launchUI {
-				if (data.isNotNull() && error.isNone()) {
+				if (!data.isNullOrEmpty() && error.isNone()) {
 					rankView.updateData(data)
 					if (data.isNotEmpty()) {
 						lastRank = data.last().rank
 					}
-				} else {
+				} else if (error.hasError()) {
 					rankView.showError(error)
 				}
 				rankView.showBottomLoading(false)
@@ -109,25 +108,19 @@ class QuotationRankPresenter(
 			return if (currentLanguage == HoneyLanguage.English.code || currentLanguage == HoneyLanguage.Russian.code) {
 				when {
 					volume > NumberUnit.Billion.value ->
-						NumberUnit.Billion.calculate(volume)
+						"$${NumberUnit.Billion.calculate(volume)}"
 					volume > NumberUnit.Million.value ->
-						NumberUnit.Million.calculate(volume)
+						"$${NumberUnit.Million.calculate(volume)}"
 					volume > NumberUnit.Thousand.value ->
-						NumberUnit.Thousand.calculate(volume)
-					else -> volume.setScale(
-						1,
-						BigDecimal.ROUND_HALF_UP
-					).toString()
+						"$${NumberUnit.Thousand.calculate(volume)}"
+					else -> "$${volume.setScale(1, BigDecimal.ROUND_HALF_UP)}"
 				}
 			} else when {
 					volume > NumberUnit.HundredMillion.value ->
-						NumberUnit.HundredMillion.calculate(volume)
+						"¥${NumberUnit.HundredMillion.calculate(volume)}"
 					volume > NumberUnit.TenThousand.value ->
-						NumberUnit.TenThousand.calculate(volume)
-					else -> volume.setScale(
-						1,
-						BigDecimal.ROUND_HALF_UP
-					).toString()
+						"¥${NumberUnit.TenThousand.calculate(volume)}"
+					else -> "¥${volume.setScale(1, BigDecimal.ROUND_HALF_UP)}"
 				}
 		}
 	}

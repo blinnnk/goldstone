@@ -19,15 +19,22 @@ data class QuotationRankTable(
 	val marketCap: String,
 	@SerializedName("change_percent_24h")
 	val changePercent24h: String,
+	@SerializedName("name")
 	val name: String,
+	@SerializedName("color")
 	val color: String,
+	@SerializedName("symbol")
 	val symbol: String,
+	@SerializedName("price")
 	val price: Float,
+	@SerializedName("rank")
 	val rank: Int,
 	@SerializedName("icon")
 	val url: String,
+	@SerializedName("volume")
 	val volume: String,
-	val address: String
+	@SerializedName("address")
+	val contract: String
 ) {
 	companion object {
 		@JvmField

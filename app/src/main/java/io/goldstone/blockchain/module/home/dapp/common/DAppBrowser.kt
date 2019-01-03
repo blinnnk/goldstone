@@ -585,6 +585,14 @@ class DAPPBrowser(
 		}
 
 		@JavascriptInterface
+		fun getCurrentWalletType() {
+			launchUI {
+				val type = SharedWallet.getCurrentWalletType().type
+				evaluateJavascript("javascript:getCurrentWalletType(\"$type\")", null)
+			}
+		}
+
+		@JavascriptInterface
 		fun backEvent(callback: () -> Unit) {
 			evaluateJavascript("javascript:backEvent()") {
 				if (it.equals("\"finished\"", true)) callback()
