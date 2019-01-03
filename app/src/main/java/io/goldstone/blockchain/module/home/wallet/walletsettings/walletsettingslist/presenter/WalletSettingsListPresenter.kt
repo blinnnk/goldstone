@@ -21,7 +21,6 @@ import io.goldstone.blockchain.common.utils.safeShowError
 import io.goldstone.blockchain.crypto.keystore.deleteWalletByWalletID
 import io.goldstone.blockchain.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blockchain.crypto.multichain.ChainType
-import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.commontable.BTCSeriesTransactionTable
 import io.goldstone.blockchain.kernel.commontable.FavoriteTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
@@ -55,12 +54,9 @@ class WalletSettingsListPresenter(
 	}
 
 	override fun updateData() {
-		val balanceText =
-			SharedWallet.getCurrentBalance().formatCurrency() + " (${SharedWallet.getCurrencyCode()})"
 		fragment.asyncData = arrayListOf()
 		arrayListOf(
 			WalletSettingsListModel(WalletSettingsText.viewAddresses),
-			WalletSettingsListModel(WalletSettingsText.balance, balanceText),
 			WalletSettingsListModel(WalletSettingsText.walletName, SharedWallet.getCurrentName()),
 			WalletSettingsListModel(WalletSettingsText.hint, "******"),
 			WalletSettingsListModel(WalletSettingsText.passwordSettings),
