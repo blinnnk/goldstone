@@ -38,7 +38,6 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), Quotatio
 			asyncData.orEmptyArray(),
 			holdHeader = {
 				headerView = this
-				presenter.start()
 			},
 			holdFooter = {
 				bottomLoadingView = this
@@ -49,8 +48,9 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), Quotatio
 	
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		presenter = QuotationRankPresenter(this)
 		asyncData = arrayListOf()
+		presenter = QuotationRankPresenter(this)
+		presenter.start()
 	}
 	
 	override fun showError(error: Throwable) {
