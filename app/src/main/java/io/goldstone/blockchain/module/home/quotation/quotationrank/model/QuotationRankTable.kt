@@ -26,13 +26,13 @@ data class QuotationRankTable(
 	@SerializedName("symbol")
 	val symbol: String,
 	@SerializedName("price")
-	val price: Float,
+	val price: Double,
 	@SerializedName("rank")
 	val rank: Int,
 	@SerializedName("icon")
 	val url: String,
 	@SerializedName("volume")
-	val volume: String,
+	val volume: String, // 24 小时成交量
 	@SerializedName("address")
 	val contract: String
 ) {
@@ -46,11 +46,11 @@ data class QuotationRankTable(
 interface QuotationRankDao {
 	@Insert
 	fun insertAll(rankList: List<QuotationRankTable>)
-	
+
 	@Query("SELECT * FROM quotationRank")
 	fun getAll(): List<QuotationRankTable>
-	
+
 	@Query("DELETE FROM quotationRank")
 	fun deleteAll()
-	
+
 }

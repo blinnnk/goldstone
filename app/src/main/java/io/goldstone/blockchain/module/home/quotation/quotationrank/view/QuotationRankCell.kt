@@ -19,6 +19,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.utils.formatCount
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import io.goldstone.blockchain.module.home.quotation.quotationrank.presenter.QuotationRankPresenter
 import org.jetbrains.anko.*
@@ -50,7 +51,7 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				}
 			}
 			val priceDescription =
-				BigDecimal(it.price.toString()).formatCount(6) + "(${SharedWallet.getCurrencyCode()})" + " / " + it.changePercent24h
+				it.price.formatCurrency() suffix  "(${SharedWallet.getCurrencyCode()})" + " / " + it.changePercent24h
 			nameInfo.title.text = it.symbol
 			val targetColor = if (it.changePercent24h.contains("-")) Spectrum.red else Spectrum.green
 			nameInfo.subtitle.text = CustomTargetTextStyle(
@@ -65,10 +66,10 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				it.marketCap.replace(",", ""),
 				true
 			).setItalic()
-			marketInfo.subtitle.text = (QuotationRankPresenter.parseVolumeText(
+			marketInfo.subtitle.text = ("24H" suffix  QuotationRankPresenter.parseVolumeText(
 				it.volume.replace(",", ""),
 				false
-			) suffix it.symbol).setItalic()
+			) suffix SharedWallet.getCurrencyCode()).setItalic()
 		}
 	}
 
