@@ -34,7 +34,8 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), Quotatio
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationRankTable>?
 	) {
-		recyclerView.adapter = QuotationRankAdapter(asyncData.orEmptyArray(),
+		recyclerView.adapter = QuotationRankAdapter(
+			asyncData.orEmptyArray(),
 			holdHeader = {
 				headerView = this
 			},
