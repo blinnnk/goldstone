@@ -35,6 +35,7 @@ class QuotationRankHeaderView(context: Context) : GSCard(context) {
 
 	var model: QuotationGlobalModel? by observing(null) {
 		model?.let {
+			removeAllViews()
 			linearLayout {
 				lparams(matchParent, matchParent)
 				gravity = Gravity.CENTER
