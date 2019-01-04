@@ -47,9 +47,11 @@ class GasEditorFragment : BaseFragment<GasEditorPresenter>() {
 			lparams(matchParent, matchParent)
 			gasPriceInput.apply {
 				setNumberInput()
-				setMargins<LinearLayout.LayoutParams> { topMargin = 50.uiPX() }
 				title = if (isBTCSeries) TransactionText.satoshiValue else TransactionText.gasPrice
 			}.into(this)
+			gasPriceInput.setMargins<LinearLayout.LayoutParams> {
+				topMargin = 50.uiPX()
+			}
 			// 只有 `ETH ERC20 or ETC` 才有 `GasLimit` 的概念
 			if (!isBTCSeries) {
 				gasLimitInput.apply {
