@@ -63,11 +63,11 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				false
 			)
 			marketInfo.title.text = QuotationRankPresenter.parseVolumeText(
-				it.marketCap.replace(",", ""),
+				it.marketCap.replace(",", "").toDoubleOrZero().formatCurrency(),
 				true
 			).setItalic()
 			marketInfo.subtitle.text = ("24H" suffix  QuotationRankPresenter.parseVolumeText(
-				it.volume.replace(",", ""),
+				it.volume.replace(",", "").toDoubleOrZero().formatCurrency(),
 				false
 			) suffix SharedWallet.getCurrencyCode()).setItalic()
 		}

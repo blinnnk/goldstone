@@ -9,7 +9,6 @@ import io.goldstone.blockchain.common.language.currentLanguage
 import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
-import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.presneter.SilentUpdater
 import io.goldstone.blockchain.module.home.profile.currency.view.CurrencySymbol
@@ -98,10 +97,9 @@ class QuotationRankPresenter(
 				}
 			}
 
-			fun calculate(volume: BigDecimal, isCurrency: Boolean): String {
+			fun calculate(volume: BigDecimal): String {
 				val result = volume.divide(value, 3, BigDecimal.ROUND_HALF_UP)
-				val formatted = if (isCurrency) result.toDouble().formatCurrency() else result.toPlainString()
-				return formatted + getUnit()
+				return result.toPlainString() + getUnit()
 			}
 		}
 
@@ -113,24 +111,22 @@ class QuotationRankPresenter(
 			return getCurrencySymbol() + if (currentLanguage == HoneyLanguage.English.code || currentLanguage == HoneyLanguage.Russian.code) {
 				when {
 					volume > NumberUnit.Billion.value ->
-						NumberUnit.Billion.calculate(volume, isCurrency)
+						NumberUnit.Billion.calculate(volume)
 					volume > NumberUnit.Million.value ->
-						NumberUnit.Million.calculate(volume, isCurrency)
+						NumberUnit.Million.calculate(volume)
 					volume > NumberUnit.Thousand.value ->
-						NumberUnit.Thousand.calculate(volume, isCurrency)
+						NumberUnit.Thousand.calculate(volume)
 					else -> {
-						val value = volume.setScale(3, BigDecimal.ROUND_HALF_UP)
-						if (isCurrency) value.toDouble().formatCurrency() else value
+						volume.setScale(3, BigDecimal.ROUND_HALF_UP)
 					}
 				}
 			} else when {
 				volume > NumberUnit.HundredMillion.value ->
-					NumberUnit.HundredMillion.calculate(volume, isCurrency)
+					NumberUnit.HundredMillion.calculate(volume)
 				volume > NumberUnit.TenThousand.value ->
-					NumberUnit.TenThousand.calculate(volume, isCurrency)
-				else ->{
-					val value = volume.setScale(3, BigDecimal.ROUND_HALF_UP)
-					if (isCurrency) value.toDouble().formatCurrency() else value
+					NumberUnit.TenThousand.calculate(volume)
+				else -> {
+					volume.setScale(3, BigDecimal.ROUND_HALF_UP)
 				}
 			}
 		}
