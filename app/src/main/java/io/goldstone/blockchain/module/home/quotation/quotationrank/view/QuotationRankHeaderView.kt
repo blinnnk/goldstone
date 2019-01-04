@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.Gravity
 import android.view.ViewGroup
 import com.blinnnk.extension.setMargins
+import com.blinnnk.extension.toDoubleOrZero
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.component.GSCard
@@ -16,6 +17,7 @@ import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
 import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.fontSize
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationGlobalModel
 import io.goldstone.blockchain.module.home.quotation.quotationrank.presenter.QuotationRankPresenter
 import org.jetbrains.anko.linearLayout
@@ -45,9 +47,9 @@ class QuotationRankHeaderView(context: Context) : GSCard(context) {
 						subtitle.text = name
 						title.text = when (name) {
 							CoinRankText.marketCap ->
-								QuotationRankPresenter.parseVolumeText(it.totalMarketCap, true)
+								QuotationRankPresenter.parseVolumeText(it.totalMarketCap.toDoubleOrZero().formatCurrency())
 							CoinRankText.volume24h ->
-								QuotationRankPresenter.parseVolumeText(it.totalVolume, false)
+								QuotationRankPresenter.parseVolumeText(it.totalVolume.toDoubleOrZero().formatCurrency())
 							else -> "${it.btcPercentageMarketCap}%"
 						}
 					}

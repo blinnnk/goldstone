@@ -103,10 +103,10 @@ class QuotationRankPresenter(
 			}
 		}
 
-		fun parseVolumeText(text: String, isCurrency: Boolean): String {
-			val volume = BigDecimal(text.toLongOrNull() ?: 0)
+		fun parseVolumeText(text: String): String {
+			val volume = BigDecimal(text)
 			fun getCurrencySymbol(): String {
-				return if (isCurrency) CurrencySymbol.getSymbol(SharedWallet.getCurrencyCode()) else ""
+				return CurrencySymbol.getSymbol(SharedWallet.getCurrencyCode())
 			}
 			return getCurrencySymbol() + if (currentLanguage == HoneyLanguage.English.code || currentLanguage == HoneyLanguage.Russian.code) {
 				when {
