@@ -1,9 +1,0 @@
-<paths xmlns:tools="http://schemas.android.com/tools"
-  tools:ignore="MissingDefaultResource">
-  <files-path name="app_directory" path="directory/"/>
-  <external-path name="app_DCIM" path="DCIM/Camera/" />
-	<root-path
-		name="external_files"
-		path="" />
-	<external-path path="lbp" name="download"/>
-</paths>
