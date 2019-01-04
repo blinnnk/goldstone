@@ -3,14 +3,18 @@ package io.goldstone.blockchain.module.home.quotation.quotationrank.view
 import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
-import android.widget.*
-import com.blinnnk.extension.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import com.blinnnk.extension.addCorner
+import com.blinnnk.extension.alignParentRight
+import com.blinnnk.extension.centerInVertical
+import com.blinnnk.extension.setItalic
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.title.twoLineTitles
-import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.GrayScale
@@ -29,21 +33,11 @@ import java.math.BigDecimal
  * @date  2019/01/02
  */
 class QuotationRankCell(context: Context) : BaseCell(context) {
-	
+
 	private val iconSize = 50.uiPX()
 	private val cellWidth = ScreenSize.widthWithPadding
-	
-	private val rank = TextView(context).apply {
-		textColor = GrayScale.midGray
-		typeface = GoldStoneFont.medium(context)
-		layoutParams = LayoutParams(25.uiPX(), wrapContent)
-	}
-	private val icon = ImageView(context).apply {
-		layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
-		setColorFilter(Spectrum.white)
-		padding = 5.uiPX()
-		addCorner(iconSize, Spectrum.white)
-	}
+	private lateinit var rank: TextView
+	private lateinit var icon: ImageView
 	private lateinit var nameInfo: TwoLineTitles
 	private lateinit var priceInfo: TwoLineTitles
 	private lateinit var marketInfo: TwoLineTitles
@@ -70,12 +64,18 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				priceInfo.subtitle.setTextColor(Spectrum.green)
 			}
 			marketInfo.title.text =
-				QuotationRankPresenter.parseVolumeText(it.marketCap.replace(",", "")).setItalic()
+				QuotationRankPresenter.parseVolumeText(
+					it.marketCap.replace(",", ""),
+					true
+				).setItalic()
 			marketInfo.subtitle.text =
-				QuotationRankPresenter.parseVolumeText(it.volume.replace(",", "")).setItalic()
+				QuotationRankPresenter.parseVolumeText(
+					it.volume.replace(",", ""),
+					false
+				).setItalic()
 		}
 	}
-	
+
 	init {
 		setHorizontalPadding(PaddingSize.content)
 		hasArrow = false
@@ -83,8 +83,17 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 		linearLayout {
 			gravity = Gravity.CENTER_VERTICAL
 			layoutParams = LayoutParams(matchParent, matchParent)
-			addView(rank)
-			addView(icon)
+			rank = textView {
+				textColor = GrayScale.midGray
+				typeface = GoldStoneFont.medium(context)
+				layoutParams = LayoutParams(25.uiPX(), wrapContent)
+			}
+			icon = imageView {
+				layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)
+				setColorFilter(Spectrum.white)
+				padding = 5.uiPX()
+				addCorner(iconSize, Spectrum.white)
+			}
 			nameInfo = twoLineTitles {
 				layoutParams = LayoutParams(cellWidth / 3, wrapContent)
 				leftPadding = 10.uiPX()
@@ -105,5 +114,5 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 			centerInVertical()
 		}
 	}
-	
+
 }

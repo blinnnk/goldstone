@@ -31,7 +31,6 @@ class GasSpeedLevelBar(context: Context) : RelativeLayout(context) {
 	private var processLayout: LinearLayout
 
 	init {
-
 		textView {
 			text = CommonText.slow
 			textSize = fontSize(12)
@@ -53,20 +52,14 @@ class GasSpeedLevelBar(context: Context) : RelativeLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(ScreenSize.widthWithPadding, 50.uiPX())
 
 		linearLayout {
-			lparams {
-				width = ScreenSize.widthWithPadding
-				height = 12.uiPX()
-			}
+			lparams(ScreenSize.widthWithPadding, 12.uiPX())
 			addCorner(6.uiPX(), GrayScale.whiteGray)
 			y = 30.uiPX().toFloat()
 		}
 
 		processLayout = linearLayout {
 			val minWidth = (ScreenSize.widthWithPadding * 0.1).toInt()
-			lparams {
-				width = minWidth
-				height = 12.uiPX()
-			}
+			lparams(minWidth, 12.uiPX())
 			y = 30.uiPX().toFloat()
 			addCorner(6.uiPX(), Color.TRANSPARENT)
 			GradientView(context).apply {

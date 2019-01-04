@@ -44,11 +44,10 @@ class QuotationRankHeaderView(context: Context) : GSCard(context) {
 						title.typeface = GoldStoneFont.black(context)
 						subtitle.text = name
 						title.text = when (name) {
-							CoinRankText.marketCap -> {
-								QuotationRankPresenter.parseVolumeText(it.totalMarketCap)
-							}
+							CoinRankText.marketCap ->
+								QuotationRankPresenter.parseVolumeText(it.totalMarketCap, true)
 							CoinRankText.volume24h ->
-								QuotationRankPresenter.parseVolumeText(it.totalVolume)
+								QuotationRankPresenter.parseVolumeText(it.totalVolume, false)
 							else -> "${it.btcPercentageMarketCap}%"
 						}
 					}
