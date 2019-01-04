@@ -7,7 +7,6 @@ import io.goldstone.blockchain.common.base.baserecyclerfragment.BottomLoadingVie
 import io.goldstone.blockchain.common.utils.click
 import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 
-
 /**
  * @author KaySaith
  * @date  2019/01/02

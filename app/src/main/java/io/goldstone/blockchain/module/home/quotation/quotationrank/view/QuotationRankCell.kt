@@ -6,20 +6,17 @@ import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.blinnnk.extension.addCorner
-import com.blinnnk.extension.alignParentRight
-import com.blinnnk.extension.centerInVertical
-import com.blinnnk.extension.setItalic
+import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blockchain.common.base.basecell.BaseCell
 import io.goldstone.blockchain.common.component.title.TwoLineTitles
 import io.goldstone.blockchain.common.component.title.twoLineTitles
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.utils.GoldStoneFont
 import io.goldstone.blockchain.common.utils.glideImage
 import io.goldstone.blockchain.common.value.GrayScale
 import io.goldstone.blockchain.common.value.PaddingSize
-import io.goldstone.blockchain.common.value.ScreenSize
 import io.goldstone.blockchain.common.value.Spectrum
 import io.goldstone.blockchain.crypto.utils.formatCount
 import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
@@ -35,44 +32,43 @@ import java.math.BigDecimal
 class QuotationRankCell(context: Context) : BaseCell(context) {
 
 	private val iconSize = 50.uiPX()
-	private val cellWidth = ScreenSize.widthWithPadding
 	private lateinit var rank: TextView
 	private lateinit var icon: ImageView
 	private lateinit var nameInfo: TwoLineTitles
-	private lateinit var priceInfo: TwoLineTitles
 	private lateinit var marketInfo: TwoLineTitles
 
 	var model: QuotationRankTable? by observing(null) {
 		model?.let { it ->
-			rank.text = "${it.rank}".setItalic()
+			rank.text = "${it.rank}.".setItalic()
 			with(icon) {
 				if (it.url.isNotEmpty()) {
-					glideImage(it.url)
+					glideImage("${it.url}?imageView2/1/w/120/h/120")
 					if (it.color.isNotEmpty()) addCorner(iconSize, Color.parseColor(it.color))
 				} else {
 					glideImage(null)
-					addCorner(iconSize, Spectrum.white)
+					addCorner(iconSize, GrayScale.whiteGray)
 				}
 			}
+			val priceDescription =
+				BigDecimal(it.price.toString()).formatCount(6) + "(${SharedWallet.getCurrencyCode()})" + " / " + it.changePercent24h
 			nameInfo.title.text = it.symbol
-			nameInfo.subtitle.text = it.name
-			priceInfo.title.text = BigDecimal(it.price.toString()).formatCount(6)
-			priceInfo.subtitle.text = it.changePercent24h
-			if (it.changePercent24h.contains("-")) {
-				priceInfo.subtitle.setTextColor(Spectrum.lightRed)
-			} else {
-				priceInfo.subtitle.setTextColor(Spectrum.green)
-			}
-			marketInfo.title.text =
-				QuotationRankPresenter.parseVolumeText(
-					it.marketCap.replace(",", ""),
-					true
-				).setItalic()
-			marketInfo.subtitle.text =
-				QuotationRankPresenter.parseVolumeText(
-					it.volume.replace(",", ""),
-					false
-				).setItalic()
+			val targetColor = if (it.changePercent24h.contains("-")) Spectrum.red else Spectrum.green
+			nameInfo.subtitle.text = CustomTargetTextStyle(
+				it.changePercent24h,
+				priceDescription,
+				targetColor,
+				11.uiPX(),
+				false,
+				false
+			)
+			marketInfo.title.text = QuotationRankPresenter.parseVolumeText(
+				it.marketCap.replace(",", ""),
+				true
+			).setItalic()
+			marketInfo.subtitle.text = (QuotationRankPresenter.parseVolumeText(
+				it.volume.replace(",", ""),
+				false
+			) suffix it.symbol).setItalic()
 		}
 	}
 
@@ -95,13 +91,9 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				addCorner(iconSize, Spectrum.white)
 			}
 			nameInfo = twoLineTitles {
-				layoutParams = LayoutParams(cellWidth / 3, wrapContent)
+				layoutParams = LayoutParams(matchParent, wrapContent)
 				leftPadding = 10.uiPX()
-				setBlackTitles()
-			}
-			priceInfo = twoLineTitles {
-				layoutParams = LayoutParams(80.uiPX(), wrapContent)
-				setBlackTitles()
+				setBlackTitles(lineSpace = 1.uiPX())
 			}
 		}
 		marketInfo = twoLineTitles {

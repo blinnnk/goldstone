@@ -105,7 +105,7 @@ class QuotationRankPresenter(
 		}
 
 		fun parseVolumeText(text: String, isCurrency: Boolean): String {
-			val volume = BigDecimal(text)
+			val volume = BigDecimal(text.toLongOrNull() ?: 0)
 			fun getCurrencySymbol(): String {
 				return if (isCurrency) when (currentLanguage) {
 					HoneyLanguage.English.code, HoneyLanguage.Russian.code -> "$"
