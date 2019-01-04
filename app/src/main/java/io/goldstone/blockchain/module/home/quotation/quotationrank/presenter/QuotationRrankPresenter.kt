@@ -6,10 +6,13 @@ import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blockchain.common.language.HoneyLanguage
 import io.goldstone.blockchain.common.language.currentLanguage
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
 import io.goldstone.blockchain.common.thread.launchDefault
 import io.goldstone.blockchain.common.thread.launchUI
+import io.goldstone.blockchain.crypto.utils.formatCurrency
 import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.presneter.SilentUpdater
+import io.goldstone.blockchain.module.home.profile.currency.view.CurrencySymbol
 import io.goldstone.blockchain.module.home.quotation.quotationrank.contract.QuotationRankContract
 import io.goldstone.blockchain.module.home.quotation.quotationrank.model.QuotationRankTable
 import java.math.BigDecimal
@@ -95,39 +98,40 @@ class QuotationRankPresenter(
 				}
 			}
 
-			fun calculate(volume: BigDecimal): String {
-				return volume.divide(
-					value,
-					3,
-					BigDecimal.ROUND_HALF_UP
-				).toPlainString() + getUnit()
+			fun calculate(volume: BigDecimal, isCurrency: Boolean): String {
+				val result = volume.divide(value, 3, BigDecimal.ROUND_HALF_UP)
+				val formatted = if (isCurrency) result.toDouble().formatCurrency() else result.toPlainString()
+				return formatted + getUnit()
 			}
 		}
 
 		fun parseVolumeText(text: String, isCurrency: Boolean): String {
-			val volume = BigDecimal(text)
+			val volume = BigDecimal(text.toLongOrNull() ?: 0)
 			fun getCurrencySymbol(): String {
-				return if (isCurrency) when (currentLanguage) {
-					HoneyLanguage.English.code, HoneyLanguage.Russian.code -> "$"
-					else -> "¥"
-				} else ""
+				return if (isCurrency) CurrencySymbol.getSymbol(SharedWallet.getCurrencyCode()) else ""
 			}
 			return getCurrencySymbol() + if (currentLanguage == HoneyLanguage.English.code || currentLanguage == HoneyLanguage.Russian.code) {
 				when {
 					volume > NumberUnit.Billion.value ->
-						NumberUnit.Billion.calculate(volume)
+						NumberUnit.Billion.calculate(volume, isCurrency)
 					volume > NumberUnit.Million.value ->
-						NumberUnit.Million.calculate(volume)
+						NumberUnit.Million.calculate(volume, isCurrency)
 					volume > NumberUnit.Thousand.value ->
-						NumberUnit.Thousand.calculate(volume)
-					else -> volume.setScale(3, BigDecimal.ROUND_HALF_UP).toPlainString()
+						NumberUnit.Thousand.calculate(volume, isCurrency)
+					else -> {
+						val value = volume.setScale(3, BigDecimal.ROUND_HALF_UP)
+						if (isCurrency) value.toDouble().formatCurrency() else value
+					}
 				}
 			} else when {
 				volume > NumberUnit.HundredMillion.value ->
-					NumberUnit.HundredMillion.calculate(volume)
+					NumberUnit.HundredMillion.calculate(volume, isCurrency)
 				volume > NumberUnit.TenThousand.value ->
-					NumberUnit.TenThousand.calculate(volume)
-				else -> volume.setScale(3, BigDecimal.ROUND_HALF_UP).toPlainString()
+					NumberUnit.TenThousand.calculate(volume, isCurrency)
+				else ->{
+					val value = volume.setScale(3, BigDecimal.ROUND_HALF_UP)
+					if (isCurrency) value.toDouble().formatCurrency() else value
+				}
 			}
 		}
 	}

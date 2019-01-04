@@ -11,7 +11,7 @@ import io.goldstone.blockchain.kernel.commontable.SupportCurrencyTable
  * @author KaySaith
  */
 class CurrencyCell(context: Context) : BaseRadioCell(context) {
-	
+
 	var model: SupportCurrencyTable by observing(SupportCurrencyTable()) {
 		title.text = model.currencySymbol
 		checkedStatus = model.isUsed
@@ -32,6 +32,42 @@ class CurrencyCell(context: Context) : BaseRadioCell(context) {
 		}
 
 		showIcon(image)
+	}
+}
+
+enum class CurrencySymbol(val value: String, val symbol: String) {
+	CNY("CNY", "¥"),
+	JPY("JPY", "¥"),
+	KRW("KRW", ""),
+	RUB("RUB", ""),
+	EUR("EUR", ""),
+	SGD("SGD", ""),
+	INR("INR", ""),
+	GBP("GBP", ""),
+	CAD("CAD", ""),
+	BYN("BYN", ""),
+	AUD("AUD", ""),
+	THB("THB", ""),
+	USD("USD", "$");
+
+	companion object {
+		fun getSymbol(currency: String): String {
+			return when (currency) {
+				CurrencySymbol.CNY.value -> CurrencySymbol.CNY.symbol
+				CurrencySymbol.JPY.value -> CurrencySymbol.JPY.symbol
+				CurrencySymbol.KRW.value -> CurrencySymbol.KRW.symbol
+				CurrencySymbol.RUB.value -> CurrencySymbol.RUB.symbol
+				CurrencySymbol.EUR.value -> CurrencySymbol.EUR.symbol
+				CurrencySymbol.SGD.value -> CurrencySymbol.SGD.symbol
+				CurrencySymbol.INR.value -> CurrencySymbol.INR.symbol
+				CurrencySymbol.GBP.value -> CurrencySymbol.GBP.symbol
+				CurrencySymbol.CAD.value -> CurrencySymbol.CAD.symbol
+				CurrencySymbol.BYN.value -> CurrencySymbol.BYN.symbol
+				CurrencySymbol.AUD.value -> CurrencySymbol.AUD.symbol
+				CurrencySymbol.THB.value -> CurrencySymbol.THB.symbol
+				else -> CurrencySymbol.USD.symbol
+			}
+		}
 	}
 }
 

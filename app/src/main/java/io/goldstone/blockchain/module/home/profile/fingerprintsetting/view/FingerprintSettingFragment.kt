@@ -153,6 +153,8 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 								if (password.isEmpty()) {
 									dismiss()
 									showError(Throwable("Please enter your password to unlock keystore"))
+									switchCell.setSelectedStatus(SharedWallet.hasFingerprint())
+									loadingView.remove()
 									return@showAlertView
 								}
 								// 如果是 `Bip44` 钱包返回 `mnemonic` 如果是多链钱包返回 `root private key`
