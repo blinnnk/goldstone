@@ -3,15 +3,16 @@
 package io.goldstone.blockchain
 
 import android.support.test.filters.LargeTest
+import android.support.test.internal.util.LogUtil
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.util.Log
 import com.blinnnk.extension.isNull
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.Config
+import io.goldstone.blockchain.common.sharedpreference.SharedWallet
+import io.goldstone.blockchain.common.value.Current
 import io.goldstone.blockchain.common.value.WebUrl
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
+import io.goldstone.blockchain.crypto.multichain.ChainID
+import io.goldstone.blockchain.kernel.network.common.GoldStoneAPI
 import io.goldstone.blockchain.module.home.home.view.MainActivity
 import io.goldstone.blockchain.module.home.wallet.notifications.notificationlist.model.NotificationTable
 import junit.framework.Assert.assertTrue
@@ -30,45 +31,27 @@ class GoldStoneServerUnitTest {
 	@Rule
 	@JvmField
 	val mActivityRule = ActivityTestRule(MainActivity::class.java)
-	private val positon = this.javaClass.simpleName
+	private val position = this.javaClass.simpleName
 
 	@Test
 	fun searchTokenBySymbolOrContract() {
-		// Change any symbo or contract value to test the result
+		// Change any symbol or contract value to test the result
 		val symbolOrContract = "t"
-		GoldStoneAPI.getTokenInfoBySymbolFromGoldStone(symbolOrContract, {
-			LogUtil.error("$positon GetSearchToken", it)
-		}) {
-			LogUtil.debug("$positon GetSearchToken", it.toString())
+		GoldStoneAPI.getTokenInfoBySymbol(symbolOrContract, Current.supportChainIDs()) { tokens, error ->
+			LogUtil.logDebug("$position GetSearchToken $error", tokens.toString())
 			// it must has result with `t` value by contract, if result is empty will be failed
-			assertTrue("Search token with `tr` by symbol or contract is empty", it.isNotEmpty())
-		}
-	}
-
-	@Test
-	fun searchQuotationByPair() {
-		// Change any symbo value to test the result
-		val symbol = "tr"
-		GoldStoneAPI.getMarketSearchList(symbol, {
-			LogUtil.error("$positon SearchQuotation", it)
-		}) {
-			LogUtil.debug("$positon SearchQuotation", it.toString())
-			// it must has result with `t` value, if result is empty will be failed
-			assertTrue("Search pair quotation with `tr` is empty", it.isNotEmpty())
+			assertTrue("Search token with `tr` by symbol or contract is empty", tokens.isNullOrEmpty())
 		}
 	}
 
 	@Test
 	fun getShareContent() {
-		GoldStoneAPI.getShareContent(
-			{
-				LogUtil.error("$positon getShareContent", it)
-			}) {
-			LogUtil.debug("$positon getShareContent", it.toString())
+		GoldStoneAPI.getShareContent { content, _ ->
+			LogUtil.logDebug("$position getShareContent", content.toString())
 			// Share content title, content, url must not be empty
-			assertTrue("Share title is empty", it.title.isNotEmpty())
-			assertTrue("Share content is empty", it.content.isNotEmpty())
-			assertTrue("Share url is empty", it.url.isNotEmpty())
+			assertTrue("Share title is empty", content?.title?.isNotEmpty() == true)
+			assertTrue("Share content is empty", content?.content?.isNotEmpty() == true)
+			assertTrue("Share url is empty", content?.url?.isNotEmpty() == true)
 		}
 	}
 
@@ -76,75 +59,53 @@ class GoldStoneServerUnitTest {
 	fun getNotificationList() {
 		NotificationTable.getAllNotifications { localData ->
 			val latestTime = localData.maxBy { it.createTime }?.createTime
-			val requestTime = if (latestTime.isNull()) 0 else latestTime!!
-			GoldStoneAPI.getNotificationList(
-				requestTime,
-				{
-					LogUtil.error("$positon getNotificationList", it)
-				}
-			) {
-				Log.d("$positon + getNotificationList", it.toString())
+			val requestTime = if (latestTime.isNull()) 0 else latestTime
+			GoldStoneAPI.getNotificationList(requestTime) { list, _ ->
+				Log.d("$position + getNotificationList", list.toString())
 			}
 		}
 	}
 
 	@Test
 	fun getTermsFromServer() {
-		GoldStoneAPI.getTerms(
-			"hello",
-			{
-				LogUtil.error("$positon GetTermsFromServer", it)
-			}
-		) {
-			LogUtil.debug(positon, it)
-			assertTrue("Terms is empty", it.isNotEmpty())
+		GoldStoneAPI.getTerms { term, _ ->
+			LogUtil.logDebug(position, term.orEmpty())
+			assertTrue("Terms is empty", term?.isNotEmpty() == true)
 		}
 	}
 
 	@Test
 	fun getConfigList() {
-		GoldStoneAPI.getConfigList(
-			{
-				LogUtil.error("$positon GetConfigList", it)
-			}
-		) {
-			LogUtil.debug(positon, it.toString())
+		GoldStoneAPI.getConfigList { list, _ ->
+			LogUtil.logDebug(position, list.toString())
 		}
 	}
 
 	@Test
 	fun getWebUrlValue() {
 		val terms =
-			"${WebUrl.header}/${WebUrl.webLanguage(Config.getCurrentLanguageCode())}/termAndConditions"
-		LogUtil.debug("getWebUrlValue", terms)
+			"${WebUrl.header}/${WebUrl.webLanguage(SharedWallet.getCurrentLanguageCode())}/termAndConditions"
+		LogUtil.logDebug("getWebUrlValue", terms)
 	}
 
 	@Test
 	fun getUnreadCount() {
-		AppConfigTable.getAppConfig {
-			it?.apply {
-				GoldStoneAPI.getUnreadCount(
-					it.goldStoneID,
-					System.currentTimeMillis(),
-					{ LogUtil.error(positon, it) }
-				) {
-					LogUtil.debug(positon + "getUnreadCount", it)
-				}
-			}
+		GoldStoneAPI.getUnreadCount(
+			SharedWallet.getGoldStoneID(),
+			System.currentTimeMillis()
+		) { count, _ ->
+			LogUtil.logDebug(position + "getUnreadCount", count.toString())
 		}
 	}
 
 	@Test
 	fun getETCTransactions() {
 		GoldStoneAPI.getETCTransactions(
-			"62",
+			ChainID.ETCTest,
 			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
-			"0",
-			{
-				LogUtil.error("getETCTransactions", it)
-			}
-		) {
-			LogUtil.debug("getETCTransactions", "$it")
+			0
+		) { transaction, _ ->
+			LogUtil.logDebug("getETCTransactions", "$transaction")
 		}
 	}
 }

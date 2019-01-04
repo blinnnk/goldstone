@@ -3,28 +3,22 @@
 package io.goldstone.blockchain
 
 import android.support.test.filters.LargeTest
+import android.support.test.internal.util.LogUtil
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.blinnnk.extension.isNull
-import com.blinnnk.extension.orZero
-import io.goldstone.blockchain.common.utils.LogUtil
-import io.goldstone.blockchain.common.value.ChainID
+import com.blinnnk.extension.getTargetChild
 import io.goldstone.blockchain.common.value.CountryCode
-import io.goldstone.blockchain.crypto.CryptoSymbol
 import io.goldstone.blockchain.crypto.bip39.Mnemonic
-import io.goldstone.blockchain.crypto.getAddress
-import io.goldstone.blockchain.crypto.utils.JavaKeystoreUtil
-import io.goldstone.blockchain.crypto.utils.prepend0xPrefix
 import io.goldstone.blockchain.crypto.utils.toCryptHexString
 import io.goldstone.blockchain.crypto.utils.toStringFromHex
-import io.goldstone.blockchain.kernel.commonmodel.AppConfigTable
+import io.goldstone.blockchain.kernel.commontable.AppConfigTable
 import io.goldstone.blockchain.kernel.database.GoldStoneDataBase
-import io.goldstone.blockchain.kernel.network.GoldStoneAPI
 import io.goldstone.blockchain.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blockchain.module.home.home.view.MainActivity
-import io.goldstone.blockchain.module.home.profile.contacts.contracts.model.ContactTable
 import junit.framework.Assert
+import kotlinx.coroutines.Dispatchers
 import org.jetbrains.anko.doAsync
+import org.json.JSONObject
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,47 +39,42 @@ class GoldStoneUtilUnitTest {
 	private val position = this.javaClass.simpleName
 
 	@Test
-	fun getSystemDefaultLanguageSymbol() {
-		LogUtil.debug("$position Get System Language Symbol", CountryCode.currentLanguageSymbol)
-	}
-
-	@Test
 	fun getAppConfig() {
-		AppConfigTable.getAppConfig {
-			LogUtil.debug("$position + getAppconfig", it.apply { it?.terms = "" }.toString())
+		AppConfigTable.getAppConfig(Dispatchers.Default) {
+			LogUtil.logDebug("$position + getAppConfig", it.apply { it?.terms = "" }.toString())
 		}
 	}
 
 	@Test
 	fun getSystemParameter() {
-		LogUtil.debug(position, CountryCode.currentCountry)
-		LogUtil.debug(position + "getSystemParameter", CountryCode.currentLanguageSymbol)
+		LogUtil.logDebug(position, CountryCode.currentCountry)
+		LogUtil.logDebug(position + "getSystemParameter", CountryCode.currentLanguageSymbol)
 	}
 
 	@Test
 	fun hexStringConverter() {
-		LogUtil.debug(position, "你好".toCryptHexString())
-		LogUtil.debug(position, "e7bb86e88a82".toUpperCase().toStringFromHex())
+		LogUtil.logDebug(position, "你好".toCryptHexString())
+		LogUtil.logDebug(position, "e7bb86e88a82".toUpperCase().toStringFromHex())
 	}
 
 	@Test
 	fun getCurrentWallet() {
-		WalletTable.getCurrentWallet {
-			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
+		WalletTable.getCurrent(Dispatchers.Default) {
+			LogUtil.logDebug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}
 
 	@Test
 	fun getAllWallets() {
 		WalletTable.getAll {
-			LogUtil.debug("getWalletByEthseriesAddress + $position", this.toString())
+			LogUtil.logDebug("getWalletByEthseriesAddress + $position", this.toString())
 		}
 	}
 
 	@Test
 	fun getWatchOnlyAddress() {
 		WalletTable.getWatchOnlyWallet {
-			LogUtil.debug("getWatchOnlyAddress", "$it")
+			LogUtil.logDebug("getWatchOnlyAddress", "$this")
 		}
 	}
 
@@ -93,7 +82,7 @@ class GoldStoneUtilUnitTest {
 	fun getMyTokenTable() {
 		doAsync {
 			GoldStoneDataBase.database.myTokenDao().getAll().let {
-				LogUtil.debug("getMyTokenTable", "$it")
+				LogUtil.logDebug("getMyTokenTable", "$it")
 			}
 		}
 	}
@@ -102,15 +91,8 @@ class GoldStoneUtilUnitTest {
 	fun getTransactionTable() {
 		doAsync {
 			GoldStoneDataBase.database.transactionDao().getAll().let {
-				LogUtil.debug("getTransactionTable", "$it")
+				LogUtil.logDebug("getTransactionTable", "$it")
 			}
-		}
-	}
-
-	@Test
-	fun getLatestEthereumChildAddressIndex() {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { _, ethereumChildAddressIndex ->
-			LogUtil.debug("getLatestEthereumChildAddressIndex + $position", "$ethereumChildAddressIndex")
 		}
 	}
 
@@ -119,44 +101,7 @@ class GoldStoneUtilUnitTest {
 		val mnemonic = "arrest tiger powder ticket snake aunt that debris enrich gown guard people"
 		val entropy = Mnemonic.mnemonicToEntropy(mnemonic)
 		val decryptEntropy = Mnemonic.entropyToMnemonic(entropy)
-		LogUtil.debug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
-	}
-
-	@Test
-	fun getMyContactTable() {
-		ContactTable.getAllContacts {
-			LogUtil.debug("getMyContactTable", "$it")
-		}
-	}
-
-	@Test
-	fun getCoinInfo() {
-		GoldStoneAPI.getTokenInfoFromMarket(
-			CryptoSymbol.btc(),
-			ChainID.BTCMain.id,
-			{
-				LogUtil.error("getCoinInfo", it)
-			}
-		) {
-			LogUtil.debug("getCoinInfo", "$it")
-		}
-	}
-
-	@Test
-	fun newEthereumChildAddress() {
-		WalletTable.getETHAndERCWalletLatestChildAddressIndex { wallet, ethereumChildAddressIndex ->
-			wallet.encryptMnemonic?.let {
-				val mnemonic = JavaKeystoreUtil().decryptData(it)
-				val index = ethereumChildAddressIndex + 1
-				val childPath = wallet.ethPath.substringBeforeLast("/") + "/" + index
-				val masterKey = Mnemonic.mnemonicToKey(mnemonic, childPath)
-				val current = masterKey.keyPair.getAddress().prepend0xPrefix()
-				Assert.assertTrue(
-					"wrong address value", current.equals
-				("0x6e3df901a984d50b68355eede503cbfc1ead8f13", true)
-				)
-			}
-		}
+		LogUtil.logDebug("cryptoMnemonic", "entroy$entropy decryptEntropy$decryptEntropy")
 	}
 
 	data class PricePairModel(val pair: String, val price: String)
@@ -167,5 +112,30 @@ class GoldStoneUtilUnitTest {
 		val status: Boolean,
 		var marketPrice: String
 	)
+
+	@Test
+	fun getMultiChildJSONObject() {
+		val expect = "kaysaith"
+		val data = JSONObject("{data : { value: { name: kaysaith }}}")
+		LogUtil.logDebug(position, data.getTargetChild("data", "value", "name"))
+		val result = data.getTargetChild("data", "value", "name")
+		Assert.assertTrue("convert to wrong value", expect == result)
+	}
+
+	@Test
+	fun getAllLocalEOSAccount() {
+		doAsync {
+			val localData = GoldStoneDataBase.database.eosAccountDao().getAll()
+			LogUtil.logDebug("all local eos account tables", localData.toString())
+		}
+	}
+
+	@Test
+	fun getAllLocalWallets() {
+		doAsync {
+			val wallets = GoldStoneDataBase.database.walletDao().getAllWallets()
+			LogUtil.logDebug("all local wallet tables", wallets.toString())
+		}
+	}
 }
 

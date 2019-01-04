@@ -100,6 +100,8 @@
 -keep class android.support.v8.renderscript.** { *; }
 
 # Xin Ge
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
 -keep class com.tencent.android.tpush.** {* ;}
 -keep class com.tencent.mid.** {* ;}
 -keep class com.qq.taf.jce.** {*;}
@@ -132,32 +134,26 @@
 -assumenosideeffects class kotlin.jvm.internal.Intrinsics {
     static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
 }
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 
 # GoldStone
 -dontwarn io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.**
 -dontwarn io.goldstone.blockchain.module.common.walletimport.**
 -dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
 -dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
-
-# Kotlinx
--keepattributes *Annotation*, InnerClasses
--dontnote kotlinx.serialization.SerializationKt
--keep,includedescriptorclasses class io.goldstone.blockchain.**$$serializer { *; }
--keepclassmembers class io.goldstone.blockchain.** {
-    *** Companion;
-}
--keepclasseswithmembers class io.goldstone.blockchain.** {
-    kotlinx.serialization.KSerializer serializer(...);
-}
-
+-dontwarn io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.**
+-dontwarn io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.presenter.**
 -adaptclassstrings com.example.Test
-
-# Instabug
--dontwarn org.apache.http.**
--dontwarn android.net.http.AndroidHttpClient
--dontwarn com.google.android.gms.**
--dontwarn com.android.volley.toolbox.**
--dontwarn com.instabug.**
 
 # Anko
 -dontwarn kotlin.jvm.internal.Intrinsics
+
+-dontwarn org.bitcoinj.store.**
+
+# Event Bus
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @org.greenrobot.eventbus.Subscribe <methods>;
+}
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
