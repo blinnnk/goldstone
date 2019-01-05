@@ -7,10 +7,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a0bb2df1-9d9c-47b7-8c3e-a2ed97c92de6" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/wallet/walletdetail/view/WalletDetailFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/wallet/walletdetail/view/WalletDetailFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goldstone.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/goldstone.ipr" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/goldstone.iws" beforeDir="false" afterPath="$PROJECT_DIR$/goldstone.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/crypto/Utils/CryptoUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/crypto/Utils/CryptoUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankCell.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankCell.kt" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -55,22 +53,54 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankCell.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-606">
-              <caret line="31" selection-start-line="31" selection-end-line="31" />
+            <state relative-caret-position="450">
+              <caret line="63" column="72" lean-forward="true" selection-start-line="63" selection-start-column="72" selection-end-line="63" selection-end-column="72" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/crypto/Utils/CryptoUtils.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="162" column="44" selection-start-line="162" selection-start-column="44" selection-end-line="162" selection-end-column="44" />
+            <state relative-caret-position="417">
+              <caret line="141" column="44" selection-start-line="141" selection-start-column="44" selection-end-line="141" selection-end-column="44" />
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="297">
+              <caret line="46" lean-forward="true" selection-start-line="46" selection-end-line="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankFragment.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="363">
+              <caret line="21" column="51" lean-forward="true" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankHeaderView.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="351">
+              <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankAdApter.kt">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -108,6 +138,8 @@
         <option value="$PROJECT_DIR$/gradle.properties" />
         <option value="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/wallet/walletdetail/view/WalletDetailFragment.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/crypto/Utils/CryptoUtils.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankCell.kt" />
       </list>
     </option>
   </component>
@@ -326,7 +358,7 @@
     <editor active="true" />
     <layout>
       <window_info id="Captures" order="0" side_tool="true" weight="0.25" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.32967034" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.32967034" />
       <window_info id="Structure" order="2" side_tool="true" />
       <window_info id="Build Variants" order="3" side_tool="true" />
       <window_info id="Image Layers" order="4" />
@@ -336,7 +368,7 @@
       <window_info id="Favorites" order="8" side_tool="true" />
       <window_info anchor="bottom" id="Find" />
       <window_info anchor="bottom" id="Run" order="0" />
-      <window_info active="true" anchor="bottom" id="Logcat" order="1" visible="true" weight="0.327551" />
+      <window_info anchor="bottom" id="Logcat" order="1" weight="0.327551" />
       <window_info anchor="bottom" id="TODO" order="2" />
       <window_info anchor="bottom" id="Android Profiler" order="3" />
       <window_info anchor="bottom" id="Debug" order="4" />
@@ -421,17 +453,41 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankCell.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-606">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
+        <state relative-caret-position="297">
+          <caret line="46" lean-forward="true" selection-start-line="46" selection-end-line="46" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/home/presneter/silentupdate.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankHeaderView.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="162" column="44" selection-start-line="162" selection-start-column="44" selection-end-line="162" selection-end-column="44" />
+        <state relative-caret-position="351">
+          <caret line="34" lean-forward="true" selection-start-line="34" selection-end-line="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankAdApter.kt">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankFragment.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="21" column="51" lean-forward="true" selection-start-line="21" selection-start-column="51" selection-end-line="21" selection-end-column="51" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/crypto/Utils/CryptoUtils.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="417">
+          <caret line="141" column="44" selection-start-line="141" selection-start-column="44" selection-end-line="141" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/io/goldstone/blinnnk/module/home/quotation/quotationrank/view/QuotationRankCell.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="450">
+          <caret line="63" column="72" lean-forward="true" selection-start-line="63" selection-start-column="72" selection-end-line="63" selection-end-column="72" />
         </state>
       </provider>
     </entry>

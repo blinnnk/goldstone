@@ -136,10 +136,10 @@ fun Long.toBTCCount(): Double {
 }
 
 
-fun Double.formatCurrency(): String {
+fun Double.formatCurrency(count: Int = 5): String {
 	val rate = SharedWallet.getCurrentRate()
 	val formatEditor = DecimalFormat("#")
-	formatEditor.maximumFractionDigits = 5
+	formatEditor.maximumFractionDigits = count
 	return formatEditor.format(this * rate).toBigDecimal().toPlainString()
 }
 
