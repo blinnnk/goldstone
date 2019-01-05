@@ -50,6 +50,9 @@ abstract class SilentUpdater {
 
 	fun star(context: Context) = launchDefault {
 		val configDao = AppConfigTable.dao
+		updateNodeData {
+
+		}
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -378,11 +381,11 @@ abstract class SilentUpdater {
 
 	private fun updateNodeData(callback: () -> Unit) {
 		GoldStoneAPI.getChainNodes { serverNodes, error ->
-			callback()
 			val nodeDao = ChainNodeTable.dao
 			if (serverNodes.isNotNull() && error.isNone() && serverNodes.isNotEmpty()) {
 				nodeDao.deleteAll()
 				nodeDao.insertAll(serverNodes)
+				callback()
 			}
 		}
 	}

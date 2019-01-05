@@ -130,8 +130,12 @@ class FingerprintSettingFragment : GSFragment(), FingerprintSettingContract.GSVi
 
 	private fun updateButtonStatus() {
 		when {
-			SharedWallet.isWatchOnlyWallet() -> switchCell.clickEvent = Runnable {
-				showError(Throwable(AlertText.watchOnly))
+			SharedWallet.isWatchOnlyWallet() -> {
+				switchCell.setTitle("Unsupported For Watch Only Wallet")
+				switchCell.clickEvent = Runnable {
+					showError(Throwable(AlertText.watchOnly))
+					switchCell.setSelectedStatus(SharedWallet.hasFingerprint())
+				}
 			}
 			fingerprintManager.checker().isValid() -> {
 				with(switchCell) {
