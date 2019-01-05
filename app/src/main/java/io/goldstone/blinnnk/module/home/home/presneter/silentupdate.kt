@@ -50,9 +50,6 @@ abstract class SilentUpdater {
 
 	fun star(context: Context) = launchDefault {
 		val configDao = AppConfigTable.dao
-		updateNodeData {
-
-		}
 		// 数据量很小, 使用频发, 可以在 `4G` 下请求
 		updateRAMUnitPrice()
 		updateCPUUnitPrice()
@@ -162,6 +159,7 @@ abstract class SilentUpdater {
 			hasNewQuotationRankMd5: Boolean
 		) -> Unit
 	) {
+
 		GoldStoneAPI.getMD5List { md5s, error ->
 			if (md5s.isNotNull() && error.isNone()) {
 				newDefaultTokenListMD5 = md5s.safeGet("default_token_list_md5")
