@@ -71,13 +71,14 @@ object QuotationText {
 	@JvmField
 	val rankToken = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Rank"
-		HoneyLanguage.Chinese.code -> "Rank"
-		HoneyLanguage.Japanese.code -> "Rank"
-		HoneyLanguage.Korean.code -> "Rank"
-		HoneyLanguage.Russian.code -> "Rank"
-		HoneyLanguage.TraditionalChinese.code -> "Rank"
+		HoneyLanguage.Chinese.code -> "排名"
+		HoneyLanguage.Japanese.code -> "ランキング"
+		HoneyLanguage.Korean.code -> "순위"
+		HoneyLanguage.Russian.code -> "Рейтинг"
+		HoneyLanguage.TraditionalChinese.code -> "排名"
 		else -> ""
 	}
+
 
 	@JvmField
 	val quotationInfo = when (currentLanguage) {

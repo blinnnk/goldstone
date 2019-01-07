@@ -6,34 +6,46 @@ package io.goldstone.blinnnk.common.language
  * @description:
  */
 object CoinRankText {
+
+	@JvmField
+	val marketRankPageTitle = when (currentLanguage) {
+		HoneyLanguage.English.code->"Market Rank"
+		HoneyLanguage.Chinese.code->"市场排行"
+		HoneyLanguage.Japanese.code->"市場のランキング"
+		HoneyLanguage.Korean.code->"시장 순위"
+		HoneyLanguage.Russian.code->"Рынок. Ранг"
+		HoneyLanguage.TraditionalChinese.code->"市場排行"
+		else -> ""
+	}
+
 	@JvmField
 	val marketCap = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Market Cap"
-		HoneyLanguage.Chinese.code -> "Market Cap"
-		HoneyLanguage.Japanese.code -> "Market Cap"
-		HoneyLanguage.Korean.code -> "Market Cap"
-		HoneyLanguage.Russian.code -> "Market Cap"
-		HoneyLanguage.TraditionalChinese.code -> "Market Cap"
+		HoneyLanguage.Chinese.code -> "市值"
+		HoneyLanguage.Japanese.code -> "時価総額"
+		HoneyLanguage.Korean.code -> "시가 총액"
+		HoneyLanguage.Russian.code -> "Рыночная капитализация"
+		HoneyLanguage.TraditionalChinese.code -> "市值"
 		else -> ""
 	}
 	@JvmField
 	val volume24h = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Volume 24h"
-		HoneyLanguage.Chinese.code -> "Volume 24h"
-		HoneyLanguage.Japanese.code -> "Volume 24h"
-		HoneyLanguage.Korean.code -> "Volume 24h"
-		HoneyLanguage.Russian.code -> "Volume 24h"
-		HoneyLanguage.TraditionalChinese.code -> "Volume 24h"
+		HoneyLanguage.English.code->"24H Volume"
+		HoneyLanguage.Chinese.code->"24 时成交量"
+		HoneyLanguage.Japanese.code->"24 時量"
+		HoneyLanguage.Korean.code->"24시 부피"
+		HoneyLanguage.Russian.code->"24H Том"
+		HoneyLanguage.TraditionalChinese.code->"24時成交量"
 		else -> ""
 	}
 	@JvmField
 	val btcDominance = when (currentLanguage) {
-		HoneyLanguage.English.code -> "BTC Dominance"
-		HoneyLanguage.Chinese.code -> "BTC Dominance"
-		HoneyLanguage.Japanese.code -> "BTC Dominance"
-		HoneyLanguage.Korean.code -> "BTC Dominance"
-		HoneyLanguage.Russian.code -> "BTC Dominance"
-		HoneyLanguage.TraditionalChinese.code -> "BTC Dominance"
+		HoneyLanguage.English.code->"BTC Dominance"
+		HoneyLanguage.Chinese.code->"BTC 主导率"
+		HoneyLanguage.Japanese.code->"BTCドミナンス"
+		HoneyLanguage.Korean.code->"BTC 우세"
+		HoneyLanguage.Russian.code->"BTC Доминирование"
+		HoneyLanguage.TraditionalChinese.code->"BTC 主導率"
 		else -> ""
 	}
 }

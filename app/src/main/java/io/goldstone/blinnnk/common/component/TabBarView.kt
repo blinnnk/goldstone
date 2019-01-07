@@ -94,10 +94,10 @@ class TabItem(context: Context) : LinearLayout(context) {
 			TabItemType.Setting -> R.drawable.setting_icon
 		}
 		titleView.text = when (type) {
-			TabItemType.Market -> QuotationText.market.toLowerCase()
-			TabItemType.Wallet -> WalletText.wallet.toLowerCase()
-			TabItemType.DAppCenter -> ProfileText.dappCenter.toLowerCase()
-			TabItemType.Setting -> ProfileText.settings.toLowerCase()
+			TabItemType.Market -> QuotationText.market
+			TabItemType.Wallet -> WalletText.wallet
+			TabItemType.DAppCenter -> ProfileText.dappCenter
+			TabItemType.Setting -> ProfileText.settings
 		}
 	}
 

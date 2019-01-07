@@ -6,6 +6,7 @@ import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
+import io.goldstone.blinnnk.common.language.CoinRankText
 import io.goldstone.blinnnk.common.utils.ErrorDisplayManager
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.contract.QuotationRankContract
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationGlobalModel
@@ -19,7 +20,7 @@ import io.goldstone.blinnnk.module.home.quotation.quotationrank.presenter.Quotat
  */
 class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), QuotationRankContract.GSView {
 	
-	override val pageTitle: String = "Quotation Rank"
+	override val pageTitle: String = CoinRankText.marketRankPageTitle
 	private var headerView: QuotationRankHeaderView? = null
 	private var bottomLoadingView: BottomLoadingView? = null
 	override lateinit var presenter: QuotationRankContract.GSPresenter
