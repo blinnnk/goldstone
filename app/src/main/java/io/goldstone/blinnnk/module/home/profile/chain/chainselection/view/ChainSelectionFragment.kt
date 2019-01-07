@@ -27,26 +27,22 @@ class ChainSelectionFragment : BaseRecyclerFragment<ChainSelectionPresenter, Cha
 		asyncData: ArrayList<ChainSelectionModel>?
 	) {
 		recyclerView.adapter = ChainSelectionAdapter(asyncData.orEmptyArray()) {
-			onClick {
-				checkIsSingleChainWalletOrElse {
-					presenter.showNodeSelectionFragment(
-						model.title.equals(ChainText.mainnet, true)
-					)
-				}
-				preventDuplicateClicks()
+			val isMainnet = model.title.equals(ChainText.mainnet, true)
+			checkIsSingleChainWalletOrElse(isMainnet) {
+				presenter.showNodeSelectionFragment(isMainnet)
 			}
 		}
 	}
 
-	private fun checkIsSingleChainWalletOrElse(callback: () -> Unit) {
+	private fun checkIsSingleChainWalletOrElse(isMainnet: Boolean, callback: () -> Unit) {
 		val type = SharedWallet.getCurrentWalletType()
 		when {
-			type.isBTCTest() -> context.alert(AlertText.testnetOnly)
-			type.isEOSJungle() || type.isEOSKylin() -> context.alert(AlertText.testnetOnly)
-			type.isEOSMainnet() -> context.alert(AlertText.mainnetOnly)
-			type.isBTC() -> context.alert(AlertText.mainnetOnly)
-			type.isLTC() -> context.alert(AlertText.mainnetOnly)
-			type.isBCH() -> context.alert(AlertText.mainnetOnly)
+			type.isBTCTest() && isMainnet -> context.alert(AlertText.testnetOnly)
+			(type.isEOSJungle() || type.isEOSKylin()) && isMainnet -> context.alert(AlertText.testnetOnly)
+			type.isEOSMainnet() && !isMainnet -> context.alert(AlertText.mainnetOnly)
+			type.isBTC() && !isMainnet -> context.alert(AlertText.mainnetOnly)
+			type.isLTC() && !isMainnet -> context.alert(AlertText.mainnetOnly)
+			type.isBCH() && !isMainnet -> context.alert(AlertText.mainnetOnly)
 			else -> callback()
 		}
 	}

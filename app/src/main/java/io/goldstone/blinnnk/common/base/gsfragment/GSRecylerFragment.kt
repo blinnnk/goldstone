@@ -18,6 +18,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.component.EmptyType
@@ -189,15 +190,20 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 		}
 	}
 
+	override fun onResume() {
+		super.onResume()
+		MobclickAgent.onPageStart(this.javaClass.simpleName)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPageEnd(this.javaClass.simpleName)
+	}
+
 	override fun onDestroy() {
 		super.onDestroy()
 		// 如果键盘在显示那么销毁键盘
 		activity?.apply { SoftKeyboard.hide(this) }
-	}
-
-	override fun onResume() {
-		super.onResume()
-		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 	}
 
 	private var emptyLayout: EmptyView? = null
