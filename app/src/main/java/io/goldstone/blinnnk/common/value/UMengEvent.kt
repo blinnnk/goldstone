@@ -14,6 +14,6 @@ object UMengEvent {
 	}
 
 	fun add(context: Context?, eventName: String) {
-		MobclickAgent.onEvent(context, eventName, currentChannel.value)
+		MobclickAgent.onEvent(context, eventName)
 	}
 }
