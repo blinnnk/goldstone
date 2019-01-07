@@ -1,6 +1,7 @@
 package io.goldstone.blinnnk.module.home.quotation.quotationrank.model
 
 import com.blinnnk.extension.safeGet
+import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import org.json.JSONObject
 
@@ -22,4 +23,7 @@ class QuotationGlobalModel(
 		jsonObject.safeGet("total_market_cap"),
 		jsonObject.safeGet("bitcoin_percentage_of_market_cap")
 	)
+	override fun toString(): String {
+		return Gson().toJson(this)
+	}
 }

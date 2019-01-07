@@ -6,6 +6,7 @@ import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blinnnk.common.language.HoneyLanguage
 import io.goldstone.blinnnk.common.language.currentLanguage
+import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
@@ -14,7 +15,9 @@ import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
 import io.goldstone.blinnnk.module.home.home.presneter.SilentUpdater
 import io.goldstone.blinnnk.module.home.profile.currency.view.CurrencySymbol
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.contract.QuotationRankContract
+import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationGlobalModel
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationRankTable
+import org.json.JSONObject
 import java.math.BigDecimal
 
 
@@ -28,6 +31,15 @@ class QuotationRankPresenter(
 	private var lastRank = 0
 
 	override fun start() {
+		launchDefault {
+			SandBoxManager.getQuotationRankGlobalData().apply {
+				if (isNotEmpty()) {
+					launchUI {
+						rankView.showHeaderData(QuotationGlobalModel(JSONObject(this)))
+					}
+				}
+			}
+		}
 		getGlobalData()
 		loadFirstPage()
 	}
@@ -78,6 +90,7 @@ class QuotationRankPresenter(
 					rankView.showError(error)
 				}
 			}
+			if (model.isNotNull()) SandBoxManager.updateQuotationRankGlobal(model.toString())
 		}
 	}
 
