@@ -483,14 +483,14 @@ object EOSAPI {
 
 	@JvmStatic
 	fun getEOSTokenList(
-		chainid: ChainID,
+		chainID: ChainID,
 		account: EOSAccount,
 		@WorkerThread hold: (info: List<TokenContract>?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData(
 			APIPath.getEOSTokenList(
 				APIPath.currentUrl,
-				chainid.id,
+				chainID.id,
 				account.name
 			),
 			"token_list",
@@ -502,7 +502,7 @@ object EOSAPI {
 
 	@JvmStatic
 	fun getEOSTokenCountInfo(
-		chainid: ChainID,
+		chainID: ChainID,
 		account: EOSAccount,
 		codeName: String,
 		symbol: CoinSymbol,
@@ -511,7 +511,7 @@ object EOSAPI {
 		RequisitionUtil.requestData<String>(
 			APIPath.getEOSTokenCountInfo(
 				APIPath.currentUrl,
-				chainid.id,
+				chainID.id,
 				account.name,
 				codeName,
 				symbol.symbol
@@ -530,7 +530,7 @@ object EOSAPI {
 
 	@JvmStatic
 	fun getTransactionCount(
-		chainid: ChainID,
+		chainID: ChainID,
 		account: EOSAccount,
 		codeName: String,
 		symbol: CoinSymbol,
@@ -539,7 +539,7 @@ object EOSAPI {
 		RequisitionUtil.requestData<String>(
 			APIPath.getEOSTransactions(
 				APIPath.currentUrl,
-				chainid.id,
+				chainID.id,
 				account.name,
 				0,
 				-1,
