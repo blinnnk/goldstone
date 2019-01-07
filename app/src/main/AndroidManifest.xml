@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	package="io.goldstone.blockchain">
+	package="io.goldstone.blinnnk">
 
 	<!-- 网络权限 -->
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -44,7 +44,7 @@
 
 		<!-- 登录和闪屏界面 -->
 		<activity
-			android:name=".module.entrance.splash.view.SplashActivity"
+			android:name="io.goldstone.blinnnk.module.entrance.splash.view.SplashActivity"
 			android:screenOrientation="portrait"
 			android:theme="@style/MainTheme"
 			android:windowSoftInputMode="adjustResize"
@@ -56,7 +56,7 @@
 			</intent-filter>
 		</activity>
 		<activity
-			android:name=".module.home.home.view.MainActivity"
+			android:name="io.goldstone.blinnnk.module.home.home.view.MainActivity"
 			android:launchMode="singleTop"
 			android:screenOrientation="portrait"
 			android:theme="@style/MainTheme"
@@ -65,7 +65,7 @@
 
 		<!-- APP实现的Receiver，用于接收消息和结果反馈 -->
 		<receiver
-			android:name=".kernel.receiver.XinGePushReceiver"
+			android:name="io.goldstone.blinnnk.kernel.receiver.XinGePushReceiver"
 			android:exported="true"
 			android:permission="GoldStone">
 			<intent-filter>
@@ -88,7 +88,7 @@
 		</provider>
 
 		<activity
-			android:name=".module.common.qrcode.view.ScanCaptureActivity"
+			android:name="io.goldstone.blinnnk.module.common.qrcode.view.ScanCaptureActivity"
 			android:screenOrientation="portrait" />
 		<!-- 对Application生效，意味着该应用的所有页面，系统都不会做竖屏场景的特殊下移 -->
 		<meta-data

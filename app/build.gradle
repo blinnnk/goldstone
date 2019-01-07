@@ -19,7 +19,7 @@ android {
   }
   compileSdkVersion 28
   defaultConfig {
-    applicationId "io.goldstone.blockchain"
+    applicationId "io.goldstone.blinnnk"
     minSdkVersion 21
     targetSdkVersion 28
     versionCode 24
