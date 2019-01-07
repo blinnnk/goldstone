@@ -301,4 +301,25 @@ object CommonText {
 		HoneyLanguage.TraditionalChinese.code -> "升級版本"
 		else -> ""
 	}
+
+	@JvmField
+	val amount100Million = when (currentLanguage) {
+		HoneyLanguage.English.code->""
+		HoneyLanguage.Chinese.code->"亿"
+		HoneyLanguage.Japanese.code->"億"
+		HoneyLanguage.Korean.code->" 억"
+		HoneyLanguage.Russian.code->""
+		HoneyLanguage.TraditionalChinese.code->"億"
+		else -> ""
+	}
+	@JvmField
+	val amount10Thousand = when (currentLanguage) {
+		HoneyLanguage.English.code->""
+		HoneyLanguage.Chinese.code->"万"
+		HoneyLanguage.Japanese.code->"万"
+		HoneyLanguage.Korean.code->" 만"
+		HoneyLanguage.Russian.code->""
+		HoneyLanguage.TraditionalChinese.code->"萬"
+		else -> ""
+	}
 }
