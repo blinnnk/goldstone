@@ -9,6 +9,7 @@ import android.widget.ScrollView
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.isTrue
 import com.blinnnk.uikit.uiPX
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.overlayview.OverlayView
 import io.goldstone.blinnnk.common.base.gsfragment.GSFragment
@@ -60,6 +61,12 @@ abstract class BaseFragment<out T : BasePresenter<BaseFragment<T>>> : GSFragment
 	override fun onResume() {
 		super.onResume()
 		presenter.onFragmentResume()
+		MobclickAgent.onPageStart(this.javaClass.simpleName)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPageEnd(this.javaClass.simpleName)
 	}
 
 	override fun onDestroy() {

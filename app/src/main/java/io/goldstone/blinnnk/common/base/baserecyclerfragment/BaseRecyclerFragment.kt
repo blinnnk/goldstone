@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blinnnk.util.SoftKeyboard
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blinnnk.common.component.EmptyView
 
@@ -79,6 +80,12 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 	override fun onResume() {
 		super.onResume()
 		presenter.onFragmentResume()
+		MobclickAgent.onPageStart(this.javaClass.simpleName)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPageEnd(this.javaClass.simpleName)
 	}
 
 	private var emptyLayout: EmptyView? = null

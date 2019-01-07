@@ -11,6 +11,7 @@ import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.isNull
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.basefragment.BaseFragment
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerFragment
@@ -69,6 +70,12 @@ class MainActivity : AppCompatActivity() {
 		super.onResume()
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
+		MobclickAgent.onResume(this)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPause(this)
 	}
 
 	fun showDappBrowserFragment(

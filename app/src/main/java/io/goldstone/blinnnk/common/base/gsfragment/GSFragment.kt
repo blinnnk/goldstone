@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
 import com.blinnnk.extension.isNull
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blinnnk.common.utils.getMainActivity
 import io.goldstone.blinnnk.module.common.webview.view.WebViewFragment
@@ -77,6 +78,16 @@ abstract class GSFragment : Fragment() {
 				}
 			}
 		}
+	}
+
+	override fun onResume() {
+		super.onResume()
+		MobclickAgent.onPageStart(this.javaClass.simpleName)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPageEnd(this.javaClass.simpleName)
 	}
 
 	private fun setPageTitle() {

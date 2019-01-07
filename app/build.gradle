@@ -124,6 +124,9 @@ dependencies {
   implementation 'me.itangqi.waveloadingview:library:0.3.5'
   // MPAndroidChart
   implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+  // UMeng
+  implementation  'com.umeng.umsdk:analytics:7.5.4'
+  implementation  'com.umeng.umsdk:common:1.5.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -18,6 +18,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.util.SoftKeyboard
 import com.blinnnk.util.observing
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.component.EmptyType
@@ -187,6 +188,16 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 				setBackEvent(getMainActivity())
 			}
 		}
+	}
+
+	override fun onResume() {
+		super.onResume()
+		MobclickAgent.onPageStart(this.javaClass.simpleName)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPageEnd(this.javaClass.simpleName)
 	}
 
 	override fun onDestroy() {
