@@ -71,7 +71,7 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), Quotatio
 			addAll(newData)
 			val dataSize = size
 			if (dataSize > 0) {
-				recyclerView.adapter?.notifyItemRangeChanged(dataSize - newData.size, dataSize)
+				recyclerView.adapter?.notifyItemRangeChanged(dataSize - newData.size + 1, dataSize + 1)
 				removeEmptyView()
 			}
 		}
