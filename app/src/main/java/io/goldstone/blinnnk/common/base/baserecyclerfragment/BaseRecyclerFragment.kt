@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blinnnk.common.component.EmptyView
-import io.goldstone.blinnnk.common.utils.getMainActivity
 
 /**
  * @date 23/03/2018 3:46 PM
@@ -79,7 +78,6 @@ abstract class BaseRecyclerFragment<out T : BaseRecyclerPresenter<BaseRecyclerFr
 
 	override fun onResume() {
 		super.onResume()
-		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
 		presenter.onFragmentResume()
 	}
 

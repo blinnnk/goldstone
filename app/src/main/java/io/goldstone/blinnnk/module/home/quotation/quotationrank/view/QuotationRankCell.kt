@@ -19,6 +19,7 @@ import io.goldstone.blinnnk.common.value.GrayScale
 import io.goldstone.blinnnk.common.value.PaddingSize
 import io.goldstone.blinnnk.common.value.Spectrum
 import io.goldstone.blinnnk.crypto.utils.formatCurrency
+import io.goldstone.blinnnk.module.home.profile.currency.view.CurrencySymbol
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationRankTable
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.presenter.QuotationRankPresenter
 import org.jetbrains.anko.*
@@ -49,7 +50,7 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 				}
 			}
 			val priceDescription =
-				it.price.formatCurrency() suffix  "(${SharedWallet.getCurrencyCode()})" + " / " + it.changePercent24h
+				CurrencySymbol.getSymbol(SharedWallet.getCurrencyCode()) + it.price.formatCurrency()+ " / " + it.changePercent24h
 			nameInfo.title.text = it.symbol
 			val targetColor = if (it.changePercent24h.contains("-")) Spectrum.red else Spectrum.green
 			nameInfo.subtitle.text = CustomTargetTextStyle(
@@ -63,10 +64,10 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 			marketInfo.title.text = QuotationRankPresenter.parseVolumeText(
 				it.marketCap.replace(",", "").toDoubleOrZero().formatCurrency(4)
 			).setItalic()
-			
-			marketInfo.subtitle.text = ("24H" suffix  QuotationRankPresenter.parseVolumeText(
+
+			marketInfo.subtitle.text = ("24H" suffix QuotationRankPresenter.parseVolumeText(
 				it.volume.replace(",", "").toDoubleOrZero().formatCurrency(4)
-			) suffix SharedWallet.getCurrencyCode()).setItalic()
+			)).setItalic()
 		}
 	}
 
@@ -78,9 +79,10 @@ class QuotationRankCell(context: Context) : BaseCell(context) {
 			gravity = Gravity.CENTER_VERTICAL
 			layoutParams = LayoutParams(matchParent, matchParent)
 			rank = textView {
+				gravity = Gravity.CENTER
 				textColor = GrayScale.midGray
 				typeface = GoldStoneFont.medium(context)
-				layoutParams = LayoutParams(25.uiPX(), wrapContent)
+				layoutParams = LayoutParams(30.uiPX(), wrapContent)
 			}
 			icon = imageView {
 				layoutParams = LinearLayout.LayoutParams(iconSize, iconSize)

@@ -195,11 +195,6 @@ abstract class GSRecyclerFragment<D> : Fragment() {
 		activity?.apply { SoftKeyboard.hide(this) }
 	}
 
-	override fun onResume() {
-		super.onResume()
-		getMainActivity()?.sendAnalyticsData(this::class.java.simpleName)
-	}
-
 	private var emptyLayout: EmptyView? = null
 
 	/**
