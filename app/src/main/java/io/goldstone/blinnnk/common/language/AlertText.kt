@@ -48,17 +48,6 @@ object AlertText {
 	}
 
 	@JvmField
-	val transferWrongDecimal = when (currentLanguage) {
-		HoneyLanguage.English.code -> "This decimal is not supported by this token. Please input a shorter decimal."
-		HoneyLanguage.Chinese.code -> "当前的token不支持你输入的小数位数，请修改金额重新提交"
-		HoneyLanguage.Japanese.code -> "現在のTokenはお客様の入力された小数点以下の桁数をサポートしていません。金額を変更してもう一度提出して下さい"
-		HoneyLanguage.Korean.code -> "현재 token은 귀하께서 입력한 소수자리수를 지원하지 않습니다, 금액을 변경한후 다시 제출하십시오"
-		HoneyLanguage.Russian.code -> "Текущий token не поддерживает количество введенных десятичных знаков, пожалуйста, исправьте сумму и отправьте ее заново."
-		HoneyLanguage.TraditionalChinese.code -> "當前的token不支持您輸入的小數位數，請修改金額重新提交"
-		else -> ""
-	}
-
-	@JvmField
 	val gasEditorEmpty = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Please set a gas price and gas limit"
 		HoneyLanguage.Chinese.code -> "请设置燃气费的单价与上限"
@@ -79,7 +68,7 @@ object AlertText {
 		else -> ""
 	}
 	@JvmField
-	val transferUnvalidInputFormat = when (currentLanguage) {
+	val transferInvalidInputFormat = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Incorrect value format, please check again"
 		HoneyLanguage.Chinese.code -> "请输入正确的金额"
 		HoneyLanguage.Japanese.code -> "正確な金額を入力して下さい"
@@ -129,26 +118,7 @@ object AlertText {
 		HoneyLanguage.TraditionalChinese.code -> "當前 Dapp 想要向鏈發起轉賬，請確認。"
 		else -> ""
 	}
-	@JvmField
-	val signRequestTitle = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Authentication"
-		HoneyLanguage.Chinese.code -> "身份验证"
-		HoneyLanguage.Japanese.code -> "認証"
-		HoneyLanguage.Korean.code -> "인증"
-		HoneyLanguage.Russian.code -> "идентификация"
-		HoneyLanguage.TraditionalChinese.code -> "身份驗證"
-		else -> ""
-	}
-	@JvmField
-	val signRequestDescription = when (currentLanguage) {
-		HoneyLanguage.English.code -> "Currently Dapp wants to sign the chain for authentication, please confirm."
-		HoneyLanguage.Chinese.code -> "当前 Dapp 想要向链发起签名以进行身份验证，请确认。"
-		HoneyLanguage.Japanese.code -> "現在、Dappは認証のためにチェーンに署名したいと考えています。確認してください。"
-		HoneyLanguage.Korean.code -> "현재 Dapp 는 인증을 위해 체인에 서명하려고합니다. 확인하십시오."
-		HoneyLanguage.Russian.code -> "В настоящее время Dapp хочет подписать цепочку для аутентификации, пожалуйста, подтвердите."
-		HoneyLanguage.TraditionalChinese.code -> "當前 Dapp 想要向鏈發起簽名以進行身份驗證，請確認。"
-		else -> ""
-	}
+
 	@JvmField
 	val signDataRequestTitle = when (currentLanguage) {
 		HoneyLanguage.English.code -> "Sign Data"

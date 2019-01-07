@@ -123,10 +123,12 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 						tokenContractCell = graySquareCell {
 							if (token?.contract.isERC20Token()) {
 								setTitle(TokenDetailText.contract)
-								setSubtitle(token?.contract?.contract.orEmpty())
 							} else {
 								setTitle(TokenDetailText.code)
-								setSubtitle(token?.contract?.contract.orEmpty())
+							}
+							setSubtitle(token?.contract?.contract.orEmpty())
+							click {
+								context.clickToCopy(token?.contract?.contract.orEmpty())
 							}
 						}
 					}
