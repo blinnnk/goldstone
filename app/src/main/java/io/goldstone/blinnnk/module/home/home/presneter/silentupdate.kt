@@ -19,10 +19,7 @@ import io.goldstone.blinnnk.crypto.eos.EOSUnit
 import io.goldstone.blinnnk.crypto.multichain.*
 import io.goldstone.blinnnk.crypto.multichain.node.ChainNodeTable
 import io.goldstone.blinnnk.crypto.multichain.node.ChainURL
-import io.goldstone.blinnnk.kernel.commontable.AppConfigTable
-import io.goldstone.blinnnk.kernel.commontable.MyTokenTable
-import io.goldstone.blinnnk.kernel.commontable.SupportCurrencyTable
-import io.goldstone.blinnnk.kernel.commontable.TransactionTable
+import io.goldstone.blinnnk.kernel.commontable.*
 import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
 import io.goldstone.blinnnk.kernel.network.common.BackupServerChecker
 import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
@@ -64,58 +61,14 @@ abstract class SilentUpdater {
 			updateDelegateBandwidthData()
 		}
 		configDao.getAppConfig()?.let {
-			checkMD5Info(it) { hasNewDefaultTokens,
-												 hasNewChainNodes,
-												 hasNewExchanges,
-												 hasNewTerm,
-												 hasNewConfig,
-												 hasNewShareContent,
-												 hasNewRecommendedDAPP,
-												 hasNewDAPP,
-												 hasNewDAPPJSCode,
-												 hasNewQuotationRank ->
-				// 确认后更新 MD5 值到数据库
-				fun updateData() {
-					if (hasNewDefaultTokens) updateLocalDefaultTokens {
-						configDao.updateDefaultTokenMD5(newDefaultTokenListMD5)
-					}
-					if (hasNewChainNodes) updateNodeData {
-						configDao.updateNodesMD5(newChainNodesMD5)
-					}
-					if (hasNewExchanges) updateLocalExchangeData {
-						configDao.updateExchangeMD5(newExchangeListMD5)
-					}
-					if (hasNewTerm) updateAgreement {
-						configDao.updateTermMD5(newTermMD5)
-					}
-					if (hasNewShareContent) updateShareContent {
-						configDao.updateShareContentMD5(newShareContentMD5)
-					}
-					if (hasNewConfig) updateConfigListData {
-						configDao.updateConfigMD5(newConfigMD5)
-					}
-					if (hasNewRecommendedDAPP) updateRecommendedDAPP {
-						configDao.updateRecommendMD5(newRecommendedDAPPMD5)
-					}
-					if (hasNewDAPP) updateNewDAPP {
-						configDao.updateNewDAPPMD5(newDAPPMD5)
-					}
-					if (hasNewDAPPJSCode) updateDAPPJSCode {
-						configDao.updateDAPPJSCodeMD5(newDAPPJSCodeMD5)
-					}
-					if (hasNewQuotationRank) updateQuotationRank {
-						configDao.updateQuotationRankMD5(newQuotationRankMd5)
-					}
-				}
-				when {
-					Connectivity.isConnectedWifi(GoldStoneApp.appContext) -> updateData()
-					Connectivity.isConnectedMobile(GoldStoneApp.appContext) -> {
-						launchUI {
-							GoldStoneDialog(context).showMobile4GConfirm {
-								launchDefault {
-									updateData()
-									updateTokenInfo()
-								}
+			when {
+				Connectivity.isConnectedWifi(GoldStoneApp.appContext) -> checkMD5AndUpdateData()
+				Connectivity.isConnectedMobile(GoldStoneApp.appContext) -> {
+					launchUI {
+						GoldStoneDialog(context).showMobile4GConfirm {
+							launchDefault {
+								checkMD5AndUpdateData()
+								updateTokenInfo()
 							}
 						}
 					}
@@ -134,56 +87,50 @@ abstract class SilentUpdater {
 		}
 	}
 
-	private var newDefaultTokenListMD5 = ""
-	private var newChainNodesMD5 = ""
-	private var newExchangeListMD5 = ""
-	private var newTermMD5 = ""
-	private var newConfigMD5 = ""
-	private var newShareContentMD5 = ""
-	private var newRecommendedDAPPMD5 = ""
-	private var newDAPPMD5 = ""
-	private var newDAPPJSCodeMD5 = ""
-	private var newQuotationRankMd5 = ""
-	private fun checkMD5Info(
-		config: AppConfigTable,
-		hold: (
-			hasNewDefaultTokens: Boolean,
-			hasNewChainNodes: Boolean,
-			hasNewExchanges: Boolean,
-			hasNewTerm: Boolean,
-			hasNewConfig: Boolean,
-			hasNewShareContent: Boolean,
-			hasNewRecommendedDAPP: Boolean,
-			hasNewDAPP: Boolean,
-			hasNewDAPPCode: Boolean,
-			hasNewQuotationRankMd5: Boolean
-		) -> Unit
-	) {
-
+	private fun checkMD5AndUpdateData() {
 		GoldStoneAPI.getMD5List { md5s, error ->
 			if (md5s.isNotNull() && error.isNone()) {
-				newDefaultTokenListMD5 = md5s.safeGet("default_token_list_md5")
-				newChainNodesMD5 = md5s.safeGet("chain_nodes_md5")
-				newExchangeListMD5 = md5s.safeGet("market_list_md5")
-				newTermMD5 = md5s.safeGet("agreement_md5")
-				newConfigMD5 = md5s.safeGet("config_list_md5")
-				newShareContentMD5 = md5s.safeGet("share_content_md5")
-				newRecommendedDAPPMD5 = md5s.safeGet("dapp_recommend_md5")
-				newDAPPMD5 = md5s.safeGet("dapps_md5")
-				newDAPPJSCodeMD5 = md5s.safeGet("get_js_md5")
-				newQuotationRankMd5 = md5s.safeGet("coin_rank_md5")
-				hold(
-					config.defaultCoinListMD5 != newDefaultTokenListMD5,
-					config.nodeListMD5 != newChainNodesMD5,
-					config.exchangeListMD5 != newExchangeListMD5,
-					config.termMD5 != newTermMD5,
-					config.configMD5 != newConfigMD5,
-					config.shareContentMD5 != newShareContentMD5,
-					config.dappRecommendMD5 != newRecommendedDAPPMD5,
-					config.newDAPPMD5 != newDAPPMD5,
-					config.dappJSCodeMD5 != newDAPPJSCodeMD5,
-					config.quotationRankMd5 != newQuotationRankMd5
-				)
+				val localMD5 = MD5Table.dao.getAll()
+				val allNames = md5s.names()
+				(0 until allNames.length()).forEach { index ->
+					val name = allNames.getString(index)
+					val md5 = md5s.safeGet(name)
+					if (name != "code" && localMD5.find { it.tableKey == name }?.md5Value != md5) {
+						val table = MD5Table(name, md5)
+						when {
+							name.contains("token_list") -> updateLocalDefaultTokens {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("chain_nodes") -> updateNodeData {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("market_list") -> updateLocalExchangeData {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("agreement") -> updateAgreement {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("config_list") -> updateConfigListData {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("share_content") -> updateShareContent {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("dapp_recommend") -> updateRecommendedDAPP {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("dapps_md5") -> updateNewDAPP {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("js") -> updateDAPPJSCode {
+								MD5Table.dao.updateValue(table)
+							}
+							name.contains("rank") -> updateQuotationRank {
+								MD5Table.dao.updateValue(table)
+							}
+						}
+					}
+				}
 			}
 		}
 	}

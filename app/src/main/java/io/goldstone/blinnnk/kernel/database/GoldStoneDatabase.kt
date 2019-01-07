@@ -53,7 +53,8 @@ import java.math.BigInteger
 		(ChainNodeTable::class),
 		(DAPPTable::class),
 		(FavoriteTable::class),
-		(QuotationRankTable::class)
+		(QuotationRankTable::class),
+		(MD5Table::class)
 	],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
@@ -95,6 +96,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun dappDao(): DAPPDao
 	abstract fun favoriteDao(): FavoriteDao
 	abstract fun quotationRankDao(): QuotationRankDao
+	abstract fun md5Dao(): MD5TableDao
 
 	companion object {
 		const val databaseVersion = 16

@@ -53,6 +53,7 @@ data class NotificationTable(
 	)
 
 	companion object {
+		@JvmField val dao = GoldStoneDataBase.database.notificationDao()
 		fun getAllNotifications(hold: (ArrayList<NotificationTable>) -> Unit) {
 			load {
 				GoldStoneDataBase.database.notificationDao().getAllNotifications()

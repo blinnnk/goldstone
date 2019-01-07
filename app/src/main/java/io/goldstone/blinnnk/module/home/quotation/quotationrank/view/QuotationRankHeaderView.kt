@@ -43,7 +43,7 @@ class QuotationRankHeaderView(context: Context) : GSCard(context) {
 						layoutParams = LayoutParams(ScreenSize.widthWithPadding / 3, wrapContent)
 						isCenter = true
 						setBlackTitles(fontSize(16))
-						title.typeface = GoldStoneFont.black(context)
+						title.typeface = GoldStoneFont.heavy(context)
 						subtitle.text = name
 						title.text = when (name) {
 							CoinRankText.marketCap ->

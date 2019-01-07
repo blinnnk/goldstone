@@ -9,6 +9,7 @@ import io.goldstone.blinnnk.common.language.currentLanguage
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
+import io.goldstone.blinnnk.common.value.NumberUnit
 import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
 import io.goldstone.blinnnk.module.home.home.presneter.SilentUpdater
 import io.goldstone.blinnnk.module.home.profile.currency.view.CurrencySymbol
@@ -29,18 +30,6 @@ class QuotationRankPresenter(
 	override fun start() {
 		getGlobalData()
 		loadFirstPage()
-	}
-
-	private fun getGlobalData() {
-		GoldStoneAPI.getGlobalRankData { model, error ->
-			launchUI {
-				if (model.isNotNull() && error.isNone()) {
-					rankView.showHeaderData(model)
-				} else {
-					rankView.showError(error)
-				}
-			}
-		}
 	}
 
 	override fun loadFirstPage() {
@@ -80,29 +69,19 @@ class QuotationRankPresenter(
 		}
 	}
 
-
-	companion object {
-
-		enum class NumberUnit(val value: BigDecimal, private val chineseSymbol: String, private val englishSymbol: String) {
-			Thousand(BigDecimal(Math.pow(10.0, 3.0)), "千", "T"),
-			Million(BigDecimal(Math.pow(10.0, 6.0)), "百万", "M"),
-			Billion(BigDecimal(Math.pow(10.0, 9.0)), "十亿", "B"),
-			TenThousand(BigDecimal(Math.pow(10.0, 4.0)), "万", "W"),
-			HundredMillion(BigDecimal(Math.pow(10.0, 8.0)), "亿", "Y");
-
-			fun getUnit(): String {
-				return when (currentLanguage) {
-					HoneyLanguage.English.code, HoneyLanguage.Russian.code -> this.englishSymbol
-					else -> this.chineseSymbol
+	private fun getGlobalData() {
+		GoldStoneAPI.getGlobalRankData { model, error ->
+			launchUI {
+				if (model.isNotNull() && error.isNone()) {
+					rankView.showHeaderData(model)
+				} else {
+					rankView.showError(error)
 				}
 			}
-
-			fun calculate(volume: BigDecimal): String {
-				val result = volume.divide(value, 3, BigDecimal.ROUND_HALF_UP)
-				return result.toPlainString() + getUnit()
-			}
 		}
+	}
 
+	companion object {
 		fun parseVolumeText(text: String): String {
 			val volume = BigDecimal(text)
 			fun getCurrencySymbol(): String {

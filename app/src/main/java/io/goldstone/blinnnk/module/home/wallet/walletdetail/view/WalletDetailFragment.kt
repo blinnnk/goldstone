@@ -70,7 +70,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 			searchButton.click {
 				showTokenManagementFragment()
 			}
-			System.out.println("____")
 		}
 	}
 

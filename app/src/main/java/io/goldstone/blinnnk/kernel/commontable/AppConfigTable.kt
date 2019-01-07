@@ -40,17 +40,7 @@ data class AppConfigTable(
 	var jsCode: String = "",
 	var isMainnet: Boolean = true,
 	var shareContent: String = ProfileText.shareContent,
-	var terms: String = "",
-	var defaultCoinListMD5: String,
-	var exchangeListMD5: String,
-	var nodeListMD5: String,
-	var termMD5: String,
-	var configMD5: String,
-	var shareContentMD5: String,
-	var dappRecommendMD5: String,
-	var newDAPPMD5: String,
-	var dappJSCodeMD5: String,
-	var quotationRankMd5: String
+	var terms: String = ""
 ) {
 
 	companion object {
@@ -79,17 +69,7 @@ data class AppConfigTable(
 				language = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol),
 				currencyCode = CountryCode.currentCurrency,
 				terms = getLocalTerms(),
-				jsCode = "{connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){identity={accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":goldStoneAccountName}]};resolve(identity)})},identity:{accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":goldStoneAccountName}]},forgetIdentity:function(){currentAccount=null;identity=null;return new Promise(function(resolve,reject){resolve()})},linkAccount:function(publicKey,network){console.log(\"linkAccount***\"+publicKey)},suggestNetwork:function(data){console.log(\"suggestNetwork***\");return new Promise(function(resolve,reject){resolve(true)})},isConnected:function(){return new Promise(function(resolve,reject){resolve(true)})},authenticate:function(nonce){console.log(\"authenticate***\"+nonce)},getOrRequestIdentity:function(data){console.log(\"getOrRequestIdentity***\"+JSON.stringify(data))},transactionResult:null,getIdentityResult:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,tableRowInterval:null,accountInterval:null,balanceInterval:null,identityInterval:null,eos:function(data){console.log(\"scatter.eos\"+JSON.stringify(data));return{transaction:function(action){console.log(\"eos.transaction\"+JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})},getRequiredKeys:function(){console.log(\"eos.getRequiredKeys ***\")},getAbi:function(data){console.log(\"eos.getAbi\");console.log(JSON.stringify(data));return new Promise(function(resolve,reject){resolve(\"get abi to do\")})},getTableRows:function(data){console.log(\"eos.getTableRows\");window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.tableRowInterval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};window.scatter.tableRow=null;clearInterval(window.scatter.tableRowInterval)}},1500)})},getAccount:function(data){console.log(\"eos.getAccount\");window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.accountInterval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};clearInterval(window.scatter.accountInterval);window.scatter.accountInfo=null}},1500)})},getCurrencyBalance:function(code,name,symbol){console.log(\"eos.getCurrencyBalance\");window.control.getEOSAccountBalance(code,name,symbol);return new Promise(function(resolve,reject){window.scatter.balanceInterval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance)};clearInterval(window.scatter.balanceInterval);window.scatter.balance=null}},2000)})},getInfo:function(data){console.log(\"eos.getInfo\"+JSON.stringify(data))},contract:function(data){console.log(\"eos.contract\");console.log(JSON.stringify(data)+\"eos.contract\");return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){console.log(\"eos.getArbitrarySignature\");window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);window.scatter.arbSignature=null;clearInterval(window.scatter.interval)}},1500)})}}",
-				defaultCoinListMD5 = "",
-				exchangeListMD5 = "",
-				nodeListMD5 = "",
-				termMD5 = "",
-				configMD5 = "",
-				shareContentMD5 = "",
-				dappRecommendMD5 = "",
-				newDAPPMD5 = "",
-				dappJSCodeMD5 = "",
-				quotationRankMd5 = ""
+				jsCode = "{connect:function(data){return new Promise(function(resolve,reject){resolve(true)})},getIdentity:function(data){return new Promise(function(resolve,reject){identity={accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":goldStoneAccountName}]};resolve(identity)})},identity:{accounts:[{\"authority\":\"active\",\"blockchain\":'eos',\"name\":goldStoneAccountName}]},forgetIdentity:function(){currentAccount=null;identity=null;return new Promise(function(resolve,reject){resolve()})},linkAccount:function(publicKey,network){console.log(\"linkAccount***\"+publicKey)},suggestNetwork:function(data){console.log(\"suggestNetwork***\");return new Promise(function(resolve,reject){resolve(true)})},isConnected:function(){return new Promise(function(resolve,reject){resolve(true)})},authenticate:function(nonce){console.log(\"authenticate***\"+nonce)},getOrRequestIdentity:function(data){console.log(\"getOrRequestIdentity***\"+JSON.stringify(data))},transactionResult:null,getIdentityResult:null,arbSignature:null,balance:null,tableRow:null,accountInfo:null,interval:null,tableRowInterval:null,accountInterval:null,balanceInterval:null,identityInterval:null,eos:function(data){console.log(\"scatter.eos\"+JSON.stringify(data));return{transaction:function(action){console.log(\"eos.transaction\"+JSON.stringify(action));window.control.transferEOS(JSON.stringify(action.actions[0]));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})},getRequiredKeys:function(){console.log(\"eos.getRequiredKeys ***\")},getAbi:function(data){console.log(\"eos.getAbi\");console.log(JSON.stringify(data));return new Promise(function(resolve,reject){resolve(\"get abi to do\")})},getTableRows:function(data){console.log(\"eos.getTableRows\");window.control.getTableRows(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.tableRowInterval=setInterval(function(){if(window.scatter.tableRow!==null){if(window.scatter.tableRow==='failed'){reject(window.scatter.tableRow)}else{resolve(window.scatter.tableRow)};window.scatter.tableRow=null;clearInterval(window.scatter.tableRowInterval)}},1500)})},getAccount:function(data){console.log(\"eos.getAccount\");window.control.getEOSAccountInfo(JSON.stringify(data));return new Promise(function(resolve,reject){window.scatter.accountInterval=setInterval(function(){if(window.scatter.accountInfo!==null){if(window.scatter.accountInfo==='failed'){reject(window.scatter.accountInfo)}else{resolve(window.scatter.accountInfo)};clearInterval(window.scatter.accountInterval);window.scatter.accountInfo=null}},1500)})},getCurrencyBalance:function(code,name,symbol){console.log(\"eos.getCurrencyBalance\");window.control.getEOSAccountBalance(code,name,symbol);return new Promise(function(resolve,reject){window.scatter.balanceInterval=setInterval(function(){if(window.scatter.balance!==null){if(window.scatter.balance==='failed'){reject(window.scatter.balance)}else{resolve(window.scatter.balance)};clearInterval(window.scatter.balanceInterval);window.scatter.balance=null}},2000)})},getInfo:function(data){console.log(\"eos.getInfo\"+JSON.stringify(data))},contract:function(data){console.log(\"eos.contract\");console.log(JSON.stringify(data)+\"eos.contract\");return new Promise(function(resolve,reject){resolve({transfer:function(fromAccount,toAccount,quantity,memo){console.log(\"contract transfer\"+memo);var transferAction;if(toAccount!==undefined&&quantity!==undefined&&memo!==undefined){transferAction={from:fromAccount,to:toAccount,quantity:quantity,memo:memo}}else{transferAction=fromAccount};window.control.simpleTransfer(JSON.stringify(transferAction));return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.transactionResult!==null){if(window.scatter.transactionResult==='failed'){reject(window.scatter.transactionResult)}else{resolve(window.scatter.transactionResult)};window.scatter.transactionResult=null;clearInterval(window.scatter.interval)}},1500)})}})})}}},getArbitrarySignature:function(publicKey,data,whatFor,isHash){console.log(\"eos.getArbitrarySignature\");window.control.getArbSignature(data);return new Promise(function(resolve,reject){window.scatter.interval=setInterval(function(){if(window.scatter.arbSignature!==null){resolve(window.scatter.arbSignature);window.scatter.arbSignature=null;clearInterval(window.scatter.interval)}},1500)})}}"
 			)
 			dao.insert(config)
 			callback(config)
@@ -121,36 +101,6 @@ interface AppConfigDao {
 
 	@Query("UPDATE appConfig SET currencyCode = :currencyCode WHERE id = 1")
 	fun updateCurrency(currencyCode: String)
-
-	@Query("UPDATE appConfig SET defaultCoinListMD5 = :defaultCoinListMD5 WHERE id = 1")
-	fun updateDefaultTokenMD5(defaultCoinListMD5: String)
-
-	@Query("UPDATE appConfig SET nodeListMD5 = :nodeListMD5 WHERE id = 1")
-	fun updateNodesMD5(nodeListMD5: String)
-
-	@Query("UPDATE appConfig SET exchangeListMD5 = :exchangeListMD5 WHERE id = 1")
-	fun updateExchangeMD5(exchangeListMD5: String)
-
-	@Query("UPDATE appConfig SET termMD5 = :termMD5 WHERE id = 1")
-	fun updateTermMD5(termMD5: String)
-
-	@Query("UPDATE appConfig SET shareContentMD5 = :shareContentMD5 WHERE id = 1")
-	fun updateShareContentMD5(shareContentMD5: String)
-
-	@Query("UPDATE appConfig SET dappJSCodeMD5 = :dappJSCodeMD5 WHERE id = 1")
-	fun updateDAPPJSCodeMD5(dappJSCodeMD5: String)
-	
-	@Query("UPDATE appConfig SET quotationRankMd5 = :quotationRankMd5 WHERE id = 1")
-	fun updateQuotationRankMD5(quotationRankMd5: String)
-
-	@Query("UPDATE appConfig SET dappRecommendMD5 = :dappRecommendMD5 WHERE id = 1")
-	fun updateRecommendMD5(dappRecommendMD5: String)
-
-	@Query("UPDATE appConfig SET newDAPPMD5 = :newDAPPMD5 WHERE id = 1")
-	fun updateNewDAPPMD5(newDAPPMD5: String)
-
-	@Query("UPDATE appConfig SET configMD5 = :configMD5 WHERE id = 1")
-	fun updateConfigMD5(configMD5: String)
 
 	@Query("UPDATE appConfig SET pincode = :pinCode WHERE id = 1")
 	fun updatePincode(pinCode: Int)

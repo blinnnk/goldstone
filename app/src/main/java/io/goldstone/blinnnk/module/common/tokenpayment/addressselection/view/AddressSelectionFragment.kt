@@ -63,6 +63,8 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 			}
 		) {
 			headerView = this
+			// 防止 `HeaderView` 时机错开的问题
+			token?.apply { presenter.start() }
 		}
 	}
 
@@ -115,10 +117,9 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		asyncData = arrayListOf()
 		token?.let {
 			presenter = AddressSelectionPresenter(it, this)
-			presenter.start()
+			asyncData = arrayListOf()
 		}
 		wrapper.addView(confirmButton)
 		setScanButtonStatus {
