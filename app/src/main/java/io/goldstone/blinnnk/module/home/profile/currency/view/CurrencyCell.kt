@@ -38,16 +38,16 @@ class CurrencyCell(context: Context) : BaseRadioCell(context) {
 enum class CurrencySymbol(val value: String, val symbol: String) {
 	CNY("CNY", "¥"),
 	JPY("JPY", "¥"),
-	KRW("KRW", ""),
-	RUB("RUB", ""),
-	EUR("EUR", ""),
-	SGD("SGD", ""),
-	INR("INR", ""),
-	GBP("GBP", ""),
-	CAD("CAD", ""),
-	BYN("BYN", ""),
-	AUD("AUD", ""),
-	THB("THB", ""),
+	KRW("KRW", "₩"),
+	RUB("RUB", "₽"),
+	EUR("EUR", "€"),
+	SGD("SGD", "$"),
+	INR("INR", "₹"),
+	GBP("GBP", "£"),
+	CAD("CAD", "$"),
+	BYN("BYN", "Br"),
+	AUD("AUD", "$"),
+	THB("THB", "฿"),
 	USD("USD", "$");
 
 	companion object {
