@@ -13,6 +13,7 @@ import io.goldstone.blinnnk.common.language.TokenDetailText
 import io.goldstone.blinnnk.common.value.ArgumentKey
 import io.goldstone.blinnnk.common.value.ScreenSize
 import io.goldstone.blinnnk.common.value.Spectrum
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.multichain.isEOS
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetail.event.FilterButtonDisplayEvent
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetailcenter.presenter.TokenDetailCenterPresenter
@@ -70,6 +71,7 @@ class TokenDetailCenterFragment : BaseFragment<TokenDetailCenterPresenter>() {
 						currentItem = id
 						menuBar.moveUnderLine(menuBar.getUnitWidth() * currentItem)
 						button.preventDuplicateClicks()
+						UMengEvent.add(context, UMengEvent.Click.TokenDetail.tabBar)
 					}
 				}
 				setMargins<RelativeLayout.LayoutParams> {

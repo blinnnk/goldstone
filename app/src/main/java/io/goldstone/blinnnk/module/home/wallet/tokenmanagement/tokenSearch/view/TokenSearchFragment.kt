@@ -5,6 +5,7 @@ import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.language.EmptyText
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.home.view.MainActivity
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenSearch.presenter.TokenSearchPresenter
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
@@ -33,6 +34,7 @@ class TokenSearchFragment : BaseRecyclerFragment<TokenSearchPresenter, DefaultTo
 				presenter.setMyTokenStatus(default, switch.isChecked) {
 					switch.isClickable = true
 				}
+			UMengEvent.add(context, UMengEvent.Click.TokenManage.switchButton, UMengEvent.Page.tokenSearch)
 			}
 		}
 	}

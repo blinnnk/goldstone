@@ -12,6 +12,7 @@ import io.goldstone.blinnnk.common.language.AlertText
 import io.goldstone.blinnnk.common.language.QuotationText
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
 import io.goldstone.blinnnk.common.utils.getMainActivity
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.home.view.MainActivity
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagement.view.TokenManagementFragment
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
@@ -45,6 +46,7 @@ class TokenManagementListFragment :
 				// 更新数据库
 				TokenManagementListPresenter.addOrCloseMyToken(switch.isChecked, default)
 				switch.isClickable = true
+				UMengEvent.add(context, UMengEvent.Click.TokenManage.switchButton, UMengEvent.Page.tokenList)
 			}
 		}
 	}

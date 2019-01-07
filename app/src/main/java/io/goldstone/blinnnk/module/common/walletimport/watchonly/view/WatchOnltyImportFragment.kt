@@ -27,6 +27,7 @@ import io.goldstone.blinnnk.common.utils.click
 import io.goldstone.blinnnk.common.utils.safeShowError
 import io.goldstone.blinnnk.common.value.ArgumentKey
 import io.goldstone.blinnnk.common.value.PaddingSize
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.common.value.WebUrl
 import io.goldstone.blinnnk.crypto.multichain.AddressType
 import io.goldstone.blinnnk.module.common.walletimport.watchonly.presenter.WatchOnlyImportPresenter
@@ -109,6 +110,7 @@ class WatchOnlyImportFragment : BaseFragment<WatchOnlyImportPresenter>() {
 						button.showLoadingStatus(false)
 					}
 				}
+				UMengEvent.add(context, UMengEvent.Click.Common.importWatchWallet, UMengEvent.Page.addWalletWindow)
 			}
 
 			ExplanationTitle(context).apply {
