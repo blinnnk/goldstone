@@ -9,12 +9,12 @@ object CoinRankText {
 
 	@JvmField
 	val marketRankPageTitle = when (currentLanguage) {
-		HoneyLanguage.English.code->"Market Rank"
-		HoneyLanguage.Chinese.code->"市场排行"
-		HoneyLanguage.Japanese.code->"市場のランキング"
-		HoneyLanguage.Korean.code->"시장 순위"
-		HoneyLanguage.Russian.code->"Рынок. Ранг"
-		HoneyLanguage.TraditionalChinese.code->"市場排行"
+		HoneyLanguage.English.code->"Market Cap Rank"
+		HoneyLanguage.Chinese.code->"市值排行"
+		HoneyLanguage.Japanese.code->"時価総額のランキング"
+		HoneyLanguage.Korean.code->"시가 총액 순위"
+		HoneyLanguage.Russian.code->"Рыночная Кепка Ранг"
+		HoneyLanguage.TraditionalChinese.code->"市值排行"
 		else -> ""
 	}
 
@@ -24,7 +24,7 @@ object CoinRankText {
 		HoneyLanguage.Chinese.code -> "市值"
 		HoneyLanguage.Japanese.code -> "時価総額"
 		HoneyLanguage.Korean.code -> "시가 총액"
-		HoneyLanguage.Russian.code -> "Рыночная капитализация"
+		HoneyLanguage.Russian.code -> "Рыночная Кепка"
 		HoneyLanguage.TraditionalChinese.code -> "市值"
 		else -> ""
 	}

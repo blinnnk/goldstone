@@ -237,7 +237,7 @@ object QuotationText {
 		HoneyLanguage.Chinese.code -> "市值"
 		HoneyLanguage.Japanese.code -> "時価総額"
 		HoneyLanguage.Korean.code -> "시가 총액"
-		HoneyLanguage.Russian.code -> "Рыночная капитализация"
+		HoneyLanguage.Russian.code -> "Рыночная Кепка"
 		HoneyLanguage.TraditionalChinese.code -> "市值"
 		else -> ""
 	}
