@@ -75,7 +75,7 @@ class NotificationListPresenter(
 			if (notificationList.isNotNull() && error.isNone()) {
 				hasLoadFromServer = true
 				if (notificationList.isNotEmpty())
-					GoldStoneDataBase.database.notificationDao().insertAll(notificationList)
+					NotificationTable.dao.insertAll(notificationList)
 				launchUI { getDataFromDatabase() }
 			} else launchUI {
 				fragment.showLoadingView(false)

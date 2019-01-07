@@ -288,34 +288,34 @@ interface TransactionDao {
 	@Query("UPDATE transactionList SET memo =:memo WHERE hash = :txHash AND isFee = :isFee")
 	fun updateFeeMemo(txHash: String, memo: String, isFee: Boolean = true)
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND chainID = :chainID ORDER BY timeStamp DESC")
 	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
 
-	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND chainID = :chainID")
+	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress = :address AND chainID = :chainID")
 	fun getMyMaxBlockNumber(address: String, chainID: String): Int?
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND symbol LIKE :symbol ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND chainID = :chainID AND symbol = :symbol ORDER BY timeStamp DESC")
 	fun getETCTransactionsByAddress(walletAddress: String, symbol: String = CoinSymbol.etc, chainID: String = SharedChain.getETCCurrent().chainID.id): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress ORDER BY timeStamp DESC")
 	fun getAllTransactionsByAddress(walletAddress: String): List<TransactionTable>
 
 	@Query("SELECT * FROM transactionList WHERE hash = :taxHash AND isReceive = :isReceive AND isFee = :isFee")
 	fun getByTaxHashAndReceivedStatus(taxHash: String, isReceive: Boolean, isFee: Boolean): TransactionTable?
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND isFee = :isFee ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND isFee = :isFee ORDER BY timeStamp DESC")
 	fun getByAddressAndContract(walletAddress: String, contract: String, chainID: String, isFee: Boolean = false): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND blockNumber <= :blockNumber ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND blockNumber <= :blockNumber ORDER BY timeStamp DESC")
 	fun getDataWithFee(walletAddress: String, contract: String, chainID: String, blockNumber: Int): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress LIKE :walletAddress AND chainID LIKE :chainID AND (contractAddress LIKE :contract OR isFee = 1) AND blockNumber <= :endBlock ORDER BY timeStamp DESC LIMIT :pageCount")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND chainID = :chainID AND (contractAddress LIKE :contract OR isFee = 1) AND blockNumber <= :endBlock ORDER BY timeStamp DESC LIMIT :pageCount")
 	fun getETHAndAllFee(walletAddress: String, contract: String, endBlock: Int, chainID: String, pageCount: Int = DataValue.pageCount): List<TransactionTable>
 
-	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID")
+	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress = :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID")
 	fun getMaxBlockNumber(address: String, contract: String, chainID: String): Int?
 
-	@Query("SELECT timeStamp FROM transactionList WHERE blockNumber = (SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress LIKE :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID)")
+	@Query("SELECT timeStamp FROM transactionList WHERE blockNumber = (SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress = :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID)")
 	fun getLatestTimeStamp(address: String, contract: String, chainID: String): String?
 
 	@Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -35,7 +35,6 @@ import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenSearch.model
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagementlist.model.CoinInfoModel
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
 import io.goldstone.blinnnk.module.home.wallet.walletdetail.model.TokenPriceModel
-import okhttp3.MediaType
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -48,12 +47,6 @@ import org.json.JSONObject
  * 自有节点进行双向加密解密. 第三方接口和节点不加密. 如 `EtherScan`, `Infura` 和 `GasTracker` 等。
  */
 object GoldStoneAPI {
-
-	/** 网络请求很多是全台异步所以使用 `Application` 的 `Context` */
-//	lateinit var context: Context
-	private val requestContentType =
-		MediaType.parse("application/json; charset=utf-8")
-
 	/**
 	 * 从服务器获取产品指定的默认的 `DefaultTokenList`
 	 */
@@ -212,7 +205,7 @@ object GoldStoneAPI {
 		requestData<String>(
 			APIPath.getShareContent(APIPath.currentUrl),
 			"data",
-			false,
+			true,
 			isEncrypt = true
 		) { result, error ->
 			if (result?.firstOrNull() != null && error.isNone()) {
@@ -530,7 +523,7 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
-	
+
 	fun getGlobalRankData(@WorkerThread hold: (model: QuotationGlobalModel?, error: RequestError) -> Unit) {
 		requestData<String>(
 			APIPath.coinGlobalData(APIPath.currentUrl),
@@ -543,7 +536,7 @@ object GoldStoneAPI {
 			} else hold(null, error)
 		}
 	}
-	
+
 	fun getQuotationRankList(
 		rank: Int,
 		@WorkerThread hold: (data: List<QuotationRankTable>?, error: RequestError) -> Unit
@@ -556,7 +549,7 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
-	
+
 }
 
 
