@@ -28,13 +28,24 @@ object SandBoxManager {
 	private const val currencyFileName = "currency"
 	private const val marketListFileName = "marketList"
 	private const val quotationPairsFileName = "quotationPairs"
-
+	private const val quotationRankGlobalName = "quotationRankGlobal"
+	
 	@WorkerThread
 	fun recoveryData(callback: () -> Unit) {
 		recoveryLanguage()
 		recoveryCurrency()
 		recoveryExchangeSelectedStatus()
 		recoveryQuotationSelections(callback)
+	}
+	
+	@WorkerThread
+	fun updateQuotationRankGlobal(data: String) {
+		updateSandBoxContentByName(quotationRankGlobalName, data)
+	}
+	
+	@WorkerThread
+	fun getQuotationRankGlobalData(): String {
+		return getSandBoxContentByName(quotationRankGlobalName)
 	}
 
 	@WorkerThread
