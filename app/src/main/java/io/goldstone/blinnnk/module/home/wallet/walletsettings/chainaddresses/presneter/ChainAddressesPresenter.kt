@@ -13,6 +13,7 @@ import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.alert
 import io.goldstone.blinnnk.common.utils.getMainActivity
 import io.goldstone.blinnnk.common.utils.safeShowError
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blinnnk.crypto.multichain.*
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -69,27 +70,33 @@ class ChainAddressesPresenter(
 				if (coinType.isEOS()) switchEOSDefaultAddress(fragment.context, bip44Address.address) { accountName ->
 					update(bip44Address, accountName)
 				} else update(bip44Address, bip44Address.address)
+				UMengEvent.add(fragment.context, UMengEvent.Click.WalletDetail.setAsDefault, UMengEvent.Page.allAddressesOfSingleChain)
 			},
 			qrCellClickEvent = {
 				val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
 				showQRCode(ContactModel(bip44Address.address, symbol))
+				UMengEvent.add(fragment.context, UMengEvent.Click.Common.saveQRToAlbum, UMengEvent.Page.allAddressesOfSingleChain)
 			},
 			keystoreCellClickEvent = {
 				showKeystoreExportFragment(bip44Address.address, coinType)
+				UMengEvent.add(fragment.context, UMengEvent.Click.WalletDetail.keystore, UMengEvent.Page.allAddressesOfSingleChain)
 			},
 			exportPrivateKey = {
 				showPrivateKeyExportFragment(bip44Address.address, coinType)
+				UMengEvent.add(fragment.context, UMengEvent.Click.WalletDetail.privateKey, UMengEvent.Page.allAddressesOfSingleChain)
 			},
 			convertBCHAddressToLegacy = {
 				val legacyAddress = BCHWalletUtils.formattedToLegacy(bip44Address.address, MainNetParams.get())
 				fragment.context.alert(legacyAddress)
 				fragment.context?.clickToCopy(legacyAddress)
+				UMengEvent.add(fragment.context, UMengEvent.Click.WalletDetail.convertToLegacy, UMengEvent.Page.allAddressesOfSingleChain)
 			}
 		)
 	}
 
 	fun setAddAddressEvent() = fragment.getParentFragment<WalletSettingsFragment> {
 		showAddButton(true, false) {
+			UMengEvent.add(context, UMengEvent.Click.WalletDetail.addSubAddress, UMengEvent.Page.allAddressesOfSingleChain)
 			context?.apply {
 				createEvent(this) { addresses, error ->
 					if (error.hasError()) safeShowError(error)

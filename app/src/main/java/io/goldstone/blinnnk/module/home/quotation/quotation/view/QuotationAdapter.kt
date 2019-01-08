@@ -6,6 +6,7 @@ import android.widget.LinearLayout
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.quotation.quotation.model.QuotationModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -40,6 +41,7 @@ class QuotationAdapter(
 		onClick {
 			clickEvent(data)
 			preventDuplicateClicks()
+			UMengEvent.add(context, UMengEvent.Click.Market.pairCard)
 		}
 	}
 }

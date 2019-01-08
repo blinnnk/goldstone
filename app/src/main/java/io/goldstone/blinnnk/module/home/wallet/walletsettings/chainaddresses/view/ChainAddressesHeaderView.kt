@@ -81,12 +81,12 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 	) {
 		currentAddress.copyButton.onClick {
 			currentAddress.context.clickToCopy(address)
-			UMengEvent.add(context, UMengEvent.Click.Common.copyAddress)
+			UMengEvent.add(context, UMengEvent.Click.Common.copyAddress, UMengEvent.Page.allAddressesOfSingleChain)
 		}
 		currentAddress.moreButton.onClick {
 			showDashboardEvent(currentAddress)
 			currentAddress.preventDuplicateClicks()
-			UMengEvent.add(context, UMengEvent.Click.Common.copyAddress)
+			UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddressesOfSingleChain)
 		}
 	}
 }

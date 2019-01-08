@@ -22,6 +22,7 @@ import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.alert
 import io.goldstone.blinnnk.common.utils.getMainActivity
 import io.goldstone.blinnnk.common.utils.safeShowError
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.bitcoincash.BCHWalletUtils
 import io.goldstone.blinnnk.crypto.keystore.verifyKeystorePasswordByWalletID
 import io.goldstone.blinnnk.crypto.multichain.*
@@ -89,6 +90,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 			cell.moreButton.onClick {
 				showCellMoreDashboard(data, chainType, !isDefault)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -108,6 +110,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -120,6 +123,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -132,6 +136,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -144,6 +149,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -158,6 +164,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -171,6 +178,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					!isDefault
 				)
 				cell.moreButton.preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -296,6 +304,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 		getParentFragment<WalletSettingsFragment> {
 			showAddButton(true, false) {
 				showCreatorDashboard()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.addSubAddress, UMengEvent.Page.allAddresses)
 			}
 		}
 	}
@@ -388,6 +397,7 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 				if (coinType.isEOS()) switchEOSDefaultAddress(context, address.address) { accountName ->
 					update(address, accountName)
 				} else update(address, address.address)
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.setAsDefault, UMengEvent.Page.allAddresses)
 			},
 			qrCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
@@ -395,21 +405,25 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 					val symbol = if (coinType.isBCH()) CoinSymbol.bch else ""
 					AddressManagerPresenter.showQRCodeFragment(ContactModel(address.address, symbol), this)
 				}
+				UMengEvent.add(context, UMengEvent.Click.Common.saveQRToAlbum, UMengEvent.Page.allAddresses)
 			},
 			exportPrivateKey = {
 				getParentFragment<WalletSettingsFragment> {
 					AddressManagerPresenter.showPrivateKeyExportFragment(address.address, coinType, this)
 				}
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.privateKey, UMengEvent.Page.allAddresses)
 			},
 			keystoreCellClickEvent = {
 				getParentFragment<WalletSettingsFragment> {
 					AddressManagerPresenter.showKeystoreExportFragment(address.address, coinType, this)
 				}
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.keystore, UMengEvent.Page.allAddresses)
 			},
 			convertBCHAddressToLegacy = {
 				val legacyAddress = BCHWalletUtils.formattedToLegacy(address.address, MainNetParams.get())
 				context.alert(legacyAddress)
 				context?.clickToCopy(legacyAddress)
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.convertToLegacy, UMengEvent.Page.allAddresses)
 			}
 		)
 	}

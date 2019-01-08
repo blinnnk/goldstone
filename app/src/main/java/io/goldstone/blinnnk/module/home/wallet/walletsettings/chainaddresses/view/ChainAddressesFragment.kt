@@ -40,11 +40,11 @@ class ChainAddressesFragment
 		) {
 			cell.copyButton.onClick {
 				cell.context.clickToCopy(model?.address.orEmpty())
-				UMengEvent.add(context, UMengEvent.Click.Common.copyAddress, "全部地址列表")
+				UMengEvent.add(context, UMengEvent.Click.Common.copyAddress, UMengEvent.Page.allAddressesOfSingleChain)
 			}
 			cell.moreButton.onClick {
 				presenter.showMoreDashboard(model ?: Bip44Address())
-				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more)
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddressesOfSingleChain)
 			}
 		}
 	}
