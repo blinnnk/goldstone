@@ -30,6 +30,20 @@ object BTCWalletUtils {
 		val secret = keyPair.getPrivateKeyEncoded(currentID).toString()
 		hold(address, secret)
 	}
+	
+	fun getBitcoinWalletAddressByMnemonic(
+		mnemonicCode: String,
+		path: String
+	): String {
+		val seed = Mnemonic.mnemonicToSeed(mnemonicCode, "")
+		val keyPair =
+			ECKey.fromPrivate(generateKey(seed, path).keyPair.privateKey, true)
+		val isTest = ChainType.isBTCTest(ChainPath.pathToChainType(path))
+		val testNetID = NetworkParameters.fromID(NetworkParameters.ID_TESTNET)
+		val mainNetID = NetworkParameters.fromID(NetworkParameters.ID_MAINNET)
+		val currentID = if (isTest) testNetID else mainNetID
+		return Address(currentID, Utils.sha256hash160(keyPair.pubKey)).toBase58()
+	}
 
 	private fun getKeyPairFromBase58PrivateKey(
 		privateKey: String,

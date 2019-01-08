@@ -606,7 +606,10 @@ interface WalletDao {
 
 	@Query("SELECT eosAccountNames FROM wallet")
 	fun getEOSAccountNames(): List<String>
-
+	
+	@Query("SELECT * FROM wallet where id = :id")
+	fun getWalletByID(id: Int): WalletTable?
+	
 	@Query("SELECT * FROM wallet")
 	fun getAllWallets(): List<WalletTable>
 

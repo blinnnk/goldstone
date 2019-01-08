@@ -7,6 +7,7 @@ import com.blinnnk.extension.isNotNull
 import io.goldstone.blinnnk.common.base.basefragment.BasePresenter
 import io.goldstone.blinnnk.common.error.AccountError
 import io.goldstone.blinnnk.common.error.GoldStoneError
+import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
 import io.goldstone.blinnnk.common.sharedpreference.SharedChain
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
@@ -167,6 +168,8 @@ class WatchOnlyImportPresenter(
 						thisWallet.registerPushByAddress()
 						callback(GoldStoneError.None)
 					}
+					// 插入数据库后更新sandbox
+					SandBoxManager.updateWalletTables()
 				} else callback(it)
 			} else callback(AccountError.ExistAddress)
 		}

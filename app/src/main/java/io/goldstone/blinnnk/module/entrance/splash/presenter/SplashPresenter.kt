@@ -7,12 +7,12 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blinnnk.R
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
-import io.goldstone.blinnnk.common.language.ChainErrorText
-import io.goldstone.blinnnk.common.language.currentLanguage
+import io.goldstone.blinnnk.common.language.*
 import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.common.value.CountryCode
@@ -37,17 +37,37 @@ import java.io.File
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
-
+	
 	// 初始化sandbox的数据
 	@WorkerThread
-	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
-		if (WalletTable.dao.rowCount() == 0) {
-			SandBoxManager.recoveryData {
-				hold(true)
+	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
+		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxData()) {
+			launchUI {
+				Dashboard(activity) {
+					showAlertView(
+						WalletText.recoveryWallets,
+						WalletText.recoveryDataTip,
+						false,
+						cancelAction = {
+							launchDefault  {
+								SandBoxManager.cleanSandBox()
+								hold(false)
+							}
+						}
+					) {
+						launchDefault  {
+							SandBoxManager.recoveryData(activity) {
+								hold(true)
+							}
+						}
+					}
+				}
 			}
+			
 		} else hold(false)
+		
+		
 	}
-
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
@@ -101,7 +121,6 @@ class SplashPresenter(val activity: SplashActivity) {
 	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
 		val walletCount = WalletTable.dao.rowCount()
 		if (walletCount == 0) {
-			cleanKeyStoreFile(activity.filesDir)
 			unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 		} else {
 			val needUnregister =

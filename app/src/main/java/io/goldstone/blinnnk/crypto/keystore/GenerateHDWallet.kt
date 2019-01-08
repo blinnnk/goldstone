@@ -114,6 +114,20 @@ fun Context.getKeystoreFileByWalletID(
 	}
 }
 
+fun Context.deleteKeystoreFileByWalletID(walletID: Int) {
+	val filename = "$walletID${CryptoValue.keystoreFilename}"
+	val keystoreFile = File(filesDir!!, filename)
+	if (keystoreFile.exists()) {
+		if (keystoreFile.isDirectory) {
+			keystoreFile.listFiles().forEach { child ->
+				child.delete()
+			}
+		}
+		keystoreFile.delete()
+	}
+	
+}
+
 fun Context.generateTemporaryKeyStore(
 	mnemonicCode: String,
 	pathValue: String,
