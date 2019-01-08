@@ -12,10 +12,7 @@ import io.goldstone.blinnnk.common.component.cell.GraySquareCellWithButtons
 import io.goldstone.blinnnk.common.component.cell.GraySquareCellWithButtons.Companion
 import io.goldstone.blinnnk.common.language.WalletSettingsText
 import io.goldstone.blinnnk.common.utils.GoldStoneFont
-import io.goldstone.blinnnk.common.value.GrayScale
-import io.goldstone.blinnnk.common.value.PaddingSize
-import io.goldstone.blinnnk.common.value.ScreenSize
-import io.goldstone.blinnnk.common.value.fontSize
+import io.goldstone.blinnnk.common.value.*
 import io.goldstone.blinnnk.crypto.multichain.*
 import io.goldstone.blinnnk.crypto.utils.CryptoUtils
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.Bip44Address
@@ -84,10 +81,12 @@ class ChainAddressesHeaderView(context: Context) : LinearLayout(context) {
 	) {
 		currentAddress.copyButton.onClick {
 			currentAddress.context.clickToCopy(address)
+			UMengEvent.add(context, UMengEvent.Click.Common.copyAddress)
 		}
 		currentAddress.moreButton.onClick {
 			showDashboardEvent(currentAddress)
 			currentAddress.preventDuplicateClicks()
+			UMengEvent.add(context, UMengEvent.Click.Common.copyAddress)
 		}
 	}
 }

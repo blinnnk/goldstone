@@ -16,6 +16,10 @@ object UMengEvent {
 			const val createWallet = "common_click_createWallet"  //通用_点击创建钱包按钮
 			const val send = "common_click_send"  //通用_点击收款
 			const val deposit = "common_click_deposit"  //通用_点击转账
+			const val thirdPartyCheckDetail = "common_click_thirdPartyCheckDetail"  //通用_点击第三方浏览器查看详情
+			const val copyAddress = "common_click_copyAddress"  //通用_点击复制地址
+			const val saveQRToAlbum = "common_click_saveQRToAlbum"  //通用_点击保存二维码到相册
+			const val share = "common_click_share"  //通用_点击分享
 		}
 
 		object Wallet {
@@ -24,13 +28,26 @@ object UMengEvent {
 			const val notificationButton = "wallet_click_notificationButton"  //钱包_点击通知按钮
 			const val tokenCell = "wallet_click_tokenCell"  //钱包_点击token条目
 		}
+		object WalletManage {
+			const val walletCard = "walletList_click_walletCard"  //钱包列表_点击钱包卡片
+			const val add = "walletList_click_add"  //钱包列表_点击添加钱包
+		}
+		object WalletDetail {
+			const val cell = "walletDetail_click_cell"  //钱包详情_点击点击cellconst val more = "allAddress_click_more"  //全部地址_点击更多按钮
+			const val more = "allAddress_click_more"  //全部地址_点击更多按钮const val addSubAddress = "allAddress_click_addSubAddress"  //全部地址_点击添加子地址
+			const val checkAll = "allAddress_click_checkAll"  //全部地址_点击某链全部子地址
+			const val QRCode = "allAddressMore_click_QRCode"  //全部地址更多操作_点击查看二维码
+			const val keystore = "allAddressMore_click_keystore"  //全部地址更多操作_点击导出Keystore
+			const val privateKey = "allAddressMore_click_privateKey"  //全部地址更多操作_点击导出私钥
+			const val setAsDefault = "allAddressMore_click_setAsDefault"  //全部地址更多操作_点击设置为默认地址
+		}
+
 		object TokenManage {
 			const val switchButton = "tokenManage_click_switchButton"  //Token管理_点击显示/关闭我的Token
 			const val searchInput = "tokenManage_click_searchInput"  //Token管理_点击搜索token输入框
 		}
 
 		object TokenDetail {
-			const val eosTools = "tokenDetail_click_eosTools"  //Token详情_点击EOS工具按钮
 			const val thirdPartyCheckDetail = "tokenDetail_click_thirdPartyCheckDetail"  //Token详情_点击第三方浏览器查看详情
 			const val toCopyAddress = "tokenDetail_click_toCopyAddress"  //Token详情_点击复制地址
 			const val tabBar = "tokenDetail_click_tabBar"  //Token详情_点击顶部tabBar
@@ -38,11 +55,56 @@ object UMengEvent {
 			const val send = "tokenDetail_click_send"  //Token详情_点击发送按钮
 			const val deposit = "tokenDetail_click_deposit"  //Token详情_点击接收按钮
 			const val filter = "tokenDetail_click_filter"  //Token详情_点击筛选按钮
+			const val filterAlertButton = "tokenDetail_click_filterAlertButton"  //Token详情_点击筛选弹窗按钮
+			const val eosTools = "tokenDetail_click_eosTools"  //Token详情_点击EOS工具按钮
 			const val eosDelegateBandwidth = "tokenDetail_click_eosDelegateBandwidth"  //Token详情_点击EOS代理带宽cell
 			const val eosResourceProcessBar = "tokenDetail_click_eosResourceProcessBar"  //Token详情_点击EOS资源进度条
 			const val eosAccountRegister = "tokenDetail_click_eosAccountRegister"  //Token详情_点击EOS资源注册
-			const val filterAlertButton = "tokenDetail_click_filterAlertButton"  //Token详情_点击筛选弹窗按钮
 			const val eosAccountList = "tokenDetail_click_eosAccountList"  //Token详情_点击EOS公钥账号列表
+		}
+
+		object EOSRNoAccount {
+			const val copyPublicKey = "noEosAccount_click_copyPublicKey"  //无EOS账户_点击复制公钥
+			const val viaContract = "noEosAccount_click_viaContract"  //无EOS账户_点击合约创建
+			const val viaFriend = "noEosAccount_click_viaFriend"  //无EOS账户_点击好友创建
+		}
+
+		object EOSViaContractGuide {
+			const val checkName = "viaContractGuide_click_checkName"  //EOS合约创建账号引导_点击检查账号名是否可用
+			const val copyMemo = "viaContractGuide_click_copyMemo"  //EOS合约创建账号引导_点击复制备注
+			const val copyContractName = "viaContractGuide_click_copyContractName"  //EOS合约创建账号引导_点击复制合约账号
+		}
+
+		object EOSViaFriendGuide {
+			const val checkName = "viaFriendGuide_click_checkName"  //EOS好友创建账号引导_点击检查账号名是否可用
+			const val copyMemo = "viaFriendGuide_click_copyMemo"  //EOS好友创建账号引导_点击复制备注
+		}
+
+		object EOSRegister {
+			const val advancedSettings = "eosRegister_click_advancedSettings"  //EOS注册账号_点击高级设置
+			const val confirm = "eosRegister_click_confirm"  //EOS注册账号_点击确认
+		}
+
+		object EOSResource {
+			const val bandwidthCell = "eosDelegateList_click_bandwidthCell"  //EOS带宽列表_点击带宽条目
+			const val confirmRefund = "eosDelegateList_click_confirmRefund"  //EOS带宽列表_点击确认赎回
+			const val buyConfirmButton = "eosResourceTrade_click_buyConfirmButton"  //EOS资源交易_点击买入确认按钮
+			const val sellConfirmButton = "eosResourceTrade_click_sellConfirmButton"  //EOS资源交易_点击卖出确认按钮
+			const val contactButton = "eosResourceTrade_click_contactButton"  //EOS资源交易_点击通讯录按钮
+		}
+
+		object EOSAccountList {
+			const val accountCell = "eosAccountList_click_accountCell"  //EOS账号列表_点击账号cell
+			const val confirm = "eosAccountList_click_confirm"  //EOS账号列表_点击确认按钮
+		}
+
+		object EOSPermission {
+			const val edit = "eosPermissionList_click_edit"  //EOS权限管理_点击删除权限
+			const val delet = "eosPermissionList_click_delet"  //EOS权限管理_点击编辑权限
+			const val add = "eosPermissionList_click_add"  //EOS权限管理_点击新增权限
+			const val permissionCell = "eosPermissionList_click_permissionCell"  //EOS权限管理_点击点击权限cell
+			const val confirmEidt = "eosPermissionAddWindow_click_confirmEidt"  //EOS权限编辑弹窗_点击按钮
+			const val switchType = "eosPermissionAddWindow_click_switchType"  //EOS权限编辑弹窗_点击角色单选按钮
 		}
 
 		object DappCenter {
@@ -54,6 +116,44 @@ object UMengEvent {
 		}
 
 		const val dappCenter = "dappCenter"
+
+		object Market {
+			const val managePair = "market_click_managePair"  //市场_点击管理交易对按钮
+			const val pairCard = "market_click_pairCard"  //市场_点击交易对卡片
+			const val rankButton = "market_click_rankButton"  //市场_点击排行按钮
+			const val tokenItem = "marketCapRank_click_tokenItem"  //市场排行_点击token条目
+			const val searchInput = "marketPairList_click_searchInput"  //市场交易对管理_点击搜索输入框
+			const val switch = "marketPairList_click_switch"  //市场交易对管理_点击开关
+		}
+
+		object Profile {
+			const val walletManage = "profile_click_walletManage"  //设置_点击钱包管理
+			const val chainNode = "profile_click_chainNode"  //设置_点击节点
+			const val PIN = "profile_click_PIN"  //设置_点击PIN
+			const val fingerPayment = "profile_click_fingerPayment"  //设置_点击指纹支付
+			const val currency = "profile_click_currency"  //设置_点击货币
+			const val language = "profile_click_language"  //设置_点击语言
+			const val contacts = "profile_click_contacts"  //设置_点击通讯录
+			const val aboutUs = "profile_click_aboutUs"  //设置_点击关于我们
+			const val helpCenter = "profile_click_helpCenter"  //设置_点击帮助中心
+			const val privacyPolicy = "profile_click_privacyPolicy"  //设置_点击隐私条款
+			const val version = "profile_click_version"  //设置_点击版本号
+			const val agreement = "profile_click_agreement"  //设置_点击用户协议
+			const val mainOrTest = "chainNodeList_click_mainOrTest"  //主网测试网选择_点击主网测试网选择
+			const val nodeItem = "chainNodeList_click_nodeItem"  //节点_点击节点
+			const val confirmSwitchNodeButton = "chainNodeList_click_confirmSwitchNodeButton"  //节点_点击确认切换节点按钮
+			const val currencyItem = "currency_click_currencyItem"  //货币_点击条目
+			const val languageItem = "language_click_languageItem"  //语言_点击条目
+			const val switchPIN = "PIN_click_switchPIN"  //PIN_点击开关功能按钮
+			const val confirmPIN = "PIN_click_confirmPIN"  //PIN_点击确认按钮
+			const val switchFingerPay = "fingerPayment_click_switchFingerPay"  //指纹支付_点击开关功能按钮
+			const val confirmFingerPay = "fingerPayment_click_confirmFingerPay"  //指纹支付_点击确认按钮
+			const val addContact = "contacts_click_addContact"  //通讯录_点击添加
+			const val deleteContact = "contacts_click_deleteContact"  //通讯录_点击删除
+			const val confirmEditContact = "contacts_click_confirmEditContact"  //通讯录_点击确认编辑按钮
+		}
+
+
 	}
 
 	object Page {
