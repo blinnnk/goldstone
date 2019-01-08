@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blinnnk.GoldStoneApp
 import io.goldstone.blinnnk.common.error.RequestError
+import io.goldstone.blinnnk.common.jni.JniManager
 import io.goldstone.blinnnk.common.language.HoneyLanguage
 import io.goldstone.blinnnk.common.language.currentLanguage
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
@@ -255,7 +256,7 @@ object RequisitionUtil {
 	}
 
 	fun getSignHeader(goldStoneID: String, timeStamp: String, version: String): String {
-		return (goldStoneID + "0" + GoldStoneCryptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
+		return (goldStoneID + "0" + JniManager.getKey() + GoldStoneCryptoKey.apiKey + timeStamp + version).getObjectMD5HexString()
 	}
 
 	fun generateCryptoPostRequest(

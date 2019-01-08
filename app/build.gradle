@@ -33,7 +33,7 @@ android {
       XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
-      abiFilters "armeabi", "armeabi-v7a", "x86" // PC 调试的时候恢复 `x86`
+      abiFilters "armeabi-v7a", "x86" // PC 调试的时候恢复 `x86`
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     // Leave only the supported languages
@@ -65,6 +65,16 @@ android {
       shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
+    }
+  }
+  sourceSets {
+    main {
+      jniLibs.srcDir 'libs'
+    }
+  }
+  externalNativeBuild {
+    cmake {
+      path 'CMakeLists.txt'
     }
   }
   kapt {
@@ -125,11 +135,10 @@ dependencies {
   // MPAndroidChart
   implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
   // UMeng
-  implementation  'com.umeng.umsdk:analytics:7.5.4'
-  implementation  'com.umeng.umsdk:common:1.5.4'
+  implementation 'com.umeng.umsdk:analytics:7.5.4'
+  implementation 'com.umeng.umsdk:common:1.5.4'
 }
 
-apply plugin: 'com.google.gms.google-services'
 repositories {
   mavenCentral()
 }

@@ -16,16 +16,6 @@ object WalletText {
 		HoneyLanguage.TraditionalChinese.code -> "總資產"
 		else -> ""
 	}
-	@JvmField
-	val section = when (currentLanguage) {
-		HoneyLanguage.English.code -> "My Tokens:"
-		HoneyLanguage.Chinese.code -> "我的资产:"
-		HoneyLanguage.Japanese.code -> "私の資産："
-		HoneyLanguage.Korean.code -> "나의자산:"
-		HoneyLanguage.Russian.code -> "Мой токен:"
-		HoneyLanguage.TraditionalChinese.code -> "我的資產:"
-		else -> ""
-	}
 
 	@JvmField
 	val wallet = when (currentLanguage) {

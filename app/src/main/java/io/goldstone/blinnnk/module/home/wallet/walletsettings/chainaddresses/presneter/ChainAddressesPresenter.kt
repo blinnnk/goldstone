@@ -98,6 +98,7 @@ class ChainAddressesPresenter(
 						addresses?.apply {
 							launchUI {
 								diffAndUpdateAdapterData<ChainAddressesAdapter>(toArrayList())
+								fragment.toast(CommonText.succeed)
 							}
 						}
 					}
