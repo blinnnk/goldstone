@@ -117,15 +117,18 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletDetailCellModel>?) {
 		recyclerView.adapter = WalletDetailAdapter(
 			asyncData.orEmptyArray(),
-			{ showTokenDetailFragment(it) }
-		) {
-			headerView = this
-			currentAccount.onClick { showWalletSettingsFragment() }
-			sendButton.onClick { presenter.showTransferDashboard(true) }
-			depositButton.onClick {
-				presenter.showTransferDashboard(false)
+			clickCellEvent = {
+					showTokenDetailFragment(it)
+			},
+			holdHeader = {
+					headerView = this
+					currentAccount.onClick { showWalletSettingsFragment() }
+					sendButton.onClick { presenter.showTransferDashboard(true) }
+					depositButton.onClick {
+						presenter.showTransferDashboard(false)
+				}
 			}
-		}
+		)
 	}
 
 	private var isShow = false
