@@ -10,6 +10,7 @@ import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
+import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.common.value.NumberUnit
 import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
 import io.goldstone.blinnnk.module.home.home.presneter.SilentUpdater
@@ -40,7 +41,7 @@ class QuotationRankPresenter(
 				}
 			}
 		}
-		getGlobalData()
+		if (NetworkUtil.hasNetwork()) getGlobalData()
 		loadFirstPage()
 	}
 
