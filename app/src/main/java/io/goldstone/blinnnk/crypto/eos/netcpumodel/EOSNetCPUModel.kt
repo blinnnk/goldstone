@@ -1,5 +1,6 @@
 package io.goldstone.blinnnk.crypto.eos.netcpumodel
 
+import io.goldstone.blinnnk.crypto.eos.EOSCodeName
 import io.goldstone.blinnnk.crypto.eos.EOSUtils
 import io.goldstone.blinnnk.crypto.eos.base.EOSModel
 import io.goldstone.blinnnk.crypto.eos.transaction.EOSAuthorization
@@ -37,7 +38,7 @@ data class BandWidthModel(
 	}
 
 	override fun serialize(): String {
-		val serializedAccount = EOSUtils.getLittleEndianCode("eosio")
+		val serializedAccount = EOSUtils.getLittleEndianCode(EOSCodeName.EOSIO.value)
 		val serializedMethodName = EOSUtils.getLittleEndianCode(stakeType.value)
 		val serializedAuthorizationSize = EOSUtils.getVariableUInt(authorizations.size)
 		var serializedAuthorizations = ""
