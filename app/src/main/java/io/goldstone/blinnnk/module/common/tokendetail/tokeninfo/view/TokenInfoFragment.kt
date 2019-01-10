@@ -18,6 +18,7 @@ import io.goldstone.blinnnk.common.language.CommonText
 import io.goldstone.blinnnk.common.language.TokenDetailText
 import io.goldstone.blinnnk.common.utils.click
 import io.goldstone.blinnnk.common.utils.safeShowError
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.multichain.isBTCSeries
 import io.goldstone.blinnnk.crypto.multichain.isEOSToken
 import io.goldstone.blinnnk.crypto.multichain.isERC20Token
@@ -73,10 +74,12 @@ class TokenInfoFragment : GSFragment(), TokenInfoContract.GSView {
 	override fun showAddress(address: String, hash160: String) {
 		addressCell.click {
 			it.context.clickToCopy(address)
+			UMengEvent.add(context, UMengEvent.Click.TokenDetail.toCopyAddress, "common address")
 		}.setSubtitle(address)
 		if (token?.contract.isBTCSeries()) {
 			hash160Cell.click {
 				it.context.clickToCopy(hash160)
+				UMengEvent.add(context, UMengEvent.Click.TokenDetail.toCopyAddress, "hash160")
 			}.setSubtitle(hash160)
 		}
 	}

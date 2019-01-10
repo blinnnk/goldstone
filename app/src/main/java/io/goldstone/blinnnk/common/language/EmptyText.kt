@@ -71,12 +71,12 @@ object EmptyText {
 	}
 	@JvmField
 	val latestUsedDAPP = when (currentLanguage) {
-		HoneyLanguage.English.code->"No Dapp usage record"
-		HoneyLanguage.Chinese.code->"没有Dapp使用记录"
-		HoneyLanguage.Japanese.code->"Dapp使用記録はありません"
-		HoneyLanguage.Korean.code->"Dapp 사용 기록 없음"
-		HoneyLanguage.Russian.code->"Нет записи об использовании Dapp"
-		HoneyLanguage.TraditionalChinese.code->"沒有Dapp使用記錄"
+		HoneyLanguage.English.code -> "No Dapp usage record"
+		HoneyLanguage.Chinese.code -> "没有Dapp使用记录"
+		HoneyLanguage.Japanese.code -> "Dapp使用記録はありません"
+		HoneyLanguage.Korean.code -> "Dapp 사용 기록 없음"
+		HoneyLanguage.Russian.code -> "Нет записи об использовании Dapp"
+		HoneyLanguage.TraditionalChinese.code -> "沒有Dapp使用記錄"
 		else -> ""
 	}
 	@JvmField
@@ -91,12 +91,12 @@ object EmptyText {
 	}
 	@JvmField
 	val latestUsedDAPPSubtitle = when (currentLanguage) {
-		HoneyLanguage.English.code->"Here you will see the Dapps you have recently visited so that you can quickly find them."
-		HoneyLanguage.Chinese.code->"这里会显示您最近访问过的 Dapp，以方便您快速找到用过的Dapp"
-		HoneyLanguage.Japanese.code->"ここにあなたが最近訪れたDappが表示されますので、使用したDappをすばやく見つけることができます。"
-		HoneyLanguage.Korean.code->"여기에 최근에 방문한 Dapp가 표시되어 사용 된 Dapp를 빨리 찾을 수 있습니다."
-		HoneyLanguage.Russian.code->"Здесь вы увидите Dapp, который вы недавно посетили, чтобы вы могли быстро найти использованный Dapp."
-		HoneyLanguage.TraditionalChinese.code->"這裡會顯示您最近訪問過的 Dapp，以方便您快速找到用過的Dapp"
+		HoneyLanguage.English.code -> "Here you will see the Dapps you have recently visited so that you can quickly find them."
+		HoneyLanguage.Chinese.code -> "这里会显示您最近访问过的 Dapp，以方便您快速找到用过的Dapp"
+		HoneyLanguage.Japanese.code -> "ここにあなたが最近訪れたDappが表示されますので、使用したDappをすばやく見つけることができます。"
+		HoneyLanguage.Korean.code -> "여기에 최근에 방문한 Dapp가 표시되어 사용 된 Dapp를 빨리 찾을 수 있습니다."
+		HoneyLanguage.Russian.code -> "Здесь вы увидите Dapp, который вы недавно посетили, чтобы вы могли быстро найти использованный Dapp."
+		HoneyLanguage.TraditionalChinese.code -> "這裡會顯示您最近訪問過的 Dapp，以方便您快速找到用過的Dapp"
 		else -> ""
 	}
 	@JvmField

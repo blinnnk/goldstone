@@ -7,6 +7,7 @@ import com.blinnnk.uikit.uiPX
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.utils.click
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.home.view.MainActivity
 import io.goldstone.blinnnk.module.home.quotation.quotation.model.QuotationModel
 import io.goldstone.blinnnk.module.home.quotation.quotation.presenter.QuotationPresenter
@@ -66,15 +67,18 @@ class QuotationFragment : BaseRecyclerFragment<QuotationPresenter, QuotationMode
 		with(slideHeader) {
 			addTokenButton.click {
 				presenter.showQuotationManagement()
+				UMengEvent.add(context, UMengEvent.Click.Market.managePair, "按钮")
 			}
 			rankButton.click {
 				presenter.showQuotationRankFragment()
+				UMengEvent.add(context, UMengEvent.Click.Market.rankButton)
 			}
 		}
 	}
 
 	override fun emptyClickEvent() {
 		presenter.showQuotationManagement()
+		UMengEvent.add(context, UMengEvent.Click.Market.managePair, "占位符")
 	}
 
 	private var isShow = false

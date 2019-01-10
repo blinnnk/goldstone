@@ -3,6 +3,7 @@ package io.goldstone.blinnnk.module.home.quotation.quotationmanagement.view
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
 import com.blinnnk.extension.preventDuplicateClicks
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.jetbrains.anko.sdk27.coroutines.onClick
 
@@ -25,6 +26,7 @@ class QuotationManagementAdapter(
 			onClick {
 				switchEvent(data, isChecked)
 				preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.Market.switch)
 			}
 		}
 	}

@@ -8,6 +8,7 @@ import com.blinnnk.util.clickToCopy
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.value.ArgumentKey
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.multichain.ChainType
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blinnnk.module.home.home.view.MainActivity
@@ -39,9 +40,11 @@ class ChainAddressesFragment
 		) {
 			cell.copyButton.onClick {
 				cell.context.clickToCopy(model?.address.orEmpty())
+				UMengEvent.add(context, UMengEvent.Click.Common.copyAddress, UMengEvent.Page.allAddressesOfSingleChain)
 			}
 			cell.moreButton.onClick {
 				presenter.showMoreDashboard(model ?: Bip44Address())
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.more, UMengEvent.Page.allAddressesOfSingleChain)
 			}
 		}
 	}

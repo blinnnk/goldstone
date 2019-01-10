@@ -8,6 +8,7 @@ import com.blinnnk.extension.preventDuplicateClicks
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.language.WalletSettingsText
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.home.view.MainActivity
 import io.goldstone.blinnnk.module.home.wallet.walletsettings.walletsettings.view.WalletSettingsFragment
 import io.goldstone.blinnnk.module.home.wallet.walletsettings.walletsettingslist.model.WalletSettingsListModel
@@ -33,6 +34,7 @@ class WalletSettingsListFragment :
 			onClick {
 				presenter.showTargetFragment(model.title)
 				preventDuplicateClicks()
+				UMengEvent.add(context, UMengEvent.Click.WalletDetail.cell, model.title)
 			}
 		}
 	}

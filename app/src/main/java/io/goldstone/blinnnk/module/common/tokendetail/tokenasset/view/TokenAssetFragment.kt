@@ -31,6 +31,7 @@ import io.goldstone.blinnnk.common.utils.safeShowError
 import io.goldstone.blinnnk.common.value.ArgumentKey
 import io.goldstone.blinnnk.common.value.ScreenSize
 import io.goldstone.blinnnk.common.value.Spectrum
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.eos.account.EOSAccount
 import io.goldstone.blinnnk.crypto.eos.base.showDialog
 import io.goldstone.blinnnk.crypto.multichain.CoinSymbol
@@ -124,6 +125,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 								setContent(info.first, info.second, Spectrum.blue)
 							}.click {
 								showTradingFragment(info.second)
+								UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosTools, info.second)
 							}
 						}
 					}
@@ -137,6 +139,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 						showArrow()
 					}.click {
 						showTradingFragment(TokenDetailText.accountRegister)
+						UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosAccountRegister)
 					}
 				}
 			}
@@ -267,6 +270,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 						safeShowError(Throwable(WalletText.watchOnly))
 					else -> showPublicKeyAccountNames()
 				}
+				UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosAccountList)
 			}
 		}
 		authorizationCell.into(this)
@@ -279,6 +283,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			setSubtitle(address)
 			click {
 				context?.clickToCopy(SharedAddress.getCurrentEOS())
+				UMengEvent.add(context, UMengEvent.Click.TokenDetail.toCopyAddress, "EOS公钥")
 			}
 		}
 		accountAddress.into(this)
@@ -300,6 +305,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 		}
 		delegateBandWidthCell.click {
 			showDelegateBandWidthDashboard()
+			UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosDelegateBandwidth)
 		}.into(this)
 		refundsCell = GraySquareCell(context).apply {
 			setTitle(TokenDetailText.refunds)
@@ -328,6 +334,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			setSubtitle(CommonText.calculating)
 		}.click {
 			showTradingFragment(TokenDetailText.buySellRAM)
+			UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosResourceProcessBar, "买卖RAM")
 		}
 
 		cpuAssetCell = ProgressView(context).apply {
@@ -335,6 +342,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			setSubtitle(CommonText.calculating)
 		}.click {
 			showTradingFragment(TokenDetailText.delegateCPU)
+			UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosResourceProcessBar, "代理CPU")
 		}
 
 		netAssetCell = ProgressView(context).apply {
@@ -342,6 +350,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			setSubtitle(CommonText.calculating)
 		}.click {
 			showTradingFragment(TokenDetailText.delegateNET)
+			UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosResourceProcessBar, "代理NET")
 		}
 
 		assetCard.addContent {

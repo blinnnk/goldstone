@@ -23,6 +23,7 @@ import io.goldstone.blinnnk.common.utils.safeShowError
 import io.goldstone.blinnnk.common.value.ArgumentKey
 import io.goldstone.blinnnk.common.value.ContainerID
 import io.goldstone.blinnnk.common.value.FragmentTag
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.kernel.receiver.XinGePushReceiver
 import io.goldstone.blinnnk.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
@@ -66,9 +67,11 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		with(slideHeader) {
 			notifyButton.click {
 				showNotificationListFragment()
+				UMengEvent.add(context, UMengEvent.Click.Wallet.notificationButton)
 			}
 			searchButton.click {
 				showTokenManagementFragment()
+				UMengEvent.add(context, UMengEvent.Click.Wallet.addTokenButton)
 			}
 		}
 	}
@@ -117,15 +120,24 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 	override fun setRecyclerViewAdapter(recyclerView: BaseRecyclerView, asyncData: ArrayList<WalletDetailCellModel>?) {
 		recyclerView.adapter = WalletDetailAdapter(
 			asyncData.orEmptyArray(),
+
 			clickCellEvent = {
-					showTokenDetailFragment(it)
+				showTokenDetailFragment(it)
+				UMengEvent.add(context, UMengEvent.Click.Wallet.tokenCell)
 			},
 			holdHeader = {
-					headerView = this
-					currentAccount.onClick { showWalletSettingsFragment() }
-					sendButton.onClick { presenter.showTransferDashboard(true) }
-					depositButton.onClick {
-						presenter.showTransferDashboard(false)
+				headerView = this
+				currentAccount.onClick {
+					showWalletSettingsFragment()
+					UMengEvent.add(context, UMengEvent.Click.Wallet.walletButton)
+				}
+				sendButton.onClick {
+					presenter.showTransferDashboard(true)
+					UMengEvent.add(context, UMengEvent.Click.Common.send, UMengEvent.Page.wallet)
+				}
+				depositButton.onClick {
+					presenter.showTransferDashboard(false)
+					UMengEvent.add(context, UMengEvent.Click.Common.deposit, UMengEvent.Page.wallet)
 				}
 			}
 		)

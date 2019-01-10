@@ -14,6 +14,7 @@ import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.isEmptyThen
 import io.goldstone.blinnnk.common.utils.safeShowError
 import io.goldstone.blinnnk.common.value.ArgumentKey
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.crypto.multichain.isEOSSeries
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetail.contract.TokenDetailContract
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetail.event.FilterButtonDisplayEvent
@@ -125,9 +126,11 @@ class TokenDetailFragment : GSRecyclerFragment<TransactionListModel>(), TokenDet
 			alignParentBottom()
 			sendButton.onClick {
 				overlayFragment?.presenter?.showAddressSelectionFragment()
+				UMengEvent.add(context, UMengEvent.Click.Common.send, UMengEvent.Page.tokenTransactionList)
 			}
 			receivedButton.onClick {
 				overlayFragment?.presenter?.showDepositFragment()
+				UMengEvent.add(context, UMengEvent.Click.Common.deposit, UMengEvent.Page.tokenTransactionList)
 			}
 		}
 	}

@@ -20,9 +20,7 @@ import io.goldstone.blinnnk.common.language.TokenDetailText
 import io.goldstone.blinnnk.common.language.TransactionText
 import io.goldstone.blinnnk.common.utils.ErrorDisplayManager
 import io.goldstone.blinnnk.common.utils.getMainActivity
-import io.goldstone.blinnnk.common.value.ArgumentKey
-import io.goldstone.blinnnk.common.value.ContainerID
-import io.goldstone.blinnnk.common.value.GrayScale
+import io.goldstone.blinnnk.common.value.*
 import io.goldstone.blinnnk.common.value.ScreenSize
 import io.goldstone.blinnnk.crypto.eos.account.EOSAccount
 import io.goldstone.blinnnk.crypto.multichain.isBTCSeries
@@ -149,6 +147,7 @@ class TransactionDetailFragment : GSFragment(), TransactionDetailContract.GSView
 						onClick {
 							showExplorerWebFragment(url[index])
 							preventDuplicateClicks()
+							UMengEvent.add(context, UMengEvent.Click.TokenDetail.thirdPartyCheckDetail, UMengEvent.Page.transactionDetail)
 						}
 					}
 					exploreButton.into(this@addContent)

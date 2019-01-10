@@ -20,6 +20,7 @@ import io.goldstone.blinnnk.common.utils.GoldStoneFont
 import io.goldstone.blinnnk.common.utils.click
 import io.goldstone.blinnnk.common.value.PaddingSize
 import io.goldstone.blinnnk.common.value.Spectrum
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.common.value.fontSize
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blinnnk.module.entrance.starting.presenter.StartingPresenter
@@ -86,6 +87,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 							setDarkStyle()
 						}.click {
 							presenter.showCreateWalletFragment()
+							UMengEvent.add(context, UMengEvent.Click.Common.createWallet, UMengEvent.Page.launchPage)
 						}.into(this)
 
 						importButton.apply {
@@ -93,6 +95,7 @@ class StartingFragment : BaseFragment<StartingPresenter>() {
 							setDarkStyle()
 						}.click {
 							presenter.showImportWalletFragment()
+							UMengEvent.add(context, UMengEvent.Click.Common.importWallet, UMengEvent.Page.launchPage)
 						}.into(this)
 					}.lparams {
 						height = (ScreenSize.Height * 0.1).toInt() + importButton.layoutParams.height * 2

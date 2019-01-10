@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.blinnnk.base.HoneyBaseAdapterWithHeaderAndFooter
 import com.blinnnk.extension.preventDuplicateClicks
 import com.blinnnk.uikit.uiPX
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.module.home.wallet.walletmanagement.walletlist.model.WalletListModel
 import org.jetbrains.anko.matchParent
 import org.jetbrains.anko.sdk27.coroutines.onClick
@@ -32,6 +33,7 @@ class WalletListAdapter(
 		onClick {
 			clickEvent(data.address)
 			preventDuplicateClicks()
+			UMengEvent.add(context, UMengEvent.Click.WalletManage.walletCard)
 		}
 	}
 }
