@@ -285,8 +285,9 @@ class AddressManagerFragment : BaseFragment<AddressManagerPresenter>() {
 	}
 
 	fun setLitecoinAddressesModel(wallet: WalletTable) {
-		val address = if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
-		else wallet.ltcAddresses
+		val address =
+			if (SharedValue.isTestEnvironment()) wallet.btcSeriesTestAddresses
+			else wallet.ltcAddresses
 		ltcAddressesView.checkAllEvent = presenter.showAllLTCAddresses()
 		ltcAddressesView.setTitle(WalletSettingsText.litecoinAddress)
 		ltcAddressesView.currentWallet = wallet

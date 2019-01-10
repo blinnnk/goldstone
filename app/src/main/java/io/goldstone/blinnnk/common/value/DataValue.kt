@@ -22,6 +22,10 @@ object Count {
 	const val retry = 5
 }
 
+object OS {
+	const val android = 0
+}
+
 data class PageInfo(val from: Int, val to: Int, val maxDataIndex: Int, val total: Int) : Serializable
 
 enum class NumberUnit(val value: BigDecimal, private val chineseSymbol: String, private val englishSymbol: String) {

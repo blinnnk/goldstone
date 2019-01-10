@@ -8,6 +8,7 @@ import io.goldstone.blinnnk.common.base.baserecyclerfragment.BottomLoadingView
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blinnnk.common.language.CoinRankText
 import io.goldstone.blinnnk.common.utils.ErrorDisplayManager
+import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.contract.QuotationRankContract
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationGlobalModel
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationRankTable
@@ -19,18 +20,18 @@ import io.goldstone.blinnnk.module.home.quotation.quotationrank.presenter.Quotat
  * @date  2019/01/02
  */
 class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), QuotationRankContract.GSView {
-	
+
 	override val pageTitle: String = CoinRankText.marketRankPageTitle
 	private var headerView: QuotationRankHeaderView? = null
 	private var bottomLoadingView: BottomLoadingView? = null
 	override lateinit var presenter: QuotationRankContract.GSPresenter
-	
+
 	override fun showBottomLoading(isShow: Boolean) {
 		if (isShow) bottomLoadingView?.show()
 		else bottomLoadingView?.hide()
 		isLoadingData = false
 	}
-	
+
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<QuotationRankTable>?
@@ -47,26 +48,26 @@ class QuotationRankFragment : GSRecyclerFragment<QuotationRankTable>(), Quotatio
 			holdClickAction = {}
 		)
 	}
-	
+
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		presenter = QuotationRankPresenter(this)
 		asyncData = arrayListOf()
 	}
-	
+
 	override fun showError(error: Throwable) {
 		ErrorDisplayManager(error).show(context)
 	}
-	
+
 	override fun showHeaderData(model: QuotationGlobalModel) {
 		headerView?.model = model
 	}
-	
+
 	override fun flipPage() {
 		super.flipPage()
-		presenter.loadMore()
+		if (NetworkUtil.hasNetworkWithAlert(context)) presenter.loadMore()
 	}
-	
+
 	override fun updateData(newData: List<QuotationRankTable>) {
 		asyncData?.apply {
 			addAll(newData)

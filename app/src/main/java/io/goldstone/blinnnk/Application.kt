@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import com.umeng.commonsdk.UMConfigure
 import io.goldstone.blinnnk.common.value.GoldStoneCryptoKey
+import io.goldstone.blinnnk.common.value.OS
 import io.goldstone.blinnnk.common.value.currentChannel
 import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
 
@@ -21,7 +22,13 @@ class GoldStoneApp : Application() {
 		GoldStoneDataBase.initDatabase(applicationContext)
 		// Init `Api` context
 		appContext = this
-		UMConfigure.init(this, GoldStoneCryptoKey.umengKey, currentChannel.value, 0, "pushKey")
+		UMConfigure.init(
+			this,
+			GoldStoneCryptoKey.umengKey,
+			currentChannel.value,
+			OS.android,
+			"pushKey"
+		)
 	}
 
 	companion object {
