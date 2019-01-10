@@ -60,12 +60,12 @@ object CommonText {
 	}
 	@JvmField
 	val checkAll = when (currentLanguage) {
-		HoneyLanguage.English.code->"Check All"
-		HoneyLanguage.Chinese.code->"查看全部"
-		HoneyLanguage.Japanese.code->"すべて"
-		HoneyLanguage.Korean.code->"모두보기"
-		HoneyLanguage.Russian.code->"Просмотреть все"
-		HoneyLanguage.TraditionalChinese.code->"查看全部"
+		HoneyLanguage.English.code -> "Check All"
+		HoneyLanguage.Chinese.code -> "查看全部"
+		HoneyLanguage.Japanese.code -> "すべて"
+		HoneyLanguage.Korean.code -> "모두보기"
+		HoneyLanguage.Russian.code -> "Просмотреть все"
+		HoneyLanguage.TraditionalChinese.code -> "查看全部"
 		else -> ""
 	}
 
@@ -304,22 +304,22 @@ object CommonText {
 
 	@JvmField
 	val amount100Million = when (currentLanguage) {
-		HoneyLanguage.English.code->""
-		HoneyLanguage.Chinese.code->"亿"
-		HoneyLanguage.Japanese.code->"億"
-		HoneyLanguage.Korean.code->" 억"
-		HoneyLanguage.Russian.code->""
-		HoneyLanguage.TraditionalChinese.code->"億"
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "亿"
+		HoneyLanguage.Japanese.code -> "億"
+		HoneyLanguage.Korean.code -> " 억"
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> "億"
 		else -> ""
 	}
 	@JvmField
 	val amount10Thousand = when (currentLanguage) {
-		HoneyLanguage.English.code->""
-		HoneyLanguage.Chinese.code->"万"
-		HoneyLanguage.Japanese.code->"万"
-		HoneyLanguage.Korean.code->" 만"
-		HoneyLanguage.Russian.code->""
-		HoneyLanguage.TraditionalChinese.code->"萬"
+		HoneyLanguage.English.code -> ""
+		HoneyLanguage.Chinese.code -> "万"
+		HoneyLanguage.Japanese.code -> "万"
+		HoneyLanguage.Korean.code -> " 만"
+		HoneyLanguage.Russian.code -> ""
+		HoneyLanguage.TraditionalChinese.code -> "萬"
 		else -> ""
 	}
 }

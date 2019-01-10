@@ -463,12 +463,12 @@ object FingerprintPaymentText {
 	}
 	@JvmField
 	val detecting = when (currentLanguage) {
-		HoneyLanguage.English.code->"Identifying fingerprints"
-		HoneyLanguage.Chinese.code->"正在鉴别指纹"
-		HoneyLanguage.Japanese.code->"指紋の識別"
-		HoneyLanguage.Korean.code->"지문 식별"
-		HoneyLanguage.Russian.code->"Идентификация отпечатков пальцев"
-		HoneyLanguage.TraditionalChinese.code->"正在鑑別指紋"
+		HoneyLanguage.English.code -> "Identifying fingerprints"
+		HoneyLanguage.Chinese.code -> "正在鉴别指纹"
+		HoneyLanguage.Japanese.code -> "指紋の識別"
+		HoneyLanguage.Korean.code -> "지문 식별"
+		HoneyLanguage.Russian.code -> "Идентификация отпечатков пальцев"
+		HoneyLanguage.TraditionalChinese.code -> "正在鑑別指紋"
 		else -> ""
 	}
 
