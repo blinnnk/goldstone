@@ -140,7 +140,6 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 					}.click {
 						showTradingFragment(TokenDetailText.accountRegister)
 						UMengEvent.add(context, UMengEvent.Click.TokenDetail.eosAccountRegister)
-
 					}
 				}
 			}

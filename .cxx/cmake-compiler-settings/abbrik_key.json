@@ -1,0 +1,16 @@
+{
+  "gradlePluginVersion": "3.4.0-alpha10",
+  "ndkInstallationFolder": {
+    "path": "/Users/RitaCheung/Library/Android/sdk/ndk-bundle"
+  },
+  "ndkSourceProperties": {
+    "map": {
+      "Pkg.Desc": "Android NDK",
+      "Pkg.Revision": "19.0.5160253-beta2"
+    }
+  },
+  "args": [
+    "-DANDROID_ABI\u003dx86",
+    "-DANDROID_PLATFORM\u003dandroid-21"
+  ]
+}

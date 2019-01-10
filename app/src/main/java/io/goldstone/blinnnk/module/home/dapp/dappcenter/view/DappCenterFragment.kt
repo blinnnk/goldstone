@@ -103,7 +103,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 							Spectrum.white
 						) {
 							showDAPPListDetailFragment(DAPPType.Recommend)
-							UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp,"推荐")
+							UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp, "推荐")
 						}
 					}
 					recommendDAPP = RecommendDappView(
@@ -118,7 +118,7 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 								)
 								presenter.setUsedDAPPs()
 							}
-							UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp,"推荐")
+							UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp, "推荐")
 						}
 					)
 					recommendDAPP.into(this)
@@ -150,11 +150,11 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 										)
 										presenter.setUsedDAPPs()
 									}
-									UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp,"最新")
+									UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp, "最新")
 								},
 								checkAllEvent = {
 									showDAPPListDetailFragment(DAPPType.New)
-									UMengEvent.add(context, UMengEvent.Click.DappCenter.allDapps,"最新")
+									UMengEvent.add(context, UMengEvent.Click.DappCenter.allDapps, "最新")
 								}
 							)
 							latestUsed = DAPPRecyclerView(
@@ -166,11 +166,11 @@ class DAPPCenterFragment : GSFragment(), DAppCenterContract.GSView {
 										backgroundColor,
 										this@DAPPCenterFragment
 									)
-									UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp,"最近使用")
+									UMengEvent.add(context, UMengEvent.Click.DappCenter.dapp, "最近使用")
 								},
 								checkAllEvent = {
 									showDAPPListDetailFragment(DAPPType.Latest)
-									UMengEvent.add(context, UMengEvent.Click.DappCenter.allDapps,"最近使用")
+									UMengEvent.add(context, UMengEvent.Click.DappCenter.allDapps, "最近使用")
 								}
 							)
 							themedViewPager {
