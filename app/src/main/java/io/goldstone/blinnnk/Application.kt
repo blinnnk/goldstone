@@ -3,9 +3,10 @@ package io.goldstone.blinnnk
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import com.blinnnk.extension.isNull
-import com.google.android.gms.analytics.GoogleAnalytics
-import com.google.android.gms.analytics.Tracker
+import com.umeng.commonsdk.UMConfigure
+import io.goldstone.blinnnk.common.value.GoldStoneCryptoKey
+import io.goldstone.blinnnk.common.value.OS
+import io.goldstone.blinnnk.common.value.currentChannel
 import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
 
 /**
@@ -14,29 +15,20 @@ import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
  */
 class GoldStoneApp : Application() {
 
-	private var sAnalytics: GoogleAnalytics? = null
-	private var tracker: Tracker? = null
-
 	@SuppressLint("HardwareIds")
 	override fun onCreate() {
 		super.onCreate()
-		// Init google analytics
-		sAnalytics = GoogleAnalytics.getInstance(this)
 		// Create and init database
 		GoldStoneDataBase.initDatabase(applicationContext)
 		// Init `Api` context
 		appContext = this
-	}
-
-	/**
-	 * Gets the default [Tracker] for this [Application].
-	 */
-	@Synchronized
-	fun getDefaultTracker(): Tracker? {
-		if (tracker.isNull()) {
-			tracker = sAnalytics?.newTracker(R.xml.global_tracker)
-		}
-		return tracker
+		UMConfigure.init(
+			this,
+			GoldStoneCryptoKey.umengKey,
+			currentChannel.value,
+			OS.android,
+			"pushKey"
+		)
 	}
 
 	companion object {

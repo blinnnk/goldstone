@@ -11,16 +11,17 @@ import com.blinnnk.extension.addFragment
 import com.blinnnk.extension.addFragmentAndSetArguments
 import com.blinnnk.extension.findChildFragmentByTag
 import com.blinnnk.extension.isNull
-import com.google.android.gms.analytics.HitBuilders
-import com.google.android.gms.analytics.Tracker
-import io.goldstone.blinnnk.GoldStoneApp
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.basefragment.BaseFragment
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayFragment
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerFragment
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.utils.ConnectionChangeReceiver
 import io.goldstone.blinnnk.common.utils.transparentStatus
-import io.goldstone.blinnnk.common.value.*
+import io.goldstone.blinnnk.common.value.ArgumentKey
+import io.goldstone.blinnnk.common.value.ContainerID
+import io.goldstone.blinnnk.common.value.FragmentTag
+import io.goldstone.blinnnk.common.value.IntentKey
 import io.goldstone.blinnnk.kernel.receiver.registerDeviceForPush
 import io.goldstone.blinnnk.module.home.dapp.dappbrowser.view.DAppBrowserFragment
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.view.DAPPCenterFragment
@@ -33,16 +34,12 @@ class MainActivity : AppCompatActivity() {
 
 	var backEvent: Runnable? = null
 	private var netWorkReceiver: ConnectionChangeReceiver? = null
-	private var tracker: Tracker? = null
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		// 如果不是开发者模式禁止任何截屏行为
 		if (!SharedValue.getDeveloperModeStatus())
 			window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-		val application = application as GoldStoneApp
-		// 初始化 `Google Analytics` 追踪器
-		tracker = application.getDefaultTracker()
 		transparentStatus()
 		setContentView(relativeLayout {
 			id = ContainerID.main
@@ -73,16 +70,12 @@ class MainActivity : AppCompatActivity() {
 		super.onResume()
 		// Push 跳转
 		showNotificationFragmentByIntent(currentIntent ?: intent)
+		MobclickAgent.onResume(this)
 	}
 
-	fun sendAnalyticsData(className: String) {
-		tracker?.setScreenName(className)
-		tracker?.send(
-			HitBuilders.ScreenViewBuilder().setCustomDimension(
-				currentChannel.code,
-				currentChannel.value
-			).build()
-		)
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPause(this)
 	}
 
 	fun showDappBrowserFragment(

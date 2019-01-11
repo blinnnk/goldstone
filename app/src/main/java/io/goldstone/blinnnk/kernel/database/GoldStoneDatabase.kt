@@ -99,7 +99,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun md5Dao(): MD5TableDao
 
 	companion object {
-		const val databaseVersion = 16
+		const val databaseVersion = 1
 		private const val databaseName = "GoldStone.db"
 		lateinit var database: GoldStoneDataBase
 

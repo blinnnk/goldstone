@@ -13,6 +13,7 @@ import com.blinnnk.extension.hideStatusBar
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.setMargins
 import com.blinnnk.util.observing
+import com.umeng.analytics.MobclickAgent
 import io.goldstone.blinnnk.common.base.basefragment.BaseFragment
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.overlayview.OverlayHeaderLayout
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.overlayview.OverlayView
@@ -218,6 +219,12 @@ abstract class BaseOverlayFragment<out T : BaseOverlayPresenter<BaseOverlayFragm
 	override fun onResume() {
 		super.onResume()
 		presenter.onFragmentResume()
+		MobclickAgent.onPageStart(this.javaClass.simpleName)
+	}
+
+	override fun onPause() {
+		super.onPause()
+		MobclickAgent.onPageEnd(this.javaClass.simpleName)
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {

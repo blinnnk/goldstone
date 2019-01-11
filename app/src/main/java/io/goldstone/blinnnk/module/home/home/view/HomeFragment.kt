@@ -13,6 +13,7 @@ import io.goldstone.blinnnk.common.component.TabBarView
 import io.goldstone.blinnnk.common.component.TabItem
 import io.goldstone.blinnnk.common.value.ContainerID
 import io.goldstone.blinnnk.common.value.Spectrum
+import io.goldstone.blinnnk.common.value.UMengEvent
 import io.goldstone.blinnnk.kernel.receiver.VersionManager
 import io.goldstone.blinnnk.module.home.home.presneter.HomePresenter
 import org.jetbrains.anko.*
@@ -46,6 +47,7 @@ class HomeFragment : BaseFragment<HomePresenter>() {
 					walletButton.preventDuplicateClicks()
 				}
 				dAppCenterButton.onClick {
+					UMengEvent.add(context, UMengEvent.Click.dappCenter)
 					presenter.showDAPPCenterFragment()
 					dAppCenterButton.preventDuplicateClicks()
 				}

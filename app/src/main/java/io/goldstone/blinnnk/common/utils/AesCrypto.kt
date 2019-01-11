@@ -6,18 +6,20 @@ package io.goldstone.blinnnk.common.utils
  */
 
 import android.util.Base64
+import io.goldstone.blinnnk.common.jni.JniManager
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object AesCrypto {
 
-	private const val key = "k+BXtgYdyEM6Q4<U"
+	private var key = ""
 	private const val iv = "Ydm0uvZh3IJxQOS8"
 	private const val algo = "AES"
 	private const val algoMode = "AES/CBC/NoPadding"
 
 	fun encrypt(Data: String): String? {
+		key = if (key.isEmpty()) JniManager.getDecryptKey() + "dyEM6Q4<U" else key
 		try {
 			val cipher = Cipher.getInstance(algoMode)
 			val blockSize = cipher.blockSize
@@ -41,6 +43,7 @@ object AesCrypto {
 	}
 
 	fun decrypt(encryptedData: String): String? {
+		key = if (key.isEmpty()) JniManager.getDecryptKey() + "dyEM6Q4<U" else key
 		return try {
 			val encrypted1 = Base64.decode(encryptedData, Base64.DEFAULT)
 
