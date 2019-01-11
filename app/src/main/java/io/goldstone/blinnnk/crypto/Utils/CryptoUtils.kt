@@ -147,7 +147,13 @@ fun Double.formatCount(count: Int = 9): String {
 	val isNegative = this < 0
 	val formatEditor = DecimalFormat("#")
 	formatEditor.maximumFractionDigits = count
-	return (if (isNegative) "-" else "") + formatEditor.format(Math.abs(this)).toBigDecimal().toPlainString()
+	// Fixed NaN Value
+	return try {
+		(if (isNegative) "-" else "") + formatEditor.format(Math.abs(this)).toBigDecimal().toPlainString()
+	} catch (error: Exception) {
+		println(error.message)
+		""
+	}
 }
 
 fun Double.formatDecimal(count: Int = 9): Double {
