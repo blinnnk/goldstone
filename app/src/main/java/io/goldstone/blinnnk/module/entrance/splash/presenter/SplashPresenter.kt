@@ -30,7 +30,6 @@ import io.goldstone.blinnnk.module.entrance.splash.view.SplashActivity
 import io.goldstone.blinnnk.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import java.io.File
 
 /**
  * @date 30/03/2018 2:21 AM
@@ -44,9 +43,10 @@ class SplashPresenter(val activity: SplashActivity) {
 		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxData()) {
 			launchUI {
 				Dashboard(activity) {
+					getDialog { setCancelable(false) }
 					showAlertView(
-						WalletText.recoveryWallets,
-						WalletText.recoveryDataTip,
+						"Recovery Wallets",
+						"Do you want to recover wallets",
 						false,
 						cancelAction = {
 							launchDefault  {
@@ -56,6 +56,7 @@ class SplashPresenter(val activity: SplashActivity) {
 						}
 					) {
 						launchDefault  {
+							initDefaultToken(activity)
 							SandBoxManager.recoveryData(activity) {
 								hold(true)
 							}
@@ -157,18 +158,6 @@ class SplashPresenter(val activity: SplashActivity) {
 			// 没有网络的情况下标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
 			SharedWallet.updateUnregisterGoldStoneID(targetGoldStoneID)
 		}
-	}
-
-	private fun cleanKeyStoreFile(dir: File): Boolean {
-		if (dir.isDirectory) {
-			val children = dir.list()
-			for (index in children.indices) {
-				val success = cleanKeyStoreFile(File(dir, children[index]))
-				if (!success) return false
-			}
-		}
-		// The directory is now empty so delete it
-		return dir.delete()
 	}
 
 	companion object {

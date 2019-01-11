@@ -5,19 +5,17 @@ import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.afollestad.materialdialogs.list.getListAdapter
-import com.blinnnk.extension.forEachOrEnd
-import com.blinnnk.extension.isNull
+import com.blinnnk.extension.*
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blinnnk.GoldStoneApp
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
-import io.goldstone.blinnnk.common.language.WalletText
 import io.goldstone.blinnnk.common.sandbox.view.wallet.RecoverWalletAdapter
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.common.utils.toJsonArray
-import io.goldstone.blinnnk.crypto.keystore.deleteKeystoreFileByWalletID
+import io.goldstone.blinnnk.crypto.multichain.CryptoValue
 import io.goldstone.blinnnk.kernel.commontable.AppConfigTable
 import io.goldstone.blinnnk.kernel.commontable.SupportCurrencyTable
 import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
@@ -48,18 +46,14 @@ object SandBoxManager {
 		return if (directoryFiles.isEmpty()) {
 			false
 		} else {
-			var length = 0L
-			directoryFiles.forEach {
-				if (it.name != quotationRankGlobalName)
-					length += it.length()
-			}
-			length != 0L
+			!directoryFiles.none { it.name != quotationRankGlobalName && it.length() > 0 }
 		}
 	}
 	
 	// 清除沙盒数据
 	@WorkerThread
 	fun cleanSandBox() {
+		cleanKeyStoreFile(GoldStoneApp.appContext.filesDir)
 		val directoryFiles = getDirectory().listFiles()
 		if (!directoryFiles.isEmpty()) {
 			directoryFiles.forEach {
@@ -76,6 +70,10 @@ object SandBoxManager {
 		recoveryQuotationSelections {
 			recoveryWallet(context, callback)
 		}
+	}
+	
+	fun getLanguage(): Int? {
+		return getSandBoxContentByName(languageFileName).toIntOrNull()
 	}
 	
 	@WorkerThread
@@ -111,9 +109,13 @@ object SandBoxManager {
 	@WorkerThread
 	fun updateWalletTables() {
 		WalletTable.getAll {
-			updateSandBoxContentByName(walletTableFileName, Gson().toJson(this.map {
-				WalletModel(it)
-			}))
+			if (isNullOrEmpty()) {
+				updateSandBoxContentByName(walletTableFileName, "")
+			} else {
+				updateSandBoxContentByName(walletTableFileName, Gson().toJson(this.map {
+					WalletBackUpModel(it)
+				}))
+			}
 			
 		}
 		
@@ -123,7 +125,6 @@ object SandBoxManager {
 		val language = getSandBoxContentByName(languageFileName)
 		if (language.isNotEmpty()) {
 			AppConfigTable.dao.updateLanguageCode(language.toInt())
-			language.toInt()
 		}
 	}
 
@@ -184,105 +185,98 @@ object SandBoxManager {
 		} else callback()
 	}
 	
-	private fun recoveryWallet(context: Context, callback: () -> Unit) {
-		recoveryWalletTables(context) { finalWalletId ->
-			if (finalWalletId.isNull()) {
-				WalletTable.getAll {
-					if (isNotEmpty()) WalletTable.dao.update(this.last().apply { isUsing = true })
-				}
-			} else {
-				WalletTable.dao.getWalletByID(finalWalletId).apply {
-					if (this.isNull()) {
-						WalletTable.getAll {
-							if (isNotEmpty()) WalletTable.dao.update(this.last().apply { isUsing = true })
-						}
-					} else {
+	private fun recoveryWallet(context: Context, @WorkerThread callback: () -> Unit) {
+		recoveryWalletTables(context) { hasFinish, finalWalletID ->
+			launchDefault {
+				if (finalWalletID.isNotNull()) {
+					WalletTable.dao.getWalletByID(finalWalletID)?.apply {
+						WalletTable.dao.updateLastUsingWalletOff()
 						WalletTable.dao.update(this.apply { isUsing = true })
 					}
 				}
+				if (hasFinish) {
+					// 更新sandbox中的数据
+					updateWalletTables()
+					callback()
+				}
 			}
-			// 更新sandbox中的数据
-			updateWalletTables()
-			callback()
 		}
 	}
 	
-	private fun recoveryWalletTables(context: Context, callback: (lastWalletID: Int?) -> Unit) {
+	private fun recoveryWalletTables(context: Context, @UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
-		val pairList = arrayListOf<WalletModel>()
-		pairList.apply {
-			try {
-				val jsonArray = JSONArray(walletModelListString)
-				for (index in 0 until jsonArray.length()) {
-					add(WalletModel(jsonArray.getJSONObject(index)))
-				}
-			} catch (error: Exception) {
-				error.printStackTrace()
-			}
-		}
+		val pairList = JSONArray(walletModelListString).toJSONObjectList().map { WalletBackUpModel(it) }.toArrayList()
 		if (pairList.isNotEmpty()) {
 			launchUI {
 				Dashboard(context) {
 					cancelOnTouchOutside()
-					getDialog {
-						negativeButton(text = WalletText.deleteAll) {
-							dismiss()
-							callback(null)
-						}
-					}
-					showList(WalletText.recoveryWallets, RecoverWalletAdapter(pairList,
+					showList(
+						"Recovery Wallets",
+						RecoverWalletAdapter(
+							pairList,
 						deleteAction = { position ->
-							val walletId = pairList[position].id
-							launchDefault { context.deleteKeystoreFileByWalletID(walletId) }
+							val walletID = pairList[position].id
+							launchDefault { context.deleteKeystoreFileByWalletID(walletID) }
 							pairList.removeAt(position)
 							getDialog {
 								getListAdapter()?.notifyDataSetChanged()
 							}
 							if (pairList.isEmpty()) {
 								dismiss()
-								launchDefault {
-									callback(null)
-								}
+								callback(true, null)
 							}
 						},
 						recoverAction = { position ->
-							recoveryWalletFromType(context, pairList[position]) { walletId ->
+							recoveryWalletFromType(context, pairList[position]) { walletID ->
 								pairList.removeAt(position)
-								getDialog {
-									getListAdapter()?.notifyDataSetChanged()
-								}
-								if (pairList.isEmpty()) {
-									dismiss()
-									launchDefault {
-										callback(walletId)
+								launchUI {
+									getDialog {
+										getListAdapter()?.notifyDataSetChanged()
 									}
+									if (pairList.isEmpty()) dismiss()
+									callback(pairList.isEmpty(), walletID)
 								}
 							}
 						}))
+				}.getDialog {
+					setCancelable(false)
+					negativeButton(text = "DELETE ALL") {
+						dismiss()
+						callback(true, null)
+						launchDefault {
+							pairList.forEach { wallet ->
+								context.deleteKeystoreFileByWalletID(wallet.id)
+							}
+						}
+					}
 				}
 			}
-		} else callback(null)
+		} else launchUI { callback(true, null) }
 	}
 	
-	private fun recoveryWalletFromType(context: Context, wallet: WalletModel, @UiThread callback: (walletId: Int?) -> Unit) {
+	private fun recoveryWalletFromType(
+		context: Context,
+		wallet: WalletBackUpModel,
+		@WorkerThread callback: (walletID: Int?) -> Unit
+	) {
 		launchDefault {
 			when {
 				wallet.isWatchOnly -> {
 					// 观察钱包
 					recoveryWatchOnlyWallet(wallet) {
-						launchUI { callback(wallet.id) }
+						callback(wallet.id)
 					}
 				}
 				!wallet.encryptMnemonic.isNullOrEmpty() -> {
 					// 助记词钱包
 					recoveryMnemonicWallet(context, wallet) { isSuccess ->
-						launchUI { callback(if (isSuccess) wallet.id else null) }
+						if (isSuccess) callback(wallet.id)
 					}
 				}
 				else -> {
 					// keystore 钱包
 					recoveryKeystoreWallet(context, wallet) { isSuccess ->
-						launchUI { callback(if (isSuccess) wallet.id else null) }
+						if (isSuccess) callback(wallet.id)
 					}
 				}
 			}
@@ -315,10 +309,36 @@ object SandBoxManager {
 	}
 
 	private fun getDirectory(): File {
-		val storagePath = GoldStoneApp.appContext.getExternalFilesDir(null).absolutePath
+		val storagePath = GoldStoneApp.appContext.filesDir.absolutePath
 		val sandBoxPath = "$storagePath/sandbox"
 		val file = File(sandBoxPath)
 		if (!file.exists()) file.mkdirs()
 		return file
+	}
+	
+	private fun cleanKeyStoreFile(dir: File): Boolean {
+		if (dir.isDirectory) {
+			val children = dir.list()
+			for (index in children.indices) {
+				val success = cleanKeyStoreFile(File(dir, children[index]))
+				if (!success) return false
+			}
+		}
+		// The directory is now empty so delete it
+		return dir.delete()
+	}
+	
+	
+	private fun Context.deleteKeystoreFileByWalletID(walletID: Int) {
+		val filename = "$walletID${CryptoValue.keystoreFilename}"
+		val keystoreFile = File(filesDir!!, filename)
+		if (keystoreFile.exists()) {
+			if (keystoreFile.isDirectory) {
+				keystoreFile.listFiles().forEach { child ->
+					child.delete()
+				}
+			}
+			keystoreFile.delete()
+		}
 	}
 }

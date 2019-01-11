@@ -1,4 +1,3 @@
-
 package io.goldstone.blinnnk.common.sandbox
 
 import com.blinnnk.extension.safeGet
@@ -15,7 +14,7 @@ import org.json.JSONObject
  * @description:
  */
 
-class WalletModel(
+class WalletBackUpModel(
 	val id: Int,
 	val avatarID: Int,
 	val name: String,
@@ -40,7 +39,7 @@ class WalletModel(
 	var currentBCHAddress: String = "",
 	var currentEOSAddress: String = ""
 ) {
-	constructor(jsonObject: JSONObject): this(
+	constructor(jsonObject: JSONObject) : this(
 		jsonObject.safeGet("id").toInt(),
 		jsonObject.safeGet("avatarID").toInt(),
 		jsonObject.safeGet("name"),
@@ -55,7 +54,10 @@ class WalletModel(
 		jsonObject.safeGet("isWatchOnly").toBoolean(),
 		jsonObject.safeGet("encryptMnemonic"),
 		jsonObject.safeGet("encryptFingerPrinterKey"),
-		currentEOSAccountName = Gson().fromJson(jsonObject.safeGet("currentEOSAccountName"), object : TypeToken<EOSDefaultAllChainName>() {}.type),
+		currentEOSAccountName = Gson().fromJson(
+			jsonObject.safeGet("currentEOSAccountName"),
+			object : TypeToken<EOSDefaultAllChainName>() {}.type
+		),
 		hasBackUpMnemonic = jsonObject.safeGet("hasBackUpMnemonic").toBoolean(),
 		currentETHSeriesAddress = jsonObject.safeGet("currentETHSeriesAddress"),
 		currentETCAddress = jsonObject.safeGet("currentETCAddress"),
@@ -64,10 +66,9 @@ class WalletModel(
 		currentLTCAddress = jsonObject.safeGet("currentLTCAddress"),
 		currentBCHAddress = jsonObject.safeGet("currentBCHAddress"),
 		currentEOSAddress = jsonObject.safeGet("currentEOSAddress")
-	
 	)
 	
-	constructor(walletTable: WalletTable): this(
+	constructor(walletTable: WalletTable) : this(
 		walletTable.id,
 		walletTable.avatarID,
 		walletTable.name,
@@ -87,6 +88,7 @@ class WalletModel(
 		currentETHSeriesAddress = walletTable.currentETHSeriesAddress,
 		currentETCAddress = walletTable.currentETCAddress,
 		currentBTCAddress = walletTable.currentBTCAddress,
+		currentBTCSeriesTestAddress = walletTable.currentBTCSeriesTestAddress,
 		currentLTCAddress = walletTable.currentLTCAddress,
 		currentBCHAddress = walletTable.currentBCHAddress,
 		currentEOSAddress = walletTable.currentEOSAddress
@@ -104,7 +106,7 @@ class WalletModel(
 			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle),
 			Pair(WalletType.eosKylinOnly, currentEOSAccountName.kylin)
 		).filter {
-			it.second.isNotEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
+			!it.second.isNullOrEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
 		}
 		return when {
 			// 减 `2` 是去除掉 `EOS` 的两个网络状态的计数, 此计数并不影响判断是否是全链钱包

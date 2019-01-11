@@ -2,7 +2,7 @@ package io.goldstone.blinnnk.common.sandbox.view.wallet
 
 import android.content.Context
 import com.blinnnk.base.HoneyBaseAdapter
-import io.goldstone.blinnnk.common.sandbox.WalletModel
+import io.goldstone.blinnnk.common.sandbox.WalletBackUpModel
 import io.goldstone.blinnnk.common.utils.click
 
 /**
@@ -11,15 +11,15 @@ import io.goldstone.blinnnk.common.utils.click
  * @description:
  */
 class RecoverWalletAdapter(
-	override val dataSet: ArrayList<WalletModel>,
-	private val deleteAction: (postion: Int) -> Unit,
+	override val dataSet: ArrayList<WalletBackUpModel>,
+	private val deleteAction: (position: Int) -> Unit,
 	private val recoverAction: (position: Int) -> Unit
-): HoneyBaseAdapter<WalletModel, WalletRecoverCell>() {
+) : HoneyBaseAdapter<WalletBackUpModel, WalletBackUpCell>() {
 	
-	override fun generateCell(context: Context) = WalletRecoverCell(context)
+	override fun generateCell(context: Context) = WalletBackUpCell(context)
 	
-	override fun WalletRecoverCell.bindCell(
-		data: WalletModel,
+	override fun WalletBackUpCell.bindCell(
+		data: WalletBackUpModel,
 		position: Int
 	) {
 		model = data

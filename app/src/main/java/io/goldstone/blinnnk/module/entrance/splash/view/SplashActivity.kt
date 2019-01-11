@@ -12,6 +12,7 @@ import io.goldstone.blinnnk.common.component.GradientView
 import io.goldstone.blinnnk.common.component.container.SplashContainer
 import io.goldstone.blinnnk.common.language.HoneyLanguage
 import io.goldstone.blinnnk.common.language.currentLanguage
+import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedChain
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
@@ -157,7 +158,7 @@ class SplashActivity : AppCompatActivity() {
 			val config = AppConfigTable.dao.getAppConfig()
 			if (config.isNull()) {
 				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
-				currentLanguage = HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+				currentLanguage = SandBoxManager.getLanguage() ?:  HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 				AppConfigTable.insertAppConfig(callback)
 			} else {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册

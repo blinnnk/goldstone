@@ -9,7 +9,7 @@ import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.observing
 import io.goldstone.blinnnk.common.base.basecell.BaseCell
 import io.goldstone.blinnnk.common.component.title.TwoLineTitles
-import io.goldstone.blinnnk.common.sandbox.WalletModel
+import io.goldstone.blinnnk.common.sandbox.WalletBackUpModel
 import io.goldstone.blinnnk.common.utils.GoldStoneFont
 import io.goldstone.blinnnk.common.value.*
 import org.jetbrains.anko.*
@@ -19,7 +19,7 @@ import org.jetbrains.anko.*
  * @author: yangLiHai
  * @description:
  */
-class WalletRecoverCell(context: Context) : BaseCell(context) {
+class WalletBackUpCell(context: Context) : BaseCell(context) {
 	private val nameAndType = TwoLineTitles(context).apply {
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 		centerInVertical()
@@ -58,7 +58,7 @@ class WalletRecoverCell(context: Context) : BaseCell(context) {
 		textColor = Spectrum.white
 	}
 	
-	var model: WalletModel? by observing(null) {
+	var model: WalletBackUpModel? by observing(null) {
 		model?.apply {
 			nameAndType.title.text = name
 			nameAndType.subtitle.text = getWalletType().getDisplayName()
@@ -83,8 +83,6 @@ class WalletRecoverCell(context: Context) : BaseCell(context) {
 			alignParentRight()
 			recoverButton.setMargins<LinearLayout.LayoutParams> { leftMargin = 10.uiPX() }
 		}
-		
-		
 		
 	}
 	

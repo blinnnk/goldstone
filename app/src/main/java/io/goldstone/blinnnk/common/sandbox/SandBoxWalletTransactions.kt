@@ -6,20 +6,17 @@ import com.blinnnk.extension.isNotNull
 import io.goldstone.blinnnk.GoldStoneApp
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
 import io.goldstone.blinnnk.common.component.overlay.LoadingView
-import io.goldstone.blinnnk.common.language.*
+import io.goldstone.blinnnk.common.language.CommonText
+import io.goldstone.blinnnk.common.language.FingerprintPaymentText
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.ErrorDisplayManager
-import io.goldstone.blinnnk.crypto.bitcoin.BTCWalletUtils
-import io.goldstone.blinnnk.crypto.bitcoincash.BCHWalletUtils
-import io.goldstone.blinnnk.crypto.eos.EOSWalletUtils
-import io.goldstone.blinnnk.crypto.ethereum.getAddress
-import io.goldstone.blinnnk.crypto.keystore.generateETHSeriesAddress
 import io.goldstone.blinnnk.crypto.keystore.getBigIntegerPrivateKeyByWalletID
-import io.goldstone.blinnnk.crypto.litecoin.LTCWalletUtils
 import io.goldstone.blinnnk.crypto.multichain.*
 import io.goldstone.blinnnk.crypto.utils.*
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.WalletTable
+import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
 import kotlinx.coroutines.*
 
 /**
@@ -28,17 +25,20 @@ import kotlinx.coroutines.*
  * @description:
  */
 
-fun recoveryMnemonicWallet(context: Context, walletModel: WalletModel, callback: (success: Boolean) -> Unit) {
+fun recoveryMnemonicWallet(
+	context: Context,
+	walletModel: WalletBackUpModel,
+	callback: (success: Boolean) -> Unit
+) {
 	launchUI {
 		Dashboard(context) {
 			showAlertView(
 				FingerprintPaymentText.usePassword,
-				WalletText.walletPasswordInputTip(walletModel.name),
+				"please input the password of the ${walletModel.name}",
 				true,
 				cancelAction = {
 					callback(false)
-				}
-			) { passwordInput ->
+				}) { passwordInput ->
 				val password = passwordInput?.text?.toString()
 				if (password.isNullOrEmpty()) {
 					recoveryMnemonicWallet(context, walletModel, callback)
@@ -48,18 +48,20 @@ fun recoveryMnemonicWallet(context: Context, walletModel: WalletModel, callback:
 				} else {
 					val loadingView = LoadingView(context)
 					loadingView.show()
-					GlobalScope.launch(Dispatchers.Default) {
+					launchDefault {
 						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
 							if (privateKey.isNotNull() && error.isNone()) {
-								recoveryMnemonicWallet(walletModel)
-								callback(true)
+								recoveryMnemonicWallet(context, walletModel, password) {
+									callback(true)
+									launchUI { loadingView.remove() }
+								}
 							} else {
 								recoveryMnemonicWallet(context, walletModel, callback)
 								launchUI {
+									loadingView.remove()
 									ErrorDisplayManager(error).show(context)
 								}
 							}
-							launchUI { loadingView.remove() }
 						}
 						
 					}
@@ -70,65 +72,44 @@ fun recoveryMnemonicWallet(context: Context, walletModel: WalletModel, callback:
 	}
 }
 
-private fun recoveryMnemonicWallet(walletModel: WalletModel) {
+private fun recoveryMnemonicWallet(
+	context: Context,
+	walletModel: WalletBackUpModel,
+	password: String,
+	callback: () -> Unit
+) {
 	val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(walletModel.encryptMnemonic!!)
-	val ethAddress = Bip44Address(
-		generateETHSeriesAddress(mnemonic, walletModel.ethPath).getAddress(),
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.ethPath),
-		ChainType.ETH.id
-	)
-	val etcAddress = Bip44Address(
-		generateETHSeriesAddress(mnemonic, walletModel.etcPath).getAddress(),
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.etcPath),
-		ChainType.ETC.id
-	)
-	val btcAddress = Bip44Address(
-		BTCWalletUtils.getBitcoinWalletAddressByMnemonic(mnemonic, walletModel.btcPath),
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.btcPath),
-		ChainType.BTC.id
-	)
-	val btcTestAddress = Bip44Address(
-		BTCWalletUtils.getBitcoinWalletAddressByMnemonic(mnemonic, walletModel.btcTestPath),
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.btcTestPath),
-		ChainType.AllTest.id
-	)
-	val ltcAddress = Bip44Address(
-		LTCWalletUtils.generateBase58Keypair(mnemonic, walletModel.ltcPath).address,
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.ltcPath),
-		ChainType.LTC.id
-	)
-	val bchAddress = Bip44Address(
-		BCHWalletUtils.generateBCHKeyPair(mnemonic, walletModel.bchPath).address,
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.bchPath),
-		ChainType.BCH.id
-	)
-	val eosAddress = Bip44Address(
-		EOSWalletUtils.generateKeyPair(mnemonic, walletModel.eosPath).address,
-		GenerateMultiChainWallet.getAddressIndexFromPath(walletModel.eosPath),
-		ChainType.EOS.id
-	)
-	insertWallet(walletModel, ChainAddresses(
-		ethAddress,
-		etcAddress,
-		btcAddress,
-		btcTestAddress,
-		ltcAddress,
-		bchAddress,
-		eosAddress
-	))
+	GenerateMultiChainWallet.import(
+		context, mnemonic, password, ChainPath(
+			ethPath = walletModel.ethPath,
+			etcPath = walletModel.etcPath,
+			btcPath = walletModel.btcPath,
+			testPath = walletModel.btcTestPath,
+			ltcPath = walletModel.ltcPath,
+			bchPath = walletModel.bchPath,
+			eosPath = walletModel.eosPath
+		), true
+	) {
+		insertWallet(walletModel, it)
+		CreateWalletPresenter.insertNewAccount(it, callback)
+	}
+	
+	
 }
 
-fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel, callback: (success: Boolean) -> Unit) {
+fun recoveryKeystoreWallet(
+	context: Context,
+	walletModel: WalletBackUpModel,
+	callback: (success: Boolean) -> Unit
+) {
 	launchUI {
 		Dashboard(context) {
-			showAlertView(
-				FingerprintPaymentText.usePassword,
-				WalletText.walletPasswordInputTip(walletModel.name),
+			showAlertView(FingerprintPaymentText.usePassword,
+				"please input the password of the ${walletModel.name}",
 				true,
 				cancelAction = {
 					callback(false)
-				}
-			) { passwordInput ->
+				}) { passwordInput ->
 				val password = passwordInput?.text?.toString()
 				if (password.isNullOrEmpty()) {
 					recoveryKeystoreWallet(context, walletModel, callback)
@@ -140,15 +121,18 @@ fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel, callback:
 					loadingView.show()
 					GlobalScope.launch(Dispatchers.Default) {
 						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
-							launchUI { loadingView.remove() }
 							if (privateKey.isNotNull() && error.isNone()) {
 								val multiChainAddresses = MultiChainUtils.getMultiChainAddressesByRootKey(privateKey)
 								insertWallet(walletModel, multiChainAddresses)
-								callback(true)
+								CreateWalletPresenter.insertNewAccount(multiChainAddresses) {
+									callback(true)
+									launchUI { loadingView.remove() }
+								}
 							} else {
 								recoveryKeystoreWallet(context, walletModel, callback)
 								launchUI {
 									ErrorDisplayManager(error).show(context)
+									loadingView.remove()
 								}
 							}
 						}
@@ -162,7 +146,10 @@ fun recoveryKeystoreWallet(context: Context, walletModel: WalletModel, callback:
 	
 }
 
-fun recoveryWatchOnlyWallet(walletModel: WalletModel, callback: () -> Unit) {
+fun recoveryWatchOnlyWallet(
+	walletModel: WalletBackUpModel,
+	callback: () -> Unit
+) {
 	WalletTable(
 		id = walletModel.id,
 		avatarID = walletModel.avatarID,
@@ -196,12 +183,26 @@ fun recoveryWatchOnlyWallet(walletModel: WalletModel, callback: () -> Unit) {
 		hasBackUpMnemonic = walletModel.hasBackUpMnemonic
 	).apply {
 		WalletTable.dao.insert(this)
-		callback()
+		CreateWalletPresenter.insertNewAccount(
+			ChainAddresses(
+				Bip44Address(walletModel.currentETHSeriesAddress, ChainType.ETH.id),
+				Bip44Address(walletModel.currentETCAddress, ChainType.ETC.id),
+				Bip44Address(walletModel.currentBTCAddress, ChainType.BTC.id),
+				Bip44Address(walletModel.currentBTCSeriesTestAddress, ChainType.AllTest.id),
+				Bip44Address(walletModel.currentLTCAddress, ChainType.LTC.id),
+				Bip44Address(walletModel.currentBCHAddress, ChainType.BCH.id),
+				Bip44Address(walletModel.currentEOSAddress, ChainType.EOS.id)
+			),
+			callback
+		)
 	}
 }
 
 
-private fun insertWallet(walletModel: WalletModel, chainAddresses: ChainAddresses) {
+private fun insertWallet(
+	walletModel: WalletBackUpModel,
+	chainAddresses: ChainAddresses
+) {
 	WalletTable(
 		id = walletModel.id,
 		avatarID = walletModel.avatarID,
@@ -233,7 +234,6 @@ private fun insertWallet(walletModel: WalletModel, chainAddresses: ChainAddresse
 		hint = walletModel.hint,
 		isWatchOnly = walletModel.isWatchOnly,
 		encryptMnemonic = walletModel.encryptMnemonic,
-		encryptFingerPrinterKey = walletModel.encryptFingerPrinterKey,
 		hasBackUpMnemonic = walletModel.hasBackUpMnemonic
 	).apply {
 		WalletTable.dao.insert(this)
