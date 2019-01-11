@@ -20,6 +20,34 @@ import org.jetbrains.anko.*
  * @description:
  */
 class WalletBackUpCell(context: Context) : BaseCell(context) {
+	val deleteButton = TextView(context).apply {
+		leftPadding = 10.uiPX()
+		rightPadding = 10.uiPX()
+		topPadding = 5.uiPX()
+		bottomPadding = 5.uiPX()
+		text = "delete"
+		gravity = Gravity.CENTER
+		addCorner(CornerSize.small.toInt(), Spectrum.red)
+		textColor = Spectrum.white
+	}
+	val recoverButton = TextView(context).apply {
+		leftPadding = 10.uiPX()
+		rightPadding = 10.uiPX()
+		topPadding = 5.uiPX()
+		bottomPadding = 5.uiPX()
+		text = "recover"
+		gravity = Gravity.CENTER
+		addCorner(CornerSize.small.toInt(), Spectrum.green)
+		textColor = Spectrum.white
+	}
+	
+	var model: WalletBackUpModel? by observing(null) {
+		model?.apply {
+			nameAndType.title.text = name
+			nameAndType.subtitle.text = getWalletType().getDisplayName()
+		}
+	}
+	
 	private val nameAndType = TwoLineTitles(context).apply {
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 		centerInVertical()
@@ -37,36 +65,8 @@ class WalletBackUpCell(context: Context) : BaseCell(context) {
 		}
 	}
 	
-	val deleteButton = TextView(context).apply {
-		leftPadding = 10.uiPX()
-		rightPadding = 10.uiPX()
-		topPadding = 5.uiPX()
-		bottomPadding = 5.uiPX()
-		text = "delete"
-		gravity = Gravity.CENTER
-		addCorner(5.uiPX(), Spectrum.red)
-		textColor = Spectrum.white
-	}
-	val recoverButton = TextView(context).apply {
-		leftPadding = 10.uiPX()
-		rightPadding = 10.uiPX()
-		topPadding = 5.uiPX()
-		bottomPadding = 5.uiPX()
-		text = "recover"
-		gravity = Gravity.CENTER
-		addCorner(5.uiPX(), Spectrum.green)
-		textColor = Spectrum.white
-	}
-	
-	var model: WalletBackUpModel? by observing(null) {
-		model?.apply {
-			nameAndType.title.text = name
-			nameAndType.subtitle.text = getWalletType().getDisplayName()
-		}
-	}
-	
 	init {
-		layoutParams = ViewGroup.MarginLayoutParams(matchParent, 100.uiPX())
+		layoutParams = ViewGroup.MarginLayoutParams(matchParent, 70.uiPX())
 		setMargins<MarginLayoutParams> {
 			leftMargin = 10.uiPX()
 			rightMargin = 10.uiPX()

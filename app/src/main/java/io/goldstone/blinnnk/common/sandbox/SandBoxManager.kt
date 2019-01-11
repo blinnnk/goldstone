@@ -227,9 +227,9 @@ object SandBoxManager {
 							}
 						},
 						recoverAction = { position ->
-							recoveryWalletFromType(context, pairList[position]) { walletID ->
-								pairList.removeAt(position)
+							recoveryWalletByType(context, pairList[position]) { walletID ->
 								launchUI {
+									pairList.removeAt(position)
 									getDialog {
 										getListAdapter()?.notifyDataSetChanged()
 									}
@@ -254,7 +254,7 @@ object SandBoxManager {
 		} else launchUI { callback(true, null) }
 	}
 	
-	private fun recoveryWalletFromType(
+	private fun recoveryWalletByType(
 		context: Context,
 		wallet: WalletBackUpModel,
 		@WorkerThread callback: (walletID: Int?) -> Unit
