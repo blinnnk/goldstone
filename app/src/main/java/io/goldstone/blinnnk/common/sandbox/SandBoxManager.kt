@@ -23,6 +23,7 @@ import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.Wa
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.QuotationSelectionTable
 import org.json.JSONArray
+import org.json.JSONException
 import java.io.*
 
 
@@ -121,6 +122,23 @@ object SandBoxManager {
 		
 	}
 	
+	fun recoveryWallet(context: Context, @WorkerThread callback: () -> Unit) {
+		recoveryWalletTables(context) { hasFinish, finalWalletID ->
+			launchDefault {
+				if (finalWalletID.isNotNull()) {
+					WalletTable.dao.getWalletByID(finalWalletID)?.apply {
+						WalletTable.dao.updateLastUsingWalletOff()
+						WalletTable.dao.update(this.apply { isUsing = true })
+					}
+				}
+				if (hasFinish) {
+					// 更新sandbox中的数据
+					updateWalletTables()
+					callback()
+				}
+			}
+		}
+	}
 	private fun recoveryLanguage() {
 		val language = getSandBoxContentByName(languageFileName)
 		if (language.isNotEmpty()) {
@@ -185,27 +203,22 @@ object SandBoxManager {
 		} else callback()
 	}
 	
-	private fun recoveryWallet(context: Context, @WorkerThread callback: () -> Unit) {
-		recoveryWalletTables(context) { hasFinish, finalWalletID ->
-			launchDefault {
-				if (finalWalletID.isNotNull()) {
-					WalletTable.dao.getWalletByID(finalWalletID)?.apply {
-						WalletTable.dao.updateLastUsingWalletOff()
-						WalletTable.dao.update(this.apply { isUsing = true })
-					}
-				}
-				if (hasFinish) {
-					// 更新sandbox中的数据
-					updateWalletTables()
-					callback()
+	private fun recoveryWalletTables(context: Context, @UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
+		val walletModelListString = getSandBoxContentByName(walletTableFileName)
+		val pairList = if (walletModelListString.isEmpty()) arrayListOf()
+		else try {
+			JSONArray(walletModelListString).toJSONObjectList().map { WalletBackUpModel(it) }.toArrayList()
+		} catch (error: JSONException) {
+			arrayListOf<WalletBackUpModel>()
+		}
+		if (pairList.isNotEmpty()) {
+			WalletTable.dao.getAllWallets().apply {
+				forEach { wallet ->
+					if (pairList.any { wallet.id == it.id }) pairList.removeAll(pairList.filter { it.id == wallet.id })
 				}
 			}
 		}
-	}
-	
-	private fun recoveryWalletTables(context: Context, @UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
-		val walletModelListString = getSandBoxContentByName(walletTableFileName)
-		val pairList = JSONArray(walletModelListString).toJSONObjectList().map { WalletBackUpModel(it) }.toArrayList()
+		SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
 		if (pairList.isNotEmpty()) {
 			launchUI {
 				Dashboard(context) {
@@ -218,6 +231,7 @@ object SandBoxManager {
 							val walletID = pairList[position].id
 							launchDefault { context.deleteKeystoreFileByWalletID(walletID) }
 							pairList.removeAt(position)
+							SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
 							getDialog {
 								getListAdapter()?.notifyDataSetChanged()
 							}
@@ -230,6 +244,7 @@ object SandBoxManager {
 							recoveryWalletByType(context, pairList[position]) { walletID ->
 								launchUI {
 									pairList.removeAt(position)
+									SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
 									getDialog {
 										getListAdapter()?.notifyDataSetChanged()
 									}

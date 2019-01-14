@@ -9,6 +9,7 @@ import io.goldstone.blinnnk.R
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
 import io.goldstone.blinnnk.common.language.*
 import io.goldstone.blinnnk.common.sandbox.SandBoxManager
+import io.goldstone.blinnnk.common.sandbox.SharedSandBoxValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
@@ -65,6 +66,9 @@ class SplashPresenter(val activity: SplashActivity) {
 				}
 			}
 			
+		} else if (SharedSandBoxValue.getRestOfWalletCount() > 0) {
+			// walletTable恢复了一半,程序被强行终止，接着恢复
+			SandBoxManager.recoveryWallet(activity) { hold(true) }
 		} else hold(false)
 		
 		

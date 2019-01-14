@@ -192,9 +192,9 @@ fun recoveryWatchOnlyWallet(
 				Bip44Address(walletModel.currentLTCAddress, ChainType.LTC.id),
 				Bip44Address(walletModel.currentBCHAddress, ChainType.BCH.id),
 				Bip44Address(walletModel.currentEOSAddress, ChainType.EOS.id)
-			),
-			callback
-		)
+			)
+		) { }
+		callback()
 	}
 }
 
