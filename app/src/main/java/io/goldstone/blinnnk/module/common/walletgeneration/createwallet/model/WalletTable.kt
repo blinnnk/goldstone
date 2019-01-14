@@ -624,6 +624,9 @@ interface WalletDao {
 	
 	@Query("SELECT * FROM wallet")
 	fun getAllWallets(): List<WalletTable>
+	
+	@Query("SELECT id FROM wallet")
+	fun getAllWalletIDs(): List<Int>
 
 	@Query("SELECT count(*) FROM wallet")
 	fun rowCount(): Int

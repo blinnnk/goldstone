@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blinnnk.GoldStoneApp
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
+import io.goldstone.blinnnk.common.language.CommonText
 import io.goldstone.blinnnk.common.sandbox.view.wallet.RecoverWalletAdapter
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
@@ -70,6 +71,9 @@ object SandBoxManager {
 		recoveryCurrency()
 		recoveryExchangeSelectedStatus()
 		recoveryQuotationSelections {
+			// 1. 恢复钱包之前需要执行完前几个函数，
+			// 2. 前三个函数没有请求网络，时间肯定早于第四个
+			// 3. 因为恢复 quotations 需要请求网络，所以在这里回调执行，来保证最后回调准确
 			recoveryWallet(context, callback)
 		}
 	}
@@ -124,7 +128,7 @@ object SandBoxManager {
 	}
 	
 	fun recoveryWallet(context: Context, @WorkerThread callback: () -> Unit) {
-		recoveryWalletTables(context) { hasFinish, finalWalletID ->
+		showRecoveryWalletDashboard(context) { hasFinish, finalWalletID ->
 			launchDefault {
 				if (finalWalletID.isNotNull()) {
 					WalletTable.dao.getWalletByID(finalWalletID)?.apply {
@@ -176,16 +180,16 @@ object SandBoxManager {
 
 	private fun recoveryQuotationSelections(callback: () -> Unit) {
 		val quotationListString = getSandBoxContentByName(quotationPairsFileName)
-		val pairList = try {
+		val models = try {
 			Gson().fromJson<List<String>>(quotationListString, object : TypeToken<List<String>>() {}.type).toJsonArray()
 		} catch (error: Exception) {
 			callback()
 			return
 		}
-		if (NetworkUtil.hasNetwork() && quotationListString.isNotEmpty() && pairList.size() > 0) {
-			GoldStoneAPI.getQuotationByPairs(pairList) { quotations, error ->
+		if (NetworkUtil.hasNetwork() && quotationListString.isNotEmpty() && models.size() > 0) {
+			GoldStoneAPI.getQuotationByPairs(models) { quotations, error ->
 				if (!quotations.isNullOrEmpty() && error.isNone()) {
-					GoldStoneAPI.getCurrencyLineChartData(pairList) { lineChart, lineChartError ->
+					GoldStoneAPI.getCurrencyLineChartData(models) { lineChart, lineChartError ->
 						if (!lineChart.isNullOrEmpty() && lineChartError.isNone()) {
 							lineChart.forEach { lineChartData ->
 								quotations.find {
@@ -204,55 +208,53 @@ object SandBoxManager {
 		} else callback()
 	}
 	
-	private fun recoveryWalletTables(context: Context, @UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
+	private fun showRecoveryWalletDashboard(context: Context, @UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
-		val pairList = if (walletModelListString.isEmpty()) arrayListOf()
+		val models = if (walletModelListString.isEmpty()) arrayListOf()
 		else try {
 			JSONArray(walletModelListString).toJSONObjectList().map { WalletBackUpModel(it) }.toArrayList()
 		} catch (error: JSONException) {
 			arrayListOf<WalletBackUpModel>()
 		}
-		if (pairList.isNotEmpty()) {
-			WalletTable.dao.getAllWallets().apply {
-				forEach { wallet ->
-					if (pairList.any { wallet.id == it.id }) pairList.removeAll(pairList.filter { it.id == wallet.id })
-				}
+		if (models.isNotEmpty()) {
+			WalletTable.dao.getAllWalletIDs().forEach { walletID ->
+				if (models.any { walletID == it.id }) models.find { it.id == walletID }?.let { models.remove(it) }
 			}
 		}
-		SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
-		if (pairList.isNotEmpty()) {
+		SharedSandBoxValue.updateRestOfWalletCount(models.size)
+		if (models.isNotEmpty()) {
 			launchUI {
 				Dashboard(context) {
 					cancelOnTouchOutside()
 					showList(
 						"Recovery Wallets",
 						RecoverWalletAdapter(
-							pairList,
+							models,
 						deleteAction = { position ->
-							val walletID = pairList[position].id
+							val walletID = models[position].id
 							launchDefault { context.deleteKeystoreFileByWalletID(walletID) }
-							pairList.removeAt(position)
-							SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
+							models.removeAt(position)
+							SharedSandBoxValue.updateRestOfWalletCount(models.size)
 							getDialog {
 								getListAdapter()?.notifyDataSetChanged()
-								context.toast("删除成功")
+								context.toast(CommonText.succeed)
 							}
-							if (pairList.isEmpty()) {
+							if (models.isEmpty()) {
 								dismiss()
 								callback(true, null)
 							}
 						},
 						recoverAction = { position ->
-							recoveryWalletByType(context, pairList[position]) { walletID ->
+							recoveryWalletByType(context, models[position]) { walletID ->
 								launchUI {
-									pairList.removeAt(position)
-									SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
+									models.removeAt(position)
+									SharedSandBoxValue.updateRestOfWalletCount(models.size)
 									getDialog {
 										getListAdapter()?.notifyDataSetChanged()
-										context.toast("恢复成功")
+										context.toast(CommonText.succeed)
 									}
-									if (pairList.isEmpty()) dismiss()
-									callback(pairList.isEmpty(), walletID)
+									if (models.isEmpty()) dismiss()
+									callback(models.isEmpty(), walletID)
 								}
 							}
 						}))
@@ -262,7 +264,7 @@ object SandBoxManager {
 						dismiss()
 						callback(true, null)
 						launchDefault {
-							pairList.forEach { wallet ->
+							models.forEach { wallet ->
 								context.deleteKeystoreFileByWalletID(wallet.id)
 							}
 						}
