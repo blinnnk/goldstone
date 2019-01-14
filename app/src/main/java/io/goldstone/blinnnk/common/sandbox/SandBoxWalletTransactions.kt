@@ -47,6 +47,7 @@ fun recoveryMnemonicWallet(
 					}
 				} else {
 					val loadingView = LoadingView(context)
+					loadingView.setCancelable(false)
 					loadingView.show()
 					launchDefault {
 						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
@@ -94,7 +95,6 @@ private fun recoveryMnemonicWallet(
 		CreateWalletPresenter.insertNewAccount(it, callback)
 	}
 	
-	
 }
 
 fun recoveryKeystoreWallet(
@@ -118,6 +118,7 @@ fun recoveryKeystoreWallet(
 					}
 				} else {
 					val loadingView = LoadingView(context)
+					loadingView.setCancelable(false)
 					loadingView.show()
 					GlobalScope.launch(Dispatchers.Default) {
 						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->

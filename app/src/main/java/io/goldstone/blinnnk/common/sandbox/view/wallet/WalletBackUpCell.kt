@@ -66,11 +66,8 @@ class WalletBackUpCell(context: Context) : BaseCell(context) {
 	}
 	
 	init {
-		layoutParams = ViewGroup.MarginLayoutParams(matchParent, 70.uiPX())
-		setMargins<MarginLayoutParams> {
-			leftMargin = 10.uiPX()
-			rightMargin = 10.uiPX()
-		}
+		setHorizontalPadding()
+		layoutParams = ViewGroup.LayoutParams(matchParent, 70.uiPX())
 		setGrayStyle()
 		hasArrow = false
 		addView(nameAndType)

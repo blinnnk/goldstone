@@ -22,6 +22,7 @@ import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.QuotationSelectionTable
+import org.jetbrains.anko.toast
 import org.json.JSONArray
 import org.json.JSONException
 import java.io.*
@@ -234,6 +235,7 @@ object SandBoxManager {
 							SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
 							getDialog {
 								getListAdapter()?.notifyDataSetChanged()
+								context.toast("删除成功")
 							}
 							if (pairList.isEmpty()) {
 								dismiss()
@@ -247,6 +249,7 @@ object SandBoxManager {
 									SharedSandBoxValue.updateRestOfWalletCount(pairList.size)
 									getDialog {
 										getListAdapter()?.notifyDataSetChanged()
+										context.toast("恢复成功")
 									}
 									if (pairList.isEmpty()) dismiss()
 									callback(pairList.isEmpty(), walletID)
