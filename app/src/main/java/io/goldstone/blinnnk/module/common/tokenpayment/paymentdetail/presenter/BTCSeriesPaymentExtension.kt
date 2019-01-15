@@ -62,16 +62,15 @@ fun PaymentDetailPresenter.generateBTCSeriesPaymentModel(
 ) {
 	val myAddress = getToken()?.contract.getAddress()
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
-	BTCSeriesJsonRPC.estimateSmartFee(
-		chainType.getChainURL(),
-		3
-	) { feePerByte, feeError ->
+	BTCSeriesJsonRPC.estimateSmartFee(chainType.getChainURL(), 3) { feePerByte, feeError ->
 		// API 错误的时候
-		if (feePerByte == null || feeError.hasError()) {
+		if (feePerByte.isNull() || feeError.hasError()) {
 			hold(null, feeError)
 			return@estimateSmartFee
 		}
-		if (feePerByte < 0) {
+
+		// 目前发现 `LTC TestNet` 的 Insight 始终是 -1 目前没办法处理暂时跳过判断
+		if (feePerByte < 0 && !chainType.isLTC()) {
 			hold(null, TransferError.GetWrongFeeFromChain)
 			return@estimateSmartFee
 		}
