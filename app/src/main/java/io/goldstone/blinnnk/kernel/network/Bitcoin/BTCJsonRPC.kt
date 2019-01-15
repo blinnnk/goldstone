@@ -1,6 +1,7 @@
 package io.goldstone.blinnnk.kernel.network.bitcoin
 
 import android.support.annotation.WorkerThread
+import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blinnnk.common.error.RequestError
 import io.goldstone.blinnnk.crypto.multichain.isBCH
@@ -41,7 +42,9 @@ object BTCSeriesJsonRPC {
 			!chainURL.chainType.isBCH(),
 			signedMessage
 		) { result, error ->
-			hold(JSONObject(result).safeGet("txid"), error)
+			if (result.isNotNull() && error.isNone()) {
+				hold(JSONObject(result).safeGet("txid"), error)
+			} else (hold(null, error))
 		}
 	}
 
