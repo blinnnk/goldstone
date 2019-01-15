@@ -9,6 +9,7 @@ import com.blinnnk.extension.orZero
 import com.blinnnk.util.load
 import com.blinnnk.util.then
 import io.goldstone.blinnnk.common.language.WalletText
+import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
 import io.goldstone.blinnnk.common.sharedpreference.SharedChain
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
@@ -496,15 +497,24 @@ data class WalletTable(
 		}
 
 		fun updateName(newName: String, callback: () -> Unit) {
-			load { dao.updateWalletName(newName) } then { callback() }
+			load {
+				dao.updateWalletName(newName)
+				SandBoxManager.updateWalletTables()
+			} then { callback() }
 		}
 
 		fun updateHint(newHint: String, callback: () -> Unit = {}) {
-			load { dao.updateHint(newHint) } then { callback() }
+			load {
+				dao.updateHint(newHint)
+				SandBoxManager.updateWalletTables()
+			} then { callback() }
 		}
 
 		fun updateHasBackupMnemonic(callback: () -> Unit) {
-			load { dao.updateHasBackUp() } then { callback() }
+			load {
+				dao.updateHasBackUp()
+				SandBoxManager.updateWalletTables()
+			} then { callback() }
 		}
 
 		fun initEOSAccountName(
@@ -551,6 +561,8 @@ data class WalletTable(
 				val willDeleteWallet = dao.findWhichIsUsing()
 				willDeleteWallet?.let {
 					dao.delete(it)
+					// 删除sandbox的存储
+					SandBoxManager.updateWalletTables()
 					callback(it)
 				}
 				dao.getAllWallets().let { wallets ->
@@ -606,9 +618,15 @@ interface WalletDao {
 
 	@Query("SELECT eosAccountNames FROM wallet")
 	fun getEOSAccountNames(): List<String>
-
+	
+	@Query("SELECT * FROM wallet where id = :id")
+	fun getWalletByID(id: Int): WalletTable?
+	
 	@Query("SELECT * FROM wallet")
 	fun getAllWallets(): List<WalletTable>
+	
+	@Query("SELECT id FROM wallet")
+	fun getAllWalletIDs(): List<Int>
 
 	@Query("SELECT count(*) FROM wallet")
 	fun rowCount(): Int

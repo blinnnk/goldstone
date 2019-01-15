@@ -47,6 +47,7 @@ object GenerateMultiChainWallet {
 		mnemonic: String,
 		password: String,
 		path: ChainPath,
+		isRecovery: Boolean = false,
 		@WorkerThread hold: (multiChainAddresses: ChainAddresses) -> Unit
 	) {
 		val addresses = ChainAddresses()
@@ -61,15 +62,17 @@ object GenerateMultiChainWallet {
 						DefaultPath.ethPath -> {
 							val ethAddress = generateETHSeriesAddress(mnemonic, path.ethPath).getAddress()
 							addresses.eth = Bip44Address(ethAddress, getAddressIndexFromPath(path.ethPath), ChainType.ETH.id)
-							// 助记词钱包生成一个定制盐用于校验用户本地权限
-							generateMnemonicVerifyKeyStore(
-								targetID,
-								mnemonic,
-								CryptoValue.verifyPasswordSalt,
-								password
-							) { address, error ->
-								if (address.isNotNull() && error.isNone()) completeMark()
-							}
+							if (!isRecovery) {
+								// 助记词钱包生成一个定制盐用于校验用户本地权限
+								generateMnemonicVerifyKeyStore(
+									targetID,
+									mnemonic,
+									CryptoValue.verifyPasswordSalt,
+									password
+								) { address, error ->
+									if (address.isNotNull() && error.isNone()) completeMark()
+								}
+							} else completeMark()
 						}
 						// Ethereum Classic
 						DefaultPath.etcPath -> {
@@ -132,7 +135,7 @@ object GenerateMultiChainWallet {
 		}.start()
 	}
 
-	private fun getAddressIndexFromPath(path: String): Int {
+	fun getAddressIndexFromPath(path: String): Int {
 		return if (path.isEmpty()) -1
 		else path.substringAfterLast("/").toInt()
 	}
