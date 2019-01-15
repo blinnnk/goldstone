@@ -36,6 +36,8 @@ class TokenDetailPresenter(
 	val token: WalletDetailCellModel,
 	val detailView: TokenDetailContract.GSView
 ) : TokenDetailContract.GSPresenter {
+	
+	var page = 1
 
 	override fun start() {
 		updateEmptyCharData()
@@ -67,7 +69,7 @@ class TokenDetailPresenter(
 			when {
 				isBTCSeries() -> loadBTCSeriesData(getChainType(), getMaxDataIndex(), true)
 				isETHSeries() -> when {
-					isETC() -> loadETCChainData(getMaxBlockNumber())
+					isETC() -> loadETCChainData()
 					isETH() -> loadETHChainData(getMaxBlockNumber())
 					isERC20Token() -> loadERCChainData(getMaxBlockNumber())
 				}
@@ -96,7 +98,7 @@ class TokenDetailPresenter(
 			launchDefault {
 				when {
 					isBTCSeries() -> getBTCSeriesData()
-					isETHSeries() -> getETHSeriesData()
+					isETHSeries() -> if (isETC()) loadETCChainData() else getETHSeriesData()
 					isEOSSeries() -> if (isRefresh) getCountInfoFromChain() else {
 						if (totalCount.isNull() && !NetworkUtil.hasNetwork()) getCountInfoFromLocal()
 						else if (

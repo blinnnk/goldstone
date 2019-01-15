@@ -217,21 +217,21 @@ data class TransactionTable(
 	)
 
 	constructor(data: ETCTransactionModel) : this(
-		data.blockNumber.hexToDecimal().toInt(),
-		data.timestamp.hexToDecimal().toString(),
+		data.blockNumber.toInt(),
+		data.timeStamp,
 		data.hash,
-		data.nonce.hexToDecimal().toString(),
+		data.nonce,
 		data.blockHash,
-		data.transactionIndex.hexToDecimal().toString(),
+		data.transactionIndex,
 		data.from,
 		data.to,
-		"${data.value.hexToDecimal()}",
+		data.value,
 		CryptoUtils.toCountByDecimal(
-			data.value.hexToDecimal(),
+			data.value.toBigInteger(),
 			CryptoValue.ethDecimal
 		),
-		data.gas.hexToDecimal().toString(),
-		data.gasPrice.hexToDecimal().toString(),
+		data.gas,
+		data.gasPrice,
 		"0",
 		"1",
 		data.input,
@@ -247,7 +247,7 @@ data class TransactionTable(
 		"",
 		chainID = SharedChain.getETCCurrent().chainID.id,
 		isFee = data.isFee,
-		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice, true)
+		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice, false)
 	)
 
 	companion object {
@@ -335,4 +335,10 @@ interface TransactionDao {
 
 	@Query("DELETE FROM transactionList WHERE recordOwnerAddress = :recordAddress")
 	fun deleteRecordAddressData(recordAddress: String)
+	
+	@Query("DELETE FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress")
+	fun deleteByChainIDAndRecordAddress(chainID: String, recordAddress: String)
+	
+	@Query("SELECT * FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress ORDER BY timeStamp DESC")
+	fun getByChainIDAndRecordAddress(chainID: String, recordAddress: String): List<TransactionTable>
 }

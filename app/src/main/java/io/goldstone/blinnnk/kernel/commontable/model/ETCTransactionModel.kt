@@ -20,8 +20,8 @@ data class ETCTransactionModel(
 	var to: String,
 	@SerializedName("blockHash")
 	var blockHash: String,
-	@SerializedName("timestamp")
-	var timestamp: String,
+	@SerializedName("timeStamp")
+	var timeStamp: String,
 	@SerializedName("gas")
 	var gas: String,
 	@SerializedName("gasPrice")

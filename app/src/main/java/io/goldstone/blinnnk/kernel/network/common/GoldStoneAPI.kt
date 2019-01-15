@@ -114,21 +114,19 @@ object GoldStoneAPI {
 
 	@JvmStatic
 	fun getETCTransactions(
-		chainID: ChainID,
+		page: Int,
 		address: String,
-		startBlock: Int,
 		@WorkerThread hold: (transactions: List<ETCTransactionModel>?, error: RequestError) -> Unit
 	) {
 		requestData(
 			APIPath.getETCTransactions(
-				APIPath.currentUrl,
-				chainID.id,
-				address,
-				startBlock
+				page,
+				10,
+				address
 			),
-			"list",
+			"result",
 			false,
-			isEncrypt = true,
+			isEncrypt = false,
 			hold = hold
 		)
 	}
