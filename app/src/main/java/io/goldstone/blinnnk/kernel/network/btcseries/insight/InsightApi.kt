@@ -2,6 +2,7 @@ package io.goldstone.blinnnk.kernel.network.btcseries.insight
 
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.safeGet
 import com.blinnnk.extension.toJSONObjectList
 import io.goldstone.blinnnk.common.error.RequestError
 import io.goldstone.blinnnk.crypto.multichain.Amount
@@ -10,6 +11,7 @@ import io.goldstone.blinnnk.crypto.multichain.ChainType
 import io.goldstone.blinnnk.crypto.multichain.isBCH
 import io.goldstone.blinnnk.crypto.utils.toSatoshi
 import io.goldstone.blinnnk.kernel.commontable.BTCSeriesTransactionTable
+import io.goldstone.blinnnk.kernel.network.ParameterUtil
 import io.goldstone.blinnnk.kernel.network.bitcoin.model.UnspentModel
 import io.goldstone.blinnnk.kernel.network.common.RequisitionUtil
 import org.json.JSONArray
@@ -21,6 +23,69 @@ import org.json.JSONObject
  */
 
 object InsightApi {
+	fun sendRAWTransaction(
+		chainType: ChainType,
+		isEncrypt: Boolean,
+		singedMessage: String,
+		hold: (hash: String?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.post(
+			ParameterUtil.prepare(isEncrypt, Pair("rawtx", singedMessage)),
+			InsightUrl.sendRAWTransaction(chainType),
+			isEncrypt,
+			hold
+		)
+	}
+
+	fun getBlockCount(
+		chainType: ChainType,
+		isEncrypt: Boolean,
+		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<String>(
+			InsightUrl.getBlockCount(chainType),
+			"",
+			true,
+			null,
+			isEncrypt
+		) { result, error ->
+			if (result.isNotNull() && error.isNone()) {
+				try {
+					hold(JSONObject(result.firstOrNull()).safeGet("blockChainHeight").toIntOrNull(), error)
+				} catch (error: Exception) {
+					hold(null, RequestError(error.message.orEmpty()))
+				}
+			} else {
+				hold(null, error)
+			}
+		}
+	}
+
+	fun getEstimateFee(
+		chainType: ChainType,
+		isEncrypt: Boolean,
+		blockCount: Int,
+		@WorkerThread hold: (fee: Double?, error: RequestError) -> Unit
+	) {
+		RequisitionUtil.requestData<String>(
+			InsightUrl.estimateFee(chainType, blockCount),
+			"",
+			true,
+			null,
+			isEncrypt
+		) { result, error ->
+			if (result.isNotNull() && error.isNone()) {
+				try {
+					hold(JSONObject(result.firstOrNull()).safeGet("$blockCount").toDoubleOrNull(), error)
+				} catch (error: Exception) {
+					hold(null, RequestError(error.message.orEmpty()))
+				}
+			} else {
+				hold(null, error)
+			}
+		}
+	}
+
 	fun getBalance(
 		chainType: ChainType,
 		isEncrypt: Boolean,
@@ -45,7 +110,7 @@ object InsightApi {
 		}
 	}
 
-	fun getUnspents(
+	fun getUnspent(
 		chainType: ChainType,
 		isEncrypt: Boolean,
 		address: String,
@@ -106,13 +171,11 @@ object InsightApi {
 		}
 	}
 
-	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
-	fun getTransactionByHash(
+	fun getTransactionJSONByHash(
 		chainID: ChainID,
 		isEncrypt: Boolean,
 		hash: String,
-		address: String,
-		@WorkerThread hold: (transaction: BTCSeriesTransactionTable?, error: RequestError) -> Unit
+		@WorkerThread hold: (json: String?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
 			InsightUrl.getTransactionByHash(chainID, hash),
@@ -121,7 +184,19 @@ object InsightApi {
 			null,
 			isEncrypt
 		) { result, error ->
-			val json = result?.firstOrNull()
+			hold(result?.firstOrNull(), error)
+		}
+	}
+
+	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
+	fun getTransactionByHash(
+		chainID: ChainID,
+		isEncrypt: Boolean,
+		hash: String,
+		address: String,
+		@WorkerThread hold: (transaction: BTCSeriesTransactionTable?, error: RequestError) -> Unit
+	) {
+		getTransactionJSONByHash(chainID, isEncrypt, hash) { json, error ->
 			if (json.isNotNull() && error.isNone()) {
 				val data = JSONObject(json)
 				hold(

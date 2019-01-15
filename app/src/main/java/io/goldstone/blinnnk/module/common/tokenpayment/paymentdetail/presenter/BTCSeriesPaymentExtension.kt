@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.isNull
 import com.blinnnk.extension.scaleTo
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blinnnk.common.error.GoldStoneError
@@ -61,25 +62,24 @@ fun PaymentDetailPresenter.generateBTCSeriesPaymentModel(
 ) {
 	val myAddress = getToken()?.contract.getAddress()
 	// 这个接口返回的是 `n` 个区块内的每千字节平均燃气费
-	BTCSeriesJsonRPC.estimatesmartFee(
+	BTCSeriesJsonRPC.estimateSmartFee(
 		chainType.getChainURL(),
-		3,
-		!chainType.isBCH()
+		3
 	) { feePerByte, feeError ->
 		// API 错误的时候
 		if (feePerByte == null || feeError.hasError()) {
 			hold(null, feeError)
-			return@estimatesmartFee
+			return@estimateSmartFee
 		}
 		if (feePerByte < 0) {
 			hold(null, TransferError.GetWrongFeeFromChain)
-			return@estimatesmartFee
+			return@estimateSmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		InsightApi.getUnspents(chainType, !chainType.isBCH(), myAddress) { unspents, error ->
-			if (unspents == null || error.hasError()) {
+		InsightApi.getUnspent(chainType, !chainType.isBCH(), myAddress) { unspent, error ->
+			if (unspent.isNull() || error.hasError()) {
 				hold(null, error)
-			} else if (unspents.isEmpty() || error.hasError()) {
+			} else if (unspent.isEmpty() || error.hasError()) {
 				// 如果余额不足或者出错这里会返回空的数组
 				hold(null, TransferError.BalanceIsNotEnough)
 			} else {
@@ -88,7 +88,7 @@ fun PaymentDetailPresenter.generateBTCSeriesPaymentModel(
 					1L,
 					fragment.address.orEmpty(),
 					changeAddress,
-					unspents,
+					unspent,
 					// 测算 `MessageSize` 的默认无效私钥
 					when {
 						SharedValue.isTestEnvironment() -> CryptoValue.signedSecret
