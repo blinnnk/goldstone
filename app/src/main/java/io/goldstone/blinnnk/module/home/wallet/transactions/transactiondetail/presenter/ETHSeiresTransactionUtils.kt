@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import io.goldstone.blinnnk.common.error.RequestError
 import io.goldstone.blinnnk.common.sharedpreference.SharedChain
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.crypto.multichain.node.ChainURL
 import io.goldstone.blinnnk.crypto.utils.CryptoUtils
@@ -29,7 +30,7 @@ object ETHSeriesTransactionUtils {
 		data: TransactionSealedModel,
 		callback: (symbol: String?, count: Double?, error: RequestError) -> Unit
 	) {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			val chainURL = SharedChain.getCurrentETH()
 			// 这种情况意味着没有燃气费的条目是 `ERC20` 的条目, 没有换算出 `Symbol` 和 `Decimal`
 			// 从而导致的 `Count` 为 `0` 的情况, 这里需要阻碍 `UI` 显示, 更新到这个数据后再允许显示下一步

@@ -11,6 +11,7 @@ import io.goldstone.blinnnk.common.base.basefragment.BasePresenter
 import io.goldstone.blinnnk.common.component.edittext.RoundInput
 import io.goldstone.blinnnk.common.error.AccountError
 import io.goldstone.blinnnk.common.language.CreateWalletText
+import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.UIUtils.generateDefaultName
@@ -102,6 +103,8 @@ class CreateWalletPresenter(
 						fragment.showMnemonicBackupFragment(arguments)
 					}
 				}
+				// 插入数据库后更新sandbox
+				SandBoxManager.updateWalletTables()
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			}
 		}

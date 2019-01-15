@@ -4,6 +4,7 @@ import android.support.annotation.WorkerThread
 import io.goldstone.blinnnk.common.base.baseoverlayfragment.BaseOverlayPresenter
 import io.goldstone.blinnnk.common.error.AccountError
 import io.goldstone.blinnnk.common.error.GoldStoneError
+import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
 import io.goldstone.blinnnk.crypto.multichain.ChainAddresses
 import io.goldstone.blinnnk.crypto.multichain.ChainPath
@@ -84,6 +85,8 @@ class WalletImportPresenter(
 				insertNewAccount(multiChainAddresses) {
 					callback(wallet.id, GoldStoneError.None)
 				}
+				// 插入数据库后更新sandbox
+				SandBoxManager.updateWalletTables()
 				// 注册钱包地址用于发送 `Push`
 				XinGePushReceiver.registerAddressesForPush(wallet)
 			} else callback(null, AccountError.ExistAddress)

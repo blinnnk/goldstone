@@ -6,13 +6,11 @@ import android.support.annotation.UiThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.isNull
 import com.blinnnk.extension.orZero
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.crypto.multichain.node.ChainURL
 import io.goldstone.blinnnk.kernel.network.bitcoin.BTCSeriesJsonRPC
 import io.goldstone.blinnnk.kernel.network.bitcoin.BTCSeriesJsonRPC.getBlockCount
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 /**
  * @date 2018/8/20 12:13 PM
@@ -29,7 +27,7 @@ abstract class BTCSeriesTransactionObserver {
 	private var blockNumber: Int? = null
 
 	open fun checkStatusByTransaction() {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			BTCSeriesJsonRPC.getConfirmations(chainURL, hash) { confirmationCount, error ->
 				if (error.hasError()) {
 					// 出错失败最大重试次数设定

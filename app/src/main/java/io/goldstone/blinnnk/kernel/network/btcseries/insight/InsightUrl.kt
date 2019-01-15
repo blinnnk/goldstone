@@ -11,8 +11,20 @@ import io.goldstone.blinnnk.crypto.multichain.*
 
 object InsightUrl {
 
+	val sendRAWTransaction: (chainType: ChainType) -> String = { type ->
+		"${getHeader(type)}/tx/send"
+	}
+
 	val getBalance: (chainType: ChainType, address: String) -> String = { type, address ->
 		"${getHeader(type)}/addr/$address/balance"
+	}
+
+	val getBlockCount: (chainType: ChainType) -> String = { type ->
+		"${getHeader(type)}/sync"
+	}
+
+	val estimateFee: (chainType: ChainType, blockCount: Int) -> String = { type, count ->
+		"${getHeader(type)}/utils/estimatefee?nbBlocks=$count"
 	}
 
 	val getUnspentInfo: (chainType: ChainType, address: String) -> String = { type, address ->

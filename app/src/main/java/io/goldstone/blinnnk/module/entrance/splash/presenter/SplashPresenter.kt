@@ -7,12 +7,13 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blinnnk.R
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
-import io.goldstone.blinnnk.common.language.ChainErrorText
-import io.goldstone.blinnnk.common.language.currentLanguage
+import io.goldstone.blinnnk.common.language.*
 import io.goldstone.blinnnk.common.sandbox.SandBoxManager
+import io.goldstone.blinnnk.common.sandbox.SharedSandBoxValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.common.value.CountryCode
@@ -30,24 +31,48 @@ import io.goldstone.blinnnk.module.entrance.splash.view.SplashActivity
 import io.goldstone.blinnnk.module.home.profile.chain.nodeselection.presenter.NodeSelectionPresenter
 import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.ExchangeTable
 import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagementlist.model.DefaultTokenTable
-import java.io.File
 
 /**
  * @date 30/03/2018 2:21 AM
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
-
+	
 	// 初始化sandbox的数据
 	@WorkerThread
-	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
-		if (WalletTable.dao.rowCount() == 0) {
-			SandBoxManager.recoveryData {
-				hold(true)
+	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
+		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxData()) {
+			launchUI {
+				Dashboard(activity) {
+					getDialog { setCancelable(false) }
+					showAlertView(
+						"Recovery Wallets",
+						"Do you want to recover wallets",
+						false,
+						cancelAction = {
+							launchDefault  {
+								SandBoxManager.cleanSandBox()
+								hold(false)
+							}
+						}
+					) {
+						launchDefault  {
+							initDefaultToken(activity)
+							SandBoxManager.recoveryData(activity) {
+								hold(true)
+							}
+						}
+					}
+				}
 			}
+			
+		} else if (SharedSandBoxValue.getRestOfWalletCount() > 0) {
+			// walletTable恢复了一半,程序被强行终止，接着恢复
+			SandBoxManager.recoveryWallet(activity) { hold(true) }
 		} else hold(false)
+		
+		
 	}
-
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
@@ -101,7 +126,6 @@ class SplashPresenter(val activity: SplashActivity) {
 	fun cleanWhenUpdateDatabaseOrElse(callback: () -> Unit) {
 		val walletCount = WalletTable.dao.rowCount()
 		if (walletCount == 0) {
-			cleanKeyStoreFile(activity.filesDir)
 			unregisterGoldStoneID(SharedWallet.getGoldStoneID())
 		} else {
 			val needUnregister =
@@ -138,18 +162,6 @@ class SplashPresenter(val activity: SplashActivity) {
 			// 没有网络的情况下标记 `Clean` 失败, 在数据库标记下次需要恢复清理的 `GoldStone ID`
 			SharedWallet.updateUnregisterGoldStoneID(targetGoldStoneID)
 		}
-	}
-
-	private fun cleanKeyStoreFile(dir: File): Boolean {
-		if (dir.isDirectory) {
-			val children = dir.list()
-			for (index in children.indices) {
-				val success = cleanKeyStoreFile(File(dir, children[index]))
-				if (!success) return false
-			}
-		}
-		// The directory is now empty so delete it
-		return dir.delete()
 	}
 
 	companion object {

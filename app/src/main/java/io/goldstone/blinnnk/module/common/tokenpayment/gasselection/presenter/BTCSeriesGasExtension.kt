@@ -52,13 +52,13 @@ fun GasSelectionPresenter.transferBTCSeries(
 	with(btcSeriesModel) {
 		val feeUsed = fee.getUsedAmount()
 		// `BCH` 的 `Insight Api` 不需要加密
-		InsightApi.getUnspents(chainType, !chainType.isBCH(), fromAddress) { unspents, error ->
-			if (unspents.isNotNull() && error.isNone()) BTCSeriesTransactionUtils.generateSignedRawTransaction(
+		InsightApi.getUnspent(chainType, !chainType.isBCH(), fromAddress) { unspent, error ->
+			if (unspent.isNotNull() && error.isNone()) BTCSeriesTransactionUtils.generateSignedRawTransaction(
 				value,
 				feeUsed,
 				toAddress,
 				changeAddress,
-				unspents,
+				unspent,
 				privateKey,
 				when {
 					SharedValue.isTestEnvironment() -> TestNet3Params.get()

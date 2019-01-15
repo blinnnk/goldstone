@@ -55,6 +55,10 @@ class LoadingView(private val context: Context) {
 	fun remove() {
 		dialog.dismiss()
 	}
+	
+	fun setCancelable(cancelable: Boolean) {
+		dialog.setCancelable(cancelable)
+	}
 
 	companion object {
 		fun addLoadingCircle(
