@@ -36,6 +36,14 @@ fun TokenDetailPresenter.loadETCChainData() {
 	}
 }
 
+fun TokenDetailPresenter.loadTestNetETCChainData(blockNumber: Int) {
+	loadTestNetDataFromChain(blockNumber) {
+		if (it.isNone()) getETHSeriesData()
+		else detailView.showLoading(false)
+	}
+}
+
+
 @WorkerThread
 private fun loadDataFromChain(page: Int, callback: (data: List<TransactionTable>?, error: RequestError) -> Unit) {
 	GoldStoneAPI.getETCTransactions(
@@ -66,5 +74,34 @@ private fun loadDataFromChain(page: Int, callback: (data: List<TransactionTable>
 		} else {
 			callback(null, error)
 		}
+	}
+}
+
+
+@WorkerThread
+private fun loadTestNetDataFromChain(blockNumber: Int, callback: (error: RequestError) -> Unit) {
+	GoldStoneAPI.getTestNetETCTransactions(
+		SharedChain.getETCCurrent().chainID,
+		SharedAddress.getCurrentETC(),
+		blockNumber
+	) { newData, error ->
+		if (!newData.isNullOrEmpty() && error.isNone()) {
+			val transactionDao = TransactionTable.dao
+			// 插入普通账单
+			transactionDao.insertAll(newData.map { TransactionTable(SharedChain.getETCCurrent().chainID.id, it) })
+			// 插入燃气费的账单
+			transactionDao.insertAll(
+				newData.asSequence().map {
+					TransactionTable(SharedChain.getETCCurrent().chainID.id, it)
+				}.filterNot {
+					it.isReceive
+				}.map {
+					it.apply { isFee = true }
+				}.toList()
+			)
+			callback(error)
+		} else if (newData?.isEmpty() == true) {
+			callback(RequestError.EmptyResut)
+		} else callback(error)
 	}
 }

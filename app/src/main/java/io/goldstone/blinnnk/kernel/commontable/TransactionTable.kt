@@ -249,6 +249,41 @@ data class TransactionTable(
 		isFee = data.isFee,
 		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice, false)
 	)
+	
+	// 适用于测试网，因为解析方式不同
+	constructor(chainID: String, data: ETCTransactionModel) : this(
+		data.blockNumber.hexToDecimal().toInt(),
+		data.timeStamp,
+		data.hash,
+		data.nonce.hexToDecimal().toString(),
+		data.blockHash,
+		data.transactionIndex.hexToDecimal().toString(),
+		data.from,
+		data.to,
+		"${data.value.hexToDecimal()}",
+		CryptoUtils.toCountByDecimal(
+			data.value.hexToDecimal(),
+			CryptoValue.ethDecimal
+		),
+		data.gas.hexToDecimal().toString(),
+		data.gasPrice.hexToDecimal().toString(),
+		"0",
+		"1",
+		data.input,
+		TokenContract.etcContract,
+		"",
+		"0",
+		"",
+		!data.from.equals(SharedAddress.getCurrentETC(), true),
+		false,
+		CoinSymbol.etc,
+		SharedAddress.getCurrentETC(),
+		false,
+		"",
+		chainID = chainID,
+		isFee = data.isFee,
+		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice, true)
+	)
 
 	companion object {
 		@JvmField

@@ -81,6 +81,15 @@ object APIPath {
 	) -> String = { header, condition, chainIDs ->
 		"$header/index/searchToken?symbolOrContract=$condition&chainids=$chainIDs"
 	}
+	val getTestNetETCTransactions: (
+		header: String,
+		chainID: String,
+		address: String,
+		startBlock: Int
+	) -> String = { header, chainID, address, startBlock ->
+		"$header/tx/pageList?chainid=$chainID&address=$address&start_block=$startBlock"
+	}
+	
 	val getETCTransactions: (
 		page: Int,
 		offset: Int,

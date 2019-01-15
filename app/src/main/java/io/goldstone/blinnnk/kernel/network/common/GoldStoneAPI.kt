@@ -111,7 +111,32 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
-
+	@JvmStatic
+	fun getTestNetETCTransactions(
+		chainID: ChainID,
+		address: String,
+		startBlock: Int,
+		@WorkerThread hold: (transactions: List<ETCTransactionModel>?, error: RequestError) -> Unit
+	) {
+		requestData<Any>(
+			APIPath.getTestNetETCTransactions(
+				APIPath.currentUrl,
+				chainID.id,
+				address,
+				startBlock
+			),
+			"list",
+			false,
+			isEncrypt = true
+		) { data, error ->
+			if (!data.isNullOrEmpty() && error.isNone()) {
+				hold(data.map { ETCTransactionModel(JSONObject(it.toString())) }, error)
+			} else {
+				hold(null, error)
+			}
+		}
+	}
+	
 	@JvmStatic
 	fun getETCTransactions(
 		page: Int,
