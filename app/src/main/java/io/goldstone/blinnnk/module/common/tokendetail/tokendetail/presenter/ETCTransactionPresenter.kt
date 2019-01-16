@@ -1,11 +1,9 @@
 package io.goldstone.blinnnk.module.common.tokendetail.tokendetail.presenter
 
 import android.support.annotation.WorkerThread
-import com.blinnnk.extension.toArrayList
 import io.goldstone.blinnnk.common.error.RequestError
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
 import io.goldstone.blinnnk.common.sharedpreference.SharedChain
-import io.goldstone.blinnnk.crypto.multichain.getAddress
 import io.goldstone.blinnnk.kernel.commontable.TransactionTable
 import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
 import io.goldstone.blinnnk.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
@@ -16,17 +14,21 @@ import io.goldstone.blinnnk.module.home.wallet.transactions.transactionlist.ethe
  */
 
 fun TokenDetailPresenter.loadETCChainData() {
-	loadDataFromChain { data, error ->
-		if (!data.isNullOrEmpty()) {
-			flipPage(data) { }
+	loadDataFromChain { newData, error ->
+		val data = if (!newData.isNullOrEmpty()) newData
+		else if (page == 1)  TransactionTable.dao.getByChainIDAndRecordAddress(SharedChain.getETCCurrent().chainID.id, SharedAddress.getCurrentETC())
+		else null
+		data?.let {
+			flipPage(it) { }
 			if (page == 1) {
-				data.map {
-					TransactionListModel(it)
-				}.generateBalanceList(token.contract) {
-					it.updateHeaderData(false)
+				it.map { table ->
+					TransactionListModel(table)
+				}.generateBalanceList(token.contract) { list ->
+					list.updateHeaderData(false)
 				}
 			}
 		}
+		page += 1
 		if (!error.isNone()) {
 			detailView.showError(error)
 		}
@@ -42,10 +44,9 @@ fun TokenDetailPresenter.loadTestNetETCChainData(blockNumber: Int) {
 	}
 }
 
-
 @WorkerThread
 private fun TokenDetailPresenter.loadDataFromChain(callback: (data: List<TransactionTable>?, error: RequestError) -> Unit) {
-	GoldStoneAPI.getETCTransactions(
+	GoldStoneAPI.getMainNetETCTransactions(
 		page,
 		SharedAddress.getCurrentETC()
 	) { newData, error ->
@@ -54,24 +55,21 @@ private fun TokenDetailPresenter.loadDataFromChain(callback: (data: List<Transac
 			var tableList = newData.map { TransactionTable(it) }
 			// 计算燃气费的账单
 			val feeList = tableList.map {
-				TransactionTable(it).apply { chainID = it.chainID }
+				TransactionTable(it).apply {
+					chainID = it.chainID
+					it.isFee = true
+				}
 			}.filterNot {
 				it.isReceive
-			}.map {
-				it.apply { isFee = true }
 			}.asSequence().toList()
 			tableList += feeList
+			// 如果是第一页的数据，则插入数据库
 			if (page == 1) {
 				transactionDao.deleteByChainIDAndRecordAddress(SharedChain.getETCCurrent().chainID.id, SharedAddress.getCurrentETC())
 				transactionDao.insertAll(tableList)
 			}
 			callback(tableList.sortedByDescending { it.timeStamp }, error)
-			page++
-		} else if (page == 1) {
-			TransactionTable.dao.getByChainIDAndRecordAddress(SharedChain.getETCCurrent().chainID.id, SharedAddress.getCurrentETC()).let {
-				callback(it, error)
-			}
-		} else {
+		}  else if (error.hasError()) {
 			callback(null, error)
 		}
 	}
@@ -80,7 +78,7 @@ private fun TokenDetailPresenter.loadDataFromChain(callback: (data: List<Transac
 
 @WorkerThread
 private fun loadTestNetDataFromChain(blockNumber: Int, callback: (error: RequestError) -> Unit) {
-	GoldStoneAPI.getTestNetETCTransactions(
+	GoldStoneAPI.getETCTransactions(
 		SharedChain.getETCCurrent().chainID,
 		SharedAddress.getCurrentETC(),
 		blockNumber
@@ -88,11 +86,11 @@ private fun loadTestNetDataFromChain(blockNumber: Int, callback: (error: Request
 		if (!newData.isNullOrEmpty() && error.isNone()) {
 			val transactionDao = TransactionTable.dao
 			// 插入普通账单
-			transactionDao.insertAll(newData.map { TransactionTable(SharedChain.getETCCurrent().chainID.id, it) })
+			transactionDao.insertAll(newData.map { TransactionTable(it) })
 			// 插入燃气费的账单
 			transactionDao.insertAll(
 				newData.asSequence().map {
-					TransactionTable(SharedChain.getETCCurrent().chainID.id, it)
+					TransactionTable(it)
 				}.filterNot {
 					it.isReceive
 				}.map {

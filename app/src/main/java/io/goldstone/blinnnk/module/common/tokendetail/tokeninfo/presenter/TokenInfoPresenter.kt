@@ -196,9 +196,9 @@ class TokenInfoPresenter(
 
 			else -> GlobalScope.launch(Dispatchers.Default) {
 				val transactions =
-					TransactionTable.dao.getTransactionsByAddress(
-						address,
-						SharedChain.getCurrentETH().chainID.id
+					TransactionTable.dao.getByChainIDAndRecordAddress(
+						SharedChain.getCurrentETH().chainID.id,
+						address
 					)
 				if (transactions.isEmpty()) {
 					// 本地没有数据的话从链上获取 `Count`
