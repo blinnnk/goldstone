@@ -16,7 +16,7 @@ import io.goldstone.blinnnk.module.home.wallet.transactions.transactionlist.ethe
  */
 
 fun TokenDetailPresenter.loadETCChainData() {
-	loadDataFromChain(page) { data, error ->
+	loadDataFromChain { data, error ->
 		if (!data.isNullOrEmpty()) {
 			flipPage(data) { }
 			if (page == 1) {
@@ -26,7 +26,6 @@ fun TokenDetailPresenter.loadETCChainData() {
 					it.updateHeaderData(false)
 				}
 			}
-			if (data.size >= 10) page++
 		}
 		if (!error.isNone()) {
 			detailView.showError(error)
@@ -45,7 +44,7 @@ fun TokenDetailPresenter.loadTestNetETCChainData(blockNumber: Int) {
 
 
 @WorkerThread
-private fun loadDataFromChain(page: Int, callback: (data: List<TransactionTable>?, error: RequestError) -> Unit) {
+private fun TokenDetailPresenter.loadDataFromChain(callback: (data: List<TransactionTable>?, error: RequestError) -> Unit) {
 	GoldStoneAPI.getETCTransactions(
 		page,
 		SharedAddress.getCurrentETC()
@@ -67,6 +66,7 @@ private fun loadDataFromChain(page: Int, callback: (data: List<TransactionTable>
 				transactionDao.insertAll(tableList)
 			}
 			callback(tableList.sortedByDescending { it.timeStamp }, error)
+			page++
 		} else if (page == 1) {
 			TransactionTable.dao.getByChainIDAndRecordAddress(SharedChain.getETCCurrent().chainID.id, SharedAddress.getCurrentETC()).let {
 				callback(it, error)

@@ -99,7 +99,7 @@ class TokenDetailPresenter(
 			launchDefault {
 				when {
 					isBTCSeries() -> getBTCSeriesData()
-					isETHSeries() -> if (!SharedValue.isTestEnvironment() || isETC()) loadETCChainData() else getETHSeriesData()
+					isETHSeries() -> if (!SharedValue.isTestEnvironment() && isETC()) loadETCChainData() else getETHSeriesData()
 					isEOSSeries() -> if (isRefresh) getCountInfoFromChain() else {
 						if (totalCount.isNull() && !NetworkUtil.hasNetwork()) getCountInfoFromLocal()
 						else if (
