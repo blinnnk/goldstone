@@ -22,13 +22,13 @@ object BTCSeriesTransactionUtils {
 		toAddress: String,
 		changeAddress: String,
 		unspentModel: List<UnspentModel>,
-		base58Privatekey: String,
+		base58PrivateKey: String,
 		network: NetworkParameters,
 		isBCH: Boolean
 	): BTCSignedModel {
 		// 传入主网参数
 		val transaction = Transaction(network)
-		val privateKey = DumpedPrivateKey.fromBase58(network, base58Privatekey)
+		val privateKey = DumpedPrivateKey.fromBase58(network, base58PrivateKey)
 		val ecKey = privateKey.key
 		var money = 0L
 		val utxos = arrayListOf<UTXO>()
@@ -38,7 +38,7 @@ object BTCSeriesTransactionUtils {
 			// 当消费列表某几个 `item` 的值加起来大于实际转账金额+手续费,
 			// 就跳出循环, 这个时候就得到了合符条件的 `utxos` 数组
 			if (money >= (sendValue + fee)) return@forEach
-			// 遍历 `unspents`, 组装合适的 `item`
+			// 遍历 `unspent`, 组装合适的 `item`
 			val utxo = UTXO(
 				Sha256Hash.wrap(it.txid),
 				it.outputNumber,
