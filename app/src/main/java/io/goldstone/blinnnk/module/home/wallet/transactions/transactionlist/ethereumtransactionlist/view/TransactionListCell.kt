@@ -62,7 +62,7 @@ open class TransactionListCell(context: Context) : BaseValueCell(context) {
 			count?.apply {
 				title.text =
 					(if (it.isReceived) "+" else "-") +
-					if (it.isFee) it.minerFee.substringBefore(" ") else it.count.formatCount()
+					if (it.isFee) it.minerFee.substringBefore(" ").toDouble().formatCount() else it.count.formatCount()
 				subtitle.text = if (it.isFee) {
 					it.contract.getSymbol().symbol
 				} else it.symbol

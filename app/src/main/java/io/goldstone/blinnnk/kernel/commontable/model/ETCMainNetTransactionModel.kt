@@ -6,8 +6,9 @@ import java.io.Serializable
 /**
  * @date 2018/6/25 6:34 PM
  * @author KaySaith
+ * 这个model适用于测试网，因为测试网的 'timeStamp'  s 是大写
  */
-data class ETCTransactionModel(
+data class ETCMainNetTransactionModel(
 	@SerializedName("hash")
 	var hash: String,
 	@SerializedName("nonce")
@@ -20,7 +21,7 @@ data class ETCTransactionModel(
 	var to: String,
 	@SerializedName("blockHash")
 	var blockHash: String,
-	@SerializedName("timestamp")
+	@SerializedName("timeStamp")
 	var timeStamp: String,
 	@SerializedName("gas")
 	var gas: String,

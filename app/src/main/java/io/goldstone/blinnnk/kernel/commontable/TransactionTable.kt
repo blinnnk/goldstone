@@ -17,6 +17,7 @@ import io.goldstone.blinnnk.crypto.multichain.TokenContract
 import io.goldstone.blinnnk.crypto.utils.CryptoUtils
 import io.goldstone.blinnnk.crypto.utils.hexToDecimal
 import io.goldstone.blinnnk.crypto.utils.toDecimalFromHex
+import io.goldstone.blinnnk.kernel.commontable.model.ETCMainNetTransactionModel
 import io.goldstone.blinnnk.kernel.commontable.model.ETCTransactionModel
 import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
 import io.goldstone.blinnnk.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.ERC20TransactionModel
@@ -216,9 +217,44 @@ data class TransactionTable(
 		minerFee = CryptoUtils.toGasUsedEther(data.safeGet("gas"), data.safeGet("gasPrice"), true)
 	)
 
+	constructor(data: ETCMainNetTransactionModel) : this(
+		data.blockNumber.toInt(),
+		data.timeStamp,
+		data.hash,
+		data.nonce,
+		data.blockHash,
+		data.transactionIndex,
+		data.from,
+		data.to,
+		data.value,
+		CryptoUtils.toCountByDecimal(
+			data.value.toBigInteger(),
+			CryptoValue.ethDecimal
+		),
+		data.gas,
+		data.gasPrice,
+		"0",
+		"1",
+		data.input,
+		TokenContract.etcContract,
+		"",
+		"0",
+		"",
+		!data.from.equals(SharedAddress.getCurrentETC(), true),
+		false,
+		CoinSymbol.etc,
+		SharedAddress.getCurrentETC(),
+		false,
+		"",
+		chainID = SharedChain.getETCCurrent().chainID.id,
+		isFee = data.isFee,
+		minerFee = CryptoUtils.toGasUsedEther(data.gas, data.gasPrice, false)
+	)
+	
+	// 适用于测试网，因为解析方式不同
 	constructor(data: ETCTransactionModel) : this(
 		data.blockNumber.hexToDecimal().toInt(),
-		data.timestamp.hexToDecimal().toString(),
+		data.timeStamp.hexToDecimal().toString(),
 		data.hash,
 		data.nonce.hexToDecimal().toString(),
 		data.blockHash,
@@ -288,9 +324,6 @@ interface TransactionDao {
 	@Query("UPDATE transactionList SET memo =:memo WHERE hash = :txHash AND isFee = :isFee")
 	fun updateFeeMemo(txHash: String, memo: String, isFee: Boolean = true)
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND chainID = :chainID ORDER BY timeStamp DESC")
-	fun getTransactionsByAddress(walletAddress: String, chainID: String): List<TransactionTable>
-
 	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress = :address AND chainID = :chainID")
 	fun getMyMaxBlockNumber(address: String, chainID: String): Int?
 
@@ -303,13 +336,13 @@ interface TransactionDao {
 	@Query("SELECT * FROM transactionList WHERE hash = :taxHash AND isReceive = :isReceive AND isFee = :isFee")
 	fun getByTaxHashAndReceivedStatus(taxHash: String, isReceive: Boolean, isFee: Boolean): TransactionTable?
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND isFee = :isFee ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND contractAddress = :contract AND chainID = :chainID AND isFee = :isFee ORDER BY timeStamp DESC")
 	fun getByAddressAndContract(walletAddress: String, contract: String, chainID: String, isFee: Boolean = false): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND contractAddress LIKE :contract AND chainID LIKE :chainID AND blockNumber <= :blockNumber ORDER BY timeStamp DESC")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND contractAddress = :contract AND chainID = :chainID AND blockNumber <= :blockNumber ORDER BY timeStamp DESC")
 	fun getDataWithFee(walletAddress: String, contract: String, chainID: String, blockNumber: Int): List<TransactionTable>
 
-	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND chainID = :chainID AND (contractAddress LIKE :contract OR isFee = 1) AND blockNumber <= :endBlock ORDER BY timeStamp DESC LIMIT :pageCount")
+	@Query("SELECT * FROM transactionList WHERE recordOwnerAddress = :walletAddress AND chainID = :chainID AND (contractAddress = :contract OR isFee = 1) AND blockNumber <= :endBlock ORDER BY timeStamp DESC LIMIT :pageCount")
 	fun getETHAndAllFee(walletAddress: String, contract: String, endBlock: Int, chainID: String, pageCount: Int = DataValue.pageCount): List<TransactionTable>
 
 	@Query("SELECT MAX(blockNumber) FROM transactionList WHERE recordOwnerAddress = :address AND (contractAddress = :contract OR isFee = 1) AND chainID = :chainID")
@@ -335,4 +368,10 @@ interface TransactionDao {
 
 	@Query("DELETE FROM transactionList WHERE recordOwnerAddress = :recordAddress")
 	fun deleteRecordAddressData(recordAddress: String)
+	
+	@Query("DELETE FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress AND isPending = 0")
+	fun deleteByChainIDAndRecordAddress(chainID: String, recordAddress: String)
+	
+	@Query("SELECT * FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress ORDER BY timeStamp DESC")
+	fun getByChainIDAndRecordAddress(chainID: String, recordAddress: String): List<TransactionTable>
 }

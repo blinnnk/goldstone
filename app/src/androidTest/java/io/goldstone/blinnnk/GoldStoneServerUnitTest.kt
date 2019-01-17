@@ -98,14 +98,5 @@ class GoldStoneServerUnitTest {
 		}
 	}
 
-	@Test
-	fun getETCTransactions() {
-		GoldStoneAPI.getETCTransactions(
-			ChainID.ETCTest,
-			"0x2D6FAE3553F082B0419c483309450CaF6bC4573E",
-			0
-		) { transaction, _ ->
-			LogUtil.logDebug("getETCTransactions", "$transaction")
-		}
-	}
+	
 }
