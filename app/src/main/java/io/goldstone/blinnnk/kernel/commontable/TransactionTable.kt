@@ -369,7 +369,7 @@ interface TransactionDao {
 	@Query("DELETE FROM transactionList WHERE recordOwnerAddress = :recordAddress")
 	fun deleteRecordAddressData(recordAddress: String)
 	
-	@Query("DELETE FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress")
+	@Query("DELETE FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress AND isPending = 0")
 	fun deleteByChainIDAndRecordAddress(chainID: String, recordAddress: String)
 	
 	@Query("SELECT * FROM transactionList WHERE chainID = :chainID AND recordOwnerAddress = :recordAddress ORDER BY timeStamp DESC")
