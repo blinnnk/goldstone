@@ -17,8 +17,7 @@ import io.goldstone.blinnnk.crypto.multichain.TokenContract
 import io.goldstone.blinnnk.crypto.multichain.TokenIcon
 import io.goldstone.blinnnk.crypto.multichain.generateObject
 import io.goldstone.blinnnk.crypto.multichain.node.ChainNodeTable
-import io.goldstone.blinnnk.kernel.commontable.model.ETCTransactionModel
-import io.goldstone.blinnnk.kernel.commontable.model.ServerConfigModel
+import io.goldstone.blinnnk.kernel.commontable.model.*
 import io.goldstone.blinnnk.kernel.network.ParameterUtil
 import io.goldstone.blinnnk.kernel.network.common.RequisitionUtil.requestData
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.model.DAPPTable
@@ -111,7 +110,6 @@ object GoldStoneAPI {
 			hold = hold
 		)
 	}
-
 	@JvmStatic
 	fun getETCTransactions(
 		chainID: ChainID,
@@ -120,7 +118,7 @@ object GoldStoneAPI {
 		@WorkerThread hold: (transactions: List<ETCTransactionModel>?, error: RequestError) -> Unit
 	) {
 		requestData(
-			APIPath.getETCTransactions(
+			APIPath.getTestNetETCTransactions(
 				APIPath.currentUrl,
 				chainID.id,
 				address,
@@ -129,6 +127,25 @@ object GoldStoneAPI {
 			"list",
 			false,
 			isEncrypt = true,
+			hold = hold
+		)
+	}
+	
+	@JvmStatic
+	fun getMainNetETCTransactions(
+		page: Int,
+		address: String,
+		@WorkerThread hold: (transactions: List<ETCMainNetTransactionModel>?, error: RequestError) -> Unit
+	) {
+		requestData(
+			APIPath.getETCTransactions(
+				page,
+				DataValue.pageCount,
+				address
+			),
+			"result",
+			false,
+			isEncrypt = false,
 			hold = hold
 		)
 	}

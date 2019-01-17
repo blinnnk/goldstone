@@ -54,6 +54,7 @@ object GenerateMultiChainWallet {
 		val targetID = SharedWallet.getMaxWalletID() + 1
 		object : ConcurrentAsyncCombine() {
 			val paths = DefaultPath.allPaths()
+			override val completeInUIThread: Boolean = false
 			override var asyncCount: Int = paths.size
 			override fun doChildTask(index: Int) {
 				context.apply {

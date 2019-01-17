@@ -82,13 +82,21 @@ object APIPath {
 	) -> String = { header, condition, chainIDs ->
 		"$header/index/searchToken?symbolOrContract=$condition&chainids=$chainIDs"
 	}
-	val getETCTransactions: (
+	val getTestNetETCTransactions: (
 		header: String,
 		chainID: String,
 		address: String,
 		startBlock: Int
 	) -> String = { header, chainID, address, startBlock ->
 		"$header/tx/pageList?chainid=$chainID&address=$address&start_block=$startBlock"
+	}
+	
+	val getETCTransactions: (
+		page: Int,
+		offset: Int,
+		address: String
+	) -> String = { page, offset, address ->
+		"https://blockscout.com/etc/mainnet/api?module=account&action=txlist&address=$address&page=$page&offset=$offset&sort=desc"
 	}
 
 	val getQuotationCurrencyCandleChart: (
