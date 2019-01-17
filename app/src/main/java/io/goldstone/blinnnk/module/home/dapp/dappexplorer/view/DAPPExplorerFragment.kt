@@ -53,13 +53,13 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 			}
 			it.enterKeyEvent = Runnable {
 				getMainActivity()?.apply {
-					SoftKeyboard.hide(this)
 					showDappBrowserFragment(
 						formattedURL(it.getSearchContent()),
 						PreviousView.DAPPExplorer,
 						"FFFFFF",
 						parentFragment
 					)
+					SoftKeyboard.hide(this)
 				}
 			}
 		}
