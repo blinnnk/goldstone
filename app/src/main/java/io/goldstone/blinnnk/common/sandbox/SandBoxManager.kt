@@ -40,16 +40,32 @@ object SandBoxManager {
 	private const val marketListFileName = "marketList"
 	private const val quotationPairsFileName = "quotationPairs"
 	private const val walletTableFileName = "walletTable"
-	private const val quotationRankGlobalName = "quotationRankGlobal"
+	private const val quotationRankGlobalName = "quotationRankGlobal" // 不用恢复的内容
 	
 	// 是否有需要恢复的数据
 	@WorkerThread
-	fun hasSandBoxData(): Boolean {
+	fun hasExtraSandBoxData(): Boolean {
 		val directoryFiles = getDirectory().listFiles()
 		return if (directoryFiles.isEmpty()) {
 			false
 		} else {
-			!directoryFiles.none { it.name != quotationRankGlobalName && it.length() > 0 }
+			!directoryFiles.none {
+				it.name != quotationRankGlobalName
+					&& it.name != walletTableFileName
+					&& it.length() > 0
+			}
+		}
+	}
+	
+	@WorkerThread
+	fun hasWalletData(): Boolean {
+		val directoryFiles = getDirectory().listFiles()
+		return if (directoryFiles.isEmpty()) {
+			false
+		} else {
+			directoryFiles.any {
+				it.name == walletTableFileName && it.length() > 0
+			}
 		}
 	}
 	
@@ -66,16 +82,11 @@ object SandBoxManager {
 	}
 	
 	@WorkerThread
-	fun recoveryData(context: Context, callback: () -> Unit) {
+	fun recoveryExtraData(callback: () -> Unit) {
 		recoveryLanguage()
 		recoveryCurrency()
 		recoveryExchangeSelectedStatus()
-		recoveryQuotationSelections {
-			// 1. 恢复钱包之前需要执行完前几个函数，
-			// 2. 前三个函数没有请求网络，时间肯定早于第四个
-			// 3. 因为恢复 quotations 需要请求网络，所以在这里回调执行，来保证最后回调准确
-			recoveryWallet(context, callback)
-		}
+		recoveryQuotationSelections(callback)
 	}
 	
 	fun getLanguage(): Int? {

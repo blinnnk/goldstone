@@ -41,7 +41,20 @@ class SplashPresenter(val activity: SplashActivity) {
 	// 初始化sandbox的数据
 	@WorkerThread
 	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
-		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxData()) {
+		if (WalletTable.dao.rowCount() == 0) {
+			if (SandBoxManager.hasExtraSandBoxData()) {
+				SandBoxManager.recoveryExtraData{
+					showRecoverWalletDashboard { hold(true) }
+				}
+			} else showRecoverWalletDashboard(hold)
+		} else if (SharedSandBoxValue.getRestOfWalletCount() > 0) {
+			// walletTable恢复了一半,程序被强行终止，接着恢复
+			SandBoxManager.recoveryWallet(activity) { hold(true) }
+		} else hold(false)
+	}
+	
+	private fun showRecoverWalletDashboard(hold: (hasChanged: Boolean) -> Unit) {
+		if (SandBoxManager.hasWalletData()) {
 			launchUI {
 				Dashboard(activity) {
 					getDialog { setCancelable(false) }
@@ -58,21 +71,16 @@ class SplashPresenter(val activity: SplashActivity) {
 					) {
 						launchDefault  {
 							initDefaultToken(activity)
-							SandBoxManager.recoveryData(activity) {
+							SandBoxManager.recoveryWallet(activity) {
 								hold(true)
 							}
 						}
 					}
 				}
 			}
-			
-		} else if (SharedSandBoxValue.getRestOfWalletCount() > 0) {
-			// walletTable恢复了一半,程序被强行终止，接着恢复
-			SandBoxManager.recoveryWallet(activity) { hold(true) }
 		} else hold(false)
-		
-		
 	}
+	
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
