@@ -138,10 +138,12 @@ fun TokenDetailPresenter.getBTCSeriesData() {
 				)
 			when {
 				transactions.isNotEmpty() -> {
-					transactions.map {
-						TransactionListModel(it)
-					}.generateBalanceList(token.contract) {
-						it.updateHeaderData(false)
+					if (detailView.asyncData?.isEmpty() == true) {
+						transactions.map {
+							TransactionListModel(it)
+						}.generateBalanceList(token.contract) {
+							it.updateHeaderData(false)
+						}
 					}
 					flipPage(transactions) {
 						detailView.showBottomLoading(false)
