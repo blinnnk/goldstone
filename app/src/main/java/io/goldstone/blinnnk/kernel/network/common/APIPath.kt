@@ -1,5 +1,6 @@
 package io.goldstone.blinnnk.kernel.network.common
 
+import android.net.Uri
 import io.goldstone.blinnnk.common.value.WebUrl
 
 /**
@@ -124,7 +125,7 @@ object APIPath {
 	}
 
 	val searchDAPP: (header: String, condition: String) -> String = { header, condition ->
-		"$header/dapp/searchDapp?dapp=$condition"
+		"$header/dapp/searchDapp?dapp=${Uri.encode(condition)}"
 	}
 	
 	val coinGlobalData: (header: String) -> String = {

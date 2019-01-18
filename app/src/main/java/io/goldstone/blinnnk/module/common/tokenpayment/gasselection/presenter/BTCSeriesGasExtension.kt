@@ -49,6 +49,13 @@ fun GasSelectionPresenter.transferBTCSeries(
 	fee: GasFee,
 	@WorkerThread callback: (receiptModel: ReceiptModel?, error: GoldStoneError) -> Unit
 ) {
+	if (btcSeriesModel.estimateFeePerByte > fee.gasPrice) {
+		callback(
+			null,
+			GoldStoneError("The current Estimate Fee Per Byte is ${btcSeriesModel.estimateFeePerByte}. The value you selected is too low. Please adjust the Gas Price in the custom gas fee.")
+		)
+		return
+	}
 	with(btcSeriesModel) {
 		val feeUsed = fee.getUsedAmount()
 		// `BCH` 的 `Insight Api` 不需要加密
