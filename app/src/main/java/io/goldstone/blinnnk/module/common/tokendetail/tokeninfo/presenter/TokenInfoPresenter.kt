@@ -237,7 +237,6 @@ class TokenInfoPresenter(
 	private fun getBTCSeriesTransactionCount(@WorkerThread hold: (count: Int?, error: RequestError) -> Unit) {
 		InsightApi.getTransactionCount(
 			token.contract.getChainType(),
-			!token.contract.isBCH(),
 			token.contract.getAddress(),
 			hold
 		)

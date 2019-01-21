@@ -175,7 +175,6 @@ data class MyTokenTable(
 
 				contract.isBTCSeries() -> InsightApi.getBalance(
 					contract.getChainType(),
-					!contract.isBCH(), // 目前 BCH 的自有加密节点暂时不能使用, 这里用的第三方非加密
 					contract.getAddress()
 				) { balance, error ->
 					hold(balance?.toBTC(), error)

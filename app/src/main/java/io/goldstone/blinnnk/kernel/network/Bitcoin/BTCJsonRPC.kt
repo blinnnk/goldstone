@@ -4,7 +4,6 @@ import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.extension.safeGet
 import io.goldstone.blinnnk.common.error.RequestError
-import io.goldstone.blinnnk.crypto.multichain.isBCH
 import io.goldstone.blinnnk.crypto.multichain.node.ChainURL
 import io.goldstone.blinnnk.kernel.network.btcseries.insight.InsightApi
 import org.json.JSONObject
@@ -26,7 +25,6 @@ object BTCSeriesJsonRPC {
 	) {
 		InsightApi.getEstimateFee(
 			chainURL.chainType,
-			!chainURL.chainType.isBCH(),
 			blocks,
 			hold
 		)
@@ -39,7 +37,6 @@ object BTCSeriesJsonRPC {
 	) {
 		InsightApi.sendRAWTransaction(
 			chainURL.chainType,
-			!chainURL.chainType.isBCH(),
 			signedMessage
 		) { result, error ->
 			if (result.isNotNull() && error.isNone()) {
@@ -55,7 +52,6 @@ object BTCSeriesJsonRPC {
 	) {
 		InsightApi.getTransactionJSONByHash(
 			chainURL.chainID,
-			!chainURL.chainType.isBCH(),
 			txID
 		) { json, error ->
 			try {
@@ -72,7 +68,6 @@ object BTCSeriesJsonRPC {
 	) {
 		InsightApi.getBlockCount(
 			chainURL.chainType,
-			!chainURL.chainType.isBCH(),
 			hold
 		)
 	}
