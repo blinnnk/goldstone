@@ -42,43 +42,47 @@ class SplashPresenter(val activity: SplashActivity) {
 	@WorkerThread
 	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
 		if (WalletTable.dao.rowCount() == 0) {
-			if (SandBoxManager.hasExtraSandBoxData()) {
-				SandBoxManager.recoveryExtraData{
-					showRecoverWalletDashboard { hold(true) }
+			fun showRecoverDashboardOrElse() {
+				if (SandBoxManager.hasWalletData()) showRecoveryWalletConfirmationDialog(hold)
+				 else hold(false)
+			}
+			if (SandBoxManager.hasExtraData()) {
+				SandBoxManager.recoveryExtraData {
+					showRecoverDashboardOrElse()
 				}
-			} else showRecoverWalletDashboard(hold)
-		} else if (SharedSandBoxValue.getRestOfWalletCount() > 0) {
+			} else showRecoverDashboardOrElse()
+		} else if (SharedSandBoxValue.getUnRecoveredWalletCount() > 0) {
 			// walletTable恢复了一半,程序被强行终止，接着恢复
-			SandBoxManager.recoveryWallet(activity) { hold(true) }
+			SandBoxManager.recoveryWallet(activity) {
+				hold(true)
+			}
 		} else hold(false)
 	}
 	
-	private fun showRecoverWalletDashboard(hold: (hasChanged: Boolean) -> Unit) {
-		if (SandBoxManager.hasWalletData()) {
-			launchUI {
-				Dashboard(activity) {
-					getDialog { setCancelable(false) }
-					showAlertView(
-						"Recovery Wallets",
-						"Do you want to recover wallets",
-						false,
-						cancelAction = {
-							launchDefault  {
-								SandBoxManager.cleanSandBox()
-								hold(false)
-							}
-						}
-					) {
+	private fun showRecoveryWalletConfirmationDialog(hold: (hasChanged: Boolean) -> Unit) {
+		launchUI {
+			Dashboard(activity) {
+				getDialog { setCancelable(false) }
+				showAlertView(
+					"Recovery Wallets",
+					"Do you want to recover wallets",
+					false,
+					cancelAction = {
 						launchDefault  {
-							initDefaultToken(activity)
-							SandBoxManager.recoveryWallet(activity) {
-								hold(true)
-							}
+							SandBoxManager.cleanSandBox()
+							hold(false)
+						}
+					}
+				) {
+					launchDefault  {
+						initDefaultToken(activity)
+						SandBoxManager.recoveryWallet(activity) {
+							hold(true)
 						}
 					}
 				}
 			}
-		} else hold(false)
+		}
 	}
 	
 	@WorkerThread

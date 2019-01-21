@@ -44,7 +44,7 @@ object SandBoxManager {
 	
 	// 是否有需要恢复的数据
 	@WorkerThread
-	fun hasExtraSandBoxData(): Boolean {
+	fun hasExtraData(): Boolean {
 		val directoryFiles = getDirectory().listFiles()
 		return if (directoryFiles.isEmpty()) {
 			false
@@ -232,7 +232,7 @@ object SandBoxManager {
 				if (models.any { walletID == it.id }) models.find { it.id == walletID }?.let { models.remove(it) }
 			}
 		}
-		SharedSandBoxValue.updateRestOfWalletCount(models.size)
+		SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
 		if (models.isNotEmpty()) {
 			launchUI {
 				Dashboard(context) {
@@ -245,7 +245,7 @@ object SandBoxManager {
 							val walletID = models[position].id
 							launchDefault { context.deleteKeystoreFileByWalletID(walletID) }
 							models.removeAt(position)
-							SharedSandBoxValue.updateRestOfWalletCount(models.size)
+							SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
 							getDialog {
 								getListAdapter()?.notifyDataSetChanged()
 								context.toast(CommonText.succeed)
@@ -259,7 +259,7 @@ object SandBoxManager {
 							recoveryWalletByType(context, models[position]) { walletID ->
 								launchUI {
 									models.removeAt(position)
-									SharedSandBoxValue.updateRestOfWalletCount(models.size)
+									SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
 									getDialog {
 										getListAdapter()?.notifyDataSetChanged()
 										context.toast(CommonText.succeed)
