@@ -10,11 +10,11 @@ import io.goldstone.blinnnk.GoldStoneApp
  * @description:
  */
 object SharedSandBoxValue {
-	fun getRestOfWalletCount(): Int {
+	fun getUnRecoveredWalletCount(): Int {
 		return GoldStoneApp.appContext.getIntFromSharedPreferences("rest_wallet_count")
 	}
 	
-	fun updateRestOfWalletCount(count: Int) {
+	fun updateUnRecoveredWalletCount(count: Int) {
 		GoldStoneApp.appContext.saveDataToSharedPreferences("rest_wallet_count", count)
 	}
 	
