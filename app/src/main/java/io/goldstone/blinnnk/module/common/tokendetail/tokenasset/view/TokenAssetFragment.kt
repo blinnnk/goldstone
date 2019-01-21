@@ -263,7 +263,7 @@ class TokenAssetFragment : GSFragment(), TokenAssetContract.GSView {
 			click {
 				val type = SharedWallet.getCurrentWalletType()
 				when {
-					type.isEOSMainnet() || type.isEOSJungle() ->
+					type.isEOSMainnet() || type.isEOSJungle() || type.isEOSKylin() ->
 						safeShowError(Throwable(WalletText.watchOnly))
 					else -> showPublicKeyAccountNames()
 				}

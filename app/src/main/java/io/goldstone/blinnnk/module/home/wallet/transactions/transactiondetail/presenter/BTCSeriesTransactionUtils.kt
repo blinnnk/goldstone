@@ -31,7 +31,7 @@ object BTCSeriesTransactionUtils {
 			dao.getDataByHash(hash, isReceive, false)
 		if (transaction.isNotNull() && transaction.blockNumber > 0 && checkLocal)
 			hold(TransactionSealedModel(transaction), RequestError.None)
-		else InsightApi.getTransactionByHash(chainID, !chainID.isBCH(), hash, address) { data, error ->
+		else InsightApi.getTransactionByHash(chainID, hash, address) { data, error ->
 			if (data.isNotNull() && error.isNone()) {
 				dao.insert(data)
 				hold(TransactionSealedModel(data), error)

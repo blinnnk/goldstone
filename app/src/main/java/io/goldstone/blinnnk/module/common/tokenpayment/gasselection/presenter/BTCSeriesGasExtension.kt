@@ -32,7 +32,7 @@ fun GasSelectionPresenter.checkBTCSeriesBalance(
 	contract: TokenContract,
 	@WorkerThread callback: (GoldStoneError) -> Unit
 ) {
-	InsightApi.getBalance(contract.getChainType(), !contract.isBCH(), contract.getAddress()) { balance, error ->
+	InsightApi.getBalance(contract.getChainType(), contract.getAddress()) { balance, error ->
 		if (balance.isNotNull() && error.isNone()) {
 			val isEnough =
 				BigInteger.valueOf(balance.value) > gasView.getTransferCount().orElse(BigInteger.ZERO) + BigInteger.valueOf(currentFee.getUsedAmount())
@@ -59,7 +59,7 @@ fun GasSelectionPresenter.transferBTCSeries(
 	with(btcSeriesModel) {
 		val feeUsed = fee.getUsedAmount()
 		// `BCH` 的 `Insight Api` 不需要加密
-		InsightApi.getUnspent(chainType, !chainType.isBCH(), fromAddress) { unspent, error ->
+		InsightApi.getUnspent(chainType, fromAddress) { unspent, error ->
 			if (unspent.isNotNull() && error.isNone()) BTCSeriesTransactionUtils.generateSignedRawTransaction(
 				value,
 				feeUsed,
