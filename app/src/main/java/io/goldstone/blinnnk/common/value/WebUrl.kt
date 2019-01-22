@@ -55,15 +55,4 @@ object WebUrl {
 	// BTC
 	const val btcMain = "https://insight.bitpay.com/api"
 	const val btcTest = "https://test-insight.bitpay.com/api"
-
-	/** GoldStone Insight API*/
-	// LTC
-	const val ltcGoldStone = "https://btc-node-mainnet.goldstone.io/ltc-insight"
-	const val ltcTestGoldStone = "https://btc-node-testnet.goldstone.io/ltc-insight"
-	// BTC
-	const val btcGoldStone = "https://btc-node-mainnet.goldstone.io/btc-insight"
-	const val btcTestGoldStone = "https://btc-node-testnet.goldstone.io/btc-insight"
-	// BCH
-	const val bchGoldStone = "https://btc-node-mainnet.goldstone.io/bch-insight"
-	const val bchTestGoldStone = "https://btc-node-testnet.goldstone.io/bch-insight"
 }

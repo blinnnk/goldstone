@@ -75,7 +75,7 @@ fun PaymentDetailPresenter.generateBTCSeriesPaymentModel(
 			return@estimateSmartFee
 		}
 		// 签名测速总的签名后的信息的 `Size`
-		InsightApi.getUnspent(chainType, !chainType.isBCH(), myAddress) { unspent, error ->
+		InsightApi.getUnspent(chainType, myAddress) { unspent, error ->
 			if (unspent.isNull() || error.hasError()) {
 				hold(null, error)
 			} else if (unspent.isEmpty() || error.hasError()) {

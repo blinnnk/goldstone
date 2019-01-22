@@ -40,7 +40,7 @@ object InsightUrl {
 	}
 
 	private var ltcHeader: () -> String = {
-		if (SharedValue.isTestEnvironment()) WebUrl.ltcTestGoldStone else WebUrl.ltcGoldStone
+		if (SharedValue.isTestEnvironment()) WebUrl.ltcTest else WebUrl.ltcMain
 	}
 
 	private var bchHeader: () -> String = {
@@ -48,7 +48,7 @@ object InsightUrl {
 	}
 
 	private var btcHeader: () -> String = {
-		if (SharedValue.isTestEnvironment()) WebUrl.btcTestGoldStone else WebUrl.btcGoldStone
+		if (SharedValue.isTestEnvironment()) WebUrl.btcTest else WebUrl.btcMain
 	}
 
 	@Throws
@@ -66,10 +66,10 @@ object InsightUrl {
 		return when {
 			chaiID.isBCHMain() -> WebUrl.bchMain
 			chaiID.isBCHTest() -> WebUrl.bchTest
-			chaiID.isBTCMain() -> WebUrl.btcGoldStone
-			chaiID.isBTCTest() -> WebUrl.btcTestGoldStone
-			chaiID.isLTCMain() -> WebUrl.ltcGoldStone
-			chaiID.isLTCTest() -> WebUrl.ltcTestGoldStone
+			chaiID.isBTCMain() -> WebUrl.btcMain
+			chaiID.isBTCTest() -> WebUrl.btcTest
+			chaiID.isLTCMain() -> WebUrl.ltcMain
+			chaiID.isLTCTest() -> WebUrl.ltcTest
 			else -> throw Throwable("Wrong Insight API Header")
 		}
 	}

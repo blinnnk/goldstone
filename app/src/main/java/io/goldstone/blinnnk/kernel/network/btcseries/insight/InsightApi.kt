@@ -25,21 +25,19 @@ import org.json.JSONObject
 object InsightApi {
 	fun sendRAWTransaction(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		singedMessage: String,
 		hold: (hash: String?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.post(
-			ParameterUtil.prepare(isEncrypt, Pair("rawtx", singedMessage)),
+			ParameterUtil.prepare(false, Pair("rawtx", singedMessage)),
 			InsightUrl.sendRAWTransaction(chainType),
-			isEncrypt,
+			false,
 			hold
 		)
 	}
 
 	fun getBlockCount(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		@WorkerThread hold: (count: Int?, error: RequestError) -> Unit
 	) {
 		RequisitionUtil.requestData<String>(
@@ -47,7 +45,7 @@ object InsightApi {
 			"",
 			true,
 			null,
-			isEncrypt
+			false
 		) { result, error ->
 			if (result.isNotNull() && error.isNone()) {
 				try {
@@ -63,7 +61,6 @@ object InsightApi {
 
 	fun getEstimateFee(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		blockCount: Int,
 		@WorkerThread hold: (fee: Double?, error: RequestError) -> Unit
 	) {
@@ -72,7 +69,7 @@ object InsightApi {
 			"",
 			true,
 			null,
-			isEncrypt
+			false
 		) { result, error ->
 			if (result.isNotNull() && error.isNone()) {
 				try {
@@ -88,7 +85,6 @@ object InsightApi {
 
 	fun getBalance(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		address: String,
 		@WorkerThread hold: (balance: Amount<Long>?, error: RequestError) -> Unit
 	) {
@@ -97,7 +93,7 @@ object InsightApi {
 			"",
 			true,
 			null,
-			isEncrypt
+			false
 		) { result, error ->
 			// Insight BCH 的 getBalance 接口返回的是 Double 信息, BTC
 			// 和 LTC 返回的是 Satoshi
@@ -112,7 +108,6 @@ object InsightApi {
 
 	fun getUnspent(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		address: String,
 		@WorkerThread hold: (unspentList: List<UnspentModel>?, error: RequestError) -> Unit
 	) {
@@ -121,14 +116,13 @@ object InsightApi {
 			"",
 			false,
 			null,
-			isEncrypt,
+			false,
 			hold = hold
 		)
 	}
 
 	fun getTransactions(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		address: String,
 		from: Int,
 		to: Int,
@@ -139,7 +133,7 @@ object InsightApi {
 			"items",
 			true,
 			null,
-			isEncrypt
+			false
 		) { result, error ->
 			if (result.isNotNull() && error.isNone()) {
 				val jsonArray = JSONArray(result.firstOrNull())
@@ -152,7 +146,6 @@ object InsightApi {
 
 	fun getTransactionCount(
 		chainType: ChainType,
-		isEncrypt: Boolean,
 		address: String,
 		hold: (count: Int?, error: RequestError) -> Unit
 	) {
@@ -161,7 +154,7 @@ object InsightApi {
 			"totalItems",
 			true,
 			null,
-			isEncrypt
+			false
 		) { result, error ->
 			try {
 				hold(result?.firstOrNull()?.toIntOrNull(), error)
@@ -173,7 +166,6 @@ object InsightApi {
 
 	fun getTransactionJSONByHash(
 		chainID: ChainID,
-		isEncrypt: Boolean,
 		hash: String,
 		@WorkerThread hold: (json: String?, error: RequestError) -> Unit
 	) {
@@ -182,7 +174,7 @@ object InsightApi {
 			"",
 			true,
 			null,
-			isEncrypt
+			false
 		) { result, error ->
 			hold(result?.firstOrNull(), error)
 		}
@@ -191,12 +183,11 @@ object InsightApi {
 	// 因为通知中心是混合主网测试网的查账所以, 相关接口设计为需要传入网络头的参数头
 	fun getTransactionByHash(
 		chainID: ChainID,
-		isEncrypt: Boolean,
 		hash: String,
 		address: String,
 		@WorkerThread hold: (transaction: BTCSeriesTransactionTable?, error: RequestError) -> Unit
 	) {
-		getTransactionJSONByHash(chainID, isEncrypt, hash) { json, error ->
+		getTransactionJSONByHash(chainID, hash) { json, error ->
 			if (json.isNotNull() && error.isNone()) {
 				val data = JSONObject(json)
 				hold(

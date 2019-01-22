@@ -13,16 +13,20 @@ import com.blinnnk.extension.orEmptyArray
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blinnnk.common.component.overlay.GoldStoneDialog
+import io.goldstone.blinnnk.common.error.AccountError
 import io.goldstone.blinnnk.common.language.CommonText
 import io.goldstone.blinnnk.common.language.TransactionText
 import io.goldstone.blinnnk.common.language.WalletSettingsText
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
+import io.goldstone.blinnnk.common.utils.alert
 import io.goldstone.blinnnk.common.utils.click
 import io.goldstone.blinnnk.common.utils.getMainActivity
 import io.goldstone.blinnnk.common.utils.safeShowError
 import io.goldstone.blinnnk.common.value.ArgumentKey
 import io.goldstone.blinnnk.common.value.ContainerID
 import io.goldstone.blinnnk.common.value.FragmentTag
+import io.goldstone.blinnnk.crypto.eos.EOSWalletType
+import io.goldstone.blinnnk.crypto.multichain.isEOSSeries
 import io.goldstone.blinnnk.kernel.receiver.XinGePushReceiver
 import io.goldstone.blinnnk.module.common.passcode.view.PasscodeFragment
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetailoverlay.presenter.TokenDetailOverlayPresenter
@@ -102,9 +106,13 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		val dialog = MaterialDialog(context!!)
 		dialog.title(text = TransactionText.tokenSelection)
 			.customListAdapter(TokenSelectionAdapter(tokens) {
-				if (isAddress)
-					TokenSelectionRecyclerView.showTransferAddressFragment(context, it)
-				else TokenSelectionRecyclerView.showDepositFragment(context, it)
+				if (isAddress) {
+					if (it.contract.isEOSSeries() && it.eosWalletType != EOSWalletType.Available) {
+						showError(AccountError.InactivatedAccountName)
+					} else {
+						TokenSelectionRecyclerView.showTransferAddressFragment(context, it)
+					}
+				} else TokenSelectionRecyclerView.showDepositFragment(context, it)
 				dialog.dismiss()
 			})
 			.negativeButton(text = CommonText.gotIt)
