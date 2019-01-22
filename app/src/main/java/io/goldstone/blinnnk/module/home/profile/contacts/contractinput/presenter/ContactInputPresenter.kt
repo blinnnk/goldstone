@@ -12,6 +12,7 @@ import com.blinnnk.util.*
 import io.goldstone.blinnnk.common.base.basefragment.BasePresenter
 import io.goldstone.blinnnk.common.component.button.RoundButton
 import io.goldstone.blinnnk.common.language.ContactText
+import io.goldstone.blinnnk.common.sharedpreference.SharedChain
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.utils.alert
 import io.goldstone.blinnnk.common.value.ArgumentKey
@@ -94,12 +95,12 @@ class ContactInputPresenter(
 							eosInput.setText(it.address)
 							eosAccountNameText = it.address
 						} else {
-							if (addressType == AddressType.EOSKylin) {
+							if (addressType == AddressType.EOSKylin || SharedChain.getEOSCurrent().chainID.isEOSKylin()) {
 								eosKylinInput.setText(it.address)
-
+								eosKylinAccountNameText = it.address
 							} else {
 								eosJungleInput.setText(it.address)
-								eosKylinAccountNameText = it.address
+								eosJungleAccountNameText = it.address
 							}
 						}
 					}

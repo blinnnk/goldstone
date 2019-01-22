@@ -71,6 +71,7 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 				showTokenManagementFragment()
 			}
 		}
+		getMainActivity()?.backEvent = null
 	}
 
 	override fun onHiddenChanged(hidden: Boolean) {
@@ -156,7 +157,6 @@ class WalletDetailFragment : GSRecyclerFragment<WalletDetailCellModel>(), Wallet
 		presenter.start()
 		// 检查是否需要显示 `PIN Code` 界面
 		if (SharedValue.getPincodeDisplayStatus()) PasscodeFragment.show(this)
-		getMainActivity()?.backEvent = null // 恢复回退站
 	}
 
 	override fun showMnemonicBackUpFragment() {
