@@ -12,13 +12,12 @@ import com.blinnnk.uikit.RippleMode
 import com.blinnnk.uikit.uiPX
 import com.blinnnk.util.getParentFragment
 import com.google.zxing.integration.android.IntentIntegrator
+import io.goldstone.blinnnk.common.base.baseoverlayfragment.removeSelf
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blinnnk.common.language.CommonText
 import io.goldstone.blinnnk.common.language.TokenDetailText
-import io.goldstone.blinnnk.common.utils.GoldStoneFont
-import io.goldstone.blinnnk.common.utils.click
-import io.goldstone.blinnnk.common.utils.safeShowError
+import io.goldstone.blinnnk.common.utils.*
 import io.goldstone.blinnnk.common.value.*
 import io.goldstone.blinnnk.crypto.multichain.QRCode
 import io.goldstone.blinnnk.module.common.tokendetail.tokendetailoverlay.view.TokenDetailOverlayFragment
@@ -165,6 +164,14 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 		val intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
 		intentResult?.let {
 			presenter.showPaymentDetailByQRCode(QRCode(it.contents))
+		}
+	}
+	
+	override fun onResume() {
+		super.onResume()
+		// 从扫码页面跳转返回的时候，设置回退栈
+		getMainActivity()?.backEvent = Runnable {
+			setBackEvent(getMainActivity())
 		}
 	}
 

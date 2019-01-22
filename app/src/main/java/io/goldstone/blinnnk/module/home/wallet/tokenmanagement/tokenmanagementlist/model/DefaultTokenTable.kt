@@ -306,8 +306,8 @@ interface DefaultTokenDao {
 	@Query("SELECT * FROM defaultTokens WHERE chainID IN (:currentChainIDs)")
 	fun getCurrentChainTokens(currentChainIDs: List<String> = Current.chainIDs()): List<DefaultTokenTable>
 
-	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE :isDefault AND chainID IN (:currentChainIDs)")
-	fun getDefaultTokens(currentChainIDs: List<String> = Current.chainIDs(), isDefault: Boolean = true): List<DefaultTokenTable>
+	@Query("SELECT * FROM defaultTokens WHERE isDefault LIKE 1 AND chainID IN (:currentChainIDs)")
+	fun getDefaultTokens(currentChainIDs: List<String> = Current.chainIDs()): List<DefaultTokenTable>
 
 	@Query("SELECT * FROM defaultTokens WHERE contract LIKE :contract AND symbol LIKE :symbol  AND chainID LIKE :chainID")
 	fun getToken(contract: String, symbol: String, chainID: String): DefaultTokenTable?

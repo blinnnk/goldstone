@@ -40,7 +40,11 @@ object BTCSeriesJsonRPC {
 			signedMessage
 		) { result, error ->
 			if (result.isNotNull() && error.isNone()) {
-				hold(JSONObject(result).safeGet("txid"), error)
+				hold(
+					if (result.contains("result")) JSONObject(JSONObject(result).safeGet("txid")).safeGet("result")
+					else JSONObject(result).safeGet("txid"),
+				error
+				)
 			} else (hold(null, error))
 		}
 	}

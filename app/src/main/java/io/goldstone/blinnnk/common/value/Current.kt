@@ -25,7 +25,7 @@ object Current {
 	fun supportChainIDs(): List<ChainID> {
 		val currentWallet = SharedWallet.getCurrentWalletType()
 		return when {
-			currentWallet.isETHSeries() -> listOf(SharedChain.getCurrentETH().chainID)
+			currentWallet.isETHSeries() -> listOf(SharedChain.getCurrentETH().chainID, SharedChain.getETCCurrent().chainID)
 			currentWallet.isEOSSeries() -> listOf(SharedChain.getEOSCurrent().chainID)
 			currentWallet.isBIP44() || currentWallet.isMultiChain() -> Current.allChainID()
 			else -> listOf()
