@@ -33,10 +33,12 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 		codeName
 	) { localData ->
 		val dao = EOSTransactionTable.dao
-		if (detailView.asyncData?.isEmpty() == true) localData.map {
-			TransactionListModel(it)
-		}.generateBalanceList(token.contract) {
-			it.updateHeaderData(false)
+		fun updateHeaderDataOrElse(headerData: List<EOSTransactionTable>) {
+			if (detailView.asyncData?.isEmpty() == true) headerData.map {
+				TransactionListModel(it)
+			}.generateBalanceList(token.contract) {
+				it.updateHeaderData(false)
+			}
 		}
 		fun loadRangeDataFromChain(endID: Long, pageSize: Int) {
 			// 拉取指定范围和数量的账单
@@ -54,6 +56,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 							dataIndex = currentMaxCount.orZero() - (index + 1)
 						}
 					})
+					updateHeaderDataOrElse(data)
 					flipPage(data, callback)
 					currentMaxCount = currentMaxCount.orZero() - pageSize
 				} else callback()
@@ -95,6 +98,7 @@ fun TokenDetailPresenter.flipEOSPage(callback: () -> Unit) {
 			}
 			// 本地有数据
 			else -> {
+				updateHeaderDataOrElse(localData)
 				flipPage(localData, callback)
 				currentMaxCount = localData.minBy { it.dataIndex }?.dataIndex.orZero() - 1
 			}
