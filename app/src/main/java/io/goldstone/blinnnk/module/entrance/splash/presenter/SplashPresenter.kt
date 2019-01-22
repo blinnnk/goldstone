@@ -41,38 +41,50 @@ class SplashPresenter(val activity: SplashActivity) {
 	// 初始化sandbox的数据
 	@WorkerThread
 	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
-		if (WalletTable.dao.rowCount() == 0 && SandBoxManager.hasSandBoxData()) {
-			launchUI {
-				Dashboard(activity) {
-					getDialog { setCancelable(false) }
-					showAlertView(
-						"Recovery Wallets",
-						"Do you want to recover wallets",
-						false,
-						cancelAction = {
-							launchDefault  {
-								SandBoxManager.cleanSandBox()
-								hold(false)
-							}
-						}
-					) {
+		if (WalletTable.dao.rowCount() == 0) {
+			fun showRecoverDashboardOrElse() {
+				if (SandBoxManager.hasWalletData()) showRecoveryWalletConfirmationDialog(hold)
+				 else hold(false)
+			}
+			if (SandBoxManager.hasExtraData()) {
+				SandBoxManager.recoveryExtraData {
+					showRecoverDashboardOrElse()
+				}
+			} else showRecoverDashboardOrElse()
+		} else if (SharedSandBoxValue.getUnRecoveredWalletCount() > 0) {
+			// walletTable恢复了一半,程序被强行终止，接着恢复
+			SandBoxManager.recoveryWallet(activity) {
+				hold(true)
+			}
+		} else hold(false)
+	}
+	
+	private fun showRecoveryWalletConfirmationDialog(hold: (hasChanged: Boolean) -> Unit) {
+		launchUI {
+			Dashboard(activity) {
+				getDialog { setCancelable(false) }
+				showAlertView(
+					"Recovery Wallets",
+					"Do you want to recover wallets",
+					false,
+					cancelAction = {
 						launchDefault  {
-							initDefaultToken(activity)
-							SandBoxManager.recoveryData(activity) {
-								hold(true)
-							}
+							SandBoxManager.cleanSandBox()
+							hold(false)
+						}
+					}
+				) {
+					launchDefault  {
+						initDefaultToken(activity)
+						SandBoxManager.recoveryWallet(activity) {
+							hold(true)
 						}
 					}
 				}
 			}
-			
-		} else if (SharedSandBoxValue.getRestOfWalletCount() > 0) {
-			// walletTable恢复了一半,程序被强行终止，接着恢复
-			SandBoxManager.recoveryWallet(activity) { hold(true) }
-		} else hold(false)
-		
-		
+		}
 	}
+	
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据

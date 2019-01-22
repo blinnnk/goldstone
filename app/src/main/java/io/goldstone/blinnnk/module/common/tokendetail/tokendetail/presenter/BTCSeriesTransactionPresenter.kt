@@ -9,7 +9,6 @@ import io.goldstone.blinnnk.common.value.PageInfo
 import io.goldstone.blinnnk.crypto.multichain.ChainType
 import io.goldstone.blinnnk.crypto.multichain.getAddress
 import io.goldstone.blinnnk.crypto.multichain.getChainType
-import io.goldstone.blinnnk.crypto.multichain.isBCH
 import io.goldstone.blinnnk.kernel.commontable.BTCSeriesTransactionTable
 import io.goldstone.blinnnk.kernel.network.btcseries.insight.InsightApi
 import io.goldstone.blinnnk.module.home.wallet.transactions.transactionlist.ethereumtransactionlist.model.TransactionListModel
@@ -25,7 +24,7 @@ fun TokenDetailPresenter.loadBTCSeriesData(
 	loadNew: Boolean
 ) {
 	val address = chainType.getContract().getAddress()
-	InsightApi.getTransactionCount(chainType, !chainType.isBCH(), address) { transactionCount, error ->
+	InsightApi.getTransactionCount(chainType, address) { transactionCount, error ->
 		if (transactionCount.isNotNull() && error.isNone()) {
 			// 如果本地的最大 Index 与 Count 相同意味着不需要拉取账单
 			when {
@@ -84,7 +83,6 @@ private fun loadDataFromChain(
 	// 意味着网络没有更新的数据直接返回
 	InsightApi.getTransactions(
 		chainType,
-		!chainType.isBCH(),
 		address,
 		pageInfo.from,
 		pageInfo.to
@@ -138,10 +136,12 @@ fun TokenDetailPresenter.getBTCSeriesData() {
 				)
 			when {
 				transactions.isNotEmpty() -> {
-					transactions.map {
-						TransactionListModel(it)
-					}.generateBalanceList(token.contract) {
-						it.updateHeaderData(false)
+					if (detailView.asyncData?.isEmpty() == true) {
+						transactions.map {
+							TransactionListModel(it)
+						}.generateBalanceList(token.contract) {
+							it.updateHeaderData(false)
+						}
 					}
 					flipPage(transactions) {
 						detailView.showBottomLoading(false)

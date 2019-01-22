@@ -11,6 +11,7 @@ import io.goldstone.blinnnk.GoldStoneApp
 import io.goldstone.blinnnk.common.component.overlay.GoldStoneDialog
 import io.goldstone.blinnnk.common.language.DialogText
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
+import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
 import io.goldstone.blinnnk.kernel.receiver.XinGePushReceiver
 import io.goldstone.blinnnk.module.entrance.splash.presenter.SplashPresenter
@@ -52,7 +53,7 @@ class ConnectionChangeReceiver : BroadcastReceiver() {
 			// 如果还没有检测过账号状态那么在网络恢复的时候检测并更新钱包的资产状态
 			if (!SharedValue.getAccountCheckedStatus()) {
 				SplashPresenter.updateAccountInformation(context) {
-					(context as? MainActivity)?.getWalletDetailFragment()?.presenter?.start()
+					(context as? MainActivity)?.getWalletDetailFragment()?.presenter?.let { launchUI { it.start() } }
 				}
 			}
 			// 网络恢复的时候判断是否有在断网情况下创建的地址需要补充注册
