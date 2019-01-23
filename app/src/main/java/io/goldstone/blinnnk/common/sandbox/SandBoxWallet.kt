@@ -2,22 +2,29 @@ package io.goldstone.blinnnk.common.sandbox
 
 
 import android.content.Context
+import android.support.annotation.UiThread
+import android.support.annotation.WorkerThread
 import com.blinnnk.extension.isNotNull
-import io.goldstone.blinnnk.GoldStoneApp
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
 import io.goldstone.blinnnk.common.component.overlay.LoadingView
+import io.goldstone.blinnnk.common.error.AccountError
 import io.goldstone.blinnnk.common.language.CommonText
 import io.goldstone.blinnnk.common.language.FingerprintPaymentText
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.ErrorDisplayManager
 import io.goldstone.blinnnk.crypto.keystore.getBigIntegerPrivateKeyByWalletID
-import io.goldstone.blinnnk.crypto.multichain.*
-import io.goldstone.blinnnk.crypto.utils.*
+import io.goldstone.blinnnk.crypto.multichain.ChainAddresses
+import io.goldstone.blinnnk.crypto.multichain.ChainPath
+import io.goldstone.blinnnk.crypto.multichain.ChainType
+import io.goldstone.blinnnk.crypto.multichain.GenerateMultiChainWallet
+import io.goldstone.blinnnk.crypto.utils.JavaKeystoreUtil
+import io.goldstone.blinnnk.crypto.utils.KeystoreInfo
+import io.goldstone.blinnnk.crypto.utils.MultiChainUtils
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.Bip44Address
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.WalletTable
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.presenter.CreateWalletPresenter
-import kotlinx.coroutines.*
+import java.math.BigInteger
 
 /**
  * @date: 2018-12-25.
@@ -25,50 +32,16 @@ import kotlinx.coroutines.*
  * @description:
  */
 
-fun recoveryMnemonicWallet(
+fun showRecoveryMnemonicWalletDashboard(
 	context: Context,
 	walletModel: WalletBackUpModel,
-	callback: (success: Boolean) -> Unit
+	@WorkerThread callback: () -> Unit
 ) {
 	launchUI {
-		Dashboard(context) {
-			showAlertView(
-				FingerprintPaymentText.usePassword,
-				"please input the password of the ${walletModel.name}",
-				true,
-				cancelAction = {
-					callback(false)
-				}) { passwordInput ->
-				val password = passwordInput?.text?.toString()
-				if (password.isNullOrEmpty()) {
-					recoveryMnemonicWallet(context, walletModel, callback)
-					launchUI {
-						ErrorDisplayManager(Throwable(CommonText.wrongPassword)).show(context)
-					}
-				} else {
-					val loadingView = LoadingView(context)
-					loadingView.setCancelable(false)
-					loadingView.show()
-					launchDefault {
-						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
-							if (privateKey.isNotNull() && error.isNone()) {
-								recoveryMnemonicWallet(context, walletModel, password) {
-									callback(true)
-									launchUI { loadingView.remove() }
-								}
-							} else {
-								recoveryMnemonicWallet(context, walletModel, callback)
-								launchUI {
-									loadingView.remove()
-									ErrorDisplayManager(error).show(context)
-								}
-							}
-						}
-						
-					}
-				}
-				
-			}
+		getPrivateKeyOrPassword<String>(context, walletModel.name, walletModel.id) { password, error ->
+			if (password.isNotNull() && error.isNone())
+				recoveryMnemonicWallet(context, walletModel, password, callback)
+			else ErrorDisplayManager(error).show(context)
 		}
 	}
 }
@@ -77,79 +50,44 @@ private fun recoveryMnemonicWallet(
 	context: Context,
 	walletModel: WalletBackUpModel,
 	password: String,
-	callback: () -> Unit
+	@WorkerThread callback: () -> Unit
 ) {
 	val mnemonic = JavaKeystoreUtil(KeystoreInfo.isMnemonic()).decryptData(walletModel.encryptMnemonic!!)
 	GenerateMultiChainWallet.import(
 		context, mnemonic, password, ChainPath(
-			ethPath = walletModel.ethPath,
-			etcPath = walletModel.etcPath,
-			btcPath = walletModel.btcPath,
-			testPath = walletModel.btcTestPath,
-			ltcPath = walletModel.ltcPath,
-			bchPath = walletModel.bchPath,
-			eosPath = walletModel.eosPath
-		), true
+		ethPath = walletModel.ethPath,
+		etcPath = walletModel.etcPath,
+		btcPath = walletModel.btcPath,
+		testPath = walletModel.btcTestPath,
+		ltcPath = walletModel.ltcPath,
+		bchPath = walletModel.bchPath,
+		eosPath = walletModel.eosPath
+	), true
 	) {
 		insertWallet(walletModel, it)
 		CreateWalletPresenter.insertNewAccount(it, callback)
 	}
-	
 }
 
 fun recoveryKeystoreWallet(
 	context: Context,
 	walletModel: WalletBackUpModel,
-	callback: (success: Boolean) -> Unit
+	@WorkerThread callback: () -> Unit
 ) {
 	launchUI {
-		Dashboard(context) {
-			showAlertView(FingerprintPaymentText.usePassword,
-				"please input the password of the ${walletModel.name}",
-				true,
-				cancelAction = {
-					callback(false)
-				}) { passwordInput ->
-				val password = passwordInput?.text?.toString()
-				if (password.isNullOrEmpty()) {
-					recoveryKeystoreWallet(context, walletModel, callback)
-					launchUI {
-						ErrorDisplayManager(Throwable(CommonText.wrongPassword)).show(context)
-					}
-				} else {
-					val loadingView = LoadingView(context)
-					loadingView.setCancelable(false)
-					loadingView.show()
-					GlobalScope.launch(Dispatchers.Default) {
-						GoldStoneApp.appContext.getBigIntegerPrivateKeyByWalletID(password, walletModel.id) { privateKey, error ->
-							if (privateKey.isNotNull() && error.isNone()) {
-								val multiChainAddresses = MultiChainUtils.getMultiChainAddressesByRootKey(privateKey)
-								insertWallet(walletModel, multiChainAddresses)
-								CreateWalletPresenter.insertNewAccount(multiChainAddresses) {
-									callback(true)
-									launchUI { loadingView.remove() }
-								}
-							} else {
-								recoveryKeystoreWallet(context, walletModel, callback)
-								launchUI {
-									ErrorDisplayManager(error).show(context)
-									loadingView.remove()
-								}
-							}
-						}
-						
-					}
-				}
-				
-			}
+		getPrivateKeyOrPassword<BigInteger>(context, walletModel.name, walletModel.id) { privateKey, error ->
+			if (privateKey.isNotNull() && error.isNone()) {
+				val multiChainAddresses = MultiChainUtils.getMultiChainAddressesByRootKey(privateKey)
+				insertWallet(walletModel, multiChainAddresses)
+				CreateWalletPresenter.insertNewAccount(multiChainAddresses, callback)
+			} else ErrorDisplayManager(error).show(context)
 		}
 	}
-	
 }
 
 fun recoveryWatchOnlyWallet(
 	walletModel: WalletBackUpModel,
-	callback: () -> Unit
+	@WorkerThread callback: () -> Unit
 ) {
 	WalletTable(
 		id = walletModel.id,
@@ -193,12 +131,55 @@ fun recoveryWatchOnlyWallet(
 				Bip44Address(walletModel.currentLTCAddress, ChainType.LTC.id),
 				Bip44Address(walletModel.currentBCHAddress, ChainType.BCH.id),
 				Bip44Address(walletModel.currentEOSAddress, ChainType.EOS.id)
-			)
-		) { }
-		callback()
+			),
+			callback
+		)
 	}
 }
 
+@UiThread
+private inline fun <reified T> getPrivateKeyOrPassword(
+	context: Context,
+	walletName: String,
+	walletID: Int,
+	@WorkerThread crossinline hold: (result: T?, error: AccountError) -> Unit
+) {
+	Dashboard(context) {
+		showAlertView(
+			FingerprintPaymentText.usePassword,
+			"please input the password of the $walletName",
+			true,
+			cancelAction = {
+				hold(null, AccountError.None)
+			}
+		) { passwordInput ->
+			val password = passwordInput?.text?.toString()
+			if (password.isNullOrEmpty()) {
+				hold(null, AccountError("Empty Password"))
+				ErrorDisplayManager(Throwable(CommonText.wrongPassword)).show(context)
+			} else {
+				val loadingView = LoadingView(context)
+				loadingView.setCancelable(false)
+				loadingView.show()
+				launchDefault {
+					context.getBigIntegerPrivateKeyByWalletID(password, walletID) { privateKey, error ->
+						if (privateKey.isNotNull() && error.isNone()) {
+							hold(privateKey as T, error)
+							launchUI {
+								loadingView.remove()
+							}
+						} else {
+							hold(null, error)
+							launchUI {
+								loadingView.remove()
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
 
 private fun insertWallet(
 	walletModel: WalletBackUpModel,

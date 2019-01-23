@@ -5,7 +5,7 @@ package io.goldstone.blinnnk.common.value
  * @author KaySaith
  */
 @JvmField
-val currentChannel = ApkChannel.Google
+val currentChannel = ApkChannel.Home
 
 enum class ApkChannel(val value: String, val code: Int) {
 	Home("Home", 1),

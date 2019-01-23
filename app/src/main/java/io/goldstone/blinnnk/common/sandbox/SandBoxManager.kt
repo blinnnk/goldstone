@@ -1,11 +1,15 @@
 @file:Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+
 package io.goldstone.blinnnk.common.sandbox
 
 import android.content.Context
 import android.support.annotation.UiThread
 import android.support.annotation.WorkerThread
 import com.afollestad.materialdialogs.list.getListAdapter
-import com.blinnnk.extension.*
+import com.blinnnk.extension.forEachOrEnd
+import com.blinnnk.extension.isNotNull
+import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.toJSONObjectList
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.goldstone.blinnnk.GoldStoneApp
@@ -14,7 +18,6 @@ import io.goldstone.blinnnk.common.language.CommonText
 import io.goldstone.blinnnk.common.sandbox.view.wallet.RecoverWalletAdapter
 import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
-import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.common.utils.toJsonArray
 import io.goldstone.blinnnk.crypto.multichain.CryptoValue
 import io.goldstone.blinnnk.kernel.commontable.AppConfigTable
@@ -26,7 +29,9 @@ import io.goldstone.blinnnk.module.home.quotation.quotationsearch.model.Quotatio
 import org.jetbrains.anko.toast
 import org.json.JSONArray
 import org.json.JSONException
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 
 
 /**
@@ -41,7 +46,7 @@ object SandBoxManager {
 	private const val quotationPairsFileName = "quotationPairs"
 	private const val walletTableFileName = "walletTable"
 	private const val quotationRankGlobalName = "quotationRankGlobal" // 不用恢复的内容
-	
+
 	// 是否有需要恢复的数据
 	@WorkerThread
 	fun hasExtraData(): Boolean {
@@ -56,7 +61,7 @@ object SandBoxManager {
 			}
 		}
 	}
-	
+
 	@WorkerThread
 	fun hasWalletData(): Boolean {
 		val directoryFiles = getDirectory().listFiles()
@@ -68,7 +73,7 @@ object SandBoxManager {
 			}
 		}
 	}
-	
+
 	// 清除沙盒数据
 	@WorkerThread
 	fun cleanSandBox() {
@@ -80,7 +85,7 @@ object SandBoxManager {
 			}
 		}
 	}
-	
+
 	@WorkerThread
 	fun recoveryExtraData(callback: () -> Unit) {
 		recoveryLanguage()
@@ -88,16 +93,16 @@ object SandBoxManager {
 		recoveryExchangeSelectedStatus()
 		recoveryQuotationSelections(callback)
 	}
-	
+
 	fun getLanguage(): Int? {
 		return getSandBoxContentByName(languageFileName).toIntOrNull()
 	}
-	
+
 	@WorkerThread
 	fun updateQuotationRankGlobal(data: String) {
 		updateSandBoxContentByName(quotationRankGlobalName, data)
 	}
-	
+
 	@WorkerThread
 	fun getQuotationRankGlobalData(): String {
 		return getSandBoxContentByName(quotationRankGlobalName)
@@ -122,7 +127,7 @@ object SandBoxManager {
 	fun updateQuotationPairs(newPairs: List<String>) {
 		updateSandBoxContentByName(quotationPairsFileName, Gson().toJson(newPairs))
 	}
-	
+
 	@WorkerThread
 	fun updateWalletTables() {
 		WalletTable.getAll {
@@ -133,12 +138,13 @@ object SandBoxManager {
 					WalletBackUpModel(it)
 				}))
 			}
-			
+
 		}
-		
+
 	}
-	
-	fun recoveryWallet(context: Context, @WorkerThread callback: () -> Unit) {
+
+	@WorkerThread
+	fun recoveryWallet(context: Context, callback: () -> Unit) {
 		showRecoveryWalletDashboard(context) { hasFinish, finalWalletID ->
 			launchDefault {
 				if (finalWalletID.isNotNull()) {
@@ -155,6 +161,7 @@ object SandBoxManager {
 			}
 		}
 	}
+
 	private fun recoveryLanguage() {
 		val language = getSandBoxContentByName(languageFileName)
 		if (language.isNotEmpty()) {
@@ -197,7 +204,7 @@ object SandBoxManager {
 			callback()
 			return
 		}
-		if (NetworkUtil.hasNetwork() && quotationListString.isNotEmpty() && models.size() > 0) {
+		if (quotationListString.isNotEmpty() && models.size() > 0) {
 			GoldStoneAPI.getQuotationByPairs(models) { quotations, error ->
 				if (!quotations.isNullOrEmpty() && error.isNone()) {
 					GoldStoneAPI.getCurrencyLineChartData(models) { lineChart, lineChartError ->
@@ -218,18 +225,27 @@ object SandBoxManager {
 			}
 		} else callback()
 	}
-	
-	private fun showRecoveryWalletDashboard(context: Context, @UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
+
+	@WorkerThread
+	private fun showRecoveryWalletDashboard(
+		context: Context,
+		@UiThread callback: (hasFinish: Boolean, lastWalletID: Int?) -> Unit) {
 		val walletModelListString = getSandBoxContentByName(walletTableFileName)
-		val models = if (walletModelListString.isEmpty()) arrayListOf()
-		else try {
-			JSONArray(walletModelListString).toJSONObjectList().map { WalletBackUpModel(it) }.toArrayList()
-		} catch (error: JSONException) {
-			arrayListOf<WalletBackUpModel>()
-		}
+		val models =
+			if (walletModelListString.isEmpty()) arrayListOf()
+			else try {
+				JSONArray(walletModelListString).toJSONObjectList().map { WalletBackUpModel(it) }.toArrayList()
+			} catch (error: JSONException) {
+				arrayListOf<WalletBackUpModel>()
+			}
 		if (models.isNotEmpty()) {
 			WalletTable.dao.getAllWalletIDs().forEach { walletID ->
-				if (models.any { walletID == it.id }) models.find { it.id == walletID }?.let { models.remove(it) }
+				if (models.any { walletID == it.id })
+					models.find {
+						it.id == walletID
+					}?.let {
+						models.remove(it)
+					}
 			}
 		}
 		SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
@@ -241,34 +257,38 @@ object SandBoxManager {
 						"Recovery Wallets",
 						RecoverWalletAdapter(
 							models,
-						deleteAction = { position ->
-							val walletID = models[position].id
-							launchDefault { context.deleteKeystoreFileByWalletID(walletID) }
-							models.removeAt(position)
-							SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
-							getDialog {
-								getListAdapter()?.notifyDataSetChanged()
-								context.toast(CommonText.succeed)
-							}
-							if (models.isEmpty()) {
-								dismiss()
-								callback(true, null)
-							}
-						},
-						recoverAction = { position ->
-							recoveryWalletByType(context, models[position]) { walletID ->
-								launchUI {
-									models.removeAt(position)
-									SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
-									getDialog {
-										getListAdapter()?.notifyDataSetChanged()
-										context.toast(CommonText.succeed)
+							deleteAction = { position ->
+								val walletID = models[position].id
+								launchDefault {
+									context.deleteKeystoreFileByWalletID(walletID)
+								}
+								models.removeAt(position)
+								SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
+								getDialog {
+									getListAdapter()?.notifyDataSetChanged()
+									context.toast(CommonText.succeed)
+								}
+								if (models.isEmpty()) {
+									dismiss()
+									callback(true, null)
+								}
+							},
+							recoverAction = { position ->
+								recoveryWalletByType(context, models[position]) { walletID ->
+									launchUI {
+										models.removeAt(position)
+										SharedSandBoxValue.updateUnRecoveredWalletCount(models.size)
+										getDialog {
+											getListAdapter()?.notifyDataSetChanged()
+											context.toast(CommonText.succeed)
+										}
+										if (models.isEmpty()) dismiss()
+										callback(models.isEmpty(), walletID)
 									}
-									if (models.isEmpty()) dismiss()
-									callback(models.isEmpty(), walletID)
 								}
 							}
-						}))
+						)
+					)
 				}.getDialog {
 					setCancelable(false)
 					negativeButton(text = "DELETE ALL") {
@@ -282,39 +302,31 @@ object SandBoxManager {
 					}
 				}
 			}
-		} else launchUI { callback(true, null) }
+		} else callback(true, null)
 	}
-	
+
 	private fun recoveryWalletByType(
 		context: Context,
 		wallet: WalletBackUpModel,
-		@WorkerThread callback: (walletID: Int?) -> Unit
+		@WorkerThread callback: (walletID: Int) -> Unit
 	) {
-		launchDefault {
-			when {
-				wallet.isWatchOnly -> {
-					// 观察钱包
-					recoveryWatchOnlyWallet(wallet) {
-						callback(wallet.id)
-					}
-				}
-				!wallet.encryptMnemonic.isNullOrEmpty() -> {
-					// 助记词钱包
-					recoveryMnemonicWallet(context, wallet) { isSuccess ->
-						if (isSuccess) callback(wallet.id)
-					}
-				}
-				else -> {
-					// keystore 钱包
-					recoveryKeystoreWallet(context, wallet) { isSuccess ->
-						if (isSuccess) callback(wallet.id)
-					}
+		when {
+			wallet.isWatchOnly -> launchDefault {
+				recoveryWatchOnlyWallet(wallet) {
+					callback(wallet.id)
 				}
 			}
+			!wallet.encryptMnemonic.isNullOrEmpty() -> {
+				showRecoveryMnemonicWalletDashboard(context, wallet) {
+					callback(wallet.id)
+				}
+			}
+			else -> recoveryKeystoreWallet(context, wallet) {
+				callback(wallet.id)
+			}
 		}
-		
 	}
-	
+
 	private fun getSandBoxContentByName(fileName: String): String {
 		val sandBoxFile = File("${getDirectory().absolutePath}/$fileName")
 		if (!sandBoxFile.exists()) sandBoxFile.createNewFile()
@@ -346,7 +358,7 @@ object SandBoxManager {
 		if (!file.exists()) file.mkdirs()
 		return file
 	}
-	
+
 	private fun cleanKeyStoreFile(dir: File): Boolean {
 		if (dir.isDirectory) {
 			val children = dir.list()
@@ -358,8 +370,8 @@ object SandBoxManager {
 		// The directory is now empty so delete it
 		return dir.delete()
 	}
-	
-	
+
+
 	private fun Context.deleteKeystoreFileByWalletID(walletID: Int) {
 		val filename = "$walletID${CryptoValue.keystoreFilename}"
 		val keystoreFile = File(filesDir!!, filename)
