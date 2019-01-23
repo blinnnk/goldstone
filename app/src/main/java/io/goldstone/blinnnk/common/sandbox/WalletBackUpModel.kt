@@ -28,7 +28,6 @@ class WalletBackUpModel(
 	val hint: String? = null,
 	val isWatchOnly: Boolean = false,
 	val encryptMnemonic: String? = null,
-	val encryptFingerPrinterKey: String? = null,
 	val currentEOSAccountName: EOSDefaultAllChainName,
 	val hasBackUpMnemonic: Boolean,
 	var currentETHSeriesAddress: String = "",
@@ -53,7 +52,6 @@ class WalletBackUpModel(
 		jsonObject.safeGet("hint"),
 		jsonObject.safeGet("isWatchOnly").toBoolean(),
 		jsonObject.safeGet("encryptMnemonic"),
-		jsonObject.safeGet("encryptFingerPrinterKey"),
 		currentEOSAccountName = Gson().fromJson(
 			jsonObject.safeGet("currentEOSAccountName"),
 			object : TypeToken<EOSDefaultAllChainName>() {}.type
@@ -82,7 +80,6 @@ class WalletBackUpModel(
 		walletTable.hint,
 		walletTable.isWatchOnly,
 		walletTable.encryptMnemonic,
-		walletTable.encryptFingerPrinterKey,
 		walletTable.currentEOSAccountName,
 		walletTable.hasBackUpMnemonic,
 		currentETHSeriesAddress = walletTable.currentETHSeriesAddress,
@@ -106,7 +103,7 @@ class WalletBackUpModel(
 			Pair(WalletType.eosJungleOnly, currentEOSAccountName.jungle),
 			Pair(WalletType.eosKylinOnly, currentEOSAccountName.kylin)
 		).filter {
-			!it.second.isNullOrEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
+			!it.second.isEmpty() && if (it.first == WalletType.eosOnly) EOSWalletUtils.isValidAddress(currentEOSAddress) else true
 		}
 		return when {
 			// 减 `2` 是去除掉 `EOS` 的两个网络状态的计数, 此计数并不影响判断是否是全链钱包

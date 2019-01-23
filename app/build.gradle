@@ -22,8 +22,8 @@ android {
     applicationId "io.goldstone.blinnnk"
     minSdkVersion 21
     targetSdkVersion 28
-    versionCode 25
-    versionName "1.7.4"
+    versionCode 27
+    versionName "1.7.5"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     kotlinOptions.allWarningsAsErrors = true
     renderscriptSupportModeEnabled true
@@ -33,7 +33,7 @@ android {
       XG_ACCESS_KEY: xinGePushAccessKey
     ]
     ndk {
-      abiFilters "armeabi-v7a", "x86" // PC 调试的时候恢复 `x86`
+      abiFilters "armeabi-v7a"//, "x86" // PC 调试的时候恢复 `x86`
     }
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     // Leave only the supported languages
