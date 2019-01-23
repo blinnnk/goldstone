@@ -13,6 +13,8 @@ import io.goldstone.blinnnk.module.common.tokendetail.tokendetail.model.TokenBal
 import io.goldstone.blinnnk.module.common.walletgeneration.createwallet.model.*
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.model.DAPPDao
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.model.DAPPTable
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentDao
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentVisitedTable
 import io.goldstone.blinnnk.module.home.profile.contacts.contracts.model.ContactTable
 import io.goldstone.blinnnk.module.home.profile.contacts.contracts.model.ContractDao
 import io.goldstone.blinnnk.module.home.quotation.quotationrank.model.QuotationRankDao
@@ -74,7 +76,8 @@ import java.math.BigInteger
 	ListBip44AddressConverter::class,
 	NotificationExtraTypeConverter::class,
 	SocialMediaConverter::class,
-	DelegateBandInfoConverter::class
+	DelegateBandInfoConverter::class,
+	DAPPRecentVisitedTable::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao
@@ -97,6 +100,7 @@ abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun favoriteDao(): FavoriteDao
 	abstract fun quotationRankDao(): QuotationRankDao
 	abstract fun md5Dao(): MD5TableDao
+	abstract fun recentDappDao(): DAPPRecentDao
 
 	companion object {
 		const val databaseVersion = 1
