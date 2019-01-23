@@ -50,7 +50,7 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 	private val confirmButton by lazy { generateConfirmButton() }
 	private var headerView: AddressSelectionHeaderView? = null
 	override lateinit var presenter: AddressSelectionContract.GSPresenter
-
+	
 	override fun setRecyclerViewAdapter(
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<ContactTable>?
@@ -167,14 +167,6 @@ class AddressSelectionFragment : GSRecyclerFragment<ContactTable>(), AddressSele
 		}
 	}
 	
-	override fun onResume() {
-		super.onResume()
-		// 从扫码页面跳转返回的时候，设置回退栈
-		getMainActivity()?.backEvent = Runnable {
-			setBackEvent(getMainActivity())
-		}
-	}
-
 	override fun showError(error: Throwable) {
 		safeShowError(error)
 	}

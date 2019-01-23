@@ -7,7 +7,8 @@ import com.blinnnk.extension.orElse
 import com.blinnnk.util.convertLocalJsonFileToJSONObjectArray
 import io.goldstone.blinnnk.R
 import io.goldstone.blinnnk.common.component.overlay.Dashboard
-import io.goldstone.blinnnk.common.language.*
+import io.goldstone.blinnnk.common.language.ChainErrorText
+import io.goldstone.blinnnk.common.language.currentLanguage
 import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sandbox.SharedSandBoxValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedAddress
@@ -37,14 +38,14 @@ import io.goldstone.blinnnk.module.home.wallet.tokenmanagement.tokenmanagementli
  * @author KaySaith
  */
 class SplashPresenter(val activity: SplashActivity) {
-	
+
 	// 初始化sandbox的数据
 	@WorkerThread
-	fun recoverySandboxData(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
+	fun recoverySandboxData(hold: (hasChanged: Boolean) -> Unit) {
 		if (WalletTable.dao.rowCount() == 0) {
 			fun showRecoverDashboardOrElse() {
 				if (SandBoxManager.hasWalletData()) showRecoveryWalletConfirmationDialog(hold)
-				 else hold(false)
+				else hold(false)
 			}
 			if (SandBoxManager.hasExtraData()) {
 				SandBoxManager.recoveryExtraData {
@@ -58,23 +59,25 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		} else hold(false)
 	}
-	
-	private fun showRecoveryWalletConfirmationDialog(hold: (hasChanged: Boolean) -> Unit) {
+
+	private fun showRecoveryWalletConfirmationDialog(@WorkerThread hold: (hasChanged: Boolean) -> Unit) {
 		launchUI {
 			Dashboard(activity) {
-				getDialog { setCancelable(false) }
+				getDialog {
+					setCancelable(false)
+				}
 				showAlertView(
 					"Recovery Wallets",
 					"Do you want to recover wallets",
 					false,
 					cancelAction = {
-						launchDefault  {
+						launchDefault {
 							SandBoxManager.cleanSandBox()
 							hold(false)
 						}
 					}
 				) {
-					launchDefault  {
+					launchDefault {
 						initDefaultToken(activity)
 						SandBoxManager.recoveryWallet(activity) {
 							hold(true)
@@ -84,13 +87,15 @@ class SplashPresenter(val activity: SplashActivity) {
 			}
 		}
 	}
-	
+
 	@WorkerThread
 	fun initDefaultToken(context: Context) {
 		// 先判断是否插入本地的 `JSON` 数据
 		if (DefaultTokenTable.dao.rowCount() == 0) {
 			val localDefaultTokens =
-				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list).map { DefaultTokenTable(it) }
+				context.convertLocalJsonFileToJSONObjectArray(R.raw.local_token_list).map {
+					DefaultTokenTable(it)
+				}
 			DefaultTokenTable.dao.insertAll(localDefaultTokens)
 		}
 	}

@@ -137,18 +137,10 @@
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 
-# GoldStone
--dontwarn io.goldstone.blockchain.module.common.tokenpayment.gasselection.view.**
--dontwarn io.goldstone.blockchain.module.common.walletimport.**
--dontwarn io.goldstone.blockchain.module.entrance.starting.view.**
--dontwarn io.goldstone.blockchain.module.common.tokenpayment.addressselection.presenter.**
--dontwarn io.goldstone.blockchain.common.base.baseoverlayfragment.overlayview.**
--dontwarn io.goldstone.blockchain.module.home.wallet.tokenmanagement.tokenmanagement.presenter.**
 -adaptclassstrings com.example.Test
 
 # Anko
 -dontwarn kotlin.jvm.internal.Intrinsics
-
 -dontwarn org.bitcoinj.store.**
 
 # Event Bus

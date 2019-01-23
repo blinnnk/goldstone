@@ -16,6 +16,7 @@ import io.goldstone.blinnnk.common.sandbox.SandBoxManager
 import io.goldstone.blinnnk.common.sharedpreference.SharedChain
 import io.goldstone.blinnnk.common.sharedpreference.SharedValue
 import io.goldstone.blinnnk.common.sharedpreference.SharedWallet
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.transparentStatus
 import io.goldstone.blinnnk.common.value.ContainerID
@@ -154,11 +155,11 @@ class SplashActivity : AppCompatActivity() {
 	}
 
 	private fun prepareAppConfig(@WorkerThread callback: AppConfigTable.() -> Unit) {
-		GlobalScope.launch(Dispatchers.Default) {
+		launchDefault {
 			val config = AppConfigTable.dao.getAppConfig()
 			if (config.isNull()) {
 				// 如果本地没有配置过 `Config` 你那么首先更新语言为系统语言
-				currentLanguage = SandBoxManager.getLanguage() ?:  HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
+				currentLanguage = SandBoxManager.getLanguage() ?: HoneyLanguage.getCodeBySymbol(CountryCode.currentLanguageSymbol)
 				AppConfigTable.insertAppConfig(callback)
 			} else {
 				// 如果之前因为失败原因 `netWork`, `Server` 等注册地址失败, 在这里检测并重新注册
