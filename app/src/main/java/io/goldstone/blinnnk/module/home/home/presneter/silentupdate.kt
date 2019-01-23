@@ -144,6 +144,7 @@ abstract class SilentUpdater {
 				if (localData.isEmpty()) {
 					exchangeDao.insertAll(exchanges)
 				} else exchangeDao.apply {
+					clearTable()
 					insertAll(
 						exchanges.map { serverData ->
 							serverData.apply {

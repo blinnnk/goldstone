@@ -68,5 +68,8 @@ interface ExchangeDao {
 
 	@Delete
 	fun delete(exchangeTable: ExchangeTable)
+	
+	@Query("DELETE FROM exchangeTable")
+	fun clearTable()
 
 }
