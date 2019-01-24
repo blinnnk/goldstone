@@ -158,7 +158,10 @@ class PaymentDetailFragment : BaseFragment<PaymentDetailPresenter>() {
 
 	override fun onResume() {
 		super.onResume()
-		inputView.setFoucs()
+		getParentFragment<TokenDetailOverlayFragment> {
+			if (childFragmentManager.fragments.last() is PaymentDetailFragment) inputView.setFoucs()
+		}
+		
 		adaptLETVLowVersionUI()
 	}
 
