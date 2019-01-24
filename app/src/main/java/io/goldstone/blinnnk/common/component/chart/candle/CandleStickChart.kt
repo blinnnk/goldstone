@@ -220,8 +220,13 @@ abstract class CandleStickChart : BarLineChartBase<CandleData>, CandleDataProvid
 		context.runOnUiThread {
 			if (high * low != 0f) {
 				with(axisLeft) {
-					axisMinimum = low - distance
-					axisMaximum = high + distance
+					if (low == high) {
+						axisMinimum = low - low / 40
+						axisMaximum = low + low / 40
+					} else {
+						axisMinimum = low - distance
+						axisMaximum = high + distance
+					}
 					setLabelCount(leftLabelCount, true)
 					textSize = labelTextSize
 				}
