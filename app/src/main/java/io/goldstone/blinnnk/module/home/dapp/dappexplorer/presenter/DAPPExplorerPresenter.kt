@@ -3,11 +3,13 @@ package io.goldstone.blinnnk.module.home.dapp.dappexplorer.presenter
 import com.blinnnk.extension.isNotNull
 import com.blinnnk.util.load
 import com.blinnnk.util.then
+import io.goldstone.blinnnk.common.thread.launchDefault
 import io.goldstone.blinnnk.common.thread.launchUI
 import io.goldstone.blinnnk.common.utils.NetworkUtil
 import io.goldstone.blinnnk.kernel.network.common.GoldStoneAPI
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blinnnk.module.home.dapp.dappexplorer.contract.DAPPExplorerContract
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentVisitedTable
 
 
 /**
@@ -29,5 +31,17 @@ class DAPPExplorerPresenter(
 		} else load {
 			DAPPTable.dao.getBy(condition)
 		} then (hold)
+	}
+	
+	override fun getRecentVisitedData() {
+		launchDefault {
+			DAPPRecentVisitedTable.dao.getLimitRecentDAPPs().apply {
+				if (isNotEmpty()) {
+					launchUI {
+						view.showHeaderData(this)
+					}
+				}
+			}
+		}
 	}
 }

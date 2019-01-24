@@ -11,10 +11,10 @@ import io.goldstone.blinnnk.kernel.database.GoldStoneDataBase
 @Entity(tableName = "dappRecent")
 data class DAPPRecentVisitedTable(
 	@PrimaryKey(autoGenerate = true)
-	val id: Int,
+	var id: Int,
 	val name: String,
-	@PrimaryKey()
 	val url: String,
+	var ico: String,
 	var timing: Long
 ) {
 	companion object {
@@ -24,8 +24,11 @@ data class DAPPRecentVisitedTable(
 
 @Dao
 interface DAPPRecentDao {
-	@Query("SELECT * FROM dappRecent")
+	@Query("SELECT * FROM dappRecent ORDER BY timing DESC LIMIT 3")
 	fun getLimitRecentDAPPs(): List<DAPPRecentVisitedTable>
+	
+	@Query("SELECT * FROM dappRecent WHERE url = :url")
+	fun getTableByUrl(url: String): DAPPRecentVisitedTable?
 	
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	fun insert(table: DAPPRecentVisitedTable)

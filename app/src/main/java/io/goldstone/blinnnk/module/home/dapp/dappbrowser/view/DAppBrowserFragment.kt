@@ -25,6 +25,7 @@ import io.goldstone.blinnnk.module.common.contract.GoldStonePresenter
 import io.goldstone.blinnnk.module.home.dapp.common.DAPPBrowser
 import io.goldstone.blinnnk.module.home.dapp.dappbrowser.contract.DAppBrowserContract
 import io.goldstone.blinnnk.module.home.dapp.dappbrowser.presenter.DAppBrowserPresenter
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentVisitedTable
 import io.goldstone.blinnnk.module.home.dapp.dapplist.event.DAPPListDisplayEvent
 import io.goldstone.blinnnk.module.home.dapp.dappoverlay.event.DAPPExplorerDisplayEvent
 import io.goldstone.blinnnk.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
@@ -45,6 +46,8 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 	private lateinit var browser: DAPPBrowser
 	private lateinit var floatingButton: DragFloatingLayout
 	private lateinit var progressView: ProgressBar
+	
+	private var needPostNewUrl = true
 
 	private val url by lazy {
 		arguments?.getString(ArgumentKey.webViewUrl)
@@ -112,6 +115,16 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 				}
 				browser = DAPPBrowser(context, url.orEmpty()) {
 					progressView.progress = it
+					if (it >= 80 && needPostNewUrl) {
+						needPostNewUrl = false
+						EventBus.getDefault().post(DAPPRecentVisitedTable(
+							0,
+							"",
+							url.orEmpty(),
+							formatIcoFromUrl(url.orEmpty().replace(" ", "")),
+							System.currentTimeMillis()
+						))
+					}
 					if (it == 100) {
 						removeView(progressView)
 						browser.alpha = 1f
@@ -121,6 +134,18 @@ class DAppBrowserFragment : GSFragment(), DAppBrowserContract.GSView {
 				addView(browser)
 			}
 		}.view
+	}
+	
+	private fun formatIcoFromUrl(url: String): String {
+		if (url.isEmpty() || !url.contains("http")) return ""
+		val startIndex = url.indexOf("//") + 2
+		var releaseUrl = url.substring(startIndex)
+		if (releaseUrl.contains("/")) {
+			releaseUrl = releaseUrl.substring(0, releaseUrl.indexOf("/"))
+		}
+		
+		return url.substring(0, startIndex) + releaseUrl + "/favicon.ico"
+		
 	}
 
 	private fun removeSelfFromActivity() {

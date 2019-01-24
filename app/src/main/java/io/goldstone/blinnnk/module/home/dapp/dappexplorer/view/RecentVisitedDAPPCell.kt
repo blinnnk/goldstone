@@ -6,8 +6,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.blinnnk.extension.*
 import com.blinnnk.uikit.uiPX
+import com.blinnnk.util.observing
 import io.goldstone.blinnnk.common.utils.GoldStoneFont
+import io.goldstone.blinnnk.common.utils.glideImage
 import io.goldstone.blinnnk.common.value.*
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentVisitedTable
 import org.jetbrains.anko.*
 
 /**
@@ -15,7 +18,7 @@ import org.jetbrains.anko.*
  * @author: yangLiHai
  * @description:
  */
-class RencentVisitedDAPPCell(context: Context) : RelativeLayout(context) {
+class RecentVisitedDAPPCell(context: Context) : RelativeLayout(context) {
 	
 	private val icon = imageView {
 		layoutParams = LayoutParams(30.uiPX(), 30.uiPX())
@@ -35,9 +38,21 @@ class RencentVisitedDAPPCell(context: Context) : RelativeLayout(context) {
 		typeface = GoldStoneFont.black(context)
 	}
 	
+	var model: DAPPRecentVisitedTable? by observing(null) {
+		if (model.isNotNull()) {
+			icon.glideImage(model!!.ico)
+			name.text = model!!.name
+			url.text = model!!.url
+		} else {
+			icon.glideImage("")
+			name.text = ""
+			url.text = ""
+		}
+	}
+	
 	init {
 		
-		layoutParams = ViewGroup.LayoutParams(70.uiPX(), matchParent)
+		layoutParams = ViewGroup.LayoutParams(matchParent, 70.uiPX())
 		leftPadding = PaddingSize.content
 		rightPadding = PaddingSize.content
 		
@@ -51,8 +66,18 @@ class RencentVisitedDAPPCell(context: Context) : RelativeLayout(context) {
 			addView(url)
 		}
 	}
-	
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

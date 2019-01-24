@@ -15,13 +15,14 @@ import org.jetbrains.anko.sdk27.coroutines.onClick
  */
 class DAPPExplorerAdapter(
 	override val dataSet: ArrayList<DAPPTable>,
+	private val holdHeader: DAPPExplorerHeader.() -> Unit,
 	private val clickEvent: DAPPTable.() -> Unit
 ) : HoneyBaseAdapterWithHeaderAndFooter<DAPPTable, View, DAPPCell, View>() {
 	override fun generateCell(context: Context) = DAPPCell(context)
 
 	override fun generateFooter(context: Context) = View(context)
 
-	override fun generateHeader(context: Context) = View(context)
+	override fun generateHeader(context: Context) = DAPPExplorerHeader(context).apply(holdHeader)
 
 	override fun DAPPCell.bindCell(data: DAPPTable, position: Int) {
 		model = data

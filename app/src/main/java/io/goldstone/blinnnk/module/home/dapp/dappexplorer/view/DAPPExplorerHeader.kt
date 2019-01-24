@@ -1,11 +1,13 @@
 package io.goldstone.blinnnk.module.home.dapp.dappexplorer.view
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
+import android.view.ViewGroup
 import android.widget.*
 import com.blinnnk.extension.alignParentRight
 import io.goldstone.blinnnk.common.utils.GoldStoneFont
+import io.goldstone.blinnnk.common.utils.click
 import io.goldstone.blinnnk.common.value.*
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentVisitedTable
 import org.jetbrains.anko.*
 
 /**
@@ -13,7 +15,9 @@ import org.jetbrains.anko.*
  * @author: yangLiHai
  * @description:
  */
-class DAPPExplorerHeader(context: Context) : LinearLayout(context) {
+class DAPPExplorerHeader(
+	context: Context
+) : LinearLayout(context) {
 	
 	private val clearAll = TextView(context).apply {
 		textColor = Spectrum.deepBlue
@@ -22,10 +26,8 @@ class DAPPExplorerHeader(context: Context) : LinearLayout(context) {
 		layoutParams = RelativeLayout.LayoutParams(wrapContent, wrapContent)
 		alignParentRight()
 	}
-	
-	private val recyclerView = RecyclerView(context)
-	
 	init {
+		layoutParams = ViewGroup.LayoutParams(matchParent, wrapContent)
 		orientation = LinearLayout.VERTICAL
 		leftPadding = PaddingSize.content
 		rightPadding = PaddingSize.content
@@ -39,8 +41,17 @@ class DAPPExplorerHeader(context: Context) : LinearLayout(context) {
 			}
 			addView(clearAll)
 		}
-		
-		addView(recyclerView)
+	}
+	
+	fun notifyData(data: ArrayList<DAPPRecentVisitedTable>, clickEvent: DAPPRecentVisitedTable.() -> Unit) {
+		data.forEach { table ->
+			addView(RecentVisitedDAPPCell(context).apply {
+				model = table
+				click {
+					clickEvent(table)
+				}
+			})
+		}
 	}
 	
 }

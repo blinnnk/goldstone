@@ -56,7 +56,8 @@ import java.math.BigInteger
 		(DAPPTable::class),
 		(FavoriteTable::class),
 		(QuotationRankTable::class),
-		(MD5Table::class)
+		(MD5Table::class),
+		(DAPPRecentVisitedTable::class)
 	],
 	version = GoldStoneDataBase.databaseVersion,
 	exportSchema = false
@@ -76,8 +77,7 @@ import java.math.BigInteger
 	ListBip44AddressConverter::class,
 	NotificationExtraTypeConverter::class,
 	SocialMediaConverter::class,
-	DelegateBandInfoConverter::class,
-	DAPPRecentVisitedTable::class
+	DelegateBandInfoConverter::class
 )
 abstract class GoldStoneDataBase : RoomDatabase() {
 	abstract fun walletDao(): WalletDao

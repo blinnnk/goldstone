@@ -2,22 +2,21 @@ package io.goldstone.blinnnk.module.home.dapp.dappexplorer.view
 
 import android.os.Bundle
 import android.view.View
-import com.blinnnk.extension.orEmptyArray
-import com.blinnnk.extension.toArrayList
+import com.blinnnk.extension.*
 import com.blinnnk.util.SoftKeyboard
 import io.goldstone.blinnnk.common.base.baserecyclerfragment.BaseRecyclerView
 import io.goldstone.blinnnk.common.base.gsfragment.GSRecyclerFragment
 import io.goldstone.blinnnk.common.language.DappCenterText
-import io.goldstone.blinnnk.common.utils.ErrorDisplayManager
-import io.goldstone.blinnnk.common.utils.getMainActivity
+import io.goldstone.blinnnk.common.utils.*
 import io.goldstone.blinnnk.module.home.dapp.dappbrowser.view.PreviousView
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.model.DAPPTable
 import io.goldstone.blinnnk.module.home.dapp.dappcenter.view.DAPPCenterFragment
 import io.goldstone.blinnnk.module.home.dapp.dappexplorer.contract.DAPPExplorerContract
+import io.goldstone.blinnnk.module.home.dapp.dappexplorer.model.DAPPRecentVisitedTable
 import io.goldstone.blinnnk.module.home.dapp.dappexplorer.presenter.DAPPExplorerPresenter
 import io.goldstone.blinnnk.module.home.dapp.dappoverlay.event.DAPPExplorerDisplayEvent
 import io.goldstone.blinnnk.module.home.dapp.dappoverlay.view.DAPPOverlayFragment
-import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.*
 
 
 /**
@@ -28,6 +27,8 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 
 	override val pageTitle: String get() = DappCenterText.dappExplorer
 	override lateinit var presenter: DAPPExplorerContract.GSPresenter
+	
+	private var header: DAPPExplorerHeader? = null
 
 	override fun showError(error: Throwable) {
 		ErrorDisplayManager(error).show(context)
@@ -36,7 +37,17 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 	private val overlayFragment by lazy {
 		parentFragment as? DAPPOverlayFragment
 	}
-
+	
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
+		EventBus.getDefault().register(this)
+	}
+	
+	override fun onDestroy() {
+		super.onDestroy()
+		EventBus.getDefault().unregister(this)
+	}
+	
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
 		asyncData = arrayListOf()
@@ -69,20 +80,26 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 		recyclerView: BaseRecyclerView,
 		asyncData: ArrayList<DAPPTable>?
 	) {
-		recyclerView.adapter = DAPPExplorerAdapter(asyncData.orEmptyArray()) {
-			DAPPCenterFragment.showAttentionOrElse(context!!, id) {
-				getMainActivity()?.apply {
-					showDappBrowserFragment(
-						url,
-						PreviousView.DAPPExplorer,
-						backgroundColor,
-						null
-					)
-					EventBus.getDefault().post(DAPPExplorerDisplayEvent(false))
-					getDAPPCenterFragment()?.refreshLatestUsed()
+		recyclerView.adapter = DAPPExplorerAdapter(
+			asyncData.orEmptyArray(),
+			holdHeader = {
+				header = this
+				presenter.getRecentVisitedData()
+			}, clickEvent = {
+				DAPPCenterFragment.showAttentionOrElse(context!!, id) {
+					getMainActivity()?.apply {
+						showDappBrowserFragment(
+							url,
+							PreviousView.DAPPExplorer,
+							backgroundColor,
+							null
+						)
+						EventBus.getDefault().post(DAPPExplorerDisplayEvent(false))
+						getDAPPCenterFragment()?.refreshLatestUsed()
+					}
 				}
 			}
-		}
+		)
 	}
 
 	private fun formattedURL(url: String): String {
@@ -90,4 +107,34 @@ class DAPPExplorerFragment : GSRecyclerFragment<DAPPTable>(), DAPPExplorerContra
 			"https://$url"
 		} else url
 	}
+	
+	override fun showHeaderData(data: List<DAPPRecentVisitedTable>) {
+		header?.let {
+			it.notifyData(data.toArrayList()) {
+				val table = this
+				this.timing = System.currentTimeMillis()
+				getMainActivity()?.apply {
+					showDappBrowserFragment(
+						formattedURL(table.url),
+						PreviousView.DAPPExplorer,
+						"FFFFFF",
+						parentFragment
+					)
+					SoftKeyboard.hide(this)
+				}
+			}
+		}
+	}
+	
+	@Subscribe(threadMode = ThreadMode.BACKGROUND)
+	fun onValidDAPPUrlEvent(table: DAPPRecentVisitedTable) {
+		val localTable = DAPPRecentVisitedTable.dao.getTableByUrl(table.url)
+		localTable?.apply {
+			table.id = id
+		}
+		DAPPRecentVisitedTable.dao.insert(table)
+		
+	}
+	
+	
 }
